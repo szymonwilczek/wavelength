@@ -11,6 +11,27 @@ public:
     float getSize() const { return size; }
     float getHue() const { return hue; }
 
+    
+    float getVelocityX() const { return velX; }
+    float getVelocityY() const { return velY; }
+
+    void setPosition(float newX, float newY) {
+        x = newX;
+        y = newY;
+        baseX = newX;
+        baseY = newY;
+        velX = 0;
+        velY = 0;
+    }
+
+    void setSize(float newSize) {
+        size = newSize;
+        mass = size / 10.0f;
+    }
+
+    
+    void stopMotion();
+
     void update(float springStiffness, float dampingFactor);
     void applyForce(float forceX, float forceY);
     void checkBoundaries();
@@ -26,4 +47,4 @@ private:
     friend class DotAnimation;
 };
 
-#endif // DOT_H
+#endif 

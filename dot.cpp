@@ -18,19 +18,28 @@ Dot::Dot(const float angle, float baseRadius, int index, int totalDots) {
     mass = size / 10.0f;
 }
 
+void Dot::stopMotion() {
+    
+    velX = 0;
+    velY = 0;
+
+    
+    x = baseX;
+    y = baseY;
+}
+
 void Dot::update(float springStiffness, float dampingFactor) {
     float forceX = (baseX - x) * springStiffness;
     float forceY = (baseY - y) * springStiffness;
 
-    // prędkość
     velX += forceX;
     velY += forceY;
 
-    // tłumienie
+    
     velX *= dampingFactor;
     velY *= dampingFactor;
 
-    // pozycja
+    
     x += velX;
     y += velY;
 
@@ -50,7 +59,7 @@ void Dot::checkBoundaries() {
         x *= normFactor;
         y *= normFactor;
 
-        // normalizacja składowych
+        
         float nx = x / distanceFromCenter;
         float ny = y / distanceFromCenter;
 
