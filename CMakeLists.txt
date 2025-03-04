@@ -8,5 +8,12 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-base_x64-windows")
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp
+        constants.h
+        dot.h
+        dot.cpp
+        dot_animation.h
+        dot_animation.cpp
+        navbar.h
+        navbar.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
