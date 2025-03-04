@@ -1,16 +1,24 @@
-//
-// Created by szymo on 04.03.2025.
-//
-
 #ifndef NAVBAR_H
 #define NAVBAR_H
 
+#include <QToolBar>
+#include <QPushButton>
+#include <QPropertyAnimation>
 
+class Navbar : public QToolBar {
+    Q_OBJECT
 
-class navbar {
+public:
+    explicit Navbar(QWidget *parent = nullptr);
 
+    public slots:
+        void toggleNavbar();
+
+private:
+    QPushButton *createWavelengthButton;
+    QPushButton *joinWavelengthButton;
+    QPropertyAnimation *animation;
+    bool isExpanded;
 };
 
-
-
-#endif //NAVBAR_H
+#endif // NAVBAR_H
