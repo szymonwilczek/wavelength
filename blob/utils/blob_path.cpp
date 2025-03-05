@@ -1,0 +1,36 @@
+#include "blob_path.h"
+
+QPainterPath BlobPath::createBlobPath(const std::vector<QPointF>& controlPoints, int numPoints) {
+    QPainterPath path;
+
+    if (controlPoints.empty()) return path;
+
+
+    path.moveTo(controlPoints[0]);
+
+    float tension = 0.25f;
+
+    for (int i = 0; i < numPoints; ++i) {
+        int prev = (i + numPoints - 1) % numPoints;
+        int curr = i;
+        int next = (i + 1) % numPoints;
+        int nextNext = (i + 2) % numPoints;
+
+        QPointF p0 = controlPoints[prev];
+        QPointF p1 = controlPoints[curr];
+        QPointF p2 = controlPoints[next];
+        QPointF p3 = controlPoints[nextNext];
+
+        if (!BlobMath::isValidPoint(p0) || !BlobMath::isValidPoint(p1) ||
+            !BlobMath::isValidPoint(p2) || !BlobMath::isValidPoint(p3)) {
+            continue;
+            }
+
+        QPointF c1 = p1 + QPointF((p2.x() - p0.x()) * tension, (p2.y() - p0.y()) * tension);
+        QPointF c2 = p2 + QPointF((p1.x() - p3.x()) * tension, (p1.y() - p3.y()) * tension);
+
+        path.cubicTo(c1, c2, p2);
+    }
+
+    return path;
+}
