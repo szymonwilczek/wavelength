@@ -5,7 +5,7 @@
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QWidget(parent)
 {
-    m_params.blobRadius = 300.0f;
+    m_params.blobRadius = 250.0f;
     m_params.numPoints = 24;
     m_params.borderColor = QColor(70, 130, 180);
     m_params.glowRadius = 10;
@@ -55,7 +55,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_windowPosCheckTimer = new QTimer(this);
     m_windowPosCheckTimer->setTimerType(Qt::PreciseTimer);
     connect(m_windowPosCheckTimer, &QTimer::timeout, this, [this]() {
-        if (window()) {
+        if (window() && m_currentState != BlobConfig::RESIZING) {
             QPointF currentWindowPos = window()->pos();
             if (currentWindowPos != m_lastWindowPos) {
                 qDebug() << "Window position changed (detected by timer): "
@@ -111,17 +111,20 @@ void BlobAnimation::updateAnimation() {
             m_currentBlobState = m_idleState.get();
 
             for (auto& vel : m_velocity) {
-                vel *= 0.2;
+                vel *= 0.7;
             }
+
+            m_idleState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
         } else {
             double progress = elapsedMs / (double)m_transitionToIdleDuration;
 
-            double easedProgress;
-            if (progress < 0.5) {
-                easedProgress = 2.0 * progress * progress;
-            } else {
+            double easedProgress = progress;
+
+            if (progress < 0.3) {
+                easedProgress = progress * (0.7 + progress * 0.3);
+            } else if (progress > 0.7) {
                 double t = 1.0 - progress;
-                easedProgress = 1.0 - 2.0 * t * t;
+                easedProgress = 1.0 - t * (0.7 + t * 0.3);
             }
 
             m_blobCenter = QPointF(
@@ -134,27 +137,23 @@ void BlobAnimation::updateAnimation() {
                     m_originalControlPoints[i].x() * (1.0 - easedProgress) + m_targetIdlePoints[i].x() * easedProgress,
                     m_originalControlPoints[i].y() * (1.0 - easedProgress) + m_targetIdlePoints[i].y() * easedProgress
                 );
-
-                m_targetPoints[i] = m_controlPoints[i];
             }
+
+            double dampingFactor = pow(0.98, 1.0 + 3.0 * easedProgress);
+            for (size_t i = 0; i < m_velocity.size(); ++i) {
+                m_velocity[i] *= dampingFactor;
+            }
+
+            double idleBlendFactor = easedProgress * 0.4;
+
+            std::vector<QPointF> tempVelocity = m_velocity;
+            QPointF tempCenter = m_blobCenter;
+            std::vector<QPointF> tempPoints = m_controlPoints;
+
+            m_idleState->apply(tempPoints, tempVelocity, tempCenter, m_params);
 
             for (size_t i = 0; i < m_velocity.size(); ++i) {
-                m_velocity[i] *= (1.0 - 0.05 * progress);
-            }
-
-            if (progress > 0.85) {
-                double idleBlendFactor = (progress - 0.85) / 0.15; // 0->1 w ostatnich 15% przejścia
-
-                std::vector<QPointF> tempVelocity = m_velocity;
-                QPointF tempCenter = m_blobCenter;
-                std::vector<QPointF> tempPoints = m_controlPoints;
-
-                m_idleState->apply(tempPoints, tempVelocity, tempCenter, m_params);
-
-                for (size_t i = 0; i < m_velocity.size(); ++i) {
-                    m_velocity[i] = m_velocity[i] * (1.0 - idleBlendFactor) +
-                                    tempVelocity[i] * idleBlendFactor * 0.3;
-                }
+                m_velocity[i] += (tempVelocity[i] - m_velocity[i]) * idleBlendFactor;
             }
 
             update();
@@ -191,17 +190,17 @@ void BlobAnimation::updateAnimation() {
 
     m_physics.updatePhysics(m_controlPoints, m_targetPoints, m_velocity,
                           m_blobCenter, m_params, m_physicsParams, this);
-    
+
     int padding = m_params.borderWidth + m_params.glowRadius;
-    m_physics.handleBorderCollisions(m_controlPoints, m_velocity, m_blobCenter, 
+    m_physics.handleBorderCollisions(m_controlPoints, m_velocity, m_blobCenter,
                                    width(), height(), m_physicsParams.restitution, padding);
-    
+
     m_physics.smoothBlobShape(m_controlPoints);
-    
+
     double minDistance = m_params.blobRadius * m_physicsParams.minNeighborDistance;
     double maxDistance = m_params.blobRadius * m_physicsParams.maxNeighborDistance;
     m_physics.constrainNeighborDistances(m_controlPoints, m_velocity, minDistance, maxDistance);
-    
+
     update();
 }
 
@@ -262,8 +261,21 @@ bool BlobAnimation::event(QEvent *event) {
 }
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
+    static qint64 lastStateChangeTime = 0;
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+    if (m_currentState == BlobConfig::RESIZING && newState == BlobConfig::MOVING) {
+        constexpr qint64 RESIZE_TO_MOVE_COOLDOWN = 300; // ms
+        if (currentTime - lastStateChangeTime < RESIZE_TO_MOVE_COOLDOWN) {
+            qDebug() << "Zablokowano zmianę z RESIZING na MOVING (zbyt szybko)";
+            return;
+        }
+    }
+
+
     if (m_currentState != newState) {
         qDebug() << "State change from" << m_currentState << "to" << newState;
+        lastStateChangeTime = currentTime;
 
         if (newState == BlobConfig::IDLE &&
             (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
@@ -275,10 +287,22 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
             m_originalBlobCenter = m_blobCenter;
 
             QPointF targetCenter = QPointF(width() / 2.0, height() / 2.0);
+
+            double currentRadius = 0.0;
+            for (const auto& point : m_controlPoints) {
+                currentRadius += QVector2D(point - m_blobCenter).length();
+            }
+            currentRadius /= m_controlPoints.size();
+
+            double radiusRatio = currentRadius / m_params.blobRadius;
+
             std::vector<QPointF> targetPoints(m_controlPoints.size());
 
             for (size_t i = 0; i < m_controlPoints.size(); ++i) {
                 QPointF relativePos = m_controlPoints[i] - m_blobCenter;
+                if (radiusRatio > 0.1) {
+                    relativePos = relativePos / radiusRatio;
+                }
                 targetPoints[i] = targetCenter + relativePos;
             }
 
@@ -287,14 +311,17 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
 
             m_inTransitionToIdle = true;
             m_transitionToIdleStartTime = QDateTime::currentMSecsSinceEpoch();
-            m_transitionToIdleDuration = 1000;
+            m_transitionToIdleDuration = 700;
 
             if (m_transitionToIdleTimer) {
                 m_transitionToIdleTimer->stop();
             }
 
-
             m_currentState = BlobConfig::IDLE;
+
+            for (auto& vel : m_velocity) {
+                vel *= 0.8;
+            }
 
             return;
         }
@@ -352,6 +379,11 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
     if (watched == window()) {
         if (event->type() == QEvent::Move) {
             qDebug() << "WINDOW MOVE EVENT DETECTED via event filter!";
+
+            if (m_currentState == BlobConfig::RESIZING) {
+                qDebug() << "Ignorowanie Move podczas stanu RESIZING";
+                return QWidget::eventFilter(watched, event);
+            }
 
             QPointF currentWindowPos = window()->pos();
             QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
