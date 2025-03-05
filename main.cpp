@@ -3,7 +3,7 @@
 #include <QPalette>
 #include <QStyleFactory>
 #include "navbar.h"
-#include "blobanimation.h"
+#include "blob/core/blob_animation.h"
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QGraphicsDropShadowEffect>
