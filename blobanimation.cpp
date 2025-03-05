@@ -20,7 +20,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
             applyIdleEffect();
         }
     });
-    m_idleTimer.start(50);
+    m_idleTimer.start(16);
 
 
     connect(&m_stateResetTimer, &QTimer::timeout, this, [this]() {
@@ -186,6 +186,10 @@ bool BlobAnimation::isValidPoint(const QPointF &point) const {
 }
 
 void BlobAnimation::updateAnimation() {
+
+    if (m_currentState == IDLE) {
+        applyIdleEffect();
+    }
 
     updateBlobPhysics();
 
@@ -497,50 +501,61 @@ void BlobAnimation::setGridSpacing(int spacing) {
 }
 
 void BlobAnimation::applyIdleEffect() {
-
-    m_idleWavePhase += 0.01;
-
-
+   
+    m_idleWavePhase += 0.005; 
     if (m_idleWavePhase > 2 * M_PI) {
         m_idleWavePhase -= 2 * M_PI;
     }
 
-
     static double secondPhase = 0.0;
-    secondPhase += 0.02;
+    secondPhase += 0.01; 
     if (secondPhase > 2 * M_PI) {
         secondPhase -= 2 * M_PI;
     }
 
+   
+    static double rotationPhase = 0.0;
+    rotationPhase += 0.0025; 
+    if (rotationPhase > 2 * M_PI) {
+        rotationPhase -= 2 * M_PI;
+    }
+
+   
+    double rotationStrength = 0.1 * std::sin(rotationPhase * 0.5); 
 
     for (int i = 0; i < m_numPoints; ++i) {
-
         QPointF vectorFromCenter = m_controlPoints[i] - m_blobCenter;
         double angle = std::atan2(vectorFromCenter.y(), vectorFromCenter.x());
-
-
         double distanceFromCenter = QVector2D(vectorFromCenter).length();
 
-
-
-        double waveStrength = m_idleWaveAmplitude * 1.2 *
+        double waveStrength = m_idleWaveAmplitude * 0.7 * 
             std::sin(m_idleWavePhase + m_idleWaveFrequency * angle);
 
-        // drugi składnik - 2ga fala (o większej częstotliwości)
-        waveStrength += (m_idleWaveAmplitude * 0.7) *
+       
+        waveStrength += (m_idleWaveAmplitude * 0.4) * 
             std::sin(secondPhase + m_idleWaveFrequency * 2 * angle + 0.5);
 
-        // trzeci składnik - 3cia fala (pulsująca)
-        waveStrength += (m_idleWaveAmplitude * 0.5) *
+       
+        waveStrength += (m_idleWaveAmplitude * 0.3) * 
             std::sin(m_idleWavePhase * 0.7) * std::cos(angle * 3);
 
         QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
-        QPointF forceVector = QPointF(normalizedVector.x(), normalizedVector.y()) * waveStrength;
+
+       
+        QPointF perpVector(-normalizedVector.y(), normalizedVector.x());
+
+       
+        double rotationFactor = rotationStrength * (distanceFromCenter / m_blobRadius);
+        QPointF rotationForce = rotationFactor * perpVector;
+
+       
+        QPointF forceVector = QPointF(normalizedVector.x(), normalizedVector.y()) * waveStrength + rotationForce;
 
         double forceScale = 0.3 + 0.7 * (distanceFromCenter / m_blobRadius);
         if (forceScale > 1.0) forceScale = 1.0;
 
-        m_velocity[i] += forceVector * forceScale * 0.3;
+       
+        m_velocity[i] += forceVector * forceScale * 0.15; 
     }
 }
 
