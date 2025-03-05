@@ -13,7 +13,7 @@ namespace BlobConfig {
     };
 
     struct BlobParameters {
-        double blobRadius = 300.0f;
+        double blobRadius = 250.0f;
         int numPoints = 24;
         QColor borderColor = QColor(70, 130, 180);
         int glowRadius = 10;
