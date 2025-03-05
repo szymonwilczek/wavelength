@@ -43,7 +43,6 @@ private:
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-
     app.setStyle(QStyleFactory::create("Fusion"));
 
     QPalette darkPalette;
@@ -62,13 +61,16 @@ int main(int argc, char *argv[]) {
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
 
     app.setPalette(darkPalette);
-
-
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
 
     QMainWindow window;
     window.setWindowTitle("Pk4");
     window.setStyleSheet("QMainWindow { background-color: #2d2d2d; }");
+
+    auto *navbar = new Navbar(&window);
+    window.addToolBar(Qt::TopToolBarArea, navbar);
+    window.setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    window.setContextMenuPolicy(Qt::NoContextMenu);
 
     QWidget *centralWidget = new QWidget(&window);
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
@@ -83,11 +85,11 @@ int main(int argc, char *argv[]) {
     mainLayout->addWidget(animation);
     window.setCentralWidget(centralWidget);
 
-
     QLabel *titleLabel = new QLabel("Hello, World!", animation);
     QLabel *outlineLabel = new QLabel("Hello, World!", animation);
 
     QFont titleFont("Arial", 40, QFont::Bold);
+    titleFont.setStyleStrategy(QFont::PreferAntialias);
     titleLabel->setFont(titleFont);
     outlineLabel->setFont(titleFont);
 
@@ -105,24 +107,11 @@ int main(int argc, char *argv[]) {
 
     outlineLabel->lower();
 
-
     ResizeEventFilter* eventFilter = new ResizeEventFilter(titleLabel, animation);
     ResizeEventFilter* outlineFilter = new ResizeEventFilter(outlineLabel, animation);
 
     animation->installEventFilter(eventFilter);
     animation->installEventFilter(outlineFilter);
-
-    auto *navbar = new Navbar(&window);
-    window.addToolBar(Qt::LeftToolBarArea, navbar);
-
-
-    navbar->setStyleSheet("QToolBar { background-color: #2a2a2a; border: none; }");
-
-    auto *toggleButton = new QPushButton("☰", &window);
-    toggleButton->setStyleSheet("QPushButton { background: rgba(50, 50, 50, 0.8); color: white; border: none; border-radius: 3px; }");
-    toggleButton->setGeometry(10, 10, 30, 30);
-
-    QObject::connect(toggleButton, &QPushButton::clicked, navbar, &Navbar::toggleNavbar);
 
     window.setMinimumSize(800, 600);
     window.setMaximumSize(1600, 900);

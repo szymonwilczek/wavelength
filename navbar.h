@@ -3,7 +3,9 @@
 
 #include <QToolBar>
 #include <QPushButton>
-#include <QPropertyAnimation>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QContextMenuEvent>
 
 class Navbar : public QToolBar {
     Q_OBJECT
@@ -11,14 +13,13 @@ class Navbar : public QToolBar {
 public:
     explicit Navbar(QWidget *parent = nullptr);
 
-    public slots:
-        void toggleNavbar();
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     QPushButton *createWavelengthButton;
     QPushButton *joinWavelengthButton;
-    QPropertyAnimation *animation;
-    bool isExpanded;
+    QLabel *logoLabel;
 };
 
 #endif // NAVBAR_H
