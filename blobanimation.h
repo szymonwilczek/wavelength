@@ -15,6 +15,9 @@ class BlobAnimation : public QWidget {
 public:
     explicit BlobAnimation(QWidget *parent = nullptr);
     ~BlobAnimation() override;
+    void setBackgroundColor(const QColor &color);
+    void setGridColor(const QColor &color);
+    void setGridSpacing(int spacing);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -25,6 +28,29 @@ protected:
         void updateAnimation();
 
 private:
+
+    enum AnimationState {
+        IDLE,
+        MOVING,
+        RESIZING
+    };
+
+    AnimationState m_currentState = IDLE;
+
+    // efekt Idle
+    QTimer m_idleTimer;
+    double m_idleWavePhase = 0.0;
+    double m_idleWaveFrequency = 2.0;
+    double m_idleWaveAmplitude = 1.0;
+
+    void applyIdleEffect();
+    void switchToState(AnimationState newState);
+
+    QTimer m_stateResetTimer;
+
+    QColor m_backgroundColor;
+    QColor m_gridColor;
+    int m_gridSpacing{};
 
     QVector<QPointF> m_controlPoints;
     QVector<QPointF> m_targetPoints;

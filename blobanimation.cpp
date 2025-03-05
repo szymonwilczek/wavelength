@@ -2,7 +2,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QRadialGradient>
-#include <QMoveEvent>
 #include <QResizeEvent>
 #include <QtMath>
 #include <QDebug>
@@ -15,6 +14,18 @@ BlobAnimation::BlobAnimation(QWidget *parent)
       m_glowRadius(10),
       m_borderWidth(6)
 {
+
+    connect(&m_idleTimer, &QTimer::timeout, this, [this]() {
+        if (m_currentState == IDLE) {
+            applyIdleEffect();
+        }
+    });
+    m_idleTimer.start(50);
+
+
+    connect(&m_stateResetTimer, &QTimer::timeout, this, [this]() {
+        switchToState(IDLE);
+    });
 
     m_controlPoints.resize(m_numPoints);
     m_targetPoints.resize(m_numPoints);
@@ -70,6 +81,22 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
+
+
+    painter.fillRect(rect(), m_backgroundColor);
+
+
+    painter.setPen(QPen(m_gridColor, 1, Qt::SolidLine));
+
+
+    for (int y = 0; y < height(); y += m_gridSpacing) {
+        painter.drawLine(0, y, width(), y);
+    }
+
+
+    for (int x = 0; x < width(); x += m_gridSpacing) {
+        painter.drawLine(x, 0, x, height());
+    }
 
     QPainterPath blobPath = createBlobPath();
 
@@ -164,7 +191,7 @@ void BlobAnimation::updateAnimation() {
 
 
     const double viscosity = 0.015;
-    const double damping = 0.9;
+    const double damping = 0.91;
 
 
     bool isInMotion = false;
@@ -365,7 +392,7 @@ void BlobAnimation::updateBlobPhysics() {
 
 
     if (windowVelocity.length() > 1.0) {
-
+        switchToState(MOVING);
         QVector2D inertiaForce = -windowVelocity * 0.0015;
         applyForces(inertiaForce);
     }
@@ -420,7 +447,7 @@ void BlobAnimation::applyForces(const QVector2D &force) {
 }
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
-
+    switchToState(RESIZING);
     QPointF oldCenter = m_blobCenter;
     m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
 
@@ -444,13 +471,89 @@ void BlobAnimation::resizeEvent(QResizeEvent *event) {
 }
 
 bool BlobAnimation::event(QEvent *event) {
-
     if (event->type() == QEvent::Move) {
-
+        switchToState(MOVING);
     }
     else if (event->type() == QEvent::Resize) {
-
+        switchToState(RESIZING);
     }
 
     return QWidget::event(event);
+}
+
+void BlobAnimation::setBackgroundColor(const QColor &color) {
+    m_backgroundColor = color;
+    update();
+}
+
+void BlobAnimation::setGridColor(const QColor &color) {
+    m_gridColor = color;
+    update();
+}
+
+void BlobAnimation::setGridSpacing(int spacing) {
+    m_gridSpacing = spacing;
+    update();
+}
+
+void BlobAnimation::applyIdleEffect() {
+
+    m_idleWavePhase += 0.01;
+
+
+    if (m_idleWavePhase > 2 * M_PI) {
+        m_idleWavePhase -= 2 * M_PI;
+    }
+
+
+    static double secondPhase = 0.0;
+    secondPhase += 0.02;
+    if (secondPhase > 2 * M_PI) {
+        secondPhase -= 2 * M_PI;
+    }
+
+
+    for (int i = 0; i < m_numPoints; ++i) {
+
+        QPointF vectorFromCenter = m_controlPoints[i] - m_blobCenter;
+        double angle = std::atan2(vectorFromCenter.y(), vectorFromCenter.x());
+
+
+        double distanceFromCenter = QVector2D(vectorFromCenter).length();
+
+
+
+        double waveStrength = m_idleWaveAmplitude * 1.2 *
+            std::sin(m_idleWavePhase + m_idleWaveFrequency * angle);
+
+        // drugi składnik - 2ga fala (o większej częstotliwości)
+        waveStrength += (m_idleWaveAmplitude * 0.7) *
+            std::sin(secondPhase + m_idleWaveFrequency * 2 * angle + 0.5);
+
+        // trzeci składnik - 3cia fala (pulsująca)
+        waveStrength += (m_idleWaveAmplitude * 0.5) *
+            std::sin(m_idleWavePhase * 0.7) * std::cos(angle * 3);
+
+        QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
+        QPointF forceVector = QPointF(normalizedVector.x(), normalizedVector.y()) * waveStrength;
+
+        double forceScale = 0.3 + 0.7 * (distanceFromCenter / m_blobRadius);
+        if (forceScale > 1.0) forceScale = 1.0;
+
+        m_velocity[i] += forceVector * forceScale * 0.3;
+    }
+}
+
+void BlobAnimation::switchToState(AnimationState newState) {
+    if (m_currentState != newState) {
+        m_currentState = newState;
+
+        if (newState != IDLE) {
+            m_stateResetTimer.stop();
+        }
+
+        if (newState == MOVING || newState == RESIZING) {
+            m_stateResetTimer.start(1000);
+        }
+    }
 }
