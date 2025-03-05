@@ -1,7 +1,6 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QPalette>
-#include <QPushButton>
 #include <QStyleFactory>
 #include "navbar.h"
 #include "blobanimation.h"

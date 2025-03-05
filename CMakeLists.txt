@@ -12,5 +12,6 @@ add_executable(${PROJECT_NAME} main.cpp
         navbar.h
         navbar.cpp
         blobanimation.cpp
-        blobanimation.h)
+        blobanimation.h
+        )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
