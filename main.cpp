@@ -1,16 +1,15 @@
 #include <QApplication>
 #include <QMainWindow>
-#include <QPushButton>
-#include "dot_animation.h"
 #include "navbar.h"
+#include "blobanimation.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     QMainWindow window;
-    window.setWindowTitle("Animacja gęstej zawiesiny");
+    window.setWindowTitle("Pk4");
 
-    auto *animation = new DotAnimation();
+    auto *animation = new BlobAnimation(&window);
     window.setCentralWidget(animation);
 
     auto *navbar = new Navbar(&window);
@@ -22,7 +21,10 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(toggleButton, &QPushButton::clicked, navbar, &Navbar::toggleNavbar);
 
-    window.resize(500, 500);
+    window.setMinimumSize(800, 600);
+
+    window.resize(1024, 768);
+
     window.show();
 
     return app.exec();
