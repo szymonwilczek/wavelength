@@ -23,8 +23,8 @@ class BlobAnimation : public QWidget {
     Q_OBJECT
 
 public:
-    BlobAnimation(QWidget *parent = nullptr);
-    ~BlobAnimation();
+    explicit BlobAnimation(QWidget *parent = nullptr);
+    ~BlobAnimation() override;
 
     void setBackgroundColor(const QColor &color);
 
@@ -77,6 +77,15 @@ private:
 
     QPointF m_lastWindowPos;
     QTimer* m_windowPosCheckTimer = nullptr;
+
+    bool m_inTransitionToIdle = false;
+    qint64 m_transitionToIdleStartTime = 0;
+    qint64 m_transitionToIdleDuration = 0;
+    std::vector<QPointF> m_originalControlPoints;
+    std::vector<QPointF> m_originalVelocities;
+    QPointF m_originalBlobCenter;
+    std::vector<QPointF> m_targetIdlePoints;
+    QPointF m_targetIdleCenter;
 };
 
 #endif // BLOBANIMATION_H
