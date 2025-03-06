@@ -42,6 +42,14 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_animationTimer.setTimerType(Qt::PreciseTimer);
     connect(&m_animationTimer, &QTimer::timeout, this, &BlobAnimation::updateAnimation);
     m_animationTimer.start(16); // ~60 FPS
+
+    connect(&m_stateResetTimer, &QTimer::timeout, this, &BlobAnimation::onStateResetTimeout);
+
+    m_eventReEnableTimer.setSingleShot(true);
+    connect(&m_eventReEnableTimer, &QTimer::timeout, this, [this]() {
+        m_eventsEnabled = true;
+        qDebug() << "Events re-enabled";
+    });
 }
 
 BlobAnimation::~BlobAnimation() {
@@ -165,6 +173,8 @@ void BlobAnimation::handleIdleTransition() {
             }
 
             m_idleState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+            m_eventReEnableTimer.start(200);
+
         } else {
             double progress = elapsedMs / (double)m_transitionToIdleDuration;
 
@@ -207,115 +217,143 @@ void BlobAnimation::handleIdleTransition() {
             }
 
             update();
-            return;
         }
 }
 
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
-    switchToState(BlobConfig::RESIZING);
 
-    m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
-                                m_blobCenter, event->oldSize(), event->size());
+    if (!m_eventsEnabled || m_inTransitionToIdle) {
+        QWidget::resizeEvent(event);
+        return;
+    }
 
-    m_renderer.resetGridBuffer();
+
+    if (event->size() != event->oldSize()) {
+        switchToState(BlobConfig::RESIZING);
+
+        m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
+                                    m_blobCenter, event->oldSize(), event->size());
+
+        m_renderer.resetGridBuffer();
+
+        m_stateResetTimer.stop();
+        m_stateResetTimer.start(2000);
+    }
 
     QWidget::resizeEvent(event);
 }
 
+void BlobAnimation::onStateResetTimeout() {
+    if (m_currentState != BlobConfig::IDLE) {
+        qDebug() << "Auto switching to IDLE state due to inactivity";
+        switchToState(BlobConfig::IDLE);
+    }
+}
+
 bool BlobAnimation::event(QEvent *event) {
-        if (event->type() == QEvent::Resize) {
-        switchToState(BlobConfig::RESIZING);
+
+    if (!m_eventsEnabled || m_inTransitionToIdle) {
+        return QWidget::event(event);
+    }
+
+    if (event->type() == QEvent::Resize) {
+        static QSize lastSize = size();
+        QSize currentSize = size();
+
+        if (currentSize != lastSize) {
+            switchToState(BlobConfig::RESIZING);
+            lastSize = currentSize;
+
+            m_stateResetTimer.stop();
+            m_stateResetTimer.start(2000);
+        }
     }
 
     return QWidget::event(event);
 }
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
-    static qint64 lastStateChangeTime = 0;
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
-    if (m_currentState == BlobConfig::RESIZING && newState == BlobConfig::MOVING) {
-        constexpr qint64 RESIZE_TO_MOVE_COOLDOWN = 650; // ms
-        if (currentTime - lastStateChangeTime < RESIZE_TO_MOVE_COOLDOWN) {
-            return;
-        }
+    if (!m_eventsEnabled || m_inTransitionToIdle) {
+        return;
     }
 
 
-    if (m_currentState != newState) {
-        qDebug() << "State change from" << m_currentState << "to" << newState;
-        lastStateChangeTime = currentTime;
-
-        if (newState == BlobConfig::IDLE &&
-            (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
-
-
-            m_originalControlPoints = m_controlPoints;
-            m_originalVelocities = m_velocity;
-            m_originalBlobCenter = m_blobCenter;
-
-            QPointF targetCenter = QPointF(width() / 2.0, height() / 2.0);
-
-            double currentRadius = 0.0;
-            for (const auto& point : m_controlPoints) {
-                currentRadius += QVector2D(point - m_blobCenter).length();
-            }
-            currentRadius /= m_controlPoints.size();
-
-            double radiusRatio = currentRadius / m_params.blobRadius;
-
-            std::vector<QPointF> targetPoints(m_controlPoints.size());
-
-            for (size_t i = 0; i < m_controlPoints.size(); ++i) {
-                QPointF relativePos = m_controlPoints[i] - m_blobCenter;
-                if (radiusRatio > 0.1) {
-                    relativePos = relativePos / radiusRatio;
-                }
-                targetPoints[i] = targetCenter + relativePos;
-            }
-
-            m_targetIdlePoints = targetPoints;
-            m_targetIdleCenter = targetCenter;
-
-            m_inTransitionToIdle = true;
-            m_transitionToIdleStartTime = QDateTime::currentMSecsSinceEpoch();
-            m_transitionToIdleDuration = 700;
-
-            if (m_transitionToIdleTimer) {
-                m_transitionToIdleTimer->stop();
-            }
-
-            m_currentState = BlobConfig::IDLE;
-
-            for (auto& vel : m_velocity) {
-                vel *= 0.8;
-            }
-
-            return;
-        }
-
-        m_currentState = newState;
-
-        switch (m_currentState) {
-            case BlobConfig::IDLE:
-                m_currentBlobState = m_idleState.get();
-                break;
-            case BlobConfig::MOVING:
-                m_currentBlobState = m_movingState.get();
-                break;
-            case BlobConfig::RESIZING:
-                m_currentBlobState = m_resizingState.get();
-                break;
-        }
-
-        if (newState != BlobConfig::IDLE) {
-            m_stateResetTimer.stop();
-        }
-
+    if (m_currentState == newState) {
         if (newState == BlobConfig::MOVING || newState == BlobConfig::RESIZING) {
-            m_stateResetTimer.start(1000);
+            m_stateResetTimer.stop();
+            m_stateResetTimer.start(2000);
         }
+        return;
+    }
+
+    qDebug() << "State change from" << m_currentState << "to" << newState;
+
+    if (newState == BlobConfig::IDLE &&
+        (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
+        m_eventsEnabled = false;
+        m_originalControlPoints = m_controlPoints;
+        m_originalVelocities = m_velocity;
+        m_originalBlobCenter = m_blobCenter;
+
+        QPointF targetCenter = QPointF(width() / 2.0, height() / 2.0);
+
+        double currentRadius = 0.0;
+        for (const auto& point : m_controlPoints) {
+            currentRadius += QVector2D(point - m_blobCenter).length();
+        }
+        currentRadius /= m_controlPoints.size();
+
+        double radiusRatio = currentRadius / m_params.blobRadius;
+
+        std::vector<QPointF> targetPoints(m_controlPoints.size());
+
+        for (size_t i = 0; i < m_controlPoints.size(); ++i) {
+            QPointF relativePos = m_controlPoints[i] - m_blobCenter;
+            if (radiusRatio > 0.1) {
+                relativePos = relativePos / radiusRatio;
+            }
+            targetPoints[i] = targetCenter + relativePos;
+        }
+
+        m_targetIdlePoints = targetPoints;
+        m_targetIdleCenter = targetCenter;
+
+        m_inTransitionToIdle = true;
+        m_transitionToIdleStartTime = QDateTime::currentMSecsSinceEpoch();
+        m_transitionToIdleDuration = 700;
+
+        if (m_transitionToIdleTimer) {
+            m_transitionToIdleTimer->stop();
+        }
+
+        m_currentState = BlobConfig::IDLE;
+        m_currentBlobState = m_idleState.get();
+
+        for (auto& vel : m_velocity) {
+            vel *= 0.8;
+        }
+
+        return;
+    }
+
+    m_currentState = newState;
+
+    switch (m_currentState) {
+        case BlobConfig::IDLE:
+            m_currentBlobState = m_idleState.get();
+            break;
+        case BlobConfig::MOVING:
+            m_currentBlobState = m_movingState.get();
+            m_stateResetTimer.stop();
+            m_stateResetTimer.start(2000);
+            break;
+        case BlobConfig::RESIZING:
+            m_currentBlobState = m_resizingState.get();
+            m_stateResetTimer.stop();
+            m_stateResetTimer.start(2000);
+            break;
     }
 }
 
@@ -348,6 +386,10 @@ void BlobAnimation::setGridSpacing(int spacing) {
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
 
+    if (!m_eventsEnabled || m_inTransitionToIdle) {
+        return QWidget::eventFilter(watched, event);
+    }
+
     if (watched == window() && event->type() == QEvent::Move) {
         static QElapsedTimer throttleTimer;
         static bool firstEvent = true;
@@ -363,8 +405,12 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
         }
         throttleTimer.restart();
 
-        if (m_currentState == BlobConfig::RESIZING) {
-            qDebug() << "Ignorowanie Move podczas stanu RESIZING";
+        static QSize lastSize;
+        QSize currentSize = window()->size();
+        bool isResizeInProgress = (currentSize != lastSize);
+        lastSize = currentSize;
+
+        if (isResizeInProgress) {
             return QWidget::eventFilter(watched, event);
         }
 
@@ -372,11 +418,10 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
         QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
 
         if (windowVelocity.length() > 0.2) {
-
             switchToState(BlobConfig::MOVING);
 
             m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
-                                         m_params.blobRadius, windowVelocity);
+                                        m_params.blobRadius, windowVelocity);
 
             for (size_t i = 0; i < m_controlPoints.size(); ++i) {
                 double randX = (qrand() % 100 - 50) / 500.0;
@@ -389,13 +434,11 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
             }
 
             m_stateResetTimer.stop();
-            m_stateResetTimer.start(1000);
+            m_stateResetTimer.start(2000);
         }
 
         m_physics.setLastWindowPos(currentWindowPos);
-
         updateAnimation();
-
     }
 
     return QWidget::eventFilter(watched, event);

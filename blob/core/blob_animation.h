@@ -50,6 +50,8 @@ private slots:
 
     void handleIdleTransition();
 
+    void onStateResetTimeout();
+
 private:
     void initializeBlob();
 
@@ -105,6 +107,9 @@ private:
     std::vector<QPointF> m_safeControlPoints;
 
     void physicsThreadFunction();
+
+    bool m_eventsEnabled = true;
+    QTimer m_eventReEnableTimer;
 };
 
 #endif // BLOBANIMATION_H
