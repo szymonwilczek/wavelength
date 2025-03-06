@@ -1,6 +1,7 @@
 #include "blob_animation.h"
 #include <QPainter>
 #include <QDebug>
+#include <QElapsedTimer>
 
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QWidget(parent)
@@ -35,7 +36,9 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_targetPoints.resize(m_params.numPoints);
     m_velocity.resize(m_params.numPoints);
 
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_NoSystemBackground, true);
 
     m_animationTimer.setTimerType(Qt::PreciseTimer);
     connect(&m_animationTimer, &QTimer::timeout, this, &BlobAnimation::updateAnimation);
@@ -46,10 +49,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     if (window()) {
         m_lastWindowPos = window()->pos();
 
-        qDebug() << "Installing event filter on window";
         window()->installEventFilter(this);
-    } else {
-        qDebug() << "No window found to install event filter!";
     }
 
     m_windowPosCheckTimer = new QTimer(this);
@@ -58,8 +58,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
         if (window() && m_currentState != BlobConfig::RESIZING) {
             QPointF currentWindowPos = window()->pos();
             if (currentWindowPos != m_lastWindowPos) {
-                qDebug() << "Window position changed (detected by timer): "
-                         << m_lastWindowPos << " -> " << currentWindowPos;
 
                 QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
                 if (windowVelocity.length() > 0.2) {
@@ -91,21 +89,26 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
     
     QPainter painter(this);
-    m_renderer.renderBlob(painter, m_controlPoints, m_blobCenter, 
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
+        painter.setRenderHint(QPainter::Antialiasing, false);
+    }
+
+    m_renderer.renderBlob(painter, m_controlPoints, m_blobCenter,
                         m_params, width(), height());
 }
 
 void BlobAnimation::updateAnimation() {
     static int frameCounter = 0;
     frameCounter++;
-    bool shouldLog = (frameCounter % 60 == 0);
 
     if (m_inTransitionToIdle) {
         qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
         qint64 elapsedMs = currentTime - m_transitionToIdleStartTime;
 
         if (elapsedMs >= m_transitionToIdleDuration) {
-            if (shouldLog) qDebug() << "Przejście do IDLE ukończone";
 
             m_inTransitionToIdle = false;
             m_currentBlobState = m_idleState.get();
@@ -162,27 +165,22 @@ void BlobAnimation::updateAnimation() {
     }
 
     if (m_currentState == BlobConfig::IDLE) {
-        if (shouldLog && !m_inTransitionToIdle) qDebug() << "Animation update: IDLE state";
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
         }
     }
     else if (m_currentState == BlobConfig::MOVING) {
-        if (shouldLog) qDebug() << "Animation update: MOVING state";
 
         if (window()) {
             QVector2D windowVelocity = m_physics.getLastWindowVelocity();
-            if (shouldLog) qDebug() << "Window velocity:" << windowVelocity.x() << "," << windowVelocity.y();
 
             if (windowVelocity.length() > 0.1) {
-                if (shouldLog) qDebug() << "Applying moving state effect";
                 if (m_currentBlobState) {
                     m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
                 }
             }
         }
     } else if (m_currentState == BlobConfig::RESIZING) {
-        if (shouldLog) qDebug() << "Animation update: RESIZING state";
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
         }
@@ -215,18 +213,13 @@ void BlobAnimation::resizeEvent(QResizeEvent *event) {
 
 bool BlobAnimation::event(QEvent *event) {
     if (event->type() == QEvent::Move) {
-        qDebug() << "EVENT DETECTED: Move event";
         switchToState(BlobConfig::MOVING);
 
         if (window()) {
             QPointF currentWindowPos = window()->pos();
             QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
 
-            qDebug() << "Window velocity:" << windowVelocity.x() << "," << windowVelocity.y()
-                     << "length:" << windowVelocity.length();
-
             if (windowVelocity.length() > 0.2) {
-                qDebug() << "Applying inertia force!";
 
                 m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
                                              m_params.blobRadius, windowVelocity);
@@ -243,8 +236,6 @@ bool BlobAnimation::event(QEvent *event) {
 
                 m_stateResetTimer.stop();
                 m_stateResetTimer.start(1000);
-            } else {
-                qDebug() << "Movement too small - ignoring";
             }
 
             m_physics.setLastWindowPos(currentWindowPos);
@@ -253,7 +244,6 @@ bool BlobAnimation::event(QEvent *event) {
         updateAnimation();
     }
     else if (event->type() == QEvent::Resize) {
-        qDebug() << "EVENT DETECTED: Resize event";
         switchToState(BlobConfig::RESIZING);
     }
 
@@ -265,7 +255,7 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     if (m_currentState == BlobConfig::RESIZING && newState == BlobConfig::MOVING) {
-        constexpr qint64 RESIZE_TO_MOVE_COOLDOWN = 300; // ms
+        constexpr qint64 RESIZE_TO_MOVE_COOLDOWN = 650; // ms
         if (currentTime - lastStateChangeTime < RESIZE_TO_MOVE_COOLDOWN) {
             qDebug() << "Zablokowano zmianę z RESIZING na MOVING (zbyt szybko)";
             return;
@@ -280,7 +270,6 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
         if (newState == BlobConfig::IDLE &&
             (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
 
-            qDebug() << "Przygotowanie płynnego przejścia do stanu IDLE";
 
             m_originalControlPoints = m_controlPoints;
             m_originalVelocities = m_velocity;
@@ -378,7 +367,17 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
 
     if (watched == window()) {
         if (event->type() == QEvent::Move) {
-            qDebug() << "WINDOW MOVE EVENT DETECTED via event filter!";
+
+            static QElapsedTimer throttleTimer;
+            static bool firstEvent = true;
+
+            if (firstEvent) {
+                throttleTimer.start();
+                firstEvent = false;
+            } else if (throttleTimer.elapsed() < 25) { // Reagujemy maksymalnie co 25ms (~40Hz)
+                return QWidget::eventFilter(watched, event);
+            }
+            throttleTimer.restart();
 
             if (m_currentState == BlobConfig::RESIZING) {
                 qDebug() << "Ignorowanie Move podczas stanu RESIZING";
@@ -388,11 +387,7 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
             QPointF currentWindowPos = window()->pos();
             QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
 
-            qDebug() << "Window velocity:" << windowVelocity.x() << "," << windowVelocity.y()
-                     << "length:" << windowVelocity.length();
-
             if (windowVelocity.length() > 0.2) {
-                qDebug() << "Applying inertia force via event filter!";
 
                 switchToState(BlobConfig::MOVING);
 
