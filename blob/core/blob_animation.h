@@ -110,6 +110,7 @@ private:
 
     bool m_eventsEnabled = true;
     QTimer m_eventReEnableTimer;
+    bool m_needsRedraw = false;
 };
 
 #endif // BLOBANIMATION_H

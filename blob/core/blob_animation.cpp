@@ -56,6 +56,11 @@ BlobAnimation::~BlobAnimation() {
     m_animationTimer.stop();
     m_idleTimer.stop();
     m_stateResetTimer.stop();
+
+    m_idleState.reset();
+    m_movingState.reset();
+    m_resizingState.reset();
+
 }
 
 void BlobAnimation::initializeBlob() {
@@ -90,17 +95,16 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
         return QRectF(0, 0, width(), height());
     }
 
-    qreal minX = std::numeric_limits<qreal>::max();
-    qreal minY = std::numeric_limits<qreal>::max();
-    qreal maxX = std::numeric_limits<qreal>::lowest();
-    qreal maxY = std::numeric_limits<qreal>::lowest();
+    auto xComp = [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); };
+    auto yComp = [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); };
 
-    for (const auto& point : m_controlPoints) {
-        minX = std::min(minX, point.x());
-        minY = std::min(minY, point.y());
-        maxX = std::max(maxX, point.x());
-        maxY = std::max(maxY, point.y());
-    }
+    auto [minXIt, maxXIt] = std::minmax_element(m_controlPoints.begin(), m_controlPoints.end(), xComp);
+    auto [minYIt, maxYIt] = std::minmax_element(m_controlPoints.begin(), m_controlPoints.end(), yComp);
+
+    qreal minX = minXIt->x();
+    qreal maxX = maxXIt->x();
+    qreal minY = minYIt->y();
+    qreal maxY = maxYIt->y();
 
     int margin = m_params.borderWidth + m_params.glowRadius + 5;
     return QRectF(minX - margin, minY - margin,
@@ -108,15 +112,18 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
 }
 
 void BlobAnimation::updateAnimation() {
+    m_needsRedraw = false;
+    QWidget* currentWindow = window();
 
-    if (window() && m_currentState != BlobConfig::RESIZING) {
-        QPointF currentWindowPos = window()->pos();
+    if (currentWindow && m_currentState != BlobConfig::RESIZING) {
+        QPointF currentWindowPos = currentWindow->pos();
         if (currentWindowPos != m_lastWindowPos) {
             QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
             if (windowVelocity.length() > 0.2) {
                 switchToState(BlobConfig::MOVING);
                 m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
                                               m_params.blobRadius, windowVelocity);
+                m_needsRedraw = true;
             }
             m_physics.setLastWindowPos(currentWindowPos);
             m_lastWindowPos = currentWindowPos;
@@ -125,23 +132,25 @@ void BlobAnimation::updateAnimation() {
 
     if (m_inTransitionToIdle) {
         handleIdleTransition();
-        update();
-        return;
-    }
+        m_needsRedraw = true;
+    } else if (m_currentState == BlobConfig::IDLE) {
 
-    if (m_currentState == BlobConfig::IDLE) {
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+            m_needsRedraw = true;
         }
     } else if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+            m_needsRedraw = true;
         }
     }
 
     updatePhysics();
 
-    update();
+    if (m_needsRedraw) {
+        update();
+    }
 }
 
 void BlobAnimation::updatePhysics() {
@@ -168,9 +177,9 @@ void BlobAnimation::handleIdleTransition() {
             m_inTransitionToIdle = false;
             m_currentBlobState = m_idleState.get();
 
-            for (auto& vel : m_velocity) {
-                vel *= 0.7;
-            }
+            std::for_each(m_velocity.begin(), m_velocity.end(), [](QPointF& vel) {
+            vel *= 0.7;
+            });
 
             m_idleState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
             m_eventReEnableTimer.start(200);
@@ -192,12 +201,17 @@ void BlobAnimation::handleIdleTransition() {
                 m_originalBlobCenter.y() * (1.0 - easedProgress) + m_targetIdleCenter.y() * easedProgress
             );
 
-            for (size_t i = 0; i < m_controlPoints.size(); ++i) {
-                m_controlPoints[i] = QPointF(
-                    m_originalControlPoints[i].x() * (1.0 - easedProgress) + m_targetIdlePoints[i].x() * easedProgress,
-                    m_originalControlPoints[i].y() * (1.0 - easedProgress) + m_targetIdlePoints[i].y() * easedProgress
+            std::transform(
+            m_originalControlPoints.begin(), m_originalControlPoints.end(),
+            m_targetIdlePoints.begin(),
+            m_controlPoints.begin(),
+            [easedProgress](const QPointF& orig, const QPointF& target) {
+                return QPointF(
+                    orig.x() * (1.0 - easedProgress) + target.x() * easedProgress,
+                    orig.y() * (1.0 - easedProgress) + target.y() * easedProgress
                 );
             }
+        );
 
             double dampingFactor = pow(0.98, 1.0 + 3.0 * easedProgress);
             for (size_t i = 0; i < m_velocity.size(); ++i) {
