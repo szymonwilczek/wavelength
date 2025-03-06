@@ -25,6 +25,7 @@ private:
     BlobConfig::IdleParameters m_idleParams;
     double m_secondPhase = 0.0;
     double m_rotationPhase = 0.0;
+    double m_mainPhaseOffset = 0.0;
 };
 
 #endif // IDLESTATE_H
