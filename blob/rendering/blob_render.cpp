@@ -24,23 +24,50 @@ void BlobRenderer::renderBlob(QPainter& painter,
     drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor);
 }
 
-void BlobRenderer::drawBackground(QPainter& painter, 
+void BlobRenderer::updateGridBuffer(const QColor& backgroundColor,
+                                  const QColor& gridColor,
+                                  int gridSpacing,
+                                  int width, int height) {
+    m_gridBuffer = QPixmap(width, height);
+
+    QPainter bufferPainter(&m_gridBuffer);
+    bufferPainter.setRenderHint(QPainter::Antialiasing, false); 
+
+    bufferPainter.fillRect(QRect(0, 0, width, height), backgroundColor);
+
+    bufferPainter.setPen(QPen(gridColor, 1, Qt::SolidLine));
+
+    for (int y = 0; y < height; y += gridSpacing) {
+        bufferPainter.drawLine(0, y, width, y);
+    }
+
+    for (int x = 0; x < width; x += gridSpacing) {
+        bufferPainter.drawLine(x, 0, x, height);
+    }
+
+    m_lastBgColor = backgroundColor;
+    m_lastGridColor = gridColor;
+    m_lastGridSpacing = gridSpacing;
+    m_lastSize = QSize(width, height);
+}
+
+void BlobRenderer::drawBackground(QPainter& painter,
                                 const QColor& backgroundColor,
                                 const QColor& gridColor,
                                 int gridSpacing,
                                 int width, int height) {
-    
-    painter.fillRect(QRect(0, 0, width, height), backgroundColor);
-    
-    painter.setPen(QPen(gridColor, 1, Qt::SolidLine));
-    
-    for (int y = 0; y < height; y += gridSpacing) {
-        painter.drawLine(0, y, width, y);
+
+    bool needsUpdate = m_gridBuffer.isNull() ||
+                      backgroundColor != m_lastBgColor ||
+                      gridColor != m_lastGridColor ||
+                      gridSpacing != m_lastGridSpacing ||
+                      QSize(width, height) != m_lastSize;
+
+    if (needsUpdate) {
+        updateGridBuffer(backgroundColor, gridColor, gridSpacing, width, height);
     }
-    
-    for (int x = 0; x < width; x += gridSpacing) {
-        painter.drawLine(x, 0, x, height);
-    }
+
+    painter.drawPixmap(0, 0, m_gridBuffer);
 }
 
 void BlobRenderer::drawGlowEffect(QPainter& painter, 
@@ -81,7 +108,7 @@ void BlobRenderer::drawFilling(QPainter& painter,
     QRadialGradient gradient(blobCenter, blobRadius);
     
     QColor centerColor = borderColor;
-    centerColor.setAlpha(30);
+    centerColor.setAlpha(10);
     gradient.setColorAt(0, centerColor);
     gradient.setColorAt(1, QColor(0, 0, 0, 0));
     

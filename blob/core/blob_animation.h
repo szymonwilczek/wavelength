@@ -10,6 +10,8 @@
 #include <QEvent>
 #include <vector>
 #include <memory>
+#include <QThread>
+#include <QMutex>
 
 #include "blob_config.h"
 #include "../physics/blob_physics.h"
@@ -34,12 +36,19 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+
+    QRectF calculateBlobBoundingRect();
+
     void resizeEvent(QResizeEvent *event) override;
     bool event(QEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void updateAnimation();
+
+    void updatePhysics();
+
+    void handleIdleTransition();
 
 private:
     void initializeBlob();
@@ -86,6 +95,16 @@ private:
     QPointF m_originalBlobCenter;
     std::vector<QPointF> m_targetIdlePoints;
     QPointF m_targetIdleCenter;
+
+    double m_precalcMinDistance = 0.0;
+    double m_precalcMaxDistance = 0.0;
+
+    QThread m_physicsThread;
+    QMutex m_dataMutex;
+    std::atomic<bool> m_physicsRunning{true};
+    std::vector<QPointF> m_safeControlPoints;
+
+    void physicsThreadFunction();
 };
 
 #endif // BLOBANIMATION_H

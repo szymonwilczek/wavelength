@@ -18,13 +18,28 @@ public:
                    const QPointF& blobCenter,
                    const BlobConfig::BlobParameters& params,
                    int width, int height);
+
+    void resetGridBuffer() {
+        m_gridBuffer = QPixmap();
+    }
     
 private:
+    QPixmap m_gridBuffer;
+    QColor m_lastBgColor;
+    QColor m_lastGridColor;
+    int m_lastGridSpacing = 0;
+    QSize m_lastSize;
+
+    void updateGridBuffer(const QColor& backgroundColor,
+                         const QColor& gridColor,
+                         int gridSpacing,
+                         int width, int height);
+
     void drawBackground(QPainter& painter,
-                      const QColor& backgroundColor,
-                      const QColor& gridColor,
-                      int gridSpacing,
-                      int width, int height);
+                         const QColor& backgroundColor,
+                         const QColor& gridColor,
+                         int gridSpacing,
+                         int width, int height);
     
     void drawGlowEffect(QPainter& painter,
                        const QPainterPath& blobPath,
