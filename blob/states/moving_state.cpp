@@ -58,12 +58,9 @@ void MovingState::applyInertiaForce(std::vector<QPointF>& velocity,
                                   const std::vector<QPointF>& controlPoints,
                                   double blobRadius,
                                   const QVector2D& windowVelocity) {
-    qDebug() << "MovingState::applyInertiaForce predkosc:"
-             << windowVelocity.x() << "," << windowVelocity.y();
 
     QVector2D inertiaForce = -windowVelocity * 0.01;
 
-    qDebug() << "Inertia force:" << inertiaForce.x() << "," << inertiaForce.y();
 
     applyForce(inertiaForce, velocity, blobCenter, controlPoints, blobRadius);
 
@@ -81,7 +78,6 @@ void MovingState::applyInertiaForce(std::vector<QPointF>& velocity,
         avgVelY /= velocity.size();
     }
 
-    qDebug() << "Avg velocity:" << avgVelX << "," << avgVelY;
 }
 
 void MovingState::applyForce(const QVector2D& force,
