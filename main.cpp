@@ -8,6 +8,8 @@
 #include <QVBoxLayout>
 #include <QGraphicsDropShadowEffect>
 
+#include "blob/core/app_instance_manager.h"
+
 void centerLabel(QLabel* label, BlobAnimation* animation) {
     if (label && animation) {
         label->setGeometry(
@@ -116,6 +118,38 @@ int main(int argc, char *argv[]) {
     window.setMinimumSize(800, 600);
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
+
+    AppInstanceManager* instanceManager = new AppInstanceManager(&window, animation, &window);
+    instanceManager->start();
+
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [](const QString& targetId) {
+        qDebug() << "[MAIN] Rozpoczęto absorpcję instancji:" << targetId;
+    });
+
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [animation, instanceManager](const QString& targetId) {
+        if (targetId == instanceManager->getInstanceId()) {
+            // Ta instancja jest celem absorpcji
+            animation->startBeingAbsorbed();
+        }
+    });
+
+    QObject::connect(instanceManager, &AppInstanceManager::instanceAbsorbed, [animation, instanceManager](const QString& targetId) {
+        if (targetId == instanceManager->getInstanceId()) {
+            // Ta instancja bedzie pochlonieta
+            animation->finishBeingAbsorbed();
+        }
+    });
+
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionCancelled, [animation, instanceManager](const QString& targetId) {
+        if (targetId == instanceManager->getInstanceId()) {
+            animation->cancelAbsorption();
+        }
+    });
+
+    if (!instanceManager->isCreator()) {
+        window.setWindowTitle("Pk4 - Instancja podrzędna");
+    }
+
     window.show();
 
     QTimer::singleShot(10, [titleLabel, outlineLabel, animation]() {
