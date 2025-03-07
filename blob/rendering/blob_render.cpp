@@ -12,9 +12,7 @@ void BlobRenderer::renderBlob(QPainter& painter,
     
     painter.setRenderHint(QPainter::Antialiasing, true);
     
-    drawBackground(painter, params.backgroundColor, params.gridColor,
-                 params.gridSpacing, width, height);
-    
+
     QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
     
     drawGlowEffect(painter, blobPath, params.borderColor, params.glowRadius);

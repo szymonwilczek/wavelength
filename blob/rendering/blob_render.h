@@ -22,6 +22,12 @@ public:
     void resetGridBuffer() {
         m_gridBuffer = QPixmap();
     }
+
+    void drawBackground(QPainter& painter,
+                         const QColor& backgroundColor,
+                         const QColor& gridColor,
+                         int gridSpacing,
+                         int width, int height);
     
 private:
     QPixmap m_gridBuffer;
@@ -35,11 +41,7 @@ private:
                          int gridSpacing,
                          int width, int height);
 
-    void drawBackground(QPainter& painter,
-                         const QColor& backgroundColor,
-                         const QColor& gridColor,
-                         int gridSpacing,
-                         int width, int height);
+
     
     void drawGlowEffect(QPainter& painter,
                        const QPainterPath& blobPath,
