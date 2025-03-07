@@ -1,4 +1,6 @@
 #include "blob_animation.h"
+
+#include <QApplication>
 #include <QPainter>
 #include <QDebug>
 #include <QElapsedTimer>
@@ -79,6 +81,17 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
 
+    if (m_isBeingAbsorbed || m_isAbsorbing) {
+        painter.setOpacity(m_absorptionOpacity);
+
+        painter.save();
+
+        QPointF center = getBlobCenter();
+        painter.translate(center);
+        painter.scale(m_absorptionScale, m_absorptionScale);
+        painter.translate(-center);
+    }
+
     if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
         painter.setRenderHint(QPainter::Antialiasing, false);
     } else {
@@ -88,6 +101,10 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
 
     m_renderer.renderBlob(painter, m_controlPoints, m_blobCenter,
                         m_params, width(), height());
+
+    if (m_isBeingAbsorbed || m_isAbsorbing) {
+        painter.restore();
+    }
 }
 
 QRectF BlobAnimation::calculateBlobBoundingRect() {
@@ -109,6 +126,83 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
     int margin = m_params.borderWidth + m_params.glowRadius + 5;
     return QRectF(minX - margin, minY - margin,
                  maxX - minX + 2*margin, maxY - minY + 2*margin);
+}
+
+void BlobAnimation::startBeingAbsorbed() {
+    qDebug() << "BlobAnimation: Rozpoczęcie procesu bycia absorbowanym";
+    m_isBeingAbsorbed = true;
+    m_absorptionOpacity = 1.0f;
+    m_absorptionScale = 1.0f;
+
+    if (m_currentState == BlobConfig::IDLE) {
+        m_animationTimer.stop();
+    }
+
+    update();
+}
+
+void BlobAnimation::finishBeingAbsorbed() {
+    qDebug() << "BlobAnimation: Zakończenie procesu bycia absorbowanym";
+    m_isBeingAbsorbed = false;
+    m_absorptionOpacity = 0.0f;
+    m_absorptionScale = 0.1f;
+    update();
+
+    QTimer::singleShot(500, []() {
+        qDebug() << "Aplikacja zostanie zamknięta po absorpcji";
+        QApplication::quit();
+    });
+}
+
+void BlobAnimation::cancelAbsorption() {
+    qDebug() << "BlobAnimation: Anulowanie procesu bycia absorbowanym";
+    m_isBeingAbsorbed = false;
+    m_absorptionOpacity = 1.0f;
+    m_absorptionScale = 1.0f;
+
+    if (m_currentState == BlobConfig::IDLE) {
+        m_animationTimer.start();
+    }
+
+    update();
+}
+
+void BlobAnimation::startAbsorbing(const QString& targetId) {
+    qDebug() << "BlobAnimation: Rozpoczęcie absorbowania innej instancji:" << targetId;
+    m_isAbsorbing = true;
+    m_absorptionTargetId = targetId;
+    m_absorptionScale = 1.0f;
+    update();
+}
+
+void BlobAnimation::finishAbsorbing(const QString& targetId) {
+    qDebug() << "BlobAnimation: Zakończenie absorbowania instancji:" << targetId;
+    m_isAbsorbing = false;
+    m_absorptionScale = 1.0f;
+    m_absorptionTargetId.clear();
+    update();
+}
+
+void BlobAnimation::cancelAbsorbing(const QString& targetId) {
+    qDebug() << "BlobAnimation: Anulowanie absorbowania instancji:" << targetId;
+    m_isAbsorbing = false;
+    m_absorptionScale = 1.0f;
+    m_absorptionTargetId.clear();
+    update();
+}
+
+void BlobAnimation::updateAbsorptionProgress(float progress) {
+    if (m_isBeingAbsorbed) {
+        m_absorptionScale = 1.0f - progress * 0.9f;
+        m_absorptionOpacity = 1.0f - progress;
+        qDebug() << "Blob pochłaniany: skala=" << m_absorptionScale << "przezroczystość=" << m_absorptionOpacity;
+    }
+    else if (m_isAbsorbing) {
+        m_absorptionScale = 1.0f + progress * 0.3f;
+        qDebug() << "Blob pochłaniający: skala=" << m_absorptionScale;
+    }
+
+    update();
 }
 
 void BlobAnimation::updateAnimation() {

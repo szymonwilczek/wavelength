@@ -12,6 +12,7 @@
 #include <memory>
 #include <QThread>
 #include <QMutex>
+#include <QDebug>
 
 #include "blob_config.h"
 #include "../physics/blob_physics.h"
@@ -33,6 +34,32 @@ public:
     void setGridColor(const QColor &color);
 
     void setGridSpacing(int spacing);
+
+    QPointF getBlobCenter() const {
+        if (m_controlPoints.empty()) {
+            return QPointF(width() / 2.0, height() / 2.0);
+        }
+
+        return m_blobCenter;
+    }
+
+    void applyExternalForce(const QVector2D& force) {
+        qDebug() << "Stosowanie siły zewnętrznej do bloba:" << force;
+        // TODO
+    }
+
+    void startBeingAbsorbed();
+    void finishBeingAbsorbed();
+    void cancelAbsorption();
+
+    void startAbsorbing(const QString& targetId);
+    void finishAbsorbing(const QString& targetId);
+    void cancelAbsorbing(const QString& targetId);
+
+    bool isBeingAbsorbed() const { return m_isBeingAbsorbed; }
+    bool isAbsorbing() const { return m_isAbsorbing; }
+
+    void updateAbsorptionProgress(float progress);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -60,6 +87,13 @@ private:
     void applyForces(const QVector2D &force);
 
     void applyIdleEffect();
+
+    float m_absorptionScale = 1.0f;
+    float m_absorptionOpacity = 1.0f;
+
+    bool m_isBeingAbsorbed = false;
+    bool m_isAbsorbing = false;
+    QString m_absorptionTargetId;
 
     BlobConfig::BlobParameters m_params;
     BlobConfig::PhysicsParameters m_physicsParams;
