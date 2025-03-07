@@ -13,6 +13,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QDebug>
+#include <QPropertyAnimation>
 
 #include "blob_config.h"
 #include "../physics/blob_physics.h"
@@ -24,6 +25,9 @@
 
 class BlobAnimation : public QWidget {
     Q_OBJECT
+    Q_PROPERTY(float absorptionScale READ absorptionScale WRITE setAbsorptionScale)
+    Q_PROPERTY(float absorptionOpacity READ absorptionOpacity WRITE setAbsorptionOpacity)
+    Q_PROPERTY(float absorptionPulse READ getAbsorptionPulse WRITE setAbsorptionPulse)
 
 public:
     explicit BlobAnimation(QWidget *parent = nullptr);
@@ -34,6 +38,22 @@ public:
     void setGridColor(const QColor &color);
 
     void setGridSpacing(int spacing);
+
+    float absorptionScale() const { return m_absorptionScale; }
+    float absorptionOpacity() const { return m_absorptionOpacity; }
+
+    float getAbsorptionPulse() const { return m_absorptionPulse; }
+    void setAbsorptionPulse(float value) { m_absorptionPulse = value; update(); }
+
+     void setAbsorptionScale(float scale) {
+        m_absorptionScale = scale;
+        update();
+    }
+
+    void setAbsorptionOpacity(float opacity) {
+        m_absorptionOpacity = opacity;
+        update();
+    }
 
     QPointF getBlobCenter() const {
         if (m_controlPoints.empty()) {
@@ -90,6 +110,10 @@ private:
 
     float m_absorptionScale = 1.0f;
     float m_absorptionOpacity = 1.0f;
+    QPropertyAnimation* m_scaleAnimation = nullptr;
+    QPropertyAnimation* m_opacityAnimation = nullptr;
+    float m_absorptionPulse = 0.0f;
+    QPropertyAnimation* m_pulseAnimation = nullptr;
 
     bool m_isBeingAbsorbed = false;
     bool m_isAbsorbing = false;

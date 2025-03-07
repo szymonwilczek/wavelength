@@ -81,17 +81,6 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
 
-    if (m_isBeingAbsorbed || m_isAbsorbing) {
-        painter.setOpacity(m_absorptionOpacity);
-
-        painter.save();
-
-        QPointF center = getBlobCenter();
-        painter.translate(center);
-        painter.scale(m_absorptionScale, m_absorptionScale);
-        painter.translate(-center);
-    }
-
     if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
         painter.setRenderHint(QPainter::Antialiasing, false);
     } else {
@@ -99,8 +88,38 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     }
 
+    m_renderer.drawBackground(painter, m_params.backgroundColor,
+                             m_params.gridColor, m_params.gridSpacing,
+                             width(), height());
+
+    if (m_isBeingAbsorbed) {
+        painter.setOpacity(m_absorptionOpacity);
+        painter.save();
+        QPointF center = getBlobCenter();
+        painter.translate(center);
+        painter.scale(m_absorptionScale, m_absorptionScale);
+        painter.translate(-center);
+    }
+    else if (m_isAbsorbing) {
+        painter.save();
+        QPointF center = getBlobCenter();
+
+        if (m_pulseAnimation && m_absorptionPulse > 0.0) {
+            QPen extraGlowPen(m_params.borderColor.lighter(150));
+            extraGlowPen.setWidth(m_params.borderWidth + 10);
+            painter.setPen(extraGlowPen);
+
+            QPainterPath blobPath = BlobPath::createBlobPath(m_controlPoints, m_controlPoints.size());
+            painter.drawPath(blobPath);
+        }
+
+        painter.translate(center);
+        painter.scale(m_absorptionScale, m_absorptionScale);
+        painter.translate(-center);
+    }
+
     m_renderer.renderBlob(painter, m_controlPoints, m_blobCenter,
-                        m_params, width(), height());
+                             m_params, width(), height());
 
     if (m_isBeingAbsorbed || m_isAbsorbing) {
         painter.restore();
@@ -138,6 +157,31 @@ void BlobAnimation::startBeingAbsorbed() {
         m_animationTimer.stop();
     }
 
+    if (m_scaleAnimation) {
+        m_scaleAnimation->stop();
+        delete m_scaleAnimation;
+    }
+
+    if (m_opacityAnimation) {
+        m_opacityAnimation->stop();
+        delete m_opacityAnimation;
+    }
+
+    m_scaleAnimation = new QPropertyAnimation(this, "absorptionScale");
+    m_scaleAnimation->setDuration(8000);  // 2 sekundy
+    m_scaleAnimation->setStartValue(1.0);
+    m_scaleAnimation->setEndValue(0.1);
+    m_scaleAnimation->setEasingCurve(QEasingCurve::InQuad);
+
+    m_opacityAnimation = new QPropertyAnimation(this, "absorptionOpacity");
+    m_opacityAnimation->setDuration(8000);  // 2 sekundy
+    m_opacityAnimation->setStartValue(1.0);
+    m_opacityAnimation->setEndValue(0.0);
+    m_opacityAnimation->setEasingCurve(QEasingCurve::InQuad);
+
+    m_scaleAnimation->start();
+    m_opacityAnimation->start();
+
     update();
 }
 
@@ -157,11 +201,40 @@ void BlobAnimation::finishBeingAbsorbed() {
 void BlobAnimation::cancelAbsorption() {
     qDebug() << "BlobAnimation: Anulowanie procesu bycia absorbowanym";
     m_isBeingAbsorbed = false;
-    m_absorptionOpacity = 1.0f;
-    m_absorptionScale = 1.0f;
+
+    if (m_scaleAnimation) {
+        m_scaleAnimation->stop();
+        delete m_scaleAnimation;
+        m_scaleAnimation = nullptr;
+    }
+
+    if (m_opacityAnimation) {
+        m_opacityAnimation->stop();
+        delete m_opacityAnimation;
+        m_opacityAnimation = nullptr;
+    }
+
+    m_scaleAnimation = new QPropertyAnimation(this, "absorptionScale");
+    m_scaleAnimation->setDuration(500);  // 0.5 sekundy
+    m_scaleAnimation->setStartValue(m_absorptionScale);
+    m_scaleAnimation->setEndValue(1.0);
+    m_scaleAnimation->setEasingCurve(QEasingCurve::OutQuad);
+
+    m_opacityAnimation = new QPropertyAnimation(this, "absorptionOpacity");
+    m_opacityAnimation->setDuration(500);  // 0.5 sekundy
+    m_opacityAnimation->setStartValue(m_absorptionOpacity);
+    m_opacityAnimation->setEndValue(1.0);
+    m_opacityAnimation->setEasingCurve(QEasingCurve::OutQuad);
+
+    m_scaleAnimation->start();
+    m_opacityAnimation->start();
 
     if (m_currentState == BlobConfig::IDLE) {
-        m_animationTimer.start();
+        QTimer::singleShot(500, [this]() {
+            if (!m_isBeingAbsorbed && !m_isAbsorbing) {
+                m_animationTimer.start();
+            }
+        });
     }
 
     update();
@@ -172,13 +245,52 @@ void BlobAnimation::startAbsorbing(const QString& targetId) {
     m_isAbsorbing = true;
     m_absorptionTargetId = targetId;
     m_absorptionScale = 1.0f;
+    m_absorptionOpacity = 1.0f;
+
+    if (m_scaleAnimation) {
+        m_scaleAnimation->stop();
+        delete m_scaleAnimation;
+    }
+
+    m_scaleAnimation = new QPropertyAnimation(this, "absorptionScale");
+    m_scaleAnimation->setDuration(8000);  // 8 sekund
+    m_scaleAnimation->setStartValue(1.0);
+    m_scaleAnimation->setEndValue(1.8);
+    m_scaleAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    m_scaleAnimation->start();
+
+    if (m_pulseAnimation) {
+        m_pulseAnimation->stop();
+        delete m_pulseAnimation;
+    }
+
+    m_pulseAnimation = new QPropertyAnimation(this, "absorptionPulse");
+    m_pulseAnimation->setDuration(800);  // krótszy czas = szybsze pulsowanie
+    m_pulseAnimation->setStartValue(0.0);
+    m_pulseAnimation->setEndValue(1.0);
+    m_pulseAnimation->setLoopCount(-1);  // pętla nieskończona
+    m_pulseAnimation->start();
+
     update();
 }
 
 void BlobAnimation::finishAbsorbing(const QString& targetId) {
     qDebug() << "BlobAnimation: Zakończenie absorbowania instancji:" << targetId;
     m_isAbsorbing = false;
-    m_absorptionScale = 1.0f;
+
+    if (m_scaleAnimation) {
+        m_scaleAnimation->stop();
+        delete m_scaleAnimation;
+        m_scaleAnimation = nullptr;
+    }
+
+    m_scaleAnimation = new QPropertyAnimation(this, "absorptionScale");
+    m_scaleAnimation->setDuration(500);  // 0.5 sekundy
+    m_scaleAnimation->setStartValue(m_absorptionScale);
+    m_scaleAnimation->setEndValue(1.0);
+    m_scaleAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    m_scaleAnimation->start();
+
     m_absorptionTargetId.clear();
     update();
 }
@@ -186,7 +298,20 @@ void BlobAnimation::finishAbsorbing(const QString& targetId) {
 void BlobAnimation::cancelAbsorbing(const QString& targetId) {
     qDebug() << "BlobAnimation: Anulowanie absorbowania instancji:" << targetId;
     m_isAbsorbing = false;
-    m_absorptionScale = 1.0f;
+
+    if (m_scaleAnimation) {
+        m_scaleAnimation->stop();
+        delete m_scaleAnimation;
+        m_scaleAnimation = nullptr;
+    }
+
+    m_scaleAnimation = new QPropertyAnimation(this, "absorptionScale");
+    m_scaleAnimation->setDuration(500);  // 0.5 sekundy
+    m_scaleAnimation->setStartValue(m_absorptionScale);
+    m_scaleAnimation->setEndValue(1.0);
+    m_scaleAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    m_scaleAnimation->start();
+
     m_absorptionTargetId.clear();
     update();
 }

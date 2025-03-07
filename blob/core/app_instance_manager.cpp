@@ -384,6 +384,7 @@ void AppInstanceManager::checkForAbsorption() {
     }
 
     QMutexLocker locker(&m_instancesMutex);
+
     if (m_absorption.inProgress) {
         bool targetFound = false;
         QPointF targetBlobCenter;
@@ -398,46 +399,17 @@ void AppInstanceManager::checkForAbsorption() {
             }
         }
 
-        if (!targetFound) {
-            qDebug() << "Cel absorpcji zniknął, ID:" << m_absorption.targetId;
+        if (!targetFound || !isInAbsorptionRange(targetBlobCenter, targetWindowPos)) {
+            qDebug() << "Cel absorpcji zniknął lub opuścił obszar, ID:" << m_absorption.targetId;
             m_absorption.inProgress = false;
-            m_absorption.progress = 0.0f;
+
             QByteArray message = createAbsorptionMessage(ABSORPTION_CANCELLED, m_absorption.targetId);
             sendToAllClients(message);
-            m_blob->cancelAbsorbing(m_absorption.targetId);
 
             emit absorptionCancelled(m_absorption.targetId);
             return;
         }
-        if (!isInAbsorptionRange(targetBlobCenter, targetWindowPos)) {
-            qDebug() << "Cel absorpcji opuścił obszar absorpcji, ID:" << m_absorption.targetId;
-            m_absorption.inProgress = false;
-            m_absorption.progress = 0.0f;
-            QByteArray message = createAbsorptionMessage(ABSORPTION_CANCELLED, m_absorption.targetId);
-            sendToAllClients(message);
-            m_blob->cancelAbsorbing(m_absorption.targetId);
 
-            emit absorptionCancelled(m_absorption.targetId);
-            return;
-        }
-        m_absorption.progress += 0.005f;
-        m_blob->updateAbsorptionProgress(m_absorption.progress);
-        QByteArray updateMessage;
-        QDataStream updateStream(&updateMessage, QIODevice::WriteOnly);
-        updateStream << quint8(ABSORPTION_PROGRESS) << m_instanceId << m_absorption.targetId << m_absorption.progress;
-        sendToAllClients(updateMessage);
-        if (m_absorption.progress >= 1.0f) {
-            qDebug() << "Absorpcja zakończona, cel został pochłonięty:" << m_absorption.targetId;
-            QByteArray message = createAbsorptionMessage(ABSORPTION_COMPLETE, m_absorption.targetId);
-            sendToAllClients(message);
-            m_blob->finishAbsorbing(m_absorption.targetId);
-
-            m_absorption.inProgress = false;
-            m_absorption.progress = 0.0f;
-
-            emit instanceAbsorbed(m_absorption.targetId);
-            return;
-        }
     }
     else {
         for (const auto& instance : m_connectedInstances) {
@@ -450,12 +422,25 @@ void AppInstanceManager::checkForAbsorption() {
 
                 m_absorption.inProgress = true;
                 m_absorption.targetId = instance.instanceId;
-                m_absorption.progress = 0.0f;
+
                 QByteArray message = createAbsorptionMessage(ABSORPTION_START, instance.instanceId);
                 sendToAllClients(message);
-                m_blob->startAbsorbing(instance.instanceId);
 
                 emit absorptionStarted(instance.instanceId);
+
+                QTimer::singleShot(8100, [this, instanceId = instance.instanceId]() {
+                    if (m_absorption.inProgress && m_absorption.targetId == instanceId) {
+                        qDebug() << "Absorpcja zakończona, cel został pochłonięty:" << instanceId;
+
+                        QByteArray message = createAbsorptionMessage(ABSORPTION_COMPLETE, instanceId);
+                        sendToAllClients(message);
+
+                        m_absorption.inProgress = false;
+
+                        emit instanceAbsorbed(instanceId);
+                    }
+                });
+
                 break;
             }
         }
