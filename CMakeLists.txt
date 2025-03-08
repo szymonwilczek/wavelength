@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Widgets Network REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-base_x64-windows")
+find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-base_x64-windows")
 
 add_executable(${PROJECT_NAME} main.cpp
         navbar.h
@@ -32,4 +32,4 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/app_instance_manager.cpp
         blob/core/app_instance_manager.h
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
