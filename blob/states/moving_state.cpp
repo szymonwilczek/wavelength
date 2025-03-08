@@ -86,19 +86,24 @@ void MovingState::applyForce(const QVector2D& force,
                            const std::vector<QPointF>& controlPoints,
                            double blobRadius) {
     
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
-        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        double distanceFromCenter = QVector2D(vectorFromCenter).length();
-        
-        double forceScale = distanceFromCenter / blobRadius;
-        
-        if (forceScale > 1.0) forceScale = 1.0;
-        
-        velocity[i] += QPointF(
-            force.x() * forceScale * 0.8,
-            force.y() * forceScale * 0.8
-        );
+    const size_t numPoints = controlPoints.size();
+    static std::vector<double> distanceCache;
+
+    if (distanceCache.size() != numPoints) {
+        distanceCache.resize(numPoints);
     }
-    
-    blobCenter += QPointF(force.x() * 0.2, force.y() * 0.2);
+
+    for (size_t i = 0; i < numPoints; ++i) {
+        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
+        distanceCache[i] = QVector2D(vectorFromCenter).length();
+    }
+
+    QPointF forceXY(force.x(), force.y());
+    QPointF centerForce = forceXY * 0.2;
+    blobCenter += centerForce;
+
+    for (size_t i = 0; i < numPoints; ++i) {
+        double forceScale = qMin(distanceCache[i] / blobRadius, 1.0);
+        velocity[i] += forceXY * (forceScale * 0.8);
+    }
 }
