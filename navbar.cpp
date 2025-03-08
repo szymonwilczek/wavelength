@@ -81,6 +81,9 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     addWidget(createWavelengthButton);
     addWidget(joinWavelengthButton);
     addWidget(spacer);
+
+    connect(createWavelengthButton, &QPushButton::clicked, this, &Navbar::createWavelengthClicked);
+    connect(joinWavelengthButton, &QPushButton::clicked, this, &Navbar::joinWavelengthClicked);
 }
 
 void Navbar::contextMenuEvent(QContextMenuEvent *event) {
