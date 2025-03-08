@@ -31,5 +31,13 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/utils/blob_path.h
         blob/core/app_instance_manager.cpp
         blob/core/app_instance_manager.h
+        wavelength/wavelength_dialog.cpp
+        wavelength/wavelength_dialog.h
+        wavelength/wavelength_manager.cpp
+        wavelength/wavelength_manager.h
+        wavelength/wavelength_chat_view.cpp
+        wavelength/wavelength_chat_view.h
+        wavelength/join_wavelength_dialog.cpp
+        wavelength/join_wavelength_dialog.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
