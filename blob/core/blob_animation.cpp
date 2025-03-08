@@ -151,6 +151,19 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
         return;
     }
 
+    static QPixmap backgroundCache;
+    static QSize lastBackgroundSize;
+    static QColor lastBgColor;
+    static QColor lastGridColor;
+    static int lastGridSpacing;
+
+    bool shouldUpdateBackgroundCache =
+        backgroundCache.isNull() ||
+        lastBackgroundSize != size() ||
+        lastBgColor != m_params.backgroundColor ||
+        lastGridColor != m_params.gridColor ||
+        lastGridSpacing != m_params.gridSpacing;
+
     QPainter painter(this);
 
     if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
@@ -160,9 +173,32 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     }
 
-    m_renderer.drawBackground(painter, m_params.backgroundColor,
-                             m_params.gridColor, m_params.gridSpacing,
-                             width(), height());
+    if (m_currentState == BlobConfig::IDLE && !m_isBeingAbsorbed && !m_isAbsorbing) {
+        if (shouldUpdateBackgroundCache) {
+            backgroundCache = QPixmap(size());
+            backgroundCache.fill(Qt::transparent);
+
+            QPainter cachePainter(&backgroundCache);
+            cachePainter.setRenderHint(QPainter::Antialiasing, true);
+            m_renderer.drawBackground(cachePainter, m_params.backgroundColor,
+                                   m_params.gridColor, m_params.gridSpacing,
+                                   width(), height());
+
+            lastBackgroundSize = size();
+            lastBgColor = m_params.backgroundColor;
+            lastGridColor = m_params.gridColor;
+            lastGridSpacing = m_params.gridSpacing;
+        }
+
+        painter.drawPixmap(0, 0, backgroundCache);
+    } else {
+        painter.setRenderHint(QPainter::Antialiasing, m_currentState == BlobConfig::IDLE);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, m_currentState == BlobConfig::IDLE);
+
+        m_renderer.drawBackground(painter, m_params.backgroundColor,
+                               m_params.gridColor, m_params.gridSpacing,
+                               width(), height());
+    }
 
     if (m_isBeingAbsorbed || m_isClosingAfterAbsorption) {
         painter.setOpacity(m_absorptionOpacity);
@@ -446,8 +482,8 @@ void BlobAnimation::updateAnimation() {
 }
 
 void BlobAnimation::updatePhysics() {
-    m_physics.updatePhysics(m_controlPoints, m_targetPoints, m_velocity,
-                          m_blobCenter, m_params, m_physicsParams, this);
+    m_physics.updatePhysicsParallel(m_controlPoints, m_targetPoints, m_velocity,
+                          m_blobCenter, m_params, m_physicsParams);
 
     int padding = m_params.borderWidth + m_params.glowRadius;
     m_physics.handleBorderCollisions(m_controlPoints, m_velocity, m_blobCenter,
