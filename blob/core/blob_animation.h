@@ -73,6 +73,9 @@ public:
         // TODO
     }
 
+    void setLifeColor(const QColor& color);
+    void resetLifeColor();
+
     void startBeingAbsorbed();
     void finishBeingAbsorbed();
     void cancelAbsorption();
@@ -119,6 +122,8 @@ private:
     int m_inactivityCounter = 0;
     QTimer m_resizeDebounceTimer;
     QSize m_lastSize;
+    QColor m_defaultLifeColor;
+    bool m_originalBorderColorSet = false;
 
     float m_absorptionScale = 1.0f;
     float m_absorptionOpacity = 1.0f;

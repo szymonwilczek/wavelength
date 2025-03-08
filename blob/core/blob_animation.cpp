@@ -726,3 +726,27 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
 
     return QWidget::eventFilter(watched, event);
 }
+
+void BlobAnimation::setLifeColor(const QColor &color) {
+    if (m_defaultLifeColor.isValid() == false) {
+        m_defaultLifeColor = m_params.borderColor;
+    }
+
+    m_params.borderColor = color;
+
+    m_needsRedraw = true;
+    update();
+
+    qDebug() << "Blob color changed to:" << color.name();
+}
+
+void BlobAnimation::resetLifeColor() {
+    if (m_defaultLifeColor.isValid()) {
+        m_params.borderColor = m_defaultLifeColor;
+
+        m_needsRedraw = true;
+        update();
+
+        qDebug() << "Blob color reset to default:" << m_defaultLifeColor.name();
+    }
+}
