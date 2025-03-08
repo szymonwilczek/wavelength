@@ -3,6 +3,92 @@
 
 BlobPhysics::BlobPhysics() {
     m_physicsTimer.start();
+    m_threadPool.setMaxThreadCount(QThread::idealThreadCount());
+}
+
+void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
+                                      std::vector<QPointF>& targetPoints,
+                                      std::vector<QPointF>& velocity,
+                                      QPointF& blobCenter,
+                                      const BlobConfig::BlobParameters& params,
+                                      const BlobConfig::PhysicsParameters& physicsParams) {
+
+    const size_t numPoints = controlPoints.size();
+    const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
+
+    if (numPoints < 16 || numThreads <= 1) {
+        updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams, nullptr);
+        return;
+    }
+
+    const double radiusThreshold = params.blobRadius * 1.1;
+    const double dampingFactor = physicsParams.damping;
+    const double velocityBlend = 0.8;
+    const double prevVelocityBlend = 0.2;
+    const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
+
+    static std::vector<QPointF> previousVelocity(numPoints);
+    std::copy(velocity.begin(), velocity.end(), previousVelocity.begin());
+
+    std::atomic isInMotion(false);
+
+    const size_t pointsPerThread = numPoints / numThreads;
+
+    QVector<QFuture<void>> futures;
+    futures.reserve(numThreads);
+
+    for (int t = 0; t < numThreads; ++t) {
+        const size_t startIdx = t * pointsPerThread;
+        const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * pointsPerThread;
+
+        futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx]() {
+            for (size_t i = startIdx; i < endIdx; ++i) {
+                QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
+
+                QPointF vectorToCenter = blobCenter - controlPoints[i];
+                double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() +
+                                       vectorToCenter.y()*vectorToCenter.y();
+
+                if (distFromCenter2 > radiusThreshold * radiusThreshold) {
+                    double factor = 0.03 / qSqrt(distFromCenter2);
+                    force.rx() += vectorToCenter.x() * factor;
+                    force.ry() += vectorToCenter.y() * factor;
+                }
+
+                velocity[i] += force;
+
+                velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
+                velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
+
+                velocity[i] *= dampingFactor;
+
+                double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
+
+                if (speedSquared < physicsParams.velocityThreshold * physicsParams.velocityThreshold) {
+                    velocity[i] = QPointF(0, 0);
+                } else {
+                    isInMotion = true;
+
+                    if (speedSquared > maxSpeed * maxSpeed) {
+                        double scaleFactor = maxSpeed / qSqrt(speedSquared);
+                        velocity[i] *= scaleFactor;
+                    }
+                }
+
+                controlPoints[i] += velocity[i];
+            }
+        }));
+    }
+
+    for (auto& future : futures) {
+        future.waitForFinished();
+    }
+
+    if (!isInMotion) {
+        stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
+    }
+
+    validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius);
 }
 
 void BlobPhysics::updatePhysics(std::vector<QPointF>& controlPoints,
@@ -13,58 +99,64 @@ void BlobPhysics::updatePhysics(std::vector<QPointF>& controlPoints,
                               const BlobConfig::PhysicsParameters& physicsParams,
                               QWidget* parent) {
 
-    if (parent && parent->window()) {
-        QPointF currentWindowPos = parent->window()->pos();
-        QVector2D windowVelocity = calculateWindowVelocity(currentWindowPos);
-        m_lastWindowPos = currentWindowPos;
-        m_lastWindowVelocity = windowVelocity;
+    static std::vector<QPointF> previousVelocity;
+    if (previousVelocity.size() != velocity.size()) {
+        previousVelocity.resize(velocity.size());
     }
+
+    const double radiusThreshold = params.blobRadius * 1.1;
+    const double dampingFactor = physicsParams.damping;
+    const double velocityBlend = 0.8;
+    const double prevVelocityBlend = 0.2;
+    const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
 
     bool isInMotion = false;
 
-    static std::vector<QPointF> previousVelocity;
-    if (previousVelocity.size() != velocity.size()) {
-        previousVelocity = velocity;
-    }
-
     for (size_t i = 0; i < controlPoints.size(); ++i) {
+        previousVelocity[i] = velocity[i];
+
         QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
 
         QPointF vectorToCenter = blobCenter - controlPoints[i];
-        double distanceFromCenter = QVector2D(vectorToCenter).length();
+        double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() + vectorToCenter.y()*vectorToCenter.y(); // square of distance
 
-        if (distanceFromCenter > params.blobRadius * 1.1) {
-            force += vectorToCenter * 0.03;
+        if (distFromCenter2 > radiusThreshold * radiusThreshold) {
+            double factor = 0.03 / qSqrt(distFromCenter2);
+            force.rx() += vectorToCenter.x() * factor;
+            force.ry() += vectorToCenter.y() * factor;
         }
 
         velocity[i] += force;
 
-        velocity[i] = velocity[i] * 0.8 + previousVelocity[i] * 0.2;
+        // Miksowanie prędkości
+        velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
+        velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
 
-        velocity[i] *= physicsParams.damping;
+        // Tłumienie
+        velocity[i] *= dampingFactor;
 
-        double speed = QVector2D(velocity[i]).length();
-        if (speed < physicsParams.velocityThreshold) {
+        double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
+        double thresholdSquared = physicsParams.velocityThreshold * physicsParams.velocityThreshold;
+
+        if (speedSquared < thresholdSquared) {
             velocity[i] = QPointF(0, 0);
         } else {
             isInMotion = true;
-        }
 
-        double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
-        if (speed > maxSpeed) {
-            velocity[i] *= (maxSpeed / speed);
+            if (speedSquared > maxSpeed * maxSpeed) {
+                double scaleFactor = maxSpeed / qSqrt(speedSquared);
+                velocity[i] *= scaleFactor;
+            }
         }
 
         controlPoints[i] += velocity[i];
     }
 
-    previousVelocity = velocity;
-
     if (!isInMotion) {
         stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
     }
 
-    if (validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius)) {
+    if (Q_UNLIKELY(validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius))) {
         qDebug() << "Wykryto nieprawidłowe punkty kontrolne. Zresetowano kształt blobu.";
     }
 }

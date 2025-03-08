@@ -1,17 +1,20 @@
 #ifndef BLOBPHYSICS_H
 #define BLOBPHYSICS_H
 
-#include <QPointF>
-#include <QVector>
-#include <QVector2D>
+#include <QtConcurrent>
+#include <QThreadPool>
 #include <QTime>
-#include <QWidget>
 #include "../core/blob_config.h"
 #include "../utils/blob_math.h"
 
 class BlobPhysics {
 public:
     BlobPhysics();
+
+    void updatePhysicsParallel(std::vector<QPointF> &controlPoints, std::vector<QPointF> &targetPoints,
+                               std::vector<QPointF> &velocity, QPointF &blobCenter,
+                               const BlobConfig::BlobParameters &params,
+                               const BlobConfig::PhysicsParameters &physicsParams);
 
     void updatePhysics(std::vector<QPointF>& controlPoints,
                        std::vector<QPointF>& targetPoints,
@@ -64,6 +67,7 @@ private:
     QTime m_physicsTimer;
     QPointF m_lastWindowPos;
     QVector2D m_lastWindowVelocity;
+    QThreadPool m_threadPool;
 };
 
 #endif // BLOBPHYSICS_H
