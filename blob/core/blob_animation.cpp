@@ -35,9 +35,18 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     initializeBlob();
 
+    m_windowPositionTimer.setInterval(16); // 60 FPS
+    m_windowPositionTimer.setTimerType(Qt::PreciseTimer);
+    connect(&m_windowPositionTimer, &QTimer::timeout, this, &BlobAnimation::checkWindowPosition);
+    m_windowPositionTimer.start();
+
+    m_resizeDebounceTimer.setSingleShot(true);
+    m_resizeDebounceTimer.setInterval(50); // 50 ms debounce
+    connect(&m_resizeDebounceTimer, &QTimer::timeout, this, &BlobAnimation::handleResizeTimeout);
+
     if (window()) {
         m_lastWindowPos = window()->pos();
-
+        m_lastWindowPosForTimer = m_lastWindowPos;
         window()->installEventFilter(this);
     }
 
@@ -52,6 +61,69 @@ BlobAnimation::BlobAnimation(QWidget *parent)
         m_eventsEnabled = true;
         qDebug() << "Events re-enabled";
     });
+}
+
+void BlobAnimation::handleResizeTimeout() {
+    QSize currentSize = size();
+    if (currentSize != m_lastSize) {
+        switchToState(BlobConfig::RESIZING);
+        m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
+                                    m_blobCenter, m_lastSize, currentSize);
+        m_renderer.resetGridBuffer();
+        m_lastSize = currentSize;
+
+        m_stateResetTimer.stop();
+        m_stateResetTimer.start(2000);
+        update();
+    }
+}
+
+void BlobAnimation::checkWindowPosition() {
+    QWidget* currentWindow = window();
+    if (!currentWindow || !m_eventsEnabled || m_inTransitionToIdle)
+        return;
+
+    QPointF currentWindowPos = currentWindow->pos();
+
+    if (currentWindowPos != m_lastWindowPosForTimer) {
+        QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
+
+        if (windowVelocity.length() > 0.2) {
+            m_isMoving = true;
+            m_inactivityCounter = 0;
+
+            switchToState(BlobConfig::MOVING);
+            m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
+                                          m_params.blobRadius, windowVelocity);
+
+            for (size_t i = 0; i < m_controlPoints.size(); ++i) {
+                double randX = (qrand() % 100 - 50) / 500.0;
+                double randY = (qrand() % 100 - 50) / 500.0;
+                QPointF randomVariation(randX, randY);
+
+                QPointF force(-windowVelocity.x() * 0.002, -windowVelocity.y() * 0.002);
+                force += randomVariation;
+                m_velocity[i] += force;
+            }
+
+            m_physics.setLastWindowPos(currentWindowPos);
+            update();
+        }
+
+        m_lastWindowPosForTimer = currentWindowPos;
+    } else if (m_isMoving) {
+        m_inactivityCounter++;
+
+        if (m_inactivityCounter > 60) {
+            m_isMoving = false;
+            m_inactivityCounter = 0;
+
+            if (m_currentState == BlobConfig::MOVING) {
+                m_stateResetTimer.stop();
+                m_stateResetTimer.start(1000);
+            }
+        }
+    }
 }
 
 BlobAnimation::~BlobAnimation() {
@@ -92,7 +164,7 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
                              m_params.gridColor, m_params.gridSpacing,
                              width(), height());
 
-    if (m_isBeingAbsorbed) {
+    if (m_isBeingAbsorbed || m_isClosingAfterAbsorption) {
         painter.setOpacity(m_absorptionOpacity);
         painter.save();
         QPointF center = getBlobCenter();
@@ -187,7 +259,8 @@ void BlobAnimation::startBeingAbsorbed() {
 
 void BlobAnimation::finishBeingAbsorbed() {
     qDebug() << "BlobAnimation: Zakończenie procesu bycia absorbowanym";
-    m_isBeingAbsorbed = false;
+    m_isClosingAfterAbsorption = true;
+
     m_absorptionOpacity = 0.0f;
     m_absorptionScale = 0.1f;
     update();
@@ -455,24 +528,13 @@ void BlobAnimation::handleIdleTransition() {
 
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
-
     if (!m_eventsEnabled || m_inTransitionToIdle) {
         QWidget::resizeEvent(event);
         return;
     }
 
-
-    if (event->size() != event->oldSize()) {
-        switchToState(BlobConfig::RESIZING);
-
-        m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
-                                    m_blobCenter, event->oldSize(), event->size());
-
-        m_renderer.resetGridBuffer();
-
-        m_stateResetTimer.stop();
-        m_stateResetTimer.start(2000);
-    }
+    m_lastSize = event->oldSize();
+    m_resizeDebounceTimer.start();
 
     QWidget::resizeEvent(event);
 }
@@ -618,60 +680,12 @@ void BlobAnimation::setGridSpacing(int spacing) {
 }
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
-
     if (!m_eventsEnabled || m_inTransitionToIdle) {
         return QWidget::eventFilter(watched, event);
     }
 
     if (watched == window() && event->type() == QEvent::Move) {
-        static QElapsedTimer throttleTimer;
-        static bool firstEvent = true;
-
-        if (firstEvent) {
-            throttleTimer.start();
-            firstEvent = false;
-            return QWidget::eventFilter(watched, event);
-        }
-
-        if (throttleTimer.elapsed() < 33) {
-            return QWidget::eventFilter(watched, event);
-        }
-        throttleTimer.restart();
-
-        static QSize lastSize;
-        QSize currentSize = window()->size();
-        bool isResizeInProgress = (currentSize != lastSize);
-        lastSize = currentSize;
-
-        if (isResizeInProgress) {
-            return QWidget::eventFilter(watched, event);
-        }
-
-        QPointF currentWindowPos = window()->pos();
-        QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
-
-        if (windowVelocity.length() > 0.2) {
-            switchToState(BlobConfig::MOVING);
-
-            m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
-                                        m_params.blobRadius, windowVelocity);
-
-            for (size_t i = 0; i < m_controlPoints.size(); ++i) {
-                double randX = (qrand() % 100 - 50) / 500.0;
-                double randY = (qrand() % 100 - 50) / 500.0;
-                QPointF randomVariation(randX, randY);
-
-                QPointF force(-windowVelocity.x() * 0.002, -windowVelocity.y() * 0.002);
-                force += randomVariation;
-                m_velocity[i] += force;
-            }
-
-            m_stateResetTimer.stop();
-            m_stateResetTimer.start(2000);
-        }
-
-        m_physics.setLastWindowPos(currentWindowPos);
-        updateAnimation();
+        m_lastWindowPos = window()->pos();
     }
 
     return QWidget::eventFilter(watched, event);

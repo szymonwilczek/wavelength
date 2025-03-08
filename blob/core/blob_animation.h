@@ -31,6 +31,11 @@ class BlobAnimation : public QWidget {
 
 public:
     explicit BlobAnimation(QWidget *parent = nullptr);
+
+    void handleResizeTimeout();
+
+    void checkWindowPosition();
+
     ~BlobAnimation() override;
 
     void setBackgroundColor(const QColor &color);
@@ -108,12 +113,20 @@ private:
 
     void applyIdleEffect();
 
+    QTimer m_windowPositionTimer;
+    bool m_isMoving = false;
+    QPointF m_lastWindowPosForTimer;
+    int m_inactivityCounter = 0;
+    QTimer m_resizeDebounceTimer;
+    QSize m_lastSize;
+
     float m_absorptionScale = 1.0f;
     float m_absorptionOpacity = 1.0f;
     QPropertyAnimation* m_scaleAnimation = nullptr;
     QPropertyAnimation* m_opacityAnimation = nullptr;
     float m_absorptionPulse = 0.0f;
     QPropertyAnimation* m_pulseAnimation = nullptr;
+    bool m_isClosingAfterAbsorption = false;
 
     bool m_isBeingAbsorbed = false;
     bool m_isAbsorbing = false;
