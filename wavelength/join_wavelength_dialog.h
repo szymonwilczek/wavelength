@@ -1,15 +1,15 @@
 #ifndef JOIN_WAVELENGTH_DIALOG_H
 #define JOIN_WAVELENGTH_DIALOG_H
 
+#include <QApplication>
 #include <QDialog>
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QIntValidator>
-#include <QDebug>
+#include "wavelength_manager.h"
 
 class JoinWavelengthDialog : public QDialog {
     Q_OBJECT
@@ -75,15 +75,21 @@ public:
             "QPushButton:pressed { background-color: #2e2e2e; }"
         );
 
-        buttonLayout->addWidget(cancelButton);
         buttonLayout->addWidget(joinButton);
-
-        mainLayout->addStretch();
+        buttonLayout->addWidget(cancelButton);
         mainLayout->addLayout(buttonLayout);
 
         connect(frequencyEdit, &QLineEdit::textChanged, this, &JoinWavelengthDialog::validateInput);
+        connect(passwordEdit, &QLineEdit::textChanged, this, &JoinWavelengthDialog::validateInput);
         connect(joinButton, &QPushButton::clicked, this, &JoinWavelengthDialog::tryJoin);
-        connect(cancelButton, &QPushButton::clicked, this, &JoinWavelengthDialog::reject);
+        connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        connect(manager, &WavelengthManager::wavelengthJoined, this, &JoinWavelengthDialog::accept);
+        connect(manager, &WavelengthManager::authenticationFailed, this, &JoinWavelengthDialog::onAuthFailed);
+        connect(manager, &WavelengthManager::connectionError, this, &JoinWavelengthDialog::onConnectionError);
+
+        validateInput();
     }
 
     int getFrequency() const {
@@ -96,19 +102,46 @@ public:
 
 private slots:
     void validateInput() {
-        joinButton->setEnabled(!frequencyEdit->text().isEmpty());
         if (statusLabel->isVisible()) {
             statusLabel->hide();
         }
+
+        bool isValid = !frequencyEdit->text().isEmpty();
+        joinButton->setEnabled(isValid);
     }
 
     void tryJoin() {
-        int frequency = getFrequency();
-        QString password = getPassword();
+        int frequency = frequencyEdit->text().toInt();
+        QString password = passwordEdit->text();
 
-        qDebug() << "Trying to join wavelength on frequency" << frequency;
+        statusLabel->hide();
 
-        accept();
+        if (frequency < 30 || frequency > 300) {
+            statusLabel->setText("Frequency must be between 30Hz and 300Hz");
+            statusLabel->show();
+            return;
+        }
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        bool success = manager->joinWavelength(frequency, password);
+        QApplication::restoreOverrideCursor();
+
+        if (!success) {
+            statusLabel->setText("Failed to join wavelength. It may not exist or server is unavailable.");
+            statusLabel->show();
+        }
+    }
+
+    void onAuthFailed(int frequency) {
+        statusLabel->setText("Authentication failed. Incorrect password.");
+        statusLabel->show();
+    }
+
+    void onConnectionError(const QString& errorMessage) {
+        statusLabel->setText("Connection error: " + errorMessage);
+        statusLabel->show();
     }
     
 private:
