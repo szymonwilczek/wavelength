@@ -2,16 +2,14 @@
 #define WAVELENGTH_CHAT_VIEW_H
 
 #include <QWidget>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
 #include <QScrollArea>
-#include <QDateTime>
-#include <QDebug>
-#include <QTimer>
+#include "wavelength_manager.h"
+#include <QScrollBar>
 
 class WavelengthChatView : public QWidget {
     Q_OBJECT
@@ -56,21 +54,21 @@ public:
             "  font-size: 11pt;"
             "}"
         );
+        inputLayout->addWidget(inputField, 1);
 
         sendButton = new QPushButton("Send", this);
         sendButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: #3e3e3e;"
-            "  color: #e0e0e0;"
-            "  border: 1px solid #4a4a4a;"
-            "  border-radius: 4px;"
+            "  background-color: #4a6db5;"
+            "  color: white;"
+            "  border: none;"
+            "  border-radius: 5px;"
             "  padding: 8px 16px;"
             "}"
-            "QPushButton:hover { background-color: #4a4a4a; }"
-            "QPushButton:pressed { background-color: #2e2e2e; }"
+            "QPushButton:hover { background-color: #5a7dc5; }"
+            "QPushButton:pressed { background-color: #3a5da5; }"
+            "QPushButton:disabled { background-color: #2c3e66; color: #aaaaaa; }"
         );
-
-        inputLayout->addWidget(inputField, 1);
         inputLayout->addWidget(sendButton);
 
         mainLayout->addLayout(inputLayout);
@@ -78,35 +76,60 @@ public:
         abortButton = new QPushButton("Abort Wavelength", this);
         abortButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: #3a3a3a;"
-            "  color: #e0e0e0;"
-            "  border: 1px solid #4a4a4a;"
-            "  border-radius: 4px;"
-            "  padding: 10px 20px;"
+            "  background-color: #b54a4a;"
+            "  color: white;"
+            "  border: none;"
+            "  border-radius: 5px;"
+            "  padding: 8px 16px;"
             "  margin-top: 10px;"
-            "  font-weight: bold;"
             "}"
-            "QPushButton:hover { background-color: #555555; }"
-            "QPushButton:pressed { background-color: #2e2e2e; }"
+            "QPushButton:hover { background-color: #c55a5a; }"
+            "QPushButton:pressed { background-color: #a53a3a; }"
+            "QPushButton:disabled { background-color: #662c2c; color: #aaaaaa; }"
         );
+        mainLayout->addWidget(abortButton);
 
-        mainLayout->addWidget(abortButton, 0, Qt::AlignCenter);
+        setVisible(false);
 
-        connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
         connect(inputField, &QLineEdit::returnPressed, this, &WavelengthChatView::sendMessage);
+        connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        connect(manager, &WavelengthManager::messageReceived, this, &WavelengthChatView::onMessageReceived);
+        connect(manager, &WavelengthManager::wavelengthClosed, this, &WavelengthChatView::onWavelengthClosed);
     }
 
     void setWavelength(int frequency, const QString& name = QString()) {
         currentFrequency = frequency;
-        QString displayName = name.isEmpty() ? QString::number(frequency) + " Hz" : name;
-        headerLabel->setText("Wavelength: " + displayName);
-        qDebug() << "Chat view set to frequency:" << frequency << (name.isEmpty() ? "" : "(" + name + ")");
+
+        QString title;
+        if (name.isEmpty()) {
+            title = QString("Wavelength: %1 Hz").arg(frequency);
+        } else {
+            title = QString("%1 (%2 Hz)").arg(name).arg(frequency);
+        }
+        headerLabel->setText(title);
+
+        messageArea->clear();
+
+        QString welcomeMsg = QString("<span style=\"color:#888888;\">Connected to wavelength %1 Hz at %2</span>")
+            .arg(frequency)
+            .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
+        messageArea->append(welcomeMsg);
+
+        setVisible(true);
+
+        inputField->setFocus();
+        inputField->clear();
     }
 
     void clear() {
+        currentFrequency = -1;
         messageArea->clear();
+        headerLabel->clear();
         inputField->clear();
+        setVisible(false);
     }
 
 private slots:
@@ -116,25 +139,58 @@ private slots:
             return;
         }
 
-        qDebug() << "Sending message on wavelength" << currentFrequency << ":" << message;
-
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        QString formattedMessage = QString("<b>[%1] You:</b> %2").arg(timestamp).arg(message);
-        messageArea->append(formattedMessage);
-
-        QTimer::singleShot(500, this, [this, message]() {
-            QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-            QString formattedMessage = QString("<b>[%1] Echo:</b> %2").arg(timestamp).arg(message);
-            messageArea->append(formattedMessage);
-        });
-
         inputField->clear();
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        manager->sendMessage(message);
+
     }
 
     void abortWavelength() {
-        qDebug() << "Aborting wavelength" << currentFrequency;
+        if (currentFrequency == -1) {
+            return;
+        }
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        manager->leaveWavelength();
+
         clear();
+
         emit wavelengthAborted();
+    }
+
+    void onMessageReceived(int frequency, const QString& message) {
+        if (frequency != currentFrequency) {
+            return;
+        }
+
+        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+        QString formattedMessage;
+
+        if (message.startsWith("<span")) {
+            formattedMessage = message;
+        } else {
+            formattedMessage = QString("<span style=\"color:#e0e0e0;\">[%1] %2</span>")
+                .arg(timestamp, message);
+        }
+
+        messageArea->append(formattedMessage);
+
+        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+    }
+
+    void onWavelengthClosed(int frequency) {
+        if (frequency != currentFrequency) {
+            return;
+        }
+
+        QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by the host.</span>");
+        messageArea->append(closeMsg);
+
+        QTimer::singleShot(2000, this, [this]() {
+            clear();
+            emit wavelengthAborted();
+        });
     }
 
 signals:
