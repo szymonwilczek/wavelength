@@ -41,3 +41,12 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/join_wavelength_dialog.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
+
+find_package(mongocxx REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
+find_package(bsoncxx REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
+
+find_package(bsoncxx CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+
+find_package(mongocxx CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
