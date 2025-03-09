@@ -6,12 +6,12 @@
 #include <QLabel>
 #include <QCheckBox>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QIntValidator>
-#include <QDebug>
 #include <QMessageBox>
+#include <QApplication>
+#include "wavelength_manager.h"
 
 class WavelengthDialog : public QDialog {
     Q_OBJECT
@@ -37,15 +37,22 @@ public:
 
         nameEdit = new QLineEdit(this);
         nameEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
-        formLayout->addRow("Wavelength Name (optional):", nameEdit);
+        nameEdit->setPlaceholderText("Optional");
+        formLayout->addRow("Name:", nameEdit);
 
         passwordProtectedCheckbox = new QCheckBox("Password Protected", this);
+        passwordProtectedCheckbox->setStyleSheet(
+            "QCheckBox { color: #e0e0e0; }"
+            "QCheckBox::indicator { width: 16px; height: 16px; }"
+            "QCheckBox::indicator:unchecked { background-color: #3e3e3e; border: 1px solid #555; }"
+            "QCheckBox::indicator:checked { background-color: #3e3e3e; border: 1px solid #555; image: url(:/icons/check.png); }"
+        );
         formLayout->addRow("", passwordProtectedCheckbox);
 
         passwordEdit = new QLineEdit(this);
         passwordEdit->setEchoMode(QLineEdit::Password);
-        passwordEdit->setEnabled(false);
         passwordEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
+        passwordEdit->setEnabled(false);
         formLayout->addRow("Password:", passwordEdit);
 
         mainLayout->addLayout(formLayout);
@@ -57,19 +64,19 @@ public:
 
         QHBoxLayout *buttonLayout = new QHBoxLayout();
 
-        generateButton = new QPushButton("Generate Wavelength", this);
+        generateButton = new QPushButton("Create Wavelength", this);
         generateButton->setEnabled(false);
         generateButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: #3e3e3e;"
-            "  color: #e0e0e0;"
-            "  border: 1px solid #4a4a4a;"
+            "  background-color: #4a6db5;"
+            "  color: white;"
+            "  border: none;"
             "  border-radius: 4px;"
             "  padding: 8px 16px;"
             "}"
-            "QPushButton:hover { background-color: #4a4a4a; }"
-            "QPushButton:pressed { background-color: #2e2e2e; }"
-            "QPushButton:disabled { background-color: #2a2a2a; color: #555555; }"
+            "QPushButton:hover { background-color: #5a7dc5; }"
+            "QPushButton:pressed { background-color: #3a5da5; }"
+            "QPushButton:disabled { background-color: #2c3e66; color: #aaaaaa; }"
         );
 
         cancelButton = new QPushButton("Cancel", this);
@@ -85,18 +92,19 @@ public:
             "QPushButton:pressed { background-color: #2e2e2e; }"
         );
 
-        buttonLayout->addWidget(cancelButton);
         buttonLayout->addWidget(generateButton);
-
-        mainLayout->addStretch();
+        buttonLayout->addWidget(cancelButton);
         mainLayout->addLayout(buttonLayout);
 
         connect(frequencyEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
-        connect(passwordProtectedCheckbox, &QCheckBox::toggled, passwordEdit, &QLineEdit::setEnabled);
-        connect(passwordProtectedCheckbox, &QCheckBox::toggled, this, &WavelengthDialog::validateInputs);
+        connect(nameEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
+        connect(passwordProtectedCheckbox, &QCheckBox::toggled, this, [this](bool checked) {
+            passwordEdit->setEnabled(checked);
+            validateInputs();
+        });
         connect(passwordEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
         connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
-        connect(cancelButton, &QPushButton::clicked, this, &WavelengthDialog::reject);
+        connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
     }
 
     int getFrequency() const {
@@ -104,7 +112,7 @@ public:
     }
 
     QString getName() const {
-        return nameEdit->text();
+        return nameEdit->text().trimmed();
     }
 
     bool isPasswordProtected() const {
@@ -117,34 +125,64 @@ public:
 
 private slots:
     void validateInputs() {
-        bool valid = !frequencyEdit->text().isEmpty();
+        statusLabel->hide();
 
+        bool isFrequencyValid = !frequencyEdit->text().isEmpty();
+
+        bool isPasswordValid = true;
         if (passwordProtectedCheckbox->isChecked()) {
-            valid = valid && !passwordEdit->text().isEmpty();
+            isPasswordValid = !passwordEdit->text().isEmpty();
         }
 
-        generateButton->setEnabled(valid);
-        if (statusLabel->isVisible()) {
-            statusLabel->hide();
-        }
+        generateButton->setEnabled(isFrequencyValid && isPasswordValid);
     }
 
-    void tryGenerate() {
-        int frequency = getFrequency();
 
-        if (!checkFrequencyAvailable(frequency)) {
-            statusLabel->setText(QString("Frequency %1Hz is already in use!").arg(frequency));
-            statusLabel->show();
+    void tryGenerate() {
+        static bool isGenerating = false;
+
+        if (isGenerating) {
+            qDebug() << "LOG: Blokada wielokrotnego wywołania tryGenerate()";
             return;
         }
 
-        accept();
+        isGenerating = true;
+        qDebug() << "LOG: tryGenerate - start";
+
+        int frequency = frequencyEdit->text().toInt();
+        QString name = nameEdit->text().trimmed();
+        bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
+        QString password = passwordEdit->text();
+
+        qDebug() << "LOG: tryGenerate - sprawdzanie dostępności częstotliwości" << frequency;
+
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        disconnect(manager, nullptr, this, nullptr);
+        disconnect(generateButton, &QPushButton::clicked, this, nullptr);
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        qDebug() << "LOG: tryGenerate - rzeczywiste tworzenie wavelength";
+        bool success = manager->createWavelength(frequency, name, isPasswordProtected, password);
+
+        QApplication::restoreOverrideCursor();
+
+        if (!success) {
+            qDebug() << "LOG: tryGenerate - niepowodzenie utworzenia wavelength";
+            statusLabel->setText("Failed to create wavelength. Check your MongoDB connection.");
+            statusLabel->show();
+        } else {
+            qDebug() << "LOG: tryGenerate - wavelength utworzony pomyślnie, akceptacja dialogu";
+            QDialog::accept();
+        }
+
+        isGenerating = false;
+        qDebug() << "LOG: tryGenerate - koniec";
     }
 
     bool checkFrequencyAvailable(int frequency) {
-        qDebug() << "Checking if frequency" << frequency << "is available...";
-
-        return true;
+        WavelengthManager* manager = WavelengthManager::getInstance();
+        return manager->isFrequencyAvailable(frequency);
     }
 
 private:
