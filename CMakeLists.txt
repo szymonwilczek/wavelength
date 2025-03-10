@@ -31,16 +31,14 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/utils/blob_path.h
         blob/core/app_instance_manager.cpp
         blob/core/app_instance_manager.h
-        wavelength/wavelength_dialog.cpp
-        wavelength/wavelength_dialog.h
-        wavelength/wavelength_chat_view.cpp
-        wavelength/wavelength_chat_view.h
-        wavelength/join_wavelength_dialog.cpp
-        wavelength/join_wavelength_dialog.h
+        wavelength/dialogs/wavelength_dialog.cpp
+        wavelength/dialogs/wavelength_dialog.h
+        wavelength/view/wavelength_chat_view.cpp
+        wavelength/view/wavelength_chat_view.h
+        wavelength/dialogs/join_wavelength_dialog.cpp
+        wavelength/dialogs/join_wavelength_dialog.h
         wavelength/database/database_manager.cpp
         wavelength/database/database_manager.h
-        wavelength/connection/connection_manager.cpp
-        wavelength/connection/connection_manager.h
         wavelength/messages/message_handler.cpp
         wavelength/messages/message_handler.h
         wavelength/auth/authentication_manager.cpp
