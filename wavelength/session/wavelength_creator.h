@@ -25,7 +25,7 @@ public:
         return &instance;
     }
 
-    bool createWavelength(int frequency, const QString& name, bool isPasswordProtected,
+    bool createWavelength(double frequency, const QString& name, bool isPasswordProtected,
                   const QString& password) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
 

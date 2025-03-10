@@ -20,9 +20,9 @@ public:
         return &instance;
     }
 
-    bool isFrequencyAvailable(int frequency) {
-        if (frequency < 30 || frequency > 300) {
-            qDebug() << "Frequency out of valid range (30-300Hz)";
+    bool isFrequencyAvailable(double frequency) {
+        if (frequency < 130.0 || frequency > 180000000.0) {
+            qDebug() << "Frequency out of valid range (30Hz-180MHz)";
             return false;
         }
 
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    bool addWavelength(int frequency, const QString& name, bool isPasswordProtected, 
+    bool addWavelength(double frequency, const QString& name, bool isPasswordProtected,
                     const QString& hostId) {
         try {
             auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
@@ -64,7 +64,7 @@ public:
         }
     }
 
-    bool removeWavelength(int frequency) {
+    bool removeWavelength(double frequency) {
         try {
             auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
             auto document = bsoncxx::builder::basic::document{};
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    bool getWavelengthDetails(int frequency, QString& name, bool& isPasswordProtected) {
+    bool getWavelengthDetails(double frequency, QString& name, bool& isPasswordProtected) {
         try {
             auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
             auto document = bsoncxx::builder::basic::document{};

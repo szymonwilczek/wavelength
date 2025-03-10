@@ -9,7 +9,7 @@
 #include <QDebug>
 
 struct WavelengthInfo {
-    int frequency;
+    double frequency;
     QString name;
     bool isPasswordProtected;
     QString password;
@@ -31,7 +31,7 @@ public:
         return &instance;
     }
 
-    bool addWavelength(int frequency, const WavelengthInfo& info) {
+    bool addWavelength(double frequency, const WavelengthInfo& info) {
         if (hasWavelength(frequency)) {
             qDebug() << "Wavelength" << frequency << "already exists";
             return false;

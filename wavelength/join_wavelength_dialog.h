@@ -8,7 +8,8 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QFormLayout>
-#include <QIntValidator>
+#include <QDoubleValidator>
+#include <QComboBox>
 #include "session/wavelength_session_coordinator.h"
 
 class JoinWavelengthDialog : public QDialog {
@@ -18,20 +19,53 @@ public:
     explicit JoinWavelengthDialog(QWidget *parent = nullptr) : QDialog(parent) {
         setWindowTitle("Join Wavelength");
         setModal(true);
-        setFixedSize(400, 200);
+        setFixedSize(400, 250); // Zwiększona wysokość dla dodatkowej etykiety
         setStyleSheet("background-color: #2d2d2d; color: #e0e0e0;");
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-        QLabel *infoLabel = new QLabel("Enter wavelength frequency to join (30Hz - 300Hz):", this);
+        QLabel *infoLabel = new QLabel("Enter wavelength frequency to join (130Hz - 180MHz):", this);
         mainLayout->addWidget(infoLabel);
 
         QFormLayout *formLayout = new QFormLayout();
 
+        // Układ dla pola częstotliwości i selecta jednostki
+        QHBoxLayout *freqLayout = new QHBoxLayout();
+
         frequencyEdit = new QLineEdit(this);
-        frequencyEdit->setValidator(new QIntValidator(30, 300, this));
+        // Walidator dla liczb zmiennoprzecinkowych (min, max, precyzja)
+        frequencyEdit->setValidator(new QDoubleValidator(130, 180000000.0, 1, this));
         frequencyEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
-        formLayout->addRow("Frequency (Hz):", frequencyEdit);
+        freqLayout->addWidget(frequencyEdit);
+
+        frequencyUnitCombo = new QComboBox(this);
+        frequencyUnitCombo->addItem("Hz");
+        frequencyUnitCombo->addItem("kHz");
+        frequencyUnitCombo->addItem("MHz");
+        frequencyUnitCombo->setStyleSheet(
+            "QComboBox {"
+            "  background-color: #3e3e3e;"
+            "  border: 1px solid #555;"
+            "  padding: 5px;"
+            "  min-width: 70px;"
+            "}"
+            "QComboBox::drop-down {"
+            "  subcontrol-origin: padding;"
+            "  subcontrol-position: top right;"
+            "  width: 20px;"
+            "  border-left-width: 1px;"
+            "  border-left-color: #555;"
+            "  border-left-style: solid;"
+            "}"
+        );
+        freqLayout->addWidget(frequencyUnitCombo);
+
+        formLayout->addRow("Frequency:", freqLayout);
+
+        // Dodaj etykietę z informacją o używaniu kropki
+        QLabel *decimalHintLabel = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
+        decimalHintLabel->setStyleSheet("color: #aaaaaa; font-size: 11px; padding-left: 5px;");
+        formLayout->addRow("", decimalHintLabel);
 
         passwordEdit = new QLineEdit(this);
         passwordEdit->setEchoMode(QLineEdit::Password);
@@ -92,8 +126,17 @@ public:
         validateInput();
     }
 
-    int getFrequency() const {
-        return frequencyEdit->text().toInt();
+    double getFrequency() const {
+        double value = frequencyEdit->text().toDouble();
+
+        // Przelicz wartość na Hz w zależności od wybranej jednostki
+        if (frequencyUnitCombo->currentText() == "kHz") {
+            value *= 1000.0;
+        } else if (frequencyUnitCombo->currentText() == "MHz") {
+            value *= 1000000.0;
+        }
+
+        return value;
     }
 
     QString getPassword() const {
@@ -111,13 +154,13 @@ private slots:
     }
 
     void tryJoin() {
-        int frequency = frequencyEdit->text().toInt();
+        double frequency = getFrequency();
         QString password = passwordEdit->text();
 
         statusLabel->hide();
 
-        if (frequency < 30 || frequency > 300) {
-            statusLabel->setText("Frequency must be between 30Hz and 300Hz");
+        if (frequency < 130 || frequency > 180000000.0) {
+            statusLabel->setText("Frequency must be between 130Hz and 180MHz");
             statusLabel->show();
             return;
         }
@@ -143,9 +186,10 @@ private slots:
         statusLabel->setText("Connection error: " + errorMessage);
         statusLabel->show();
     }
-    
+
 private:
     QLineEdit *frequencyEdit;
+    QComboBox *frequencyUnitCombo;
     QLineEdit *passwordEdit;
     QLabel *statusLabel;
     QPushButton *joinButton;

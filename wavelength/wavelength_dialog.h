@@ -25,15 +25,15 @@ public:
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-        QLabel *infoLabel = new QLabel("Enter wavelength frequency (30Hz - 300Hz):", this);
+        QLabel *infoLabel = new QLabel("System automatically assigns the lowest available frequency:", this);
         mainLayout->addWidget(infoLabel);
 
         QFormLayout *formLayout = new QFormLayout();
 
-        frequencyEdit = new QLineEdit(this);
-        frequencyEdit->setValidator(new QIntValidator(30, 300, this));
-        frequencyEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
-        formLayout->addRow("Frequency (Hz):", frequencyEdit);
+        // Pole wyświetlające częstotliwość (tylko do odczytu)
+        frequencyLabel = new QLabel(this);
+        frequencyLabel->setStyleSheet("font-size: 16px; font-weight: bold; color: #4a6db5;");
+        formLayout->addRow("Assigned frequency:", frequencyLabel);
 
         nameEdit = new QLineEdit(this);
         nameEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
@@ -65,7 +65,6 @@ public:
         QHBoxLayout *buttonLayout = new QHBoxLayout();
 
         generateButton = new QPushButton("Create Wavelength", this);
-        generateButton->setEnabled(false);
         generateButton->setStyleSheet(
             "QPushButton {"
             "  background-color: #4a6db5;"
@@ -96,8 +95,6 @@ public:
         buttonLayout->addWidget(cancelButton);
         mainLayout->addLayout(buttonLayout);
 
-        connect(frequencyEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
-        connect(nameEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
         connect(passwordProtectedCheckbox, &QCheckBox::toggled, this, [this](bool checked) {
             passwordEdit->setEnabled(checked);
             validateInputs();
@@ -105,10 +102,14 @@ public:
         connect(passwordEdit, &QLineEdit::textChanged, this, &WavelengthDialog::validateInputs);
         connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
         connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+
+        // Znajdź najniższą dostępną częstotliwość i wyświetl ją
+        findLowestAvailableFrequency();
+        validateInputs();
     }
 
-    int getFrequency() const {
-        return frequencyEdit->text().toInt();
+    double getFrequency() const {
+        return m_frequency;
     }
 
     QString getName() const {
@@ -127,16 +128,13 @@ private slots:
     void validateInputs() {
         statusLabel->hide();
 
-        bool isFrequencyValid = !frequencyEdit->text().isEmpty();
-
         bool isPasswordValid = true;
         if (passwordProtectedCheckbox->isChecked()) {
             isPasswordValid = !passwordEdit->text().isEmpty();
         }
 
-        generateButton->setEnabled(isFrequencyValid && isPasswordValid);
+        generateButton->setEnabled(isPasswordValid);
     }
-
 
     void tryGenerate() {
         static bool isGenerating = false;
@@ -149,21 +147,9 @@ private slots:
         isGenerating = true;
         qDebug() << "LOG: tryGenerate - start";
 
-        // Tylko walidacja, bez tworzenia częstotliwości
-        int frequency = frequencyEdit->text().toInt();
         QString name = nameEdit->text().trimmed();
         bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
         QString password = passwordEdit->text();
-
-        DatabaseManager* manager = DatabaseManager::getInstance();
-
-        if (!manager->isFrequencyAvailable(frequency)) {
-            qDebug() << "LOG: tryGenerate - częstotliwość niedostępna";
-            statusLabel->setText("Frequency is already in use.");
-            statusLabel->show();
-            isGenerating = false;
-            return;
-        }
 
         qDebug() << "LOG: tryGenerate - walidacja pomyślna, akceptacja dialogu";
         QDialog::accept();
@@ -172,19 +158,70 @@ private slots:
         qDebug() << "LOG: tryGenerate - koniec";
     }
 
-    bool checkFrequencyAvailable(int frequency) {
+private:
+    void findLowestAvailableFrequency() {
         DatabaseManager* manager = DatabaseManager::getInstance();
-        return manager->isFrequencyAvailable(frequency);
+
+        // Początek od 130Hz i szukamy do 1800MHz
+        double frequency = 130;
+        double maxFrequency = 180.0 * 1000000; // 180MHz w Hz
+
+        while (frequency <= maxFrequency) {
+            if (manager->isFrequencyAvailable(frequency)) {
+                m_frequency = frequency;
+                updateFrequencyLabel();
+                return;
+            }
+
+            // Zwiększamy o 0.1 dla częstotliwości poniżej 1000Hz
+            // Dla większych częstotliwości zwiększamy o większe skoki
+            if (frequency < 1000) {
+                frequency += 0.1;
+            } else if (frequency < 10000) {
+                frequency += 1.0;
+            } else if (frequency < 100000) {
+                frequency += 10.0;
+            } else if (frequency < 1000000) {
+                frequency += 100.0;
+            } else {
+                frequency += 1000.0;
+            }
+        }
+
+        // Jeśli nie znaleziono, ustawiamy domyślną wartość
+        m_frequency = 130.0;
+        updateFrequencyLabel();
+    }
+
+    void updateFrequencyLabel() {
+        QString unitText;
+        double displayValue;
+
+        if (m_frequency >= 1000000) {
+            displayValue = m_frequency / 1000000.0;
+            unitText = " MHz";
+        } else if (m_frequency >= 1000) {
+            displayValue = m_frequency / 1000.0;
+            unitText = " kHz";
+        } else {
+            displayValue = m_frequency;
+            unitText = " Hz";
+        }
+
+        // Formatuj z jednym miejscem po przecinku
+        QString displayText = QString::number(displayValue, 'f', 1) + unitText;
+        frequencyLabel->setText(displayText);
     }
 
 private:
-    QLineEdit *frequencyEdit;
+    QLabel *frequencyLabel;
     QLineEdit *nameEdit;
     QCheckBox *passwordProtectedCheckbox;
     QLineEdit *passwordEdit;
     QLabel *statusLabel;
     QPushButton *generateButton;
     QPushButton *cancelButton;
+    double m_frequency = 130.0; // Domyślna wartość
 };
 
 #endif // WAVELENGTH_DIALOG_H
