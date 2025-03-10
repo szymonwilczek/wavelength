@@ -11,9 +11,9 @@
 #include <QTimer>
 
 #include "blob/core/app_instance_manager.h"
-#include "wavelength/join_wavelength_dialog.h"
-#include "wavelength/wavelength_chat_view.h"
-#include "wavelength/wavelength_dialog.h"
+#include "wavelength/dialogs/join_wavelength_dialog.h"
+#include "wavelength/view/wavelength_chat_view.h"
+#include "wavelength/dialogs/wavelength_dialog.h"
 
 // Zamiast wavelength_manager.h, teraz importujemy koordynatora
 #include "wavelength/session/wavelength_session_coordinator.h"

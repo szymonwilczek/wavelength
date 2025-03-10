@@ -11,7 +11,7 @@
 #include <QIntValidator>
 #include <QMessageBox>
 #include <QApplication>
-#include "session/wavelength_session_coordinator.h"
+#include "../session/wavelength_session_coordinator.h"
 
 class WavelengthDialog : public QDialog {
     Q_OBJECT

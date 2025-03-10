@@ -10,7 +10,7 @@
 #include <QFormLayout>
 #include <QDoubleValidator>
 #include <QComboBox>
-#include "session/wavelength_session_coordinator.h"
+#include "../session/wavelength_session_coordinator.h"
 
 class JoinWavelengthDialog : public QDialog {
     Q_OBJECT

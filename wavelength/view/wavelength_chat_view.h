@@ -11,7 +11,7 @@
 #include <QScrollBar>
 #include <QTimer>
 
-#include "session/wavelength_session_coordinator.h"
+#include "../session/wavelength_session_coordinator.h"
 
 class WavelengthChatView : public QWidget {
     Q_OBJECT

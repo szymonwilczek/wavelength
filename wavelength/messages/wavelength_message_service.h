@@ -79,6 +79,8 @@ public:
         qDebug() << "Sending message to server:" << jsonMessage;
         socket->sendTextMessage(jsonMessage);
 
+        qDebug() << "WavelengthMessageService: Message sent:" << messageId;
+
         return true;
     }
 

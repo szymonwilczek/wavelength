@@ -41,6 +41,7 @@ public:
         QJsonDocument doc(messageObj);
         socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
 
+        qDebug() << "MessageHandler: Message sent:" << messageObj["messageId"].toString();
         return true;
     }
 
