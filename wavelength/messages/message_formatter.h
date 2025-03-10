@@ -1,8 +1,6 @@
 #ifndef MESSAGE_FORMATTER_H
 #define MESSAGE_FORMATTER_H
 
-#include <QString>
-#include <QDateTime>
 #include <QJsonObject>
 #include "../registry/wavelength_registry.h"
 
@@ -64,17 +62,6 @@ public:
         }
         
         return formattedMsg;
-    }
-
-    // Formatowanie wysyłanych wiadomości
-    static QString formatSentMessage(int frequency, const QString& content, bool isHost) {
-        QString timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
-        
-        if (isHost) {
-            return QString("%1 <span style=\"color:#60ff8a;\">[You (Host)]:</span> %2").arg(timestamp, content);
-        } else {
-            return QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> %2").arg(timestamp, content);
-        }
     }
 
     // Formatowanie komunikatów systemowych
