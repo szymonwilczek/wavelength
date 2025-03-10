@@ -228,6 +228,10 @@ private:
     QPushButton *sendButton;
     QPushButton *abortButton;
     int currentFrequency = -1;
+    void addMessage(const QString& message) {
+        qDebug() << "Adding message to chat:" << message;
+        messageArea->append(message);
+    }
 };
 
 #endif // WAVELENGTH_CHAT_VIEW_H
