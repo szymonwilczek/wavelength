@@ -24,26 +24,6 @@ public:
         return QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
-    bool sendMessage(QWebSocket* socket, int frequency, const QString& content, const QString& senderId) {
-        if (!socket || !socket->isValid()) {
-            qDebug() << "Cannot send message - socket is invalid";
-            return false;
-        }
-
-        QJsonObject messageObj;
-        messageObj["type"] = "message";
-        messageObj["frequency"] = frequency;
-        messageObj["content"] = content;
-        messageObj["senderId"] = senderId;
-        messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
-        messageObj["messageId"] = generateMessageId();
-
-        QJsonDocument doc(messageObj);
-        socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
-
-        qDebug() << "MessageHandler: Message sent:" << messageObj["messageId"].toString();
-        return true;
-    }
 
     bool sendSystemCommand(QWebSocket* socket, const QString& command, const QJsonObject& params = QJsonObject()) {
         if (!socket || !socket->isValid()) {
