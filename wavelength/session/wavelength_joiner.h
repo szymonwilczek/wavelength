@@ -12,6 +12,7 @@
 #include "../database/database_manager.h"
 #include "../registry/wavelength_registry.h"
 #include "../auth/authentication_manager.h"
+#include "../messages/message_formatter.h"
 #include "../messages/message_handler.h"
 #include "../util/wavelength_config.h"
 
@@ -117,101 +118,16 @@ public:
                 // Disconnect socket
                 socket->close();
             }
-        } else if (msgType == "message" || msgType == "send_message") {
-    qDebug() << "\n===== PEŁNA WIADOMOŚĆ =====";
-    qDebug() << "Typ:" << msgType;
-    qDebug() << "Oryginalna treść JSON:" << message;
-    qDebug() << "Parsowane pola:";
-    for (auto it = msgObj.constBegin(); it != msgObj.constEnd(); ++it) {
-        qDebug() << " - " << it.key() << ":" << it.value().toString();
-    }
-    qDebug() << "==========================\n";
-
-    QString messageId = msgObj["messageId"].toString();
-    int msgFrequency = msgObj["frequency"].toInt();
-
-    // Check if we've seen this message before
-    if (!MessageHandler::getInstance()->isMessageProcessed(messageId)) {
-        MessageHandler::getInstance()->markMessageAsProcessed(messageId);
-
-        // Sprawdź czy to wiadomość dla tej częstotliwości
-        if (msgFrequency == frequency) {
-            QString content;
-            QString senderName;
-
-            // Ustal treść wiadomości
-            if (msgObj.contains("content")) {
-                content = msgObj["content"].toString();
-            }
-
-            // Jeśli treść jest pusta, a to jest wiadomość od nas, sprawdźmy w cache'u
-            if (content.isEmpty() && msgObj.contains("isSelf") && msgObj["isSelf"].toBool()) {
-                if (msgObj.contains(messageId)) {
-                    content = msgObj[messageId].toString();
-                    msgObj.remove(messageId);
-                }
-            }
-
-            // Jeśli treść jest nadal pusta, próbujmy ostatniej szansy
-            if (content.isEmpty()) {
-                // Sprawdź, czy w oryginalnym tekście JSON jest content w ramach innego pola
-                // lub struktury zagnieżdżonej
-                QString jsonStr = message.toLower();
-                int contentPos = jsonStr.indexOf("content");
-                if (contentPos >= 0) {
-                    int valueStart = jsonStr.indexOf(":", contentPos);
-                    if (valueStart > 0) {
-                        valueStart++; // Przejdź za dwukropek
-
-                        // Przejdź za spacje
-                        while (valueStart < jsonStr.length() && jsonStr[valueStart].isSpace()) {
-                            valueStart++;
-                        }
-
-                        // Sprawdź czy to string (zaczyna się od ")
-                        if (valueStart < jsonStr.length() && jsonStr[valueStart] == '"') {
-                            valueStart++; // Przejdź za cudzysłów
-                            int valueEnd = jsonStr.indexOf("\"", valueStart);
-                            if (valueEnd > valueStart) {
-                                content = message.mid(valueStart, valueEnd - valueStart);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Ustal nazwę nadawcy
-            if (msgObj.contains("sender")) {
-                senderName = msgObj["sender"].toString();
-            } else if (msgObj.contains("senderId")) {
-                QString senderId = msgObj["senderId"].toString();
-                WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
-
-                if (senderId == info.hostId) {
-                    senderName = "Host";
-                } else {
-                    senderName = "User_" + senderId.left(5);
-                }
-            }
-
-            // Ostatnia próba - jeśli nadal nie mamy treści lub nadawcy
-            if (content.isEmpty()) {
-                content = "[treść nieodczytana]";
-            }
-
-            if (senderName.isEmpty()) {
-                senderName = "Unknown";
-            }
-
-            // Format wiadomości
-            QString timestamp = QTime::currentTime().toString("[hh:mm:ss]");
-            QString formattedMessage = QString("%1 %2: %3").arg(timestamp).arg(senderName).arg(content);
-
-            qDebug() << "Sformatowana wiadomość:" << formattedMessage;
-            emit messageReceived(formattedMessage);
         }
-    }
-}
+        else if (msgType == "message" || msgType == "send_message") {
+            qDebug() << "Received chat message in wavelength" << frequency;
+
+            // Używamy MessageFormatter do formatowania wiadomości
+            QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+
+            // Emitujemy sygnał o otrzymaniu wiadomości
+            emit messageReceived(frequency, formattedMsg);
+        }
 
     });
 
@@ -296,7 +212,7 @@ signals:
     void wavelengthClosed(int frequency);
     void authenticationFailed(int frequency);
     void connectionError(const QString& errorMessage);
-    void messageReceived(const QString& formattedMessage);
+    void messageReceived(int frequency, const QString& formattedMessage);
     void wavelengthLeft(int frequency);
 
 private:

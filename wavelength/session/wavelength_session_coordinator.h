@@ -270,6 +270,8 @@ private:
                 this, &WavelengthSessionCoordinator::onConnectionError, Qt::DirectConnection);
         connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::authenticationFailed,
                 this, &WavelengthSessionCoordinator::onAuthenticationFailed, Qt::DirectConnection);
+        connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::messageReceived,
+           this, &WavelengthSessionCoordinator::onMessageReceived, Qt::DirectConnection);
 
         // WavelengthLeaver
         connect(WavelengthLeaver::getInstance(), &WavelengthLeaver::wavelengthLeft,
