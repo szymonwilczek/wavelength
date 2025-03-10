@@ -9,7 +9,7 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QIntValidator>
-#include "wavelength_manager.h"
+#include "session/wavelength_session_coordinator.h"
 
 class JoinWavelengthDialog : public QDialog {
     Q_OBJECT
@@ -84,10 +84,10 @@ public:
         connect(joinButton, &QPushButton::clicked, this, &JoinWavelengthDialog::tryJoin);
         connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
-        connect(manager, &WavelengthManager::wavelengthJoined, this, &JoinWavelengthDialog::accept);
-        connect(manager, &WavelengthManager::authenticationFailed, this, &JoinWavelengthDialog::onAuthFailed);
-        connect(manager, &WavelengthManager::connectionError, this, &JoinWavelengthDialog::onConnectionError);
+        WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
+        connect(joiner, &WavelengthJoiner::wavelengthJoined, this, &JoinWavelengthDialog::accept);
+        connect(joiner, &WavelengthJoiner::authenticationFailed, this, &JoinWavelengthDialog::onAuthFailed);
+        connect(joiner, &WavelengthJoiner::connectionError, this, &JoinWavelengthDialog::onConnectionError);
 
         validateInput();
     }
@@ -122,10 +122,10 @@ private slots:
             return;
         }
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
+        WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        bool success = manager->joinWavelength(frequency, password);
+        bool success = joiner->joinWavelength(frequency, password);
         QApplication::restoreOverrideCursor();
 
         if (!success) {
