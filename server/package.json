@@ -1,0 +1,17 @@
+{
+  "name": "wavelength-relay-server",
+  "version": "1.0.0",
+  "description": "Relay server for Wavelength application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "mongodb": "^6.14.2",
+    "socket.io": "^4.8.1"
+  }
+}
