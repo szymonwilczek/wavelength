@@ -1,0 +1,143 @@
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
+
+#include <QObject>
+#include <QString>
+#include <QDebug>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+
+class DatabaseManager : public QObject {
+    Q_OBJECT
+
+public:
+    static DatabaseManager* getInstance() {
+        static DatabaseManager instance;
+        return &instance;
+    }
+
+    bool isFrequencyAvailable(int frequency) {
+        if (frequency < 30 || frequency > 300) {
+            qDebug() << "Frequency out of valid range (30-300Hz)";
+            return false;
+        }
+
+        try {
+            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+            auto document = bsoncxx::builder::basic::document{};
+            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+            auto filter = document.view();
+            auto result = collection.find_one(filter);
+
+            bool available = !result;
+            qDebug() << "Checking if frequency" << frequency << "is available:" << available;
+            return available;
+        }
+        catch (const std::exception& e) {
+            qDebug() << "MongoDB error:" << e.what();
+            return false;
+        }
+    }
+
+    bool addWavelength(int frequency, const QString& name, bool isPasswordProtected, 
+                    const QString& hostId) {
+        try {
+            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+            auto builder = bsoncxx::builder::basic::document{};
+            
+            builder.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+            builder.append(bsoncxx::builder::basic::kvp("name", name.toStdString()));
+            builder.append(bsoncxx::builder::basic::kvp("isPasswordProtected", isPasswordProtected));
+            builder.append(bsoncxx::builder::basic::kvp("hostId", hostId.toStdString()));
+            
+            collection.insert_one(builder.view());
+            qDebug() << "Successfully added wavelength" << frequency << "to database";
+            return true;
+        }
+        catch (const std::exception& e) {
+            qDebug() << "MongoDB error when adding wavelength:" << e.what();
+            return false;
+        }
+    }
+
+    bool removeWavelength(int frequency) {
+        try {
+            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+            auto document = bsoncxx::builder::basic::document{};
+            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+            auto filter = document.view();
+            
+            auto result = collection.delete_one(filter);
+            bool success = result && result->deleted_count() > 0;
+            
+            qDebug() << "Removed wavelength" << frequency << "from database:" << success;
+            return success;
+        }
+        catch (const std::exception& e) {
+            qDebug() << "MongoDB error when removing wavelength:" << e.what();
+            return false;
+        }
+    }
+
+    bool getWavelengthDetails(int frequency, QString& name, bool& isPasswordProtected) {
+        try {
+            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+            auto document = bsoncxx::builder::basic::document{};
+            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+            auto filter = document.view();
+            auto result = collection.find_one(filter);
+            
+            if (!result) {
+                qDebug() << "Wavelength" << frequency << "not found in database";
+                return false;
+            }
+            
+            auto doc = result->view();
+            isPasswordProtected = doc["isPasswordProtected"].get_bool().value;
+            name = QString::fromStdString(static_cast<std::string>(doc["name"].get_string().value));
+            
+            return true;
+        }
+        catch (const std::exception& e) {
+            qDebug() << "MongoDB error when getting wavelength details:" << e.what();
+            return false;
+        }
+    }
+
+    bool isConnected() const {
+        return m_isConnected;
+    }
+
+private:
+    DatabaseManager(QObject* parent = nullptr) 
+        : QObject(parent), m_isConnected(false) {
+        try {
+            static mongocxx::instance instance{};
+            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb+srv://wolfiksw:PrincePolo1@testcluster.taymr.mongodb.net/"}};
+            
+            // Test connection
+            // m_mongoClient.database("admin").run_command(bsoncxx::builder::basic::document{}.view());
+            m_isConnected = true;
+            
+            qDebug() << "Connected to MongoDB successfully";
+        }
+        catch (const std::exception& e) {
+            qDebug() << "Failed to connect to MongoDB:" << e.what();
+            m_isConnected = false;
+        }
+    }
+
+    ~DatabaseManager() {}
+
+    DatabaseManager(const DatabaseManager&) = delete;
+    DatabaseManager& operator=(const DatabaseManager&) = delete;
+
+    mongocxx::client m_mongoClient;
+    bool m_isConnected;
+};
+
+#endif // DATABASE_MANAGER_H
