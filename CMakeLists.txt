@@ -51,6 +51,28 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/registry/wavelength_registry.h
         wavelength/network/network_utilities.cpp
         wavelength/network/network_utilities.h
+        wavelength/session/wavelength_creator.cpp
+        wavelength/session/wavelength_creator.h
+        wavelength/session/wavelength_joiner.cpp
+        wavelength/session/wavelength_joiner.h
+        wavelength/session/wavelength_leaver.cpp
+        wavelength/session/wavelength_leaver.h
+        wavelength/socket/wavelength_socket_handler.cpp
+        wavelength/socket/wavelength_socket_handler.h
+        wavelength/messages/wavelength_message_service.cpp
+        wavelength/messages/wavelength_message_service.h
+        wavelength/messages/wavelength_message_processor.cpp
+        wavelength/messages/wavelength_message_processor.h
+        wavelength/managers/wavelength_state_manager.cpp
+        wavelength/managers/wavelength_state_manager.h
+        wavelength/managers/wavelength_event_broker.cpp
+        wavelength/managers/wavelength_event_broker.h
+        wavelength/util/wavelength_config.cpp
+        wavelength/util/wavelength_config.h
+        wavelength/session/wavelength_session_coordinator.cpp
+        wavelength/session/wavelength_session_coordinator.h
+        wavelength/messages/message_formatter.cpp
+        wavelength/messages/message_formatter.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
