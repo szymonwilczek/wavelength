@@ -39,6 +39,18 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/wavelength_chat_view.h
         wavelength/join_wavelength_dialog.cpp
         wavelength/join_wavelength_dialog.h
+        wavelength/database/database_manager.cpp
+        wavelength/database/database_manager.h
+        wavelength/connection/connection_manager.cpp
+        wavelength/connection/connection_manager.h
+        wavelength/messages/message_handler.cpp
+        wavelength/messages/message_handler.h
+        wavelength/auth/authentication_manager.cpp
+        wavelength/auth/authentication_manager.h
+        wavelength/registry/wavelength_registry.cpp
+        wavelength/registry/wavelength_registry.h
+        wavelength/network/network_utilities.cpp
+        wavelength/network/network_utilities.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
