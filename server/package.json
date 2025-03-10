@@ -12,6 +12,7 @@
     "express": "^4.21.2",
     "http": "^0.0.1-security",
     "mongodb": "^6.14.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.1"
   }
 }
