@@ -11,7 +11,7 @@
 #include <QIntValidator>
 #include <QMessageBox>
 #include <QApplication>
-#include "wavelength_manager.h"
+#include "session/wavelength_session_coordinator.h"
 
 class WavelengthDialog : public QDialog {
     Q_OBJECT
@@ -155,7 +155,7 @@ private slots:
         bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
         QString password = passwordEdit->text();
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
+        DatabaseManager* manager = DatabaseManager::getInstance();
 
         if (!manager->isFrequencyAvailable(frequency)) {
             qDebug() << "LOG: tryGenerate - częstotliwość niedostępna";
@@ -173,7 +173,7 @@ private slots:
     }
 
     bool checkFrequencyAvailable(int frequency) {
-        WavelengthManager* manager = WavelengthManager::getInstance();
+        DatabaseManager* manager = DatabaseManager::getInstance();
         return manager->isFrequencyAvailable(frequency);
     }
 
