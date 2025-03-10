@@ -149,32 +149,24 @@ private slots:
         isGenerating = true;
         qDebug() << "LOG: tryGenerate - start";
 
+        // Tylko walidacja, bez tworzenia częstotliwości
         int frequency = frequencyEdit->text().toInt();
         QString name = nameEdit->text().trimmed();
         bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
         QString password = passwordEdit->text();
 
-        qDebug() << "LOG: tryGenerate - sprawdzanie dostępności częstotliwości" << frequency;
-
         WavelengthManager* manager = WavelengthManager::getInstance();
-        disconnect(manager, nullptr, this, nullptr);
-        disconnect(generateButton, &QPushButton::clicked, this, nullptr);
 
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-
-        qDebug() << "LOG: tryGenerate - rzeczywiste tworzenie wavelength";
-        bool success = manager->createWavelength(frequency, name, isPasswordProtected, password);
-
-        QApplication::restoreOverrideCursor();
-
-        if (!success) {
-            qDebug() << "LOG: tryGenerate - niepowodzenie utworzenia wavelength";
-            statusLabel->setText("Failed to create wavelength. Check your MongoDB connection.");
+        if (!manager->isFrequencyAvailable(frequency)) {
+            qDebug() << "LOG: tryGenerate - częstotliwość niedostępna";
+            statusLabel->setText("Frequency is already in use.");
             statusLabel->show();
-        } else {
-            qDebug() << "LOG: tryGenerate - wavelength utworzony pomyślnie, akceptacja dialogu";
-            QDialog::accept();
+            isGenerating = false;
+            return;
         }
+
+        qDebug() << "LOG: tryGenerate - walidacja pomyślna, akceptacja dialogu";
+        QDialog::accept();
 
         isGenerating = false;
         qDebug() << "LOG: tryGenerate - koniec";
