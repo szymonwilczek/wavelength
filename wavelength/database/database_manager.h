@@ -119,8 +119,6 @@ private:
             static mongocxx::instance instance{};
             m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb+srv://wolfiksw:PrincePolo1@testcluster.taymr.mongodb.net/"}};
             
-            // Test connection
-            // m_mongoClient.database("admin").run_command(bsoncxx::builder::basic::document{}.view());
             m_isConnected = true;
             
             qDebug() << "Connected to MongoDB successfully";
