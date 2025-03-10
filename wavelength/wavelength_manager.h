@@ -4,19 +4,23 @@
 #include <QObject>
 #include <QString>
 #include <QTimer>
-#include <QTcpServer>
-#include <QTcpSocket>
 #include <QNetworkInterface>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QByteArray>
 #include <QList>
+#include <qpointer.h>
+#include <QUuid>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <QWebSocket>
+#include <QWebSocketServer>
+#include <Qt>
 
 struct WavelengthInfo {
     int frequency;
@@ -27,18 +31,23 @@ struct WavelengthInfo {
     bool isHost;
     QString hostAddress;
     int hostPort;
-    QTcpSocket* socket = nullptr;
+    QPointer<QWebSocket> socket = nullptr;
+    bool isClosing = false;
 };
 
 struct ClientInfo {
     QString clientId;
-    QTcpSocket* socket;
+    QWebSocket* socket;
 };
 
 class WavelengthManager : public QObject {
     Q_OBJECT
 
 public:
+
+    const QString RELAY_SERVER_ADDRESS = "ws://localhost";
+    const int RELAY_SERVER_PORT = 3000;
+
     static WavelengthManager* getInstance() {
         static WavelengthManager instance;
         return &instance;
@@ -79,227 +88,440 @@ public:
     }
 
     bool createWavelength(int frequency, const QString& name, bool isPasswordProtected,
-                          const QString& password) {
+                      const QString& password) {
 
-        if (m_wavelengths.contains(frequency)) {
-            qDebug() << "LOG: Częstotliwość" << frequency << "już istnieje lokalnie, ignoruję wywołanie";
-            emit wavelengthCreated(frequency);
-            return true;
-        }
-
-
-        if (!isFrequencyAvailable(frequency)) {
-            qDebug() << "Cannot create wavelength - frequency" << frequency << "is already in use";
-            return false;
-        }
-
-        if (m_tcpServer) {
-            delete m_tcpServer;
-        }
-        m_tcpServer = new QTcpServer(this);
-
-        if (!m_tcpServer->listen(QHostAddress::Any, 0)) {
-            qDebug() << "Failed to start TCP server:" << m_tcpServer->errorString();
-            return false;
-        }
-
-        int port = m_tcpServer->serverPort();
-        QString hostAddress = getLocalIpAddress();
-        qDebug() << "Server started on" << hostAddress << "port" << port;
-
-        try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            document.append(bsoncxx::builder::basic::kvp("name", name.toStdString()));
-            document.append(bsoncxx::builder::basic::kvp("hostAddress", hostAddress.toStdString()));
-            document.append(bsoncxx::builder::basic::kvp("port", port));
-            document.append(bsoncxx::builder::basic::kvp("isPasswordProtected", isPasswordProtected));
-            collection.insert_one(document.view());
-        }
-        catch (const std::exception& e) {
-            qDebug() << "MongoDB error:" << e.what();
-            return false;
-        }
-
-        WavelengthInfo info;
-        info.frequency = frequency;
-        info.name = name.isEmpty() ? QString("Wavelength-%1").arg(frequency) : name;
-        info.isPasswordProtected = isPasswordProtected;
-        info.password = password;
-        info.hostId = QUuid::createUuid().toString();
-        info.isHost = true;
-        info.hostAddress = hostAddress;
-        info.hostPort = port;
-
-        qDebug() << "Creating new wavelength server on frequency" << frequency
-                 << (isPasswordProtected ? "(password protected)" : "");
-
-        m_wavelengths[frequency] = info;
-        m_activeWavelength = frequency;
-
-        connect(m_tcpServer, &QTcpServer::newConnection, this, &WavelengthManager::handleNewConnection);
-
+    if (m_wavelengths.contains(frequency)) {
+        qDebug() << "LOG: Częstotliwość" << frequency << "już istnieje lokalnie, ignoruję wywołanie";
         emit wavelengthCreated(frequency);
         return true;
     }
 
-    bool joinWavelength(int frequency, const QString& password = QString()) {
-        try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            auto filter = document.view();
-            auto result = collection.find_one(filter);
+    if (!isFrequencyAvailable(frequency)) {
+        qDebug() << "Cannot create wavelength - frequency" << frequency << "is already in use";
+        return false;
+    }
 
-            if (!result) {
-                qDebug() << "Wavelength" << frequency << "does not exist";
-                return false;
+    QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
+    QString url = QString("%1:%2").arg(RELAY_SERVER_ADDRESS).arg(RELAY_SERVER_PORT);
+
+    qDebug() << "Connecting to relay server at" << url;
+
+    connect(socket, &QWebSocket::connected, this, [=]() {
+        qDebug() << "Connected to relay server via WebSocket";
+
+        QJsonObject registerMsg;
+        registerMsg["type"] = "register_wavelength";
+        registerMsg["frequency"] = frequency;
+        registerMsg["name"] = name;
+        registerMsg["isPasswordProtected"] = isPasswordProtected;
+
+        QJsonDocument doc(registerMsg);
+        socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+
+        qDebug() << "Sent wavelength registration request";
+    });
+
+    connect(socket, &QWebSocket::textMessageReceived, this, [=](const QString& message) {
+        QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+        if (doc.isNull() || !doc.isObject()) {
+            qDebug() << "Invalid JSON response from relay server";
+            socket->close();
+            emit connectionError("Invalid response from relay server");
+            return;
+        }
+
+        QJsonObject response = doc.object();
+        QString msgType = response["type"].toString();
+
+        if (msgType == "register_result") {
+            bool success = response["success"].toBool();
+
+            if (!success) {
+                qDebug() << "Failed to register wavelength:" << response["error"].toString();
+                socket->close();
+                emit connectionError(response["error"].toString());
+                return;
             }
 
-            auto doc = result->view();
-
-            bool isPasswordProtected = doc["isPasswordProtected"].get_bool().value;
-            std::string hostAddressStr = static_cast<std::string>(doc["hostAddress"].get_string().value);
-            int hostPort = doc["port"].get_int32().value;
-            std::string nameStr = static_cast<std::string>(doc["name"].get_string().value);
-
-            if (isPasswordProtected && password.isEmpty()) {
-                qDebug() << "Password is required for this wavelength";
-                return false;
-            }
-
-            QTcpSocket* socket = new QTcpSocket(this);
-            socket->connectToHost(QString::fromStdString(hostAddressStr), hostPort);
-
-            if (!socket->waitForConnected(5000)) {
-                qDebug() << "Failed to connect to host:" << socket->errorString();
-                delete socket;
-                return false;
-            }
-
-            QJsonObject authData;
-            authData["type"] = "auth";
-            authData["password"] = password;
-            authData["clientId"] = QUuid::createUuid().toString();
-
-            QJsonDocument doc_json(authData);
-            socket->write(doc_json.toJson(QJsonDocument::Compact));
+            QString sessionId = response["sessionId"].toString();
+            qDebug() << "Wavelength registered with ID:" << sessionId;
 
             WavelengthInfo info;
             info.frequency = frequency;
-            info.name = QString::fromStdString(nameStr);
+            info.name = name.isEmpty() ? QString("Wavelength-%1").arg(frequency) : name;
             info.isPasswordProtected = isPasswordProtected;
             info.password = password;
-            info.isHost = false;
-            info.hostAddress = QString::fromStdString(hostAddressStr);
-            info.hostPort = hostPort;
+            info.hostId = sessionId;
+            info.isHost = true;
+            info.hostAddress = RELAY_SERVER_ADDRESS;
+            info.hostPort = RELAY_SERVER_PORT;
             info.socket = socket;
-
-            connect(socket, &QTcpSocket::readyRead, this, &WavelengthManager::handleClientMessage);
-            connect(socket, &QTcpSocket::disconnected, this, &WavelengthManager::handleServerDisconnect);
 
             m_wavelengths[frequency] = info;
             m_activeWavelength = frequency;
 
-            qDebug() << "Joined wavelength" << frequency;
-            emit wavelengthJoined(frequency);
-            return true;
+            qDebug() << "Successfully registered wavelength" << frequency;
+            emit wavelengthCreated(frequency);
         }
-        catch (const std::exception& e) {
-            qDebug() << "MongoDB error:" << e.what();
+        else if (msgType == "message") {
+            QString sender = response["sender"].toString();
+            QString content = response["content"].toString();
+
+            QString formattedMessage = sender + ": " + content;
+            emit messageReceived(frequency, formattedMessage);
+        }
+        else if (msgType == "client_joined") {
+            QString clientId = response["clientId"].toString();
+            qDebug() << "Client joined:" << clientId;
+        }
+        else if (msgType == "client_left") {
+            QString clientId = response["clientId"].toString();
+            qDebug() << "Client left:" << clientId;
+        }
+        else if (msgType == "wavelength_closed") {
+            qDebug() << "Wavelength was closed:" << response["reason"].toString();
+
+            if (m_wavelengths.contains(frequency)) {
+                m_wavelengths.remove(frequency);
+
+                if (m_activeWavelength == frequency) {
+                    m_activeWavelength = -1;
+                    emit wavelengthClosed(frequency);
+                }
+            }
+
+            socket->close();
+        }
+    });
+
+        connect(socket, &QWebSocket::disconnected, this, [this, frequency, socket]() {
+        qDebug() << "Disconnected from relay server for wavelength" << frequency;
+
+        if (m_wavelengths.contains(frequency) && m_wavelengths[frequency].socket == socket) {
+            m_wavelengths[frequency].socket = nullptr;
+
+            bool wasActive = (m_activeWavelength == frequency);
+            if (wasActive) {
+                m_activeWavelength = -1;
+            }
+
+            m_wavelengths.remove(frequency);
+
+            if (wasActive) {
+                emit wavelengthClosed(frequency);
+            }
+        }
+
+    });
+
+    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+            this, [=](QAbstractSocket::SocketError error) {
+        qDebug() << "WebSocket error:" << error << "-" << socket->errorString();
+        emit connectionError("Connection error: " + socket->errorString());
+
+        socket->close();
+        socket->deleteLater();
+    });
+
+    socket->open(QUrl(url));
+
+    return true;
+}
+
+    bool joinWavelength(int frequency, const QString& password = QString()) {
+    try {
+        auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+        auto document = bsoncxx::builder::basic::document{};
+        document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+        auto filter = document.view();
+        auto result = collection.find_one(filter);
+
+        if (!result) {
+            qDebug() << "Wavelength" << frequency << "does not exist";
             return false;
         }
+
+        auto doc = result->view();
+        bool isPasswordProtected = doc["isPasswordProtected"].get_bool().value;
+        std::string nameStr = static_cast<std::string>(doc["name"].get_string().value);
+
+        if (isPasswordProtected && password.isEmpty()) {
+            qDebug() << "Password is required for this wavelength";
+            return false;
+        }
+
+        QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
+        QString url = QString("%1:%2").arg(RELAY_SERVER_ADDRESS).arg(RELAY_SERVER_PORT);
+
+        qDebug() << "Connecting to relay server at" << url << "to join wavelength" << frequency;
+
+        connect(socket, &QWebSocket::connected, this, [=]() {
+            qDebug() << "Connected to relay server via WebSocket";
+
+            QJsonObject joinMsg;
+            joinMsg["type"] = "join_wavelength";
+            joinMsg["frequency"] = frequency;
+            if (isPasswordProtected) {
+                joinMsg["password"] = password;
+            }
+
+            QJsonDocument doc(joinMsg);
+            socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+
+            qDebug() << "Sent join request for wavelength" << frequency;
+        });
+
+        connect(socket, &QWebSocket::textMessageReceived, this, [=](const QString& message) {
+            QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+            if (doc.isNull() || !doc.isObject()) {
+                qDebug() << "Invalid JSON response from relay server";
+                socket->close();
+                emit connectionError("Invalid response from relay server");
+                return;
+            }
+
+            QJsonObject response = doc.object();
+            QString msgType = response["type"].toString();
+
+            if (msgType == "join_result") {
+                bool success = response["success"].toBool();
+
+                if (!success) {
+                    qDebug() << "Failed to join wavelength:" << response["error"].toString();
+                    socket->close();
+                    emit authenticationFailed(frequency);
+                    return;
+                }
+
+                qDebug() << "Successfully joined wavelength" << frequency;
+                emit wavelengthJoined(frequency);
+            }
+            else if (msgType == "message") {
+                QString sender = response["sender"].toString();
+                QString content = response["content"].toString();
+
+                QString formattedMessage = sender + ": " + content;
+                emit messageReceived(frequency, formattedMessage);
+            }
+            else if (msgType == "wavelength_closed") {
+                qDebug() << "Wavelength was closed:" << response["reason"].toString();
+
+                if (m_wavelengths.contains(frequency)) {
+                    m_wavelengths.remove(frequency);
+
+                    if (m_activeWavelength == frequency) {
+                        m_activeWavelength = -1;
+                        emit wavelengthClosed(frequency);
+                    }
+                }
+
+                socket->close();
+            }
+        });
+
+        connect(socket, &QWebSocket::disconnected, this, [=]() {
+            qDebug() << "Disconnected from relay server";
+
+            if (m_wavelengths.contains(frequency) && m_wavelengths[frequency].socket == socket) {
+                m_wavelengths.remove(frequency);
+
+                if (m_activeWavelength == frequency) {
+                    m_activeWavelength = -1;
+                    emit wavelengthClosed(frequency);
+                }
+            }
+
+            socket->deleteLater();
+        });
+
+        connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+                this, [=](QAbstractSocket::SocketError error) {
+            qDebug() << "WebSocket error:" << error << "-" << socket->errorString();
+            emit connectionError("Connection error: " + socket->errorString());
+
+            socket->close();
+            socket->deleteLater();
+        });
+
+        WavelengthInfo info;
+        info.frequency = frequency;
+        info.name = QString::fromStdString(nameStr);
+        info.isPasswordProtected = isPasswordProtected;
+        info.password = password;
+        info.isHost = false;
+        info.hostAddress = RELAY_SERVER_ADDRESS;
+        info.hostPort = RELAY_SERVER_PORT;
+        info.socket = socket;
+
+        m_wavelengths[frequency] = info;
+        m_activeWavelength = frequency;
+
+        socket->open(QUrl(url));
+
+        return true;
     }
+    catch (const std::exception& e) {
+        qDebug() << "MongoDB error:" << e.what();
+        return false;
+    }
+}
 
     void leaveWavelength() {
-        if (m_activeWavelength == -1) {
-            qDebug() << "Not connected to any wavelength";
-            return;
-        }
+    qDebug() << "===== LEAVE SEQUENCE START (MANAGER) =====";
 
-        int freq = m_activeWavelength;
+    if (m_activeWavelength == -1) {
+        qDebug() << "Not connected to any wavelength";
+        return;
+    }
 
-        if (m_wavelengths.contains(freq) && m_wavelengths[freq].isHost) {
-            closeWavelength(freq);
-        } else if (m_wavelengths.contains(freq)) {
-            if (m_wavelengths[freq].socket) {
-                QJsonObject disconnectMsg;
-                disconnectMsg["type"] = "clientDisconnect";
+    int freq = m_activeWavelength;
+    qDebug() << "Leaving wavelength" << freq;
 
-                QJsonDocument doc(disconnectMsg);
-                m_wavelengths[freq].socket->write(doc.toJson(QJsonDocument::Compact));
-                m_wavelengths[freq].socket->disconnectFromHost();
-                m_wavelengths[freq].socket->deleteLater();
-            }
-            m_wavelengths.remove(freq);
-        }
-
+    if (!m_wavelengths.contains(freq)) {
         m_activeWavelength = -1;
-
-        qDebug() << "Left wavelength" << freq;
+        qDebug() << "No active connection for wavelength" << freq;
         emit wavelengthLeft(freq);
+        return;
+    }
+
+    auto& info = m_wavelengths[freq];
+    qDebug() << "Found wavelength info, isHost =" << info.isHost;
+
+    if (info.socket) {
+        qDebug() << "Socket exists, valid =" << info.socket->isValid();
+
+        if (info.socket->isValid()) {
+            QJsonObject leaveMsg;
+            if (info.isHost) {
+                leaveMsg["type"] = "close_wavelength";
+            } else {
+                leaveMsg["type"] = "leave_wavelength";
+            }
+            leaveMsg["frequency"] = freq;
+
+            QJsonDocument doc(leaveMsg);
+            qDebug() << "Sending leave/close message to server";
+            info.socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+        }
+
+        qDebug() << "Disconnecting all signals from socket";
+        info.socket->disconnect();
+
+        qDebug() << "Closing socket";
+        info.socket->close();
+
+        QPointer<QWebSocket> socketPtr = info.socket;
+        QTimer::singleShot(100, [socketPtr]() {
+            qDebug() << "Delayed socket deletion (if still valid)";
+            if (!socketPtr.isNull()) {
+                socketPtr->deleteLater();
+            }
+        });
+
+        info.socket = nullptr;
+    }
+
+    qDebug() << "Removing wavelength from map";
+    m_wavelengths.remove(freq);
+    m_activeWavelength = -1;
+
+    qDebug() << "Left wavelength" << freq;
+    qDebug() << "Emitting wavelengthLeft signal";
+    emit wavelengthLeft(freq);
+    qDebug() << "===== LEAVE SEQUENCE COMPLETE =====";
+}
+
+    bool getWavelengthInfo(int frequency, bool* isHost = nullptr) {
+        if (!m_wavelengths.contains(frequency)) {
+            return false;
+        }
+
+        if (isHost) {
+            *isHost = m_wavelengths[frequency].isHost;
+        }
+
+        return true;
     }
 
     void closeWavelength(int frequency) {
-        if (!m_wavelengths.contains(frequency)) {
-            qDebug() << "Wavelength" << frequency << "does not exist";
-            return;
-        }
+    qDebug() << "===== CLOSE WAVELENGTH START =====";
+    qDebug() << "Closing wavelength" << frequency;
 
-        if (!m_wavelengths[frequency].isHost) {
-            qDebug() << "Cannot close wavelength" << frequency << "- not the host";
-            return;
-        }
+    if (!m_wavelengths.contains(frequency)) {
+        qDebug() << "Wavelength" << frequency << "does not exist";
+        qDebug() << "===== CLOSE WAVELENGTH ABORTED =====";
+        return;
+    }
 
-        qDebug() << "Closing wavelength" << frequency;
+    if (!m_wavelengths[frequency].isHost) {
+        qDebug() << "Cannot close wavelength" << frequency << "- not the host";
+        qDebug() << "===== CLOSE WAVELENGTH ABORTED =====";
+        return;
+    }
+
+    bool wasActive = (m_activeWavelength == frequency);
+    qDebug() << "Was active wavelength:" << wasActive;
+
+    m_wavelengths[frequency].isClosing = true;
+
+    QPointer<QWebSocket> socketToClose = m_wavelengths[frequency].socket;
+    m_wavelengths[frequency].socket = nullptr;
+
+    qDebug() << "Socket pointer saved, valid:" << (socketToClose && socketToClose->isValid());
+
+    if (m_activeWavelength == frequency) {
+        m_activeWavelength = -1;
+    }
+
+    m_wavelengths.remove(frequency);
+    qDebug() << "Removed wavelength from local map";
+
+    if (socketToClose && socketToClose->isValid()) {
+        qDebug() << "Sending close message to server";
+
+        socketToClose->disconnect();
+
+        QObject::connect(socketToClose, &QWebSocket::disconnected,
+                        socketToClose, &QWebSocket::deleteLater);
 
         QJsonObject closeMsg;
-        closeMsg["type"] = "serverShutdown";
+        closeMsg["type"] = "close_wavelength";
+        closeMsg["frequency"] = frequency;
         QJsonDocument doc(closeMsg);
-        QByteArray message = doc.toJson(QJsonDocument::Compact);
+        socketToClose->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+        qDebug() << "Close message sent to server";
 
-        for (const auto& client : m_clients) {
-            if (client.socket && client.socket->isOpen()) {
-                client.socket->write(message);
-                client.socket->flush();
+        QTimer::singleShot(200, socketToClose, [socketToClose]() {
+            qDebug() << "Delayed socket close triggered";
+            if (!socketToClose.isNull()) {
+                socketToClose->close();
             }
-        }
+        });
+    } else if (socketToClose) {
+        qDebug() << "Socket exists but is invalid, scheduling deletion";
+        socketToClose->deleteLater();
+    }
 
-        if (m_tcpServer) {
-            m_tcpServer->close();
-            delete m_tcpServer;
-            m_tcpServer = nullptr;
-        }
-
-        for (auto& client : m_clients) {
-            if (client.socket) {
-                client.socket->disconnectFromHost();
-                client.socket->deleteLater();
-            }
-        }
-        m_clients.clear();
-
-        try {
-            auto collection = m_mongoClient["wavelength"]["active_wavelengths"];
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            auto filter = document.view();
-            collection.delete_one(filter);
-        }
-        catch (const std::exception& e) {
-            qDebug() << "MongoDB error on delete:" << e.what();
-        }
-
-        m_wavelengths.remove(frequency);
-
-        if (m_activeWavelength == frequency) {
-            m_activeWavelength = -1;
-        }
-
+    if (wasActive) {
+        qDebug() << "Emitting wavelengthClosed signal";
         emit wavelengthClosed(frequency);
     }
+
+    try {
+        qDebug() << "Attempting to remove from MongoDB";
+        auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
+        auto document = bsoncxx::builder::basic::document{};
+        document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
+        auto filter = document.view();
+        collection.delete_one(filter);
+        qDebug() << "Successfully removed from MongoDB";
+    }
+    catch (const std::exception& e) {
+        qDebug() << "MongoDB error on delete:" << e.what();
+    }
+
+    qDebug() << "===== CLOSE WAVELENGTH COMPLETE =====";
+}
 
     void sendMessage(const QString& message) {
         if (m_activeWavelength == -1) {
@@ -307,38 +529,44 @@ public:
             return;
         }
 
-        qDebug() << "Sending message on wavelength" << m_activeWavelength << ":" << message;
+        if (!m_wavelengths.contains(m_activeWavelength)) {
+            qDebug() << "Wavelength not found in map";
+            return;
+        }
 
-        const auto& info = m_wavelengths[m_activeWavelength];
+        QWebSocket* socket = m_wavelengths[m_activeWavelength].socket;
 
-        if (info.isHost) {
+        if (!socket) {
+            qDebug() << "Socket is null";
+            return;
+        }
+
+        if (!socket->isValid()) {
+            qDebug() << "Socket is not valid";
+            return;
+        }
+
+        try {
+            QString messageId = QUuid::createUuid().toString();
+
             QJsonObject msgObj;
-            msgObj["type"] = "message";
-            msgObj["sender"] = "Host";
-            msgObj["content"] = message;
+            msgObj["type"] = "send_message";
+            msgObj["message"] = message;
+            msgObj["messageId"] = messageId;
 
             QJsonDocument doc(msgObj);
-            QByteArray messageData = doc.toJson(QJsonDocument::Compact);
+            QString jsonMessage = doc.toJson(QJsonDocument::Compact);
 
-            for (const auto& client : m_clients) {
-                if (client.socket && client.socket->isOpen()) {
-                    client.socket->write(messageData);
-                }
-            }
+            m_processedMessageIds.insert(messageId);
+
+            qDebug() << "Sending WebSocket message:" << jsonMessage;
+            socket->sendTextMessage(jsonMessage);
 
             emit messageSent(m_activeWavelength, message);
-            emit messageReceived(m_activeWavelength, "Host: " + message);
-        } else {
-            if (info.socket && info.socket->isOpen()) {
-                QJsonObject msgObj;
-                msgObj["type"] = "message";
-                msgObj["content"] = message;
-
-                QJsonDocument doc(msgObj);
-                info.socket->write(doc.toJson(QJsonDocument::Compact));
-
-                emit messageSent(m_activeWavelength, message);
-            }
+        } catch (const std::exception& e) {
+            qDebug() << "Exception in sendMessage:" << e.what();
+        } catch (...) {
+            qDebug() << "Unknown exception in sendMessage";
         }
     }
 
@@ -358,29 +586,30 @@ signals:
 
 private slots:
     void handleNewConnection() {
-        QTcpSocket* clientSocket = m_tcpServer->nextPendingConnection();
+        QWebSocket* clientSocket = m_wsServer->nextPendingConnection();
 
         if (!clientSocket) {
             return;
         }
 
-        qDebug() << "New client connected:" << clientSocket->peerAddress().toString();
+        qDebug() << "New WebSocket client connected:" << clientSocket->peerAddress().toString();
 
         ClientInfo newClient;
         newClient.socket = clientSocket;
         newClient.clientId = "pending";
         m_pendingClients.append(newClient);
 
-        connect(clientSocket, &QTcpSocket::readyRead, this, &WavelengthManager::handleServerMessage);
-        connect(clientSocket, &QTcpSocket::disconnected, this, &WavelengthManager::handleClientDisconnect);
+        connect(clientSocket, &QWebSocket::textMessageReceived,
+                this, &WavelengthManager::handleServerMessage);
+        connect(clientSocket, &QWebSocket::disconnected,
+                this, &WavelengthManager::handleClientDisconnect);
     }
 
-    void handleServerMessage() {
-        QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    void handleServerMessage(const QString& message) {
+        QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
         if (!socket) return;
 
-        QByteArray data = socket->readAll();
-        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
 
         if (doc.isNull() || !doc.isObject()) {
             qDebug() << "Invalid message format";
@@ -417,23 +646,24 @@ private slots:
                 forwardMsg["content"] = content;
 
                 QJsonDocument forwardDoc(forwardMsg);
-                QByteArray forwardData = forwardDoc.toJson(QJsonDocument::Compact);
+                QString forwardData = forwardDoc.toJson(QJsonDocument::Compact);
 
                 for (const auto& client : m_clients) {
                     if (client.socket && client.socket != socket) {
-                        client.socket->write(forwardData);
+                        client.socket->sendTextMessage(forwardData);
                     }
                 }
             }
         }
     }
 
-    void handleClientMessage() {
-        QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    void handleClientMessage(const QString& message) {
+        QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
         if (!socket || m_activeWavelength == -1) return;
 
-        QByteArray data = socket->readAll();
-        QJsonDocument doc = QJsonDocument::fromJson(data);
+    qDebug() << "Received client message:" << message;
+
+        QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
 
         if (doc.isNull() || !doc.isObject()) {
             qDebug() << "Invalid message format received from server";
@@ -443,13 +673,64 @@ private slots:
         QJsonObject msgObj = doc.object();
         QString msgType = msgObj["type"].toString();
 
-        if (msgType == "message") {
-            QString sender = msgObj["sender"].toString();
-            QString content = msgObj["content"].toString();
+    if (msgType == "message") {
+        QString messageId;
+        if (msgObj.contains("messageId")) {
+            messageId = msgObj["messageId"].toString();
 
-            QString formattedMessage = sender + ": " + content;
-            emit messageReceived(m_activeWavelength, formattedMessage);
+            if (!messageId.isEmpty() && m_processedMessageIds.contains(messageId)) {
+                qDebug() << "Ignoring duplicate message with ID:" << messageId;
+                return;
+            }
+
+            if (!messageId.isEmpty()) {
+                m_processedMessageIds.insert(messageId);
+
+                if (m_processedMessageIds.size() > 200) {
+                    QList<QString> idsList = m_processedMessageIds.values();
+                    for (int i = 0; i < idsList.size() / 2; i++) {
+                        m_processedMessageIds.remove(idsList[i]);
+                    }
+                }
+            }
         }
+
+        QString sender = msgObj["sender"].toString();
+        QString content = msgObj["content"].toString();
+        bool isSelf = msgObj["isSelf"].toBool();
+
+        qDebug() << "Message details - Sender:" << sender
+                 << "Content:" << content
+                 << "IsSelf:" << isSelf
+                 << "MessageID:" << messageId;
+
+        QString formattedMessage;
+        if (isSelf) {
+            formattedMessage = "You: " + content;
+        } else {
+            formattedMessage = sender + ": " + content;
+        }
+
+        qDebug() << "Emitting message:" << formattedMessage;
+        emit messageReceived(m_activeWavelength, formattedMessage);
+    } else if (msgType == "wavelength_closed") {
+        qDebug() << "Server has shut down the wavelength";
+        int freq = msgObj["frequency"].toInt();
+
+        if (m_wavelengths.contains(freq)) {
+            if (m_wavelengths[freq].socket) {
+                m_wavelengths[freq].socket->disconnect();
+                m_wavelengths[freq].socket->deleteLater();
+            }
+
+            m_wavelengths.remove(freq);
+
+            if (m_activeWavelength == freq) {
+                m_activeWavelength = -1;
+                emit wavelengthClosed(freq);
+            }
+        }
+    }
         else if (msgType == "serverShutdown") {
             qDebug() << "Server has shut down the wavelength";
 
@@ -473,7 +754,7 @@ private slots:
                 QString reason = msgObj["reason"].toString();
                 qDebug() << "Authentication failed:" << reason;
 
-                socket->disconnectFromHost();
+                socket->close();
                 socket->deleteLater();
 
                 if (m_wavelengths.contains(m_activeWavelength)) {
@@ -483,11 +764,30 @@ private slots:
                 m_activeWavelength = -1;
 
                 emit authenticationFailed(m_activeWavelength);
+            } else {
+                emit wavelengthJoined(m_activeWavelength);
+            }
+        } else if (msgType == "close_confirmed") {
+            qDebug() << "Received close confirmation from server";
+            int freq = msgObj["frequency"].toInt();
+
+            if (m_wavelengths.contains(freq) && !m_wavelengths[freq].isClosing) {
+                if (m_wavelengths[freq].socket) {
+                    m_wavelengths[freq].socket->disconnect();
+                    m_wavelengths[freq].socket->deleteLater();
+                }
+
+                m_wavelengths.remove(freq);
+
+                if (m_activeWavelength == freq) {
+                    m_activeWavelength = -1;
+                    emit wavelengthClosed(freq);
+                }
             }
         }
     }
 
-    void handleClientAuth(QTcpSocket* socket, const QJsonObject& msgObj) {
+    void handleClientAuth(QWebSocket* socket, const QJsonObject& msgObj) {
         QString password = msgObj["password"].toString();
         QString clientId = msgObj["clientId"].toString();
 
@@ -514,11 +814,11 @@ private slots:
             response["reason"] = reason;
 
             QJsonDocument doc(response);
-            socket->write(doc.toJson(QJsonDocument::Compact));
-            socket->disconnectFromHost();
+            socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+            socket->close();
         } else {
             QJsonDocument doc(response);
-            socket->write(doc.toJson(QJsonDocument::Compact));
+            socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
 
             for (int i = 0; i < m_pendingClients.size(); ++i) {
                 if (m_pendingClients[i].socket == socket) {
@@ -535,10 +835,10 @@ private slots:
     }
 
     void handleClientDisconnect() {
-        QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+        QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
         if (!socket) return;
 
-        qDebug() << "Client disconnected:" << socket->peerAddress().toString();
+        qDebug() << "WebSocket client disconnected";
 
         for (int i = 0; i < m_pendingClients.size(); ++i) {
             if (m_pendingClients[i].socket == socket) {
@@ -558,35 +858,40 @@ private slots:
     }
 
     void handleServerDisconnect() {
-        QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
-        if (!socket) return;
+    QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
+    if (!socket) return;
 
-        qDebug() << "Disconnected from server";
+    qDebug() << "Disconnected from WebSocket server";
 
-        if (m_activeWavelength != -1 && m_wavelengths.contains(m_activeWavelength)) {
-            int freq = m_activeWavelength;
-
-            if (m_wavelengths[freq].socket == socket) {
-                m_wavelengths.remove(freq);
-                m_activeWavelength = -1;
-
-                emit wavelengthClosed(freq);
-            }
+    QList<int> frequenciesToRemove;
+    for (auto it = m_wavelengths.begin(); it != m_wavelengths.end(); ++it) {
+        if (it.value().socket == socket) {
+            frequenciesToRemove.append(it.key());
         }
-
-        socket->deleteLater();
     }
 
+    foreach (int freq, frequenciesToRemove) {
+        bool wasActive = (m_activeWavelength == freq);
+
+        if (m_wavelengths.contains(freq)) {
+            m_wavelengths[freq].socket = nullptr;
+        }
+
+        m_wavelengths.remove(freq);
+
+        if (wasActive) {
+            m_activeWavelength = -1;
+            emit wavelengthClosed(freq);
+        }
+    }
+
+}
+
 private:
-    WavelengthManager(QObject* parent = nullptr) : QObject(parent), m_activeWavelength(-1), m_tcpServer(nullptr) {
+    WavelengthManager(QObject* parent = nullptr) : QObject(parent), m_activeWavelength(-1), m_wsServer(nullptr) {
         try {
             static mongocxx::instance instance{};
-            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb+srv://wolfiksw:PrincePolo1@testcluster.taymr.mongodb.net/"}};
-
-            auto db = m_mongoClient["wavelength"];
-            auto collection = db["active_wavelengths"];
-
-            collection.delete_many({});
+            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb+srv://wolfiksw:asdasdas@testcluster.taymr.mongodb.net/"}};
 
             qDebug() << "Connected to MongoDB successfully";
         }
@@ -602,9 +907,9 @@ private:
             }
         }
 
-        if (m_tcpServer) {
-            m_tcpServer->close();
-            delete m_tcpServer;
+        if (m_wsServer) {
+            m_wsServer->close();
+            delete m_wsServer;
         }
     }
 
@@ -613,10 +918,13 @@ private:
 
     QMap<int, WavelengthInfo> m_wavelengths;
     int m_activeWavelength;
-    QTcpServer* m_tcpServer;
+    QWebSocketServer* m_wsServer;
     QList<ClientInfo> m_clients;
     QList<ClientInfo> m_pendingClients;
     mongocxx::client m_mongoClient;
+    bool m_closing = false;
+    QMetaObject::Connection m_closeMessageConnection;
+    QSet<QString> m_processedMessageIds;
 };
 
 #endif // WAVELENGTH_MANAGER_H

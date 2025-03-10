@@ -151,12 +151,37 @@ private slots:
             return;
         }
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
-        manager->leaveWavelength();
+        qDebug() << "===== ABORT SEQUENCE START (UI) =====";
+        qDebug() << "Aborting wavelength" << currentFrequency;
 
+        WavelengthManager* manager = WavelengthManager::getInstance();
+
+        bool isHost = false;
+        if (manager->getWavelengthInfo(currentFrequency, &isHost)) {
+            qDebug() << "Current user is host:" << isHost;
+
+            if (isHost) {
+                qDebug() << "Calling closeWavelength() as host";
+                manager->closeWavelength(currentFrequency);
+            } else {
+                qDebug() << "Calling leaveWavelength() as client";
+                manager->leaveWavelength();
+            }
+        } else {
+            qDebug() << "Could not determine role, calling leaveWavelength()";
+            manager->leaveWavelength();
+        }
+
+        qDebug() << "Manager operation completed, clearing UI";
         clear();
 
-        emit wavelengthAborted();
+        qDebug() << "Clear completed, delaying wavelengthAborted signal emission";
+
+        QTimer::singleShot(250, this, [this]() {
+            qDebug() << "Emitting delayed wavelengthAborted signal";
+            emit wavelengthAborted();
+            qDebug() << "===== ABORT SEQUENCE COMPLETE =====";
+        });
     }
 
     void onMessageReceived(int frequency, const QString& message) {
