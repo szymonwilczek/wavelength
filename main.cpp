@@ -172,6 +172,8 @@ int main(int argc, char *argv[]) {
     WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
+    WavelengthMessageService* messageService = WavelengthMessageService::getInstance();
+
     auto switchToChatView = [chatView, stackedWidget, animation](int frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
@@ -180,10 +182,13 @@ int main(int argc, char *argv[]) {
     };
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
-                chatView, [chatView](int frequency, const QString& message) {
-    qDebug() << "Main: Received message event for frequency" << frequency;
-    chatView->onMessageReceived(frequency, message);
-});
+                chatView, &WavelengthChatView::onMessageReceived);
+
+    QObject::connect(coordinator, &WavelengthSessionCoordinator::messageSent,
+                    chatView, &WavelengthChatView::onMessageSent);
+
+    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
+                    chatView, &WavelengthChatView::onWavelengthClosed);
 
     // Podłączanie sygnałów z koordynatora zamiast z managera
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
