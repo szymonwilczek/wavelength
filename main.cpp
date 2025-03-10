@@ -14,7 +14,9 @@
 #include "wavelength/join_wavelength_dialog.h"
 #include "wavelength/wavelength_chat_view.h"
 #include "wavelength/wavelength_dialog.h"
-#include "wavelength/wavelength_manager.h"
+
+// Zamiast wavelength_manager.h, teraz importujemy koordynatora
+#include "wavelength/session/wavelength_session_coordinator.h"
 
 void centerLabel(QLabel* label, BlobAnimation* animation) {
     if (label && animation) {
@@ -166,7 +168,9 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    WavelengthManager* wavelengthManager = WavelengthManager::getInstance();
+    // Inicjalizacja koordynatora zamiast WavelengthManager
+    WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+    coordinator->initialize();
 
     auto switchToChatView = [chatView, stackedWidget, animation](int frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
@@ -175,70 +179,77 @@ int main(int argc, char *argv[]) {
         chatView->show();
     };
 
-    QObject::connect(wavelengthManager, &WavelengthManager::wavelengthCreated,
-                 [switchToChatView](int frequency) {
-     qDebug() << "Wavelength created signal received";
-     switchToChatView(frequency);
- });
+    QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
+                chatView, [chatView](int frequency, const QString& message) {
+    qDebug() << "Main: Received message event for frequency" << frequency;
+    chatView->onMessageReceived(frequency, message);
+});
 
-    QObject::connect(wavelengthManager, &WavelengthManager::wavelengthJoined,
+    // Podłączanie sygnałów z koordynatora zamiast z managera
+    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
+             [switchToChatView](int frequency) {
+    qDebug() << "Wavelength created signal received";
+    switchToChatView(frequency);
+});
+
+    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
                     [switchToChatView](int frequency) {
         qDebug() << "Wavelength joined signal received";
         switchToChatView(frequency);
     });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted, [stackedWidget, animationWidget, animation]() {
-    qDebug() << "Wavelength aborted, switching back to animation view";
-    animation->resetLifeColor(); // Resetuje kolor, jeśli był ustawiony
-    stackedWidget->setCurrentWidget(animationWidget);
+        qDebug() << "Wavelength aborted, switching back to animation view";
+        animation->resetLifeColor(); // Resetuje kolor, jeśli był ustawiony
+        stackedWidget->setCurrentWidget(animationWidget);
+    });
+
+    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, chatView, stackedWidget, coordinator]() {
+    qDebug() << "Create wavelength button clicked";
+
+    animation->setLifeColor(QColor(0, 200, 0));
+
+    WavelengthDialog dialog(&window);
+    if (dialog.exec() == QDialog::Accepted) {
+        int frequency = dialog.getFrequency();
+        QString name = dialog.getName();
+        bool isPasswordProtected = dialog.isPasswordProtected();
+        QString password = dialog.getPassword();
+
+        // Używamy koordynatora zamiast managera
+        if (coordinator->createWavelength(frequency, name, isPasswordProtected, password)) {
+            qDebug() << "Created and joined wavelength:" << frequency << "Hz";
+        } else {
+            qDebug() << "Failed to create wavelength";
+            animation->resetLifeColor();
+        }
+    } else {
+        animation->resetLifeColor();
+    }
 });
 
-    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, chatView, stackedWidget]() {
-        qDebug() << "Create wavelength button clicked";
+    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, chatView, stackedWidget, coordinator]() {
+        qDebug() << "Join wavelength button clicked";
 
-        animation->setLifeColor(QColor(0, 200, 0));
+        animation->setLifeColor(QColor(0, 0, 200)); // Niebieski kolor dla dołączania
 
-        WavelengthDialog dialog(&window);
+        JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
             int frequency = dialog.getFrequency();
-            QString name = dialog.getName();
-            bool isPasswordProtected = dialog.isPasswordProtected();
             QString password = dialog.getPassword();
 
-            WavelengthManager* manager = WavelengthManager::getInstance();
-            if (manager->createWavelength(frequency, name, isPasswordProtected, password)) {
-                qDebug() << "Created and joined wavelength:" << frequency << "Hz";
+            // Używamy koordynatora zamiast managera
+            if (coordinator->joinWavelength(frequency, password)) {
+                qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
+                // Nie przełączamy widoku tutaj - zrobi to signal handler
             } else {
-                qDebug() << "Failed to create wavelength";
+                qDebug() << "Failed to join wavelength";
                 animation->resetLifeColor();
             }
         } else {
             animation->resetLifeColor();
         }
     });
-
-    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, chatView, stackedWidget]() {
-     qDebug() << "Join wavelength button clicked";
-
-     animation->setLifeColor(QColor(0, 0, 200)); // Niebieski kolor dla dołączania
-
-     JoinWavelengthDialog dialog(&window);
-     if (dialog.exec() == QDialog::Accepted) {
-         int frequency = dialog.getFrequency();
-         QString password = dialog.getPassword();
-
-         WavelengthManager* manager = WavelengthManager::getInstance();
-         if (manager->joinWavelength(frequency, password)) {
-             qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
-             // Nie przełączamy widoku tutaj - zrobi to signal handler
-         } else {
-             qDebug() << "Failed to join wavelength";
-             animation->resetLifeColor();
-         }
-     } else {
-         animation->resetLifeColor();
-     }
- });
 
     if (!instanceManager->isCreator()) {
         window.setWindowTitle("Pk4 - Instancja podrzędna");
