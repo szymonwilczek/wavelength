@@ -243,7 +243,7 @@ wss.on("connection", function connection(ws, req) {
         console.log(`Client ${ws.sessionId} joined wavelength ${frequency}`);
       } else if (data.type === "send_message") {
         const frequency = ws.frequency;
-        const message = data.message;
+        const message = data.content || data.message;
         // Użyj dostarczonego messageId lub wygeneruj nowy
         const messageId =
           data.messageId ||
@@ -357,11 +357,31 @@ wss.on("connection", function connection(ws, req) {
         ws.frequency = null;
         ws.isHost = false;
       } else if (data.type === "close_wavelength") {
-        const frequency = ws.frequency;
+        const frequency = data.frequency;
 
-        if (!frequency) return;
+        if (!frequency) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              error: "No frequency specified",
+            })
+          );
+          return;
+        }
 
-        if (!ws.isHost) {
+        const wavelength = activeWavelengths.get(frequency);
+
+        if (!wavelength) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              error: "Wavelength not found",
+            })
+          );
+          return;
+        }
+
+        if (ws !== wavelength.host) {
           ws.send(
             JSON.stringify({
               type: "error",
@@ -371,21 +391,16 @@ wss.on("connection", function connection(ws, req) {
           return;
         }
 
-        await closeWavelength(frequency, "Host closed the wavelength");
+        // Zamknij wavelength
+        closeWavelength(frequency, "Host closed the wavelength");
 
-        // Wysyłamy potwierdzenie użytkownikowi przed zamknięciem
         ws.send(
           JSON.stringify({
-            type: "close_confirmed",
+            type: "close_result",
+            success: true,
             frequency,
           })
         );
-
-        // Reset socket state
-        ws.frequency = null;
-        ws.isHost = false;
-
-        console.log(`Host closed wavelength ${frequency}`);
       }
     } catch (e) {
       console.error("Error processing message:", e);
