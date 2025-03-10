@@ -33,8 +33,6 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/app_instance_manager.h
         wavelength/wavelength_dialog.cpp
         wavelength/wavelength_dialog.h
-        wavelength/wavelength_manager.cpp
-        wavelength/wavelength_manager.h
         wavelength/wavelength_chat_view.cpp
         wavelength/wavelength_chat_view.h
         wavelength/join_wavelength_dialog.cpp
