@@ -11,6 +11,8 @@
 #include "wavelength_manager.h"
 #include <QScrollBar>
 
+#include "session/wavelength_session_coordinator.h"
+
 class WavelengthChatView : public QWidget {
     Q_OBJECT
 
@@ -124,6 +126,26 @@ public:
         inputField->clear();
     }
 
+    void onMessageReceived(int frequency, const QString& message) {
+        if (frequency != currentFrequency) {
+            return;
+        }
+
+        // QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+        // QString formattedMessage;
+        //
+        // if (message.startsWith("<span")) {
+        //     formattedMessage = message;
+        // } else {
+        //     formattedMessage = QString("<span style=\"color:#e0e0e0;\">[%1] %2</span>")
+        //         .arg(timestamp, message);
+        // }
+
+        messageArea->append(message);
+
+        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+    }
+
     void clear() {
         currentFrequency = -1;
         messageArea->clear();
@@ -184,25 +206,7 @@ private slots:
         });
     }
 
-    void onMessageReceived(int frequency, const QString& message) {
-        if (frequency != currentFrequency) {
-            return;
-        }
 
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        QString formattedMessage;
-
-        if (message.startsWith("<span")) {
-            formattedMessage = message;
-        } else {
-            formattedMessage = QString("<span style=\"color:#e0e0e0;\">[%1] %2</span>")
-                .arg(timestamp, message);
-        }
-
-        messageArea->append(formattedMessage);
-
-        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
-    }
 
     void onWavelengthClosed(int frequency) {
         if (frequency != currentFrequency) {
@@ -228,10 +232,6 @@ private:
     QPushButton *sendButton;
     QPushButton *abortButton;
     int currentFrequency = -1;
-    void addMessage(const QString& message) {
-        qDebug() << "Adding message to chat:" << message;
-        messageArea->append(message);
-    }
 };
 
 #endif // WAVELENGTH_CHAT_VIEW_H
