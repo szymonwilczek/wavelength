@@ -8,8 +8,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QScrollArea>
-#include "wavelength_manager.h"
 #include <QScrollBar>
+#include <QTimer>
 
 #include "session/wavelength_session_coordinator.h"
 
@@ -96,10 +96,6 @@ public:
         connect(inputField, &QLineEdit::returnPressed, this, &WavelengthChatView::sendMessage);
         connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
-
-        WavelengthManager* manager = WavelengthManager::getInstance();
-        connect(manager, &WavelengthManager::messageReceived, this, &WavelengthChatView::onMessageReceived);
-        connect(manager, &WavelengthManager::wavelengthClosed, this, &WavelengthChatView::onWavelengthClosed);
     }
 
     void setWavelength(int frequency, const QString& name = QString()) {
@@ -131,19 +127,35 @@ public:
             return;
         }
 
-        // QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        // QString formattedMessage;
-        //
-        // if (message.startsWith("<span")) {
-        //     formattedMessage = message;
-        // } else {
-        //     formattedMessage = QString("<span style=\"color:#e0e0e0;\">[%1] %2</span>")
-        //         .arg(timestamp, message);
-        // }
 
         messageArea->append(message);
 
         messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+    }
+
+    void onMessageSent(int frequency, const QString& message) {
+        if (frequency != currentFrequency) {
+            return;
+        }
+
+
+        messageArea->append(message);
+
+        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+    }
+
+    void onWavelengthClosed(int frequency) {
+        if (frequency != currentFrequency) {
+            return;
+        }
+
+        QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by the host.</span>");
+        messageArea->append(closeMsg);
+
+        QTimer::singleShot(2000, this, [this]() {
+            clear();
+            emit wavelengthAborted();
+        });
     }
 
     void clear() {
@@ -163,7 +175,7 @@ private slots:
 
         inputField->clear();
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
+        WavelengthMessageService* manager = WavelengthMessageService::getInstance();
         manager->sendMessage(message);
 
     }
@@ -176,22 +188,22 @@ private slots:
         qDebug() << "===== ABORT SEQUENCE START (UI) =====";
         qDebug() << "Aborting wavelength" << currentFrequency;
 
-        WavelengthManager* manager = WavelengthManager::getInstance();
+        WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
 
         bool isHost = false;
-        if (manager->getWavelengthInfo(currentFrequency, &isHost)) {
+        if (coordinator->getWavelengthInfo(currentFrequency, &isHost).isHost) {
             qDebug() << "Current user is host:" << isHost;
 
             if (isHost) {
                 qDebug() << "Calling closeWavelength() as host";
-                manager->closeWavelength(currentFrequency);
+                coordinator->closeWavelength(currentFrequency);
             } else {
                 qDebug() << "Calling leaveWavelength() as client";
-                manager->leaveWavelength();
+                coordinator->leaveWavelength();
             }
         } else {
             qDebug() << "Could not determine role, calling leaveWavelength()";
-            manager->leaveWavelength();
+            coordinator->leaveWavelength();
         }
 
         qDebug() << "Manager operation completed, clearing UI";
@@ -208,19 +220,7 @@ private slots:
 
 
 
-    void onWavelengthClosed(int frequency) {
-        if (frequency != currentFrequency) {
-            return;
-        }
 
-        QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by the host.</span>");
-        messageArea->append(closeMsg);
-
-        QTimer::singleShot(2000, this, [this]() {
-            clear();
-            emit wavelengthAborted();
-        });
-    }
 
 signals:
     void wavelengthAborted();

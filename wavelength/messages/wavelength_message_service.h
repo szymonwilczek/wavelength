@@ -24,65 +24,62 @@ public:
     }
 
     bool sendMessage(const QString& message) {
-        // Get the active wavelength
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        int frequency = registry->getActiveWavelength();
+        int freq = registry->getActiveWavelength();
 
-        if (frequency == -1) {
-            qDebug() << "No active wavelength to send message to";
+        if (freq == -1) {
+            qDebug() << "Cannot send message - no active wavelength";
             return false;
         }
 
-        if (!registry->hasWavelength(frequency)) {
-            qDebug() << "Wavelength" << frequency << "not found in registry";
+        if (!registry->hasWavelength(freq)) {
+            qDebug() << "Cannot send message - active wavelength not found";
             return false;
         }
 
-        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+        WavelengthInfo info = registry->getWavelengthInfo(freq);
+        QWebSocket* socket = info.socket;
 
-        if (!info.socket || !info.socket->isValid()) {
-            qDebug() << "Invalid socket for wavelength" << frequency;
+        if (!socket) {
+            qDebug() << "Cannot send message - no socket for wavelength" << freq;
             return false;
         }
 
-        // Generate a message ID
+        if (!socket->isValid()) {
+            qDebug() << "Cannot send message - socket for wavelength" << freq << "is invalid";
+            return false;
+        }
+
+        // Generate a sender ID (use host ID if we're host, or client ID otherwise)
+        QString senderId = info.isHost ? info.hostId :
+                          AuthenticationManager::getInstance()->generateClientId();
+
         QString messageId = MessageHandler::getInstance()->generateMessageId();
 
-        // Store the message in the sent message cache
+        // Zapamiętujemy treść wiadomości do późniejszego użycia
         m_sentMessages[messageId] = message;
 
-        // Clean up cache if it gets too big
+        // Ograniczamy rozmiar cache'u wiadomości
         if (m_sentMessages.size() > 100) {
             auto it = m_sentMessages.begin();
             m_sentMessages.erase(it);
         }
 
-        // Create client ID for the sender
-        QString clientId;
-        if (info.isHost) {
-            clientId = info.hostId;
-        } else {
-            // Tworzenie ID klienta, jeśli nie jest hostem - używamy ID z struktury WavelengthInfo
-            // lub generujemy nowe, jeśli potrzeba
-            if (!m_clientId.isEmpty()) {
-                clientId = m_clientId;
-            } else {
-                clientId = AuthenticationManager::getInstance()->generateClientId();
-                m_clientId = clientId; // Zapamiętanie do późniejszego użycia
-            }
-        }
+        // Tworzmy obiekt wiadomości
+        QJsonObject messageObj;
+        messageObj["type"] = "send_message"; // Używamy typu zgodnego z serwerem
+        messageObj["frequency"] = freq;
+        messageObj["content"] = message;
+        messageObj["senderId"] = senderId;
+        messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+        messageObj["messageId"] = messageId;
 
-        // Send the message
-        bool success = MessageHandler::getInstance()->sendMessage(
-            info.socket, frequency, message, clientId);
+        QJsonDocument doc(messageObj);
+        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+        qDebug() << "Sending message to server:" << jsonMessage;
+        socket->sendTextMessage(jsonMessage);
 
-        if (success) {
-            // Użyj zewnętrznego formattera
-            QString formattedMsg = MessageFormatter::formatSentMessage(frequency, message, info.isHost);
-            emit messageSent(frequency, formattedMsg);
-        }
-
-        return success;
+        return true;
     }
 
     QMap<QString, QString>* getSentMessageCache() {
