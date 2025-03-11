@@ -34,7 +34,11 @@ public:
 
         frequencyEdit = new QLineEdit(this);
         // Walidator dla liczb zmiennoprzecinkowych (min, max, precyzja)
-        frequencyEdit->setValidator(new QDoubleValidator(130, 180000000.0, 1, this));
+        QDoubleValidator* validator = new QDoubleValidator(130, 180000000.0, 1, this);
+        QLocale locale(QLocale::English);
+        locale.setNumberOptions(QLocale::RejectGroupSeparator);
+        validator->setLocale(locale);
+        frequencyEdit->setValidator(validator);
         frequencyEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
         freqLayout->addWidget(frequencyEdit);
 

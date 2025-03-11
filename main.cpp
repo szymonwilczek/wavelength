@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
 
     WavelengthMessageService* messageService = WavelengthMessageService::getInstance();
 
-    auto switchToChatView = [chatView, stackedWidget, animation](int frequency) {
+    auto switchToChatView = [chatView, stackedWidget, animation](double frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
         stackedWidget->setCurrentWidget(chatView);
@@ -192,13 +192,13 @@ int main(int argc, char *argv[]) {
 
     // Podłączanie sygnałów z koordynatora zamiast z managera
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
-             [switchToChatView](int frequency) {
+             [switchToChatView](double frequency) {
     qDebug() << "Wavelength created signal received";
     switchToChatView(frequency);
 });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
-                    [switchToChatView](int frequency) {
+                    [switchToChatView](double frequency) {
         qDebug() << "Wavelength joined signal received";
         switchToChatView(frequency);
     });
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
 
     WavelengthDialog dialog(&window);
     if (dialog.exec() == QDialog::Accepted) {
-        int frequency = dialog.getFrequency();
+        double frequency = dialog.getFrequency();
         QString name = dialog.getName();
         bool isPasswordProtected = dialog.isPasswordProtected();
         QString password = dialog.getPassword();
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            int frequency = dialog.getFrequency();
+            double frequency = dialog.getFrequency();
             QString password = dialog.getPassword();
 
             // Używamy koordynatora zamiast managera

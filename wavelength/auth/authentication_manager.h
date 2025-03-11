@@ -30,7 +30,7 @@ public:
         return QString(QCryptographicHash::hash(tokenData, QCryptographicHash::Sha256).toHex());
     }
 
-    bool verifyPassword(int frequency, const QString& providedPassword) {
+    bool verifyPassword(double frequency, const QString& providedPassword) {
         if (!m_wavelengthPasswords.contains(frequency)) {
             qDebug() << "No password stored for frequency" << frequency;
             return false;
@@ -45,12 +45,12 @@ public:
         return isValid;
     }
 
-    void registerPassword(int frequency, const QString& password) {
+    void registerPassword(double frequency, const QString& password) {
         m_wavelengthPasswords[frequency] = password;
         qDebug() << "Password registered for frequency" << frequency;
     }
 
-    void removePassword(int frequency) {
+    void removePassword(double frequency) {
         if (m_wavelengthPasswords.contains(frequency)) {
             m_wavelengthPasswords.remove(frequency);
             qDebug() << "Password removed for frequency" << frequency;
@@ -73,7 +73,7 @@ public:
         return QJsonDocument(response).toJson(QJsonDocument::Compact);
     }
 
-    bool storeSession(int frequency, const QString& clientId, const QString& sessionToken) {
+    bool storeSession(double frequency, const QString& clientId, const QString& sessionToken) {
         SessionInfo info;
         info.clientId = clientId;
         info.frequency = frequency;
@@ -86,7 +86,7 @@ public:
         return true;
     }
 
-    bool validateSession(const QString& sessionToken, int frequency) {
+    bool validateSession(const QString& sessionToken, double frequency) {
         if (!m_sessions.contains(sessionToken)) {
             qDebug() << "Session token not found";
             return false;
@@ -133,7 +133,7 @@ public:
         }
     }
 
-    void deactivateFrequencySessions(int frequency) {
+    void deactivateFrequencySessions(double frequency) {
         for (auto it = m_sessions.begin(); it != m_sessions.end(); ++it) {
             if (it.value().frequency == frequency) {
                 it.value().isActive = false;
@@ -166,7 +166,7 @@ public:
 private:
     struct SessionInfo {
         QString clientId;
-        int frequency;
+        double frequency;
         QDateTime timestamp;
         bool isActive;
     };

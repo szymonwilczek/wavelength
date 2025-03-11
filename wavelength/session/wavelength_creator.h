@@ -96,8 +96,6 @@ public:
                     registry->addWavelength(frequency, info);
                     registry->setActiveWavelength(frequency);
 
-                    DatabaseManager::getInstance()->addWavelength(frequency, name, isPasswordProtected, hostId);
-
                     // Dodaj to:
                     QObject::connect(socket, &QWebSocket::textMessageReceived,
                                    [frequency](const QString& message) {
@@ -130,11 +128,10 @@ public:
 
             if (registry->hasWavelength(frequency)) {
                 qDebug() << "Removing wavelength" << frequency << "due to socket disconnect";
-                int activeFreq = registry->getActiveWavelength();
+                double activeFreq = registry->getActiveWavelength();
                 
                 registry->removeWavelength(frequency);
-                DatabaseManager::getInstance()->removeWavelength(frequency);
-                
+
                 if (activeFreq == frequency) {
                     registry->setActiveWavelength(-1);
                 }
@@ -195,8 +192,8 @@ public:
     }
 
 signals:
-    void wavelengthCreated(int frequency);
-    void wavelengthClosed(int frequency);
+    void wavelengthCreated(double frequency);
+    void wavelengthClosed(double frequency);
     void connectionError(const QString& errorMessage);
 
 private:

@@ -43,46 +43,6 @@ public:
         }
     }
 
-    bool addWavelength(double frequency, const QString& name, bool isPasswordProtected,
-                    const QString& hostId) {
-        try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-            auto builder = bsoncxx::builder::basic::document{};
-            
-            builder.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            builder.append(bsoncxx::builder::basic::kvp("name", name.toStdString()));
-            builder.append(bsoncxx::builder::basic::kvp("isPasswordProtected", isPasswordProtected));
-            builder.append(bsoncxx::builder::basic::kvp("hostId", hostId.toStdString()));
-            
-            collection.insert_one(builder.view());
-            qDebug() << "Successfully added wavelength" << frequency << "to database";
-            return true;
-        }
-        catch (const std::exception& e) {
-            qDebug() << "MongoDB error when adding wavelength:" << e.what();
-            return false;
-        }
-    }
-
-    bool removeWavelength(double frequency) {
-        try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            auto filter = document.view();
-            
-            auto result = collection.delete_one(filter);
-            bool success = result && result->deleted_count() > 0;
-            
-            qDebug() << "Removed wavelength" << frequency << "from database:" << success;
-            return success;
-        }
-        catch (const std::exception& e) {
-            qDebug() << "MongoDB error when removing wavelength:" << e.what();
-            return false;
-        }
-    }
-
     bool getWavelengthDetails(double frequency, QString& name, bool& isPasswordProtected) {
         try {
             auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];

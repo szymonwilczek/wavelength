@@ -6,7 +6,7 @@
 
 class MessageFormatter {
 public:
-    static QString formatMessage(const QJsonObject& msgObj, int frequency) {
+    static QString formatMessage(const QJsonObject& msgObj, double frequency) {
         // Pobierz treść wiadomości
         QString content;
         if (msgObj.contains("content")) {

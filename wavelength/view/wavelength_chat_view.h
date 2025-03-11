@@ -98,7 +98,7 @@ public:
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
     }
 
-    void setWavelength(int frequency, const QString& name = QString()) {
+    void setWavelength(double frequency, const QString& name = QString()) {
         currentFrequency = frequency;
 
         QString title;
@@ -122,7 +122,7 @@ public:
         inputField->clear();
     }
 
-    void onMessageReceived(int frequency, const QString& message) {
+    void onMessageReceived(double frequency, const QString& message) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -133,7 +133,7 @@ public:
         messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
     }
 
-    void onMessageSent(int frequency, const QString& message) {
+    void onMessageSent(double frequency, const QString& message) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -144,7 +144,7 @@ public:
         messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
     }
 
-    void onWavelengthClosed(int frequency) {
+    void onWavelengthClosed(double frequency) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -218,10 +218,6 @@ private slots:
         });
     }
 
-
-
-
-
 signals:
     void wavelengthAborted();
 
@@ -231,7 +227,7 @@ private:
     QLineEdit *inputField;
     QPushButton *sendButton;
     QPushButton *abortButton;
-    int currentFrequency = -1;
+    double currentFrequency = -1.0;
 };
 
 #endif // WAVELENGTH_CHAT_VIEW_H

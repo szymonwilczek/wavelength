@@ -20,7 +20,7 @@ public:
 
     void leaveWavelength() {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        int freq = registry->getActiveWavelength();
+        double freq = registry->getActiveWavelength();
         
         if (freq == -1) {
             qDebug() << "No active wavelength to leave";
@@ -52,15 +52,12 @@ public:
         
         registry->removeWavelength(freq);
         
-        if (info.isHost) {
-            DatabaseManager::getInstance()->removeWavelength(freq);
-        }
-        
+
         registry->setActiveWavelength(-1);
         emit wavelengthLeft(freq);
     }
 
-    void closeWavelength(int frequency) {
+    void closeWavelength(double frequency) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
         
         if (!registry->hasWavelength(frequency)) {
@@ -78,7 +75,7 @@ public:
         // Mark as closing to prevent disconnect handler from triggering again
         registry->markWavelengthClosing(frequency, true);
         
-        int activeFreq = registry->getActiveWavelength();
+        double activeFreq = registry->getActiveWavelength();
         bool wasActive = (activeFreq == frequency);
         
         QWebSocket* socketToClose = info.socket;
@@ -95,10 +92,7 @@ public:
         
         registry->removeWavelength(frequency);
         
-        if (info.isPasswordProtected) {
-            DatabaseManager::getInstance()->removeWavelength(frequency);
-        }
-        
+
         if (wasActive) {
             registry->setActiveWavelength(-1);
         }
@@ -107,8 +101,8 @@ public:
     }
 
 signals:
-    void wavelengthLeft(int frequency);
-    void wavelengthClosed(int frequency);
+    void wavelengthLeft(double frequency);
+    void wavelengthClosed(double frequency);
 
 private:
     WavelengthLeaver(QObject* parent = nullptr) : QObject(parent) {}

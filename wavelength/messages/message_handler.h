@@ -85,8 +85,8 @@ public:
         return messageObj["content"].toString();
     }
 
-    int getMessageFrequency(const QJsonObject& messageObj) {
-        return messageObj["frequency"].toInt();
+    double getMessageFrequency(const QJsonObject& messageObj) {
+        return messageObj["frequency"].toDouble();
     }
 
     QString getMessageSenderId(const QJsonObject& messageObj) {
@@ -97,20 +97,28 @@ public:
         return messageObj["messageId"].toString();
     }
 
-    QJsonObject createAuthRequest(int frequency, const QString& password, const QString& clientId) {
+    double normalizeFrequency(double frequency, int precision = 1) {
+        // Zaokrąglenie do określonej liczby miejsc po przecinku
+        double multiplier = std::pow(10.0, precision);
+        return std::round(frequency * multiplier) / multiplier;
+    }
+
+    QJsonObject createAuthRequest(double frequency, const QString& password, const QString& clientId) {
         QJsonObject authObj;
         authObj["type"] = "auth";
-        authObj["frequency"] = frequency;
+        authObj["frequency"] = normalizeFrequency(frequency);
         authObj["password"] = password;
         authObj["clientId"] = clientId;
         return authObj;
     }
 
-    QJsonObject createRegisterRequest(int frequency, const QString& name, bool isPasswordProtected, 
+
+
+    QJsonObject createRegisterRequest(double frequency, const QString& name, bool isPasswordProtected,
                                       const QString& password, const QString& hostId) {
         QJsonObject regObj;
         regObj["type"] = "register_wavelength";
-        regObj["frequency"] = frequency;
+        regObj["frequency"] = normalizeFrequency(frequency);
         regObj["name"] = name;
         regObj["isPasswordProtected"] = isPasswordProtected;
         regObj["password"] = password;
@@ -118,7 +126,7 @@ public:
         return regObj;
     }
 
-    QJsonObject createLeaveRequest(int frequency, bool isHost) {
+    QJsonObject createLeaveRequest(double frequency, bool isHost) {
         QJsonObject leaveObj;
         leaveObj["type"] = isHost ? "close_wavelength" : "leave_wavelength";
         leaveObj["frequency"] = frequency;

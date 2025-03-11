@@ -25,7 +25,7 @@ public:
         return &instance;
     }
 
-    bool joinWavelength(int frequency, const QString& password = QString()) {
+    bool joinWavelength(double frequency, const QString& password = QString()) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     DatabaseManager* dbManager = DatabaseManager::getInstance();
 
@@ -142,7 +142,7 @@ public:
         }
 
         if (registry->hasWavelength(frequency)) {
-            int activeFreq = registry->getActiveWavelength();
+            double activeFreq = registry->getActiveWavelength();
 
             registry->removeWavelength(frequency);
 
@@ -208,12 +208,12 @@ public:
 }
 
 signals:
-    void wavelengthJoined(int frequency);
-    void wavelengthClosed(int frequency);
-    void authenticationFailed(int frequency);
+    void wavelengthJoined(double frequency);
+    void wavelengthClosed(double frequency);
+    void authenticationFailed(double frequency);
     void connectionError(const QString& errorMessage);
-    void messageReceived(int frequency, const QString& formattedMessage);
-    void wavelengthLeft(int frequency);
+    void messageReceived(double frequency, const QString& formattedMessage);
+    void wavelengthLeft(double frequency);
 
 private:
     WavelengthJoiner(QObject* parent = nullptr) : QObject(parent) {}

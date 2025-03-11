@@ -25,7 +25,7 @@ public:
 
     bool sendMessage(const QString& message) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        int freq = registry->getActiveWavelength();
+        double freq = registry->getActiveWavelength();
 
         if (freq == -1) {
             qDebug() << "Cannot send message - no active wavelength";
@@ -101,7 +101,7 @@ public:
     }
 
 signals:
-    void messageSent(int frequency, const QString& formattedMessage);
+    void messageSent(double frequency, const QString& formattedMessage);
 
 private:
     WavelengthMessageService(QObject* parent = nullptr) : QObject(parent) {}
