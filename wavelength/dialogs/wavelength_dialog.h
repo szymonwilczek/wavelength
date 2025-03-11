@@ -15,6 +15,10 @@
 #include <QFutureWatcher>
 #include <QGraphicsOpacityEffect>
 #include <QProgressBar>
+#include <QPropertyAnimation>
+#include <QShowEvent>  // Dodany nagłówek
+#include <QCloseEvent> // Dodany nagłówek
+#include <QPainter>
 #include "../session/wavelength_session_coordinator.h"
 
 class WavelengthDialog : public QDialog {
@@ -22,10 +26,13 @@ class WavelengthDialog : public QDialog {
 
 public:
     explicit WavelengthDialog(QWidget *parent = nullptr) : QDialog(parent) {
+        setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
         setWindowTitle("Create New Wavelength");
         setModal(true);
         setFixedSize(400, 250);
-        setStyleSheet("background-color: #2d2d2d; color: #e0e0e0;");
+        setAttribute(Qt::WA_TranslucentBackground); // Kluczowe dla zaokrąglonych rogów
+
+        setAutoFillBackground(false);
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -50,12 +57,6 @@ public:
         formLayout->addRow("Name:", nameEdit);
 
         passwordProtectedCheckbox = new QCheckBox("Password Protected", this);
-        passwordProtectedCheckbox->setStyleSheet(
-            "QCheckBox { color: #e0e0e0; }"
-            "QCheckBox::indicator { width: 16px; height: 16px; }"
-            "QCheckBox::indicator:unchecked { background-color: #3e3e3e; border: 1px solid #555; }"
-            "QCheckBox::indicator:checked { background-color: #3e3e3e; border: 1px solid #555; image: url(:/icons/check.png); }"
-        );
         formLayout->addRow("", passwordProtectedCheckbox);
 
         passwordEdit = new QLineEdit(this);
@@ -140,7 +141,80 @@ public:
         return passwordEdit->text();
     }
 
+protected:
+
+    void paintEvent(QPaintEvent *event) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        QColor bgColor(45, 45, 45); // #2d2d2d
+        painter.setBrush(bgColor);
+
+        QPen pen(QColor(74, 74, 74), 1); // #4a4a4a, 1px szerokości
+        painter.setPen(pen);
+
+        painter.drawRoundedRect(rect(), 10, 10);
+
+    }
+
+    void showEvent(QShowEvent *event) override {
+        QDialog::showEvent(event);
+
+        // Pobierz aktualną pozycję finalną dialogu - to jest docelowa geometria
+        QRect endGeometry = geometry();
+
+        // Znajdź rzeczywisty środek okna
+        QPoint centerPoint = endGeometry.center();
+
+        // Utwórz początkową geometrię jako mały punkt dokładnie w środku
+        int smallSize = 20; // Bardzo mały rozmiar początkowy
+        QRect startGeometry(0, 0, smallSize, smallSize);
+        startGeometry.moveCenter(centerPoint);
+
+        setGeometry(startGeometry);
+
+        layout()->activate();
+        repaint();
+
+        // Utwórz animację
+        QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
+        animation->setDuration(500);
+        animation->setStartValue(startGeometry);
+        animation->setEndValue(endGeometry);
+        animation->setEasingCurve(QEasingCurve::OutExpo);
+
+        // Uruchom animację
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
+void closeEvent(QCloseEvent *event) override {
+    event->ignore();
+
+    QRect startGeometry = geometry();
+    QPoint centerPoint = startGeometry.center();
+    QRect endGeometry = QRect(0, 0, startGeometry.width() * 0.1, startGeometry.height() * 0.1);
+    endGeometry.moveCenter(centerPoint);
+
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
+    animation->setDuration(400);  // Długość animacji
+    animation->setStartValue(startGeometry);
+    animation->setEndValue(endGeometry);
+    animation->setEasingCurve(QEasingCurve::InBack);
+
+    // Dodatkowe punkty pośrednie dla płynniejszego efektu
+    animation->setKeyValueAt(0.5, QRect(
+        centerPoint.x() - startGeometry.width() * 0.35,
+        centerPoint.y() - startGeometry.height() * 0.35,
+        startGeometry.width() * 0.7,
+        startGeometry.height() * 0.7
+    ));
+
+    connect(animation, &QPropertyAnimation::finished, this, &QDialog::reject);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 private slots:
+
     void validateInputs() {
         statusLabel->hide();
 
