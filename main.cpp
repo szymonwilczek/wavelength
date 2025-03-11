@@ -9,6 +9,7 @@
 #include <QGraphicsDropShadowEffect>
 #include <QStackedWidget>
 #include <QTimer>
+#include <QAbstractAnimation> // Dodaj ten nagłówek
 
 #include "blob/core/app_instance_manager.h"
 #include "wavelength/dialogs/join_wavelength_dialog.h"
@@ -51,6 +52,11 @@ private:
 
 
 int main(int argc, char *argv[]) {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    
+    // Alternatywa dla QAbstractAnimation::setGlobalTimerType
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
 
     app.setStyle(QStyleFactory::create("Fusion"));
