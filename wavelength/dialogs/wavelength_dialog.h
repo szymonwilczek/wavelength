@@ -11,6 +11,10 @@
 #include <QIntValidator>
 #include <QMessageBox>
 #include <QApplication>
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QGraphicsOpacityEffect>
+#include <QProgressBar>
 #include "../session/wavelength_session_coordinator.h"
 
 class WavelengthDialog : public QDialog {
@@ -34,6 +38,11 @@ public:
         frequencyLabel = new QLabel(this);
         frequencyLabel->setStyleSheet("font-size: 16px; font-weight: bold; color: #4a6db5;");
         formLayout->addRow("Assigned frequency:", frequencyLabel);
+
+        // Wskaźnik ładowania przy wyszukiwaniu częstotliwości
+        loadingIndicator = new QLabel("Searching for available frequency...", this);
+        loadingIndicator->setStyleSheet("color: #ffcc00;");
+        formLayout->addRow("", loadingIndicator);
 
         nameEdit = new QLineEdit(this);
         nameEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
@@ -77,6 +86,7 @@ public:
             "QPushButton:pressed { background-color: #3a5da5; }"
             "QPushButton:disabled { background-color: #2c3e66; color: #aaaaaa; }"
         );
+        generateButton->setEnabled(false); // Disable until frequency is found
 
         cancelButton = new QPushButton("Cancel", this);
         cancelButton->setStyleSheet(
@@ -103,9 +113,15 @@ public:
         connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
         connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-        // Znajdź najniższą dostępną częstotliwość i wyświetl ją
-        findLowestAvailableFrequency();
-        validateInputs();
+        // Inicjalizacja watcher'a dla asynchronicznego wyszukiwania
+        frequencyWatcher = new QFutureWatcher<double>(this);
+        connect(frequencyWatcher, &QFutureWatcher<double>::finished, this, &WavelengthDialog::onFrequencyFound);
+
+        // Uruchom asynchroniczne wyszukiwanie
+        QFuture<double> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
+        frequencyWatcher->setFuture(future);
+
+        frequencyLabel->setText("...");
     }
 
     double getFrequency() const {
@@ -133,7 +149,8 @@ private slots:
             isPasswordValid = !passwordEdit->text().isEmpty();
         }
 
-        generateButton->setEnabled(isPasswordValid);
+        // Przycisk jest aktywny tylko jeśli znaleziono częstotliwość i hasło jest prawidłowe
+        generateButton->setEnabled(isPasswordValid && m_frequencyFound);
     }
 
     void tryGenerate() {
@@ -158,8 +175,96 @@ private slots:
         qDebug() << "LOG: tryGenerate - koniec";
     }
 
+    void onFrequencyFound() {
+    // Pobierz wynik asynchronicznego wyszukiwania
+    m_frequency = frequencyWatcher->result();
+    m_frequencyFound = true;
+
+    // Przygotuj tekst częstotliwości, ale jeszcze go nie wyświetlaj
+    QString frequencyText = formatFrequencyText(m_frequency);
+
+    // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
+    QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
+    loaderSlideAnimation->setDuration(400); // Skrócony czas dla lepszej responsywności
+    loaderSlideAnimation->setStartValue(loadingIndicator->sizeHint().height());
+    loaderSlideAnimation->setEndValue(0);
+    loaderSlideAnimation->setEasingCurve(QEasingCurve::OutQuint); // Płynniejsza krzywa
+
+    // Dodanie efektu przezroczystości dla etykiety częstotliwości
+    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(frequencyLabel);
+    frequencyLabel->setGraphicsEffect(opacityEffect);
+    opacityEffect->setOpacity(0.0); // Początkowo niewidoczny
+
+    // Animacja pojawiania się etykiety częstotliwości
+    QPropertyAnimation *frequencyAnimation = new QPropertyAnimation(opacityEffect, "opacity");
+    frequencyAnimation->setDuration(600);
+    frequencyAnimation->setStartValue(0.0);
+    frequencyAnimation->setEndValue(1.0);
+    frequencyAnimation->setEasingCurve(QEasingCurve::InQuad);
+
+    // Utwórz grupę animacji, która zostanie uruchomiona sekwencyjnie
+    QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
+    animGroup->addAnimation(loaderSlideAnimation);
+
+    // Sygnalizacja kiedy pierwsza animacja się kończy
+    connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyText]() {
+        // Ukryj loadingIndicator
+        loadingIndicator->hide();
+
+        // Ustaw tekst częstotliwości
+        frequencyLabel->setText(frequencyText);
+    });
+
+    // Połączenie sekwencyjne - druga animacja po zakończeniu pierwszej
+    connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyAnimation]() {
+        frequencyAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+    });
+
+    // Aby uzyskać wysoką płynność animacji:
+    // 1. Wyłączamy cache tła dla animowanych widżetów
+    loadingIndicator->setAttribute(Qt::WA_OpaquePaintEvent, false);
+    frequencyLabel->setAttribute(Qt::WA_OpaquePaintEvent, false);
+
+    // 2. Ustaw wyższą częstotliwość aktualizacji dla animacji
+    frequencyAnimation->setDuration(600);  // 600ms
+    loaderSlideAnimation->setDuration(400);  // 400ms
+
+    // Dla większej płynności możemy ustawić więcej klatek animacji
+    const int framesPerSecond = 60;
+    frequencyAnimation->setKeyValueAt(0.2, 0.3);
+    frequencyAnimation->setKeyValueAt(0.4, 0.6);
+    frequencyAnimation->setKeyValueAt(0.6, 0.8);
+    frequencyAnimation->setKeyValueAt(0.8, 0.95);
+
+    // Rozpocznij pierwszą animację
+    animGroup->start(QAbstractAnimation::DeleteWhenStopped);
+
+    // Sprawdź czy przycisk powinien być aktywowany
+    validateInputs();
+}
+
+// Nowa pomocnicza metoda do formatowania tekstu częstotliwości
+QString formatFrequencyText(double frequency) {
+    QString unitText;
+    double displayValue;
+
+    if (frequency >= 1000000) {
+        displayValue = frequency / 1000000.0;
+        unitText = " MHz";
+    } else if (frequency >= 1000) {
+        displayValue = frequency / 1000.0;
+        unitText = " kHz";
+    } else {
+        displayValue = frequency;
+        unitText = " Hz";
+    }
+
+    // Formatuj z jednym miejscem po przecinku
+    return QString::number(displayValue, 'f', 1) + unitText;
+}
+
 private:
-    void findLowestAvailableFrequency() {
+    static double findLowestAvailableFrequency() {
         DatabaseManager* manager = DatabaseManager::getInstance();
 
         // Początek od 130Hz i szukamy do 1800MHz
@@ -168,9 +273,7 @@ private:
 
         while (frequency <= maxFrequency) {
             if (manager->isFrequencyAvailable(frequency)) {
-                m_frequency = frequency;
-                updateFrequencyLabel();
-                return;
+                return frequency;
             }
 
             // Zwiększamy o 0.1 dla częstotliwości poniżej 1000Hz
@@ -189,39 +292,25 @@ private:
         }
 
         // Jeśli nie znaleziono, ustawiamy domyślną wartość
-        m_frequency = 130.0;
-        updateFrequencyLabel();
+        return 130.0;
     }
 
     void updateFrequencyLabel() {
-        QString unitText;
-        double displayValue;
-
-        if (m_frequency >= 1000000) {
-            displayValue = m_frequency / 1000000.0;
-            unitText = " MHz";
-        } else if (m_frequency >= 1000) {
-            displayValue = m_frequency / 1000.0;
-            unitText = " kHz";
-        } else {
-            displayValue = m_frequency;
-            unitText = " Hz";
-        }
-
-        // Formatuj z jednym miejscem po przecinku
-        QString displayText = QString::number(displayValue, 'f', 1) + unitText;
-        frequencyLabel->setText(displayText);
+        frequencyLabel->setText(formatFrequencyText(m_frequency));
     }
 
 private:
     QLabel *frequencyLabel;
+    QLabel *loadingIndicator;
     QLineEdit *nameEdit;
     QCheckBox *passwordProtectedCheckbox;
     QLineEdit *passwordEdit;
     QLabel *statusLabel;
     QPushButton *generateButton;
     QPushButton *cancelButton;
+    QFutureWatcher<double> *frequencyWatcher;
     double m_frequency = 130.0; // Domyślna wartość
+    bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
 };
 
 #endif // WAVELENGTH_DIALOG_H
