@@ -1,6 +1,7 @@
 #ifndef BLOBANIMATION_H
 #define BLOBANIMATION_H
 
+#include <deque>
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
@@ -101,6 +102,8 @@ protected:
 private slots:
     void updateAnimation();
 
+    void processMovementBuffer();
+
     void updatePhysics();
 
     void handleIdleTransition();
@@ -187,6 +190,17 @@ private:
     bool m_eventsEnabled = true;
     QTimer m_eventReEnableTimer;
     bool m_needsRedraw = false;
+
+    struct WindowMovementSample {
+        QPointF position;
+        qint64 timestamp;
+    };
+
+    static const int MAX_MOVEMENT_SAMPLES = 10;
+    std::pmr::deque<WindowMovementSample> m_movementBuffer;
+    QVector2D m_smoothedVelocity;
+    bool m_significantMovementDetected = false;
+    qint64 m_lastMovementTime = 0;
 };
 
 #endif // BLOBANIMATION_H

@@ -35,11 +35,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     initializeBlob();
 
-    m_windowPositionTimer.setInterval(16); // 60 FPS
-    m_windowPositionTimer.setTimerType(Qt::PreciseTimer);
-    connect(&m_windowPositionTimer, &QTimer::timeout, this, &BlobAnimation::checkWindowPosition);
-    m_windowPositionTimer.start();
-
     m_resizeDebounceTimer.setSingleShot(true);
     m_resizeDebounceTimer.setInterval(50); // 50 ms debounce
     connect(&m_resizeDebounceTimer, &QTimer::timeout, this, &BlobAnimation::handleResizeTimeout);
@@ -51,8 +46,15 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     }
 
     m_animationTimer.setTimerType(Qt::PreciseTimer);
+    m_animationTimer.setInterval(16); // ~60 FPS
     connect(&m_animationTimer, &QTimer::timeout, this, &BlobAnimation::updateAnimation);
-    m_animationTimer.start(16); // ~60 FPS
+    m_animationTimer.start();
+
+    // Konfiguracja timera sprawdzającego pozycję okna - wysoka częstotliwość
+    m_windowPositionTimer.setInterval(8); // Sprawdzaj jeszcze częściej (>100 FPS)
+    m_windowPositionTimer.setTimerType(Qt::PreciseTimer);
+    connect(&m_windowPositionTimer, &QTimer::timeout, this, &BlobAnimation::checkWindowPosition);
+    m_windowPositionTimer.start();
 
     connect(&m_stateResetTimer, &QTimer::timeout, this, &BlobAnimation::onStateResetTimeout);
 
@@ -79,68 +81,32 @@ void BlobAnimation::handleResizeTimeout() {
 }
 
 void BlobAnimation::checkWindowPosition() {
-    static QElapsedTimer debounceTimer;
-    static int adaptiveFrameDelay = 16; // Zaczynamy od 60 FPS
-    static int inactiveFrames = 0;
-
-    if (debounceTimer.elapsed() < adaptiveFrameDelay) {
-        return;
-    }
-    debounceTimer.restart();
-
     QWidget* currentWindow = window();
     if (!currentWindow || !m_eventsEnabled || m_inTransitionToIdle)
         return;
 
-    QPointF currentWindowPos = currentWindow->pos();
+    // Ta metoda jest wywoływana przez timer, ale nie potrzebujemy sprawdzać pozycji
+    // za każdym razem - eventy są już filtrowane w eventFilter
+    // i zapisywane do bufora m_movementBuffer
 
-    if (currentWindowPos != m_lastWindowPosForTimer) {
-        QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
-        double velocityMagnitude = windowVelocity.length();
+    // Sprawdzamy tylko czy nie ma bezczynności
+    qint64 currentTimestamp = QDateTime::currentMSecsSinceEpoch();
 
-        // Adaptacyjna częstotliwość odświeżania w zależności od prędkości
-        if (velocityMagnitude > 1.0) {
-            adaptiveFrameDelay = 16; // ~60 FPS dla szybkich ruchów
-            inactiveFrames = 0;
-        } else if (velocityMagnitude > 0.5) {
-            adaptiveFrameDelay = 16; // ~50 FPS dla średnich ruchów
-        } else if (velocityMagnitude > 0.2) {
-            adaptiveFrameDelay = 16; // ~30 FPS dla wolnych ruchów
-            m_isMoving = true;
-            m_inactivityCounter = 0;
+    if (!m_movementBuffer.empty() &&
+        (currentTimestamp - m_movementBuffer.back().timestamp) > 100) {
+        // Dodaj potwierdzenie statusu nieruchomego po okresie bezczynności
+        QPointF currentWindowPos = currentWindow->pos();
 
-            switchToState(BlobConfig::MOVING);
-            m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
-                                          m_params.blobRadius, windowVelocity);
+        // Dodaj próbkę z obecną pozycją tylko jeśli się zmieniła
+        if (m_movementBuffer.empty() || currentWindowPos != m_movementBuffer.back().position) {
+            m_movementBuffer.push_back({currentWindowPos, currentTimestamp});
 
-            m_physics.setLastWindowPos(currentWindowPos);
-            update();
-        } else {
-            // Zbyt mała prędkość, nie trzeba aktualizować
-            inactiveFrames++;
-        }
-
-        m_lastWindowPosForTimer = currentWindowPos;
-    } else {
-        inactiveFrames++;
-
-        if (inactiveFrames > 10) {
-            // Stopniowo zmniejszaj częstotliwość sprawdzania gdy brak ruchu
-            adaptiveFrameDelay = qMin(100, adaptiveFrameDelay + 5); // Max 10 FPS w stanie spoczynku
-        }
-
-        if (m_isMoving) {
-            m_inactivityCounter++;
-
-            if (m_inactivityCounter > 60) {
-                m_isMoving = false;
-
-                if (m_currentState == BlobConfig::MOVING) {
-                    switchToState(BlobConfig::IDLE);
-                }
+            // Ogranicz rozmiar bufora
+            if (m_movementBuffer.size() > MAX_MOVEMENT_SAMPLES) {
+                m_movementBuffer.pop_front();
             }
         }
-    }
+        }
 }
 
 BlobAnimation::~BlobAnimation() {
@@ -458,28 +424,14 @@ void BlobAnimation::updateAbsorptionProgress(float progress) {
 
 void BlobAnimation::updateAnimation() {
     m_needsRedraw = false;
-    QWidget* currentWindow = window();
 
-    if (currentWindow && m_currentState != BlobConfig::RESIZING) {
-        QPointF currentWindowPos = currentWindow->pos();
-        if (currentWindowPos != m_lastWindowPos) {
-            QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
-            if (windowVelocity.length() > 0.2) {
-                switchToState(BlobConfig::MOVING);
-                m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
-                                              m_params.blobRadius, windowVelocity);
-                m_needsRedraw = true;
-            }
-            m_physics.setLastWindowPos(currentWindowPos);
-            m_lastWindowPos = currentWindowPos;
-        }
-    }
+    // Przetwarzaj bufor ruchów przy każdej klatce animacji (60 FPS)
+    processMovementBuffer();
 
     if (m_inTransitionToIdle) {
         handleIdleTransition();
         m_needsRedraw = true;
     } else if (m_currentState == BlobConfig::IDLE) {
-
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
             m_needsRedraw = true;
@@ -495,6 +447,96 @@ void BlobAnimation::updateAnimation() {
 
     if (m_needsRedraw) {
         update();
+    }
+}
+
+// Nowa metoda do przetwarzania bufora ruchów
+void BlobAnimation::processMovementBuffer() {
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+    // Jeśli bufor jest pusty lub nie zawiera wystarczającej liczby próbek, zakończ
+    if (m_movementBuffer.size() < 2)
+        return;
+
+    // Oblicz wygładzoną prędkość na podstawie bufora próbek
+    QVector2D newVelocity(0, 0);
+    double totalWeight = 0;
+
+    // Przetwarzamy wszystkie próbki, nadając większą wagę nowszym próbkom
+    for (size_t i = 1; i < m_movementBuffer.size(); i++) {
+        QPointF posDelta = m_movementBuffer[i].position - m_movementBuffer[i-1].position;
+        qint64 timeDelta = m_movementBuffer[i].timestamp - m_movementBuffer[i-1].timestamp;
+
+        if (timeDelta > 0) {
+            // Oblicz wektor prędkości dla danej pary próbek
+            double scale = 700.0 / timeDelta; // Skalowanie do jednostek/s
+            QVector2D sampleVelocity(posDelta.x() * scale, posDelta.y() * scale);
+
+            // Waga próbki - nowsze próbki mają większą wagę
+            double weight = 0.5 + 0.5 * (i / (double)(m_movementBuffer.size() - 1));
+
+            // Dodaj do wygładzonej prędkości
+            newVelocity += sampleVelocity * weight;
+            totalWeight += weight;
+        }
+    }
+
+    // Normalizacja prędkości
+    if (totalWeight > 0) {
+        newVelocity /= totalWeight;
+    }
+
+    // Wygładź prędkość z poprzednią wartością dla bardziej płynnych przejść
+    if (m_smoothedVelocity.length() > 0) {
+        m_smoothedVelocity = m_smoothedVelocity * 0.7 + newVelocity * 0.2;
+    } else {
+        m_smoothedVelocity = newVelocity;
+    }
+
+    double velocityMagnitude = m_smoothedVelocity.length();
+
+    // Sprawdź czy wykryto znaczący ruch
+    bool significantMovement = velocityMagnitude > 0.3;
+
+    // Jeśli wykryto znaczący ruch lub niedawno był ruch
+    if (significantMovement || (currentTime - m_lastMovementTime) < 200) { // 200ms "pamięci" ruchu
+        if (significantMovement) {
+            // Przejdź do stanu ruchu i zastosuj efekty fizyczne
+            switchToState(BlobConfig::MOVING);
+
+            QVector2D scaledVelocity = m_smoothedVelocity * 0.6;
+            m_movingState->applyInertiaForce(
+                m_velocity,
+                m_blobCenter,
+                m_controlPoints,
+                m_params.blobRadius,
+                scaledVelocity
+            );
+
+            m_physics.setLastWindowPos(m_movementBuffer.back().position);
+            m_isMoving = true;
+            m_inactivityCounter = 0;
+            m_needsRedraw = true;
+        }
+    } else if (m_isMoving) {
+        // Zliczanie nieaktywności i ewentualne przejście do stanu bezczynności
+        m_inactivityCounter++;
+
+        if (m_inactivityCounter > 60) { // Po około 1s nieaktywności przy 60 FPS
+            m_isMoving = false;
+            if (m_currentState == BlobConfig::MOVING) {
+                switchToState(BlobConfig::IDLE);
+            }
+        }
+    }
+
+    // Wyczyść stare próbki, pozostawiając tylko ostatnią jako punkt odniesienia dla nowych
+    if (m_movementBuffer.size() > 1 && (currentTime - m_lastMovementTime) > 500) { // 0.5s bez ruchu
+        QPointF lastPosition = m_movementBuffer.back().position;
+        qint64 lastTimestamp = m_movementBuffer.back().timestamp;
+
+        m_movementBuffer.clear();
+        m_movementBuffer.push_back({lastPosition, lastTimestamp});
     }
 }
 
@@ -737,8 +779,57 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
         return QWidget::eventFilter(watched, event);
     }
 
-    if (watched == window() && event->type() == QEvent::DragMove) {
-        m_lastWindowPos = window()->pos();
+    static QPointF lastProcessedPos;
+    static qint64 lastProcessedMoveTime = 0;
+
+    if (watched == window()) {
+        if (event->type() == QEvent::Move) {
+            QMoveEvent *moveEvent = static_cast<QMoveEvent*>(event);
+            QPointF newPos = moveEvent->pos();
+            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+            double moveDist = QVector2D(newPos - lastProcessedPos).length();
+            qint64 timeDelta = currentTime - lastProcessedMoveTime;
+
+            double distThreshold = 1.0;
+            int timeThreshold = 5; // ms
+
+            if (timeDelta < 8) {
+                distThreshold = 2.0;
+            } else if (timeDelta < 16) {
+                distThreshold = 1.0;
+            }
+
+            if (moveDist > distThreshold || timeDelta > timeThreshold) {
+                lastProcessedPos = newPos;
+                lastProcessedMoveTime = currentTime;
+
+                QWidget* currentWindow = window();
+                if (currentWindow) {
+                    QPointF currentWindowPos = currentWindow->pos();
+                    m_lastWindowPosForTimer = currentWindowPos;
+
+                    m_movementBuffer.push_back({currentWindowPos, currentTime});
+                    if (m_movementBuffer.size() > MAX_MOVEMENT_SAMPLES) {
+                        m_movementBuffer.pop_front();
+                    }
+                    m_lastMovementTime = currentTime;
+                }
+            } else {
+                return true;
+            }
+        }
+
+        else if (event->type() == QEvent::DragMove) {
+            static qint64 lastDragEventTime = 0;
+            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+            if (currentTime - lastDragEventTime < 16) { // ~60 FPS
+                return true;
+            }
+
+            lastDragEventTime = currentTime;
+        }
     }
 
     return QWidget::eventFilter(watched, event);

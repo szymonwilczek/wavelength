@@ -26,12 +26,12 @@ void MovingState::apply(std::vector<QPointF>& controlPoints,
             double distanceFromCenter = QVector2D(vectorFromCenter).length();
 
             double factor = distanceFromCenter / params.blobRadius;
-            // TUTAJ: Zmniejsz współczynnik odkształcenia (z 0.2 na 0.1)
-            factor = factor * factor * 0.1;
+            // Zmniejsz współczynnik odkształcenia (z 0.1 na 0.05)
+            factor = factor * factor * 0.05;
 
             QPointF stretchForce = QPointF(avgVelX * factor, avgVelY * factor);
-            // TUTAJ: Zmniejsz wpływ siły (z 0.05 na 0.025)
-            velocity[i] += stretchForce * 0.025;
+            // Zmniejsz wpływ siły (z 0.025 na 0.015)
+            velocity[i] += stretchForce * 0.015;
         }
     }
 }
@@ -47,8 +47,8 @@ void MovingState::applyInertiaForce(std::vector<QPointF>& velocity,
         return;
     }
 
-    // TUTAJ: Zmniejsz współczynnik siły bezwładności z 0.01 na 0.005
-    QVector2D inertiaForce = -windowVelocity * (0.005 * qMin(1.0, windowSpeed / 10.0));
+    // Zmniejsz współczynnik siły bezwładności z 0.005 na 0.0025
+    QVector2D inertiaForce = -windowVelocity * (0.0025 * qMin(1.0, windowSpeed / 10.0));
 
     // Prekalkujemy dla wydajności
     double forceX = inertiaForce.x();
@@ -61,24 +61,24 @@ void MovingState::applyInertiaForce(std::vector<QPointF>& velocity,
     // Prekalkujemy odwrotność promienia
     double invRadius = 1.0 / blobRadius;
 
-    // TUTAJ: Zmniejsz wpływ sił na punkty kontrolne (z 0.8 na 0.4)
+    // Zmniejsz wpływ sił na punkty kontrolne (z 0.4 na 0.2)
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         double distX = controlPoints[i].x() - centerX;
         double distY = controlPoints[i].y() - centerY;
 
         double distApprox = qAbs(distX) + qAbs(distY);
-        double forceScale = qMin(distApprox * invRadius * 0.4, 0.5); // Zmniejszono oba współczynniki
+        double forceScale = qMin(distApprox * invRadius * 0.2, 0.3); // Zmniejszono oba współczynniki
 
         velocity[i].rx() += forceX * forceScale;
         velocity[i].ry() += forceY * forceScale;
     }
 
-    // TUTAJ: Zmniejsz wpływ na środek bloba (z 0.001 na 0.0005)
-    double centerFactor = 0.0005 * qMin(1.0, windowSpeed / 5.0);
+    // Zmniejsz wpływ na środek bloba (z 0.0005 na 0.0003)
+    double centerFactor = 0.0003 * qMin(1.0, windowSpeed / 5.0);
     blobCenter.rx() += -windowVelocity.x() * centerFactor;
     blobCenter.ry() += -windowVelocity.y() * centerFactor;
 
-    // TUTAJ: Również zmniejsz współczynnik dodatkowych sił dla gwałtownych ruchów
+    // Zmniejsz współczynnik dodatkowych sił dla gwałtownych ruchów
     if (windowSpeed > 5.0) {
         for (size_t i = 0; i < controlPoints.size(); ++i) {
             double distX = controlPoints[i].x() - centerX;
@@ -88,9 +88,9 @@ void MovingState::applyInertiaForce(std::vector<QPointF>& velocity,
             double perpY = forceX;
 
             double dotProduct = distX * perpX + distY * perpY;
-            // Zmniejszono z 0.0001 na 0.00005
-            velocity[i].rx() += dotProduct * 0.00005;
-            velocity[i].ry() += dotProduct * 0.00005;
+            // Zmniejszono z 0.00005 na 0.00002
+            velocity[i].rx() += dotProduct * 0.00002;
+            velocity[i].ry() += dotProduct * 0.00002;
         }
     }
 }
