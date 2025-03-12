@@ -720,7 +720,7 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
         return QWidget::eventFilter(watched, event);
     }
 
-    if (watched == window() && event->type() == QEvent::Move) {
+    if (watched == window() && event->type() == QEvent::DragMove) {
         m_lastWindowPos = window()->pos();
     }
 
