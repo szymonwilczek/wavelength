@@ -7,7 +7,6 @@ void MovingState::apply(std::vector<QPointF>& controlPoints,
                        std::vector<QPointF>& velocity,
                        QPointF& blobCenter,
                        const BlobConfig::BlobParameters& params) {
-
     double avgVelX = 0.0;
     double avgVelY = 0.0;
 
@@ -20,14 +19,7 @@ void MovingState::apply(std::vector<QPointF>& controlPoints,
 
     if (std::abs(avgVelX) > 0.1 || std::abs(avgVelY) > 0.1) {
         QVector2D avgDirection(avgVelX, avgVelY);
-        QVector2D perpendicular(-avgVelY, avgVelX);
-
-        if (avgDirection.length() > 0) {
-            avgDirection.normalize();
-        }
-        if (perpendicular.length() > 0) {
-            perpendicular.normalize();
-        }
+        avgDirection.normalize();
 
         for (size_t i = 0; i < controlPoints.size(); ++i) {
             QPointF vectorFromCenter = controlPoints[i] - blobCenter;
@@ -38,17 +30,6 @@ void MovingState::apply(std::vector<QPointF>& controlPoints,
 
             QPointF stretchForce = QPointF(avgVelX * factor, avgVelY * factor);
             velocity[i] += stretchForce * 0.05;
-
-            QVector2D normalizedFromCenter = QVector2D(vectorFromCenter);
-            if (normalizedFromCenter.length() > 0) {
-                normalizedFromCenter.normalize();
-            }
-            double dotProduct = normalizedFromCenter.x() * avgDirection.x() +
-                               normalizedFromCenter.y() * avgDirection.y();
-
-            QPointF squeezeForce = QPointF(perpendicular.x() * factor * dotProduct,
-                                          perpendicular.y() * factor * dotProduct);
-            velocity[i] += squeezeForce * 0.02;
         }
     }
 }

@@ -79,6 +79,13 @@ void BlobAnimation::handleResizeTimeout() {
 }
 
 void BlobAnimation::checkWindowPosition() {
+    static QElapsedTimer debounceTimer;
+    if (debounceTimer.elapsed() < 16) { // 60 FPS
+        return;
+    }
+    debounceTimer.restart();
+
+
     QWidget* currentWindow = window();
     if (!currentWindow || !m_eventsEnabled || m_inTransitionToIdle)
         return;

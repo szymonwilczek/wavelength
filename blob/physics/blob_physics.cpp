@@ -15,6 +15,7 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
 
     const size_t numPoints = controlPoints.size();
     const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
+    const int batchSize = 8;
 
     if (numPoints < 16 || numThreads <= 1) {
         updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams, nullptr);
@@ -32,50 +33,52 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
 
     std::atomic isInMotion(false);
 
-    const size_t pointsPerThread = numPoints / numThreads;
-
     QVector<QFuture<void>> futures;
     futures.reserve(numThreads);
 
     for (int t = 0; t < numThreads; ++t) {
-        const size_t startIdx = t * pointsPerThread;
-        const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * pointsPerThread;
+        const size_t startIdx = t * (numPoints / numThreads);
+        const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * (numPoints / numThreads);
 
         futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx]() {
-            for (size_t i = startIdx; i < endIdx; ++i) {
-                QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
+            for (size_t batchStart = startIdx; batchStart < endIdx; batchStart += batchSize) {
+                const size_t batchEnd = qMin(batchStart + batchSize, endIdx);
 
-                QPointF vectorToCenter = blobCenter - controlPoints[i];
-                double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() +
-                                       vectorToCenter.y()*vectorToCenter.y();
+                for (size_t i = batchStart; i < batchEnd; ++i) {
+                    QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
 
-                if (distFromCenter2 > radiusThreshold * radiusThreshold) {
-                    double factor = 0.03 / qSqrt(distFromCenter2);
-                    force.rx() += vectorToCenter.x() * factor;
-                    force.ry() += vectorToCenter.y() * factor;
-                }
+                    QPointF vectorToCenter = blobCenter - controlPoints[i];
+                    double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() +
+                                           vectorToCenter.y()*vectorToCenter.y();
 
-                velocity[i] += force;
-
-                velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
-                velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
-
-                velocity[i] *= dampingFactor;
-
-                double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
-
-                if (speedSquared < physicsParams.velocityThreshold * physicsParams.velocityThreshold) {
-                    velocity[i] = QPointF(0, 0);
-                } else {
-                    isInMotion = true;
-
-                    if (speedSquared > maxSpeed * maxSpeed) {
-                        double scaleFactor = maxSpeed / qSqrt(speedSquared);
-                        velocity[i] *= scaleFactor;
+                    if (distFromCenter2 > radiusThreshold * radiusThreshold) {
+                        double factor = 0.03 / qSqrt(distFromCenter2);
+                        force.rx() += vectorToCenter.x() * factor;
+                        force.ry() += vectorToCenter.y() * factor;
                     }
-                }
 
-                controlPoints[i] += velocity[i];
+                    velocity[i] += force;
+
+                    velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
+                    velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
+
+                    velocity[i] *= dampingFactor;
+
+                    double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
+
+                    if (speedSquared < physicsParams.velocityThreshold * physicsParams.velocityThreshold) {
+                        velocity[i] = QPointF(0, 0);
+                    } else {
+                        isInMotion = true;
+
+                        if (speedSquared > maxSpeed * maxSpeed) {
+                            double scaleFactor = maxSpeed / qSqrt(speedSquared);
+                            velocity[i] *= scaleFactor;
+                        }
+                    }
+
+                    controlPoints[i] += velocity[i];
+                }
             }
         }));
     }
