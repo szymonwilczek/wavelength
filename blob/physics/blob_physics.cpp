@@ -6,6 +6,127 @@ BlobPhysics::BlobPhysics() {
     m_threadPool.setMaxThreadCount(QThread::idealThreadCount());
 }
 
+void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF>& controlPoints,
+                                       std::vector<QPointF>& targetPoints,
+                                       std::vector<QPointF>& velocity,
+                                       QPointF& blobCenter,
+                                       const BlobConfig::BlobParameters& params,
+                                       const BlobConfig::PhysicsParameters& physicsParams) {
+    const size_t numPoints = controlPoints.size();
+
+    // Używamy struktur danych zoptymalizowanych pod kątem wydajności pamięci podręcznej
+    static std::vector<float> posX, posY, targX, targY, velX, velY, forceX, forceY;
+
+    // Rezerwuj pamięć raz
+    if (posX.size() != numPoints) {
+        posX.resize(numPoints);
+        posY.resize(numPoints);
+        targX.resize(numPoints);
+        targY.resize(numPoints);
+        velX.resize(numPoints);
+        velY.resize(numPoints);
+        forceX.resize(numPoints);
+        forceY.resize(numPoints);
+    }
+
+    // Konwertuj dane na zoptymalizowane struktury (SoA - Structure of Arrays)
+    const float centerX = static_cast<float>(blobCenter.x());
+    const float centerY = static_cast<float>(blobCenter.y());
+    const float radiusThreshold = static_cast<float>(params.blobRadius * 1.1f);
+    const float radiusThresholdSquared = radiusThreshold * radiusThreshold;
+    const float dampingFactor = static_cast<float>(physicsParams.damping);
+    const float viscosity = static_cast<float>(physicsParams.viscosity);
+    const float velocityThreshold = static_cast<float>(physicsParams.velocityThreshold);
+    const float velocityThresholdSquared = velocityThreshold * velocityThreshold;
+    const float maxSpeed = static_cast<float>(params.blobRadius * physicsParams.maxSpeed);
+    const float maxSpeedSquared = maxSpeed * maxSpeed;
+
+    // Kopiuj dane do zoptymalizowanych buforów
+    #pragma omp parallel for
+    for (int i = 0; i < numPoints; ++i) {
+        posX[i] = static_cast<float>(controlPoints[i].x());
+        posY[i] = static_cast<float>(controlPoints[i].y());
+        targX[i] = static_cast<float>(targetPoints[i].x());
+        targY[i] = static_cast<float>(targetPoints[i].y());
+        velX[i] = static_cast<float>(velocity[i].x());
+        velY[i] = static_cast<float>(velocity[i].y());
+        forceX[i] = 0.0f;
+        forceY[i] = 0.0f;
+    }
+
+    bool isInMotion = false;
+
+    // Przetwarzaj w blokach dla lepszej wydajności cache
+    const int blockSize = 64;  // Zoptymalizowane pod kątem linii cache
+
+    #pragma omp parallel for reduction(|:isInMotion)
+    for (int blockStart = 0; blockStart < numPoints; blockStart += blockSize) {
+        const int blockEnd = std::min(blockStart + blockSize, static_cast<int>(numPoints));
+
+        for (int i = blockStart; i < blockEnd; ++i) {
+            // Oblicz siłę
+            forceX[i] = (targX[i] - posX[i]) * viscosity;
+            forceY[i] = (targY[i] - posY[i]) * viscosity;
+
+            // Oblicz wektor do środka
+            const float vecToCenterX = centerX - posX[i];
+            const float vecToCenterY = centerY - posY[i];
+            const float distSquared = vecToCenterX * vecToCenterX + vecToCenterY * vecToCenterY;
+
+            if (distSquared > radiusThresholdSquared) {
+                // Fast inverse square root approximation
+                const float invDist = 1.0f / sqrtf(distSquared);
+                const float factor = 0.03f * invDist;
+                forceX[i] += vecToCenterX * factor;
+                forceY[i] += vecToCenterY * factor;
+            }
+
+            // Aktualizuj prędkość
+            velX[i] += forceX[i];
+            velY[i] += forceY[i];
+
+            // Zastosuj tłumienie
+            velX[i] *= dampingFactor;
+            velY[i] *= dampingFactor;
+
+            // Sprawdź prędkość
+            const float speedSquared = velX[i] * velX[i] + velY[i] * velY[i];
+
+            if (speedSquared < velocityThresholdSquared) {
+                velX[i] = 0.0f;
+                velY[i] = 0.0f;
+            } else {
+                isInMotion = true;
+
+                if (speedSquared > maxSpeedSquared) {
+                    const float scaleFactor = maxSpeed / sqrtf(speedSquared);
+                    velX[i] *= scaleFactor;
+                    velY[i] *= scaleFactor;
+                }
+            }
+
+            // Aktualizuj pozycję
+            posX[i] += velX[i];
+            posY[i] += velY[i];
+        }
+    }
+
+    // Kopiuj dane z powrotem
+    #pragma omp parallel for
+    for (int i = 0; i < numPoints; ++i) {
+        controlPoints[i].rx() = posX[i];
+        controlPoints[i].ry() = posY[i];
+        velocity[i].rx() = velX[i];
+        velocity[i].ry() = velY[i];
+    }
+
+    if (!isInMotion) {
+        stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
+    }
+
+    validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius);
+}
+
 void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
                                       std::vector<QPointF>& targetPoints,
                                       std::vector<QPointF>& velocity,
@@ -14,24 +135,39 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
                                       const BlobConfig::PhysicsParameters& physicsParams) {
 
     const size_t numPoints = controlPoints.size();
-    const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
-    const int batchSize = 8;
 
-    if (numPoints < 16 || numThreads <= 1) {
+    // Użyj SIMD-friendly struktury danych gdy liczba punktów jest duża
+    if (numPoints > 64) {
+        updatePhysicsOptimized(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams);
+        return;
+    }
+
+    const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
+    const int batchSize = 16; // Zwiększony rozmiar partii dla lepszej wydajności cache
+
+    if (numPoints < 24 || numThreads <= 1) {
         updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams, nullptr);
         return;
     }
 
+    // Prekalkujemy stałe wartości dla wszystkich wątków
     const double radiusThreshold = params.blobRadius * 1.1;
+    const double radiusThresholdSquared = radiusThreshold * radiusThreshold;
     const double dampingFactor = physicsParams.damping;
     const double velocityBlend = 0.8;
     const double prevVelocityBlend = 0.2;
     const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
+    const double velocityThresholdSquared = physicsParams.velocityThreshold * physicsParams.velocityThreshold;
+    const double maxSpeedSquared = maxSpeed * maxSpeed;
 
-    static std::vector<QPointF> previousVelocity(numPoints);
+    // Użyj statycznego bufora dla poprzednich prędkości, aby uniknąć realokacji
+    static std::vector<QPointF> previousVelocity;
+    if (previousVelocity.size() != numPoints) {
+        previousVelocity.resize(numPoints);
+    }
     std::copy(velocity.begin(), velocity.end(), previousVelocity.begin());
 
-    std::atomic isInMotion(false);
+    std::atomic<bool> isInMotion(false);
 
     QVector<QFuture<void>> futures;
     futures.reserve(numThreads);
@@ -40,44 +176,65 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
         const size_t startIdx = t * (numPoints / numThreads);
         const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * (numPoints / numThreads);
 
-        futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx]() {
+        futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx, radiusThresholdSquared,
+                                        dampingFactor, velocityBlend, prevVelocityBlend,
+                                        velocityThresholdSquared, maxSpeedSquared]() {
+            // Prekalkujemy środek jeden raz dla każdego wątku
+            const double centerX = blobCenter.x();
+            const double centerY = blobCenter.y();
+
             for (size_t batchStart = startIdx; batchStart < endIdx; batchStart += batchSize) {
                 const size_t batchEnd = qMin(batchStart + batchSize, endIdx);
 
                 for (size_t i = batchStart; i < batchEnd; ++i) {
-                    QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
+                    QPointF& currentPoint = controlPoints[i];
+                    QPointF& currentTarget = targetPoints[i];
+                    QPointF& currentVelocity = velocity[i];
+                    const QPointF& prevVelocity = previousVelocity[i];
 
-                    QPointF vectorToCenter = blobCenter - controlPoints[i];
-                    double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() +
-                                           vectorToCenter.y()*vectorToCenter.y();
+                    // Oblicz siłę bezpośrednio bez tworzenia pośrednich obiektów
+                    double forceX = (currentTarget.x() - currentPoint.x()) * physicsParams.viscosity;
+                    double forceY = (currentTarget.y() - currentPoint.y()) * physicsParams.viscosity;
 
-                    if (distFromCenter2 > radiusThreshold * radiusThreshold) {
+                    // Oblicz wektor do środka bez tworzenia obiektu QPointF
+                    double vectorToCenterX = centerX - currentPoint.x();
+                    double vectorToCenterY = centerY - currentPoint.y();
+                    double distFromCenter2 = vectorToCenterX*vectorToCenterX + vectorToCenterY*vectorToCenterY;
+
+                    if (distFromCenter2 > radiusThresholdSquared) {
+                        // Fast inverse square root approximation można zastosować zamiast qSqrt dla wyższej wydajności
                         double factor = 0.03 / qSqrt(distFromCenter2);
-                        force.rx() += vectorToCenter.x() * factor;
-                        force.ry() += vectorToCenter.y() * factor;
+                        forceX += vectorToCenterX * factor;
+                        forceY += vectorToCenterY * factor;
                     }
 
-                    velocity[i] += force;
+                    currentVelocity.rx() += forceX;
+                    currentVelocity.ry() += forceY;
 
-                    velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
-                    velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
+                    // Blend prędkości
+                    currentVelocity.rx() = currentVelocity.x() * velocityBlend + prevVelocity.x() * prevVelocityBlend;
+                    currentVelocity.ry() = currentVelocity.y() * velocityBlend + prevVelocity.y() * prevVelocityBlend;
 
-                    velocity[i] *= dampingFactor;
+                    // Zastosuj tłumienie
+                    currentVelocity *= dampingFactor;
 
-                    double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
+                    double speedSquared = currentVelocity.x()*currentVelocity.x() +
+                                         currentVelocity.y()*currentVelocity.y();
 
-                    if (speedSquared < physicsParams.velocityThreshold * physicsParams.velocityThreshold) {
-                        velocity[i] = QPointF(0, 0);
+                    if (speedSquared < velocityThresholdSquared) {
+                        currentVelocity = QPointF(0, 0);
                     } else {
                         isInMotion = true;
 
-                        if (speedSquared > maxSpeed * maxSpeed) {
+                        if (speedSquared > maxSpeedSquared) {
                             double scaleFactor = maxSpeed / qSqrt(speedSquared);
-                            velocity[i] *= scaleFactor;
+                            currentVelocity *= scaleFactor;
                         }
                     }
 
-                    controlPoints[i] += velocity[i];
+                    // Aktualizuj pozycję punktu
+                    currentPoint.rx() += currentVelocity.x();
+                    currentPoint.ry() += currentVelocity.y();
                 }
             }
         }));

@@ -11,6 +11,11 @@ class BlobPhysics {
 public:
     BlobPhysics();
 
+    void updatePhysicsOptimized(std::vector<QPointF> &controlPoints, std::vector<QPointF> &targetPoints,
+                                std::vector<QPointF> &velocity, QPointF &blobCenter,
+                                const BlobConfig::BlobParameters &params,
+                                const BlobConfig::PhysicsParameters &physicsParams);
+
     void updatePhysicsParallel(std::vector<QPointF> &controlPoints, std::vector<QPointF> &targetPoints,
                                std::vector<QPointF> &velocity, QPointF &blobCenter,
                                const BlobConfig::BlobParameters &params,

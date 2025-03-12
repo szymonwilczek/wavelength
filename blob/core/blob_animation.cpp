@@ -80,11 +80,13 @@ void BlobAnimation::handleResizeTimeout() {
 
 void BlobAnimation::checkWindowPosition() {
     static QElapsedTimer debounceTimer;
-    if (debounceTimer.elapsed() < 16) { // 60 FPS
+    static int adaptiveFrameDelay = 16; // Zaczynamy od 60 FPS
+    static int inactiveFrames = 0;
+
+    if (debounceTimer.elapsed() < adaptiveFrameDelay) {
         return;
     }
     debounceTimer.restart();
-
 
     QWidget* currentWindow = window();
     if (!currentWindow || !m_eventsEnabled || m_inTransitionToIdle)
@@ -94,8 +96,16 @@ void BlobAnimation::checkWindowPosition() {
 
     if (currentWindowPos != m_lastWindowPosForTimer) {
         QVector2D windowVelocity = m_physics.calculateWindowVelocity(currentWindowPos);
+        double velocityMagnitude = windowVelocity.length();
 
-        if (windowVelocity.length() > 0.2) {
+        // Adaptacyjna częstotliwość odświeżania w zależności od prędkości
+        if (velocityMagnitude > 1.0) {
+            adaptiveFrameDelay = 16; // ~60 FPS dla szybkich ruchów
+            inactiveFrames = 0;
+        } else if (velocityMagnitude > 0.5) {
+            adaptiveFrameDelay = 16; // ~50 FPS dla średnich ruchów
+        } else if (velocityMagnitude > 0.2) {
+            adaptiveFrameDelay = 16; // ~30 FPS dla wolnych ruchów
             m_isMoving = true;
             m_inactivityCounter = 0;
 
@@ -103,31 +113,31 @@ void BlobAnimation::checkWindowPosition() {
             m_movingState->applyInertiaForce(m_velocity, m_blobCenter, m_controlPoints,
                                           m_params.blobRadius, windowVelocity);
 
-            for (size_t i = 0; i < m_controlPoints.size(); ++i) {
-                double randX = (qrand() % 100 - 50) / 500.0;
-                double randY = (qrand() % 100 - 50) / 500.0;
-                QPointF randomVariation(randX, randY);
-
-                QPointF force(-windowVelocity.x() * 0.002, -windowVelocity.y() * 0.002);
-                force += randomVariation;
-                m_velocity[i] += force;
-            }
-
             m_physics.setLastWindowPos(currentWindowPos);
             update();
+        } else {
+            // Zbyt mała prędkość, nie trzeba aktualizować
+            inactiveFrames++;
         }
 
         m_lastWindowPosForTimer = currentWindowPos;
-    } else if (m_isMoving) {
-        m_inactivityCounter++;
+    } else {
+        inactiveFrames++;
 
-        if (m_inactivityCounter > 60) {
-            m_isMoving = false;
-            m_inactivityCounter = 0;
+        if (inactiveFrames > 10) {
+            // Stopniowo zmniejszaj częstotliwość sprawdzania gdy brak ruchu
+            adaptiveFrameDelay = qMin(100, adaptiveFrameDelay + 5); // Max 10 FPS w stanie spoczynku
+        }
 
-            if (m_currentState == BlobConfig::MOVING) {
-                m_stateResetTimer.stop();
-                m_stateResetTimer.start(1000);
+        if (m_isMoving) {
+            m_inactivityCounter++;
+
+            if (m_inactivityCounter > 60) {
+                m_isMoving = false;
+
+                if (m_currentState == BlobConfig::MOVING) {
+                    switchToState(BlobConfig::IDLE);
+                }
             }
         }
     }
