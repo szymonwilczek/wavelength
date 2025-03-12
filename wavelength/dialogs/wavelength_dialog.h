@@ -51,11 +51,6 @@ public:
         loadingIndicator->setStyleSheet("color: #ffcc00;");
         formLayout->addRow("", loadingIndicator);
 
-        nameEdit = new QLineEdit(this);
-        nameEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
-        nameEdit->setPlaceholderText("Optional");
-        formLayout->addRow("Name:", nameEdit);
-
         passwordProtectedCheckbox = new QCheckBox("Password Protected", this);
         formLayout->addRow("", passwordProtectedCheckbox);
 
