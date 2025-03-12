@@ -23,12 +23,10 @@
 #include "../states/idle_state.h"
 #include "../states/moving_state.h"
 #include "../states/resizing_state.h"
+#include "blob_absorption.h"
 
 class BlobAnimation : public QWidget {
     Q_OBJECT
-    Q_PROPERTY(float absorptionScale READ absorptionScale WRITE setAbsorptionScale)
-    Q_PROPERTY(float absorptionOpacity READ absorptionOpacity WRITE setAbsorptionOpacity)
-    Q_PROPERTY(float absorptionPulse READ getAbsorptionPulse WRITE setAbsorptionPulse)
 
 public:
     explicit BlobAnimation(QWidget *parent = nullptr);
@@ -44,22 +42,6 @@ public:
     void setGridColor(const QColor &color);
 
     void setGridSpacing(int spacing);
-
-    float absorptionScale() const { return m_absorptionScale; }
-    float absorptionOpacity() const { return m_absorptionOpacity; }
-
-    float getAbsorptionPulse() const { return m_absorptionPulse; }
-    void setAbsorptionPulse(float value) { m_absorptionPulse = value; update(); }
-
-     void setAbsorptionScale(float scale) {
-        m_absorptionScale = scale;
-        update();
-    }
-
-    void setAbsorptionOpacity(float opacity) {
-        m_absorptionOpacity = opacity;
-        update();
-    }
 
     QPointF getBlobCenter() const {
         if (m_controlPoints.empty()) {
@@ -80,15 +62,14 @@ public:
     void startBeingAbsorbed();
     void finishBeingAbsorbed();
     void cancelAbsorption();
-
     void startAbsorbing(const QString& targetId);
     void finishAbsorbing(const QString& targetId);
     void cancelAbsorbing(const QString& targetId);
-
-    bool isBeingAbsorbed() const { return m_isBeingAbsorbed; }
-    bool isAbsorbing() const { return m_isAbsorbing; }
-
     void updateAbsorptionProgress(float progress);
+
+    bool isBeingAbsorbed() const { return m_absorption.isBeingAbsorbed(); }
+    bool isAbsorbing() const { return m_absorption.isAbsorbing(); }
+
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -119,6 +100,8 @@ private:
 
     void applyIdleEffect();
 
+    BlobAbsorption m_absorption;
+
     QTimer m_windowPositionTimer;
     bool m_isMoving = false;
     QPointF m_lastWindowPosForTimer;
@@ -127,18 +110,6 @@ private:
     QSize m_lastSize;
     QColor m_defaultLifeColor;
     bool m_originalBorderColorSet = false;
-
-    float m_absorptionScale = 1.0f;
-    float m_absorptionOpacity = 1.0f;
-    QPropertyAnimation* m_scaleAnimation = nullptr;
-    QPropertyAnimation* m_opacityAnimation = nullptr;
-    float m_absorptionPulse = 0.0f;
-    QPropertyAnimation* m_pulseAnimation = nullptr;
-    bool m_isClosingAfterAbsorption = false;
-
-    bool m_isBeingAbsorbed = false;
-    bool m_isAbsorbing = false;
-    QString m_absorptionTargetId;
 
     BlobConfig::BlobParameters m_params;
     BlobConfig::PhysicsParameters m_physicsParams;

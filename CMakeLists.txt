@@ -69,6 +69,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/session/wavelength_session_coordinator.h
         wavelength/messages/message_formatter.cpp
         wavelength/messages/message_formatter.h
+        blob/core/blob_absorption.cpp
+        blob/core/blob_absorption.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
