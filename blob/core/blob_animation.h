@@ -24,6 +24,7 @@
 #include "../states/moving_state.h"
 #include "../states/resizing_state.h"
 #include "blob_absorption.h"
+#include "blob_event_handler.h"
 #include "blob_transition_manager.h"
 
 class BlobAnimation : public QWidget {
@@ -102,6 +103,8 @@ private:
     void applyIdleEffect();
 
     BlobAbsorption m_absorption;
+    BlobEventHandler m_eventHandler;
+    BlobTransitionManager m_transitionManager;
 
     QTimer m_windowPositionTimer;
     QPointF m_lastWindowPosForTimer;
@@ -122,7 +125,7 @@ private:
 
     BlobConfig::AnimationState m_currentState = BlobConfig::IDLE;
 
-    BlobTransitionManager m_transitionManager;
+
 
     QTimer m_animationTimer;
     QTimer m_idleTimer;

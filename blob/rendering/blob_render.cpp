@@ -114,3 +114,97 @@ void BlobRenderer::drawFilling(QPainter& painter,
     painter.setPen(Qt::NoPen);
     painter.drawPath(blobPath);
 }
+
+void BlobRenderer::renderScene(QPainter& painter,
+                             const std::vector<QPointF>& controlPoints,
+                             const QPointF& blobCenter,
+                             const BlobConfig::BlobParameters& params,
+                             const BlobRenderState& renderState,
+                             int width, int height,
+                             QPixmap& backgroundCache,
+                             QSize& lastBackgroundSize,
+                             QColor& lastBgColor,
+                             QColor& lastGridColor,
+                             int& lastGridSpacing) {
+
+    if (renderState.animationState == BlobConfig::MOVING || renderState.animationState == BlobConfig::RESIZING) {
+        painter.setRenderHint(QPainter::Antialiasing, false);
+    } else {
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    }
+
+    // Sprawdź czy potrzebujemy zaktualizować bufor tła
+    bool shouldUpdateBackgroundCache =
+        backgroundCache.isNull() ||
+        lastBackgroundSize != QSize(width, height) ||
+        lastBgColor != params.backgroundColor ||
+        lastGridColor != params.gridColor ||
+        lastGridSpacing != params.gridSpacing;
+
+    // W stanie IDLE i gdy nie ma absorpcji, używamy bufora tła
+    if (renderState.animationState == BlobConfig::IDLE &&
+        !renderState.isBeingAbsorbed &&
+        !renderState.isAbsorbing) {
+
+        if (shouldUpdateBackgroundCache) {
+            backgroundCache = QPixmap(width, height);
+            backgroundCache.fill(Qt::transparent);
+
+            QPainter cachePainter(&backgroundCache);
+            cachePainter.setRenderHint(QPainter::Antialiasing, true);
+            drawBackground(cachePainter, params.backgroundColor,
+                           params.gridColor, params.gridSpacing,
+                           width, height);
+
+            lastBackgroundSize = QSize(width, height);
+            lastBgColor = params.backgroundColor;
+            lastGridColor = params.gridColor;
+            lastGridSpacing = params.gridSpacing;
+        }
+
+        painter.drawPixmap(0, 0, backgroundCache);
+    } else {
+        painter.setRenderHint(QPainter::Antialiasing, renderState.animationState == BlobConfig::IDLE);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, renderState.animationState == BlobConfig::IDLE);
+
+        drawBackground(painter, params.backgroundColor,
+                      params.gridColor, params.gridSpacing,
+                      width, height);
+    }
+
+    // Obsługa stanów absorpcji
+    if (renderState.isBeingAbsorbed || renderState.isClosingAfterAbsorption) {
+        painter.setOpacity(renderState.opacity);
+        painter.save();
+        QPointF center = blobCenter;
+        painter.translate(center);
+        painter.scale(renderState.scale, renderState.scale);
+        painter.translate(-center);
+    }
+    else if (renderState.isAbsorbing) {
+        painter.save();
+        QPointF center = blobCenter;
+
+        if (renderState.isPulseActive) {
+            QPen extraGlowPen(params.borderColor.lighter(150));
+            extraGlowPen.setWidth(params.borderWidth + 10);
+            painter.setPen(extraGlowPen);
+
+            QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
+            painter.drawPath(blobPath);
+        }
+
+        painter.translate(center);
+        painter.scale(renderState.scale, renderState.scale);
+        painter.translate(-center);
+    }
+
+    // Renderuj blob
+    renderBlob(painter, controlPoints, blobCenter, params, width, height);
+
+    // Przywróć poprzedni stan transformacji
+    if (renderState.isBeingAbsorbed || renderState.isAbsorbing) {
+        painter.restore();
+    }
+}

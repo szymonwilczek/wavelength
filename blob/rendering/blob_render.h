@@ -9,10 +9,22 @@
 #include "../core/blob_config.h"
 #include "../utils/blob_path.h"
 
+// Struktura do przechowywania stanu wyświetlania bloba
+struct BlobRenderState {
+    bool isBeingAbsorbed = false;
+    bool isAbsorbing = false;
+    bool isClosingAfterAbsorption = false;
+    bool isPulseActive = false;
+    double opacity = 1.0;
+    double scale = 1.0;
+    BlobConfig::AnimationState animationState = BlobConfig::IDLE;
+    bool isInTransitionToIdle = false;
+};
+
 class BlobRenderer {
 public:
     BlobRenderer();
-    
+
     void renderBlob(QPainter& painter,
                    const std::vector<QPointF>& controlPoints,
                    const QPointF& blobCenter,
@@ -28,7 +40,20 @@ public:
                          const QColor& gridColor,
                          int gridSpacing,
                          int width, int height);
-    
+
+    // Nowa metoda do renderowania całej sceny
+    void renderScene(QPainter& painter,
+                    const std::vector<QPointF>& controlPoints,
+                    const QPointF& blobCenter,
+                    const BlobConfig::BlobParameters& params,
+                    const BlobRenderState& renderState,
+                    int width, int height,
+                    QPixmap& backgroundCache,
+                    QSize& lastBackgroundSize,
+                    QColor& lastBgColor,
+                    QColor& lastGridColor,
+                    int& lastGridSpacing);
+
 private:
     QPixmap m_gridBuffer;
     QColor m_lastBgColor;
@@ -40,8 +65,6 @@ private:
                          const QColor& gridColor,
                          int gridSpacing,
                          int width, int height);
-
-
     
     void drawGlowEffect(QPainter& painter,
                        const QPainterPath& blobPath,

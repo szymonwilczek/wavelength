@@ -3,12 +3,12 @@
 #include <QApplication>
 #include <QPainter>
 #include <QDebug>
-#include <QElapsedTimer>
 
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QWidget(parent),
     m_absorption(this),
-    m_transitionManager(this)
+    m_transitionManager(this),
+    m_eventHandler(this)
 {
     m_params.blobRadius = 250.0f;
     m_params.numPoints = 20;
@@ -42,7 +42,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     if (window()) {
         m_lastWindowPos = window()->pos();
         m_lastWindowPosForTimer = m_lastWindowPos;
-        window()->installEventFilter(this);
     }
 
     m_animationTimer.setTimerType(Qt::PreciseTimer);
@@ -50,17 +49,48 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     connect(&m_animationTimer, &QTimer::timeout, this, &BlobAnimation::updateAnimation);
     m_animationTimer.start();
 
-    m_windowPositionTimer.setInterval(8); // (>100 FPS)
+    m_windowPositionTimer.setInterval(16); // (>100 FPS)
     m_windowPositionTimer.setTimerType(Qt::PreciseTimer);
     connect(&m_windowPositionTimer, &QTimer::timeout, this, &BlobAnimation::checkWindowPosition);
     m_windowPositionTimer.start();
 
     connect(&m_stateResetTimer, &QTimer::timeout, this, &BlobAnimation::onStateResetTimeout);
 
-    m_eventReEnableTimer.setSingleShot(true);
-    connect(&m_eventReEnableTimer, &QTimer::timeout, this, [this]() {
+    // Podłączenie eventów z BlobEventHandler
+    connect(&m_eventHandler, &BlobEventHandler::windowMoved, this, [this](const QPointF& pos, qint64 timestamp) {
+        m_lastWindowPosForTimer = pos;
+    });
+
+    connect(&m_eventHandler, &BlobEventHandler::movementSampleAdded, this, [this](const QPointF& pos, qint64 timestamp) {
+        m_transitionManager.addMovementSample(pos, timestamp);
+    });
+
+    connect(&m_eventHandler, &BlobEventHandler::resizeStateRequested, this, [this]() {
+        switchToState(BlobConfig::RESIZING);
+    });
+
+    connect(&m_eventHandler, &BlobEventHandler::significantResizeDetected, this, [this](const QSize& oldSize, const QSize& newSize) {
+        m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
+                                     m_blobCenter, oldSize, newSize);
+
+        // Resetuj bufor siatki tylko gdy zmiana rozmiaru jest znacząca
+        if (abs(newSize.width() - m_lastSize.width()) > 20 ||
+            abs(newSize.height() - m_lastSize.height()) > 20) {
+            m_renderer.resetGridBuffer();
+        }
+
+        m_lastSize = newSize;
+        update();
+    });
+
+    connect(&m_eventHandler, &BlobEventHandler::stateResetTimerRequested, this, [this]() {
+        m_stateResetTimer.stop();
+        m_stateResetTimer.start(2000);
+    });
+
+    connect(&m_eventHandler, &BlobEventHandler::eventsReEnabled, this, [this]() {
         m_eventsEnabled = true;
-        qDebug() << "Events re-enabled";
+        qDebug() << "Events re-enabled via handler";
     });
 
     connect(&m_absorption, &BlobAbsorption::redrawNeeded, this, [this]() {
@@ -83,21 +113,21 @@ BlobAnimation::BlobAnimation(QWidget *parent)
             switchToState(BlobConfig::IDLE);
         }
     });
+
+    m_eventReEnableTimer.setSingleShot(true);
+    connect(&m_eventReEnableTimer, &QTimer::timeout, this, [this]() {
+        m_eventsEnabled = true;
+        m_eventHandler.enableEvents();
+        qDebug() << "Events re-enabled";
+    });
 }
 
 void BlobAnimation::handleResizeTimeout() {
     QSize currentSize = size();
-    if (currentSize != m_lastSize) {
-        switchToState(BlobConfig::RESIZING);
-        m_resizingState->handleResize(m_controlPoints, m_targetPoints, m_velocity,
-                                    m_blobCenter, m_lastSize, currentSize);
-        m_renderer.resetGridBuffer();
-        m_lastSize = currentSize;
 
-        m_stateResetTimer.stop();
-        m_stateResetTimer.start(2000);
-        update();
-    }
+    m_renderer.resetGridBuffer();
+    m_lastSize = currentSize;
+    update();
 }
 
 void BlobAnimation::checkWindowPosition() {
@@ -105,11 +135,17 @@ void BlobAnimation::checkWindowPosition() {
     if (!currentWindow || !m_eventsEnabled || m_transitionManager.isInTransitionToIdle())
         return;
 
+    static qint64 lastCheckTime = 0;
     qint64 currentTimestamp = QDateTime::currentMSecsSinceEpoch();
+
+    if (currentTimestamp - lastCheckTime < 16) {
+        return;
+    }
+
+    lastCheckTime = currentTimestamp;
 
     std::pmr::deque<BlobTransitionManager::WindowMovementSample> movementBuffer = m_transitionManager.getMovementBuffer();
 
-    // Sprawdzenie ostatniego czasu ruchu
     if (movementBuffer.empty() ||
         (currentTimestamp - m_transitionManager.getLastMovementTime()) > 100) {
         QPointF currentWindowPos = currentWindow->pos();
@@ -117,7 +153,7 @@ void BlobAnimation::checkWindowPosition() {
         if (movementBuffer.empty() || currentWindowPos != movementBuffer.back().position) {
             m_transitionManager.addMovementSample(currentWindowPos, currentTimestamp);
         }
-        }
+    }
 }
 
 BlobAnimation::~BlobAnimation() {
@@ -128,7 +164,6 @@ BlobAnimation::~BlobAnimation() {
     m_idleState.reset();
     m_movingState.reset();
     m_resizingState.reset();
-
 }
 
 void BlobAnimation::initializeBlob() {
@@ -151,81 +186,34 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
     static QColor lastGridColor;
     static int lastGridSpacing;
 
-    bool shouldUpdateBackgroundCache =
-        backgroundCache.isNull() ||
-        lastBackgroundSize != size() ||
-        lastBgColor != m_params.backgroundColor ||
-        lastGridColor != m_params.gridColor ||
-        lastGridSpacing != m_params.gridSpacing;
-
     QPainter painter(this);
 
-    if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
-        painter.setRenderHint(QPainter::Antialiasing, false);
-    } else {
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-    }
+    // Przygotuj stan renderowania
+    BlobRenderState renderState;
+    renderState.isBeingAbsorbed = m_absorption.isBeingAbsorbed();
+    renderState.isAbsorbing = m_absorption.isAbsorbing();
+    renderState.isClosingAfterAbsorption = m_absorption.isClosingAfterAbsorption();
+    renderState.isPulseActive = m_absorption.isPulseActive();
+    renderState.opacity = m_absorption.opacity();
+    renderState.scale = m_absorption.scale();
+    renderState.animationState = m_currentState;
+    renderState.isInTransitionToIdle = m_transitionManager.isInTransitionToIdle();
 
-    if (m_currentState == BlobConfig::IDLE && !m_absorption.isBeingAbsorbed() && !m_absorption.isAbsorbing()) {
-        if (shouldUpdateBackgroundCache) {
-            backgroundCache = QPixmap(size());
-            backgroundCache.fill(Qt::transparent);
-
-            QPainter cachePainter(&backgroundCache);
-            cachePainter.setRenderHint(QPainter::Antialiasing, true);
-            m_renderer.drawBackground(cachePainter, m_params.backgroundColor,
-                                   m_params.gridColor, m_params.gridSpacing,
-                                   width(), height());
-
-            lastBackgroundSize = size();
-            lastBgColor = m_params.backgroundColor;
-            lastGridColor = m_params.gridColor;
-            lastGridSpacing = m_params.gridSpacing;
-        }
-
-        painter.drawPixmap(0, 0, backgroundCache);
-    } else {
-        painter.setRenderHint(QPainter::Antialiasing, m_currentState == BlobConfig::IDLE);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, m_currentState == BlobConfig::IDLE);
-
-        m_renderer.drawBackground(painter, m_params.backgroundColor,
-                               m_params.gridColor, m_params.gridSpacing,
-                               width(), height());
-    }
-
-    if (m_absorption.isBeingAbsorbed() || m_absorption.isClosingAfterAbsorption()) {
-        painter.setOpacity(m_absorption.opacity());
-        painter.save();
-        QPointF center = getBlobCenter();
-        painter.translate(center);
-        painter.scale(m_absorption.scale(), m_absorption.scale());
-        painter.translate(-center);
-    }
-    else if (m_absorption.isAbsorbing()) {
-        painter.save();
-        QPointF center = getBlobCenter();
-
-        if (m_absorption.isPulseActive()) {
-            QPen extraGlowPen(m_params.borderColor.lighter(150));
-            extraGlowPen.setWidth(m_params.borderWidth + 10);
-            painter.setPen(extraGlowPen);
-
-            QPainterPath blobPath = BlobPath::createBlobPath(m_controlPoints, m_controlPoints.size());
-            painter.drawPath(blobPath);
-        }
-
-        painter.translate(center);
-        painter.scale(m_absorption.scale(), m_absorption.scale());
-        painter.translate(-center);
-    }
-
-    m_renderer.renderBlob(painter, m_controlPoints, m_blobCenter,
-                             m_params, width(), height());
-
-    if (m_absorption.isBeingAbsorbed() || m_absorption.isAbsorbing()) {
-        painter.restore();
-    }
+    // Deleguj renderowanie do BlobRenderer
+    m_renderer.renderScene(
+        painter,
+        m_controlPoints,
+        m_blobCenter,
+        m_params,
+        renderState,
+        width(),
+        height(),
+        backgroundCache,
+        lastBackgroundSize,
+        lastBgColor,
+        lastGridColor,
+        lastGridSpacing
+    );
 }
 
 QRectF BlobAnimation::calculateBlobBoundingRect() {
@@ -354,16 +342,11 @@ void BlobAnimation::handleIdleTransition() {
     );
 }
 
-
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
-    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
-        QWidget::resizeEvent(event);
-        return;
+    // Deleguj obsługę zdarzenia resize do BlobEventHandler
+    if (m_eventHandler.processResizeEvent(event)) {
+        update();
     }
-
-    m_lastSize = event->oldSize();
-    m_resizeDebounceTimer.start();
-
     QWidget::resizeEvent(event);
 }
 
@@ -375,33 +358,13 @@ void BlobAnimation::onStateResetTimeout() {
 }
 
 bool BlobAnimation::event(QEvent *event) {
-
-    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
-        return QWidget::event(event);
-    }
-
-    if (event->type() == QEvent::Resize) {
-        static QSize lastSize = size();
-        QSize currentSize = size();
-
-        if (currentSize != lastSize) {
-            switchToState(BlobConfig::RESIZING);
-            lastSize = currentSize;
-
-            m_stateResetTimer.stop();
-            m_stateResetTimer.start(2000);
-        }
-    }
-
     return QWidget::event(event);
 }
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
-
     if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
         return;
     }
-
 
     if (m_currentState == newState) {
         if (newState == BlobConfig::MOVING || newState == BlobConfig::RESIZING) {
@@ -416,8 +379,8 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
     if (newState == BlobConfig::IDLE &&
     (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
         m_eventsEnabled = false;
+        m_eventHandler.disableEvents();
 
-        // Uruchom przejście do stanu IDLE przez transition manager
         m_transitionManager.startTransitionToIdle(
             m_controlPoints,
             m_velocity,
@@ -484,61 +447,8 @@ void BlobAnimation::setGridSpacing(int spacing) {
 }
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
-    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
-        return QWidget::eventFilter(watched, event);
-    }
-
-    static QPointF lastProcessedPos;
-    static qint64 lastProcessedMoveTime = 0;
-
-    if (watched == window()) {
-        if (event->type() == QEvent::Move) {
-            QMoveEvent *moveEvent = static_cast<QMoveEvent*>(event);
-            QPointF newPos = moveEvent->pos();
-            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-
-            double moveDist = QVector2D(newPos - lastProcessedPos).length();
-            qint64 timeDelta = currentTime - lastProcessedMoveTime;
-
-            double distThreshold = 1.0;
-            int timeThreshold = 5; // ms
-
-            if (timeDelta < 8) {
-                distThreshold = 2.0;
-            } else if (timeDelta < 16) {
-                distThreshold = 1.0;
-            }
-
-            if (moveDist > distThreshold || timeDelta > timeThreshold) {
-                lastProcessedPos = newPos;
-                lastProcessedMoveTime = currentTime;
-
-                QWidget* currentWindow = window();
-                if (currentWindow) {
-                    QPointF currentWindowPos = currentWindow->pos();
-                    m_lastWindowPosForTimer = currentWindowPos;
-
-                    // Dodaj próbkę ruchu do transition managera
-                    m_transitionManager.addMovementSample(currentWindowPos, currentTime);
-                }
-            } else {
-                return true;
-            }
-        }
-
-        else if (event->type() == QEvent::DragMove) {
-            static qint64 lastDragEventTime = 0;
-            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-
-            if (currentTime - lastDragEventTime < 16) { // ~60 FPS
-                return true;
-            }
-
-            lastDragEventTime = currentTime;
-        }
-    }
-
-    return QWidget::eventFilter(watched, event);
+    // Deleguj filtrowanie zdarzeń do BlobEventHandler
+    return m_eventHandler.eventFilter(watched, event) || QWidget::eventFilter(watched, event);
 }
 
 void BlobAnimation::setLifeColor(const QColor &color) {
