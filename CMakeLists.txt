@@ -73,6 +73,10 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/blob_absorption.h
         blob/core/blob_transition_manager.cpp
         blob/core/blob_transition_manager.h
+        blob/core/blob_event_handler.cpp
+        blob/core/blob_event_handler.h
+        font_manager.cpp
+        font_manager.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
