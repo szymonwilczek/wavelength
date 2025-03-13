@@ -25,7 +25,7 @@ public:
         return &instance;
     }
 
-    bool createWavelength(double frequency, const QString& name, bool isPasswordProtected,
+    bool createWavelength(double frequency, bool isPasswordProtected,
                   const QString& password) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
 
@@ -62,7 +62,7 @@ public:
         QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
         // Definiujemy obsługę wiadomości - wspólna dla wszystkich callbacków
-        auto messageHandler = [this, frequency, hostId, name, isPasswordProtected, password, socket](const QString& message) {
+        auto messageHandler = [this, frequency, hostId, isPasswordProtected, password, socket](const QString& message) {
             qDebug() << "WebSocket received message for wavelength" << frequency << ":" << message;
             bool ok = false;
             QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
@@ -85,7 +85,6 @@ public:
                 if (success) {
                     WavelengthInfo info;
                     info.frequency = frequency;
-                    info.name = name;
                     info.isPasswordProtected = isPasswordProtected;
                     info.password = password;
                     info.hostId = hostId;
@@ -165,7 +164,7 @@ public:
             });
 
         // Definiujemy obsługę połączenia
-        connect(socket, &QWebSocket::connected, this, [this, socket, frequency, name, isPasswordProtected,
+        connect(socket, &QWebSocket::connected, this, [this, socket, frequency, isPasswordProtected,
                                                        password, hostId, connectedCallbackExecuted]() {
             if (*connectedCallbackExecuted) {
                 qDebug() << "Connected callback already executed, ignoring";
@@ -176,7 +175,7 @@ public:
             qDebug() << "WebSocket connected for wavelength" << frequency;
             
             MessageHandler* msgHandler = MessageHandler::getInstance();
-            QJsonObject regRequest = msgHandler->createRegisterRequest(frequency, name, isPasswordProtected, password, hostId);
+            QJsonObject regRequest = msgHandler->createRegisterRequest(frequency, isPasswordProtected, password, hostId);
             
             QJsonDocument doc(regRequest);
             socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));

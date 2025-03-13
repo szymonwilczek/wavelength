@@ -10,7 +10,6 @@
 
 struct WavelengthInfo {
     double frequency;
-    QString name;
     bool isPasswordProtected;
     QString password;
     QString hostId;
@@ -40,7 +39,7 @@ public:
         m_wavelengths[frequency] = info;
         m_wavelengths[frequency].frequency = frequency;  // Ensure frequency is correct
         
-        qDebug() << "Added wavelength:" << frequency << info.name 
+        qDebug() << "Added wavelength:" << frequency
                  << "protected:" << info.isPasswordProtected;
                  
         if (m_pendingRegistrations.contains(frequency)) {

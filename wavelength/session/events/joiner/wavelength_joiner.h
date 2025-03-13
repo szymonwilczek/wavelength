@@ -91,7 +91,6 @@ public:
 
                 WavelengthInfo info;
                 info.frequency = frequency;
-                info.name = name;
                 info.isPasswordProtected = isPasswordProtected;
                 info.hostId = msgObj["hostId"].toString();
                 info.isHost = false;

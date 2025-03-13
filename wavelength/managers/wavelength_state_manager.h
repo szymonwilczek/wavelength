@@ -91,10 +91,6 @@ public:
         return info.isHost;
     }
 
-    QString getWavelengthName(double frequency) {
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.name;
-    }
 
     QDateTime getWavelengthCreationTime(double frequency) {
         WavelengthInfo info = getWavelengthInfo(frequency);

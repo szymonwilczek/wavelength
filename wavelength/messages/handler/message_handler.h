@@ -114,12 +114,11 @@ public:
 
 
 
-    QJsonObject createRegisterRequest(double frequency, const QString& name, bool isPasswordProtected,
+    QJsonObject createRegisterRequest(double frequency, bool isPasswordProtected,
                                       const QString& password, const QString& hostId) {
         QJsonObject regObj;
         regObj["type"] = "register_wavelength";
         regObj["frequency"] = normalizeFrequency(frequency);
-        regObj["name"] = name;
         regObj["isPasswordProtected"] = isPasswordProtected;
         regObj["password"] = password;
         regObj["hostId"] = hostId;

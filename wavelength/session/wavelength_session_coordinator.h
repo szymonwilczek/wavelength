@@ -45,11 +45,11 @@ public:
     // ---- Metody fasadowe dla głównych operacji na wavelength ----
 
     // Tworzenie nowego wavelength
-    bool createWavelength(double frequency, const QString& name,
+    bool createWavelength(double frequency,
                          bool isPasswordProtected, const QString& password) {
         qDebug() << "Coordinator: Creating wavelength" << frequency;
         bool success = WavelengthCreator::getInstance()->createWavelength(
-            frequency, name, isPasswordProtected, password);
+            frequency, isPasswordProtected, password);
 
         if (success) {
             WavelengthStateManager::getInstance()->registerJoinedWavelength(frequency);
@@ -136,10 +136,6 @@ public:
         return WavelengthStateManager::getInstance()->isWavelengthHost(frequency);
     }
 
-    // Nazwa wavelength
-    QString getWavelengthName(double frequency) {
-        return WavelengthStateManager::getInstance()->getWavelengthName(frequency);
-    }
 
     // Sprawdzanie czy dołączyliśmy do wavelength
     bool isWavelengthJoined(double frequency) {

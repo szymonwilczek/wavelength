@@ -124,9 +124,6 @@ public:
         return m_frequency;
     }
 
-    QString getName() const {
-        return nameEdit->text().trimmed();
-    }
 
     bool isPasswordProtected() const {
         return passwordProtectedCheckbox->isChecked();
@@ -233,7 +230,6 @@ private slots:
         isGenerating = true;
         qDebug() << "LOG: tryGenerate - start";
 
-        QString name = nameEdit->text().trimmed();
         bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
         QString password = passwordEdit->text();
 
@@ -371,7 +367,6 @@ private:
 private:
     QLabel *frequencyLabel;
     QLabel *loadingIndicator;
-    QLineEdit *nameEdit;
     QCheckBox *passwordProtectedCheckbox;
     QLineEdit *passwordEdit;
     QLabel *statusLabel;

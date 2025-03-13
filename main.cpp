@@ -224,11 +224,10 @@ int main(int argc, char *argv[]) {
     WavelengthDialog dialog(&window);
     if (dialog.exec() == QDialog::Accepted) {
         double frequency = dialog.getFrequency();
-        QString name = dialog.getName();
         bool isPasswordProtected = dialog.isPasswordProtected();
         QString password = dialog.getPassword();
 
-        if (coordinator->createWavelength(frequency, name, isPasswordProtected, password)) {
+        if (coordinator->createWavelength(frequency, isPasswordProtected, password)) {
             qDebug() << "Created and joined wavelength:" << frequency << "Hz";
         } else {
             qDebug() << "Failed to create wavelength";
