@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <!-- Czcionki Lato -->
+        <file>assets/fonts/Lato/Lato-Regular.ttf</file>
+        <file>assets/fonts/Lato/Lato-Bold.ttf</file>
+        <file>assets/fonts/Lato/Lato-Italic.ttf</file>
+        <file>assets/fonts/Lato/Lato-Light.ttf</file>
+        <file>assets/fonts/Lato/Lato-Black.ttf</file>
+        <file>assets/fonts/Lato/Lato-Thin.ttf</file>
+        <file>assets/fonts/Lato/Lato-BoldItalic.ttf</file>
+        <file>assets/fonts/Lato/Lato-BlackItalic.ttf</file>
+        <file>assets/fonts/Lato/Lato-LightItalic.ttf</file>
+        <file>assets/fonts/Lato/Lato-ThinItalic.ttf</file>
+
+        <!-- Czcionki Noto Sans (podstawowe warianty) -->
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-Regular.ttf</file>
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-Bold.ttf</file>
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-Black.ttf</file>
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-Light.ttf</file>
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-Medium.ttf</file>
+        <file>assets/fonts/Noto_Sans/NotoSans_Condensed-SemiBold.ttf</file>
+
+        <!-- Czcionki Poppins (podstawowe warianty) -->
+        <file>assets/fonts/Poppins/Poppins-Regular.ttf</file>
+        <file>assets/fonts/Poppins/Poppins-Bold.ttf</file>
+        <file>assets/fonts/Poppins/Poppins-Medium.ttf</file>
+        <file>assets/fonts/Poppins/Poppins-Light.ttf</file>
+        <file>assets/fonts/Poppins/Poppins-SemiBold.ttf</file>
+    </qresource>
+</RCC>
