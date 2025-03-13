@@ -2,7 +2,6 @@
 #define WAVELENGTH_MESSAGE_SERVICE_H
 
 #include <QObject>
-#include <QWebSocket>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QMap>
@@ -10,9 +9,8 @@
 #include <QDebug>
 
 #include "../registry/wavelength_registry.h"
-#include "../messages/message_handler.h"
+#include "../messages/handler/message_handler.h"
 #include "../auth/authentication_manager.h"
-#include "../messages/message_formatter.h" // Użyj formattera zamiast procesora
 
 class WavelengthMessageService : public QObject {
     Q_OBJECT

@@ -9,12 +9,12 @@
 #include <QUrl>
 #include <QDebug>
 
-#include "../database/database_manager.h"
-#include "../registry/wavelength_registry.h"
-#include "../auth/authentication_manager.h"
-#include "../network/network_utilities.h"
-#include "../messages/message_handler.h"
-#include "../messages/wavelength_message_processor.h"
+#include "../../../database/database_manager.h"
+#include "../../../registry/wavelength_registry.h"
+#include "../../../auth/authentication_manager.h"
+#include "../../../network/network_utilities.h"
+#include "../../../messages/handler/message_handler.h"
+#include "../../../messages/wavelength_message_processor.h"
 
 class WavelengthCreator : public QObject {
     Q_OBJECT

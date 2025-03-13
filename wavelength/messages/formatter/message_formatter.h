@@ -2,7 +2,7 @@
 #define MESSAGE_FORMATTER_H
 
 #include <QJsonObject>
-#include "../registry/wavelength_registry.h"
+#include "../../registry/wavelength_registry.h"
 
 class MessageFormatter {
 public:

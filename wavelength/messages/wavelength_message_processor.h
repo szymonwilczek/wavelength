@@ -11,8 +11,8 @@
 #include <QDateTime>
 
 #include "../registry/wavelength_registry.h"
-#include "../messages/message_handler.h"
-#include "../messages/message_formatter.h" // Użyj nowej klasy formatującej
+#include "../messages/handler/message_handler.h"
+#include "../messages/formatter/message_formatter.h"
 
 class WavelengthMessageProcessor : public QObject {
     Q_OBJECT

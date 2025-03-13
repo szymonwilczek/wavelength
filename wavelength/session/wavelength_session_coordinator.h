@@ -6,9 +6,9 @@
 #include <QDebug>
 #include <qfile.h>
 
-#include "wavelength_creator.h"
-#include "wavelength_joiner.h"
-#include "wavelength_leaver.h"
+#include "events/creator/wavelength_creator.h"
+#include "events/joiner/wavelength_joiner.h"
+#include "events/leaver/wavelength_leaver.h"
 #include "../messages/wavelength_message_service.h"
 #include "../messages/wavelength_message_processor.h"
 #include "../managers/wavelength_state_manager.h"

@@ -3,11 +3,10 @@
 
 #include <QObject>
 #include <QString>
-#include <QDebug>
 
-#include "../registry/wavelength_registry.h"
-#include "../database/database_manager.h"
-#include "../messages/message_handler.h"
+#include "../../../registry/wavelength_registry.h"
+#include "../../../database/database_manager.h"
+#include "../../../messages/handler/message_handler.h"
 
 class WavelengthLeaver : public QObject {
     Q_OBJECT

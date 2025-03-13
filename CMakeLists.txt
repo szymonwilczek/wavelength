@@ -41,20 +41,20 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/dialogs/join_wavelength_dialog.h
         wavelength/database/database_manager.cpp
         wavelength/database/database_manager.h
-        wavelength/messages/message_handler.cpp
-        wavelength/messages/message_handler.h
+        wavelength/messages/handler/message_handler.cpp
+        wavelength/messages/handler/message_handler.h
         wavelength/auth/authentication_manager.cpp
         wavelength/auth/authentication_manager.h
         wavelength/registry/wavelength_registry.cpp
         wavelength/registry/wavelength_registry.h
         wavelength/network/network_utilities.cpp
         wavelength/network/network_utilities.h
-        wavelength/session/wavelength_creator.cpp
-        wavelength/session/wavelength_creator.h
-        wavelength/session/wavelength_joiner.cpp
-        wavelength/session/wavelength_joiner.h
-        wavelength/session/wavelength_leaver.cpp
-        wavelength/session/wavelength_leaver.h
+        wavelength/session/events/creator/wavelength_creator.cpp
+        wavelength/session/events/creator/wavelength_creator.h
+        wavelength/session/events/joiner/wavelength_joiner.cpp
+        wavelength/session/events/joiner/wavelength_joiner.h
+        wavelength/session/events/leaver/wavelength_leaver.cpp
+        wavelength/session/events/leaver/wavelength_leaver.h
         wavelength/socket/wavelength_socket_handler.cpp
         wavelength/socket/wavelength_socket_handler.h
         wavelength/messages/wavelength_message_service.cpp
@@ -69,8 +69,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/util/wavelength_config.h
         wavelength/session/wavelength_session_coordinator.cpp
         wavelength/session/wavelength_session_coordinator.h
-        wavelength/messages/message_formatter.cpp
-        wavelength/messages/message_formatter.h
+        wavelength/messages/formatter/message_formatter.cpp
+        wavelength/messages/formatter/message_formatter.h
         blob/core/blob_absorption.cpp
         blob/core/blob_absorption.h
         blob/core/blob_transition_manager.cpp

@@ -3,18 +3,13 @@
 
 #include <QObject>
 #include <QString>
-#include <QWebSocket>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QUrl>
-#include <QDebug>
 
-#include "../database/database_manager.h"
-#include "../registry/wavelength_registry.h"
-#include "../auth/authentication_manager.h"
-#include "../messages/message_formatter.h"
-#include "../messages/message_handler.h"
-#include "../util/wavelength_config.h"
+#include "../../../database/database_manager.h"
+#include "../../../registry/wavelength_registry.h"
+#include "../../../auth/authentication_manager.h"
+#include "../../../messages/formatter/message_formatter.h"
+#include "../../../messages/handler/message_handler.h"
+#include "../../../util/wavelength_config.h"
 
 class WavelengthJoiner : public QObject {
     Q_OBJECT
