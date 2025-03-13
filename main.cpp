@@ -2,21 +2,17 @@
 #include <QMainWindow>
 #include <QPalette>
 #include <QStyleFactory>
-#include "navbar.h"
+#include "wavelength/navigation/navbar.h"
 #include "blob/core/blob_animation.h"
 #include <QLabel>
-#include <QVBoxLayout>
-#include <QGraphicsDropShadowEffect>
 #include <QStackedWidget>
 #include <QTimer>
-#include <QAbstractAnimation> // Dodaj ten nagłówek
 
 #include "blob/core/app_instance_manager.h"
 #include "wavelength/dialogs/join_wavelength_dialog.h"
 #include "wavelength/view/wavelength_chat_view.h"
 #include "wavelength/dialogs/wavelength_dialog.h"
 
-// Zamiast wavelength_manager.h, teraz importujemy koordynatora
 #include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
 
@@ -55,7 +51,6 @@ private:
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     
-    // Alternatywa dla QAbstractAnimation::setGlobalTimerType
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
@@ -64,13 +59,10 @@ int main(int argc, char *argv[]) {
         qWarning() << "Nie udało się załadować wszystkich czcionek!";
     }
 
-    // Ustawienie domyślnej czcionki dla całej aplikacji (możesz wybrać jedną z trzech)
     FontManager::instance().setApplicationFont(FontFamily::Lato, FontStyle::Regular, 10);
-    // Alternatywnie:
     // FontManager::instance().setApplicationFont(FontFamily::NotoSans, FontStyle::Regular, 10);
     // FontManager::instance().setApplicationFont(FontFamily::Poppins, FontStyle::Regular, 10);
 
-    // Wyświetlenie informacji o czcionkach (opcjonalne, pomocne przy debugowaniu)
     FontManager::instance().debugFontInfo();
 
     app.setStyle(QStyleFactory::create("Fusion"));
@@ -187,13 +179,10 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    // Inicjalizacja koordynatora zamiast WavelengthManager
     WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
-    WavelengthMessageService* messageService = WavelengthMessageService::getInstance();
-
-    auto switchToChatView = [chatView, stackedWidget, animation](double frequency) {
+    auto switchToChatView = [chatView, stackedWidget](const double frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
         stackedWidget->setCurrentWidget(chatView);
@@ -209,7 +198,6 @@ int main(int argc, char *argv[]) {
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
                     chatView, &WavelengthChatView::onWavelengthClosed);
 
-    // Podłączanie sygnałów z koordynatora zamiast z managera
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
              [switchToChatView](double frequency) {
     qDebug() << "Wavelength created signal received";
@@ -224,11 +212,11 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted, [stackedWidget, animationWidget, animation]() {
         qDebug() << "Wavelength aborted, switching back to animation view";
-        animation->resetLifeColor(); // Resetuje kolor, jeśli był ustawiony
+        animation->resetLifeColor();
         stackedWidget->setCurrentWidget(animationWidget);
     });
 
-    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, chatView, stackedWidget, coordinator]() {
+    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
     qDebug() << "Create wavelength button clicked";
 
     animation->setLifeColor(QColor(0, 200, 0));
@@ -240,7 +228,6 @@ int main(int argc, char *argv[]) {
         bool isPasswordProtected = dialog.isPasswordProtected();
         QString password = dialog.getPassword();
 
-        // Używamy koordynatora zamiast managera
         if (coordinator->createWavelength(frequency, name, isPasswordProtected, password)) {
             qDebug() << "Created and joined wavelength:" << frequency << "Hz";
         } else {
@@ -252,20 +239,18 @@ int main(int argc, char *argv[]) {
     }
 });
 
-    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, chatView, stackedWidget, coordinator]() {
+    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Join wavelength button clicked";
 
-        animation->setLifeColor(QColor(0, 0, 200)); // Niebieski kolor dla dołączania
+        animation->setLifeColor(QColor(0, 0, 200));
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
             double frequency = dialog.getFrequency();
             QString password = dialog.getPassword();
 
-            // Używamy koordynatora zamiast managera
             if (coordinator->joinWavelength(frequency, password)) {
                 qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
-                // Nie przełączamy widoku tutaj - zrobi to signal handler
             } else {
                 qDebug() << "Failed to join wavelength";
                 animation->resetLifeColor();

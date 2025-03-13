@@ -11,8 +11,8 @@ find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/Users/
 
 add_executable(${PROJECT_NAME} main.cpp
         resources.qrc
-        navbar.h
-        navbar.cpp
+        wavelength/navigation/navbar.h
+        wavelength/navigation/navbar.cpp
         blob/core/blob_animation.cpp
         blob/core/blob_animation.h
         blob/core/blob_config.h
