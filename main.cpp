@@ -17,6 +17,7 @@
 #include "wavelength/dialogs/wavelength_dialog.h"
 
 // Zamiast wavelength_manager.h, teraz importujemy koordynatora
+#include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
 
 void centerLabel(QLabel* label, BlobAnimation* animation) {
@@ -58,6 +59,19 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
+
+    if (!FontManager::instance().initialize()) {
+        qWarning() << "Nie udało się załadować wszystkich czcionek!";
+    }
+
+    // Ustawienie domyślnej czcionki dla całej aplikacji (możesz wybrać jedną z trzech)
+    FontManager::instance().setApplicationFont(FontFamily::Lato, FontStyle::Regular, 10);
+    // Alternatywnie:
+    // FontManager::instance().setApplicationFont(FontFamily::NotoSans, FontStyle::Regular, 10);
+    // FontManager::instance().setApplicationFont(FontFamily::Poppins, FontStyle::Regular, 10);
+
+    // Wyświetlenie informacji o czcionkach (opcjonalne, pomocne przy debugowaniu)
+    FontManager::instance().debugFontInfo();
 
     app.setStyle(QStyleFactory::create("Fusion"));
 
@@ -119,8 +133,7 @@ int main(int argc, char *argv[]) {
     QLabel *titleLabel = new QLabel("Hello, World!", animation);
     QLabel *outlineLabel = new QLabel("Hello, World!", animation);
 
-    QFont titleFont("Arial", 40, QFont::Bold);
-    titleFont.setStyleStrategy(QFont::PreferAntialias);
+    QFont titleFont = FontManager::instance().getFont(FontFamily::Poppins, FontStyle::Bold, 40);
     titleLabel->setFont(titleFont);
     outlineLabel->setFont(titleFont);
 
