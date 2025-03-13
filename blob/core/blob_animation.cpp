@@ -7,7 +7,8 @@
 
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QWidget(parent),
-    m_absorption(this)
+    m_absorption(this),
+    m_transitionManager(this)
 {
     m_params.blobRadius = 250.0f;
     m_params.numPoints = 20;
@@ -27,8 +28,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_controlPoints.reserve(m_params.numPoints);
     m_targetPoints.reserve(m_params.numPoints);
     m_velocity.reserve(m_params.numPoints);
-    m_originalControlPoints.reserve(m_params.numPoints);
-    m_targetIdlePoints.reserve(m_params.numPoints);
 
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -51,8 +50,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     connect(&m_animationTimer, &QTimer::timeout, this, &BlobAnimation::updateAnimation);
     m_animationTimer.start();
 
-    // Konfiguracja timera sprawdzającego pozycję okna - wysoka częstotliwość
-    m_windowPositionTimer.setInterval(8); // Sprawdzaj jeszcze częściej (>100 FPS)
+    m_windowPositionTimer.setInterval(8); // (>100 FPS)
     m_windowPositionTimer.setTimerType(Qt::PreciseTimer);
     connect(&m_windowPositionTimer, &QTimer::timeout, this, &BlobAnimation::checkWindowPosition);
     m_windowPositionTimer.start();
@@ -70,6 +68,21 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     });
 
     connect(&m_absorption, &BlobAbsorption::absorptionFinished, this, [this] {});
+
+    connect(&m_transitionManager, &BlobTransitionManager::transitionCompleted, this, [this]() {
+        m_eventReEnableTimer.start(200);
+    });
+
+    connect(&m_transitionManager, &BlobTransitionManager::significantMovementDetected, this, [this]() {
+        switchToState(BlobConfig::MOVING);
+        m_needsRedraw = true;
+    });
+
+    connect(&m_transitionManager, &BlobTransitionManager::movementStopped, this, [this]() {
+        if (m_currentState == BlobConfig::MOVING) {
+            switchToState(BlobConfig::IDLE);
+        }
+    });
 }
 
 void BlobAnimation::handleResizeTimeout() {
@@ -89,29 +102,20 @@ void BlobAnimation::handleResizeTimeout() {
 
 void BlobAnimation::checkWindowPosition() {
     QWidget* currentWindow = window();
-    if (!currentWindow || !m_eventsEnabled || m_inTransitionToIdle)
+    if (!currentWindow || !m_eventsEnabled || m_transitionManager.isInTransitionToIdle())
         return;
 
-    // Ta metoda jest wywoływana przez timer, ale nie potrzebujemy sprawdzać pozycji
-    // za każdym razem - eventy są już filtrowane w eventFilter
-    // i zapisywane do bufora m_movementBuffer
-
-    // Sprawdzamy tylko czy nie ma bezczynności
     qint64 currentTimestamp = QDateTime::currentMSecsSinceEpoch();
 
-    if (!m_movementBuffer.empty() &&
-        (currentTimestamp - m_movementBuffer.back().timestamp) > 100) {
-        // Dodaj potwierdzenie statusu nieruchomego po okresie bezczynności
+    std::pmr::deque<BlobTransitionManager::WindowMovementSample> movementBuffer = m_transitionManager.getMovementBuffer();
+
+    // Sprawdzenie ostatniego czasu ruchu
+    if (movementBuffer.empty() ||
+        (currentTimestamp - m_transitionManager.getLastMovementTime()) > 100) {
         QPointF currentWindowPos = currentWindow->pos();
 
-        // Dodaj próbkę z obecną pozycją tylko jeśli się zmieniła
-        if (m_movementBuffer.empty() || currentWindowPos != m_movementBuffer.back().position) {
-            m_movementBuffer.push_back({currentWindowPos, currentTimestamp});
-
-            // Ogranicz rozmiar bufora
-            if (m_movementBuffer.size() > MAX_MOVEMENT_SAMPLES) {
-                m_movementBuffer.pop_front();
-            }
+        if (movementBuffer.empty() || currentWindowPos != movementBuffer.back().position) {
+            m_transitionManager.addMovementSample(currentWindowPos, currentTimestamp);
         }
         }
 }
@@ -248,7 +252,6 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
 void BlobAnimation::startBeingAbsorbed() {
     m_absorption.startBeingAbsorbed();
 
-    // Jeśli potrzeba, dodatkowo zatrzymaj animację
     if (m_currentState == BlobConfig::IDLE) {
         m_animationTimer.stop();
     }
@@ -261,7 +264,6 @@ void BlobAnimation::finishBeingAbsorbed() {
 void BlobAnimation::cancelAbsorption() {
     m_absorption.cancelAbsorption();
 
-    // Dodatkowa logika specyficzna dla BlobAnimation
     if (m_currentState == BlobConfig::IDLE && !m_absorption.isBeingAbsorbed() && !m_absorption.isAbsorbing()) {
         m_animationTimer.start();
     }
@@ -286,10 +288,9 @@ void BlobAnimation::updateAbsorptionProgress(float progress) {
 void BlobAnimation::updateAnimation() {
     m_needsRedraw = false;
 
-    // Przetwarzaj bufor ruchów przy każdej klatce animacji (60 FPS)
     processMovementBuffer();
 
-    if (m_inTransitionToIdle) {
+    if (m_transitionManager.isInTransitionToIdle()) {
         handleIdleTransition();
         m_needsRedraw = true;
     } else if (m_currentState == BlobConfig::IDLE) {
@@ -311,94 +312,19 @@ void BlobAnimation::updateAnimation() {
     }
 }
 
-// Nowa metoda do przetwarzania bufora ruchów
 void BlobAnimation::processMovementBuffer() {
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-
-    // Jeśli bufor jest pusty lub nie zawiera wystarczającej liczby próbek, zakończ
-    if (m_movementBuffer.size() < 2)
-        return;
-
-    // Oblicz wygładzoną prędkość na podstawie bufora próbek
-    QVector2D newVelocity(0, 0);
-    double totalWeight = 0;
-
-    // Przetwarzamy wszystkie próbki, nadając większą wagę nowszym próbkom
-    for (size_t i = 1; i < m_movementBuffer.size(); i++) {
-        QPointF posDelta = m_movementBuffer[i].position - m_movementBuffer[i-1].position;
-        qint64 timeDelta = m_movementBuffer[i].timestamp - m_movementBuffer[i-1].timestamp;
-
-        if (timeDelta > 0) {
-            // Oblicz wektor prędkości dla danej pary próbek
-            double scale = 700.0 / timeDelta; // Skalowanie do jednostek/s
-            QVector2D sampleVelocity(posDelta.x() * scale, posDelta.y() * scale);
-
-            // Waga próbki - nowsze próbki mają większą wagę
-            double weight = 0.5 + 0.5 * (i / (double)(m_movementBuffer.size() - 1));
-
-            // Dodaj do wygładzonej prędkości
-            newVelocity += sampleVelocity * weight;
-            totalWeight += weight;
+    m_transitionManager.processMovementBuffer(
+        m_velocity,
+        m_blobCenter,
+        m_controlPoints,
+        m_params.blobRadius,
+        [this](std::vector<QPointF>& vel, QPointF& center, std::vector<QPointF>& points, float radius, QVector2D force) {
+            m_movingState->applyInertiaForce(vel, center, points, radius, force);
+        },
+        [this](const QPointF& pos) {
+            m_physics.setLastWindowPos(pos);
         }
-    }
-
-    // Normalizacja prędkości
-    if (totalWeight > 0) {
-        newVelocity /= totalWeight;
-    }
-
-    // Wygładź prędkość z poprzednią wartością dla bardziej płynnych przejść
-    if (m_smoothedVelocity.length() > 0) {
-        m_smoothedVelocity = m_smoothedVelocity * 0.7 + newVelocity * 0.2;
-    } else {
-        m_smoothedVelocity = newVelocity;
-    }
-
-    double velocityMagnitude = m_smoothedVelocity.length();
-
-    // Sprawdź czy wykryto znaczący ruch
-    bool significantMovement = velocityMagnitude > 0.3;
-
-    // Jeśli wykryto znaczący ruch lub niedawno był ruch
-    if (significantMovement || (currentTime - m_lastMovementTime) < 200) { // 200ms "pamięci" ruchu
-        if (significantMovement) {
-            // Przejdź do stanu ruchu i zastosuj efekty fizyczne
-            switchToState(BlobConfig::MOVING);
-
-            QVector2D scaledVelocity = m_smoothedVelocity * 0.6;
-            m_movingState->applyInertiaForce(
-                m_velocity,
-                m_blobCenter,
-                m_controlPoints,
-                m_params.blobRadius,
-                scaledVelocity
-            );
-
-            m_physics.setLastWindowPos(m_movementBuffer.back().position);
-            m_isMoving = true;
-            m_inactivityCounter = 0;
-            m_needsRedraw = true;
-        }
-    } else if (m_isMoving) {
-        // Zliczanie nieaktywności i ewentualne przejście do stanu bezczynności
-        m_inactivityCounter++;
-
-        if (m_inactivityCounter > 60) { // Po około 1s nieaktywności przy 60 FPS
-            m_isMoving = false;
-            if (m_currentState == BlobConfig::MOVING) {
-                switchToState(BlobConfig::IDLE);
-            }
-        }
-    }
-
-    // Wyczyść stare próbki, pozostawiając tylko ostatnią jako punkt odniesienia dla nowych
-    if (m_movementBuffer.size() > 1 && (currentTime - m_lastMovementTime) > 500) { // 0.5s bez ruchu
-        QPointF lastPosition = m_movementBuffer.back().position;
-        qint64 lastTimestamp = m_movementBuffer.back().timestamp;
-
-        m_movementBuffer.clear();
-        m_movementBuffer.push_back({lastPosition, lastTimestamp});
-    }
+    );
 }
 
 void BlobAnimation::updatePhysics() {
@@ -417,74 +343,20 @@ void BlobAnimation::updatePhysics() {
 }
 
 void BlobAnimation::handleIdleTransition() {
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    qint64 elapsedMs = currentTime - m_transitionToIdleStartTime;
-
-        if (elapsedMs >= m_transitionToIdleDuration) {
-
-            m_inTransitionToIdle = false;
-            m_currentBlobState = m_idleState.get();
-
-            std::for_each(m_velocity.begin(), m_velocity.end(), [](QPointF& vel) {
-            vel *= 0.7;
-            });
-
-            m_idleState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
-            m_eventReEnableTimer.start(200);
-
-        } else {
-            double progress = elapsedMs / (double)m_transitionToIdleDuration;
-
-            double easedProgress = progress;
-
-            if (progress < 0.3) {
-                easedProgress = progress * (0.7 + progress * 0.3);
-            } else if (progress > 0.7) {
-                double t = 1.0 - progress;
-                easedProgress = 1.0 - t * (0.7 + t * 0.3);
-            }
-
-            m_blobCenter = QPointF(
-                m_originalBlobCenter.x() * (1.0 - easedProgress) + m_targetIdleCenter.x() * easedProgress,
-                m_originalBlobCenter.y() * (1.0 - easedProgress) + m_targetIdleCenter.y() * easedProgress
-            );
-
-            std::transform(
-            m_originalControlPoints.begin(), m_originalControlPoints.end(),
-            m_targetIdlePoints.begin(),
-            m_controlPoints.begin(),
-            [easedProgress](const QPointF& orig, const QPointF& target) {
-                return QPointF(
-                    orig.x() * (1.0 - easedProgress) + target.x() * easedProgress,
-                    orig.y() * (1.0 - easedProgress) + target.y() * easedProgress
-                );
-            }
-        );
-
-            double dampingFactor = pow(0.98, 1.0 + 3.0 * easedProgress);
-            for (size_t i = 0; i < m_velocity.size(); ++i) {
-                m_velocity[i] *= dampingFactor;
-            }
-
-            double idleBlendFactor = easedProgress * 0.4;
-
-            std::vector<QPointF> tempVelocity = m_velocity;
-            QPointF tempCenter = m_blobCenter;
-            std::vector<QPointF> tempPoints = m_controlPoints;
-
-            m_idleState->apply(tempPoints, tempVelocity, tempCenter, m_params);
-
-            for (size_t i = 0; i < m_velocity.size(); ++i) {
-                m_velocity[i] += (tempVelocity[i] - m_velocity[i]) * idleBlendFactor;
-            }
-
-            update();
+    m_transitionManager.handleIdleTransition(
+        m_controlPoints,
+        m_velocity,
+        m_blobCenter,
+        m_params,
+        [this](std::vector<QPointF>& points, std::vector<QPointF>& vel, QPointF& center, const BlobConfig::BlobParameters& params) {
+            m_idleState->apply(points, vel, center, params);
         }
+    );
 }
 
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
-    if (!m_eventsEnabled || m_inTransitionToIdle) {
+    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
         QWidget::resizeEvent(event);
         return;
     }
@@ -504,7 +376,7 @@ void BlobAnimation::onStateResetTimeout() {
 
 bool BlobAnimation::event(QEvent *event) {
 
-    if (!m_eventsEnabled || m_inTransitionToIdle) {
+    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
         return QWidget::event(event);
     }
 
@@ -526,7 +398,7 @@ bool BlobAnimation::event(QEvent *event) {
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
 
-    if (!m_eventsEnabled || m_inTransitionToIdle) {
+    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
         return;
     }
 
@@ -542,42 +414,18 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
     qDebug() << "State change from" << m_currentState << "to" << newState;
 
     if (newState == BlobConfig::IDLE &&
-        (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
+    (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
         m_eventsEnabled = false;
-        m_originalControlPoints = m_controlPoints;
-        m_originalVelocities = m_velocity;
-        m_originalBlobCenter = m_blobCenter;
 
-        QPointF targetCenter = QPointF(width() / 2.0, height() / 2.0);
-
-        double currentRadius = 0.0;
-        for (const auto& point : m_controlPoints) {
-            currentRadius += QVector2D(point - m_blobCenter).length();
-        }
-        currentRadius /= m_controlPoints.size();
-
-        double radiusRatio = currentRadius / m_params.blobRadius;
-
-        std::vector<QPointF> targetPoints(m_controlPoints.size());
-
-        for (size_t i = 0; i < m_controlPoints.size(); ++i) {
-            QPointF relativePos = m_controlPoints[i] - m_blobCenter;
-            if (radiusRatio > 0.1) {
-                relativePos = relativePos / radiusRatio;
-            }
-            targetPoints[i] = targetCenter + relativePos;
-        }
-
-        m_targetIdlePoints = targetPoints;
-        m_targetIdleCenter = targetCenter;
-
-        m_inTransitionToIdle = true;
-        m_transitionToIdleStartTime = QDateTime::currentMSecsSinceEpoch();
-        m_transitionToIdleDuration = 700;
-
-        if (m_transitionToIdleTimer) {
-            m_transitionToIdleTimer->stop();
-        }
+        // Uruchom przejście do stanu IDLE przez transition manager
+        m_transitionManager.startTransitionToIdle(
+            m_controlPoints,
+            m_velocity,
+            m_blobCenter,
+            QPointF(width() / 2.0, height() / 2.0),
+            width(),
+            height()
+        );
 
         m_currentState = BlobConfig::IDLE;
         m_currentBlobState = m_idleState.get();
@@ -636,7 +484,7 @@ void BlobAnimation::setGridSpacing(int spacing) {
 }
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
-    if (!m_eventsEnabled || m_inTransitionToIdle) {
+    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
         return QWidget::eventFilter(watched, event);
     }
 
@@ -670,11 +518,8 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
                     QPointF currentWindowPos = currentWindow->pos();
                     m_lastWindowPosForTimer = currentWindowPos;
 
-                    m_movementBuffer.push_back({currentWindowPos, currentTime});
-                    if (m_movementBuffer.size() > MAX_MOVEMENT_SAMPLES) {
-                        m_movementBuffer.pop_front();
-                    }
-                    m_lastMovementTime = currentTime;
+                    // Dodaj próbkę ruchu do transition managera
+                    m_transitionManager.addMovementSample(currentWindowPos, currentTime);
                 }
             } else {
                 return true;

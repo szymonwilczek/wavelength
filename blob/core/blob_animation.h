@@ -24,6 +24,7 @@
 #include "../states/moving_state.h"
 #include "../states/resizing_state.h"
 #include "blob_absorption.h"
+#include "blob_transition_manager.h"
 
 class BlobAnimation : public QWidget {
     Q_OBJECT
@@ -103,9 +104,7 @@ private:
     BlobAbsorption m_absorption;
 
     QTimer m_windowPositionTimer;
-    bool m_isMoving = false;
     QPointF m_lastWindowPosForTimer;
-    int m_inactivityCounter = 0;
     QTimer m_resizeDebounceTimer;
     QSize m_lastSize;
     QColor m_defaultLifeColor;
@@ -123,6 +122,8 @@ private:
 
     BlobConfig::AnimationState m_currentState = BlobConfig::IDLE;
 
+    BlobTransitionManager m_transitionManager;
+
     QTimer m_animationTimer;
     QTimer m_idleTimer;
     QTimer m_stateResetTimer;
@@ -137,16 +138,7 @@ private:
     BlobState* m_currentBlobState;
 
     QPointF m_lastWindowPos;
-    QTimer* m_windowPosCheckTimer = nullptr;
 
-    bool m_inTransitionToIdle = false;
-    qint64 m_transitionToIdleStartTime = 0;
-    qint64 m_transitionToIdleDuration = 0;
-    std::vector<QPointF> m_originalControlPoints;
-    std::vector<QPointF> m_originalVelocities;
-    QPointF m_originalBlobCenter;
-    std::vector<QPointF> m_targetIdlePoints;
-    QPointF m_targetIdleCenter;
 
     double m_precalcMinDistance = 0.0;
     double m_precalcMaxDistance = 0.0;
@@ -156,22 +148,9 @@ private:
     std::atomic<bool> m_physicsRunning{true};
     std::vector<QPointF> m_safeControlPoints;
 
-    void physicsThreadFunction();
-
     bool m_eventsEnabled = true;
     QTimer m_eventReEnableTimer;
     bool m_needsRedraw = false;
-
-    struct WindowMovementSample {
-        QPointF position;
-        qint64 timestamp;
-    };
-
-    static const int MAX_MOVEMENT_SAMPLES = 10;
-    std::pmr::deque<WindowMovementSample> m_movementBuffer;
-    QVector2D m_smoothedVelocity;
-    bool m_significantMovementDetected = false;
-    qint64 m_lastMovementTime = 0;
 };
 
 #endif // BLOBANIMATION_H
