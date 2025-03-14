@@ -29,14 +29,26 @@ public:
         setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
         setWindowTitle("Create New Wavelength");
         setModal(true);
-        setFixedSize(400, 250);
+        setFixedSize(450 + m_shadowSize, 250 + m_shadowSize);
         setAttribute(Qt::WA_TranslucentBackground); // Kluczowe dla zaokrąglonych rogów
 
         setAutoFillBackground(false);
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10);
 
-        QLabel *infoLabel = new QLabel("System automatically assigns the lowest available frequency:", this);
+        QLabel *titleLabel = new QLabel("GENERATE WAVELENGTH", this);
+        titleLabel->setStyleSheet("font-size: 15px; font-weight: bold;");
+        titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignHCenter);
+        QFont font = titleLabel->font();
+        font.setStyleStrategy(QFont::PreferAntialias);
+        titleLabel->setFont(font);
+        titleLabel->setContentsMargins(0, 0, 0, 10);
+        mainLayout->addWidget(titleLabel);
+
+        QLabel *infoLabel = new QLabel("System automatically assigns the lowest available frequency", this);
+        infoLabel->setStyleSheet("font-size: 14px; font-weight: semibold;");
+        infoLabel->setAlignment(Qt::AlignLeft | Qt::AlignHCenter);
         mainLayout->addWidget(infoLabel);
 
         QFormLayout *formLayout = new QFormLayout();
@@ -56,8 +68,14 @@ public:
 
         passwordEdit = new QLineEdit(this);
         passwordEdit->setEchoMode(QLineEdit::Password);
-        passwordEdit->setStyleSheet("background-color: #3e3e3e; border: 1px solid #555; padding: 5px;");
+        passwordEdit->setStyleSheet("background-color: #27272A; border: 1.5px solid #71717A; padding: 5px; border-radius: 8px;");
         passwordEdit->setEnabled(false);
+        passwordEdit->setPlaceholderText("Enter Wavelength Password...");
+        QFont passwordFont = passwordEdit->font();
+        passwordFont.setFamily("Roboto");
+        passwordFont.setPointSize(10);
+        passwordFont.setStyleStrategy(QFont::PreferAntialias);
+        passwordEdit->setFont(passwordFont);
         formLayout->addRow("Password:", passwordEdit);
 
         mainLayout->addLayout(formLayout);
@@ -87,15 +105,20 @@ public:
         cancelButton = new QPushButton("Cancel", this);
         cancelButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: #3e3e3e;"
-            "  color: #e0e0e0;"
-            "  border: 1px solid #4a4a4a;"
-            "  border-radius: 4px;"
+            "  background-color: #441729;"
+            "  color: #cf386e;"
+            "  border-radius: 10%;"
             "  padding: 8px 16px;"
             "}"
-            "QPushButton:hover { background-color: #4a4a4a; }"
-            "QPushButton:pressed { background-color: #2e2e2e; }"
+            "QPushButton:hover { cursor: pointer; }"
+            "QPushButton:pressed { background-color: #401827; }"
         );
+
+        QFont buttonFont = generateButton->font();
+        buttonFont.setFamily("Roboto");
+        buttonFont.setPointSize(10);
+        generateButton->setFont(buttonFont);
+        cancelButton->setFont(buttonFont);
 
         buttonLayout->addWidget(generateButton);
         buttonLayout->addWidget(cancelButton);
@@ -137,16 +160,42 @@ protected:
 
     void paintEvent(QPaintEvent *event) override {
         QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::Antialiasing, true);
 
-        QColor bgColor(45, 45, 45); // #2d2d2d
+        // Parametry cienia
+        const int cornerRadius = 15;
+        const int shadowSteps = 25; // Zwiększ dla bardziej rozmytego cienia (było 15)
+
+        // Rysowanie złożonego cienia z większą liczbą warstw
+        for (int i = 0; i < shadowSteps; i++) {
+            qreal ratio = (qreal)i / shadowSteps;
+
+            // Modyfikacja wzoru dla bardziej rozmytego efektu
+            qreal size = m_shadowSize * pow(ratio, 0.8); // Wykładnik < 1 daje bardziej rozmyty efekt
+
+            // Wolniejszy spadek przezroczystości = bardziej rozmyty cień
+            int alpha = 30 * pow(1.0 - ratio, 0.7);
+
+            QColor shadowColor(20, 20, 20, alpha);
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(shadowColor);
+
+            QRect shadowRect = rect().adjusted(
+                m_shadowSize - size,
+                m_shadowSize - size,
+                size - m_shadowSize,
+                size - m_shadowSize
+            );
+
+            painter.drawRoundedRect(shadowRect, cornerRadius, cornerRadius);
+        }
+
+        // Główne tło dialogu
+        QColor bgColor(24, 24, 27);
+        painter.setPen(Qt::NoPen);
         painter.setBrush(bgColor);
-
-        QPen pen(QColor(74, 74, 74), 1); // #4a4a4a, 1px szerokości
-        painter.setPen(pen);
-
-        painter.drawRoundedRect(rect(), 10, 10);
-
+        QRect mainRect = rect().adjusted(m_shadowSize, m_shadowSize, -m_shadowSize, -m_shadowSize);
+        painter.drawRoundedRect(mainRect, cornerRadius, cornerRadius);
     }
 
     void showEvent(QShowEvent *event) override {
@@ -375,6 +424,7 @@ private:
     QFutureWatcher<double> *frequencyWatcher;
     double m_frequency = 130.0; // Domyślna wartość
     bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
+    const int m_shadowSize = 4; // Rozmiar cienia
 };
 
 #endif // WAVELENGTH_DIALOG_H
