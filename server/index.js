@@ -321,6 +321,140 @@ wss.on("connection", function connection(ws, req) {
         ) {
           wavelength.host.send(broadcastStr);
         }
+      } else if (data.type === "send_file") {
+        const frequency = data.frequency;
+        const messageId =
+          data.messageId ||
+          `file_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const hasAttachment = true; // Zawsze true dla plików
+        const attachmentType = data.attachmentType;
+        const attachmentMimeType = data.attachmentMimeType;
+        const attachmentName = data.attachmentName;
+        const attachmentData = data.attachmentData;
+        const senderId = data.senderId;
+        const timestamp = data.timestamp || Date.now();
+
+        if (!frequency) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              error: "You are not connected to any wavelength",
+            })
+          );
+          return;
+        }
+
+        const wavelength = activeWavelengths.get(frequency);
+
+        if (!wavelength) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              error: "Wavelength not found",
+            })
+          );
+          return;
+        }
+
+        // Sprawdź rozmiar danych
+        if (attachmentData && attachmentData.length > 15 * 1024 * 1024) {
+          // Limit ~10MB po dekodowaniu base64
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              error: "File size exceeds the maximum limit (10MB)",
+            })
+          );
+          return;
+        }
+
+        const isHost = ws.isHost;
+        const sender = isHost
+          ? "Host"
+          : (ws.sessionId && ws.sessionId.substring(0, 8)) || "Client";
+
+        console.log(
+          `File received in wavelength ${frequency} from ${sender}: ${attachmentName} (${attachmentType}, ID: ${messageId})`
+        );
+
+        // Jeśli wiadomość była już przetworzona (ma ID), zignoruj
+        if (
+          wavelength.processedMessageIds &&
+          wavelength.processedMessageIds.has(messageId)
+        ) {
+          console.log(`Ignoring duplicate message ID: ${messageId}`);
+          return;
+        }
+
+        // Dodaj ID wiadomości do przetworzonych
+        if (wavelength.processedMessageIds) {
+          wavelength.processedMessageIds.add(messageId);
+
+          // Ogranicz rozmiar zestawu przetworzonych ID
+          if (wavelength.processedMessageIds.size > 1000) {
+            const iterator = wavelength.processedMessageIds.values();
+            wavelength.processedMessageIds.delete(iterator.next().value);
+          }
+        }
+
+        // Zawsze wysyłaj potwierdzenie do nadawcy
+        ws.send(
+          JSON.stringify({
+            type: "message",
+            hasAttachment: true,
+            attachmentType: attachmentType,
+            attachmentMimeType: attachmentMimeType,
+            attachmentName: attachmentName,
+            attachmentData: attachmentData,
+            frequency: frequency,
+            messageId: messageId,
+            timestamp: new Date(timestamp).toISOString(),
+            isSelf: true,
+            senderId: senderId,
+          })
+        );
+
+        // Przygotuj wiadomość do wysłania innym
+        const broadcastMessage = {
+          type: "message",
+          hasAttachment: true,
+          attachmentType: attachmentType,
+          attachmentMimeType: attachmentMimeType,
+          attachmentName: attachmentName,
+          attachmentData: attachmentData,
+          frequency: frequency,
+          messageId: messageId,
+          timestamp: new Date(timestamp).toISOString(),
+          sender: sender,
+          senderId: senderId,
+        };
+
+        const broadcastStr = JSON.stringify(broadcastMessage);
+
+        // Wyślij do pozostałych klientów (oprócz nadawcy)
+        wavelength.clients.forEach((client) => {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            try {
+              client.send(broadcastStr);
+            } catch (e) {
+              console.error("Error sending message to client:", e);
+            }
+          }
+        });
+
+        // Jeśli nadawca nie jest hostem, wyślij do hosta
+        if (
+          !isHost &&
+          wavelength.host &&
+          wavelength.host !== ws &&
+          wavelength.host.readyState === WebSocket.OPEN
+        ) {
+          try {
+            wavelength.host.send(broadcastStr);
+          } catch (e) {
+            console.error("Error sending message to host:", e);
+          }
+        }
       } else if (data.type === "leave_wavelength") {
         const frequency = ws.frequency;
 

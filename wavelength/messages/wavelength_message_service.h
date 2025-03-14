@@ -7,6 +7,8 @@
 #include <QMap>
 #include <QString>
 #include <QDebug>
+#include <QFile>
+#include <qfileinfo.h>
 
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
@@ -78,6 +80,66 @@ public:
         socket->sendTextMessage(jsonMessage);
 
         qDebug() << "WavelengthMessageService: Message sent:" << messageId;
+
+        return true;
+    }
+
+    bool sendFileMessage(const QString& filePath) {
+        QFile file(filePath);
+        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+        double frequency = registry->getActiveWavelength();
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "Failed to open file:" << filePath;
+            return false;
+        }
+
+        QByteArray fileData = file.readAll();
+        file.close();
+
+        QFileInfo fileInfo(filePath);
+        QString fileExtension = fileInfo.suffix().toLower();
+        QString mimeType;
+        QString fileType;
+
+        // Określamy typ pliku
+        if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
+            mimeType = "image/" + fileExtension;
+            fileType = "image";
+        } else if (QStringList({"mp3", "wav"}).contains(fileExtension)) {
+            mimeType = "audio/" + fileExtension;
+            fileType = "audio";
+        } else if (QStringList({"mp4", "webm"}).contains(fileExtension)) {
+            mimeType = "video/" + fileExtension;
+            fileType = "video";
+        } else {
+            mimeType = "application/octet-stream";
+            fileType = "file";
+        }
+
+        // Tworzymy obiekt wiadomości
+        QJsonObject messageObj;
+        messageObj["type"] = "send_file";
+        messageObj["frequency"] = frequency;
+        messageObj["senderId"] = AuthenticationManager::getInstance()->generateClientId();
+        messageObj["messageId"] = MessageHandler::getInstance()->generateMessageId();
+        messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+        messageObj["hasAttachment"] = true;
+        messageObj["attachmentType"] = fileType;
+        messageObj["attachmentMimeType"] = mimeType;
+        messageObj["attachmentName"] = fileInfo.fileName();
+        messageObj["attachmentData"] = QString(fileData.toBase64());
+
+        QJsonDocument doc(messageObj);
+        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+
+        QWebSocket* socket = WavelengthRegistry::getInstance()->getWavelengthSocket(frequency);
+        if (!socket) {
+            qDebug() << "No socket for frequency" << frequency;
+            return false;
+        }
+
+        qDebug() << "Sending file message, size:" << fileData.size() << "bytes";
+        socket->sendTextMessage(jsonMessage);
 
         return true;
     }

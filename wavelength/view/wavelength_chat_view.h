@@ -1,15 +1,18 @@
 #ifndef WAVELENGTH_CHAT_VIEW_H
 #define WAVELENGTH_CHAT_VIEW_H
 
+#include <qfileinfo.h>
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <QMessageBox>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QTimer>
+#include <QFileDialog>
 
 #include "../session/wavelength_session_coordinator.h"
 
@@ -40,9 +43,34 @@ public:
             "  font-size: 11pt;"
             "}"
         );
+        messageArea->setAcceptRichText(true);
+        messageArea->document()->setDefaultStyleSheet(
+         "img { max-width: 300px; max-height: 200px; } "
+         "audio, video { max-width: 300px; } "
+         "span.attachment-name { color: #aaaaaa; font-size: 9pt; }"
+     );
         mainLayout->addWidget(messageArea, 1);
 
+        messageArea->document()->setMaximumBlockCount(1000);
+
+        messageArea->setTextInteractionFlags(Qt::TextBrowserInteraction);
+
         QHBoxLayout *inputLayout = new QHBoxLayout();
+
+        attachButton = new QPushButton(this);
+        attachButton->setToolTip("Attach file");
+        attachButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: #333333;"
+            "  border: 1px solid #444444;"
+            "  border-radius: 5px;"
+            "  padding: 8px;"
+            "}"
+            "QPushButton:hover { background-color: #444444; }"
+            "QPushButton:pressed { background-color: #2a2a2a; }"
+        );
+        attachButton->setFixedSize(36, 36);
+        inputLayout->addWidget(attachButton);
 
         inputField = new QLineEdit(this);
         inputField->setPlaceholderText("Enter message...");
@@ -95,7 +123,41 @@ public:
 
         connect(inputField, &QLineEdit::returnPressed, this, &WavelengthChatView::sendMessage);
         connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
+        connect(attachButton, &QPushButton::clicked, this, &WavelengthChatView::attachFile);
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
+    }
+
+    void attachFile() {
+        QString filePath = QFileDialog::getOpenFileName(this,
+            "Select File to Attach",
+            QString(),
+            "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
+
+        if (filePath.isEmpty()) {
+            return;
+        }
+
+        QFileInfo fileInfo(filePath);
+        // if (fileInfo.size() > 10 * 1024 * 1024) { // Ograniczamy do 10MB
+        //     QMessageBox::warning(this, "File too large",
+        //         "The selected file exceeds the maximum size limit (10MB).");
+        //     return;
+        // }
+
+        // Dodaj informację o wysyłaniu pliku
+        QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
+            .arg(fileInfo.fileName());
+        messageArea->append(processingMsg);
+
+        // Opóźnij wysyłanie, aby dać czas na wyświetlenie komunikatu
+        QTimer::singleShot(100, this, [this, filePath]() {
+            WavelengthMessageService* manager = WavelengthMessageService::getInstance();
+            if(manager->sendFileMessage(filePath)) {
+                qDebug() << "File sent successfully";
+            } else {
+                messageArea->append("<span style=\"color:#ff5555;\">Failed to send file.</span>");
+            }
+        });
     }
 
     void setWavelength(double frequency, const QString& name = QString()) {
@@ -127,10 +189,13 @@ public:
             return;
         }
 
+        qDebug() << "Received message for display, HTML length:" << message.length();
 
-        messageArea->append(message);
-
-        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+        // W przypadku bardzo dużych wiadomości (z załącznikami), zapobiegaj zawieszeniom UI
+        QTimer::singleShot(0, this, [this, message]() {
+            messageArea->append(message);
+            messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+        });
     }
 
     void onMessageSent(double frequency, const QString& message) {
@@ -225,6 +290,8 @@ private:
     QLabel *headerLabel;
     QTextEdit *messageArea;
     QLineEdit *inputField;
+    QPushButton *attachButton;
+    QList<QFile> attachedFiles;
     QPushButton *sendButton;
     QPushButton *abortButton;
     double currentFrequency = -1.0;
