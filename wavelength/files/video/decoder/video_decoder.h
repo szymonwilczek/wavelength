@@ -4,16 +4,28 @@
 
 #ifndef VIDEO_DECODER_H
 #define VIDEO_DECODER_H
+
+#ifdef _MSC_VER
+#pragma comment(lib, "swresample.lib")
+#endif
+
 #include <QImage>
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
+#include <QAudioOutput>
+#include <QAudioFormat>
+#include <QBuffer>
+#include <QIODevice>
+#include <QDebug>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
 }
 
 class VideoDecoder : public QThread {
@@ -68,6 +80,18 @@ public:
         if (m_codecContext)
             avcodec_free_context(&m_codecContext);
 
+        // Zwolnij zasoby audio
+        if (m_audioCodecContext)
+            avcodec_free_context(&m_audioCodecContext);
+
+        if (m_swrContext)
+            swr_free(&m_swrContext);
+
+        if (m_audioOutput) {
+            m_audioOutput->stop();
+            delete m_audioOutput;
+        }
+
         if (m_formatContext) {
             if (m_formatContext->pb == m_ioContext)
                 m_formatContext->pb = nullptr;
@@ -78,6 +102,20 @@ public:
             av_free(m_ioContext->buffer);
             avio_context_free(&m_ioContext);
         }
+    }
+
+    void setVolume(float volume) {
+        if (m_audioOutput) {
+            m_audioOutput->setVolume(volume);
+        }
+    }
+
+    float getVolume() const {
+        return m_audioOutput ? m_audioOutput->volume() : 0.0f;
+    }
+
+    bool hasAudio() const {
+        return m_hasAudio;
     }
 
     bool initialize() {
@@ -110,10 +148,12 @@ public:
 
         // Znajdź pierwszy strumień wideo
         m_videoStream = -1;
+        m_audioStream = -1;
         for (unsigned int i = 0; i < m_formatContext->nb_streams; i++) {
             if (m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
                 m_videoStream = i;
-                break;
+            } else if (m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+                m_audioStream = i;
             }
         }
 
@@ -196,6 +236,91 @@ public:
             m_formatContext->duration / AV_TIME_BASE
         );
 
+        if (m_audioStream != -1) {
+            if (!initializeAudio()) {
+                qDebug() << "Nie można zainicjalizować audio, odtwarzam tylko wideo";
+                m_hasAudio = false;
+            } else {
+                m_hasAudio = true;
+            }
+        }
+
+        return true;
+    }
+
+    bool initializeAudio() {
+        // Znajdź dekoder audio
+        const AVCodec* audioCodec = avcodec_find_decoder(
+            m_formatContext->streams[m_audioStream]->codecpar->codec_id
+        );
+        if (!audioCodec) {
+            qDebug() << "Nie znaleziono dekodera audio";
+            return false;
+        }
+
+        // Utwórz kontekst kodeka audio
+        m_audioCodecContext = avcodec_alloc_context3(audioCodec);
+        if (!m_audioCodecContext) {
+            qDebug() << "Nie można utworzyć kontekstu kodeka audio";
+            return false;
+        }
+
+        // Skopiuj parametry kodeka audio
+        if (avcodec_parameters_to_context(
+                m_audioCodecContext,
+                m_formatContext->streams[m_audioStream]->codecpar
+            ) < 0) {
+            qDebug() << "Nie można skopiować parametrów kodeka audio";
+            return false;
+        }
+
+        // Otwórz kodek audio
+        if (avcodec_open2(m_audioCodecContext, audioCodec, nullptr) < 0) {
+            qDebug() << "Nie można otworzyć kodeka audio";
+            return false;
+        }
+
+        // Utwórz kontekst resamplingu
+        m_swrContext = swr_alloc();
+        if (!m_swrContext) {
+            qDebug() << "Nie można utworzyć kontekstu resamplingu audio";
+            return false;
+        }
+
+        // Inicjalizacja layoutu kanałów wyjściowych (stereo)
+        AVChannelLayout outLayout;
+        av_channel_layout_default(&outLayout, 2); // 2 kanały (stereo)
+
+        // Konfiguracja resamplingu do formatu PCM S16LE stereo 44.1kHz
+        av_opt_set_chlayout(m_swrContext, "in_chlayout", &m_audioCodecContext->ch_layout, 0);
+        av_opt_set_chlayout(m_swrContext, "out_chlayout", &outLayout, 0);
+        av_opt_set_int(m_swrContext, "in_sample_rate", m_audioCodecContext->sample_rate, 0);
+        av_opt_set_int(m_swrContext, "out_sample_rate", 44100, 0);
+        av_opt_set_sample_fmt(m_swrContext, "in_sample_fmt", m_audioCodecContext->sample_fmt, 0);
+        av_opt_set_sample_fmt(m_swrContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+
+        if (swr_init(m_swrContext) < 0) {
+            qDebug() << "Nie można zainicjalizować kontekstu resamplingu audio";
+            return false;
+        }
+
+        // Zwolnij pamięć layoutu kanałów wyjściowych
+        av_channel_layout_uninit(&outLayout);
+
+        // Konfiguracja formatu audio dla Qt
+        m_audioFormat.setSampleRate(44100);
+        m_audioFormat.setChannelCount(2);
+        m_audioFormat.setSampleType(QAudioFormat::SignedInt); // Poprawna wartość enumeracji
+        m_audioFormat.setSampleSize(16); // Dodajemy rozmiar próbki (16 bitów)
+        m_audioFormat.setCodec("audio/pcm");
+
+        // Inicjalizacja wyjścia audio
+        m_audioOutput = new QAudioOutput(m_audioFormat, nullptr);
+        m_audioOutput->setVolume(1.0);
+        m_audioOutputBuffer.setBuffer(&m_audioBuffer);
+        m_audioOutputBuffer.open(QIODevice::ReadWrite);
+        m_audioDevice = m_audioOutput->start();
+
         return true;
     }
 
@@ -248,6 +373,7 @@ protected:
 
         AVPacket packet;
         bool frameFinished;
+        AVFrame* audioFrame = av_frame_alloc();
 
         while (!m_stopped) {
             m_mutex.lock();
@@ -310,10 +436,52 @@ protected:
                     // Zmniejsz sleep, aby uzyskać ~60fps
                     QThread::msleep(16);  // ~60fps
                 }
+            } else if (m_hasAudio && packet.stream_index == m_audioStream) {
+                // Dekoduj ramkę audio
+                avcodec_send_packet(m_audioCodecContext, &packet);
+                if (avcodec_receive_frame(m_audioCodecContext, audioFrame) == 0) {
+                    // Konwertuj audio do PCM i odtwarzaj
+                    decodeAudioFrame(audioFrame);
+                }
             }
 
             av_packet_unref(&packet);
         }
+        av_frame_free(&audioFrame);
+    }
+
+    void decodeAudioFrame(AVFrame* audioFrame) {
+        if (!m_hasAudio || !m_audioDevice)
+            return;
+
+        // Oblicz rozmiar bufora wyjściowego (2 kanały stereo, 16-bit)
+        int outSamples = audioFrame->nb_samples;
+        int outBufferSize = outSamples * 2 * 2; // samples * channels * bytes_per_sample
+        uint8_t* outBuffer = (uint8_t*)av_malloc(outBufferSize);
+
+        int convertedSamples = swr_convert(
+            m_swrContext,
+            &outBuffer, outSamples,
+            (const uint8_t**)audioFrame->extended_data, audioFrame->nb_samples
+        );
+
+        if (convertedSamples > 0) {
+            int actualSize = convertedSamples * 2 * 2; // converted_samples * channels * bytes_per_sample
+            QByteArray buffer((char*)outBuffer, actualSize);
+
+            m_mutex.lock();
+            m_audioOutputBuffer.write(buffer);
+
+            if (m_audioBuffer.size() > 8192 && !m_paused) {
+                m_audioOutputBuffer.seek(0);
+                m_audioDevice->write(m_audioOutputBuffer.readAll());
+                m_audioBuffer.clear();
+                m_audioOutputBuffer.seek(0);
+            }
+            m_mutex.unlock();
+        }
+
+        av_freep(&outBuffer);
     }
 
 private:
@@ -366,6 +534,17 @@ private:
     int m_videoStream;
     uint8_t* m_buffer;
     int m_bufferSize;
+
+    int m_audioStream = -1;
+    AVCodecContext* m_audioCodecContext = nullptr;
+    SwrContext* m_swrContext = nullptr;
+    QAudioOutput* m_audioOutput = nullptr;
+    QIODevice* m_audioDevice = nullptr;
+    QByteArray m_audioBuffer;
+    QBuffer m_audioOutputBuffer;
+    bool m_hasAudio = false;
+    QAudioFormat m_audioFormat;
+
 
     QMutex m_mutex;
     QWaitCondition m_waitCondition;

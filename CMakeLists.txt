@@ -110,6 +110,7 @@ find_library(AVCODEC_LIBRARY avcodec HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_
 find_library(AVFORMAT_LIBRARY avformat HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
 find_library(AVUTIL_LIBRARY avutil HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
 find_library(SWSCALE_LIBRARY swscale HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
+find_library(SWRESAMPLE_LIBRARY swresample HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
 
 # Dodaj ścieżkę do plików nagłówkowych
 find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/include")
@@ -121,6 +122,7 @@ message(STATUS "  avformat: ${AVFORMAT_LIBRARY}")
 message(STATUS "  avutil: ${AVUTIL_LIBRARY}")
 message(STATUS "  swscale: ${SWSCALE_LIBRARY}")
 message(STATUS "  include: ${FFMPEG_INCLUDE_DIR}")
+message(STATUS "  swresample: ${SWRESAMPLE_LIBRARY}")
 
 # Podlinkuj biblioteki
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -128,6 +130,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ${AVFORMAT_LIBRARY}
         ${AVUTIL_LIBRARY}
         ${SWSCALE_LIBRARY}
+        ${SWRESAMPLE_LIBRARY}
 )
 
 # Dodaj ścieżki do plików nagłówkowych

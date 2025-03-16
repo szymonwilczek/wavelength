@@ -1,7 +1,3 @@
-//
-// Created by szymo on 16.03.2025.
-//
-
 #ifndef INLINE_VIDEO_PLAYER_H
 #define INLINE_VIDEO_PLAYER_H
 #include <QFrame>
@@ -10,7 +6,7 @@
 #include <QSlider>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QDebug>
+#include <QToolButton>
 
 #include "../decoder/video_decoder.h"
 
@@ -55,9 +51,27 @@ public:
         m_timeLabel = new QLabel("00:00 / 00:00", this);
         m_timeLabel->setStyleSheet("color: #aaa; font-size: 8pt; min-width: 80px;");
 
+        // Dodajemy kontrolki dźwięku
+        m_volumeButton = new QToolButton(this);
+        m_volumeButton->setText("🔊");
+        m_volumeButton->setFixedSize(20, 20);
+        m_volumeButton->setCursor(Qt::PointingHandCursor);
+        m_volumeButton->setStyleSheet("QToolButton { background-color: #333; color: white; border-radius: 3px; }");
+
+        m_volumeSlider = new QSlider(Qt::Horizontal, this);
+        m_volumeSlider->setRange(0, 100);
+        m_volumeSlider->setValue(100);
+        m_volumeSlider->setFixedWidth(60);
+        m_volumeSlider->setStyleSheet("QSlider::groove:horizontal { background: #555; height: 3px; }"
+                                     "QSlider::handle:horizontal { background: #85c4ff; width: 8px; margin: -3px 0; border-radius: 2px; }");
+
         controlLayout->addWidget(m_playButton);
         controlLayout->addWidget(m_progressSlider, 1);
         controlLayout->addWidget(m_timeLabel);
+        controlLayout->addWidget(m_volumeButton);
+        controlLayout->addWidget(m_volumeSlider);
+
+        layout->addLayout(controlLayout);
 
         layout->addLayout(controlLayout);
 
@@ -74,6 +88,11 @@ public:
             m_decoder->pause(); // Zatrzymaj odtwarzanie
             m_playButton->setText("▶");
         });
+
+        // Dodajemy obsługę kontroli dźwięku
+        connect(m_volumeSlider, &QSlider::valueChanged, this, &InlineVideoPlayer::adjustVolume);
+        connect(m_volumeButton, &QToolButton::clicked, this, &InlineVideoPlayer::toggleMute);
+
         // Nowe połączenie dla aktualizacji pozycji
         connect(m_decoder, &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
 
@@ -99,6 +118,39 @@ public:
             m_decoder->stop();
             m_decoder->wait();
             delete m_decoder;
+        }
+    }
+
+
+
+    void adjustVolume(int volume) {
+        if (!m_decoder) return;
+
+        float normalizedVolume = volume / 100.0f;
+        m_decoder->setVolume(normalizedVolume);
+
+        // Aktualizacja ikony głośności
+        updateVolumeIcon(normalizedVolume);
+    }
+
+    void toggleMute() {
+        if (!m_decoder) return;
+
+        if (m_volumeSlider->value() > 0) {
+            m_lastVolume = m_volumeSlider->value();
+            m_volumeSlider->setValue(0);
+        } else {
+            m_volumeSlider->setValue(m_lastVolume > 0 ? m_lastVolume : 100);
+        }
+    }
+
+    void updateVolumeIcon(float volume) {
+        if (volume <= 0.01f) {
+            m_volumeButton->setText("🔇");
+        } else if (volume < 0.5f) {
+            m_volumeButton->setText("🔉");
+        } else {
+            m_volumeButton->setText("🔊");
         }
     }
 
@@ -220,6 +272,8 @@ private:
     QPushButton* m_playButton;
     QSlider* m_progressSlider;
     QLabel* m_timeLabel;
+    QToolButton* m_volumeButton;
+    QSlider* m_volumeSlider;
     VideoDecoder* m_decoder;
     QTimer* m_updateTimer;
 
@@ -231,6 +285,7 @@ private:
     double m_videoDuration = 0;
     double m_currentFramePosition = 0;
     bool m_sliderDragging = false;
+    int m_lastVolume = 100; // Domyślny poziom głośności
 };
 
 
