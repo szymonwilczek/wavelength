@@ -351,8 +351,10 @@ private slots:
 
         m_progressSlider->setRange(0, duration * 1000);
 
-        // Wyświetl pierwszą klatkę
-        m_decoder->seek(0);
+        // Pobierz pierwszą klatkę jako miniaturkę
+        QTimer::singleShot(100, this, [this]() {
+            m_decoder->extractFirstFrame();
+        });
     }
 
 

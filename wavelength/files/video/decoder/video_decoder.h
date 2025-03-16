@@ -290,6 +290,51 @@ public:
         return true;
     }
 
+    void extractFirstFrame() {
+        if (!m_formatContext || m_videoStream < 0)
+            return;
+
+        // Tymczasowo zapisz stan
+        bool wasPaused = m_paused;
+
+        // Ustaw na początek strumienia
+        av_seek_frame(m_formatContext, m_videoStream, 0, AVSEEK_FLAG_BACKWARD);
+        avcodec_flush_buffers(m_codecContext);
+
+        // Odczytaj pakiet i dekoduj ramkę
+        AVPacket packet;
+        while (av_read_frame(m_formatContext, &packet) >= 0) {
+            if (packet.stream_index == m_videoStream) {
+                avcodec_send_packet(m_codecContext, &packet);
+                if (avcodec_receive_frame(m_codecContext, m_frame) == 0) {
+                    // Konwertuj ramkę do RGB
+                    sws_scale(
+                        m_swsContext,
+                        (const uint8_t* const*)m_frame->data, m_frame->linesize, 0, m_codecContext->height,
+                        m_frameRGB->data, m_frameRGB->linesize
+                    );
+
+                    // Utwórz QImage i wyemituj sygnał
+                    QImage frame(
+                        m_frameRGB->data[0],
+                        m_codecContext->width,
+                        m_codecContext->height,
+                        m_frameRGB->linesize[0],
+                        QImage::Format_RGB888
+                    );
+
+                    emit frameReady(frame);
+                    av_packet_unref(&packet);
+                    break;
+                }
+            }
+            av_packet_unref(&packet);
+        }
+
+        // Przywróć stan pauzy
+        m_paused = wasPaused;
+    }
+
     bool initializeAudio() {
         // Znajdź dekoder audio
         const AVCodec* audioCodec = avcodec_find_decoder(
