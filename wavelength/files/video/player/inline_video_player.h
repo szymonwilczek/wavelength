@@ -78,7 +78,9 @@ public:
 
         // Połącz sygnały
         connect(m_playButton, &QPushButton::clicked, this, &InlineVideoPlayer::togglePlayback);
-        connect(m_progressSlider, &QSlider::sliderMoved, this, &InlineVideoPlayer::seekVideo);
+        connect(m_progressSlider, &QSlider::sliderMoved, this, &InlineVideoPlayer::updateTimeLabel);
+        connect(m_progressSlider, &QSlider::sliderPressed, this, &InlineVideoPlayer::onSliderPressed);
+        connect(m_progressSlider, &QSlider::sliderReleased, this, &InlineVideoPlayer::onSliderReleased);
         connect(m_decoder, &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame);
         connect(m_decoder, &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
         connect(m_decoder, &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
@@ -154,6 +156,53 @@ public:
 
 private slots:
 
+    void onSliderPressed() {
+        // Zapamiętaj stan odtwarzania przed przesunięciem
+        m_wasPlaying = !m_decoder->isPaused();
+
+        // Zatrzymaj odtwarzanie na czas przesuwania
+        if (m_wasPlaying) {
+            m_decoder->pause();
+        }
+
+        m_sliderDragging = true;
+    }
+
+    void onSliderReleased() {
+        // Wykonaj faktyczne przesunięcie
+        seekVideo(m_progressSlider->value());
+
+        m_sliderDragging = false;
+
+        // Przywróć odtwarzanie jeśli było aktywne wcześniej
+        if (m_wasPlaying) {
+            m_decoder->pause(); // Przełącza stan pauzy (wznawia)
+            m_playButton->setText("⏸");
+        }
+    }
+
+    void updateTimeLabel(int position) {
+        if (!m_decoder || m_videoDuration <= 0)
+            return;
+
+        double seekPosition = position / 1000.0;
+
+        // Aktualizuj tylko etykietę czasu, bez faktycznego przesuwania wideo
+        int seconds = int(seekPosition) % 60;
+        int minutes = int(seekPosition) / 60;
+
+        int totalSeconds = int(m_videoDuration) % 60;
+        int totalMinutes = int(m_videoDuration) / 60;
+
+        m_timeLabel->setText(
+            QString("%1:%2 / %3:%4")
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'))
+            .arg(totalMinutes, 2, 10, QChar('0'))
+            .arg(totalSeconds, 2, 10, QChar('0'))
+        );
+    }
+
     void updateSliderPosition(double position) {
         // Bezpośrednia aktualizacja pozycji suwaka z dekodera
         if (m_videoDuration <= 0)
@@ -185,20 +234,6 @@ private slots:
         double seekPosition = position / 1000.0;
         m_decoder->seek(seekPosition);
 
-        // Natychmiast aktualizuj widoczny timestamp
-        int seconds = int(seekPosition) % 60;
-        int minutes = int(seekPosition) / 60;
-
-        int totalSeconds = int(m_videoDuration) % 60;
-        int totalMinutes = int(m_videoDuration) / 60;
-
-        m_timeLabel->setText(
-            QString("%1:%2 / %3:%4")
-            .arg(minutes, 2, 10, QChar('0'))
-            .arg(seconds, 2, 10, QChar('0'))
-            .arg(totalMinutes, 2, 10, QChar('0'))
-            .arg(totalSeconds, 2, 10, QChar('0'))
-        );
     }
 
     void togglePlayback() {
@@ -293,6 +328,7 @@ private:
     bool m_sliderDragging = false;
     int m_lastVolume = 100; // Domyślny poziom głośności
     bool m_playbackFinished = false;
+    bool m_wasPlaying = false;
 };
 
 
