@@ -4,17 +4,15 @@
 #include <qfileinfo.h>
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
 #include <QMessageBox>
-#include <QScrollArea>
-#include <QScrollBar>
 #include <QTimer>
 #include <QFileDialog>
 
 #include "../session/wavelength_session_coordinator.h"
+#include "../messages/wavelength_text_display.h"
 
 class WavelengthChatView : public QWidget {
     Q_OBJECT
@@ -31,29 +29,9 @@ public:
         headerLabel->setStyleSheet("font-size: 16pt; color: #a0a0a0; margin-bottom: 10px;");
         mainLayout->addWidget(headerLabel);
 
-        messageArea = new QTextEdit(this);
-        messageArea->setReadOnly(true);
-        messageArea->setStyleSheet(
-            "QTextEdit {"
-            "  background-color: #232323;"
-            "  border: 1px solid #3a3a3a;"
-            "  border-radius: 5px;"
-            "  padding: 10px;"
-            "  color: #e0e0e0;"
-            "  font-size: 11pt;"
-            "}"
-        );
-        messageArea->setAcceptRichText(true);
-        messageArea->document()->setDefaultStyleSheet(
-         "img { max-width: 300px; max-height: 200px; } "
-         "audio, video { max-width: 300px; } "
-         "span.attachment-name { color: #aaaaaa; font-size: 9pt; }"
-     );
+        // Zastępujemy QTextEdit naszą nową klasą
+        messageArea = new WavelengthTextDisplay(this);
         mainLayout->addWidget(messageArea, 1);
-
-        messageArea->document()->setMaximumBlockCount(1000);
-
-        messageArea->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
         QHBoxLayout *inputLayout = new QHBoxLayout();
 
@@ -147,7 +125,7 @@ public:
         // Dodaj informację o wysyłaniu pliku
         QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
             .arg(fileInfo.fileName());
-        messageArea->append(processingMsg);
+        messageArea->appendMessage(processingMsg);
 
         // Opóźnij wysyłanie, aby dać czas na wyświetlenie komunikatu
         QTimer::singleShot(100, this, [this, filePath]() {
@@ -155,7 +133,7 @@ public:
             if(manager->sendFileMessage(filePath)) {
                 qDebug() << "File sent successfully";
             } else {
-                messageArea->append("<span style=\"color:#ff5555;\">Failed to send file.</span>");
+                messageArea->appendMessage("<span style=\"color:#ff5555;\">Failed to send file.</span>");
             }
         });
     }
@@ -176,7 +154,7 @@ public:
         QString welcomeMsg = QString("<span style=\"color:#888888;\">Connected to wavelength %1 Hz at %2</span>")
             .arg(frequency)
             .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
-        messageArea->append(welcomeMsg);
+        messageArea->appendMessage(welcomeMsg);
 
         setVisible(true);
 
@@ -185,16 +163,21 @@ public:
     }
 
     void onMessageReceived(double frequency, const QString& message) {
+        qDebug() << "onMessageReceived called - frequency:" << frequency
+                 << "Current frequency:" << currentFrequency;
+
         if (frequency != currentFrequency) {
+            qDebug() << "Ignoring message for different frequency";
             return;
         }
 
         qDebug() << "Received message for display, HTML length:" << message.length();
+        qDebug() << "Message preview:" << message.left(100);
 
         // W przypadku bardzo dużych wiadomości (z załącznikami), zapobiegaj zawieszeniom UI
         QTimer::singleShot(0, this, [this, message]() {
-            messageArea->append(message);
-            messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+            messageArea->appendMessage(message);
+            qDebug() << "Message added to display";
         });
     }
 
@@ -203,10 +186,7 @@ public:
             return;
         }
 
-
-        messageArea->append(message);
-
-        messageArea->verticalScrollBar()->setValue(messageArea->verticalScrollBar()->maximum());
+        messageArea->appendMessage(message);
     }
 
     void onWavelengthClosed(double frequency) {
@@ -215,7 +195,7 @@ public:
         }
 
         QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by the host.</span>");
-        messageArea->append(closeMsg);
+        messageArea->appendMessage(closeMsg);
 
         QTimer::singleShot(2000, this, [this]() {
             clear();
@@ -288,7 +268,7 @@ signals:
 
 private:
     QLabel *headerLabel;
-    QTextEdit *messageArea;
+    WavelengthTextDisplay *messageArea;  // Zmieniony typ
     QLineEdit *inputField;
     QPushButton *attachButton;
     QList<QFile> attachedFiles;
