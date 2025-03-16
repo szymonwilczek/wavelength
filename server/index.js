@@ -37,6 +37,14 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+function normalizeFrequency(frequency) {
+  // Konwersja do liczby jeśli to string
+  const numFreq =
+    typeof frequency === "string" ? parseFloat(frequency) : frequency;
+  // Zaokrąglenie do 1 miejsca po przecinku i konwersja z powrotem do liczby
+  return parseFloat(numFreq.toFixed(1));
+}
+
 app.get("/api/wavelengths", async (req, res) => {
   try {
     const wavelengths = await db
@@ -76,7 +84,7 @@ wss.on("connection", function connection(ws, req) {
       const data = JSON.parse(message.toString());
 
       if (data.type === "register_wavelength") {
-        const frequency = data.frequency;
+        const frequency = normalizeFrequency(data.frequency);
         const name = data.name || `Wavelength-${frequency}`;
         const isPasswordProtected = data.isPasswordProtected || false;
 
@@ -158,7 +166,7 @@ wss.on("connection", function connection(ws, req) {
           );
         }
       } else if (data.type === "join_wavelength") {
-        const frequency = data.frequency;
+        const frequency = normalizeFrequency(data.frequency);
         const password = data.password || "";
 
         const wavelength = activeWavelengths.get(frequency);
@@ -242,7 +250,7 @@ wss.on("connection", function connection(ws, req) {
 
         console.log(`Client ${ws.sessionId} joined wavelength ${frequency}`);
       } else if (data.type === "send_message") {
-        const frequency = ws.frequency;
+        const frequency = normalizeFrequency(ws.frequency);
         const message = data.content || data.message;
         // Użyj dostarczonego messageId lub wygeneruj nowy
         const messageId =
@@ -322,7 +330,7 @@ wss.on("connection", function connection(ws, req) {
           wavelength.host.send(broadcastStr);
         }
       } else if (data.type === "send_file") {
-        const frequency = data.frequency;
+        const frequency = normalizeFrequency(ws.frequency);
         const messageId =
           data.messageId ||
           `file_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
@@ -456,7 +464,7 @@ wss.on("connection", function connection(ws, req) {
           }
         }
       } else if (data.type === "leave_wavelength") {
-        const frequency = ws.frequency;
+        const frequency = normalizeFrequency(ws.frequency);
 
         if (!frequency) return;
 
@@ -491,7 +499,7 @@ wss.on("connection", function connection(ws, req) {
         ws.frequency = null;
         ws.isHost = false;
       } else if (data.type === "close_wavelength") {
-        const frequency = data.frequency;
+        const frequency = normalizeFrequency(ws.frequency);
 
         if (!frequency) {
           ws.send(
