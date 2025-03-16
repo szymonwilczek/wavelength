@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QToolButton>
+#include <memory>
+#include <QApplication>
 
 #include "../decoder/video_decoder.h"
 
@@ -74,17 +76,17 @@ public:
         layout->addLayout(controlLayout);
 
         // Dekoder wideo
-        m_decoder = new VideoDecoder(videoData, this);
+        m_decoder = std::make_shared<VideoDecoder>(videoData, this);
 
         // Połącz sygnały
         connect(m_playButton, &QPushButton::clicked, this, &InlineVideoPlayer::togglePlayback);
         connect(m_progressSlider, &QSlider::sliderMoved, this, &InlineVideoPlayer::updateTimeLabel);
         connect(m_progressSlider, &QSlider::sliderPressed, this, &InlineVideoPlayer::onSliderPressed);
         connect(m_progressSlider, &QSlider::sliderReleased, this, &InlineVideoPlayer::onSliderReleased);
-        connect(m_decoder, &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame);
-        connect(m_decoder, &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
-        connect(m_decoder, &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
-        connect(m_decoder, &VideoDecoder::playbackFinished, this, [this]() {
+        connect(m_decoder.get(), &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame, Qt::QueuedConnection);
+        connect(m_decoder.get(), &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
+        connect(m_decoder.get(), &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
+        connect(m_decoder.get(), &VideoDecoder::playbackFinished, this, [this]() {
     m_playbackFinished = true;
     m_playButton->setText("↻"); // Symbol powtórzenia zamiast pauzy
 });;
@@ -94,7 +96,7 @@ public:
         connect(m_volumeButton, &QToolButton::clicked, this, &InlineVideoPlayer::toggleMute);
 
         // Nowe połączenie dla aktualizacji pozycji
-        connect(m_decoder, &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
+        connect(m_decoder.get(), &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
 
         // Inicjalizuj odtwarzacz w osobnym wątku
         QTimer::singleShot(100, this, [this]() {
@@ -106,6 +108,8 @@ public:
         m_updateTimer->setInterval(100); // Częstsze aktualizacje
         connect(m_updateTimer, &QTimer::timeout, this, &InlineVideoPlayer::updateProgressUI);
         m_updateTimer->start();
+
+        connect(qApp, &QApplication::aboutToQuit, this, &InlineVideoPlayer::releaseResources);
     }
 
     void updateProgressUI() {
@@ -114,13 +118,57 @@ public:
     }
 
     ~InlineVideoPlayer() {
+        releaseResources();
+    }
+
+    void releaseResources() {
         if (m_decoder) {
-            m_decoder->stop();
-            m_decoder->wait();
-            delete m_decoder;
+            m_decoder->releaseResources();
+            // Nie usuwamy dekodera, tylko zwalniamy zasoby
         }
     }
 
+    void activate() {
+        // Jeśli już jest aktywny, nic nie rób
+        if (m_isActive) return;
+
+        // Dezaktywuj aktualnie aktywny odtwarzacz
+        if (s_activePlayer && s_activePlayer != this) {
+            s_activePlayer->deactivate();
+        }
+
+        // Aktywuj ten odtwarzacz
+        m_isActive = true;
+        s_activePlayer = this;
+
+        // Reinicjalizuj dekoder, jeśli potrzeba
+        if (!m_decoder->isRunning()) {
+            m_decoder->reinitialize();
+        }
+    }
+
+    void deactivate() {
+        if (!m_isActive) return;
+
+        // Zatrzymaj odtwarzanie
+        if (m_decoder && !m_decoder->isPaused()) {
+            m_playButton->setText("▶");
+            m_decoder->pause();
+        }
+
+        // Wyświetl miniaturkę zamiast bieżącej klatki
+        if (!m_thumbnailFrame.isNull()) {
+            m_videoLabel->setPixmap(QPixmap::fromImage(m_thumbnailFrame));
+        }
+
+        // Zwolnij zasoby dekodera
+        releaseResources();
+
+        m_isActive = false;
+        if (s_activePlayer == this) {
+            s_activePlayer = nullptr;
+        }
+    }
 
 
     void adjustVolume(int volume) {
@@ -237,36 +285,35 @@ private slots:
     }
 
     void togglePlayback() {
-        if (!m_decoder)
-            return;
+        if (!m_decoder) return;
+
+        // Aktywuj ten odtwarzacz przy próbie odtworzenia
+        activate();
 
         if (m_playbackFinished) {
-            // Resetuj dekoder i rozpocznij odtwarzanie od początku
             m_decoder->reset();
             m_playbackFinished = false;
-            m_decoder->pause(); // Unpause (metoda pause przełącza stan)
-            m_playButton->setText("⏸");
+            m_decoder->pause(); // Aby następne wywołanie zaczęło odtwarzanie
+            m_playButton->setText("▶");
+        }
+
+        if (m_decoder->isPaused()) {
+            m_decoder->pause(); // Odpauzowanie
+            m_playButton->setText("❚❚");
         } else {
-            // Normalne przełączanie pauzy
-            m_decoder->pause();
-            if (m_decoder->isPaused()) {
-                m_playButton->setText("▶");
-            } else {
-                m_playButton->setText("⏸");
-            }
+            m_decoder->pause(); // Pauzowanie
+            m_playButton->setText("▶");
         }
     }
 
     void updateFrame(const QImage& frame) {
-        if (!frame.isNull()) {
-            // Skaluj obraz do rozmiaru etykiety z zachowaniem proporcji
-            QSize labelSize = m_videoLabel->size();
-            QPixmap pixmap = QPixmap::fromImage(frame).scaled(
-                labelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation
-            );
-
-            m_videoLabel->setPixmap(pixmap);
+        // Jeśli to pierwsza klatka, zapisz ją jako miniaturkę
+        if (m_thumbnailFrame.isNull()) {
+            m_thumbnailFrame = frame.copy(); // Tutaj kopiujemy tylko raz dla miniatury
         }
+
+        // Wyświetl klatkę bez kopiowania
+        m_videoLabel->setPixmap(QPixmap::fromImage(frame));
     }
 
     void updatePosition() {
@@ -308,6 +355,8 @@ private slots:
         m_decoder->seek(0);
     }
 
+
+
 private:
     QLabel* m_videoLabel;
     QPushButton* m_playButton;
@@ -315,7 +364,7 @@ private:
     QLabel* m_timeLabel;
     QToolButton* m_volumeButton;
     QSlider* m_volumeSlider;
-    VideoDecoder* m_decoder;
+    std::shared_ptr<VideoDecoder> m_decoder;
     QTimer* m_updateTimer;
 
     QByteArray m_videoData;
@@ -329,6 +378,10 @@ private:
     int m_lastVolume = 100; // Domyślny poziom głośności
     bool m_playbackFinished = false;
     bool m_wasPlaying = false;
+    bool m_isActive = false;                 // Czy ten odtwarzacz jest aktywny
+    QImage m_thumbnailFrame;                 // Przechowuje miniaturkę dla zatrzymanego odtwarzacza
+    InlineVideoPlayer* InlineVideoPlayer::s_activePlayer = nullptr;
+
 };
 
 

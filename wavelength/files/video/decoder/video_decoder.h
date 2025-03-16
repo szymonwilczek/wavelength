@@ -105,6 +105,33 @@ public:
         }
     }
 
+    void releaseResources() {
+        QMutexLocker locker(&m_mutex);
+        // Zatrzymanie wątku, jeśli działa
+        if (isRunning()) {
+            m_stopped = true;
+            m_waitCondition.wakeAll();
+            locker.unlock();
+            wait(); // Czekanie na zakończenie wątku
+            locker.relock();
+        }
+
+        // Zwolnienie zasobów FFmpeg
+        cleanupFFmpegResources();
+    }
+
+    // Metoda do ponownego inicjowania zasobów
+    bool reinitialize() {
+        QMutexLocker locker(&m_mutex);
+        cleanupFFmpegResources();
+        m_stopped = false;
+        m_paused = true;
+        m_reachedEndOfStream = false;
+        m_seeking = false;
+        m_currentPosition = 0;
+        return true;
+    }
+
     void setVolume(float volume) {
         if (m_audioOutput) {
             m_audioOutput->setVolume(volume);
@@ -498,12 +525,12 @@ protected:
 
                     // Konwertuj ramkę do RGB
                     sws_scale(
-                        m_swsContext,
-                        (const uint8_t* const*)m_frame->data, m_frame->linesize, 0, m_codecContext->height,
-                        m_frameRGB->data, m_frameRGB->linesize
-                    );
+            m_swsContext,
+            (const uint8_t* const*)m_frame->data, m_frame->linesize, 0, m_codecContext->height,
+            m_frameRGB->data, m_frameRGB->linesize
+        );
 
-                    // Konwertuj do QImage i emituj
+                    // Twórz QImage, która korzysta z danych m_frameRGB bez kopiowania
                     QImage frame(
                         m_frameRGB->data[0],
                         m_codecContext->width,
@@ -512,7 +539,9 @@ protected:
                         QImage::Format_RGB888
                     );
 
-                    emit frameReady(frame.copy());
+                    // Wysyłamy referencję do obrazu zamiast kopii
+                    // QImage jest copy-on-write, więc faktyczne kopiowanie nastąpi tylko przy modyfikacji
+                    emit frameReady(frame);
                 }
             } else if (m_hasAudio && packet.stream_index == m_audioStream) {
                 // Obsługa audio - jak wcześniej
@@ -562,6 +591,63 @@ protected:
     }
 
 private:
+
+    void cleanupFFmpegResources() {
+        if (m_audioOutput) {
+            m_audioOutput->stop();
+            m_audioDevice = nullptr;
+        }
+
+        if (m_frameRGB)
+            av_frame_free(&m_frameRGB);
+
+        if (m_frame)
+            av_frame_free(&m_frame);
+
+        if (m_codecContext) {
+            avcodec_close(m_codecContext);
+            avcodec_free_context(&m_codecContext);
+            m_codecContext = nullptr;
+        }
+
+        if (m_audioCodecContext) {
+            avcodec_close(m_audioCodecContext);
+            avcodec_free_context(&m_audioCodecContext);
+            m_audioCodecContext = nullptr;
+        }
+
+        if (m_swrContext) {
+            swr_free(&m_swrContext);
+            m_swrContext = nullptr;
+        }
+
+        if (m_swsContext) {
+            sws_freeContext(m_swsContext);
+            m_swsContext = nullptr;
+        }
+
+        if (m_formatContext) {
+            avformat_close_input(&m_formatContext);
+            m_formatContext = nullptr;
+        }
+
+        if (m_ioContext) {
+            if (m_ioContext->buffer)
+                av_free(m_ioContext->buffer);
+            avio_context_free(&m_ioContext);
+            m_ioContext = nullptr;
+        }
+
+        if (m_buffer) {
+            av_free(m_buffer);
+            m_buffer = nullptr;
+        }
+
+        m_videoStream = -1;
+        m_audioStream = -1;
+        m_hasAudio = false;
+    }
+
     // Funkcje callback dla custom I/O
     static int readPacket(void* opaque, uint8_t* buf, int buf_size) {
         VideoDecoder* decoder = static_cast<VideoDecoder*>(opaque);
