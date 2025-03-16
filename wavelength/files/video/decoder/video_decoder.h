@@ -358,6 +358,30 @@ public:
             m_waitCondition.wakeOne();
     }
 
+    void reset() {
+        QMutexLocker locker(&m_mutex);
+
+        // Resetuj pozycję strumienia na początek
+        if (m_formatContext && m_videoStream >= 0) {
+            av_seek_frame(m_formatContext, m_videoStream, 0, AVSEEK_FLAG_BACKWARD);
+            avcodec_flush_buffers(m_codecContext);
+            m_currentPosition = 0;
+            emit positionChanged(0);
+
+            // Resetuj stan audio jeśli istnieje
+            if (m_hasAudio && m_audioCodecContext) {
+                avcodec_flush_buffers(m_audioCodecContext);
+                m_audioBuffer.clear();
+                m_audioOutputBuffer.seek(0);
+            }
+        }
+
+        // Resetuj flagi stanu
+        m_seeking = false;
+        m_seekPosition = 0;
+        m_reachedEndOfStream = false;
+    }
+
 signals:
     void frameReady(const QImage& frame);
     void error(const QString& message);
@@ -399,7 +423,13 @@ protected:
             if (av_read_frame(m_formatContext, &packet) < 0) {
                 // Koniec strumienia
                 emit playbackFinished();
-                break;
+
+                // Zamiast opuszczać pętlę, zapauzuj odtwarzanie i poczekaj na reset
+                m_mutex.lock();
+                m_paused = true;
+                m_reachedEndOfStream = true;
+                m_mutex.unlock();
+                continue; // Kontynuuj pętlę zamiast break
             }
 
             if (packet.stream_index == m_videoStream) {
@@ -553,6 +583,7 @@ private:
     bool m_seeking = false;
     int64_t m_seekPosition = 0;
     double m_currentPosition = 0;
+    bool m_reachedEndOfStream = false;
 };
 
 

@@ -85,9 +85,9 @@ public:
         connect(m_decoder, &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
         connect(m_decoder, &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
         connect(m_decoder, &VideoDecoder::playbackFinished, this, [this]() {
-            m_decoder->pause(); // Zatrzymaj odtwarzanie
-            m_playButton->setText("▶");
-        });
+    m_playbackFinished = true;
+    m_playButton->setText("↻"); // Symbol powtórzenia zamiast pauzy
+});;
 
         // Dodajemy obsługę kontroli dźwięku
         connect(m_volumeSlider, &QSlider::valueChanged, this, &InlineVideoPlayer::adjustVolume);
@@ -207,12 +207,20 @@ private slots:
         if (!m_decoder)
             return;
 
-        m_decoder->pause();
-
-        if (m_decoder->isPaused()) {
-            m_playButton->setText("▶");
-        } else {
+        if (m_playbackFinished) {
+            // Resetuj dekoder i rozpocznij odtwarzanie od początku
+            m_decoder->reset();
+            m_playbackFinished = false;
+            m_decoder->pause(); // Unpause (metoda pause przełącza stan)
             m_playButton->setText("⏸");
+        } else {
+            // Normalne przełączanie pauzy
+            m_decoder->pause();
+            if (m_decoder->isPaused()) {
+                m_playButton->setText("▶");
+            } else {
+                m_playButton->setText("⏸");
+            }
         }
     }
 
@@ -286,6 +294,7 @@ private:
     double m_currentFramePosition = 0;
     bool m_sliderDragging = false;
     int m_lastVolume = 100; // Domyślny poziom głośności
+    bool m_playbackFinished = false;
 };
 
 
