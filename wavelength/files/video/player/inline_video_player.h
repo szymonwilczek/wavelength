@@ -9,6 +9,7 @@
 #include <QToolButton>
 #include <memory>
 #include <QApplication>
+#include <QPainter>
 
 #include "../decoder/video_decoder.h"
 
@@ -23,6 +24,7 @@ public:
 
         setFrameStyle(QFrame::StyledPanel);
         setStyleSheet("background-color: #1a1a1a; border: 1px solid #444;");
+        setFixedSize(720, 450);
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -30,9 +32,9 @@ public:
         // Obszar wyświetlania wideo - zmniejszamy rozmiar początkowy
         m_videoLabel = new QLabel(this);
         m_videoLabel->setAlignment(Qt::AlignCenter);
-        m_videoLabel->setMinimumSize(320, 180); // Mniejszy rozmiar wyjściowy
+        m_videoLabel->setFixedSize(720, 405); // Mniejszy rozmiar wyjściowy
         // m_videoLabel->setMaximumHeight(240); // Ograniczamy maksymalną wysokość
-        m_videoLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        // m_videoLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         m_videoLabel->setStyleSheet("background-color: #000000; color: #ffffff;");
         m_videoLabel->setText("Ładowanie wideo...");
         layout->addWidget(m_videoLabel);
@@ -156,9 +158,34 @@ public:
             m_decoder->pause();
         }
 
-        // Wyświetl miniaturkę zamiast bieżącej klatki
+        // Wyświetl miniaturkę z czarnymi paskami
         if (!m_thumbnailFrame.isNull()) {
-            m_videoLabel->setPixmap(QPixmap::fromImage(m_thumbnailFrame));
+            // Stały rozmiar obszaru wyświetlania
+            const int displayWidth = 720;
+            const int displayHeight = 405;
+
+            // Tworzymy nowy obraz o stałym rozmiarze z czarnym tłem
+            QImage containerImage(displayWidth, displayHeight, QImage::Format_RGB32);
+            containerImage.fill(Qt::black);
+
+            // Obliczamy rozmiar skalowanej miniatury z zachowaniem proporcji
+            QSize targetSize = m_thumbnailFrame.size();
+            targetSize.scale(displayWidth, displayHeight, Qt::KeepAspectRatio);
+
+            // Skalujemy miniaturkę
+            QImage scaledThumbnail = m_thumbnailFrame.scaled(targetSize.width(), targetSize.height(),
+                                                  Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            // Obliczamy pozycję do umieszczenia przeskalowanej miniatury (wyśrodkowana)
+            int xOffset = (displayWidth - scaledThumbnail.width()) / 2;
+            int yOffset = (displayHeight - scaledThumbnail.height()) / 2;
+
+            // Rysujemy przeskalowaną miniaturkę na czarnym tle
+            QPainter painter(&containerImage);
+            painter.drawImage(QPoint(xOffset, yOffset), scaledThumbnail);
+
+            // Wyświetlamy pełny obraz (z czarnymi paskami)
+            m_videoLabel->setPixmap(QPixmap::fromImage(containerImage));
         }
 
         // Zwolnij zasoby dekodera
@@ -309,11 +336,35 @@ private slots:
     void updateFrame(const QImage& frame) {
         // Jeśli to pierwsza klatka, zapisz ją jako miniaturkę
         if (m_thumbnailFrame.isNull()) {
-            m_thumbnailFrame = frame.copy(); // Tutaj kopiujemy tylko raz dla miniatury
+            m_thumbnailFrame = frame.copy();
         }
 
-        // Wyświetl klatkę bez kopiowania
-        m_videoLabel->setPixmap(QPixmap::fromImage(frame));
+        // Stały rozmiar obszaru wyświetlania
+        const int displayWidth = 720;
+        const int displayHeight = 405;
+
+        // Tworzymy nowy obraz o stałym rozmiarze z czarnym tłem
+        QImage containerImage(displayWidth, displayHeight, QImage::Format_RGB32);
+        containerImage.fill(Qt::black);
+
+        // Obliczamy rozmiar skalowanej ramki z zachowaniem proporcji
+        QSize targetSize = frame.size();
+        targetSize.scale(displayWidth, displayHeight, Qt::KeepAspectRatio);
+
+        // Skalujemy oryginalną klatkę
+        QImage scaledFrame = frame.scaled(targetSize.width(), targetSize.height(),
+                                         Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        // Obliczamy pozycję do umieszczenia przeskalowanej klatki (wyśrodkowana)
+        int xOffset = (displayWidth - scaledFrame.width()) / 2;
+        int yOffset = (displayHeight - scaledFrame.height()) / 2;
+
+        // Rysujemy przeskalowaną klatkę na czarnym tle
+        QPainter painter(&containerImage);
+        painter.drawImage(QPoint(xOffset, yOffset), scaledFrame);
+
+        // Wyświetlamy pełny obraz (z czarnymi paskami)
+        m_videoLabel->setPixmap(QPixmap::fromImage(containerImage));
     }
 
     void updatePosition() {
@@ -348,6 +399,15 @@ private slots:
         m_videoWidth = width;
         m_videoHeight = height;
         m_videoDuration = duration;
+
+        // Ustaw rozmiar QLabel odpowiednio do proporcji wideo, ale nie przekraczając maksymalnych wymiarów
+        QSize videoSize(width, height);
+        if (videoSize.width() > 480 || videoSize.height() > 270) {
+            videoSize.scale(480, 270, Qt::KeepAspectRatio);
+        }
+
+        // Ustaw preferowany rozmiar dla wyświetlacza wideo, ale nadal z ograniczeniem maksymalnym
+        m_videoLabel->setMinimumSize(videoSize);
 
         m_progressSlider->setRange(0, duration * 1000);
 
