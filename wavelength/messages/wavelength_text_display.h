@@ -251,6 +251,7 @@ signals:
     void error(const QString& message);
     void videoInfo(int width, int height, double duration);
     void playbackFinished();
+    void positionChanged(double position);
 
 protected:
     void run() override {
@@ -274,6 +275,10 @@ protected:
                 av_seek_frame(m_formatContext, m_videoStream, m_seekPosition, AVSEEK_FLAG_BACKWARD);
                 avcodec_flush_buffers(m_codecContext);
                 m_seeking = false;
+
+                // Po przeszukiwaniu wyczyść stan i zaktualizuj pozycję
+                m_currentPosition = m_seekPosition * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
+                emit positionChanged(m_currentPosition);
             }
 
             m_mutex.unlock();
@@ -290,6 +295,12 @@ protected:
                 frameFinished = (avcodec_receive_frame(m_codecContext, m_frame) == 0);
 
                 if (frameFinished) {
+                    // Aktualizuj rzeczywistą pozycję odtwarzania na podstawie timestampa ramki
+                    if (m_frame->pts != AV_NOPTS_VALUE) {
+                        m_currentPosition = m_frame->pts * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
+                        emit positionChanged(m_currentPosition);
+                    }
+
                     // Konwertuj ramkę do RGB
                     sws_scale(
                         m_swsContext,
@@ -309,8 +320,8 @@ protected:
                     // Wyemituj ramkę
                     emit frameReady(frame.copy());
 
-                    // Prosty throttling dla ograniczenia FPS
-                    QThread::msleep(40); // ~25fps
+                    // Zmniejsz sleep, aby uzyskać ~60fps
+                    QThread::msleep(16);  // ~60fps
                 }
             }
 
@@ -375,6 +386,7 @@ private:
     bool m_paused = true;
     bool m_seeking = false;
     int64_t m_seekPosition = 0;
+    double m_currentPosition = 0;
 };
 
 // Klasa odtwarzacza wideo zintegrowanego z czatem
@@ -391,10 +403,12 @@ public:
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
 
-        // Obszar wyświetlania wideo
+        // Obszar wyświetlania wideo - zmniejszamy rozmiar początkowy
         m_videoLabel = new QLabel(this);
         m_videoLabel->setAlignment(Qt::AlignCenter);
-        m_videoLabel->setMinimumSize(320, 240);
+        m_videoLabel->setMinimumSize(320, 180); // Mniejszy rozmiar wyjściowy
+        // m_videoLabel->setMaximumHeight(240); // Ograniczamy maksymalną wysokość
+        m_videoLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         m_videoLabel->setStyleSheet("background-color: #000000; color: #ffffff;");
         m_videoLabel->setText("Ładowanie wideo...");
         layout->addWidget(m_videoLabel);
@@ -426,13 +440,7 @@ public:
 
         // Połącz sygnały
         connect(m_playButton, &QPushButton::clicked, this, &InlineVideoPlayer::togglePlayback);
-        connect(m_progressSlider, &QSlider::sliderPressed, this, [this]() {
-            m_sliderDragging = true;
-        });
-        connect(m_progressSlider, &QSlider::sliderReleased, this, [this]() {
-            m_sliderDragging = false;
-            m_decoder->seek(m_progressSlider->value() / 1000.0);
-        });
+        connect(m_progressSlider, &QSlider::sliderMoved, this, &InlineVideoPlayer::seekVideo);
         connect(m_decoder, &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame);
         connect(m_decoder, &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
         connect(m_decoder, &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
@@ -440,17 +448,24 @@ public:
             m_decoder->pause(); // Zatrzymaj odtwarzanie
             m_playButton->setText("▶");
         });
+        // Nowe połączenie dla aktualizacji pozycji
+        connect(m_decoder, &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
 
         // Inicjalizuj odtwarzacz w osobnym wątku
         QTimer::singleShot(100, this, [this]() {
-            m_decoder->start(QThread::LowPriority);
+            m_decoder->start(QThread::HighPriority); // Wyższy priorytet dla lepszej płynności
         });
 
-        // Timer do aktualizacji pozycji suwaka
+        // Timer do aktualizacji pozycji suwaka - zwiększona częstotliwość
         m_updateTimer = new QTimer(this);
-        m_updateTimer->setInterval(500);
-        connect(m_updateTimer, &QTimer::timeout, this, &InlineVideoPlayer::updatePosition);
+        m_updateTimer->setInterval(100); // Częstsze aktualizacje
+        connect(m_updateTimer, &QTimer::timeout, this, &InlineVideoPlayer::updateProgressUI);
         m_updateTimer->start();
+    }
+
+    void updateProgressUI() {
+        // Timer do częstszej aktualizacji interfejsu, ale nie modyfikuje pozycji,
+        // która jest aktualizowana bezpośrednio przez sygnał positionChanged
     }
 
     ~InlineVideoPlayer() {
@@ -462,6 +477,54 @@ public:
     }
 
 private slots:
+
+    void updateSliderPosition(double position) {
+        // Bezpośrednia aktualizacja pozycji suwaka z dekodera
+        if (m_videoDuration <= 0)
+            return;
+
+        // Aktualizacja suwaka
+        m_progressSlider->setValue(position * 1000);
+
+        // Aktualizacja etykiety czasu
+        int seconds = int(position) % 60;
+        int minutes = int(position) / 60;
+
+        int totalSeconds = int(m_videoDuration) % 60;
+        int totalMinutes = int(m_videoDuration) / 60;
+
+        m_timeLabel->setText(
+            QString("%1:%2 / %3:%4")
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'))
+            .arg(totalMinutes, 2, 10, QChar('0'))
+            .arg(totalSeconds, 2, 10, QChar('0'))
+        );
+    }
+
+    void seekVideo(int position) {
+        if (!m_decoder || m_videoDuration <= 0)
+            return;
+
+        double seekPosition = position / 1000.0;
+        m_decoder->seek(seekPosition);
+
+        // Natychmiast aktualizuj widoczny timestamp
+        int seconds = int(seekPosition) % 60;
+        int minutes = int(seekPosition) / 60;
+
+        int totalSeconds = int(m_videoDuration) % 60;
+        int totalMinutes = int(m_videoDuration) / 60;
+
+        m_timeLabel->setText(
+            QString("%1:%2 / %3:%4")
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'))
+            .arg(totalMinutes, 2, 10, QChar('0'))
+            .arg(totalSeconds, 2, 10, QChar('0'))
+        );
+    }
+
     void togglePlayback() {
         if (!m_decoder)
             return;
@@ -484,7 +547,6 @@ private slots:
             );
 
             m_videoLabel->setPixmap(pixmap);
-            m_currentFramePosition += 1.0 / 25.0; // Przybliżone 25 fps
         }
     }
 
