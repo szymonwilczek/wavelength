@@ -7,7 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-base_x64-windows")
+find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/qt5-base_x64-windows")
 
 add_executable(${PROJECT_NAME} main.cpp
         resources.qrc
@@ -79,20 +79,52 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/blob_event_handler.h
         font_manager.cpp
         font_manager.h
+        wavelength/messages/wavelength_text_display.cpp
+        wavelength/messages/wavelength_text_display.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
-find_package(Qt5 COMPONENTS WebSockets REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-websockets_x64-windows")
+find_package(Qt5 COMPONENTS WebSockets REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/qt5-websockets_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/qt5-multimedia_x64-windows")
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/qt5-multimedia_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
 
-find_package(mongocxx REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
-find_package(bsoncxx REQUIRED HINTS "C:/Users/szymo/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
+find_package(mongocxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
+find_package(bsoncxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
 
 find_package(bsoncxx CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 
 find_package(mongocxx CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+
+list(APPEND CMAKE_PREFIX_PATH "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows")
+
+# Bezpośrednie linkowanie bibliotek FFmpeg
+find_library(AVCODEC_LIBRARY avcodec HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
+find_library(AVFORMAT_LIBRARY avformat HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
+find_library(AVUTIL_LIBRARY avutil HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
+find_library(SWSCALE_LIBRARY swscale HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/lib")
+
+# Dodaj ścieżkę do plików nagłówkowych
+find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h HINTS "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows/include")
+
+# Wyświetl znalezione ścieżki
+message(STATUS "FFmpeg libraries:")
+message(STATUS "  avcodec: ${AVCODEC_LIBRARY}")
+message(STATUS "  avformat: ${AVFORMAT_LIBRARY}")
+message(STATUS "  avutil: ${AVUTIL_LIBRARY}")
+message(STATUS "  swscale: ${SWSCALE_LIBRARY}")
+message(STATUS "  include: ${FFMPEG_INCLUDE_DIR}")
+
+# Podlinkuj biblioteki
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${AVCODEC_LIBRARY}
+        ${AVFORMAT_LIBRARY}
+        ${AVUTIL_LIBRARY}
+        ${SWSCALE_LIBRARY}
+)
+
+# Dodaj ścieżki do plików nagłówkowych
+target_include_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_INCLUDE_DIR})
