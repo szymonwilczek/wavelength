@@ -18,6 +18,7 @@
 #include <QBuffer>
 #include <QIODevice>
 #include <QDebug>
+#include <QElapsedTimer>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -160,6 +161,20 @@ public:
         if (m_videoStream == -1) {
             emit error("Nie znaleziono strumienia wideo");
             return false;
+        }
+
+        if (m_videoStream >= 0) {
+            AVStream* stream = m_formatContext->streams[m_videoStream];
+            // Pobieramy rzeczywistą częstotliwość klatek
+            if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
+                m_frameRate = av_q2d(stream->avg_frame_rate);
+            } else if (stream->r_frame_rate.den && stream->r_frame_rate.num) {
+                m_frameRate = av_q2d(stream->r_frame_rate);
+            } else {
+                m_frameRate = 30; // Domyślna wartość, jeśli nie można wykryć
+            }
+
+            qDebug() << "Wykryta częstotliwość klatek wideo:" << m_frameRate << "FPS";
         }
 
         // Znajdź dekoder
@@ -398,12 +413,20 @@ protected:
         AVPacket packet;
         bool frameFinished;
         AVFrame* audioFrame = av_frame_alloc();
+        double frameDuration = m_frameRate > 0 ? 1000.0 / m_frameRate : 33.3; // w ms
+
+        m_frameTimer.start();
+        m_firstFrame = true;
 
         while (!m_stopped) {
             m_mutex.lock();
 
             if (m_paused) {
                 m_waitCondition.wait(&m_mutex);
+                if (!m_paused) {
+                    m_frameTimer.restart();
+                    m_firstFrame = true;
+                }
                 m_mutex.unlock();
                 continue;
             }
@@ -411,9 +434,15 @@ protected:
             if (m_seeking) {
                 av_seek_frame(m_formatContext, m_videoStream, m_seekPosition, AVSEEK_FLAG_BACKWARD);
                 avcodec_flush_buffers(m_codecContext);
+                if (m_hasAudio && m_audioCodecContext) {
+                    avcodec_flush_buffers(m_audioCodecContext);
+                }
                 m_seeking = false;
+                m_firstFrame = true;
+                m_frameTimer.restart();
+                m_lastFramePts = 0;
 
-                // Po przeszukiwaniu wyczyść stan i zaktualizuj pozycję
+                // Aktualizacja pozycji po przeszukiwaniu
                 m_currentPosition = m_seekPosition * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
                 emit positionChanged(m_currentPosition);
             }
@@ -421,15 +450,13 @@ protected:
             m_mutex.unlock();
 
             if (av_read_frame(m_formatContext, &packet) < 0) {
-                // Koniec strumienia
+                // Obsługa końca strumienia - jak wcześniej
                 emit playbackFinished();
-
-                // Zamiast opuszczać pętlę, zapauzuj odtwarzanie i poczekaj na reset
                 m_mutex.lock();
                 m_paused = true;
                 m_reachedEndOfStream = true;
                 m_mutex.unlock();
-                continue; // Kontynuuj pętlę zamiast break
+                continue;
             }
 
             if (packet.stream_index == m_videoStream) {
@@ -438,10 +465,35 @@ protected:
                 frameFinished = (avcodec_receive_frame(m_codecContext, m_frame) == 0);
 
                 if (frameFinished) {
-                    // Aktualizuj rzeczywistą pozycję odtwarzania na podstawie timestampa ramki
+                    // Aktualizacja pozycji odtwarzania
                     if (m_frame->pts != AV_NOPTS_VALUE) {
                         m_currentPosition = m_frame->pts * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
                         emit positionChanged(m_currentPosition);
+
+                        // Synchronizacja klatek
+                        if (!m_firstFrame) {
+                            // Oblicz ile czasu powinno minąć od ostatniej klatki
+                            int64_t currentPts = m_frame->pts;
+                            double ptsDiff = (currentPts - m_lastFramePts) *
+                                             av_q2d(m_formatContext->streams[m_videoStream]->time_base) * 1000.0;
+
+                            // Jeśli ptsDiff jest zbyt małe lub nieprawidłowe, użyj frameDuration
+                            if (ptsDiff <= 0 || ptsDiff > 1000.0) { // Zabezpieczenie przed błędnymi wartościami
+                                ptsDiff = frameDuration;
+                            }
+
+                            // Sprawdź, ile czasu minęło od ostatniej klatki
+                            int elapsedTime = m_frameTimer.elapsed();
+                            int sleepTime = qMax(0, qRound(ptsDiff - elapsedTime));
+
+                            if (sleepTime > 0) {
+                                QThread::msleep(sleepTime);
+                            }
+                        }
+
+                        m_firstFrame = false;
+                        m_lastFramePts = m_frame->pts;
+                        m_frameTimer.restart();
                     }
 
                     // Konwertuj ramkę do RGB
@@ -451,7 +503,7 @@ protected:
                         m_frameRGB->data, m_frameRGB->linesize
                     );
 
-                    // Konwertuj do QImage
+                    // Konwertuj do QImage i emituj
                     QImage frame(
                         m_frameRGB->data[0],
                         m_codecContext->width,
@@ -460,17 +512,12 @@ protected:
                         QImage::Format_RGB888
                     );
 
-                    // Wyemituj ramkę
                     emit frameReady(frame.copy());
-
-                    // Zmniejsz sleep, aby uzyskać ~60fps
-                    QThread::msleep(16);  // ~60fps
                 }
             } else if (m_hasAudio && packet.stream_index == m_audioStream) {
-                // Dekoduj ramkę audio
+                // Obsługa audio - jak wcześniej
                 avcodec_send_packet(m_audioCodecContext, &packet);
                 if (avcodec_receive_frame(m_audioCodecContext, audioFrame) == 0) {
-                    // Konwertuj audio do PCM i odtwarzaj
                     decodeAudioFrame(audioFrame);
                 }
             }
@@ -584,6 +631,11 @@ private:
     int64_t m_seekPosition = 0;
     double m_currentPosition = 0;
     bool m_reachedEndOfStream = false;
+
+    double m_frameRate = 0.0;
+    int64_t m_lastFramePts = 0;
+    QElapsedTimer m_frameTimer;
+    bool m_firstFrame = true;
 };
 
 
