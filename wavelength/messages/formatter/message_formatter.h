@@ -7,132 +7,138 @@
 class MessageFormatter {
 public:
     static QString formatMessage(const QJsonObject& msgObj, double frequency) {
-    // Pobierz treść wiadomości
-    QString content;
-    if (msgObj.contains("content")) {
-        content = msgObj["content"].toString();
-    }
+        // Pobierz treść wiadomości
+        QString content;
+        if (msgObj.contains("content")) {
+            content = msgObj["content"].toString();
+        }
 
-    // Pobierz nadawcę
-    QString senderName;
-    if (msgObj.contains("sender")) {
-        senderName = msgObj["sender"].toString();
-    } else if (msgObj.contains("senderId")) {
-        QString senderId = msgObj["senderId"].toString();
-        WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
+        // Pobierz nadawcę
+        QString senderName;
+        if (msgObj.contains("sender")) {
+            senderName = msgObj["sender"].toString();
+        } else if (msgObj.contains("senderId")) {
+            QString senderId = msgObj["senderId"].toString();
+            WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
 
-        if (senderId == info.hostId) {
-            senderName = "Host";
+            if (senderId == info.hostId) {
+                senderName = "Host";
+            } else {
+                senderName = "User " + senderId.left(5);
+            }
+        }
+
+        // Pobierz timestamp
+        QString timestamp;
+        if (msgObj.contains("timestamp")) {
+            // Konwersja do QDateTime
+            QDateTime msgTime;
+            QVariant timeVar = msgObj["timestamp"].toVariant();
+            if (timeVar.type() == QVariant::String) {
+                // Format ISO
+                QString timeStr = timeVar.toString();
+                msgTime = QDateTime::fromString(timeStr, Qt::ISODate);
+            } else {
+                // Unix timestamp
+                msgTime = QDateTime::fromMSecsSinceEpoch(timeVar.toLongLong());
+            }
+
+            // Formatuj timestamp
+            timestamp = msgTime.toString("[HH:mm:ss]");
         } else {
-            senderName = "User " + senderId.left(5);
-        }
-    }
-
-    // Pobierz timestamp
-    QString timestamp;
-    if (msgObj.contains("timestamp")) {
-        // Konwersja do QDateTime
-        QDateTime msgTime;
-        QVariant timeVar = msgObj["timestamp"].toVariant();
-        if (timeVar.type() == QVariant::String) {
-            // Format ISO
-            QString timeStr = timeVar.toString();
-            msgTime = QDateTime::fromString(timeStr, Qt::ISODate);
-        } else {
-            // Unix timestamp
-            msgTime = QDateTime::fromMSecsSinceEpoch(timeVar.toLongLong());
+            // Jeśli brak timestamp, użyj aktualnego czasu
+            timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
         }
 
-        // Formatuj timestamp
-        timestamp = msgTime.toString("[HH:mm:ss]");
-    } else {
-        // Jeśli brak timestamp, użyj aktualnego czasu
-        timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
-    }
+        // Jednolite formatowanie
+        QString formattedMsg;
+        bool isSelf = msgObj.contains("isSelf") && msgObj["isSelf"].toBool();
 
-    // Jednolite formatowanie
-    QString formattedMsg;
-    bool isSelf = msgObj.contains("isSelf") && msgObj["isSelf"].toBool();
+        // Sprawdź czy jest załącznik
+        bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
-    // Sprawdź czy jest załącznik
-    bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
-
-    QString messageStart;
-    if (isSelf) {
-        // Własne wiadomości - zielone
-        messageStart = QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> ").arg(timestamp);
-    } else {
-        // Cudze wiadomości - niebieskie
-        messageStart = QString("%1 <span style=\"color:#85c4ff;\">[%2]:</span> ").arg(timestamp, senderName);
-    }
-
-    if (hasAttachment) {
-        qDebug() << "Załącznik wykryty w wiadomości";
-        QString attachmentType = msgObj["attachmentType"].toString();
-        QString attachmentData = msgObj["attachmentData"].toString();
-        QString attachmentName = msgObj["attachmentName"].toString();
-        QString attachmentMimeType = msgObj["attachmentMimeType"].toString();
-
-        qDebug() << "Attachment details:" << attachmentType << attachmentName << attachmentMimeType;
-        qDebug() << "Attachment data length:" << attachmentData.length();
-
-        // Generujemy unikalny identyfikator dla elementu
-        QString elementId = "attachment_" + QUuid::createUuid().toString(QUuid::WithoutBraces);
-
-        if (attachmentType == "image" && !attachmentData.isEmpty()) {
-            qDebug() << "Formatowanie obrazu:" << attachmentName;
-            qDebug() << "MIME:" << attachmentMimeType;
-            qDebug() << "Długość danych base64:" << attachmentData.length() << "bajtów";
-
-            // Dokładne formatowanie HTML z poprawnymi cudzysłowami i bez zbędnych znaków
-            formattedMsg = messageStart + "<br>" +
-                          QString("<div style='margin-top:5px;'>"
-                                 "<img src='data:%1;base64,%2' alt='%3' style='max-width:300px; max-height:200px;'/><br>"
-                                 "<span style='color:#aaaaaa; font-size:9pt;'>%3</span>"
-                                 "</div>")
-                          .arg(attachmentMimeType, attachmentData, attachmentName.toHtmlEscaped());
-        }
-        else if (attachmentType == "audio" && !attachmentData.isEmpty()) {
-            // Renderowanie audio
-            formattedMsg = messageStart + "<br>" +
-                           QString("<div style='margin-top:5px;'>"
-                                  "<audio id='%1' controls style='max-width:300px;'>"
-                                  "<source src='data:%2;base64,%3' type='%2'>"
-                                  "Your browser does not support audio playback."
-                                  "</audio><br>"
-                                  "<span style='color:#aaaaaa; font-size:9pt;'>%4</span>"
-                                  "</div>")
-                           .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
-        }
-        else if (attachmentType == "video" && !attachmentData.isEmpty()) {
-            // Renderowanie wideo
-            formattedMsg = messageStart + "<br>" +
-                           QString("<div style='margin-top:5px;'>"
-                                  "<video id='%1' controls style='max-width:300px; max-height:200px;'>"
-                                  "<source src='data:%2;base64,%3' type='%2'>"
-                                  "Your browser does not support video playback."
-                                  "</video><br>"
-                                  "<span style='color:#aaaaaa; font-size:9pt;'>%4</span>"
-                                  "</div>")
-                           .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
-        }
-        else {
-            // Pozostałe typy plików
-            formattedMsg = messageStart +
-                           QString("<span style='color:#cccccc;'>Attached file: %1 [%2]</span>")
-                           .arg(attachmentName, formatFileSize(attachmentData.length() * 3 / 4)); // Przybliżony rozmiar po dekodowaniu Base64
-        }
-    } else {
-        // Standardowa wiadomość tekstowa
+        QString messageStart;
         if (isSelf) {
-            formattedMsg = QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> %2").arg(timestamp, content);
+            // Własne wiadomości - zielone
+            messageStart = QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> ").arg(timestamp);
         } else {
-            formattedMsg = QString("%1 <span style=\"color:#85c4ff;\">[%2]:</span> %3").arg(timestamp, senderName, content);
+            // Cudze wiadomości - niebieskie
+            messageStart = QString("%1 <span style=\"color:#85c4ff;\">[%2]:</span> ").arg(timestamp, senderName);
         }
-    }
 
-    return formattedMsg;
-}
+        if (hasAttachment) {
+            qDebug() << "Załącznik wykryty w wiadomości";
+            QString attachmentType = msgObj["attachmentType"].toString();
+            QString attachmentData = msgObj["attachmentData"].toString();
+            QString attachmentName = msgObj["attachmentName"].toString();
+            QString attachmentMimeType = msgObj["attachmentMimeType"].toString();
+
+            qDebug() << "Attachment details:" << attachmentType << attachmentName << attachmentMimeType;
+            qDebug() << "Attachment data length:" << attachmentData.length();
+
+            // Generujemy unikalny identyfikator dla elementu
+            QString elementId = "attachment_" + QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+            if (attachmentType == "image" && !attachmentData.isEmpty()) {
+                qDebug() << "Formatowanie obrazu:" << attachmentName;
+                qDebug() << "MIME:" << attachmentMimeType;
+                qDebug() << "Długość danych base64:" << attachmentData.length() << "bajtów";
+
+                // Dokładne formatowanie HTML z poprawnymi cudzysłowami i bez zbędnych znaków
+                formattedMsg = messageStart + "<br>" +
+                              QString("<div style='margin-top:5px;'>"
+                                     "<img src='data:%1;base64,%2' alt='%3' style='max-width:300px; max-height:200px;'/><br>"
+                                     "<span style='color:#aaaaaa; font-size:9pt;'>%3</span>"
+                                     "</div>")
+                              .arg(attachmentMimeType, attachmentData, attachmentName.toHtmlEscaped());
+            }
+            else if (attachmentType == "audio" && !attachmentData.isEmpty()) {
+                // Renderowanie audio
+                formattedMsg = messageStart + "<br>" +
+                               QString("<div style='margin-top:5px;'>"
+                                      "<audio id='%1' controls style='max-width:300px;'>"
+                                      "<source src='data:%2;base64,%3' type='%2'>"
+                                      "Your browser does not support audio playback."
+                                      "</audio><br>"
+                                      "<span style='color:#aaaaaa; font-size:9pt;'>%4</span>"
+                                      "</div>")
+                               .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+            }
+            else if (attachmentType == "video" && !attachmentData.isEmpty()) {
+                // Renderowanie wideo - specjalny format dla naszej obsługi
+                formattedMsg = messageStart + "<br>" +
+                               QString("<div class='video-placeholder' "
+                                      "data-video-id='%1' "
+                                      "data-mime-type='%2' "
+                                      "data-base64='%3' "
+                                      "data-filename='%4'>"
+                                      "</div>")
+                               .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+            }
+            else {
+                // Inne typy plików - renderuj jako link do pobrania
+                formattedMsg = messageStart + " " +
+                               QString("<a href='file:%1' style='color:#85c4ff;'>[%2]</a> (%3)")
+                               .arg(elementId, attachmentName, MessageFormatter::formatFileSize(attachmentData.length()));
+            }
+        } else {
+            // Zwykła wiadomość tekstowa
+            if (content.isEmpty()) {
+                content = "[Empty message]";
+            }
+
+            // Uwzględnij nowe linie w treści
+            content.replace("\n", "<br>");
+
+            if (isSelf) {
+                formattedMsg = messageStart + "<span style=\"color:#ffffff;\">" + content + "</span>";
+            } else {
+                formattedMsg = messageStart + "<span style=\"color:#ffffff;\">" + content + "</span>";
+            }
+        }
+
+        return formattedMsg;
+    }
 
     static QString formatFileSize(qint64 sizeInBytes) {
         if (sizeInBytes < 1024)
