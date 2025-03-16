@@ -73,8 +73,6 @@ public:
 
         layout->addLayout(controlLayout);
 
-        layout->addLayout(controlLayout);
-
         // Dekoder wideo
         m_decoder = new VideoDecoder(videoData, this);
 
