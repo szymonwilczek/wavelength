@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFile>
 #include <qfileinfo.h>
+#include <QThread>
 
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
@@ -85,36 +86,66 @@ public:
     }
 
     bool sendFileMessage(const QString& filePath) {
-        QFile file(filePath);
+    QFile file(filePath);
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
         double frequency = registry->getActiveWavelength();
+    if (filePath.isEmpty()) {
+        qDebug() << "Empty file path";
+        return false;
+    }
+
+    QFileInfo fileInfo(filePath);
+    if (!fileInfo.exists() || !fileInfo.isReadable()) {
+        qDebug() << "File does not exist or is not readable:" << filePath;
+        return false;
+    }
+
+    if (file.isOpen()) {
+        qDebug() << "File is already open, closing it first:" << filePath;
+        file.close();
+    }
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        // Spróbuj ponownie otworzyć plik z opóźnieniem
+        QThread::msleep(500);
         if (!file.open(QIODevice::ReadOnly)) {
-            qDebug() << "Failed to open file:" << filePath;
+            qDebug() << "Cannot open file for reading (even after retry):" << filePath;
             return false;
         }
+    }
 
-        QByteArray fileData = file.readAll();
-        file.close();
+    QString fileExtension = fileInfo.suffix().toLower();
+    QString fileType;
+    QString mimeType;
 
-        QFileInfo fileInfo(filePath);
-        QString fileExtension = fileInfo.suffix().toLower();
-        QString mimeType;
-        QString fileType;
+    qDebug() << "Sending file message, size:" << file.size() << "bytes";
+    qDebug() << "File extension:" << fileExtension;
 
-        // Określamy typ pliku
-        if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
-            mimeType = "image/" + fileExtension;
-            fileType = "image";
-        } else if (QStringList({"mp3", "wav"}).contains(fileExtension)) {
-            mimeType = "audio/" + fileExtension;
-            fileType = "audio";
-        } else if (QStringList({"mp4", "webm"}).contains(fileExtension)) {
-            mimeType = "video/" + fileExtension;
-            fileType = "video";
-        } else {
-            mimeType = "application/octet-stream";
-            fileType = "file";
-        }
+    // Ustalamy typ pliku i MIME
+    if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
+        fileType = "image";
+        mimeType = "image/" + fileExtension;
+        if (fileExtension == "jpg") mimeType = "image/jpeg";
+    } else if (QStringList({"mp3", "wav", "ogg"}).contains(fileExtension)) {
+        fileType = "audio";
+        mimeType = "audio/" + fileExtension;
+    } else if (QStringList({"mp4", "webm", "avi", "mov"}).contains(fileExtension)) {
+        fileType = "video";
+        mimeType = "video/" + fileExtension;
+        qDebug() << "Detected video file:" << fileInfo.fileName() << "MIME:" << mimeType;
+    } else {
+        fileType = "file";
+        mimeType = "application/octet-stream";
+    }
+
+    // Czytamy zawartość pliku
+    QByteArray fileData = file.readAll();
+
+    // WAŻNE: Zamykamy plik zaraz po odczytaniu
+    file.close();
+
+    QByteArray base64Data = fileData.toBase64();
+    qDebug() << "Base64 data length:" << base64Data.size() << "bytes";
 
         // Tworzymy obiekt wiadomości
         QJsonObject messageObj;
