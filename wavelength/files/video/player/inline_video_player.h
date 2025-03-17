@@ -78,35 +78,18 @@ public:
 
         layout->addLayout(controlLayout);
 
-        // Dekoder wideo
-        m_decoder = std::make_shared<VideoDecoder>(videoData, this);
 
         // Połącz sygnały
         connect(m_playButton, &QPushButton::clicked, this, &InlineVideoPlayer::togglePlayback);
         connect(m_progressSlider, &QSlider::sliderMoved, this, &InlineVideoPlayer::updateTimeLabel);
         connect(m_progressSlider, &QSlider::sliderPressed, this, &InlineVideoPlayer::onSliderPressed);
         connect(m_progressSlider, &QSlider::sliderReleased, this, &InlineVideoPlayer::onSliderReleased);
-        connect(m_decoder.get(), &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame, Qt::QueuedConnection);
-        connect(m_decoder.get(), &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
-        connect(m_decoder.get(), &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
-        connect(m_decoder.get(), &VideoDecoder::playbackFinished, this, [this]() {
-    m_playbackFinished = true;
-    m_playButton->setText("↻"); // Symbol powtórzenia zamiast pauzy
-});;
 
         // Dodajemy obsługę kontroli dźwięku
         connect(m_volumeSlider, &QSlider::valueChanged, this, &InlineVideoPlayer::adjustVolume);
         connect(m_volumeButton, &QToolButton::clicked, this, &InlineVideoPlayer::toggleMute);
 
-        // Nowe połączenie dla aktualizacji pozycji
-        connect(m_decoder.get(), &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
 
-        // Inicjalizuj odtwarzacz w osobnym wątku
-        QTimer::singleShot(100, this, [this]() {
-            m_decoder->start(QThread::HighPriority); // Wyższy priorytet dla lepszej płynności
-        });
-
-        // Timer do aktualizacji pozycji suwaka - zwiększona częstotliwość
         m_updateTimer = new QTimer(this);
         m_updateTimer->setInterval(100); // Częstsze aktualizacje
         connect(m_updateTimer, &QTimer::timeout, this, &InlineVideoPlayer::updateProgressUI);
@@ -339,7 +322,25 @@ private slots:
     }
 
     void togglePlayback() {
-        if (!m_decoder) return;
+        if (!m_decoder) {
+            // Inicjalizacja dekodera przy pierwszym odtwarzaniu
+            m_decoder = std::make_shared<VideoDecoder>(m_videoData, this);
+            connect(m_decoder.get(), &VideoDecoder::frameReady, this, &InlineVideoPlayer::updateFrame, Qt::QueuedConnection);
+            connect(m_decoder.get(), &VideoDecoder::error, this, &InlineVideoPlayer::handleError);
+            connect(m_decoder.get(), &VideoDecoder::videoInfo, this, &InlineVideoPlayer::handleVideoInfo);
+            connect(m_decoder.get(), &VideoDecoder::playbackFinished, this, [this]() {
+                m_playbackFinished = true;
+                m_playButton->setText("↻");
+            });
+            connect(m_decoder.get(), &VideoDecoder::positionChanged, this, &InlineVideoPlayer::updateSliderPosition);
+
+            // Rozpocznij dekodowanie w tle
+            m_decoder->start(QThread::HighPriority);
+
+            // Zmień tekst przycisku na pauzę
+            m_playButton->setText("❚❚");
+            return;
+        }
 
         // Aktywuj ten odtwarzacz przed odtwarzaniem
         activate();

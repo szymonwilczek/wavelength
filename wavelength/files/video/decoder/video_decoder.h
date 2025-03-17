@@ -498,9 +498,14 @@ signals:
 
 protected:
     void run() override {
+        static QMutex initMutex;
+        QMutexLocker locker(&initMutex);
+
         if (!initialize()) {
             return;
         }
+
+        locker.unlock();
 
         AVPacket packet;
         bool frameFinished;
