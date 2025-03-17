@@ -80,17 +80,33 @@ public:
             QString elementId = "attachment_" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
             if (attachmentType == "image" && !attachmentData.isEmpty()) {
-                qDebug() << "Formatowanie obrazu:" << attachmentName;
-                qDebug() << "MIME:" << attachmentMimeType;
-                qDebug() << "Długość danych base64:" << attachmentData.length() << "bajtów";
+                // Sprawdź, czy to GIF
+                if (attachmentMimeType == "image/gif") {
+                    qDebug() << "Formatowanie GIF:" << attachmentName;
 
-                // Dokładne formatowanie HTML z poprawnymi cudzysłowami i bez zbędnych znaków
-                formattedMsg = messageStart + "<br>" +
-                              QString("<div style='margin-top:5px;'>"
-                                     "<img src='data:%1;base64,%2' alt='%3' style='max-width:300px; max-height:200px;'/><br>"
-                                     "<span style='color:#aaaaaa; font-size:9pt;'>%3</span>"
-                                     "</div>")
-                              .arg(attachmentMimeType, attachmentData, attachmentName.toHtmlEscaped());
+                    // Renderowanie GIF - specjalny format dla naszej obsługi
+                    formattedMsg = messageStart + "<br>" +
+                                   QString("<div class='gif-placeholder' "
+                                          "data-gif-id='%1' "
+                                          "data-mime-type='%2' "
+                                          "data-base64='%3' "
+                                          "data-filename='%4'>"
+                                          "</div>")
+                                   .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+                } else {
+                    // Zwykły obraz (nie GIF)
+                    qDebug() << "Formatowanie obrazu:" << attachmentName;
+                    qDebug() << "MIME:" << attachmentMimeType;
+                    qDebug() << "Długość danych base64:" << attachmentData.length() << "bajtów";
+
+                    // Dokładne formatowanie HTML z poprawnymi cudzysłowami i bez zbędnych znaków
+                    formattedMsg = messageStart + "<br>" +
+                                  QString("<div style='margin-top:5px;'>"
+                                         "<img src='data:%1;base64,%2' alt='%3' style='max-width:300px; max-height:200px;'/><br>"
+                                         "<span style='color:#aaaaaa; font-size:9pt;'>%3</span>"
+                                         "</div>")
+                                  .arg(attachmentMimeType, attachmentData, attachmentName.toHtmlEscaped());
+                }
             }
             else if (attachmentType == "audio" && !attachmentData.isEmpty()) {
                 // Renderowanie audio - specjalny format dla naszej obsługi (podobnie jak wideo)

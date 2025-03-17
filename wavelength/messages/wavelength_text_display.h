@@ -23,6 +23,7 @@
 
 #include "../files/video/player/inline_video_player.h"
 #include "../files/audio/player/inline_audio_player.h"
+#include "../files/gif/player/inline_gif_player.h"
 
 
 // Główna klasa wyświetlająca czat
@@ -60,6 +61,8 @@ public:
             processMessageWithVideo(formattedMessage);
         } else if (formattedMessage.contains("audio-placeholder")) {
             processMessageWithAudio(formattedMessage);
+        } else if (formattedMessage.contains("gif-placeholder")) {
+            processMessageWithGif(formattedMessage);
         } else {
             // Standardowa wiadomość tekstowa
             QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
@@ -73,6 +76,64 @@ public:
 
         // Przewiń do najnowszej wiadomości
         QTimer::singleShot(0, this, &WavelengthTextDisplay::scrollToBottom);
+    }
+
+    void processMessageWithGif(const QString& formattedMessage) {
+        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika gif)
+        QString messageText = formattedMessage;
+        int gifPos = messageText.indexOf("<div class='gif-placeholder'");
+        if (gifPos > 0) {
+            messageText = messageText.left(gifPos);
+
+            // Dodaj tekst wiadomości, jeśli istnieje
+            if (!messageText.trimmed().isEmpty()) {
+                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+                messageLabel->setTextFormat(Qt::RichText);
+                messageLabel->setWordWrap(true);
+                m_contentLayout->addWidget(messageLabel);
+            }
+        }
+
+        // Wyodrębnij dane GIF z wiadomości
+        QRegExp gifRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+        gifRegex.setMinimal(true);
+
+        if (gifRegex.indexIn(formattedMessage) != -1) {
+            QString mimeType = gifRegex.cap(1);
+            QString base64Data = gifRegex.cap(2);
+            QString filename = gifRegex.cap(3);
+
+            qDebug() << "Found GIF:" << filename << "MIME:" << mimeType;
+            qDebug() << "Base64 data length:" << base64Data.length();
+
+            // Dodaj informację o pliku GIF
+            QLabel* fileInfoLabel = new QLabel(QString("🎞️ <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
+            fileInfoLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(fileInfoLabel);
+
+            // Dodaj odtwarzacz GIF
+            if (!base64Data.isEmpty() && base64Data.length() > 100) {
+                QByteArray gifData = QByteArray::fromBase64(base64Data.toUtf8());
+
+                if (!gifData.isEmpty()) {
+                    InlineGifPlayer* gifPlayer = new InlineGifPlayer(gifData, m_contentWidget);
+                    m_contentLayout->addWidget(gifPlayer);
+                    qDebug() << "Added inline GIF player, data size:" << gifData.size();
+                } else {
+                    qDebug() << "Failed to decode base64 data";
+                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych GIF", m_contentWidget);
+                    errorLabel->setStyleSheet("color: #ff5555;");
+                    m_contentLayout->addWidget(errorLabel);
+                }
+            } else {
+                qDebug() << "Invalid GIF data, not adding player";
+                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić GIF (uszkodzone dane)", m_contentWidget);
+                errorLabel->setStyleSheet("color: #ff5555;");
+                m_contentLayout->addWidget(errorLabel);
+            }
+        } else {
+            qDebug() << "Failed to extract GIF data";
+        }
     }
 
     void processMessageWithAudio(const QString& formattedMessage) {
