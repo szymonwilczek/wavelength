@@ -19,6 +19,11 @@ class InlineAudioPlayer : public QFrame {
     Q_OBJECT
 
 public:
+
+    static InlineAudioPlayer* getActivePlayer() {
+        return s_activePlayer;
+    }
+
     InlineAudioPlayer(const QByteArray& audioData, const QString& mimeType, QWidget* parent = nullptr)
         : QFrame(parent), m_audioData(audioData), m_mimeType(mimeType) {
 
