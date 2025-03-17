@@ -99,6 +99,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/files/image/displayer/image_viewer.h
         wavelength/files/attachment_placeholder.cpp
         wavelength/files/attachment_placeholder.h
+        wavelength/files/video/player/video_player_overlay.cpp
+        wavelength/files/video/player/video_player_overlay.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

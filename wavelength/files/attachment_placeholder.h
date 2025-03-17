@@ -13,6 +13,7 @@
 
 #include "gif/player/inline_gif_player.h"
 #include "image/displayer/image_viewer.h"
+#include "video/player/video_player_overlay.h"
 
 class AttachmentPlaceholder : public QWidget {
     Q_OBJECT
@@ -183,10 +184,123 @@ public slots:
     }
 
     void showVideo(const QByteArray& data) {
-        InlineVideoPlayer* videoPlayer = new InlineVideoPlayer(data, m_mimeType, m_contentContainer);
-        setContent(videoPlayer);
-        setLoading(false);
-    }
+    // Zamiast osadzać odtwarzacz bezpośrednio, tworzymy miniaturkę z przyciskiem odtwarzania
+    QWidget* videoPreview = new QWidget(m_contentContainer);
+    QVBoxLayout* previewLayout = new QVBoxLayout(videoPreview);
+
+    // Tworzymy miniaturkę (czarny prostokąt z ikoną odtwarzania)
+    QLabel* thumbnailLabel = new QLabel(videoPreview);
+    thumbnailLabel->setFixedSize(480, 270);
+    thumbnailLabel->setAlignment(Qt::AlignCenter);
+    thumbnailLabel->setStyleSheet("background-color: #000000; color: white; font-size: 48px;");
+    thumbnailLabel->setText("▶");
+    thumbnailLabel->setCursor(Qt::PointingHandCursor);
+
+    // Generujemy miniaturkę z pierwszej klatki (asynchronicznie)
+    generateThumbnail(data, thumbnailLabel);
+
+    previewLayout->addWidget(thumbnailLabel);
+
+    // Dodajemy przycisk odtwarzania pod miniaturką
+    QPushButton* playButton = new QPushButton("Odtwórz wideo", videoPreview);
+    playButton->setStyleSheet("QPushButton { background-color: #2c5e9e; color: white; padding: 6px; border-radius: 3px; }");
+    previewLayout->addWidget(playButton);
+
+    // Po kliknięciu na miniaturkę lub przycisk, otwórz dialog z odtwarzaczem
+        auto openPlayer = [this, data]() {
+            // Zachowujemy kopię danych wideo w m_videoData
+            m_videoData = data;
+            VideoPlayerOverlay* playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
+            playerOverlay->setAttribute(Qt::WA_DeleteOnClose);
+    
+            // Ważne - rozłącz połączenie przed zamknięciem
+            QMetaObject::Connection conn = connect(playerOverlay, &QDialog::finished,
+                [this, playerOverlay]() {
+                    // Rozłącz wszystkie połączenia z tym obiektem przed usunięciem
+                    disconnect(playerOverlay, nullptr, this, nullptr);
+                    // Zwolnij pamięć
+                    m_videoData.clear();
+                });
+
+            playerOverlay->show();
+        };
+
+    connect(thumbnailLabel, &QLabel::linkActivated, this, openPlayer);
+    connect(playButton, &QPushButton::clicked, this, openPlayer);
+
+    // Dodatkowe połączenie dla kliknięcia w miniaturkę
+    thumbnailLabel->installEventFilter(this);
+    m_thumbnailLabel = thumbnailLabel;
+    m_clickHandler = openPlayer;
+
+    setContent(videoPreview);
+    setLoading(false);
+}
+
+// Dodajemy metodę generującą miniaturkę
+void generateThumbnail(const QByteArray& videoData, QLabel* thumbnailLabel) {
+    QFuture<void> future = QtConcurrent::run([this, videoData, thumbnailLabel]() {
+        try {
+            // Tworzymy tymczasowy dekoder, który wyekstrahuje pierwszą klatkę
+            auto tempDecoder = std::make_shared<VideoDecoder>(videoData, nullptr);
+
+            // Łączymy sygnał frameReady z funkcją aktualizującą miniaturkę
+            QObject::connect(tempDecoder.get(), &VideoDecoder::frameReady,
+                thumbnailLabel, [thumbnailLabel, tempDecoder](const QImage& frame) {
+                    // Skalujemy klatkę do rozmiaru miniaturki
+                    QImage scaledFrame = frame.scaled(thumbnailLabel->width(), thumbnailLabel->height(),
+                                                     Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+                    // Tworzymy obraz z ikoną odtwarzania na środku
+                    QImage overlayImage(thumbnailLabel->width(), thumbnailLabel->height(), QImage::Format_RGB32);
+                    overlayImage.fill(Qt::black);
+
+                    // Rysujemy przeskalowaną klatkę na środku
+                    QPainter painter(&overlayImage);
+                    int x = (thumbnailLabel->width() - scaledFrame.width()) / 2;
+                    int y = (thumbnailLabel->height() - scaledFrame.height()) / 2;
+                    painter.drawImage(x, y, scaledFrame);
+
+                    // Rysujemy półprzezroczystą ikonę odtwarzania
+                    painter.setPen(Qt::NoPen);
+                    painter.setBrush(QColor(255, 255, 255, 180));
+                    painter.drawEllipse(QRect(thumbnailLabel->width()/2 - 30, thumbnailLabel->height()/2 - 30, 60, 60));
+
+                    painter.setBrush(QColor(0, 0, 0, 200));
+                    QPolygon triangle;
+                    triangle << QPoint(thumbnailLabel->width()/2 - 15, thumbnailLabel->height()/2 - 20);
+                    triangle << QPoint(thumbnailLabel->width()/2 + 25, thumbnailLabel->height()/2);
+                    triangle << QPoint(thumbnailLabel->width()/2 - 15, thumbnailLabel->height()/2 + 20);
+                    painter.drawPolygon(triangle);
+
+                    // Ustawiamy obraz jako pixmap etykiety
+                    thumbnailLabel->setPixmap(QPixmap::fromImage(overlayImage));
+
+                    // Zatrzymujemy dekoder
+                    tempDecoder->stop();
+                    tempDecoder->wait(500);
+                    tempDecoder->releaseResources();
+                },
+                Qt::QueuedConnection);
+
+            // Wyekstrahuj pierwszą klatkę
+            tempDecoder->start(QThread::LowPriority);
+            QThread::msleep(100); // Daj czas na inicjalizację
+            tempDecoder->extractFirstFrame();
+
+            // Poczekaj chwilę na przetworzenie pierwszej klatki
+            QThread::msleep(500);
+
+            // Zatrzymaj dekoder
+            tempDecoder->stop();
+            tempDecoder->wait(500);
+            tempDecoder->releaseResources();
+
+        } catch (...) {
+            // Jeśli wystąpił błąd, ignoruj - miniaturka pozostanie czarna z ikoną odtwarzania
+        }
+    });
+}
 
 private:
     QString m_filename;
@@ -198,6 +312,19 @@ private:
     QWidget* m_contentContainer;
     QVBoxLayout* m_contentLayout;
     bool m_isLoaded;
+    QByteArray m_videoData; // Do przechowywania danych wideo
+    QLabel* m_thumbnailLabel = nullptr;
+    std::function<void()> m_clickHandler;
+
+    bool eventFilter(QObject* watched, QEvent* event) override {
+        if (watched == m_thumbnailLabel && event->type() == QEvent::MouseButtonRelease) {
+            if (m_clickHandler) {
+                m_clickHandler();
+                return true;
+            }
+        }
+        return QWidget::eventFilter(watched, event);
+    }
 };
 
 #endif //ATTACHMENT_PLACEHOLDER_H
