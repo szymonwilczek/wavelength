@@ -43,12 +43,6 @@ public:
         m_audioInfoLabel->setText("Odtwarzacz audio");
         layout->addWidget(m_audioInfoLabel);
 
-        // Ikona audio / wizualizacja
-        m_audioIcon = new QLabel(this);
-        m_audioIcon->setAlignment(Qt::AlignCenter);
-        m_audioIcon->setStyleSheet("color: #85c4ff; font-size: 24pt;");
-        m_audioIcon->setText("🎵");  // Ikona muzyki
-        layout->addWidget(m_audioIcon);
 
         // Kontrolki odtwarzania
         QHBoxLayout* controlLayout = new QHBoxLayout();
