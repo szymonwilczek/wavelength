@@ -66,42 +66,24 @@ public:
     }
 
     ~VideoDecoder() {
+        // Zatrzymaj wątek
         stop();
-        wait();
+        wait(500); // Daj mu trochę czasu na zakończenie
 
-        if (m_buffer)
-            av_free(m_buffer);
+        // Zwolnij zasoby FFmpeg i inne zasoby
+        cleanupFFmpegResources();
 
-        if (m_frameRGB)
-            av_frame_free(&m_frameRGB);
-
-        if (m_frame)
-            av_frame_free(&m_frame);
-
-        if (m_codecContext)
-            avcodec_free_context(&m_codecContext);
-
-        // Zwolnij zasoby audio
-        if (m_audioCodecContext)
-            avcodec_free_context(&m_audioCodecContext);
-
-        if (m_swrContext)
-            swr_free(&m_swrContext);
-
-        if (m_audioOutput) {
-            m_audioOutput->stop();
-            delete m_audioOutput;
-        }
-
-        if (m_formatContext) {
-            if (m_formatContext->pb == m_ioContext)
-                m_formatContext->pb = nullptr;
-            avformat_close_input(&m_formatContext);
-        }
-
+        // Zwolnij zasoby IO, które są trzymane oddzielnie
         if (m_ioContext) {
-            av_free(m_ioContext->buffer);
+            if (m_ioContext->buffer) {
+                av_free(m_ioContext->buffer);
+                m_ioContext->buffer = nullptr;
+            }
             avio_context_free(&m_ioContext);
+            m_ioContext = nullptr;
+        } else if (m_ioBuffer) {
+            av_free(m_ioBuffer);
+            m_ioBuffer = nullptr;
         }
     }
 
@@ -123,12 +105,49 @@ public:
     // Metoda do ponownego inicjowania zasobów
     bool reinitialize() {
         QMutexLocker locker(&m_mutex);
+
+        // Zatrzymaj wątek jeśli działa
+        bool wasRunning = isRunning();
+        if (wasRunning) {
+            m_stopped = true;
+            m_waitCondition.wakeAll();
+            locker.unlock();
+            wait(500); // Czekaj max 500ms
+            locker.relock();
+        }
+
+        // Zwolnij wszystkie zasoby
         cleanupFFmpegResources();
+
+        // Zresetuj stany
         m_stopped = false;
         m_paused = true;
-        m_reachedEndOfStream = false;
         m_seeking = false;
         m_currentPosition = 0;
+
+        // Przygotowanie buforów I/O jeśli zostały zwolnione
+        if (!m_ioBuffer) {
+            m_ioBuffer = (unsigned char*)av_malloc(m_videoData.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+            if (!m_ioBuffer) {
+                emit error("Nie można zaalokować pamięci dla danych wideo");
+                return false;
+            }
+            memcpy(m_ioBuffer, m_videoData.constData(), m_videoData.size());
+        }
+
+        if (!m_ioContext) {
+            m_ioContext = avio_alloc_context(
+                m_ioBuffer, m_videoData.size(), 0, this,
+                &VideoDecoder::readPacket, nullptr, &VideoDecoder::seekPacket
+            );
+            if (!m_ioContext) {
+                av_free(m_ioBuffer);
+                m_ioBuffer = nullptr;
+                emit error("Nie można utworzyć kontekstu I/O");
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -412,10 +431,11 @@ public:
     }
 
     void stop() {
-        m_mutex.lock();
-        m_stopped = true;
-        m_mutex.unlock();
+        QMutexLocker locker(&m_mutex);
+        if (m_stopped) return;
 
+        m_stopped = true;
+        locker.unlock();
         m_waitCondition.wakeOne();
     }
 
@@ -638,16 +658,34 @@ protected:
 private:
 
     void cleanupFFmpegResources() {
+        // Zatrzymaj odtwarzanie audio
         if (m_audioOutput) {
             m_audioOutput->stop();
+            delete m_audioOutput;
+            m_audioOutput = nullptr;
             m_audioDevice = nullptr;
         }
 
-        if (m_frameRGB)
-            av_frame_free(&m_frameRGB);
+        // Wyczyść bufory audio
+        m_audioBuffer.clear();
+        m_audioOutputBuffer.close();
+        m_audioOutputBuffer.setBuffer(nullptr);
 
-        if (m_frame)
+        // Zwolnij zasoby FFmpeg
+        if (m_buffer) {
+            av_free(m_buffer);
+            m_buffer = nullptr;
+        }
+
+        if (m_frameRGB) {
+            av_frame_free(&m_frameRGB);
+            m_frameRGB = nullptr;
+        }
+
+        if (m_frame) {
             av_frame_free(&m_frame);
+            m_frame = nullptr;
+        }
 
         if (m_codecContext) {
             avcodec_close(m_codecContext);
@@ -672,25 +710,22 @@ private:
         }
 
         if (m_formatContext) {
+            if (m_formatContext->pb == m_ioContext)
+                m_formatContext->pb = nullptr;
             avformat_close_input(&m_formatContext);
             m_formatContext = nullptr;
         }
 
-        if (m_ioContext) {
-            if (m_ioContext->buffer)
-                av_free(m_ioContext->buffer);
-            avio_context_free(&m_ioContext);
-            m_ioContext = nullptr;
-        }
-
-        if (m_buffer) {
-            av_free(m_buffer);
-            m_buffer = nullptr;
-        }
-
+        // Reset stanu
         m_videoStream = -1;
         m_audioStream = -1;
         m_hasAudio = false;
+        m_readPosition = 0;
+        m_bufferSize = 0;
+        m_frameRate = 0.0;
+        m_lastFramePts = 0;
+        m_firstFrame = true;
+        m_reachedEndOfStream = false;
     }
 
     // Funkcje callback dla custom I/O

@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QPainter>
 
+#include "../../audio/player/inline_audio_player.h"
 #include "../decoder/video_decoder.h"
 
 
@@ -111,12 +112,21 @@ public:
         connect(m_updateTimer, &QTimer::timeout, this, &InlineVideoPlayer::updateProgressUI);
         m_updateTimer->start();
 
-        connect(qApp, &QApplication::aboutToQuit, this, &InlineVideoPlayer::releaseResources);
+        connect(qApp, &QApplication::aboutToQuit, this, [this]() {
+    if (s_activePlayer == this) {
+        s_activePlayer = nullptr;
+    }
+    releaseResources();
+});
     }
 
     void updateProgressUI() {
         // Timer do częstszej aktualizacji interfejsu, ale nie modyfikuje pozycji,
         // która jest aktualizowana bezpośrednio przez sygnał positionChanged
+    }
+
+    static InlineVideoPlayer* getActivePlayer() {
+        return s_activePlayer;
     }
 
     ~InlineVideoPlayer() {
@@ -125,27 +135,42 @@ public:
 
     void releaseResources() {
         if (m_decoder) {
+            m_decoder->stop();
+            m_decoder->wait(500); // Czekaj max 500ms na zakończenie wątku
             m_decoder->releaseResources();
-            // Nie usuwamy dekodera, tylko zwalniamy zasoby
         }
+
+        if (s_activePlayer == this) {
+            s_activePlayer = nullptr;
+        }
+        m_isActive = false;
     }
 
     void activate() {
         // Jeśli już jest aktywny, nic nie rób
         if (m_isActive) return;
 
-        // Dezaktywuj aktualnie aktywny odtwarzacz
+        // Dezaktywuj aktualnie aktywny odtwarzacz wideo
         if (s_activePlayer && s_activePlayer != this) {
             s_activePlayer->deactivate();
+        }
+
+        // Dezaktywuj aktywny odtwarzacz audio, jeśli taki istnieje
+        if (InlineAudioPlayer::getActivePlayer() != nullptr) {
+            InlineAudioPlayer::getActivePlayer()->deactivate();
         }
 
         // Aktywuj ten odtwarzacz
         m_isActive = true;
         s_activePlayer = this;
 
-        // Reinicjalizuj dekoder, jeśli potrzeba
+        // Upewnij się, że dekoder jest w odpowiednim stanie
         if (!m_decoder->isRunning()) {
-            m_decoder->reinitialize();
+            if (!m_decoder->reinitialize()) {
+                qDebug() << "Nie udało się zainicjalizować dekodera wideo";
+                return;
+            }
+            m_decoder->start(QThread::HighPriority);
         }
     }
 
@@ -154,8 +179,8 @@ public:
 
         // Zatrzymaj odtwarzanie
         if (m_decoder && !m_decoder->isPaused()) {
+            m_decoder->pause();  // Pauzuj odtwarzanie
             m_playButton->setText("▶");
-            m_decoder->pause();
         }
 
         // Wyświetl miniaturkę z czarnymi paskami
@@ -189,12 +214,14 @@ public:
         }
 
         // Zwolnij zasoby dekodera
-        releaseResources();
+        // releaseResources();
 
-        m_isActive = false;
+        // Usuń status aktywnego, jeśli to ten odtwarzacz
         if (s_activePlayer == this) {
             s_activePlayer = nullptr;
         }
+
+        m_isActive = false;
     }
 
 
@@ -314,22 +341,26 @@ private slots:
     void togglePlayback() {
         if (!m_decoder) return;
 
-        // Aktywuj ten odtwarzacz przy próbie odtworzenia
+        // Aktywuj ten odtwarzacz przed odtwarzaniem
         activate();
 
         if (m_playbackFinished) {
             m_decoder->reset();
             m_playbackFinished = false;
-            m_decoder->pause(); // Aby następne wywołanie zaczęło odtwarzanie
-            m_playButton->setText("▶");
-        }
-
-        if (m_decoder->isPaused()) {
-            m_decoder->pause(); // Odpauzowanie
             m_playButton->setText("❚❚");
+            // Upewnij się, że dekoder jest w stanie pauzy, aby następne wywołanie rozpoczęło odtwarzanie
+            if (!m_decoder->isPaused()) {
+                m_decoder->pause();
+            }
+            m_decoder->pause(); // Zmienia stan pauzy
         } else {
-            m_decoder->pause(); // Pauzowanie
-            m_playButton->setText("▶");
+            if (m_decoder->isPaused()) {
+                m_decoder->pause(); // Wznów odtwarzanie
+                m_playButton->setText("❚❚");
+            } else {
+                m_decoder->pause(); // Wstrzymaj odtwarzanie
+                m_playButton->setText("▶");
+            }
         }
     }
 
@@ -442,7 +473,7 @@ private:
     bool m_wasPlaying = false;
     bool m_isActive = false;                 // Czy ten odtwarzacz jest aktywny
     QImage m_thumbnailFrame;                 // Przechowuje miniaturkę dla zatrzymanego odtwarzacza
-    InlineVideoPlayer* InlineVideoPlayer::s_activePlayer = nullptr;
+    inline static InlineVideoPlayer* s_activePlayer = nullptr;
 
 };
 
