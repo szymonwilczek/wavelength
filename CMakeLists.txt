@@ -93,6 +93,10 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/files/gif/decoder/gif_decoder.h
         wavelength/files/gif/player/inline_gif_player.cpp
         wavelength/files/gif/player/inline_gif_player.h
+        wavelength/files/image/decoder/image_decoder.cpp
+        wavelength/files/image/decoder/image_decoder.h
+        wavelength/files/image/displayer/image_viewer.cpp
+        wavelength/files/image/displayer/image_viewer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
