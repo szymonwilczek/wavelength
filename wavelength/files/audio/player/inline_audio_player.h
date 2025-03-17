@@ -116,7 +116,12 @@ public:
         connect(m_updateTimer, &QTimer::timeout, this, &InlineAudioPlayer::updateProgressUI);
         m_updateTimer->start();
 
-        connect(qApp, &QApplication::aboutToQuit, this, &InlineAudioPlayer::releaseResources);
+        connect(qApp, &QApplication::aboutToQuit, this, [this]() {
+    if (s_activePlayer == this) {
+        s_activePlayer = nullptr;
+    }
+    releaseResources();
+});
     }
 
     void updateProgressUI() {
@@ -130,72 +135,81 @@ public:
 
     void releaseResources() {
         if (m_decoder) {
+            m_decoder->stop();
+            m_decoder->wait();
             m_decoder->releaseResources();
-            // Nie usuwamy dekodera, tylko zwalniamy zasoby
         }
+
+        if (s_activePlayer == this) {
+            s_activePlayer = nullptr;
+        }
+        m_isActive = false;
     }
 
     void activate() {
-        // Jeśli już jest aktywny, nic nie rób
-        if (m_isActive) return;
+        if (m_isActive)
+            return;
 
-        // Dezaktywuj aktualnie aktywny odtwarzacz
+        // Jeśli istnieje inny aktywny odtwarzacz, deaktywuj go najpierw
         if (s_activePlayer && s_activePlayer != this) {
             s_activePlayer->deactivate();
         }
 
-        // Aktywuj ten odtwarzacz
-        m_isActive = true;
-        s_activePlayer = this;
-
-        // Reinicjalizuj dekoder, jeśli potrzeba
+        // Upewnij się, że dekoder jest w odpowiednim stanie
         if (!m_decoder->isRunning()) {
-            m_decoder->reinitialize();
+            if (!m_decoder->reinitialize()) {
+                qDebug() << "Nie udało się zainicjalizować dekodera";
+                return;
+            }
+            m_decoder->start(QThread::HighPriority);
         }
+
+        // Ustaw ten odtwarzacz jako aktywny
+        s_activePlayer = this;
+        m_isActive = true;
     }
 
     void deactivate() {
-        if (!m_isActive) return;
+        if (!m_isActive)
+            return;
 
-        // Zatrzymaj odtwarzanie
+        // Zatrzymaj odtwarzanie, jeśli trwa
         if (m_decoder && !m_decoder->isPaused()) {
-            m_playButton->setText("▶");
-            m_decoder->pause();
+            m_decoder->pause(); // Zatrzymaj odtwarzanie
         }
 
-        // Zwolnij zasoby dekodera
-        releaseResources();
-
-        m_isActive = false;
+        // Jeśli ten odtwarzacz jest aktywny globalnie, wyczyść referencję
         if (s_activePlayer == this) {
             s_activePlayer = nullptr;
         }
+
+        m_isActive = false;
     }
 
     void adjustVolume(int volume) {
-        if (!m_decoder) return;
+        if (!m_decoder)
+            return;
 
-        float normalizedVolume = volume / 100.0f;
-        m_decoder->setVolume(normalizedVolume);
-
-        // Aktualizacja ikony głośności
-        updateVolumeIcon(normalizedVolume);
+        float volumeFloat = volume / 100.0f;
+        m_decoder->setVolume(volumeFloat);
+        updateVolumeIcon(volumeFloat);
     }
 
     void toggleMute() {
-        if (!m_decoder) return;
+        if (!m_decoder)
+            return;
 
         if (m_volumeSlider->value() > 0) {
             m_lastVolume = m_volumeSlider->value();
             m_volumeSlider->setValue(0);
         } else {
-            m_volumeSlider->setValue(m_lastVolume > 0 ? m_lastVolume : 100);
+            m_volumeSlider->setValue(m_lastVolume);
         }
     }
 
     void updateVolumeIcon(float volume) {
         if (volume <= 0.01f) {
-            m_volumeButton->setText("🔇");
+            m_volumeButton->setText("🔈");
         } else if (volume < 0.5f) {
             m_volumeButton->setText("🔉");
         } else {
@@ -233,22 +247,15 @@ private slots:
         if (!m_decoder || m_audioDuration <= 0)
             return;
 
-        double seekPosition = position / 1000.0;
+        m_currentPosition = position / 1000.0; // Milisekundy na sekundy
+        int currentSeconds = static_cast<int>(m_currentPosition);
+        int totalSeconds = static_cast<int>(m_audioDuration);
 
-        // Aktualizuj tylko etykietę czasu, bez faktycznego przesuwania audio
-        int seconds = int(seekPosition) % 60;
-        int minutes = int(seekPosition) / 60;
-
-        int totalSeconds = int(m_audioDuration) % 60;
-        int totalMinutes = int(m_audioDuration) / 60;
-
-        m_timeLabel->setText(
-            QString("%1:%2 / %3:%4")
-            .arg(minutes, 2, 10, QChar('0'))
-            .arg(seconds, 2, 10, QChar('0'))
-            .arg(totalMinutes, 2, 10, QChar('0'))
-            .arg(totalSeconds, 2, 10, QChar('0'))
-        );
+        m_timeLabel->setText(QString("%1:%2 / %3:%4")
+            .arg(currentSeconds / 60, 2, 10, QChar('0'))
+            .arg(currentSeconds % 60, 2, 10, QChar('0'))
+            .arg(totalSeconds / 60, 2, 10, QChar('0'))
+            .arg(totalSeconds % 60, 2, 10, QChar('0')));
     }
 
     void updateSliderPosition(double position) {
@@ -285,28 +292,32 @@ private slots:
         if (!m_decoder || m_audioDuration <= 0)
             return;
 
-        double seekPosition = position / 1000.0;
-        m_decoder->seek(seekPosition);
+        double seekPos = position / 1000.0; // Milisekundy na sekundy
+        m_decoder->seek(seekPos);
     }
 
     void togglePlayback() {
-        if (!m_decoder) return;
+        if (!m_decoder)
+            return;
 
-        // Aktywuj ten odtwarzacz przy próbie odtworzenia
+        // Aktywuj ten odtwarzacz przed odtwarzaniem
         activate();
 
         if (m_playbackFinished) {
+            // Resetuj odtwarzacz
             m_decoder->reset();
             m_playbackFinished = false;
-            m_playButton->setText("❚❚");
-            m_decoder->pause(); // Przełącza stan pauzy - uruchamia odtwarzanie
+            m_playButton->setText("❚❚"); // Symbol pauzy
+            m_currentPosition = 0;
+            updateTimeLabel(0);
+            m_decoder->pause(); // Rozpocznij odtwarzanie (przełącz stan)
         } else {
             if (m_decoder->isPaused()) {
-                m_playButton->setText("❚❚");
-                m_decoder->pause(); // Odpauzowanie
+                m_playButton->setText("❚❚"); // Symbol pauzy
+                m_decoder->pause(); // Wznów odtwarzanie
             } else {
-                m_playButton->setText("▶");
-                m_decoder->pause(); // Pauzowanie
+                m_playButton->setText("▶"); // Symbol odtwarzania
+                m_decoder->pause(); // Wstrzymaj odtwarzanie
             }
         }
     }
