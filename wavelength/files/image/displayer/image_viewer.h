@@ -24,7 +24,7 @@ public:
         setStyleSheet("background-color: #1a1a1a; border: 1px solid #444;");
         
         // Początkowy rozmiar będzie dostosowany po otrzymaniu obrazu
-        setMaximumSize(800, 800);
+        setMaximumSize(600, 600);
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
