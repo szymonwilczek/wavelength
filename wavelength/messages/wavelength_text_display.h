@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QDebug>
 
+#include "../files/attachment_placeholder.h"
 #include "../files/video/player/inline_video_player.h"
 #include "../files/audio/player/inline_audio_player.h"
 #include "../files/gif/player/inline_gif_player.h"
@@ -118,7 +119,7 @@ public:
     }
 
     void processMessageWithImage(const QString& formattedMessage) {
-        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika obrazu)
+        // Wyodrębnij podstawowy tekst wiadomości
         QString messageText = formattedMessage;
         int imagePos = messageText.indexOf("<div class='image-placeholder'");
         if (imagePos > 0) {
@@ -142,212 +143,170 @@ public:
             QString base64Data = imageRegex.cap(2);
             QString filename = imageRegex.cap(3);
 
-            qDebug() << "Found image:" << filename << "MIME:" << mimeType;
-            qDebug() << "Base64 data length:" << base64Data.length();
+            // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+            bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
 
-            // Dodaj informację o pliku obrazu
-            QLabel* fileInfoLabel = new QLabel(QString("🖼️ <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
-            fileInfoLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(fileInfoLabel);
+            // Tworzymy placeholder, który obsłuży opóźnione ładowanie załącznika
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "image", m_contentWidget, isSelf);
+            placeholder->setBase64Data(base64Data, mimeType);
+            m_contentLayout->addWidget(placeholder);
 
-            // Dodaj wyświetlacz obrazu
-            if (!base64Data.isEmpty() && base64Data.length() > 100) {
-                QByteArray imageData = QByteArray::fromBase64(base64Data.toUtf8());
-
-                if (!imageData.isEmpty()) {
-                    InlineImageViewer* imageViewer = new InlineImageViewer(imageData, m_contentWidget);
-                    m_contentLayout->addWidget(imageViewer);
-                    qDebug() << "Added inline image viewer, data size:" << imageData.size();
-                } else {
-                    qDebug() << "Failed to decode base64 data";
-                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych obrazu", m_contentWidget);
-                    errorLabel->setStyleSheet("color: #ff5555;");
-                    m_contentLayout->addWidget(errorLabel);
-                }
-            } else {
-                qDebug() << "Invalid image data, not adding viewer";
-                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić obrazu (uszkodzone dane)", m_contentWidget);
-                errorLabel->setStyleSheet("color: #ff5555;");
-                m_contentLayout->addWidget(errorLabel);
-            }
-        } else {
-            qDebug() << "Failed to extract image data";
+            qDebug() << "Added image placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
         }
     }
 
     void processMessageWithGif(const QString& formattedMessage) {
-        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika gif)
-        QString messageText = formattedMessage;
-        int gifPos = messageText.indexOf("<div class='gif-placeholder'");
-        if (gifPos > 0) {
-            messageText = messageText.left(gifPos);
+    // Wyodrębnij podstawowy tekst wiadomości
+    QString messageText = formattedMessage;
+    int gifPos = messageText.indexOf("<div class='gif-placeholder'");
+    if (gifPos > 0) {
+        messageText = messageText.left(gifPos);
 
-            // Dodaj tekst wiadomości, jeśli istnieje
-            if (!messageText.trimmed().isEmpty()) {
-                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-                messageLabel->setTextFormat(Qt::RichText);
-                messageLabel->setWordWrap(true);
-                m_contentLayout->addWidget(messageLabel);
-            }
-        }
-
-        // Wyodrębnij dane GIF z wiadomości
-        QRegExp gifRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-        gifRegex.setMinimal(true);
-
-        if (gifRegex.indexIn(formattedMessage) != -1) {
-            QString mimeType = gifRegex.cap(1);
-            QString base64Data = gifRegex.cap(2);
-            QString filename = gifRegex.cap(3);
-
-            qDebug() << "Found GIF:" << filename << "MIME:" << mimeType;
-            qDebug() << "Base64 data length:" << base64Data.length();
-
-            // Dodaj informację o pliku GIF
-            QLabel* fileInfoLabel = new QLabel(QString("🎞️ <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
-            fileInfoLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(fileInfoLabel);
-
-            // Dodaj odtwarzacz GIF
-            if (!base64Data.isEmpty() && base64Data.length() > 100) {
-                QByteArray gifData = QByteArray::fromBase64(base64Data.toUtf8());
-
-                if (!gifData.isEmpty()) {
-                    InlineGifPlayer* gifPlayer = new InlineGifPlayer(gifData, m_contentWidget);
-                    m_contentLayout->addWidget(gifPlayer);
-                    qDebug() << "Added inline GIF player, data size:" << gifData.size();
-                } else {
-                    qDebug() << "Failed to decode base64 data";
-                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych GIF", m_contentWidget);
-                    errorLabel->setStyleSheet("color: #ff5555;");
-                    m_contentLayout->addWidget(errorLabel);
-                }
-            } else {
-                qDebug() << "Invalid GIF data, not adding player";
-                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić GIF (uszkodzone dane)", m_contentWidget);
-                errorLabel->setStyleSheet("color: #ff5555;");
-                m_contentLayout->addWidget(errorLabel);
-            }
-        } else {
-            qDebug() << "Failed to extract GIF data";
+        // Dodaj tekst wiadomości, jeśli istnieje
+        if (!messageText.trimmed().isEmpty()) {
+            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+            messageLabel->setTextFormat(Qt::RichText);
+            messageLabel->setWordWrap(true);
+            m_contentLayout->addWidget(messageLabel);
         }
     }
 
-    void processMessageWithAudio(const QString& formattedMessage) {
-        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika audio)
-        QString messageText = formattedMessage;
-        int audioPos = messageText.indexOf("<div class='audio-placeholder'");
-        if (audioPos > 0) {
-            messageText = messageText.left(audioPos);
+    // Wyodrębnij dane GIFa z wiadomości
+    QRegExp gifRegex("data-gif-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+    gifRegex.setMinimal(true);
 
-            // Dodaj tekst wiadomości, jeśli istnieje
-            if (!messageText.trimmed().isEmpty()) {
-                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-                messageLabel->setTextFormat(Qt::RichText);
-                messageLabel->setWordWrap(true);
-                m_contentLayout->addWidget(messageLabel);
-            }
-        }
+    if (gifRegex.indexIn(formattedMessage) != -1) {
+        QString elementId = gifRegex.cap(1);
+        QString mimeType = gifRegex.cap(2);
+        QString base64Data = gifRegex.cap(3);
+        QString filename = gifRegex.cap(4);
 
-        // Wyodrębnij dane audio z wiadomości
-        QRegExp audioRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-        audioRegex.setMinimal(true);
+        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
 
-        if (audioRegex.indexIn(formattedMessage) != -1) {
-            QString mimeType = audioRegex.cap(1);
-            QString base64Data = audioRegex.cap(2);
-            QString filename = audioRegex.cap(3);
+        if (!base64Data.isEmpty() && base64Data.length() > 100) {
+            // Tworzymy placeholder, który obsłuży opóźnione ładowanie GIFa
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "gif", m_contentWidget, isSelf);
+            placeholder->setBase64Data(base64Data, mimeType);
+            m_contentLayout->addWidget(placeholder);
 
-            qDebug() << "Found audio:" << filename << "MIME:" << mimeType;
-            qDebug() << "Base64 data length:" << base64Data.length();
-
-            // Dodaj informację o pliku audio
-            QLabel* fileInfoLabel = new QLabel(QString("🎵 <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
-            fileInfoLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(fileInfoLabel);
-
-            // Dodaj odtwarzacz audio
-            if (!base64Data.isEmpty() && base64Data.length() > 100) {
-                QByteArray audioData = QByteArray::fromBase64(base64Data.toUtf8());
-
-                if (!audioData.isEmpty()) {
-                    InlineAudioPlayer* audioPlayer = new InlineAudioPlayer(audioData, mimeType, m_contentWidget);
-                    m_contentLayout->addWidget(audioPlayer);
-                    qDebug() << "Added inline audio player, data size:" << audioData.size();
-                } else {
-                    qDebug() << "Failed to decode base64 data";
-                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych audio", m_contentWidget);
-                    errorLabel->setStyleSheet("color: #ff5555;");
-                    m_contentLayout->addWidget(errorLabel);
-                }
-            } else {
-                qDebug() << "Invalid audio data, not adding player";
-                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić audio (uszkodzone dane)", m_contentWidget);
-                errorLabel->setStyleSheet("color: #ff5555;");
-                m_contentLayout->addWidget(errorLabel);
-            }
+            qDebug() << "Added GIF placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
         } else {
-            qDebug() << "Failed to extract audio data";
+            // Przypadek błędu - brak danych lub niepoprawny format
+            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować animacji GIF</span>", m_contentWidget);
+            errorLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(errorLabel);
+        }
+    } else {
+        // Przypadek błędu - niepoprawny format wiadomości
+        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setWordWrap(true);
+        m_contentLayout->addWidget(messageLabel);
+    }
+}
+
+void processMessageWithAudio(const QString& formattedMessage) {
+    // Wyodrębnij podstawowy tekst wiadomości
+    QString messageText = formattedMessage;
+    int audioPos = messageText.indexOf("<div class='audio-placeholder'");
+    if (audioPos > 0) {
+        messageText = messageText.left(audioPos);
+
+        // Dodaj tekst wiadomości, jeśli istnieje
+        if (!messageText.trimmed().isEmpty()) {
+            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+            messageLabel->setTextFormat(Qt::RichText);
+            messageLabel->setWordWrap(true);
+            m_contentLayout->addWidget(messageLabel);
         }
     }
 
-    void processMessageWithVideo(const QString& formattedMessage) {
-        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika wideo)
-        QString messageText = formattedMessage;
-        int videoPos = messageText.indexOf("<div class='video-placeholder'");
-        if (videoPos > 0) {
-            messageText = messageText.left(videoPos);
+    // Wyodrębnij dane audio z wiadomości
+    QRegExp audioRegex("data-audio-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+    audioRegex.setMinimal(true);
 
-            // Dodaj tekst wiadomości, jeśli istnieje
-            if (!messageText.trimmed().isEmpty()) {
-                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-                messageLabel->setTextFormat(Qt::RichText);
-                messageLabel->setWordWrap(true);
-                m_contentLayout->addWidget(messageLabel);
-            }
-        }
+    if (audioRegex.indexIn(formattedMessage) != -1) {
+        QString elementId = audioRegex.cap(1);
+        QString mimeType = audioRegex.cap(2);
+        QString base64Data = audioRegex.cap(3);
+        QString filename = audioRegex.cap(4);
 
-        // Wyodrębnij dane wideo z wiadomości
-        QRegExp videoRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-        videoRegex.setMinimal(true);
+        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
 
-        if (videoRegex.indexIn(formattedMessage) != -1) {
-            QString mimeType = videoRegex.cap(1);
-            QString base64Data = videoRegex.cap(2);
-            QString filename = videoRegex.cap(3);
+        if (!base64Data.isEmpty() && base64Data.length() > 100) {
+            // Tworzymy placeholder, który obsłuży opóźnione ładowanie audio
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "audio", m_contentWidget, isSelf);
+            placeholder->setBase64Data(base64Data, mimeType);
+            m_contentLayout->addWidget(placeholder);
 
-            qDebug() << "Found video:" << filename << "MIME:" << mimeType;
-            qDebug() << "Base64 data length:" << base64Data.length();
-
-            // Dodaj informację o pliku wideo
-            QLabel* fileInfoLabel = new QLabel(QString("📹 <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
-            fileInfoLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(fileInfoLabel);
-
-            // Dodaj odtwarzacz wideo
-            if (!base64Data.isEmpty() && base64Data.length() > 100) {
-                QByteArray videoData = QByteArray::fromBase64(base64Data.toUtf8());
-
-                if (!videoData.isEmpty()) {
-                    InlineVideoPlayer* videoPlayer = new InlineVideoPlayer(videoData, mimeType, m_contentWidget);
-                    m_contentLayout->addWidget(videoPlayer);
-                    qDebug() << "Added inline video player, data size:" << videoData.size();
-                } else {
-                    qDebug() << "Failed to decode base64 data";
-                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych wideo", m_contentWidget);
-                    errorLabel->setStyleSheet("color: #ff5555;");
-                    m_contentLayout->addWidget(errorLabel);
-                }
-            } else {
-                qDebug() << "Invalid video data, not adding player";
-                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić wideo (uszkodzone dane)", m_contentWidget);
-                errorLabel->setStyleSheet("color: #ff5555;");
-                m_contentLayout->addWidget(errorLabel);
-            }
+            qDebug() << "Added audio placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
         } else {
-            qDebug() << "Failed to extract video data";
+            // Przypadek błędu - brak danych lub niepoprawny format
+            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować pliku audio</span>", m_contentWidget);
+            errorLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(errorLabel);
+        }
+    } else {
+        // Przypadek błędu - niepoprawny format wiadomości
+        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setWordWrap(true);
+        m_contentLayout->addWidget(messageLabel);
+    }
+}
+
+void processMessageWithVideo(const QString& formattedMessage) {
+    // Wyodrębnij podstawowy tekst wiadomości
+    QString messageText = formattedMessage;
+    int videoPos = messageText.indexOf("<div class='video-placeholder'");
+    if (videoPos > 0) {
+        messageText = messageText.left(videoPos);
+
+        // Dodaj tekst wiadomości, jeśli istnieje
+        if (!messageText.trimmed().isEmpty()) {
+            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+            messageLabel->setTextFormat(Qt::RichText);
+            messageLabel->setWordWrap(true);
+            m_contentLayout->addWidget(messageLabel);
         }
     }
+
+    // Wyodrębnij dane wideo z wiadomości
+    QRegExp videoRegex("data-video-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+    videoRegex.setMinimal(true);
+
+    if (videoRegex.indexIn(formattedMessage) != -1) {
+        QString elementId = videoRegex.cap(1);
+        QString mimeType = videoRegex.cap(2);
+        QString base64Data = videoRegex.cap(3);
+        QString filename = videoRegex.cap(4);
+
+        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
+
+        if (!base64Data.isEmpty() && base64Data.length() > 100) {
+            // Tworzymy placeholder, który obsłuży opóźnione ładowanie wideo
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "video", m_contentWidget, isSelf);
+            placeholder->setBase64Data(base64Data, mimeType);
+            m_contentLayout->addWidget(placeholder);
+
+            qDebug() << "Added video placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
+        } else {
+            // Przypadek błędu - brak danych lub niepoprawny format
+            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować pliku wideo</span>", m_contentWidget);
+            errorLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(errorLabel);
+        }
+    } else {
+        // Przypadek błędu - niepoprawny format wiadomości
+        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setWordWrap(true);
+        m_contentLayout->addWidget(messageLabel);
+    }
+}
 
     void clear() {
         qDebug() << "Clearing all messages";

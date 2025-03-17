@@ -9,6 +9,7 @@
 #include <QString>
 #include <QDebug>
 #include <QDateTime>
+#include <qtconcurrentrun.h>
 
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
@@ -91,11 +92,28 @@ private:
 
         MessageHandler::getInstance()->markMessageAsProcessed(messageId);
 
-        // Użyj zewnętrznej klasy do formatowania
-        QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+        // Sprawdź, czy wiadomość zawiera duże załączniki
+        bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
-        qDebug() << "Final formatted message:" << formattedMsg;
-        emit messageReceived(frequency, formattedMsg);
+        if (hasAttachment && msgObj.contains("attachmentData")) {
+            // Dla dużych załączników, formatuj i emituj sygnał asynchronicznie
+            QtConcurrent::run([this, msgObj, frequency, messageId]() {
+                QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+                QMetaObject::invokeMethod(this, "emitMessageReceived",
+                    Qt::QueuedConnection,
+                    Q_ARG(double, frequency),
+                    Q_ARG(QString, formattedMsg));
+            });
+        } else {
+            // Dla zwykłych wiadomości tekstowych, formatuj standardowo
+            QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+            emit messageReceived(frequency, formattedMsg);
+        }
+    }
+
+    // Dodaj metodę dla emitowania sygnału w głównym wątku:
+    Q_INVOKABLE void emitMessageReceived(double frequency, const QString& formattedMessage) {
+        emit messageReceived(frequency, formattedMessage);
     }
 
     void processSystemCommand(const QJsonObject& msgObj, double frequency) {

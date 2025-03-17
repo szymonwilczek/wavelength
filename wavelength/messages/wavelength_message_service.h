@@ -88,104 +88,126 @@ public:
     }
 
     bool sendFileMessage(const QString& filePath, const QString& progressMsgId = QString()) {
-        // Tworzymy kopię ścieżki, którą przekażemy do wątku
-        QString filePathCopy = filePath;
+    // Tworzymy kopię ścieżki, którą przekażemy do wątku
+    QString filePathCopy = filePath;
 
-        // Uruchamiamy asynchroniczne przetwarzanie pliku
-        QFuture<void> future = QtConcurrent::run([this, filePathCopy, progressMsgId]() {
-            WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-            double frequency = registry->getActiveWavelength();
+    // Uruchamiamy asynchroniczne przetwarzanie pliku
+    QFuture<void> future = QtConcurrent::run([this, filePathCopy, progressMsgId]() {
+        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+        double frequency = registry->getActiveWavelength();
 
-            if (filePathCopy.isEmpty()) {
-                qDebug() << "Empty file path";
-                this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Empty file path</span>");
-                return;
+        if (filePathCopy.isEmpty()) {
+            qDebug() << "Empty file path";
+            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Empty file path</span>");
+            return;
+        }
+
+        QFileInfo fileInfo(filePathCopy);
+        if (!fileInfo.exists() || !fileInfo.isReadable()) {
+            qDebug() << "File does not exist or is not readable:" << filePathCopy;
+            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
+            return;
+        }
+
+        QFile file(filePathCopy);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "Cannot open file for reading:" << filePathCopy;
+            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Cannot open file</span>");
+            return;
+        }
+
+        QString fileExtension = fileInfo.suffix().toLower();
+        QString fileType;
+        QString mimeType;
+
+        // Ustalamy typ pliku i MIME
+        if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
+            fileType = "image";
+            mimeType = "image/" + fileExtension;
+            if (fileExtension == "jpg") mimeType = "image/jpeg";
+        } else if (QStringList({"mp3", "wav", "ogg"}).contains(fileExtension)) {
+            fileType = "audio";
+            mimeType = "audio/" + fileExtension;
+        } else if (QStringList({"mp4", "webm", "avi", "mov"}).contains(fileExtension)) {
+            fileType = "video";
+            mimeType = "video/" + fileExtension;
+        } else {
+            fileType = "file";
+            mimeType = "application/octet-stream";
+        }
+
+        // Aktualizacja komunikatu przed wczytywaniem dużego pliku
+        this->updateProgressMessage(progressMsgId,
+            QString("<span style=\"color:#888888;\">Processing %1: %2...</span>")
+            .arg(fileType)
+            .arg(fileInfo.fileName()));
+
+        // Czytamy zawartość pliku w kawałkach dla dużych plików
+        QByteArray fileData;
+        qint64 fileSize = fileInfo.size();
+        const qint64 chunkSize = 1024 * 1024; // 1 MB chunks
+        qint64 totalRead = 0;
+
+        while (!file.atEnd()) {
+            QByteArray chunk = file.read(chunkSize);
+            fileData.append(chunk);
+            totalRead += chunk.size();
+
+            // Aktualizacja postępu co jakiś czas
+            if (progressMsgId != QString() && fileSize > 0) {
+                int progress = (totalRead * 100) / fileSize;
+                if (progress % 10 == 0) { // Aktualizuj co 10%
+                    this->updateProgressMessage(progressMsgId,
+                        QString("<span style=\"color:#888888;\">Processing %1: %2... %3%</span>")
+                        .arg(fileType)
+                        .arg(fileInfo.fileName())
+                        .arg(progress));
+                }
             }
+        }
 
-            QFileInfo fileInfo(filePathCopy);
-            if (!fileInfo.exists() || !fileInfo.isReadable()) {
-                qDebug() << "File does not exist or is not readable:" << filePathCopy;
-                this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
-                return;
-            }
+        file.close();
 
-            QFile file(filePathCopy);
-            if (!file.open(QIODevice::ReadOnly)) {
-                qDebug() << "Cannot open file for reading:" << filePathCopy;
-                this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Cannot open file</span>");
-                return;
-            }
+        // Aktualizacja przed kodowaniem Base64
+        this->updateProgressMessage(progressMsgId,
+            QString("<span style=\"color:#888888;\">Encoding %1: %2...</span>")
+            .arg(fileType)
+            .arg(fileInfo.fileName()));
 
-            QString fileExtension = fileInfo.suffix().toLower();
-            QString fileType;
-            QString mimeType;
+        QByteArray base64Data = fileData.toBase64();
 
-            // Ustalamy typ pliku i MIME
-            if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
-                fileType = "image";
-                mimeType = "image/" + fileExtension;
-                if (fileExtension == "jpg") mimeType = "image/jpeg";
-            } else if (QStringList({"mp3", "wav", "ogg"}).contains(fileExtension)) {
-                fileType = "audio";
-                mimeType = "audio/" + fileExtension;
-            } else if (QStringList({"mp4", "webm", "avi", "mov"}).contains(fileExtension)) {
-                fileType = "video";
-                mimeType = "video/" + fileExtension;
-            } else {
-                fileType = "file";
-                mimeType = "application/octet-stream";
-            }
+        // Tworzymy obiekt wiadomości
+        QJsonObject messageObj;
+        messageObj["type"] = "send_file";
+        messageObj["frequency"] = frequency;
+        messageObj["senderId"] = AuthenticationManager::getInstance()->generateClientId();
+        messageObj["messageId"] = MessageHandler::getInstance()->generateMessageId();
+        messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+        messageObj["hasAttachment"] = true;
+        messageObj["attachmentType"] = fileType;
+        messageObj["attachmentMimeType"] = mimeType;
+        messageObj["attachmentName"] = fileInfo.fileName();
+        messageObj["attachmentData"] = QString(base64Data);
 
-            // Aktualizacja komunikatu przed wczytywaniem dużego pliku
-            this->updateProgressMessage(progressMsgId,
-                QString("<span style=\"color:#888888;\">Processing %1: %2...</span>")
-                .arg(fileType)
-                .arg(fileInfo.fileName()));
+        // Aktualizacja przed wysłaniem
+        this->updateProgressMessage(progressMsgId,
+            QString("<span style=\"color:#888888;\">Sending %1: %2...</span>")
+            .arg(fileType)
+            .arg(fileInfo.fileName()));
 
-            // Czytamy zawartość pliku
-            QByteArray fileData = file.readAll();
-            file.close();
+        QJsonDocument doc(messageObj);
+        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
 
-            // Aktualizacja przed kodowaniem Base64
-            this->updateProgressMessage(progressMsgId,
-                QString("<span style=\"color:#888888;\">Encoding %1: %2...</span>")
-                .arg(fileType)
-                .arg(fileInfo.fileName()));
+        // To musi być wykonane w głównym wątku
+        QMetaObject::invokeMethod(this, "sendFileToServer",
+            Qt::QueuedConnection,
+            Q_ARG(QString, jsonMessage),
+            Q_ARG(double, frequency),
+            Q_ARG(QString, progressMsgId));
+    });
 
-            QByteArray base64Data = fileData.toBase64();
-
-            // Tworzymy obiekt wiadomości
-            QJsonObject messageObj;
-            messageObj["type"] = "send_file";
-            messageObj["frequency"] = frequency;
-            messageObj["senderId"] = AuthenticationManager::getInstance()->generateClientId();
-            messageObj["messageId"] = MessageHandler::getInstance()->generateMessageId();
-            messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
-            messageObj["hasAttachment"] = true;
-            messageObj["attachmentType"] = fileType;
-            messageObj["attachmentMimeType"] = mimeType;
-            messageObj["attachmentName"] = fileInfo.fileName();
-            messageObj["attachmentData"] = QString(base64Data);
-
-            // Aktualizacja przed wysłaniem
-            this->updateProgressMessage(progressMsgId,
-                QString("<span style=\"color:#888888;\">Sending %1: %2...</span>")
-                .arg(fileType)
-                .arg(fileInfo.fileName()));
-
-            QJsonDocument doc(messageObj);
-            QString jsonMessage = doc.toJson(QJsonDocument::Compact);
-
-            // To musi być wykonane w głównym wątku
-            QMetaObject::invokeMethod(this, "sendFileToServer",
-                Qt::QueuedConnection,
-                Q_ARG(QString, jsonMessage),
-                Q_ARG(double, frequency),
-                Q_ARG(QString, progressMsgId));
-        });
-
-        return true;
-    }
+    return true;
+}
 
     Q_INVOKABLE void sendFileToServer(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
         QWebSocket* socket = WavelengthRegistry::getInstance()->getWavelengthSocket(frequency);
