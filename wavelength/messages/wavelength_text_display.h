@@ -22,6 +22,7 @@
 #include <QDebug>
 
 #include "../files/video/player/inline_video_player.h"
+#include "../files/audio/player/inline_audio_player.h"
 
 
 // Główna klasa wyświetlająca czat
@@ -54,9 +55,11 @@ public:
     void appendMessage(const QString& formattedMessage) {
         qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
 
-        // Sprawdzamy czy wiadomość zawiera wideo
+        // Sprawdzamy czy wiadomość zawiera wideo lub audio
         if (formattedMessage.contains("video-placeholder")) {
             processMessageWithVideo(formattedMessage);
+        } else if (formattedMessage.contains("audio-placeholder")) {
+            processMessageWithAudio(formattedMessage);
         } else {
             // Standardowa wiadomość tekstowa
             QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
@@ -70,6 +73,64 @@ public:
 
         // Przewiń do najnowszej wiadomości
         QTimer::singleShot(0, this, &WavelengthTextDisplay::scrollToBottom);
+    }
+
+    void processMessageWithAudio(const QString& formattedMessage) {
+        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika audio)
+        QString messageText = formattedMessage;
+        int audioPos = messageText.indexOf("<div class='audio-placeholder'");
+        if (audioPos > 0) {
+            messageText = messageText.left(audioPos);
+
+            // Dodaj tekst wiadomości, jeśli istnieje
+            if (!messageText.trimmed().isEmpty()) {
+                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+                messageLabel->setTextFormat(Qt::RichText);
+                messageLabel->setWordWrap(true);
+                m_contentLayout->addWidget(messageLabel);
+            }
+        }
+
+        // Wyodrębnij dane audio z wiadomości
+        QRegExp audioRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+        audioRegex.setMinimal(true);
+
+        if (audioRegex.indexIn(formattedMessage) != -1) {
+            QString mimeType = audioRegex.cap(1);
+            QString base64Data = audioRegex.cap(2);
+            QString filename = audioRegex.cap(3);
+
+            qDebug() << "Found audio:" << filename << "MIME:" << mimeType;
+            qDebug() << "Base64 data length:" << base64Data.length();
+
+            // Dodaj informację o pliku audio
+            QLabel* fileInfoLabel = new QLabel(QString("🎵 <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
+            fileInfoLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(fileInfoLabel);
+
+            // Dodaj odtwarzacz audio
+            if (!base64Data.isEmpty() && base64Data.length() > 100) {
+                QByteArray audioData = QByteArray::fromBase64(base64Data.toUtf8());
+
+                if (!audioData.isEmpty()) {
+                    InlineAudioPlayer* audioPlayer = new InlineAudioPlayer(audioData, mimeType, m_contentWidget);
+                    m_contentLayout->addWidget(audioPlayer);
+                    qDebug() << "Added inline audio player, data size:" << audioData.size();
+                } else {
+                    qDebug() << "Failed to decode base64 data";
+                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych audio", m_contentWidget);
+                    errorLabel->setStyleSheet("color: #ff5555;");
+                    m_contentLayout->addWidget(errorLabel);
+                }
+            } else {
+                qDebug() << "Invalid audio data, not adding player";
+                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić audio (uszkodzone dane)", m_contentWidget);
+                errorLabel->setStyleSheet("color: #ff5555;");
+                m_contentLayout->addWidget(errorLabel);
+            }
+        } else {
+            qDebug() << "Failed to extract audio data";
+        }
     }
 
     void processMessageWithVideo(const QString& formattedMessage) {

@@ -93,14 +93,13 @@ public:
                               .arg(attachmentMimeType, attachmentData, attachmentName.toHtmlEscaped());
             }
             else if (attachmentType == "audio" && !attachmentData.isEmpty()) {
-                // Renderowanie audio
+                // Renderowanie audio - specjalny format dla naszej obsługi (podobnie jak wideo)
                 formattedMsg = messageStart + "<br>" +
-                               QString("<div style='margin-top:5px;'>"
-                                      "<audio id='%1' controls style='max-width:300px;'>"
-                                      "<source src='data:%2;base64,%3' type='%2'>"
-                                      "Your browser does not support audio playback."
-                                      "</audio><br>"
-                                      "<span style='color:#aaaaaa; font-size:9pt;'>%4</span>"
+                               QString("<div class='audio-placeholder' "
+                                      "data-audio-id='%1' "
+                                      "data-mime-type='%2' "
+                                      "data-base64='%3' "
+                                      "data-filename='%4'>"
                                       "</div>")
                                .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
             }
