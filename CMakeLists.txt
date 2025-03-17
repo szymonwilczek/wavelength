@@ -89,6 +89,10 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/files/audio/decoder/audio_decoder.h
         wavelength/files/audio/player/inline_audio_player.cpp
         wavelength/files/audio/player/inline_audio_player.h
+        wavelength/files/gif/decoder/gif_decoder.cpp
+        wavelength/files/gif/decoder/gif_decoder.h
+        wavelength/files/gif/player/inline_gif_player.cpp
+        wavelength/files/gif/player/inline_gif_player.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
