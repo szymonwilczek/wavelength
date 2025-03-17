@@ -24,6 +24,7 @@
 #include "../files/video/player/inline_video_player.h"
 #include "../files/audio/player/inline_audio_player.h"
 #include "../files/gif/player/inline_gif_player.h"
+#include "../files/image/displayer/image_viewer.h"
 
 
 // Główna klasa wyświetlająca czat
@@ -56,13 +57,15 @@ public:
     void appendMessage(const QString& formattedMessage) {
         qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
 
-        // Sprawdzamy czy wiadomość zawiera wideo lub audio
+        // Sprawdzamy czy wiadomość zawiera media
         if (formattedMessage.contains("video-placeholder")) {
             processMessageWithVideo(formattedMessage);
         } else if (formattedMessage.contains("audio-placeholder")) {
             processMessageWithAudio(formattedMessage);
         } else if (formattedMessage.contains("gif-placeholder")) {
             processMessageWithGif(formattedMessage);
+        } else if (formattedMessage.contains("image-placeholder")) {
+            processMessageWithImage(formattedMessage);
         } else {
             // Standardowa wiadomość tekstowa
             QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
@@ -76,6 +79,64 @@ public:
 
         // Przewiń do najnowszej wiadomości
         QTimer::singleShot(0, this, &WavelengthTextDisplay::scrollToBottom);
+    }
+
+    void processMessageWithImage(const QString& formattedMessage) {
+        // Wyodrębnij podstawowy tekst wiadomości (bez znacznika obrazu)
+        QString messageText = formattedMessage;
+        int imagePos = messageText.indexOf("<div class='image-placeholder'");
+        if (imagePos > 0) {
+            messageText = messageText.left(imagePos);
+
+            // Dodaj tekst wiadomości, jeśli istnieje
+            if (!messageText.trimmed().isEmpty()) {
+                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
+                messageLabel->setTextFormat(Qt::RichText);
+                messageLabel->setWordWrap(true);
+                m_contentLayout->addWidget(messageLabel);
+            }
+        }
+
+        // Wyodrębnij dane obrazu z wiadomości
+        QRegExp imageRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
+        imageRegex.setMinimal(true);
+
+        if (imageRegex.indexIn(formattedMessage) != -1) {
+            QString mimeType = imageRegex.cap(1);
+            QString base64Data = imageRegex.cap(2);
+            QString filename = imageRegex.cap(3);
+
+            qDebug() << "Found image:" << filename << "MIME:" << mimeType;
+            qDebug() << "Base64 data length:" << base64Data.length();
+
+            // Dodaj informację o pliku obrazu
+            QLabel* fileInfoLabel = new QLabel(QString("🖼️ <span style='color:#aaaaaa; font-size:9pt;'>%1</span>").arg(filename), m_contentWidget);
+            fileInfoLabel->setTextFormat(Qt::RichText);
+            m_contentLayout->addWidget(fileInfoLabel);
+
+            // Dodaj wyświetlacz obrazu
+            if (!base64Data.isEmpty() && base64Data.length() > 100) {
+                QByteArray imageData = QByteArray::fromBase64(base64Data.toUtf8());
+
+                if (!imageData.isEmpty()) {
+                    InlineImageViewer* imageViewer = new InlineImageViewer(imageData, m_contentWidget);
+                    m_contentLayout->addWidget(imageViewer);
+                    qDebug() << "Added inline image viewer, data size:" << imageData.size();
+                } else {
+                    qDebug() << "Failed to decode base64 data";
+                    QLabel* errorLabel = new QLabel("⚠️ Nie można zdekodować danych obrazu", m_contentWidget);
+                    errorLabel->setStyleSheet("color: #ff5555;");
+                    m_contentLayout->addWidget(errorLabel);
+                }
+            } else {
+                qDebug() << "Invalid image data, not adding viewer";
+                QLabel* errorLabel = new QLabel("⚠️ Nie można wyświetlić obrazu (uszkodzone dane)", m_contentWidget);
+                errorLabel->setStyleSheet("color: #ff5555;");
+                m_contentLayout->addWidget(errorLabel);
+            }
+        } else {
+            qDebug() << "Failed to extract image data";
+        }
     }
 
     void processMessageWithGif(const QString& formattedMessage) {
