@@ -32,6 +32,7 @@ class WavelengthTextDisplay : public QWidget {
     Q_OBJECT
 
 public:
+    QMap<QString, QLabel*> m_messageLabels;
     WavelengthTextDisplay(QWidget* parent = nullptr) : QWidget(parent) {
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -54,7 +55,7 @@ public:
         mainLayout->addWidget(m_scrollArea);
     }
 
-    void appendMessage(const QString& formattedMessage) {
+    void appendMessage(const QString& formattedMessage, const QString& messageId = QString()) {
         qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
 
         // Sprawdzamy czy wiadomość zawiera media
@@ -74,11 +75,46 @@ public:
             messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
             messageLabel->setOpenExternalLinks(true);
 
+            // Jeśli podano ID, zapisz referencję do etykiety
+            if (!messageId.isEmpty()) {
+                // Usuń starą etykietę, jeśli istnieje
+                if (m_messageLabels.contains(messageId)) {
+                    QLabel* oldLabel = m_messageLabels[messageId];
+                    m_contentLayout->removeWidget(oldLabel);
+                    delete oldLabel;
+                }
+                m_messageLabels[messageId] = messageLabel;
+            }
+
             m_contentLayout->addWidget(messageLabel);
         }
 
         // Przewiń do najnowszej wiadomości
         QTimer::singleShot(0, this, &WavelengthTextDisplay::scrollToBottom);
+    }
+
+    // Metoda do zastępowania wiadomości według ID
+    void replaceMessage(const QString& messageId, const QString& newMessage) {
+        if (messageId.isEmpty() || !m_messageLabels.contains(messageId)) {
+            // Jeśli nie istnieje, po prostu dodaj nową wiadomość
+            appendMessage(newMessage);
+            return;
+        }
+
+        QLabel* label = m_messageLabels[messageId];
+        label->setText(newMessage);
+    }
+
+    // Metoda do usuwania wiadomości według ID
+    void removeMessage(const QString& messageId) {
+        if (messageId.isEmpty() || !m_messageLabels.contains(messageId)) {
+            return;
+        }
+
+        QLabel* label = m_messageLabels[messageId];
+        m_contentLayout->removeWidget(label);
+        m_messageLabels.remove(messageId);
+        delete label;
     }
 
     void processMessageWithImage(const QString& formattedMessage) {

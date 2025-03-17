@@ -103,6 +103,12 @@ public:
         connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
         connect(attachButton, &QPushButton::clicked, this, &WavelengthChatView::attachFile);
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
+
+        WavelengthMessageService* messageService = WavelengthMessageService::getInstance();
+        connect(messageService, &WavelengthMessageService::progressMessageUpdated,
+                this, &WavelengthChatView::updateProgressMessage);
+        connect(messageService, &WavelengthMessageService::removeProgressMessage,
+                this, &WavelengthChatView::removeProgressMessage);
     }
 
     void attachFile() {
@@ -116,24 +122,25 @@ public:
         }
 
         QFileInfo fileInfo(filePath);
-        // if (fileInfo.size() > 10 * 1024 * 1024) { // Ograniczamy do 10MB
-        //     QMessageBox::warning(this, "File too large",
-        //         "The selected file exceeds the maximum size limit (10MB).");
-        //     return;
-        // }
 
-        // Dodaj informację o wysyłaniu pliku
+        // Generujemy unikalny identyfikator dla komunikatu
+        QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
+
+        // Dodaj informację o wysyłaniu pliku z identyfikatorem
         QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
             .arg(fileInfo.fileName());
-        messageArea->appendMessage(processingMsg);
+        messageArea->appendMessage(processingMsg, progressMsgId);
 
         // Opóźnij wysyłanie, aby dać czas na wyświetlenie komunikatu
-        QTimer::singleShot(100, this, [this, filePath]() {
+        QTimer::singleShot(100, this, [this, filePath, progressMsgId]() {
             WavelengthMessageService* manager = WavelengthMessageService::getInstance();
-            if(manager->sendFileMessage(filePath)) {
+
+            // Przekazujemy identyfikator komunikatu do serwisu wiadomości
+            if(manager->sendFileMessage(filePath, progressMsgId)) {
                 qDebug() << "File sent successfully";
+                // Komunikat zostanie zaktualizowany przez serwis wiadomości
             } else {
-                messageArea->appendMessage("<span style=\"color:#ff5555;\">Failed to send file.</span>");
+                messageArea->replaceMessage(progressMsgId, "<span style=\"color:#ff5555;\">Failed to send file.</span>");
             }
         });
     }
@@ -212,6 +219,15 @@ public:
     }
 
 private slots:
+
+    void updateProgressMessage(const QString& messageId, const QString& message) {
+        messageArea->replaceMessage(messageId, message);
+    }
+
+    void removeProgressMessage(const QString& messageId) {
+        messageArea->removeMessage(messageId);
+    }
+
     void sendMessage() {
         QString message = inputField->text().trimmed();
         if (message.isEmpty()) {
