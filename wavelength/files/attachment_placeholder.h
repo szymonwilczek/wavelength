@@ -102,10 +102,9 @@ private slots:
 
         // Uruchamiamy asynchroniczne przetwarzanie w osobnym wątku
         QFuture<void> future = QtConcurrent::run([this]() {
-            // Dekodowanie base64 w osobnym wątku
-            QByteArray data;
             try {
-                data = QByteArray::fromBase64(m_base64Data.toUtf8());
+                // Dekodowanie base64 w osobnym wątku
+                QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
 
                 if (data.isEmpty()) {
                     QMetaObject::invokeMethod(this, "setError",
@@ -114,19 +113,28 @@ private slots:
                     return;
                 }
 
-                // Przetwarzanie zależne od typu załącznika
+                // Wywołanie odpowiedniej metody przetwarzającej w głównym wątku,
+                // ale dane zostały już zdekodowane w wątku roboczym
                 if (m_mimeType.startsWith("image/")) {
                     if (m_mimeType == "image/gif") {
-                        processGif(data);
+                        QMetaObject::invokeMethod(this, "showGif",
+                            Qt::QueuedConnection,
+                            Q_ARG(QByteArray, data));
                     } else {
-                        processImage(data);
+                        QMetaObject::invokeMethod(this, "showImage",
+                            Qt::QueuedConnection,
+                            Q_ARG(QByteArray, data));
                     }
                 }
                 else if (m_mimeType.startsWith("audio/")) {
-                    processAudio(data);
+                    QMetaObject::invokeMethod(this, "showAudio",
+                        Qt::QueuedConnection,
+                        Q_ARG(QByteArray, data));
                 }
                 else if (m_mimeType.startsWith("video/")) {
-                    processVideo(data);
+                    QMetaObject::invokeMethod(this, "showVideo",
+                        Qt::QueuedConnection,
+                        Q_ARG(QByteArray, data));
                 }
             } catch (const std::exception& e) {
                 QMetaObject::invokeMethod(this, "setError",
@@ -134,34 +142,6 @@ private slots:
                     Q_ARG(QString, QString("⚠️ Błąd przetwarzania: %1").arg(e.what())));
             }
         });
-    }
-
-    void processImage(const QByteArray& data) {
-        // Przetwarzamy obraz w osobnym wątku
-        QMetaObject::invokeMethod(this, "showImage",
-            Qt::QueuedConnection,
-            Q_ARG(QByteArray, data));
-    }
-
-    void processGif(const QByteArray& data) {
-        // Przetwarzamy GIF w osobnym wątku
-        QMetaObject::invokeMethod(this, "showGif",
-            Qt::QueuedConnection,
-            Q_ARG(QByteArray, data));
-    }
-
-    void processAudio(const QByteArray& data) {
-        // Przetwarzamy audio w osobnym wątku
-        QMetaObject::invokeMethod(this, "showAudio",
-            Qt::QueuedConnection,
-            Q_ARG(QByteArray, data));
-    }
-
-    void processVideo(const QByteArray& data) {
-        // Przetwarzamy wideo w osobnym wątku
-        QMetaObject::invokeMethod(this, "showVideo",
-            Qt::QueuedConnection,
-            Q_ARG(QByteArray, data));
     }
 
 public slots:

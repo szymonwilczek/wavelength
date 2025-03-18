@@ -143,15 +143,16 @@ public:
             QString base64Data = imageRegex.cap(2);
             QString filename = imageRegex.cap(3);
 
-            // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+            // Sprawdź, czy wiadomość jest od bieżącego użytkownika - ale nie używaj tego do autoLoad!
             bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
 
             // Tworzymy placeholder, który obsłuży opóźnione ładowanie załącznika
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "image", m_contentWidget, isSelf);
+            // Zmiana: zawsze false dla autoLoad - załącznik będzie ładowany tylko na żądanie
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "image", m_contentWidget, false);
             placeholder->setBase64Data(base64Data, mimeType);
             m_contentLayout->addWidget(placeholder);
 
-            qDebug() << "Added image placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
+            qDebug() << "Added image placeholder for:" << filename;
         }
     }
 
@@ -186,7 +187,7 @@ public:
 
         if (!base64Data.isEmpty() && base64Data.length() > 100) {
             // Tworzymy placeholder, który obsłuży opóźnione ładowanie GIFa
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "gif", m_contentWidget, isSelf);
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "gif", m_contentWidget, false);
             placeholder->setBase64Data(base64Data, mimeType);
             m_contentLayout->addWidget(placeholder);
 
@@ -237,7 +238,7 @@ void processMessageWithAudio(const QString& formattedMessage) {
 
         if (!base64Data.isEmpty() && base64Data.length() > 100) {
             // Tworzymy placeholder, który obsłuży opóźnione ładowanie audio
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "audio", m_contentWidget, isSelf);
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "audio", m_contentWidget, false);
             placeholder->setBase64Data(base64Data, mimeType);
             m_contentLayout->addWidget(placeholder);
 
@@ -288,7 +289,7 @@ void processMessageWithVideo(const QString& formattedMessage) {
 
         if (!base64Data.isEmpty() && base64Data.length() > 100) {
             // Tworzymy placeholder, który obsłuży opóźnione ładowanie wideo
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "video", m_contentWidget, isSelf);
+            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "video", m_contentWidget, false);
             placeholder->setBase64Data(base64Data, mimeType);
             m_contentLayout->addWidget(placeholder);
 
