@@ -4,9 +4,7 @@ const WebSocket = require("ws");
 const { MongoClient } = require("mongodb");
 
 const PORT = process.env.PORT || 3000;
-const MONGO_URI =
-  process.env.MONGO_URI ||
-  "mongodb+srv://wolfiksw:PrincePolo1@testcluster.taymr.mongodb.net/";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/";
 const DB_NAME = "wavelengthDB";
 
 let messageCounter = 0;

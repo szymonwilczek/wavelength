@@ -77,7 +77,7 @@ private:
         : QObject(parent), m_isConnected(false) {
         try {
             static mongocxx::instance instance{};
-            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb+srv://wolfiksw:PrincePolo1@testcluster.taymr.mongodb.net/"}};
+            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb://localhost:27017"}};
             
             m_isConnected = true;
             
