@@ -223,6 +223,71 @@ void BlobAnimation::initializeBlob() {
     m_precalcMaxDistance = m_params.blobRadius * m_physicsParams.maxNeighborDistance;
 }
 
+void BlobAnimation::paintEvent(QPaintEvent *event) {
+
+    std::lock_guard lock(m_pointsMutex);
+
+    QRectF blobRect = calculateBlobBoundingRect();
+    if (!event->rect().intersects(blobRect.toRect())) {
+        return;
+    }
+
+    static QPixmap backgroundCache;
+    static QSize lastBackgroundSize;
+    static QColor lastBgColor;
+    static QColor lastGridColor;
+    static int lastGridSpacing;
+
+    QPainter painter(this);
+
+    // Przygotuj stan renderowania
+    BlobRenderState renderState;
+    renderState.isBeingAbsorbed = m_absorption.isBeingAbsorbed();
+    renderState.isAbsorbing = m_absorption.isAbsorbing();
+    renderState.isClosingAfterAbsorption = m_absorption.isClosingAfterAbsorption();
+    renderState.isPulseActive = m_absorption.isPulseActive();
+    renderState.opacity = m_absorption.opacity();
+    renderState.scale = m_absorption.scale();
+    renderState.animationState = m_currentState;
+    renderState.isInTransitionToIdle = m_transitionManager.isInTransitionToIdle();
+
+    // Deleguj renderowanie do BlobRenderer
+    m_renderer.renderScene(
+        painter,
+        m_controlPoints,
+        m_blobCenter,
+        m_params,
+        renderState,
+        width(),
+        height(),
+        backgroundCache,
+        lastBackgroundSize,
+        lastBgColor,
+        lastGridColor,
+        lastGridSpacing
+    );
+}
+
+QRectF BlobAnimation::calculateBlobBoundingRect() {
+    if (m_controlPoints.empty()) {
+        return QRectF(0, 0, width(), height());
+    }
+
+    auto xComp = [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); };
+    auto yComp = [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); };
+
+    auto [minXIt, maxXIt] = std::minmax_element(m_controlPoints.begin(), m_controlPoints.end(), xComp);
+    auto [minYIt, maxYIt] = std::minmax_element(m_controlPoints.begin(), m_controlPoints.end(), yComp);
+
+    qreal minX = minXIt->x();
+    qreal maxX = maxXIt->x();
+    qreal minY = minYIt->y();
+    qreal maxY = maxYIt->y();
+
+    int margin = m_params.borderWidth + m_params.glowRadius + 5;
+    return QRectF(minX - margin, minY - margin,
+                 maxX - minX + 2*margin, maxY - minY + 2*margin);
+}
 
 void BlobAnimation::startBeingAbsorbed() {
     m_absorption.startBeingAbsorbed();
