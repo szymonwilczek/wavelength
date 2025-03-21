@@ -54,6 +54,17 @@ bool BlobEventHandler::processResizeEvent(QResizeEvent* event) {
     if (significantChange && (currentTime - lastResizeTime >= 16)) {
         lastResizeTime = currentTime;
 
+        // Ustaw flagę resizing i zaplanuj jej wyłączenie
+        m_isResizing = true;
+
+        // Przedłużamy blokadę zdarzeń move po zakończeniu resize
+        QTimer::singleShot(300, this, [this]() {
+            m_isResizing = false;
+        });
+
+        // Poinformuj TransitionManager o stanie resize
+        emit resizeInProgress(true);
+
         // Emituj sygnał o wykryciu znaczącej zmiany rozmiaru
         emit resizeStateRequested();
         emit significantResizeDetected(oldSize, currentSize);
@@ -68,6 +79,10 @@ bool BlobEventHandler::processResizeEvent(QResizeEvent* event) {
 }
 
 void BlobEventHandler::handleMoveEvent(QMoveEvent* moveEvent) {
+    if (m_isResizing) {
+        return;
+    }
+
     QPointF newPos = moveEvent->pos();
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 

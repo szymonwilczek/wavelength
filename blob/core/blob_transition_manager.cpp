@@ -165,6 +165,10 @@ void BlobTransitionManager::processMovementBuffer(
     std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> applyInertiaForce,
     std::function<void(const QPointF&)> setLastWindowPos)
 {
+    if (m_isResizing) {
+        return;
+    }
+
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     if (m_movementBuffer.size() < 2)

@@ -130,7 +130,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
         qDebug() << "Events re-enabled";
     });
 
-
+    connect(&m_eventHandler, &BlobEventHandler::resizeInProgress, &m_transitionManager, &BlobTransitionManager::setResizingState);
 }
 
 void BlobAnimation::handleResizeTimeout() {

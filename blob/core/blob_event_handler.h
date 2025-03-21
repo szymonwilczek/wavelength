@@ -43,6 +43,7 @@ public:
 
     // Sygnał informujący o włączeniu eventów po opóźnieniu
     void eventsReEnabled();
+    void resizeInProgress(bool inProgress);
 
     private slots:
         void onEventReEnableTimeout();
@@ -64,6 +65,7 @@ private:
 
     // Timer do ponownego włączenia eventów
     QTimer m_eventReEnableTimer;
+    bool m_isResizing = false;
 };
 
 #endif // BLOBEVENTHANDLER_H

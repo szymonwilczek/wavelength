@@ -55,6 +55,7 @@ public:
     
     bool isMoving() const { return m_isMoving; }
     void setMoving(bool isMoving) { m_isMoving = isMoving; }
+    void setResizingState(bool isResizing) { m_isResizing = isResizing; }
     
     void resetInactivityCounter() { m_inactivityCounter = 0; }
     int getInactivityCounter() const { return m_inactivityCounter; }
@@ -88,6 +89,7 @@ private:
     bool m_isMoving = false;
     int m_inactivityCounter = 0;
     qint64 m_lastMovementTime = 0;
+    bool m_isResizing = false;
 };
 
 #endif // BLOB_TRANSITION_MANAGER_H
