@@ -16,6 +16,7 @@
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
 #include "../auth/authentication_manager.h"
+#include "../files/attachment_queue_manager.h"
 
 class WavelengthMessageService : public QObject {
     Q_OBJECT
@@ -88,151 +89,171 @@ public:
     }
 
     bool sendFileMessage(const QString& filePath, const QString& progressMsgId = QString()) {
-    // Tworzymy kopię ścieżki, którą przekażemy do wątku
+    if (filePath.isEmpty()) {
+        emit progressMessageUpdated(progressMsgId, "<span style=\"color:#ff5555;\">Error: Empty file path</span>");
+        return false;
+    }
+
+    // Początkowa informacja o przygotowywaniu pliku
+    emit progressMessageUpdated(progressMsgId,
+        "<span style=\"color:#888888;\">Preparing file...</span>");
+
+    // Tworzenie kopii ścieżki pliku i ID wiadomości, aby uniknąć problemów z wątkami
     QString filePathCopy = filePath;
+    QString progressMsgIdCopy = progressMsgId;
 
-    // Uruchamiamy asynchroniczne przetwarzanie pliku
-    QFuture<void> future = QtConcurrent::run([this, filePathCopy, progressMsgId]() {
-        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        double frequency = registry->getActiveWavelength();
+    // Przeniesienie całego przetwarzania do osobnego wątku przy użyciu AttachmentQueueManager
+    AttachmentQueueManager::getInstance()->addTask([this, filePathCopy, progressMsgIdCopy]() {
+        try {
+            QFileInfo fileInfo(filePathCopy);
+            if (!fileInfo.exists() || !fileInfo.isReadable()) {
+                emit progressMessageUpdated(progressMsgIdCopy,
+                    "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
+                return;
+            }
 
-        if (filePathCopy.isEmpty()) {
-            qDebug() << "Empty file path";
-            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Empty file path</span>");
-            return;
-        }
+            QFile file(filePathCopy);
+            if (!file.open(QIODevice::ReadOnly)) {
+                emit progressMessageUpdated(progressMsgIdCopy,
+                    "<span style=\"color:#ff5555;\">Error: Cannot open file</span>");
+                return;
+            }
 
-        QFileInfo fileInfo(filePathCopy);
-        if (!fileInfo.exists() || !fileInfo.isReadable()) {
-            qDebug() << "File does not exist or is not readable:" << filePathCopy;
-            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
-            return;
-        }
+            // Ustalamy typ pliku
+            QString fileExtension = fileInfo.suffix().toLower();
+            QString fileType;
+            QString mimeType;
 
-        QFile file(filePathCopy);
-        if (!file.open(QIODevice::ReadOnly)) {
-            qDebug() << "Cannot open file for reading:" << filePathCopy;
-            this->updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Cannot open file</span>");
-            return;
-        }
+            if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
+                fileType = "image";
+                mimeType = "image/" + fileExtension;
+                if (fileExtension == "jpg") mimeType = "image/jpeg";
+            } else if (QStringList({"mp3", "wav", "ogg"}).contains(fileExtension)) {
+                fileType = "audio";
+                mimeType = "audio/" + fileExtension;
+            } else if (QStringList({"mp4", "webm", "avi", "mov"}).contains(fileExtension)) {
+                fileType = "video";
+                mimeType = "video/" + fileExtension;
+            } else {
+                fileType = "file";
+                mimeType = "application/octet-stream";
+            }
 
-        QString fileExtension = fileInfo.suffix().toLower();
-        QString fileType;
-        QString mimeType;
+            // Informujemy o rozpoczęciu przetwarzania
+            emit progressMessageUpdated(progressMsgIdCopy,
+                QString("<span style=\"color:#888888;\">Processing %1: %2...</span>")
+                .arg(fileType)
+                .arg(fileInfo.fileName()));
 
-        // Ustalamy typ pliku i MIME
-        if (QStringList({"jpg", "jpeg", "png", "gif"}).contains(fileExtension)) {
-            fileType = "image";
-            mimeType = "image/" + fileExtension;
-            if (fileExtension == "jpg") mimeType = "image/jpeg";
-        } else if (QStringList({"mp3", "wav", "ogg"}).contains(fileExtension)) {
-            fileType = "audio";
-            mimeType = "audio/" + fileExtension;
-        } else if (QStringList({"mp4", "webm", "avi", "mov"}).contains(fileExtension)) {
-            fileType = "video";
-            mimeType = "video/" + fileExtension;
-        } else {
-            fileType = "file";
-            mimeType = "application/octet-stream";
-        }
+            // Czytamy plik w kawałkach
+            QByteArray fileData;
+            qint64 fileSize = fileInfo.size();
+            const qint64 chunkSize = 1024 * 1024; // 1 MB chunks
+            qint64 totalRead = 0;
+            int lastProgressReported = 0;
 
-        // Aktualizacja komunikatu przed wczytywaniem dużego pliku
-        this->updateProgressMessage(progressMsgId,
-            QString("<span style=\"color:#888888;\">Processing %1: %2...</span>")
-            .arg(fileType)
-            .arg(fileInfo.fileName()));
+            while (!file.atEnd()) {
+                QByteArray chunk = file.read(chunkSize);
+                fileData.append(chunk);
+                totalRead += chunk.size();
 
-        // Czytamy zawartość pliku w kawałkach dla dużych plików
-        QByteArray fileData;
-        qint64 fileSize = fileInfo.size();
-        const qint64 chunkSize = 1024 * 1024; // 1 MB chunks
-        qint64 totalRead = 0;
+                // Aktualizujemy postęp co 5%
+                if (fileSize > 0) {
+                    int progress = (totalRead * 100) / fileSize;
+                    if (progress - lastProgressReported >= 5) {
+                        lastProgressReported = progress;
+                        emit progressMessageUpdated(progressMsgIdCopy,
+                            QString("<span style=\"color:#888888;\">Processing %1: %2... %3%</span>")
+                            .arg(fileType)
+                            .arg(fileInfo.fileName())
+                            .arg(progress));
 
-        while (!file.atEnd()) {
-            QByteArray chunk = file.read(chunkSize);
-            fileData.append(chunk);
-            totalRead += chunk.size();
-
-            // Aktualizacja postępu co jakiś czas
-            if (progressMsgId != QString() && fileSize > 0) {
-                int progress = (totalRead * 100) / fileSize;
-                if (progress % 10 == 0) { // Aktualizuj co 10%
-                    this->updateProgressMessage(progressMsgId,
-                        QString("<span style=\"color:#888888;\">Processing %1: %2... %3%</span>")
-                        .arg(fileType)
-                        .arg(fileInfo.fileName())
-                        .arg(progress));
+                        // Krótkie uśpienie, aby dać szansę innym wątkom
+                        QThread::msleep(1);
+                    }
                 }
             }
+
+            file.close();
+
+            // Informujemy o rozpoczęciu kodowania
+            emit progressMessageUpdated(progressMsgIdCopy,
+                QString("<span style=\"color:#888888;\">Encoding %1: %2...</span>")
+                .arg(fileType)
+                .arg(fileInfo.fileName()));
+
+            // Kodowanie base64
+            QByteArray base64Data = fileData.toBase64();
+
+            // Pobieramy dane potrzebne do wysłania
+            WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+            double frequency = registry->getActiveWavelength();
+            QString senderId = AuthenticationManager::getInstance()->generateClientId();
+            QString messageId = MessageHandler::getInstance()->generateMessageId();
+
+            // Tworzymy obiekt wiadomości
+            QJsonObject messageObj;
+            messageObj["type"] = "send_file";
+            messageObj["frequency"] = frequency;
+            messageObj["senderId"] = senderId;
+            messageObj["messageId"] = messageId;
+            messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+            messageObj["hasAttachment"] = true;
+            messageObj["attachmentType"] = fileType;
+            messageObj["attachmentMimeType"] = mimeType;
+            messageObj["attachmentName"] = fileInfo.fileName();
+            messageObj["attachmentData"] = QString(base64Data);
+
+            // Informujemy o rozpoczęciu wysyłania
+            emit progressMessageUpdated(progressMsgIdCopy,
+                QString("<span style=\"color:#888888;\">Sending %1: %2...</span>")
+                .arg(fileType)
+                .arg(fileInfo.fileName()));
+
+            QJsonDocument doc(messageObj);
+            QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+
+            // Wysyłamy plik używając sygnału
+            emit sendJsonViaSocket(jsonMessage, frequency, progressMsgIdCopy);
         }
-
-        file.close();
-
-        // Aktualizacja przed kodowaniem Base64
-        this->updateProgressMessage(progressMsgId,
-            QString("<span style=\"color:#888888;\">Encoding %1: %2...</span>")
-            .arg(fileType)
-            .arg(fileInfo.fileName()));
-
-        QByteArray base64Data = fileData.toBase64();
-
-        // Tworzymy obiekt wiadomości
-        QJsonObject messageObj;
-        messageObj["type"] = "send_file";
-        messageObj["frequency"] = frequency;
-        messageObj["senderId"] = AuthenticationManager::getInstance()->generateClientId();
-        messageObj["messageId"] = MessageHandler::getInstance()->generateMessageId();
-        messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
-        messageObj["hasAttachment"] = true;
-        messageObj["attachmentType"] = fileType;
-        messageObj["attachmentMimeType"] = mimeType;
-        messageObj["attachmentName"] = fileInfo.fileName();
-        messageObj["attachmentData"] = QString(base64Data);
-
-        // Aktualizacja przed wysłaniem
-        this->updateProgressMessage(progressMsgId,
-            QString("<span style=\"color:#888888;\">Sending %1: %2...</span>")
-            .arg(fileType)
-            .arg(fileInfo.fileName()));
-
-        QJsonDocument doc(messageObj);
-        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
-
-        // To musi być wykonane w głównym wątku
-        QMetaObject::invokeMethod(this, "sendFileToServer",
-            Qt::QueuedConnection,
-            Q_ARG(QString, jsonMessage),
-            Q_ARG(double, frequency),
-            Q_ARG(QString, progressMsgId));
+        catch (const std::exception& e) {
+            emit progressMessageUpdated(progressMsgIdCopy,
+                QString("<span style=\"color:#ff5555;\">Error: %1</span>").arg(e.what()));
+        }
     });
 
     return true;
 }
 
-    Q_INVOKABLE void sendFileToServer(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
-        QWebSocket* socket = WavelengthRegistry::getInstance()->getWavelengthSocket(frequency);
-        if (!socket) {
-            qDebug() << "No socket for frequency" << frequency;
-            updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Connection lost</span>");
-            return;
-        }
+// Dodaj nową wersję metody sendFileToServer, która zwraca bool
+Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
+    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    QWebSocket* socket = nullptr;
 
-        socket->sendTextMessage(jsonMessage);
-
-        // Usuwamy komunikat o postępie - nie jest już potrzebny
-        if (!progressMsgId.isEmpty()) {
-            QTimer::singleShot(500, this, [this, progressMsgId]() {
-                emit removeProgressMessage(progressMsgId);
-            });
-        }
+    if (registry->hasWavelength(frequency)) {
+        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+        socket = info.socket;
     }
 
-    // Metoda do aktualizacji komunikatu o postępie
-    void updateProgressMessage(const QString& progressMsgId, const QString& message) {
-        if (!progressMsgId.isEmpty()) {
-            emit progressMessageUpdated(progressMsgId, message);
-        }
+    if (!socket || !socket->isValid()) {
+        updateProgressMessage(progressMsgId, "<span style=\"color:#ff5555;\">Error: Not connected to server</span>");
+        return false;
     }
+
+    // Faktycznie wysyłamy dane
+    socket->sendTextMessage(jsonMessage);
+
+    // Potwierdzenie wysłania
+    updateProgressMessage(progressMsgId, "<span style=\"color:#66cc66;\">File sent successfully!</span>");
+
+    // Po 5 sekundach usuwamy komunikat postępu
+    QTimer::singleShot(5000, this, [this, progressMsgId]() {
+        emit removeProgressMessage(progressMsgId);
+    });
+
+    return true;
+}
+
 
     QMap<QString, QString>* getSentMessageCache() {
         return &m_sentMessages;
@@ -250,20 +271,62 @@ public:
         m_clientId = clientId;
     }
 
+    public slots:
+    void updateProgressMessage(const QString& progressMsgId, const QString& message) {
+        if (progressMsgId.isEmpty()) return;
+        emit progressMessageUpdated(progressMsgId, message);
+    }
+
+    // Dodajemy slot do wysyłania wiadomości przez socket
+    void handleSendJsonViaSocket(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
+        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+        QWebSocket* socket = nullptr;
+
+        if (registry->hasWavelength(frequency)) {
+            WavelengthInfo info = registry->getWavelengthInfo(frequency);
+            socket = info.socket;
+        }
+
+        if (!socket || !socket->isValid()) {
+            emit progressMessageUpdated(progressMsgId,
+                "<span style=\"color:#ff5555;\">Error: Not connected to server</span>");
+            return;
+        }
+
+        // Wysyłamy dane
+        socket->sendTextMessage(jsonMessage);
+
+        // Potwierdzamy wysłanie
+        emit progressMessageUpdated(progressMsgId,
+            "<span style=\"color:#66cc66;\">File sent successfully!</span>");
+
+        // Po 5 sekundach usuwamy komunikat
+        QTimer::singleShot(5000, this, [this, progressMsgId]() {
+            emit removeProgressMessage(progressMsgId);
+        });
+    }
+
 signals:
     void messageSent(double frequency, const QString& formattedMessage);
     void progressMessageUpdated(const QString& messageId, const QString& message);
     void removeProgressMessage(const QString& messageId);
+    void sendJsonViaSocket(const QString& jsonMessage, double frequency, const QString& progressMsgId);
 
 private:
-    WavelengthMessageService(QObject* parent = nullptr) : QObject(parent) {}
+    WavelengthMessageService(QObject* parent = nullptr) : QObject(parent) {
+        // Łączymy sygnał wysyłania przez socket z odpowiednim slotem
+        connect(this, &WavelengthMessageService::sendJsonViaSocket,
+                this, &WavelengthMessageService::handleSendJsonViaSocket,
+                Qt::QueuedConnection);
+    }
+
     ~WavelengthMessageService() {}
 
     WavelengthMessageService(const WavelengthMessageService&) = delete;
     WavelengthMessageService& operator=(const WavelengthMessageService&) = delete;
 
     QMap<QString, QString> m_sentMessages;
-    QString m_clientId;  // Przechowuje ID klienta
+    QString m_clientId;
 };
 
 #endif // WAVELENGTH_MESSAGE_SERVICE_H

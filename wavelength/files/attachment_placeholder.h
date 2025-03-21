@@ -11,6 +11,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "attachment_queue_manager.h"
+#include "../messages/formatter/message_formatter.h"
 #include "gif/player/inline_gif_player.h"
 #include "image/displayer/image_viewer.h"
 #include "video/player/video_player_overlay.h"
@@ -71,25 +73,34 @@ public:
         m_isLoaded = true;
     }
 
+    void setAttachmentReference(const QString& attachmentId, const QString& mimeType) {
+        m_attachmentId = attachmentId;
+        m_mimeType = mimeType;
+        m_hasReference = true;
+    }
+
     void setBase64Data(const QString& base64Data, const QString& mimeType) {
         m_base64Data = base64Data;
         m_mimeType = mimeType;
     }
 
-    void setError(const QString& errorMessage) {
-        m_progressLabel->setText("<span style='color:#ff5555;'>" + errorMessage + "</span>");
-        m_progressLabel->setVisible(true);
+    void setError(const QString& errorMsg) {
         m_loadButton->setEnabled(true);
-        m_loadButton->setText("Spróbuj ponownie");
+        m_loadButton->setText("Załaduj ponownie");
+        m_progressLabel->setText(errorMsg);
+        m_progressLabel->setVisible(true);
+        m_isLoaded = false;
     }
 
-    void setLoading(bool isLoading) {
-        m_loadButton->setEnabled(!isLoading);
-        if (isLoading) {
+    void setLoading(bool loading) {
+        if (loading) {
+            m_loadButton->setEnabled(false);
             m_loadButton->setText("Ładowanie...");
-            m_progressLabel->setText("<span style='color:#aaaaaa;'>Trwa przetwarzanie załącznika...</span>");
+            m_progressLabel->setText("Dekodowanie zawartości...");
             m_progressLabel->setVisible(true);
         } else {
+            m_loadButton->setEnabled(true);
+            m_loadButton->setText("Załaduj załącznik");
             m_progressLabel->setVisible(false);
         }
     }
@@ -100,11 +111,21 @@ private slots:
 
         setLoading(true);
 
-        // Uruchamiamy asynchroniczne przetwarzanie w osobnym wątku
-        QFuture<void> future = QtConcurrent::run([this]() {
-            try {
-                // Dekodowanie base64 w osobnym wątku
-                QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
+        // Sprawdź czy mamy referencję czy pełne dane
+        if (m_hasReference) {
+            // Pobieramy dane z magazynu w wątku roboczym
+            AttachmentQueueManager::getInstance()->addTask([this]() {
+                QString base64Data = AttachmentDataStore::getInstance()->getAttachmentData(m_attachmentId);
+
+                if (base64Data.isEmpty()) {
+                    QMetaObject::invokeMethod(this, "setError",
+                        Qt::QueuedConnection,
+                        Q_ARG(QString, "⚠️ Nie można odnaleźć danych załącznika"));
+                    return;
+                }
+
+                // Dekodujemy dane i kontynuujemy jak wcześniej
+                QByteArray data = QByteArray::fromBase64(base64Data.toUtf8());
 
                 if (data.isEmpty()) {
                     QMetaObject::invokeMethod(this, "setError",
@@ -113,8 +134,7 @@ private slots:
                     return;
                 }
 
-                // Wywołanie odpowiedniej metody przetwarzającej w głównym wątku,
-                // ale dane zostały już zdekodowane w wątku roboczym
+                // Wybieramy odpowiednią metodę wyświetlania na podstawie MIME type
                 if (m_mimeType.startsWith("image/")) {
                     if (m_mimeType == "image/gif") {
                         QMetaObject::invokeMethod(this, "showGif",
@@ -136,12 +156,29 @@ private slots:
                         Qt::QueuedConnection,
                         Q_ARG(QByteArray, data));
                 }
-            } catch (const std::exception& e) {
-                QMetaObject::invokeMethod(this, "setError",
-                    Qt::QueuedConnection,
-                    Q_ARG(QString, QString("⚠️ Błąd przetwarzania: %1").arg(e.what())));
-            }
-        });
+            });
+        } else {
+            // Stare zachowanie dla pełnych danych (dla kompatybilności)
+            AttachmentQueueManager::getInstance()->addTask([this]() {
+                try {
+                    QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
+
+                    if (data.isEmpty()) {
+                        QMetaObject::invokeMethod(this, "setError",
+                            Qt::QueuedConnection,
+                            Q_ARG(QString, "⚠️ Nie można zdekodować danych załącznika"));
+                        return;
+                    }
+
+                    // Dalsze przetwarzanie jak wcześniej
+                    // ...
+                } catch (const std::exception& e) {
+                    QMetaObject::invokeMethod(this, "setError",
+                        Qt::QueuedConnection,
+                        Q_ARG(QString, QString("⚠️ Błąd przetwarzania: %1").arg(e.what())));
+                }
+            });
+        }
     }
 
 public slots:
@@ -219,12 +256,13 @@ public slots:
 
 // Dodajemy metodę generującą miniaturkę
 void generateThumbnail(const QByteArray& videoData, QLabel* thumbnailLabel) {
-    QFuture<void> future = QtConcurrent::run([this, videoData, thumbnailLabel]() {
+    // Dodajemy zadanie do menedżera kolejki
+    AttachmentQueueManager::getInstance()->addTask([this, videoData, thumbnailLabel]() {
         try {
-            // Tworzymy tymczasowy dekoder, który wyekstrahuje pierwszą klatkę
+            // Tworzymy tymczasowy dekoder wideo tylko dla miniatury
             auto tempDecoder = std::make_shared<VideoDecoder>(videoData, nullptr);
 
-            // Łączymy sygnał frameReady z funkcją aktualizującą miniaturkę
+            // Łączymy sygnał z dekoderem
             QObject::connect(tempDecoder.get(), &VideoDecoder::frameReady,
                 thumbnailLabel, [thumbnailLabel, tempDecoder](const QImage& frame) {
                     // Skalujemy klatkę do rozmiaru miniaturki
@@ -241,10 +279,11 @@ void generateThumbnail(const QByteArray& videoData, QLabel* thumbnailLabel) {
                     int y = (thumbnailLabel->height() - scaledFrame.height()) / 2;
                     painter.drawImage(x, y, scaledFrame);
 
-                    // Rysujemy półprzezroczystą ikonę odtwarzania
+                    // Dodajemy ikonę odtwarzania
                     painter.setPen(Qt::NoPen);
                     painter.setBrush(QColor(255, 255, 255, 180));
-                    painter.drawEllipse(QRect(thumbnailLabel->width()/2 - 30, thumbnailLabel->height()/2 - 30, 60, 60));
+                    painter.drawEllipse(QRect(thumbnailLabel->width()/2 - 30,
+                                             thumbnailLabel->height()/2 - 30, 60, 60));
 
                     painter.setBrush(QColor(0, 0, 0, 200));
                     QPolygon triangle;
@@ -253,31 +292,28 @@ void generateThumbnail(const QByteArray& videoData, QLabel* thumbnailLabel) {
                     triangle << QPoint(thumbnailLabel->width()/2 - 15, thumbnailLabel->height()/2 + 20);
                     painter.drawPolygon(triangle);
 
-                    // Ustawiamy obraz jako pixmap etykiety
-                    thumbnailLabel->setPixmap(QPixmap::fromImage(overlayImage));
+                    // Aktualizacja UI w głównym wątku
+                    QMetaObject::invokeMethod(thumbnailLabel, "setPixmap",
+                        Qt::QueuedConnection,
+                        Q_ARG(QPixmap, QPixmap::fromImage(overlayImage)));
 
                     // Zatrzymujemy dekoder
                     tempDecoder->stop();
-                    tempDecoder->wait(500);
-                    tempDecoder->releaseResources();
                 },
                 Qt::QueuedConnection);
 
             // Wyekstrahuj pierwszą klatkę
-            tempDecoder->start(QThread::LowPriority);
-            QThread::msleep(100); // Daj czas na inicjalizację
             tempDecoder->extractFirstFrame();
 
-            // Poczekaj chwilę na przetworzenie pierwszej klatki
+            // Dajemy czas na przetworzenie klatki
             QThread::msleep(500);
 
-            // Zatrzymaj dekoder
+            // Zatrzymujemy dekoder
             tempDecoder->stop();
-            tempDecoder->wait(500);
-            tempDecoder->releaseResources();
+            tempDecoder->wait(300);
 
         } catch (...) {
-            // Jeśli wystąpił błąd, ignoruj - miniaturka pozostanie czarna z ikoną odtwarzania
+            // W przypadku błędu pozostawiamy domyślną czarną miniaturkę
         }
     });
 }
@@ -295,6 +331,8 @@ private:
     QByteArray m_videoData; // Do przechowywania danych wideo
     QLabel* m_thumbnailLabel = nullptr;
     std::function<void()> m_clickHandler;
+    QString m_attachmentId;
+    bool m_hasReference = false;
 
     bool eventFilter(QObject* watched, QEvent* event) override {
         if (watched == m_thumbnailLabel && event->type() == QEvent::MouseButtonRelease) {

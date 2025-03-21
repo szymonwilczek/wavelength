@@ -118,195 +118,295 @@ public:
         delete label;
     }
 
-    void processMessageWithImage(const QString& formattedMessage) {
-        // Wyodrębnij podstawowy tekst wiadomości
-        QString messageText = formattedMessage;
-        int imagePos = messageText.indexOf("<div class='image-placeholder'");
-        if (imagePos > 0) {
-            messageText = messageText.left(imagePos);
+    // Funkcje przetwarzające różne typy wiadomości z załącznikami
 
-            // Dodaj tekst wiadomości, jeśli istnieje
-            if (!messageText.trimmed().isEmpty()) {
-                QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-                messageLabel->setTextFormat(Qt::RichText);
-                messageLabel->setWordWrap(true);
-                m_contentLayout->addWidget(messageLabel);
-            }
+// Przetwarzanie wiadomości z obrazkiem
+void processMessageWithImage(const QString& formattedMessage, const QString& messageId = QString()) {
+    // Sprawdź czy wiadomość zawiera placeholder obrazu
+    int placeholderStart = formattedMessage.indexOf("<div class='image-placeholder'");
+    if (placeholderStart >= 0) {
+        // Znajdujemy koniec placeholdera
+        int placeholderEnd = formattedMessage.indexOf("</div>", placeholderStart);
+        if (placeholderEnd < 0) placeholderEnd = formattedMessage.length();
+
+        // Wyciągamy atrybuty placeholdera
+        QString imageId = extractAttribute(formattedMessage, "data-image-id");
+        QString mimeType = extractAttribute(formattedMessage, "data-mime-type");
+        QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
+        QString filename = extractAttribute(formattedMessage, "data-filename");
+
+        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
+        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
+        messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+        m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
         }
 
-        // Wyodrębnij dane obrazu z wiadomości
-        QRegExp imageRegex("data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-        imageRegex.setMinimal(true);
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* imagePlaceholder = new AttachmentPlaceholder(
+            filename, "image", this, false);
 
-        if (imageRegex.indexIn(formattedMessage) != -1) {
-            QString mimeType = imageRegex.cap(1);
-            QString base64Data = imageRegex.cap(2);
-            QString filename = imageRegex.cap(3);
+        // Używamy referencji zamiast pełnych danych
+        imagePlaceholder->setAttachmentReference(attachmentId, mimeType);
+        m_contentLayout->addWidget(imagePlaceholder);
 
-            // Sprawdź, czy wiadomość jest od bieżącego użytkownika - ale nie używaj tego do autoLoad!
-            bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
-
-            // Tworzymy placeholder, który obsłuży opóźnione ładowanie załącznika
-            // Zmiana: zawsze false dla autoLoad - załącznik będzie ładowany tylko na żądanie
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "image", m_contentWidget, false);
-            placeholder->setBase64Data(base64Data, mimeType);
-            m_contentLayout->addWidget(placeholder);
-
-            qDebug() << "Added image placeholder for:" << filename;
-        }
-    }
-
-    void processMessageWithGif(const QString& formattedMessage) {
-    // Wyodrębnij podstawowy tekst wiadomości
-    QString messageText = formattedMessage;
-    int gifPos = messageText.indexOf("<div class='gif-placeholder'");
-    if (gifPos > 0) {
-        messageText = messageText.left(gifPos);
-
-        // Dodaj tekst wiadomości, jeśli istnieje
-        if (!messageText.trimmed().isEmpty()) {
-            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-            messageLabel->setTextFormat(Qt::RichText);
-            messageLabel->setWordWrap(true);
-            m_contentLayout->addWidget(messageLabel);
-        }
-    }
-
-    // Wyodrębnij dane GIFa z wiadomości
-    QRegExp gifRegex("data-gif-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-    gifRegex.setMinimal(true);
-
-    if (gifRegex.indexIn(formattedMessage) != -1) {
-        QString elementId = gifRegex.cap(1);
-        QString mimeType = gifRegex.cap(2);
-        QString base64Data = gifRegex.cap(3);
-        QString filename = gifRegex.cap(4);
-
-        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
-        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
-
-        if (!base64Data.isEmpty() && base64Data.length() > 100) {
-            // Tworzymy placeholder, który obsłuży opóźnione ładowanie GIFa
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "gif", m_contentWidget, false);
-            placeholder->setBase64Data(base64Data, mimeType);
-            m_contentLayout->addWidget(placeholder);
-
-            qDebug() << "Added GIF placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
-        } else {
-            // Przypadek błędu - brak danych lub niepoprawny format
-            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować animacji GIF</span>", m_contentWidget);
-            errorLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(errorLabel);
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        if (placeholderEnd < formattedMessage.length()) {
+            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
+            afterLabel->setWordWrap(true);
+            afterLabel->setTextFormat(Qt::RichText);
+            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            afterLabel->setOpenExternalLinks(true);
+            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+            m_contentLayout->addWidget(afterLabel);
         }
     } else {
-        // Przypadek błędu - niepoprawny format wiadomości
-        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
-        messageLabel->setTextFormat(Qt::RichText);
+        // Standardowe wyświetlanie wiadomości bez załącznika
+        QLabel* messageLabel = new QLabel(formattedMessage);
         messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
         m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
+        }
     }
+
+    // Przewijamy obszar przewijania do dołu
+    QTimer::singleShot(100, this, [this]() {
+        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
+    });
 }
 
-void processMessageWithAudio(const QString& formattedMessage) {
-    // Wyodrębnij podstawowy tekst wiadomości
-    QString messageText = formattedMessage;
-    int audioPos = messageText.indexOf("<div class='audio-placeholder'");
-    if (audioPos > 0) {
-        messageText = messageText.left(audioPos);
+// Przetwarzanie wiadomości z animacją GIF
+void processMessageWithGif(const QString& formattedMessage, const QString& messageId = QString()) {
+    // Sprawdź czy wiadomość zawiera placeholder GIF-a
+    int placeholderStart = formattedMessage.indexOf("<div class='gif-placeholder'");
+    if (placeholderStart >= 0) {
+        // Znajdujemy koniec placeholdera
+        int placeholderEnd = formattedMessage.indexOf("</div>", placeholderStart);
+        if (placeholderEnd < 0) placeholderEnd = formattedMessage.length();
 
-        // Dodaj tekst wiadomości, jeśli istnieje
-        if (!messageText.trimmed().isEmpty()) {
-            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-            messageLabel->setTextFormat(Qt::RichText);
-            messageLabel->setWordWrap(true);
-            m_contentLayout->addWidget(messageLabel);
+        // Wyciągamy atrybuty placeholdera
+        QString gifId = extractAttribute(formattedMessage, "data-gif-id");
+        QString mimeType = extractAttribute(formattedMessage, "data-mime-type");
+        QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
+        QString filename = extractAttribute(formattedMessage, "data-filename");
+
+        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
+        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
+        messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+        m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
         }
-    }
 
-    // Wyodrębnij dane audio z wiadomości
-    QRegExp audioRegex("data-audio-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-    audioRegex.setMinimal(true);
+        // Tworzymy placeholder załącznika GIF
+        AttachmentPlaceholder* gifPlaceholder = new AttachmentPlaceholder(
+            filename, "gif", this, false);
 
-    if (audioRegex.indexIn(formattedMessage) != -1) {
-        QString elementId = audioRegex.cap(1);
-        QString mimeType = audioRegex.cap(2);
-        QString base64Data = audioRegex.cap(3);
-        QString filename = audioRegex.cap(4);
+        // Używamy referencji zamiast pełnych danych
+        gifPlaceholder->setAttachmentReference(attachmentId, mimeType);
+        m_contentLayout->addWidget(gifPlaceholder);
 
-        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
-        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
-
-        if (!base64Data.isEmpty() && base64Data.length() > 100) {
-            // Tworzymy placeholder, który obsłuży opóźnione ładowanie audio
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "audio", m_contentWidget, false);
-            placeholder->setBase64Data(base64Data, mimeType);
-            m_contentLayout->addWidget(placeholder);
-
-            qDebug() << "Added audio placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
-        } else {
-            // Przypadek błędu - brak danych lub niepoprawny format
-            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować pliku audio</span>", m_contentWidget);
-            errorLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(errorLabel);
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        if (placeholderEnd < formattedMessage.length()) {
+            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
+            afterLabel->setWordWrap(true);
+            afterLabel->setTextFormat(Qt::RichText);
+            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            afterLabel->setOpenExternalLinks(true);
+            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+            m_contentLayout->addWidget(afterLabel);
         }
     } else {
-        // Przypadek błędu - niepoprawny format wiadomości
-        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
-        messageLabel->setTextFormat(Qt::RichText);
+        // Standardowe wyświetlanie wiadomości bez załącznika
+        QLabel* messageLabel = new QLabel(formattedMessage);
         messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
         m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
+        }
     }
+
+    // Przewijamy obszar przewijania do dołu
+    QTimer::singleShot(100, this, [this]() {
+        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
+    });
 }
 
-void processMessageWithVideo(const QString& formattedMessage) {
-    // Wyodrębnij podstawowy tekst wiadomości
-    QString messageText = formattedMessage;
-    int videoPos = messageText.indexOf("<div class='video-placeholder'");
-    if (videoPos > 0) {
-        messageText = messageText.left(videoPos);
+// Przetwarzanie wiadomości z plikiem audio
+void processMessageWithAudio(const QString& formattedMessage, const QString& messageId = QString()) {
+    // Sprawdź czy wiadomość zawiera placeholder audio
+    int placeholderStart = formattedMessage.indexOf("<div class='audio-placeholder'");
+    if (placeholderStart >= 0) {
+        // Znajdujemy koniec placeholdera
+        int placeholderEnd = formattedMessage.indexOf("</div>", placeholderStart);
+        if (placeholderEnd < 0) placeholderEnd = formattedMessage.length();
 
-        // Dodaj tekst wiadomości, jeśli istnieje
-        if (!messageText.trimmed().isEmpty()) {
-            QLabel* messageLabel = new QLabel(messageText, m_contentWidget);
-            messageLabel->setTextFormat(Qt::RichText);
-            messageLabel->setWordWrap(true);
-            m_contentLayout->addWidget(messageLabel);
+        // Wyciągamy atrybuty placeholdera
+        QString audioId = extractAttribute(formattedMessage, "data-audio-id");
+        QString mimeType = extractAttribute(formattedMessage, "data-mime-type");
+        QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
+        QString filename = extractAttribute(formattedMessage, "data-filename");
+
+        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
+        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
+        messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+        m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
         }
-    }
 
-    // Wyodrębnij dane wideo z wiadomości
-    QRegExp videoRegex("data-video-id='([^']*)'.*data-mime-type='([^']*)'.*data-base64='([^']*)'.*data-filename='([^']*)'");
-    videoRegex.setMinimal(true);
+        // Tworzymy placeholder załącznika audio
+        AttachmentPlaceholder* audioPlaceholder = new AttachmentPlaceholder(
+            filename, "audio", this, false);
 
-    if (videoRegex.indexIn(formattedMessage) != -1) {
-        QString elementId = videoRegex.cap(1);
-        QString mimeType = videoRegex.cap(2);
-        QString base64Data = videoRegex.cap(3);
-        QString filename = videoRegex.cap(4);
+        // Używamy referencji zamiast pełnych danych
+        audioPlaceholder->setAttachmentReference(attachmentId, mimeType);
+        m_contentLayout->addWidget(audioPlaceholder);
 
-        // Sprawdź, czy wiadomość jest od bieżącego użytkownika
-        bool isSelf = formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>");
-
-        if (!base64Data.isEmpty() && base64Data.length() > 100) {
-            // Tworzymy placeholder, który obsłuży opóźnione ładowanie wideo
-            AttachmentPlaceholder* placeholder = new AttachmentPlaceholder(filename, "video", m_contentWidget, false);
-            placeholder->setBase64Data(base64Data, mimeType);
-            m_contentLayout->addWidget(placeholder);
-
-            qDebug() << "Added video placeholder for:" << filename << (isSelf ? "(autoloading)" : "");
-        } else {
-            // Przypadek błędu - brak danych lub niepoprawny format
-            QLabel* errorLabel = new QLabel("<span style='color:#ff5555;'>⚠️ Nie udało się załadować pliku wideo</span>", m_contentWidget);
-            errorLabel->setTextFormat(Qt::RichText);
-            m_contentLayout->addWidget(errorLabel);
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        if (placeholderEnd < formattedMessage.length()) {
+            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
+            afterLabel->setWordWrap(true);
+            afterLabel->setTextFormat(Qt::RichText);
+            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            afterLabel->setOpenExternalLinks(true);
+            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+            m_contentLayout->addWidget(afterLabel);
         }
     } else {
-        // Przypadek błędu - niepoprawny format wiadomości
-        QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
-        messageLabel->setTextFormat(Qt::RichText);
+        // Standardowe wyświetlanie wiadomości bez załącznika
+        QLabel* messageLabel = new QLabel(formattedMessage);
         messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
         m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
+        }
     }
+
+    // Przewijamy obszar przewijania do dołu
+    QTimer::singleShot(100, this, [this]() {
+        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
+    });
+}
+
+// Przetwarzanie wiadomości z filmem wideo
+void processMessageWithVideo(const QString& formattedMessage, const QString& messageId = QString()) {
+    // Sprawdź czy wiadomość zawiera placeholder wideo
+    int placeholderStart = formattedMessage.indexOf("<div class='video-placeholder'");
+    if (placeholderStart >= 0) {
+        // Znajdujemy koniec placeholdera
+        int placeholderEnd = formattedMessage.indexOf("</div>", placeholderStart);
+        if (placeholderEnd < 0) placeholderEnd = formattedMessage.length();
+
+        // Wyciągamy atrybuty placeholdera
+        QString videoId = extractAttribute(formattedMessage, "data-video-id");
+        QString mimeType = extractAttribute(formattedMessage, "data-mime-type");
+        QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
+        QString filename = extractAttribute(formattedMessage, "data-filename");
+
+        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
+        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
+        messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+        m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
+        }
+
+        // Tworzymy placeholder załącznika wideo
+        AttachmentPlaceholder* videoPlaceholder = new AttachmentPlaceholder(
+            filename, "video", this, false);
+
+        // Używamy referencji zamiast pełnych danych
+        videoPlaceholder->setAttachmentReference(attachmentId, mimeType);
+        m_contentLayout->addWidget(videoPlaceholder);
+
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        if (placeholderEnd < formattedMessage.length()) {
+            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
+            afterLabel->setWordWrap(true);
+            afterLabel->setTextFormat(Qt::RichText);
+            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            afterLabel->setOpenExternalLinks(true);
+            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+            m_contentLayout->addWidget(afterLabel);
+        }
+    } else {
+        // Standardowe wyświetlanie wiadomości bez załącznika
+        QLabel* messageLabel = new QLabel(formattedMessage);
+        messageLabel->setWordWrap(true);
+        messageLabel->setTextFormat(Qt::RichText);
+        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        messageLabel->setOpenExternalLinks(true);
+        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
+        m_contentLayout->addWidget(messageLabel);
+
+        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        if (!messageId.isEmpty()) {
+            m_messageLabels[messageId] = messageLabel;
+        }
+    }
+
+    // Przewijamy obszar przewijania do dołu
+    QTimer::singleShot(100, this, [this]() {
+        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
+    });
+}
+
+// Metoda pomocnicza do wyciągania atrybutów z HTML
+QString extractAttribute(const QString& html, const QString& attribute) {
+    int attrPos = html.indexOf(attribute + "='");
+    if (attrPos >= 0) {
+        attrPos += attribute.length() + 2; // przesunięcie za ='
+        int endPos = html.indexOf("'", attrPos);
+        if (endPos >= 0) {
+            return html.mid(attrPos, endPos - attrPos);
+        }
+    }
+    return QString();
 }
 
     void clear() {

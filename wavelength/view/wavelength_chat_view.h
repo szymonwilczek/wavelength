@@ -121,28 +121,26 @@ public:
             return;
         }
 
+        // Pobieramy nazwę pliku
         QFileInfo fileInfo(filePath);
+        QString fileName = fileInfo.fileName();
 
-        // Generujemy unikalny identyfikator dla komunikatu
+        // Generujemy identyfikator dla komunikatu
         QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
 
-        // Dodaj informację o wysyłaniu pliku z identyfikatorem
+        // Wyświetlamy początkowy komunikat
         QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
-            .arg(fileInfo.fileName());
+            .arg(fileName);
         messageArea->appendMessage(processingMsg, progressMsgId);
 
-        // Opóźnij wysyłanie, aby dać czas na wyświetlenie komunikatu
-        QTimer::singleShot(100, this, [this, filePath, progressMsgId]() {
-            WavelengthMessageService* manager = WavelengthMessageService::getInstance();
+        // Uruchamiamy asynchroniczny proces przetwarzania pliku
+        WavelengthMessageService* service = WavelengthMessageService::getInstance();
+        bool started = service->sendFileMessage(filePath, progressMsgId);
 
-            // Przekazujemy identyfikator komunikatu do serwisu wiadomości
-            if(manager->sendFileMessage(filePath, progressMsgId)) {
-                qDebug() << "File sent successfully";
-                // Komunikat zostanie zaktualizowany przez serwis wiadomości
-            } else {
-                messageArea->replaceMessage(progressMsgId, "<span style=\"color:#ff5555;\">Failed to send file.</span>");
-            }
-        });
+        if (!started) {
+            messageArea->replaceMessage(progressMsgId,
+                "<span style=\"color:#ff5555;\">Failed to start file processing.</span>");
+        }
     }
 
     void setWavelength(double frequency, const QString& name = QString()) {

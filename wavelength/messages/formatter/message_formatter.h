@@ -2,7 +2,49 @@
 #define MESSAGE_FORMATTER_H
 
 #include <QJsonObject>
+#include <QUuid>
+#include <QDebug>
+#include <QDateTime>
+#include <QMutex>
+#include <QMap>
 #include "../../registry/wavelength_registry.h"
+
+// Klasa przechowująca dane załączników
+class AttachmentDataStore {
+public:
+    static AttachmentDataStore* getInstance() {
+        static AttachmentDataStore instance;
+        return &instance;
+    }
+
+    // Dodaj dane załącznika i zwróć identyfikator
+    QString storeAttachmentData(const QString& base64Data) {
+        QMutexLocker locker(&m_mutex);
+        QString attachmentId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        m_attachmentData[attachmentId] = base64Data;
+        return attachmentId;
+    }
+
+    // Pobierz dane załącznika
+    QString getAttachmentData(const QString& attachmentId) {
+        QMutexLocker locker(&m_mutex);
+        if (m_attachmentData.contains(attachmentId)) {
+            return m_attachmentData[attachmentId];
+        }
+        return QString();
+    }
+
+    // Usuń dane załącznika (do zwalniania pamięci)
+    void removeAttachmentData(const QString& attachmentId) {
+        QMutexLocker locker(&m_mutex);
+        m_attachmentData.remove(attachmentId);
+    }
+
+private:
+    AttachmentDataStore() = default;
+    QMap<QString, QString> m_attachmentData;
+    QMutex m_mutex;
+};
 
 class MessageFormatter {
 public:
@@ -31,127 +73,117 @@ public:
         // Pobierz timestamp
         QString timestamp;
         if (msgObj.contains("timestamp")) {
-            // Konwersja do QDateTime
             QDateTime msgTime;
             QVariant timeVar = msgObj["timestamp"].toVariant();
             if (timeVar.type() == QVariant::String) {
-                // Format ISO
-                QString timeStr = timeVar.toString();
-                msgTime = QDateTime::fromString(timeStr, Qt::ISODate);
+                msgTime = QDateTime::fromString(timeVar.toString(), Qt::ISODate);
             } else {
-                // Unix timestamp
                 msgTime = QDateTime::fromMSecsSinceEpoch(timeVar.toLongLong());
             }
-
-            // Formatuj timestamp
             timestamp = msgTime.toString("[HH:mm:ss]");
         } else {
-            // Jeśli brak timestamp, użyj aktualnego czasu
             timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
         }
 
-        // Jednolite formatowanie
+        // Formatowanie wiadomości
         QString formattedMsg;
         bool isSelf = msgObj.contains("isSelf") && msgObj["isSelf"].toBool();
-
-        // Sprawdź czy jest załącznik
         bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
         QString messageStart;
         if (isSelf) {
-            // Własne wiadomości - zielone
             messageStart = QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> ").arg(timestamp);
         } else {
-            // Cudze wiadomości - niebieskie
             messageStart = QString("%1 <span style=\"color:#85c4ff;\">[%2]:</span> ").arg(timestamp, senderName);
         }
 
         if (hasAttachment) {
-            qDebug() << "Załącznik wykryty w wiadomości";
             QString attachmentType = msgObj["attachmentType"].toString();
-            QString attachmentData = msgObj["attachmentData"].toString();
             QString attachmentName = msgObj["attachmentName"].toString();
             QString attachmentMimeType = msgObj["attachmentMimeType"].toString();
 
-            qDebug() << "Attachment details:" << attachmentType << attachmentName << attachmentMimeType;
-            qDebug() << "Attachment data length:" << attachmentData.length();
+            // KLUCZOWA ZMIANA: Przetwarzamy dane załącznika oddzielnie
+            QString attachmentId;
 
-            // Generujemy unikalny identyfikator dla elementu
-            QString elementId = "attachment_" + QUuid::createUuid().toString(QUuid::WithoutBraces);
+            // Sprawdź czy wiadomość zawiera już tylko referencję (placeholder)
+            if (!msgObj["attachmentData"].toString().isEmpty() && msgObj["attachmentData"].toString().length() < 100) {
+                // Używamy już przechowanego ID
+                attachmentId = msgObj["attachmentData"].toString();
+            } else if (msgObj.contains("attachmentData") && !msgObj["attachmentData"].toString().isEmpty()) {
+                // Zapisz dane base64 w magazynie i uzyskaj ID
+                attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
+                    msgObj["attachmentData"].toString());
+            } else {
+                // Brak danych załącznika
+                attachmentId = "";
+            }
 
-            if (attachmentType == "image" && !attachmentData.isEmpty()) {
-                // Sprawdź, czy to GIF
+            // Generuj formatowanie bez umieszczania danych base64 w HTML
+            if (attachmentType == "image") {
                 if (attachmentMimeType == "image/gif") {
-                    qDebug() << "Formatowanie GIF:" << attachmentName;
-
-                    // Renderowanie GIF - specjalny format dla naszej obsługi
                     formattedMsg = messageStart + "<br>" +
                                    QString("<div class='gif-placeholder' "
                                           "data-gif-id='%1' "
                                           "data-mime-type='%2' "
-                                          "data-base64='%3' "
+                                          "data-attachment-id='%3' "
                                           "data-filename='%4'>"
                                           "</div>")
-                                   .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+                                   .arg(QUuid::createUuid().toString(QUuid::WithoutBraces),
+                                        attachmentMimeType,
+                                        attachmentId,
+                                        attachmentName);
                 } else {
-                    // Obrazy statyczne - używamy własnego formatu dla naszego dekodera obrazów
-                    qDebug() << "Formatowanie obrazu:" << attachmentName;
-                    qDebug() << "MIME:" << attachmentMimeType;
-                    qDebug() << "Długość danych base64:" << attachmentData.length() << "bajtów";
-
-                    // Zmiana na format placeholder podobny do innych mediów
                     formattedMsg = messageStart + "<br>" +
                                   QString("<div class='image-placeholder' "
                                          "data-image-id='%1' "
                                          "data-mime-type='%2' "
-                                         "data-base64='%3' "
+                                         "data-attachment-id='%3' "
                                          "data-filename='%4'>"
                                          "</div>")
-                                  .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+                                  .arg(QUuid::createUuid().toString(QUuid::WithoutBraces),
+                                       attachmentMimeType,
+                                       attachmentId,
+                                       attachmentName);
                 }
             }
-            else if (attachmentType == "audio" && !attachmentData.isEmpty()) {
-                // Renderowanie audio - specjalny format dla naszej obsługi (podobnie jak wideo)
+            else if (attachmentType == "audio") {
                 formattedMsg = messageStart + "<br>" +
                                QString("<div class='audio-placeholder' "
                                       "data-audio-id='%1' "
                                       "data-mime-type='%2' "
-                                      "data-base64='%3' "
+                                      "data-attachment-id='%3' "
                                       "data-filename='%4'>"
                                       "</div>")
-                               .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+                               .arg(QUuid::createUuid().toString(QUuid::WithoutBraces),
+                                    attachmentMimeType,
+                                    attachmentId,
+                                    attachmentName);
             }
-            else if (attachmentType == "video" && !attachmentData.isEmpty()) {
-                // Renderowanie wideo - specjalny format dla naszej obsługi
+            else if (attachmentType == "video") {
                 formattedMsg = messageStart + "<br>" +
                                QString("<div class='video-placeholder' "
                                       "data-video-id='%1' "
                                       "data-mime-type='%2' "
-                                      "data-base64='%3' "
+                                      "data-attachment-id='%3' "
                                       "data-filename='%4'>"
                                       "</div>")
-                               .arg(elementId, attachmentMimeType, attachmentData, attachmentName);
+                               .arg(QUuid::createUuid().toString(QUuid::WithoutBraces),
+                                    attachmentMimeType,
+                                    attachmentId,
+                                    attachmentName);
             }
             else {
-                // Inne typy plików - renderuj jako link do pobrania
                 formattedMsg = messageStart + " " +
-                               QString("<a href='file:%1' style='color:#85c4ff;'>[%2]</a> (%3)")
-                               .arg(elementId, attachmentName, MessageFormatter::formatFileSize(attachmentData.length()));
+                               QString("<a href='file:%1' style='color:#85c4ff;'>[%2]</a>")
+                               .arg(attachmentName, attachmentName);
             }
         } else {
             // Zwykła wiadomość tekstowa
             if (content.isEmpty()) {
                 content = "[Empty message]";
             }
-
-            // Uwzględnij nowe linie w treści
             content.replace("\n", "<br>");
-
-            if (isSelf) {
-                formattedMsg = messageStart + "<span style=\"color:#ffffff;\">" + content + "</span>";
-            } else {
-                formattedMsg = messageStart + "<span style=\"color:#ffffff;\">" + content + "</span>";
-            }
+            formattedMsg = messageStart + "<span style=\"color:#ffffff;\">" + content + "</span>";
         }
 
         return formattedMsg;
@@ -168,7 +200,6 @@ public:
             return QString("%1 GB").arg(sizeInBytes / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2);
     }
 
-    // Formatowanie komunikatów systemowych
     static QString formatSystemMessage(const QString& message) {
         QString timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
         return QString("%1 <span style=\"color:#ffcc00;\">%2</span>").arg(timestamp, message);

@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include <qtconcurrentrun.h>
 
+#include "../files/attachment_queue_manager.h"
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
 #include "../messages/formatter/message_formatter.h"
@@ -92,26 +93,31 @@ private:
 
         MessageHandler::getInstance()->markMessageAsProcessed(messageId);
 
-        // Sprawdź, czy wiadomość zawiera duże załączniki
+        // Sprawdź, czy wiadomość zawiera załączniki
         bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
-        if (hasAttachment && msgObj.contains("attachmentData")) {
-            // Dla dużych załączników, formatuj i emituj sygnał asynchronicznie
-            QtConcurrent::run([this, msgObj, frequency, messageId]() {
-                QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
-                QMetaObject::invokeMethod(this, "emitMessageReceived",
-                    Qt::QueuedConnection,
-                    Q_ARG(double, frequency),
-                    Q_ARG(QString, formattedMsg));
-            });
+        if (hasAttachment && msgObj.contains("attachmentData") && msgObj["attachmentData"].toString().length() > 100) {
+            // Tworzymy lekką wersję wiadomości z referencją
+            QJsonObject lightMsg = msgObj;
+
+            // Zamiast surowych danych base64, zapisujemy dane w magazynie i używamy ID
+            QString attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
+                msgObj["attachmentData"].toString());
+
+            // Zastępujemy dane załącznika identyfikatorem
+            lightMsg["attachmentData"] = attachmentId;
+
+            // Formatujemy i emitujemy placeholder
+            QString placeholderMsg = MessageFormatter::formatMessage(lightMsg, frequency);
+            emit messageReceived(frequency, placeholderMsg);
         } else {
-            // Dla zwykłych wiadomości tekstowych, formatuj standardowo
+            // Dla zwykłych wiadomości tekstowych lub już z referencjami
             QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
             emit messageReceived(frequency, formattedMsg);
         }
     }
 
-    // Dodaj metodę dla emitowania sygnału w głównym wątku:
+    // Dodaj tę metodę, jeśli jeszcze nie istnieje
     Q_INVOKABLE void emitMessageReceived(double frequency, const QString& formattedMessage) {
         emit messageReceived(frequency, formattedMessage);
     }
