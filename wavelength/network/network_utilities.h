@@ -43,23 +43,7 @@ public:
         return "127.0.0.1";
     }
 
-    QList<QString> getAllLocalIpAddresses() {
-        QList<QString> addresses;
-        
-        foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces()) {
-            if (interface.flags().testFlag(QNetworkInterface::IsRunning) &&
-                !interface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
-                
-                foreach (const QNetworkAddressEntry &entry, interface.addressEntries()) {
-                    if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                        addresses.append(entry.ip().toString());
-                    }
-                }
-            }
-        }
 
-        return addresses;
-    }
 
     bool isPortAvailable(int port) {
         QTcpSocket socket;
@@ -119,29 +103,6 @@ public:
         return sent;
     }
 
-    QString getNetworkInterfaceName(const QString& ipAddress) {
-        foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces()) {
-            foreach (const QNetworkAddressEntry &entry, interface.addressEntries()) {
-                if (entry.ip().toString() == ipAddress) {
-                    return interface.humanReadableName();
-                }
-            }
-        }
-        
-        return QString();
-    }
-
-    QString getSubnetMask(const QString& ipAddress) {
-        foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces()) {
-            foreach (const QNetworkAddressEntry &entry, interface.addressEntries()) {
-                if (entry.ip().toString() == ipAddress) {
-                    return entry.netmask().toString();
-                }
-            }
-        }
-        
-        return QString();
-    }
 
     bool isValidIpAddress(const QString& address) {
         QHostAddress hostAddress(address);
