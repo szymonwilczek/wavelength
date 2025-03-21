@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <cmath>
 #include <algorithm>
+#include <qmath.h>
 
 BlobTransitionManager::BlobTransitionManager(QObject* parent)
     : QObject(parent)
@@ -22,6 +23,7 @@ void BlobTransitionManager::startTransitionToIdle(
     const std::vector<QPointF>& currentVelocity,
     const QPointF& currentBlobCenter,
     const QPointF& targetCenter,
+    const BlobConfig::BlobParameters& params,
     int width, 
     int height)
 {
@@ -29,8 +31,10 @@ void BlobTransitionManager::startTransitionToIdle(
     m_originalVelocities = currentVelocity;
     m_originalBlobCenter = currentBlobCenter;
 
+    // Upewnij się, że targetIdleCenter jest dokładnie w środku
     QPointF targetIdleCenter = targetCenter.isNull() ? QPointF(width / 2.0, height / 2.0) : targetCenter;
 
+    // Oblicz dokładny radius dla aktualnego kształtu
     double currentRadius = 0.0;
     for (const auto& point : currentControlPoints) {
         currentRadius += QVector2D(point - currentBlobCenter).length();
@@ -38,18 +42,18 @@ void BlobTransitionManager::startTransitionToIdle(
     currentRadius /= currentControlPoints.size();
 
     // Obliczamy stosunek aktualnego promienia do docelowego
-    double targetRadius = 250.0f; // Standardowy promień bloba
+    double targetRadius = params.blobRadius; // Używamy dokładnej wartości z konfiguracji
     double radiusRatio = currentRadius / targetRadius;
 
     std::vector<QPointF> targetPoints(currentControlPoints.size());
 
-    // Przygotowujemy docelowe punkty dla stanu IDLE
+    // Przygotowujemy idealne punkty dla stanu IDLE - równomiernie rozłożone na okręgu
     for (size_t i = 0; i < currentControlPoints.size(); ++i) {
-        QPointF relativePos = currentControlPoints[i] - currentBlobCenter;
-        if (radiusRatio > 0.1) {
-            relativePos = relativePos / radiusRatio;
-        }
-        targetPoints[i] = targetIdleCenter + relativePos;
+        double angle = 2.0 * M_PI * i / currentControlPoints.size();
+        targetPoints[i] = targetIdleCenter + QPointF(
+            cos(angle) * targetRadius,
+            sin(angle) * targetRadius
+        );
     }
 
     m_targetIdlePoints = targetPoints;
@@ -81,9 +85,20 @@ void BlobTransitionManager::handleIdleTransition(
         // Zakończenie animacji przejścia
         m_inTransitionToIdle = false;
 
+        // POPRAWKA: Dokładne ustawienie środka bloba w docelowej pozycji
+        blobCenter = m_targetIdleCenter;
+
+        // Oblicz wektor przesunięcia dla każdego punktu (od aktualnego centrum do docelowego)
+        QPointF centerDelta = m_targetIdleCenter - blobCenter;
+
+        // Przesuń wszystkie punkty kontrolne, aby zachować kształt bloba
+        for (auto& point : controlPoints) {
+            point += centerDelta;
+        }
+
         // Wygaszanie prędkości
         std::for_each(velocity.begin(), velocity.end(), [](QPointF& vel) {
-            vel *= 0.7;
+            vel *= 0.5; // Mocniejsze wygaszenie prędkości (było 0.7)
         });
 
         // Stosujemy efekt stanu IDLE

@@ -34,6 +34,11 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
     double rotationStrength = 0.15 * std::sin(m_rotationPhase * 0.3);
 
     QPointF originalCenter = blobCenter;
+    QPointF screenCenter(params.screenWidth / 2.0, params.screenHeight / 2.0);
+
+    // POPRAWKA: Delikatna siła przyciągająca do środka ekranu
+    QPointF centeringForce = (screenCenter - blobCenter) * 0.01;
+    blobCenter += centeringForce;
 
     QPointF totalDisplacement(0, 0);
 
@@ -75,8 +80,11 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
     for (auto& vel : velocity) {
         vel -= avgDisplacement;
     }
-
-    blobCenter = originalCenter;
+    if (QVector2D(blobCenter - screenCenter).length() > params.blobRadius * 0.1) {
+        blobCenter = blobCenter * 0.95 + screenCenter * 0.05;
+    } else {
+        blobCenter = originalCenter;
+    }
 }
 
 void IdleState::applyForce(const QVector2D& force,

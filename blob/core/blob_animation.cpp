@@ -350,6 +350,8 @@ void BlobAnimation::updateAnimation() {
 
     if (m_needsRedraw) {
         update();
+        m_params.screenWidth = width();
+        m_params.screenHeight = height();
     }
 }
 
@@ -439,8 +441,8 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
             m_velocity,
             m_blobCenter,
             QPointF(width() / 2.0, height() / 2.0),
-            width(),
-            height()
+            m_params,
+            width(), height()
         );
 
         m_currentState = BlobConfig::IDLE;

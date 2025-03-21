@@ -23,12 +23,12 @@ public:
     };
 
     void startTransitionToIdle(
-        const std::vector<QPointF>& currentControlPoints, 
-        const std::vector<QPointF>& currentVelocity,
-        const QPointF& currentBlobCenter,
-        const QPointF& targetCenter,
-        int width, 
-        int height
+        const std::vector<QPointF> &currentControlPoints,
+        const std::vector<QPointF> &currentVelocity,
+        const QPointF &currentBlobCenter,
+        const QPointF &targetCenter,
+        const BlobConfig::BlobParameters &params,
+        int width, int height
     );
 
     void handleIdleTransition(

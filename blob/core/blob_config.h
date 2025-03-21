@@ -21,6 +21,8 @@ namespace BlobConfig {
         QColor backgroundColor;
         QColor gridColor;
         int gridSpacing = 25;
+        int screenWidth = 0;
+        int screenHeight = 0;
     };
 
     struct PhysicsParameters {
