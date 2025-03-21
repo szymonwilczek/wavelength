@@ -110,6 +110,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/qt5-multimedia_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
 
+find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/libpqxx_x64-windows")
+target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)
+
 find_package(mongocxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
 find_package(bsoncxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
 

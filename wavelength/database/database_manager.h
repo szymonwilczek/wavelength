@@ -4,12 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QDebug>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
+#include <pqxx/pqxx>  // Upewnij się, że masz zainstalowaną libpqxx z obsługą SSL
 
 class DatabaseManager : public QObject {
     Q_OBJECT
@@ -27,43 +22,44 @@ public:
         }
 
         try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            auto filter = document.view();
-            auto result = collection.find_one(filter);
+            pqxx::work txn{*m_connection};
+            pqxx::result result = txn.exec_params(
+                "SELECT frequency FROM active_wavelengths WHERE frequency = $1",
+                frequency
+            );
+            txn.commit();
 
-            bool available = !result;
+            bool available = result.empty();
             qDebug() << "Checking if frequency" << frequency << "is available:" << available;
             return available;
         }
         catch (const std::exception& e) {
-            qDebug() << "MongoDB error:" << e.what();
+            qDebug() << "PostgreSQL error:" << e.what();
             return false;
         }
     }
 
     bool getWavelengthDetails(double frequency, QString& name, bool& isPasswordProtected) {
         try {
-            auto collection = m_mongoClient["wavelengthDB"]["activeWavelengths"];
-            auto document = bsoncxx::builder::basic::document{};
-            document.append(bsoncxx::builder::basic::kvp("frequency", frequency));
-            auto filter = document.view();
-            auto result = collection.find_one(filter);
-            
-            if (!result) {
+            pqxx::work txn{*m_connection};
+            pqxx::result result = txn.exec_params(
+                "SELECT name, is_password_protected FROM active_wavelengths WHERE frequency = $1",
+                frequency
+            );
+            txn.commit();
+
+            if (result.empty()) {
                 qDebug() << "Wavelength" << frequency << "not found in database";
                 return false;
             }
-            
-            auto doc = result->view();
-            isPasswordProtected = doc["isPasswordProtected"].get_bool().value;
-            name = QString::fromStdString(static_cast<std::string>(doc["name"].get_string().value));
-            
+
+            name = QString::fromStdString(result[0]["name"].as<std::string>());
+            isPasswordProtected = result[0]["is_password_protected"].as<bool>();
+
             return true;
         }
         catch (const std::exception& e) {
-            qDebug() << "MongoDB error when getting wavelength details:" << e.what();
+            qDebug() << "PostgreSQL error when getting wavelength details:" << e.what();
             return false;
         }
     }
@@ -73,18 +69,43 @@ public:
     }
 
 private:
-    DatabaseManager(QObject* parent = nullptr) 
+    DatabaseManager(QObject* parent = nullptr)
         : QObject(parent), m_isConnected(false) {
         try {
-            static mongocxx::instance instance{};
-            m_mongoClient = mongocxx::client{mongocxx::uri{"mongodb://localhost:27017"}};
-            
-            m_isConnected = true;
-            
-            qDebug() << "Connected to MongoDB successfully";
+            // Parametry połączenia do hostowanej bazy PostgreSQL
+            std::string connectionString =
+                "user=u_f67b73d1_c584_40b2_a189_3cf401949c75 "
+                "dbname=db_f67b73d1_c584_40b2_a189_3cf401949c75 "
+                "password=NUlV9202u7L7J8i9sVIk6hC8erKY2O5v5v72s0v3nJ1hyy6QsnA2 "
+                "host=pg.rapidapp.io "
+                "port=5433 "
+                "sslmode=require "
+                "application_name=rapidapp_cpp";
+
+            m_connection = std::make_unique<pqxx::connection>(connectionString);
+
+            if (m_connection->is_open()) {
+                m_isConnected = true;
+                qDebug() << "Connected to PostgreSQL successfully";
+
+                // Sprawdź czy tabela istnieje, jeśli nie - wyświetl ostrzeżenie
+                pqxx::work txn{*m_connection};
+                pqxx::result result = txn.exec(
+                    "SELECT EXISTS (SELECT FROM information_schema.tables "
+                    "WHERE table_name = 'active_wavelengths')"
+                );
+                bool tableExists = result[0][0].as<bool>();
+                if (!tableExists) {
+                    qDebug() << "WARNING: Table 'active_wavelengths' does not exist in the database!";
+                }
+                txn.commit();
+            } else {
+                qDebug() << "Failed to connect to PostgreSQL";
+                m_isConnected = false;
+            }
         }
         catch (const std::exception& e) {
-            qDebug() << "Failed to connect to MongoDB:" << e.what();
+            qDebug() << "Failed to connect to PostgreSQL:" << e.what();
             m_isConnected = false;
         }
     }
@@ -94,7 +115,7 @@ private:
     DatabaseManager(const DatabaseManager&) = delete;
     DatabaseManager& operator=(const DatabaseManager&) = delete;
 
-    mongocxx::client m_mongoClient;
+    std::unique_ptr<pqxx::connection> m_connection;
     bool m_isConnected;
 };
 

@@ -1,35 +1,61 @@
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
-const { MongoClient } = require("mongodb");
+const { Pool } = require("pg");
 
 const PORT = process.env.PORT || 3000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/";
-const DB_NAME = "wavelengthDB";
 
-let messageCounter = 0;
+const connectionString =
+  "postgresql://u_f67b73d1_c584_40b2_a189_3cf401949c75:NUlV9202u7L7J8i9sVIk6hC8erKY2O5v5v72s0v3nJ1hyy6QsnA2@pg.rapidapp.io:5433/db_f67b73d1_c584_40b2_a189_3cf401949c75?ssl=true&sslmode=no-verify&application_name=rapidapp_nodejs";
+
+// Inicjalizacja puli połączeń
+const pool = new Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false, // Wymagane dla "sslmode=no-verify"
+  },
+});
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-let db;
 let activeWavelengths = new Map();
 
-MongoClient.connect(MONGO_URI)
-  .then((client) => {
-    console.log("Connected to MongoDB");
-    db = client.db(DB_NAME);
+async function initDatabase() {
+  try {
+    // Sprawdź połączenie
+    const res = await pool.query("SELECT NOW()");
+    console.log("Connected to PostgreSQL:", res.rows[0].now);
 
-    return db.collection("activeWavelengths").deleteMany({});
-  })
-  .then(() => {
-    console.log("Active wavelengths collection cleared");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
+    // Upewnij się, że tabela istnieje (tylko przy pierwszym uruchomieniu)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS active_wavelengths (
+        id SERIAL PRIMARY KEY,
+        frequency NUMERIC(12, 1) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        is_password_protected BOOLEAN DEFAULT FALSE,
+        host_socket_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Utwórz indeksy, jeśli nie istnieją
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_active_wavelengths_frequency
+      ON active_wavelengths(frequency);
+    `);
+
+    // Wyczyść tabelę active_wavelengths
+    await pool.query("DELETE FROM active_wavelengths");
+    console.log("Active wavelengths table cleared");
+  } catch (err) {
+    console.error("PostgreSQL connection error:", err);
     process.exit(1);
-  });
+  }
+}
+
+initDatabase();
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
@@ -45,22 +71,16 @@ function normalizeFrequency(frequency) {
 
 app.get("/api/wavelengths", async (req, res) => {
   try {
-    const wavelengths = await db
-      .collection("activeWavelengths")
-      .find(
-        {},
-        {
-          projection: {
-            frequency: 1,
-            name: 1,
-            isPasswordProtected: 1,
-            createdAt: 1,
-          },
-        }
-      )
-      .toArray();
+    const result = await pool.query(`
+      SELECT 
+        frequency, 
+        name, 
+        is_password_protected AS "isPasswordProtected", 
+        created_at AS "createdAt" 
+      FROM active_wavelengths
+    `);
 
-    res.json(wavelengths);
+    res.json(result.rows);
   } catch (err) {
     console.error("Error fetching wavelengths:", err);
     res.status(500).json({ error: "Server error" });
@@ -103,15 +123,19 @@ wss.on("connection", function connection(ws, req) {
           }
 
           // Sprawdź w bazie danych
-          const existingWavelength = await db
-            .collection("activeWavelengths")
-            .findOne({ frequency });
+          const existingResult = await pool.query(
+            "SELECT frequency FROM active_wavelengths WHERE frequency = $1",
+            [frequency]
+          );
 
-          if (existingWavelength) {
+          if (existingResult.rows.length > 0) {
             console.log(
               `Found existing wavelength ${frequency} in database, deleting it`
             );
-            await db.collection("activeWavelengths").deleteOne({ frequency });
+            await pool.query(
+              "DELETE FROM active_wavelengths WHERE frequency = $1",
+              [frequency]
+            );
           }
 
           // Utwórz nowy wpis
@@ -119,13 +143,10 @@ wss.on("connection", function connection(ws, req) {
             Math.random() * 1000
           )}`;
 
-          await db.collection("activeWavelengths").insertOne({
-            frequency,
-            name,
-            isPasswordProtected,
-            hostSocketId: sessionId,
-            createdAt: new Date(),
-          });
+          await pool.query(
+            "INSERT INTO active_wavelengths (frequency, name, is_password_protected, host_socket_id, created_at) VALUES ($1, $2, $3, $4, $5)",
+            [frequency, name, isPasswordProtected, sessionId, new Date()]
+          );
 
           // Utwórz wpis w pamięci
           ws.frequency = frequency;
@@ -171,9 +192,11 @@ wss.on("connection", function connection(ws, req) {
 
         if (!wavelength) {
           try {
-            const dbWavelength = await db
-              .collection("activeWavelengths")
-              .findOne({ frequency });
+            const dbWavelengthResult = await pool.query(
+              "SELECT * FROM active_wavelengths WHERE frequency = $1",
+              [frequency]
+            );
+            const dbWavelength = dbWavelengthResult.rows[0];
 
             if (!dbWavelength) {
               ws.send(
@@ -622,7 +645,9 @@ async function closeWavelength(frequency, reason) {
 
   try {
     // Remove from database
-    await db.collection("activeWavelengths").deleteOne({ frequency });
+    await pool.query("DELETE FROM active_wavelengths WHERE frequency = $1", [
+      frequency,
+    ]);
     console.log(`Wavelength ${frequency} removed from database`);
   } catch (err) {
     console.error(`Error removing wavelength ${frequency} from database:`, err);
@@ -656,13 +681,12 @@ server.listen(PORT, () => {
 process.on("SIGINT", async () => {
   console.log("Shutting down server...");
 
-  if (db) {
-    try {
-      await db.collection("activeWavelengths").deleteMany({});
-      console.log("Cleared active wavelengths");
-    } catch (err) {
-      console.error("Error cleaning database on shutdown:", err);
-    }
+  try {
+    await pool.query("DELETE FROM active_wavelengths");
+    console.log("Cleared active wavelengths");
+    await pool.end(); // Zamknij połączenie z bazą danych przed zakończeniem
+  } catch (err) {
+    console.error("Error cleaning database on shutdown:", err);
   }
 
   process.exit(0);
