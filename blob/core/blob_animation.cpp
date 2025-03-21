@@ -1,7 +1,6 @@
 #include "blob_animation.h"
 
 #include <QApplication>
-#include <QPainter>
 #include <QDebug>
 
 BlobAnimation::BlobAnimation(QWidget *parent)
