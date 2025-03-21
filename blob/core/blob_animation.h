@@ -27,7 +27,13 @@
 #include "blob_event_handler.h"
 #include "blob_transition_manager.h"
 
-class BlobAnimation : public QWidget {
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLShaderProgram>
+
+class BlobAnimation : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
 public:
@@ -81,6 +87,14 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     bool event(QEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
+
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int w, int h) override;
+
+    void updateBlobGeometry();
+
+    void drawGrid();
 
 private slots:
     void updateAnimation();
@@ -146,7 +160,6 @@ private:
     double m_precalcMinDistance = 0.0;
     double m_precalcMaxDistance = 0.0;
 
-    QThread m_physicsThread;
     QMutex m_dataMutex;
     std::atomic<bool> m_physicsRunning{true};
     std::vector<QPointF> m_safeControlPoints;
@@ -154,6 +167,21 @@ private:
     bool m_eventsEnabled = true;
     QTimer m_eventReEnableTimer;
     bool m_needsRedraw = false;
+
+    std::thread m_physicsThread;
+    std::atomic<bool> m_physicsActive{true};
+    std::mutex m_pointsMutex;
+    std::condition_variable m_physicsCondition;
+    bool m_needsUpdate{false};
+
+    void physicsThreadFunction();
+
+    QOpenGLShaderProgram* m_shaderProgram = nullptr;
+    QOpenGLBuffer m_vbo;
+    QOpenGLVertexArrayObject m_vao;
+
+    // Bufor dla geometrii bloba
+    std::vector<GLfloat> m_glVertices;
 };
 
 #endif // BLOBANIMATION_H

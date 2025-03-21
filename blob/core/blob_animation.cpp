@@ -5,7 +5,7 @@
 #include <QDebug>
 
 BlobAnimation::BlobAnimation(QWidget *parent)
-    : QWidget(parent),
+    : QOpenGLWidget(parent),
     m_absorption(this),
     m_transitionManager(this),
     m_eventHandler(this)
@@ -29,11 +29,21 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_targetPoints.reserve(m_params.numPoints);
     m_velocity.reserve(m_params.numPoints);
 
+
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_NoSystemBackground, true);
 
     initializeBlob();
+
+    m_physicsThread = std::thread(&BlobAnimation::physicsThreadFunction, this);
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    setFormat(format);
 
     m_resizeDebounceTimer.setSingleShot(true);
     m_resizeDebounceTimer.setInterval(50); // 50 ms debounce
@@ -120,6 +130,8 @@ BlobAnimation::BlobAnimation(QWidget *parent)
         m_eventHandler.enableEvents();
         qDebug() << "Events re-enabled";
     });
+
+
 }
 
 void BlobAnimation::handleResizeTimeout() {
@@ -156,7 +168,45 @@ void BlobAnimation::checkWindowPosition() {
     }
 }
 
+void BlobAnimation::physicsThreadFunction() {
+    while (m_physicsActive) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+
+        {
+            std::lock_guard<std::mutex> lock(m_pointsMutex);
+            // Wywołaj swoją istniejącą metodę fizyki - dostosuj nazwę jeśli potrzeba
+            updatePhysics();
+        }
+
+        // Poinformuj wątek UI o konieczności odświeżenia
+        QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
+
+        // Utrzymuj stałą liczbę klatek
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        auto targetFrameTime = std::chrono::microseconds(8333); // ~120fps
+
+        if (duration < targetFrameTime) {
+            std::unique_lock<std::mutex> lock(m_pointsMutex);
+            m_physicsCondition.wait_for(lock, targetFrameTime - duration);
+        }
+    }
+}
+
 BlobAnimation::~BlobAnimation() {
+
+    m_physicsActive = false;
+    m_physicsCondition.notify_all();
+    if (m_physicsThread.joinable()) {
+        m_physicsThread.join();
+    }
+
+    makeCurrent();
+    m_vbo.destroy();
+    m_vao.destroy();
+    delete m_shaderProgram;
+    doneCurrent();
+
     m_animationTimer.stop();
     m_idleTimer.stop();
     m_stateResetTimer.stop();
@@ -175,6 +225,9 @@ void BlobAnimation::initializeBlob() {
 }
 
 void BlobAnimation::paintEvent(QPaintEvent *event) {
+
+    std::lock_guard lock(m_pointsMutex);
+
     QRectF blobRect = calculateBlobBoundingRect();
     if (!event->rect().intersects(blobRect.toRect())) {
         return;
@@ -276,6 +329,8 @@ void BlobAnimation::updateAbsorptionProgress(float progress) {
 void BlobAnimation::updateAnimation() {
     m_needsRedraw = false;
 
+    std::lock_guard<std::mutex> lock(m_pointsMutex);
+
     processMovementBuffer();
 
     if (m_transitionManager.isInTransitionToIdle()) {
@@ -293,7 +348,6 @@ void BlobAnimation::updateAnimation() {
         }
     }
 
-    updatePhysics();
 
     if (m_needsRedraw) {
         update();
@@ -347,7 +401,7 @@ void BlobAnimation::resizeEvent(QResizeEvent *event) {
     if (m_eventHandler.processResizeEvent(event)) {
         update();
     }
-    QWidget::resizeEvent(event);
+    QOpenGLWidget::resizeEvent(event);
 }
 
 void BlobAnimation::onStateResetTimeout() {
@@ -473,4 +527,219 @@ void BlobAnimation::resetLifeColor() {
 
         qDebug() << "Blob color reset to default:" << m_defaultLifeColor.name();
     }
+}
+
+void BlobAnimation::initializeGL() {
+    // Inicjalizuj funkcje OpenGL
+    initializeOpenGLFunctions();
+
+    // Ustaw kolor tła
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    // Tworzenie programu shaderowego
+    m_shaderProgram = new QOpenGLShaderProgram();
+
+    // Vertex shader
+    const char* vertexShaderSource = R"(
+        #version 330 core
+        layout (location = 0) in vec2 position;
+        uniform mat4 projection;
+        void main() {
+            gl_Position = projection * vec4(position, 0.0, 1.0);
+        }
+    )";
+
+    // Fragment shader z efektem glow dla bloba
+    const char* fragmentShaderSource = R"(
+        #version 330 core
+        out vec4 FragColor;
+        uniform vec4 blobColor;
+        uniform vec2 blobCenter;
+        uniform float blobRadius;
+
+        void main() {
+            // Oblicz odległość od środka bloba
+            vec2 fragCoord = gl_FragCoord.xy;
+            float distance = length(fragCoord - blobCenter);
+
+            // Efekt glow
+            float glow = 1.0 - smoothstep(blobRadius * 0.8, blobRadius, distance);
+            FragColor = blobColor * glow;
+        }
+    )";
+
+    // Kompiluj i linkuj shadery
+    m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
+    m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
+    m_shaderProgram->link();
+
+    // Inicjalizuj VAO i VBO
+    m_vao.create();
+    m_vao.bind();
+
+    m_vbo = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    m_vbo.create();
+    m_vbo.bind();
+
+    // Ustaw atrybuty wierzchołków
+    m_shaderProgram->enableAttributeArray(0);
+    m_shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 2, 2 * sizeof(GLfloat));
+
+    m_vbo.release();
+    m_vao.release();
+}
+
+void BlobAnimation::paintGL() {
+    // Wyczyść bufor
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Synchronizuj dostęp do punktów kontrolnych
+    std::lock_guard<std::mutex> lock(m_pointsMutex);
+
+    // Renderuj siatkę (możesz użyć własnej metody renderGrid)
+    drawGrid();
+
+    // Konwertuj punkty kontrolne na wierzchołki OpenGL
+    updateBlobGeometry();
+
+    // Użyj programu shaderowego
+    m_shaderProgram->bind();
+
+    // Ustaw macierz projekcji
+    QMatrix4x4 projection;
+    projection.ortho(0, width(), height(), 0, -1, 1);
+    m_shaderProgram->setUniformValue("projection", projection);
+
+    // Ustaw parametry bloba
+    QColor blobColor = m_params.borderColor;
+
+    m_shaderProgram->setUniformValue("blobColor", QVector4D(
+        blobColor.redF(), blobColor.greenF(), blobColor.blueF(), blobColor.alphaF()));
+    m_shaderProgram->setUniformValue("blobCenter", QVector2D(m_blobCenter));
+    m_shaderProgram->setUniformValue("blobRadius",
+        static_cast<float>(m_params.blobRadius));
+
+    // Renderuj bloba
+    m_vao.bind();
+    m_vbo.bind();
+    m_vbo.allocate(m_glVertices.data(), m_glVertices.size() * sizeof(GLfloat));
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, m_glVertices.size() / 2);
+
+    m_vbo.release();
+    m_vao.release();
+    m_shaderProgram->release();
+}
+
+void BlobAnimation::resizeGL(int w, int h) {
+    // Aktualizuj viewport
+    glViewport(0, 0, w, h);
+}
+
+void BlobAnimation::updateBlobGeometry() {
+    m_glVertices.clear();
+
+    // Najpierw dodaj środek bloba (dla trybu TRIANGLE_FAN)
+    m_glVertices.push_back(m_blobCenter.x());
+    m_glVertices.push_back(m_blobCenter.y());
+
+    // Dodaj wszystkie punkty kontrolne
+    for (const auto& point : m_controlPoints) {
+        m_glVertices.push_back(point.x());
+        m_glVertices.push_back(point.y());
+    }
+
+    // Zamknij kształt, dodając pierwszy punkt ponownie
+    if (!m_controlPoints.empty()) {
+        m_glVertices.push_back(m_controlPoints[0].x());
+        m_glVertices.push_back(m_controlPoints[0].y());
+    }
+}
+
+void BlobAnimation::drawGrid() {
+    // Upewnij się, że shader jest załadowany
+    static QOpenGLShaderProgram* gridShader = nullptr;
+
+    if (!gridShader) {
+        gridShader = new QOpenGLShaderProgram(this);
+
+        // Prosty shader dla siatki
+        const char* gridVertexShader = R"(
+            #version 330 core
+            layout (location = 0) in vec2 position;
+            uniform mat4 projection;
+            void main() {
+                gl_Position = projection * vec4(position, 0.0, 1.0);
+            }
+        )";
+
+        const char* gridFragmentShader = R"(
+            #version 330 core
+            out vec4 FragColor;
+            uniform vec4 gridColor;
+            void main() {
+                FragColor = gridColor;
+            }
+        )";
+
+        gridShader->addShaderFromSourceCode(QOpenGLShader::Vertex, gridVertexShader);
+        gridShader->addShaderFromSourceCode(QOpenGLShader::Fragment, gridFragmentShader);
+        gridShader->link();
+    }
+
+    // Użyj shadera dla siatki
+    gridShader->bind();
+
+    // Ustaw macierz projekcji
+    QMatrix4x4 projection;
+    projection.ortho(0, width(), height(), 0, -1, 1);
+    gridShader->setUniformValue("projection", projection);
+
+    // Ustaw kolor siatki
+    QColor color = m_params.backgroundColor;
+    gridShader->setUniformValue("gridColor", QVector4D(
+        color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.5f));
+
+    // Przygotuj bufor dla linii siatki
+    QOpenGLBuffer gridVBO(QOpenGLBuffer::VertexBuffer);
+    gridVBO.create();
+    gridVBO.bind();
+
+    // Generuj wierzchołki dla linii siatki
+    std::vector<GLfloat> gridVertices;
+    int gridSpacing = 25; // Możesz dostosować lub pobrać z konfiguracji
+
+    // Linie poziome
+    for (int y = 0; y < height(); y += gridSpacing) {
+        gridVertices.push_back(0);
+        gridVertices.push_back(y);
+
+        gridVertices.push_back(width());
+        gridVertices.push_back(y);
+    }
+
+    // Linie pionowe
+    for (int x = 0; x < width(); x += gridSpacing) {
+        gridVertices.push_back(x);
+        gridVertices.push_back(0);
+
+        gridVertices.push_back(x);
+        gridVertices.push_back(height());
+    }
+
+    // Załaduj dane do bufora
+    gridVBO.allocate(gridVertices.data(), gridVertices.size() * sizeof(GLfloat));
+
+    // Rysuj linie
+    gridShader->enableAttributeArray(0);
+    gridShader->setAttributeBuffer(0, GL_FLOAT, 0, 2, 2 * sizeof(GLfloat));
+
+    glLineWidth(1.0f);
+    glDrawArrays(GL_LINES, 0, gridVertices.size() / 2);
+
+    // Zwolnij zasoby
+    gridShader->disableAttributeArray(0);
+    gridVBO.release();
+    gridShader->release();
+    gridVBO.destroy();
 }
