@@ -1,20 +1,11 @@
 #ifndef BLOBANIMATION_H
 #define BLOBANIMATION_H
 
-#include <deque>
 #include <QWidget>
-#include <QTimer>
-#include <QTime>
 #include <QPointF>
 #include <QColor>
-#include <QResizeEvent>
-#include <QEvent>
 #include <vector>
 #include <memory>
-#include <QThread>
-#include <QMutex>
-#include <QDebug>
-#include <QPropertyAnimation>
 
 #include "blob_config.h"
 #include "../physics/blob_physics.h"
@@ -80,9 +71,6 @@ public:
 
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-
-    QRectF calculateBlobBoundingRect();
 
     void resizeEvent(QResizeEvent *event) override;
     bool event(QEvent *event) override;
@@ -125,7 +113,6 @@ private:
     QTimer m_resizeDebounceTimer;
     QSize m_lastSize;
     QColor m_defaultLifeColor;
-    bool m_originalBorderColorSet = false;
 
     BlobConfig::BlobParameters m_params;
     BlobConfig::PhysicsParameters m_physicsParams;
@@ -139,12 +126,9 @@ private:
 
     BlobConfig::AnimationState m_currentState = BlobConfig::IDLE;
 
-
-
     QTimer m_animationTimer;
     QTimer m_idleTimer;
     QTimer m_stateResetTimer;
-    QTimer* m_transitionToIdleTimer = nullptr;
 
     BlobPhysics m_physics;
     BlobRenderer m_renderer;
@@ -156,13 +140,8 @@ private:
 
     QPointF m_lastWindowPos;
 
-
     double m_precalcMinDistance = 0.0;
     double m_precalcMaxDistance = 0.0;
-
-    QMutex m_dataMutex;
-    std::atomic<bool> m_physicsRunning{true};
-    std::vector<QPointF> m_safeControlPoints;
 
     bool m_eventsEnabled = true;
     QTimer m_eventReEnableTimer;
@@ -180,7 +159,6 @@ private:
     QOpenGLBuffer m_vbo;
     QOpenGLVertexArrayObject m_vao;
 
-    // Bufor dla geometrii bloba
     std::vector<GLfloat> m_glVertices;
 };
 
