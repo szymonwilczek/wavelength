@@ -109,6 +109,10 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/widgets/animated_stacked_widget.h
         wavelength/ui/dialogs/animated_dialog.cpp
         wavelength/ui/dialogs/animated_dialog.h
+        wavelength/ui/messages/message_bubble.cpp
+        wavelength/ui/messages/message_bubble.h
+        wavelength/ui/chat/chat_style.cpp
+        wavelength/ui/chat/chat_style.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
