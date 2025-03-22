@@ -141,37 +141,14 @@ public:
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-        // Parametry cienia i zaokrąglonych rogów
+        // Tylko zaokrąglone narożniki bez cienia
         const int cornerRadius = 15;
-        const int shadowSize = 10;
-        const int shadowSteps = 15;
-
-        // Rysowanie złożonego cienia z większą liczbą warstw
-        for (int i = 0; i < shadowSteps; i++) {
-            qreal ratio = (qreal)i / shadowSteps;
-            qreal size = shadowSize * pow(ratio, 0.8);
-            int alpha = 30 * pow(1.0 - ratio, 0.7);
-
-            QColor shadowColor(20, 20, 20, alpha);
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(shadowColor);
-
-            QRect shadowRect = rect().adjusted(
-                shadowSize - size,
-                shadowSize - size,
-                size - shadowSize,
-                size - shadowSize
-            );
-
-            painter.drawRoundedRect(shadowRect, cornerRadius, cornerRadius);
-        }
 
         // Główne tło dialogu
         QColor bgColor(24, 24, 27);
         painter.setPen(Qt::NoPen);
         painter.setBrush(bgColor);
-        QRect mainRect = rect().adjusted(shadowSize, shadowSize, -shadowSize, -shadowSize);
-        painter.drawRoundedRect(mainRect, cornerRadius, cornerRadius);
+        painter.drawRoundedRect(rect(), cornerRadius, cornerRadius);
     }
 
     double getFrequency() const {

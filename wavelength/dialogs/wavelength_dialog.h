@@ -29,13 +29,13 @@ public:
     {
         setWindowTitle("Create New Wavelength");
         setModal(true);
-        setFixedSize(450 + m_shadowSize, 250 + m_shadowSize);
+        setFixedSize(450, 250);
 
         // Ustaw czas trwania animacji
         setAnimationDuration(400);
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
-        mainLayout->setContentsMargins(m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10);
+        mainLayout->setContentsMargins(20, 20, 20, 20);
 
         QLabel *titleLabel = new QLabel("GENERATE WAVELENGTH", this);
         titleLabel->setStyleSheet("font-size: 15px; font-weight: bold;");
@@ -147,36 +147,14 @@ public:
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-        // Parametry cienia
+        // Tylko zaokrąglone narożniki bez cienia
         const int cornerRadius = 15;
-        const int shadowSteps = 15;
-
-        // Rysowanie złożonego cienia z większą liczbą warstw
-        for (int i = 0; i < shadowSteps; i++) {
-            qreal ratio = (qreal)i / shadowSteps;
-            qreal size = m_shadowSize * pow(ratio, 0.8);
-            int alpha = 30 * pow(1.0 - ratio, 0.7);
-
-            QColor shadowColor(20, 20, 20, alpha);
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(shadowColor);
-
-            QRect shadowRect = rect().adjusted(
-                m_shadowSize - size,
-                m_shadowSize - size,
-                size - m_shadowSize,
-                size - m_shadowSize
-            );
-
-            painter.drawRoundedRect(shadowRect, cornerRadius, cornerRadius);
-        }
 
         // Główne tło dialogu
         QColor bgColor(24, 24, 27);
         painter.setPen(Qt::NoPen);
         painter.setBrush(bgColor);
-        QRect mainRect = rect().adjusted(m_shadowSize, m_shadowSize, -m_shadowSize, -m_shadowSize);
-        painter.drawRoundedRect(mainRect, cornerRadius, cornerRadius);
+        painter.drawRoundedRect(rect(), cornerRadius, cornerRadius);
     }
 
     double getFrequency() const {
