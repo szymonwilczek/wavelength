@@ -1,3 +1,11 @@
+#include <QOperatingSystemVersion>
+
+#ifdef Q_OS_WINDOWS
+    #include <windows.h>
+    #include <dwmapi.h>
+    #pragma comment(lib, "dwmapi.lib")
+#endif
+
 #include <QApplication>
 #include <QMainWindow>
 #include <QPalette>
@@ -271,6 +279,20 @@ int main(int argc, char *argv[]) {
     if (!instanceManager->isCreator()) {
         window.setWindowTitle("Pk4 - Instancja podrzędna");
     }
+
+#ifdef Q_OS_WINDOWS
+    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
+        // Windows 10 1809 lub nowszy
+        HWND hwnd = (HWND)window.winId();
+
+        // Dla Windows 10 i nowszych wersji
+        BOOL darkMode = TRUE;
+
+        // DWMWA_USE_IMMERSIVE_DARK_MODE = 20 dla nowszych wersji Windows
+        // DWMWA_USE_IMMERSIVE_DARK_MODE = 19 dla starszych wersji Windows 10
+        DwmSetWindowAttribute(hwnd, 20, &darkMode, sizeof(darkMode));
+    }
+#endif
 
     window.show();
 
