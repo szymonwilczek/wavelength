@@ -43,7 +43,6 @@ public:
 
     // Sygnał informujący o włączeniu eventów po opóźnieniu
     void eventsReEnabled();
-    void resizeInProgress(bool inProgress);
 
     private slots:
         void onEventReEnableTimeout();
@@ -51,7 +50,6 @@ public:
 private:
     // Metody pomocnicze
     void handleMoveEvent(QMoveEvent* moveEvent);
-    void handleDragMoveEvent();
 
     // Pola przechowujące stan
     QWidget* m_parentWidget;
