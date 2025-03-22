@@ -11,8 +11,8 @@ find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/.vcpkg
 
 add_executable(${PROJECT_NAME} main.cpp
         resources.qrc
-        wavelength/navigation/navbar.h
-        wavelength/navigation/navbar.cpp
+        wavelength/ui/navigation/navbar.h
+        wavelength/ui/navigation/navbar.cpp
         blob/core/blob_animation.cpp
         blob/core/blob_animation.h
         blob/core/blob_config.h
@@ -105,6 +105,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/files/attachment_queue_manager.cpp
         wavelength/util/wavelength_utilities.cpp
         wavelength/util/wavelength_utilities.h
+        wavelength/ui/widgets/animated_stacked_widget.cpp
+        wavelength/ui/widgets/animated_stacked_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

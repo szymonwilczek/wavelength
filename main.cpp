@@ -10,7 +10,7 @@
 #include <QMainWindow>
 #include <QPalette>
 #include <QStyleFactory>
-#include "wavelength/navigation/navbar.h"
+#include "wavelength/ui/navigation/navbar.h"
 #include "blob/core/blob_animation.h"
 #include <QLabel>
 #include <QStackedWidget>
@@ -23,6 +23,7 @@
 
 #include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
+#include "wavelength/ui/widgets/animated_stacked_widget.h"
 
 void centerLabel(QLabel* label, BlobAnimation* animation) {
     if (label && animation) {
@@ -108,7 +109,9 @@ int main(int argc, char *argv[]) {
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    QStackedWidget *stackedWidget = new QStackedWidget(centralWidget);
+    AnimatedStackedWidget *stackedWidget = new AnimatedStackedWidget(centralWidget);
+    stackedWidget->setDuration(600);
+    stackedWidget->setAnimationType(AnimatedStackedWidget::Slide);
     mainLayout->addWidget(stackedWidget);
 
     QWidget *animationWidget = new QWidget(stackedWidget);
@@ -202,7 +205,7 @@ int main(int argc, char *argv[]) {
     auto switchToChatView = [chatView, stackedWidget](const double frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
-        stackedWidget->setCurrentWidget(chatView);
+        stackedWidget->slideToWidget(chatView);
         chatView->show();
     };
 
@@ -230,7 +233,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted, [stackedWidget, animationWidget, animation]() {
         qDebug() << "Wavelength aborted, switching back to animation view";
         animation->resetLifeColor();
-        stackedWidget->setCurrentWidget(animationWidget);
+        stackedWidget->slideToWidget(animationWidget);
     });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
@@ -282,14 +285,11 @@ int main(int argc, char *argv[]) {
 
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
-        // Windows 10 1809 lub nowszy
+        // Windows 10 1809>=
         HWND hwnd = (HWND)window.winId();
 
-        // Dla Windows 10 i nowszych wersji
         BOOL darkMode = TRUE;
 
-        // DWMWA_USE_IMMERSIVE_DARK_MODE = 20 dla nowszych wersji Windows
-        // DWMWA_USE_IMMERSIVE_DARK_MODE = 19 dla starszych wersji Windows 10
         DwmSetWindowAttribute(hwnd, 20, &darkMode, sizeof(darkMode));
     }
 #endif
