@@ -103,7 +103,6 @@ private slots:
 
     void updatePhysics();
 
-    void handleIdleTransition();
 
     void onStateResetTimeout();
 

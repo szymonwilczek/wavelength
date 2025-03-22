@@ -22,25 +22,6 @@ public:
         qint64 timestamp;
     };
 
-    void startTransitionToIdle(
-        const std::vector<QPointF> &currentControlPoints,
-        const std::vector<QPointF> &currentVelocity,
-        const QPointF &currentBlobCenter,
-        const QPointF &targetCenter,
-        const BlobConfig::BlobParameters &params,
-        int width, int height
-    );
-
-    void handleIdleTransition(
-        std::vector<QPointF>& controlPoints,
-        std::vector<QPointF>& velocity,
-        QPointF& blobCenter,
-        const BlobConfig::BlobParameters& params,
-        std::function<void(std::vector<QPointF>&, std::vector<QPointF>&, QPointF&, const BlobConfig::BlobParameters&)> applyIdleState
-    );
-
-    bool isInTransitionToIdle() const { return m_inTransitionToIdle; }
-    
     void processMovementBuffer(
         std::vector<QPointF>& velocity,
         QPointF& blobCenter,

@@ -129,8 +129,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
         m_eventHandler.enableEvents();
         qDebug() << "Events re-enabled";
     });
-
-    connect(&m_eventHandler, &BlobEventHandler::resizeInProgress, &m_transitionManager, &BlobTransitionManager::setResizingState);
 }
 
 void BlobAnimation::handleResizeTimeout() {
@@ -143,7 +141,7 @@ void BlobAnimation::handleResizeTimeout() {
 
 void BlobAnimation::checkWindowPosition() {
     QWidget* currentWindow = window();
-    if (!currentWindow || !m_eventsEnabled || m_transitionManager.isInTransitionToIdle())
+    if (!m_eventsEnabled || !currentWindow)
         return;
 
     static qint64 lastCheckTime = 0;
@@ -249,7 +247,6 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
     renderState.opacity = m_absorption.opacity();
     renderState.scale = m_absorption.scale();
     renderState.animationState = m_currentState;
-    renderState.isInTransitionToIdle = m_transitionManager.isInTransitionToIdle();
 
     // Deleguj renderowanie do BlobRenderer
     m_renderer.renderScene(
@@ -332,10 +329,13 @@ void BlobAnimation::updateAnimation() {
 
     processMovementBuffer();
 
-    if (m_transitionManager.isInTransitionToIdle()) {
-        handleIdleTransition();
-        m_needsRedraw = true;
-    } else if (m_currentState == BlobConfig::IDLE) {
+    // Usuwamy sprawdzanie isInTransitionToIdle
+    // if (m_transitionManager.isInTransitionToIdle()) {
+    //     handleIdleTransition();
+    //     m_needsRedraw = true;
+    // } else
+
+    if (m_currentState == BlobConfig::IDLE) {
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
             m_needsRedraw = true;
@@ -346,7 +346,6 @@ void BlobAnimation::updateAnimation() {
             m_needsRedraw = true;
         }
     }
-
 
     if (m_needsRedraw) {
         update();
@@ -385,17 +384,6 @@ void BlobAnimation::updatePhysics() {
     m_physics.constrainNeighborDistances(m_controlPoints, m_velocity, minDistance, maxDistance);
 }
 
-void BlobAnimation::handleIdleTransition() {
-    m_transitionManager.handleIdleTransition(
-        m_controlPoints,
-        m_velocity,
-        m_blobCenter,
-        m_params,
-        [this](std::vector<QPointF>& points, std::vector<QPointF>& vel, QPointF& center, const BlobConfig::BlobParameters& params) {
-            m_idleState->apply(points, vel, center, params);
-        }
-    );
-}
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
     // Deleguj obsługę zdarzenia resize do BlobEventHandler
@@ -417,7 +405,7 @@ bool BlobAnimation::event(QEvent *event) {
 }
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
-    if (!m_eventsEnabled || m_transitionManager.isInTransitionToIdle()) {
+    if (!m_eventsEnabled) {
         return;
     }
 
@@ -431,46 +419,42 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
 
     qDebug() << "State change from" << m_currentState << "to" << newState;
 
+    // Zmieniona logika przejścia do Idle - bez animacji przejścia
     if (newState == BlobConfig::IDLE &&
-    (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
-        m_eventsEnabled = false;
-        m_eventHandler.disableEvents();
+        (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
 
-        m_transitionManager.startTransitionToIdle(
-            m_controlPoints,
-            m_velocity,
-            m_blobCenter,
-            QPointF(width() / 2.0, height() / 2.0),
-            m_params,
-            width(), height()
-        );
+        // Usuwamy blokadę eventów i już nie potrzebujemy transition managera
+        // m_eventsEnabled = false;
+        // m_eventHandler.disableEvents();
 
+        // Już nie inicjujemy przejścia, tylko od razu zmieniamy stan
         m_currentState = BlobConfig::IDLE;
         m_currentBlobState = m_idleState.get();
 
+        // Wygaszamy prędkości, aby blob nie kontynuował ruchu
         for (auto& vel : m_velocity) {
             vel *= 0.8;
         }
 
         return;
-    }
+        }
 
     m_currentState = newState;
 
     switch (m_currentState) {
         case BlobConfig::IDLE:
             m_currentBlobState = m_idleState.get();
-            break;
+        break;
         case BlobConfig::MOVING:
             m_currentBlobState = m_movingState.get();
-            m_stateResetTimer.stop();
-            m_stateResetTimer.start(2000);
-            break;
+        m_stateResetTimer.stop();
+        m_stateResetTimer.start(2000);
+        break;
         case BlobConfig::RESIZING:
             m_currentBlobState = m_resizingState.get();
-            m_stateResetTimer.stop();
-            m_stateResetTimer.start(2000);
-            break;
+        m_stateResetTimer.stop();
+        m_stateResetTimer.start(2000);
+        break;
     }
 }
 
