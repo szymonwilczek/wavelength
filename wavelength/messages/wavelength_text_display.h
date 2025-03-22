@@ -26,6 +26,7 @@
 #include "../files/audio/player/inline_audio_player.h"
 #include "../files/gif/player/inline_gif_player.h"
 #include "../files/image/displayer/image_viewer.h"
+#include "../ui/chat/chat_style.h"
 #include "../ui/messages/message_bubble.h" // Dodajemy nagłówek nowej klasy
 
 // Główna klasa wyświetlająca czat
@@ -44,10 +45,14 @@ public:
         m_scrollArea->setWidgetResizable(true);
         m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_scrollArea->setStyleSheet("QScrollArea { background-color: #232323; border: 1px solid #3a3a3a; border-radius: 5px; }");
+        m_scrollArea->setStyleSheet(ChatStyle::getScrollBarStyle() +
+                               "QScrollArea { background-color: #232323; border: 1px solid #3a3a3a; border-radius: 5px; }");
 
         // Widget zawartości
         m_contentWidget = new QWidget(m_scrollArea);
+        m_contentWidget->setObjectName("chatContentWidget");
+        m_contentWidget->setStyleSheet("#chatContentWidget { background-color: #1b1b1b; }");
+
         m_contentLayout = new QVBoxLayout(m_contentWidget);
         m_contentLayout->setAlignment(Qt::AlignTop);
         m_contentLayout->setSpacing(12); // Zwiększamy odstęp między wiadomościami
@@ -58,50 +63,52 @@ public:
     }
 
     void appendMessage(const QString& formattedMessage, const QString& messageId = QString()) {
-        qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
+    qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
 
-        // Określamy typ wiadomości (własna, odebrana, systemowa)
-        MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage;
+    // Określamy typ wiadomości (własna, odebrana, systemowa)
+    MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage;
 
-        if (formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>")) {
-            bubbleType = MessageBubble::SentMessage;
-        } else if (formattedMessage.contains("<span style=\"color:#ffcc00;\">")) {
-            bubbleType = MessageBubble::SystemMessage;
-        }
-
-        // Sprawdzamy czy wiadomość zawiera media
-        if (formattedMessage.contains("video-placeholder")) {
-            processMessageWithVideo(formattedMessage, messageId, bubbleType);
-        } else if (formattedMessage.contains("audio-placeholder")) {
-            processMessageWithAudio(formattedMessage, messageId, bubbleType);
-        } else if (formattedMessage.contains("gif-placeholder")) {
-            processMessageWithGif(formattedMessage, messageId, bubbleType);
-        } else if (formattedMessage.contains("image-placeholder")) {
-            processMessageWithImage(formattedMessage, messageId, bubbleType);
-        } else {
-            // Standardowa wiadomość tekstowa w dymku
-            MessageBubble* messageBubble = new MessageBubble(formattedMessage, bubbleType, m_contentWidget);
-
-            // Jeśli podano ID, zapisz referencję do widgetu
-            if (!messageId.isEmpty()) {
-                // Usuń stary dymek, jeśli istnieje
-                if (m_messageWidgets.contains(messageId)) {
-                    MessageBubble* oldBubble = m_messageWidgets[messageId];
-                    m_contentLayout->removeWidget(oldBubble);
-                    delete oldBubble;
-                }
-                m_messageWidgets[messageId] = messageBubble;
-            }
-
-            m_contentLayout->addWidget(messageBubble);
-
-            // Uruchom animację wejścia
-            QTimer::singleShot(50, messageBubble, &MessageBubble::startEntryAnimation);
-        }
-
-        // Przewiń do najnowszej wiadomości
-        QTimer::singleShot(100, this, &WavelengthTextDisplay::scrollToBottom);
+    if (formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>")) {
+        bubbleType = MessageBubble::SentMessage;
+    } else if (formattedMessage.contains("<span style=\"color:#ffcc00;\">")) {
+        bubbleType = MessageBubble::SystemMessage;
     }
+
+    // Sprawdzamy czy wiadomość zawiera media
+    if (formattedMessage.contains("video-placeholder")) {
+        processMessageWithVideo(formattedMessage, messageId, bubbleType);
+    } else if (formattedMessage.contains("audio-placeholder")) {
+        processMessageWithAudio(formattedMessage, messageId, bubbleType);
+    } else if (formattedMessage.contains("gif-placeholder")) {
+        processMessageWithGif(formattedMessage, messageId, bubbleType);
+    } else if (formattedMessage.contains("image-placeholder")) {
+        processMessageWithImage(formattedMessage, messageId, bubbleType);
+    } else {
+        // Standardowa wiadomość tekstowa w dymku
+        MessageBubble* messageBubble = new MessageBubble(formattedMessage, bubbleType, m_contentWidget);
+
+        // Jeśli podano ID, zapisz referencję do widgetu
+        if (!messageId.isEmpty()) {
+            // Usuń stary dymek, jeśli istnieje
+            if (m_messageWidgets.contains(messageId)) {
+                MessageBubble* oldBubble = m_messageWidgets[messageId];
+                m_contentLayout->removeWidget(oldBubble);
+                delete oldBubble;
+            }
+            m_messageWidgets[messageId] = messageBubble;
+        }
+
+        m_contentLayout->addWidget(messageBubble);
+
+        // Uruchom zaawansowaną animację wejścia
+        QTimer::singleShot(30, messageBubble, [messageBubble]() {
+            messageBubble->startAdvancedEntryAnimation(true);
+        });
+    }
+
+    // Przewiń do najnowszej wiadomości
+    QTimer::singleShot(100, this, &WavelengthTextDisplay::scrollToBottom);
+}
 
     // Metoda do zastępowania wiadomości według ID
     void replaceMessage(const QString& messageId, const QString& newMessage) {
@@ -180,7 +187,7 @@ void processMessageWithImage(const QString& formattedMessage, const QString& mes
         }
 
         m_contentLayout->addWidget(messageBubble);
-        messageBubble->startEntryAnimation();
+        messageBubble->startAdvancedEntryAnimation(true);
 
         // Tworzymy placeholder załącznika
         AttachmentPlaceholder* imagePlaceholder = new AttachmentPlaceholder(
@@ -193,12 +200,12 @@ void processMessageWithImage(const QString& formattedMessage, const QString& mes
         // Jeśli jest tekst po placeholderze, dodajemy go jako osobny dymek
         if (placeholderEnd < formattedMessage.length()) {
             MessageBubble* afterBubble = new MessageBubble(
-                formattedMessage.mid(placeholderEnd + 6),  // +6 dla "</div>"
+                formattedMessage.mid(placeholderEnd + 6),
                 bubbleType,
                 m_contentWidget
             );
             m_contentLayout->addWidget(afterBubble);
-            afterBubble->startEntryAnimation();
+            afterBubble->startAdvancedEntryAnimation(true);
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
@@ -251,7 +258,7 @@ void processMessageWithGif(const QString& formattedMessage, const QString& messa
         }
 
         m_contentLayout->addWidget(messageBubble);
-        messageBubble->startEntryAnimation();
+        messageBubble->startAdvancedEntryAnimation(true);
 
         // Tworzymy placeholder załącznika GIF
         AttachmentPlaceholder* gifPlaceholder = new AttachmentPlaceholder(
@@ -269,7 +276,7 @@ void processMessageWithGif(const QString& formattedMessage, const QString& messa
                 m_contentWidget
             );
             m_contentLayout->addWidget(afterBubble);
-            afterBubble->startEntryAnimation();
+            afterBubble->startAdvancedEntryAnimation(true);
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
@@ -322,7 +329,7 @@ void processMessageWithAudio(const QString& formattedMessage, const QString& mes
         }
 
         m_contentLayout->addWidget(messageBubble);
-        messageBubble->startEntryAnimation();
+        messageBubble->startAdvancedEntryAnimation(true);
 
         // Tworzymy placeholder załącznika audio
         AttachmentPlaceholder* audioPlaceholder = new AttachmentPlaceholder(
@@ -340,7 +347,7 @@ void processMessageWithAudio(const QString& formattedMessage, const QString& mes
                 m_contentWidget
             );
             m_contentLayout->addWidget(afterBubble);
-            afterBubble->startEntryAnimation();
+            afterBubble->startAdvancedEntryAnimation(true);
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
@@ -393,7 +400,7 @@ void processMessageWithVideo(const QString& formattedMessage, const QString& mes
         }
 
         m_contentLayout->addWidget(messageBubble);
-        messageBubble->startEntryAnimation();
+        messageBubble->startAdvancedEntryAnimation(true);
 
         // Tworzymy placeholder załącznika wideo
         AttachmentPlaceholder* videoPlaceholder = new AttachmentPlaceholder(
@@ -411,7 +418,7 @@ void processMessageWithVideo(const QString& formattedMessage, const QString& mes
                 m_contentWidget
             );
             m_contentLayout->addWidget(afterBubble);
-            afterBubble->startEntryAnimation();
+            afterBubble->startAdvancedEntryAnimation(true);
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
