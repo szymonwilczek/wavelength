@@ -98,7 +98,29 @@ public:
             m_messageWidgets[messageId] = messageBubble;
         }
 
-        m_contentLayout->addWidget(messageBubble);
+        // Tworzymy wrapper dla wyrównania dymka
+        QHBoxLayout* bubbleLayout = new QHBoxLayout();
+        bubbleLayout->setContentsMargins(0, 0, 0, 0);
+
+        // Wyrównanie zależne od typu wiadomości
+        if (bubbleType == MessageBubble::SentMessage) {
+            bubbleLayout->addStretch(1); // Dodaje elastyczną przestrzeń po lewej stronie
+            bubbleLayout->addWidget(messageBubble, 0);  // Widget bez rozciągania
+        } else if (bubbleType == MessageBubble::ReceivedMessage) {
+            bubbleLayout->addWidget(messageBubble, 0);  // Widget bez rozciągania
+            bubbleLayout->addStretch(1); // Dodaje elastyczną przestrzeń po prawej stronie
+        } else {
+            // Wiadomości systemowe są wyśrodkowane
+            bubbleLayout->addStretch(1);
+            bubbleLayout->addWidget(messageBubble, 0);
+            bubbleLayout->addStretch(1);
+        }
+
+        // Dodajemy wrapper do głównego układu
+        QWidget* wrapperWidget = new QWidget(m_contentWidget);
+        wrapperWidget->setLayout(bubbleLayout);
+        wrapperWidget->setContentsMargins(0, 0, 0, 0);
+        m_contentLayout->addWidget(wrapperWidget);
 
         // Uruchom zaawansowaną animację wejścia
         QTimer::singleShot(30, messageBubble, [messageBubble]() {

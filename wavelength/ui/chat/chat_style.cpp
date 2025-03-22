@@ -17,25 +17,25 @@ QString ChatStyle::getChatStyleSheet() {
 
 QString ChatStyle::getSentMessageStyle() {
     return QString(
-        "background-color: #0b93f6;"
-        "border-radius: 18px;"
-        "padding: 10px;"
+        "background-color: transparent;"  // Tło przezroczyste - używamy QPainter
+        "padding: 0px;"                   // Padding obsługiwany przez layout
     );
 }
 
 QString ChatStyle::getReceivedMessageStyle() {
     return QString(
-        "background-color: #262626;"
-        "border-radius: 18px;"
-        "padding: 10px;"
+        "background-color: transparent;"  // Tło przezroczyste - używamy QPainter
+        "padding: 0px;"                   // Padding obsługiwany przez layout
     );
 }
 
 QString ChatStyle::getSystemMessageStyle() {
     return QString(
-        "background-color: #3a3a3a;"
-        "border-radius: 14px;"
-        "padding: 8px;"
+        "background-color: transparent;"
+        "padding: 4px 8px;"
+        "font-weight: bold;" // Dodajemy pogrubienie dla wiadomości systemowych
+        "color: #ffcc00;"
+        "font-size: 14px;" // Nieco większa czcionka dla wiadomości systemowych
     );
 }
 

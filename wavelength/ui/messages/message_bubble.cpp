@@ -16,9 +16,18 @@ MessageBubble::MessageBubble(const QString& message, BubbleType type, QWidget* p
     setObjectName("messageBubble");
     setAttribute(Qt::WA_TranslucentBackground);
 
-    // Konfiguracja layoutu
+    // Konfiguracja layoutu z większymi marginesami, aby uwzględnić "róg" dymka
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(13, 10, 13, 10);
+
+    // Marginesy dla różnych typów dymków
+    if (m_type == SentMessage) {
+        layout->setContentsMargins(13, 10, 18, 10); // Więcej miejsca po prawej dla "rogu"
+    } else if (m_type == ReceivedMessage) {
+        layout->setContentsMargins(18, 10, 13, 10); // Więcej miejsca po lewej dla "rogu"
+    } else {
+        layout->setContentsMargins(13, 10, 13, 10); // Systemowe bez rogu
+    }
+
     layout->setSpacing(3);
 
     // Etykieta wiadomości
@@ -31,16 +40,16 @@ MessageBubble::MessageBubble(const QString& message, BubbleType type, QWidget* p
     // Dostosowanie stylu w zależności od typu wiadomości
     switch(m_type) {
         case SentMessage:
-            setStyleSheet(ChatStyle::getSentMessageStyle());
+            setStyleSheet("background-color: transparent;");
             m_messageLabel->setStyleSheet("color: white; background: transparent;");
             break;
         case ReceivedMessage:
-            setStyleSheet(ChatStyle::getReceivedMessageStyle());
+            setStyleSheet("background-color: transparent;");
             m_messageLabel->setStyleSheet("color: white; background: transparent;");
             break;
         case SystemMessage:
-            setStyleSheet(ChatStyle::getSystemMessageStyle());
-            m_messageLabel->setStyleSheet("color: #ffcc00; background: transparent;");
+            setStyleSheet("background-color: transparent;");
+            m_messageLabel->setStyleSheet("color: #ffcc00; font-weight: bold; background: transparent;");
             break;
     }
 
@@ -54,14 +63,11 @@ MessageBubble::MessageBubble(const QString& message, BubbleType type, QWidget* p
     // Optymalizacje renderowania
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
-
-    // Inicjalizacja ścieżki dymka
-    updateBubblePath();
 }
 
 MessageBubble::~MessageBubble()
 {
-    // Opracityeffect jest własnością tego obiektu, zostanie automatycznie usunięty
+    // Efekt przezroczystości jest własnością tego obiektu, zostanie automatycznie usunięty
 }
 
 void MessageBubble::setScale(qreal scale)
@@ -83,44 +89,8 @@ void MessageBubble::setPosition(const QPointF& pos)
 
 void MessageBubble::startEntryAnimation()
 {
-    // 1. Animacja opacity
-    QPropertyAnimation* opacityAnim = new QPropertyAnimation(m_opacityEffect, "opacity");
-    opacityAnim->setDuration(280);
-    opacityAnim->setStartValue(0.0);
-    opacityAnim->setEndValue(1.0);
-    opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    // 2. Animacja powiększania
-    QPropertyAnimation* scaleAnim = new QPropertyAnimation(this, "scale");
-    scaleAnim->setDuration(320);
-    scaleAnim->setStartValue(0.95);
-    scaleAnim->setEndValue(1.0);
-    scaleAnim->setEasingCurve(QEasingCurve::OutBack);
-
-    // 3. Animacja pojawienia się z boku (zależnie od typu)
-    QPropertyAnimation* posAnim = new QPropertyAnimation(this, "position");
-    posAnim->setDuration(280);
-    QPointF startPos = pos();
-
-    if (m_type == SentMessage) {
-        // Wiadomości wysłane wjeżdżają z prawej
-        posAnim->setStartValue(QPointF(startPos.x() + 20, startPos.y()));
-    } else {
-        // Wiadomości odebrane wjeżdżają z lewej
-        posAnim->setStartValue(QPointF(startPos.x() - 20, startPos.y()));
-    }
-
-    posAnim->setEndValue(startPos);
-    posAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    // Grupa animacji
-    QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
-    group->addAnimation(opacityAnim);
-    group->addAnimation(scaleAnim);
-    group->addAnimation(posAnim);
-
-    // Rozpocznij animację
-    group->start(QAbstractAnimation::DeleteWhenStopped);
+    // Animacja podstawowa - będziemy używać bardziej zaawansowanej wersji
+    startAdvancedEntryAnimation(false);
 }
 
 void MessageBubble::startAdvancedEntryAnimation(bool delayed)
@@ -138,14 +108,14 @@ void MessageBubble::startAdvancedEntryAnimation(bool delayed)
         opacityAnim->setEndValue(1.0);
         opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
 
-        // 2. Złożona animacja powiększania z lekkim efektem "bujania"
+        // 2. Złożona animacja powiększania
         QSequentialAnimationGroup* scaleGroup = new QSequentialAnimationGroup(this);
 
-        // Najpierw powiększanie do 1.03 (lekko ponad docelową wartość)
+        // Najpierw powiększanie do 1.03 (lekki overshooting)
         QPropertyAnimation* scaleUp = new QPropertyAnimation(this, "scale");
         scaleUp->setDuration(260);
         scaleUp->setStartValue(0.93);
-        scaleUp->setEndValue(1.03);  // Lekki overshooting
+        scaleUp->setEndValue(1.03);
         scaleUp->setEasingCurve(QEasingCurve::OutQuad);
 
         // Potem zmniejszenie do docelowego rozmiaru
@@ -158,33 +128,34 @@ void MessageBubble::startAdvancedEntryAnimation(bool delayed)
         scaleGroup->addAnimation(scaleUp);
         scaleGroup->addAnimation(scaleDown);
 
-        // 3. Animacja pojawienia się z kierunku zależnego od typu
+        // 3. Animacja pojawienia się z kierunku zależnego od typu - POPRAWIONA
         QPropertyAnimation* posAnim = new QPropertyAnimation(this, "position");
         posAnim->setDuration(320);
         QPointF startPos = pos();
+        QPointF endPos = startPos;
 
         switch (m_type) {
             case SentMessage: {
-                // Wiadomości wysłane wjeżdżają z prawej i lekko z dołu
-                posAnim->setStartValue(QPointF(startPos.x() + 30, startPos.y() + 8));
-                posAnim->setKeyValueAt(0.6, QPointF(startPos.x() + 3, startPos.y() + 1));
+                // Wiadomości wysłane "wjeżdżają" z prawej strony
+                posAnim->setStartValue(QPointF(parentWidget()->width() - 40, startPos.y()));
+                posAnim->setKeyValueAt(0.7, QPointF(startPos.x() + 5, startPos.y()));
                 break;
             }
             case ReceivedMessage: {
-                // Wiadomości odebrane wjeżdżają z lewej
-                posAnim->setStartValue(QPointF(startPos.x() - 25, startPos.y()));
-                posAnim->setKeyValueAt(0.6, QPointF(startPos.x() - 3, startPos.y()));
+                // Wiadomości odebrane "wjeżdżają" z lewej strony
+                posAnim->setStartValue(QPointF(-width() + 40, startPos.y()));
+                posAnim->setKeyValueAt(0.7, QPointF(startPos.x() - 5, startPos.y()));
                 break;
             }
             case SystemMessage: {
-                // Wiadomości systemowe pojawiają się z góry
-                posAnim->setStartValue(QPointF(startPos.x(), startPos.y() - 15));
-                posAnim->setKeyValueAt(0.7, QPointF(startPos.x(), startPos.y() - 2));
+                // Wiadomości systemowe pojawiają się ze środka, z subtelnymi ruchami w górę i dół
+                posAnim->setStartValue(QPointF(startPos.x(), startPos.y() - 20));
+                posAnim->setKeyValueAt(0.5, QPointF(startPos.x(), startPos.y() + 5));
                 break;
             }
         }
 
-        posAnim->setEndValue(startPos);
+        posAnim->setEndValue(endPos);
         posAnim->setEasingCurve(QEasingCurve::OutQuint);
 
         // Grupa animacji
@@ -201,25 +172,25 @@ void MessageBubble::startAdvancedEntryAnimation(bool delayed)
 QSize MessageBubble::sizeHint() const
 {
     // Bazujemy na szerokości nadrzędnego widgetu, ale z ograniczeniem
-    int parentWidth = parentWidget() ? parentWidget()->width() - 60 : 400;
-    int maxWidth = std::min(parentWidth, 600); // Maksymalna szerokość dymka
+    int parentWidth = parentWidget() ? parentWidget()->width() - 80 : 400;
+    int maxWidth = std::min(parentWidth, 550); // Maksymalna szerokość dymka
 
     // Różna szerokość w zależności od typu wiadomości
     if (m_type == SentMessage) {
         // Własne wiadomości są węższe
-        maxWidth = std::min(maxWidth, 380);
+        maxWidth = std::min(maxWidth, 350);
     } else if (m_type == SystemMessage) {
         // Wiadomości systemowe mają średnią szerokość
-        maxWidth = std::min(maxWidth, 450);
+        maxWidth = std::min(maxWidth, 400);
     }
 
     // Obliczamy potrzebną wysokość na podstawie tekstu
     QTextDocument doc;
     doc.setHtml(m_messageLabel->text());
-    doc.setTextWidth(maxWidth - 26); // Uwzględniamy wewnętrzne marginesy
+    doc.setTextWidth(maxWidth - 30); // Uwzględniamy wewnętrzne marginesy
 
     int height = doc.size().height() + 20; // Dodajemy marginesy
-    int width = std::min(maxWidth, (int)doc.idealWidth() + 30);
+    int width = std::min(maxWidth, (int)doc.idealWidth() + 35);
 
     // Minimalny rozmiar dymka
     width = std::max(width, 80);
@@ -230,10 +201,7 @@ QSize MessageBubble::sizeHint() const
 
 void MessageBubble::paintEvent(QPaintEvent* event)
 {
-    QStyleOption opt;
-    opt.initFrom(this);
     QPainter painter(this);
-
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setOpacity(m_opacityEffect->opacity());
 
@@ -244,8 +212,7 @@ void MessageBubble::paintEvent(QPaintEvent* event)
     transform.translate(-width() / 2, -height() / 2);
     painter.setTransform(transform);
 
-    // Rysowanie tła dymka
-    QBrush brush;
+    // Konfiguracja koloru tła
     QColor bgColor;
 
     switch(m_type) {
@@ -256,38 +223,63 @@ void MessageBubble::paintEvent(QPaintEvent* event)
             bgColor = QColor("#262626");
             break;
         case SystemMessage:
-            bgColor = QColor("#3a3a3a");
-            break;
+            // Bez tła dla wiadomości systemowych
+            QFrame::paintEvent(event);
+            return;
     }
 
-    brush = QBrush(bgColor);
-    painter.setBrush(brush);
+    // Standardowy promień zaokrąglenia
+    const int cornerRadius = 18;
+
+    // Rysowanie dymku z rogiem - POPRAWIONE
+    QPainterPath path;
+    QRectF rect(0, 0, width(), height());
+
+    if (m_type == SentMessage) {
+        // Dymek wysłanej wiadomości (niebieski z rogiem po prawej) w stylu iOS
+        // Tworzymy zaokrąglony prostokąt jako ścieżkę bazową
+        path.addRoundedRect(rect.adjusted(0, 0, -6, 0), cornerRadius, cornerRadius);
+
+        // Dodajemy "róg" jako część ścieżki - POPRAWIONE
+        const int tipSize = 8; // Rozmiar "rogu"
+        const int tipPosY = rect.bottom() - 15; // Pozycja Y rogu
+
+        QPainterPath tipPath;
+        tipPath.moveTo(rect.right() - 6, tipPosY);
+        tipPath.lineTo(rect.right() + tipSize, rect.bottom() - 10);
+        tipPath.lineTo(rect.right() - 6, tipPosY + 10);
+
+        // Łączymy ścieżki używając operacji unii
+        path = path.united(tipPath);
+
+    } else if (m_type == ReceivedMessage) {
+        // Dymek otrzymanej wiadomości (szary z rogiem po lewej) w stylu iOS
+        path.addRoundedRect(rect.adjusted(6, 0, 0, 0), cornerRadius, cornerRadius);
+
+        // Dodajemy "róg" jako część ścieżki - POPRAWIONE
+        const int tipSize = 8; // Rozmiar "rogu"
+        const int tipPosY = rect.bottom() - 15; // Pozycja Y rogu
+
+        QPainterPath tipPath;
+        tipPath.moveTo(rect.left() + 6, tipPosY);
+        tipPath.lineTo(rect.left() - tipSize, rect.bottom() - 10);
+        tipPath.lineTo(rect.left() + 6, tipPosY + 10);
+
+        // Łączymy ścieżki używając operacji unii
+        path = path.united(tipPath);
+    }
+
+    // Wypełniamy dymek kolorem
     painter.setPen(Qt::NoPen);
+    painter.setBrush(bgColor);
+    painter.drawPath(path);
 
-    // Rysowanie dymka
-    painter.drawPath(m_bubblePath);
-
-    // Wywołanie rysowania standardowych elementów
-    style()->drawPrimitive(QStyle::PE_Frame, &opt, &painter, this);
+    // Z-order w Qt działa automatycznie - child widgets są zawsze rysowane nad parent
+    QFrame::paintEvent(event);
 }
 
 void MessageBubble::resizeEvent(QResizeEvent* event)
 {
     QFrame::resizeEvent(event);
-    updateBubblePath();
-}
-
-void MessageBubble::updateBubblePath()
-{
-    // Aktualizujemy ścieżkę dymka po zmianie rozmiaru
-    m_bubblePath = QPainterPath();
-
-    QRect rect = this->rect();
-    int cornerRadius = 18;
-
-    if (m_type == SystemMessage) {
-        cornerRadius = 14; // Mniejsze zaokrąglenie dla systemowych
-    }
-
-    m_bubblePath.addRoundedRect(rect, cornerRadius, cornerRadius);
+    update(); // Wymuszamy przerysowanie przy zmianie rozmiaru
 }
