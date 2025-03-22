@@ -423,17 +423,15 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
     if (newState == BlobConfig::IDLE &&
         (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING)) {
 
-        // Usuwamy blokadę eventów i już nie potrzebujemy transition managera
-        // m_eventsEnabled = false;
-        // m_eventHandler.disableEvents();
-
-        // Już nie inicjujemy przejścia, tylko od razu zmieniamy stan
         m_currentState = BlobConfig::IDLE;
         m_currentBlobState = m_idleState.get();
 
-        // Wygaszamy prędkości, aby blob nie kontynuował ruchu
+        // Reset inicjalizacji dla efektu bicia serca
+        static_cast<IdleState*>(m_currentBlobState)->resetInitialization();
+
+        // Wygaszamy prędkości, ale nie do zera - zostawiamy trochę dynamiki
         for (auto& vel : m_velocity) {
-            vel *= 0.8;
+            vel *= 0.5;
         }
 
         return;
@@ -444,6 +442,8 @@ void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
     switch (m_currentState) {
         case BlobConfig::IDLE:
             m_currentBlobState = m_idleState.get();
+        // Reset inicjalizacji również tutaj
+        static_cast<IdleState*>(m_currentBlobState)->resetInitialization();
         break;
         case BlobConfig::MOVING:
             m_currentBlobState = m_movingState.get();

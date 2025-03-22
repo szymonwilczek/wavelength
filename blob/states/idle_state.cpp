@@ -8,17 +8,18 @@ IdleState::IdleState() {
 }
 
 void IdleState::updatePhases() {
-    m_idleParams.wavePhase += 0.005;
+    // Przyspieszenie fal - zwiększamy inkrementację
+    m_idleParams.wavePhase += 0.01;  // Było 0.005
     if (m_idleParams.wavePhase > 2 * M_PI) {
         m_idleParams.wavePhase -= 2 * M_PI;
     }
 
-    m_secondPhase += 0.008;
+    m_secondPhase += 0.015;  // Było 0.008
     if (m_secondPhase > 2 * M_PI) {
         m_secondPhase -= 2 * M_PI;
     }
 
-    m_rotationPhase += 0.002;
+    m_rotationPhase += 0.003;  // Było 0.002
     if (m_rotationPhase > 2 * M_PI) {
         m_rotationPhase -= 2 * M_PI;
     }
@@ -29,6 +30,13 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
                      QPointF& blobCenter,
                      const BlobConfig::BlobParameters& params) {
 
+    // Sprawdzamy, czy jesteśmy w fazie inicjalizacji
+    if (m_isInitializing) {
+        applyHeartbeatEffect(controlPoints, velocity, blobCenter, params);
+        return;
+    }
+
+    // Standardowa animacja idle z falami - istniejący kod
     updatePhases();
 
     double rotationStrength = 0.15 * std::sin(m_rotationPhase * 0.3);
@@ -107,4 +115,54 @@ void IdleState::applyForce(const QVector2D& force,
     }
 
     blobCenter += QPointF(force.x() * 0.2, force.y() * 0.2);
+}
+
+void IdleState::applyHeartbeatEffect(std::vector<QPointF>& controlPoints,
+                                    std::vector<QPointF>& velocity,
+                                    QPointF& blobCenter,
+                                    const BlobConfig::BlobParameters& params) {
+    // Zmniejsz wartość, aby zwolnić tempo bicia serca
+    m_heartbeatPhase += 0.02;  // Zwolnione z 0.03 na 0.015
+
+    if (m_heartbeatPhase >= 2 * M_PI) {
+        m_heartbeatPhase -= 2 * M_PI;
+        m_heartbeatCount++;
+
+        if (m_heartbeatCount >= REQUIRED_HEARTBEATS) {
+            m_isInitializing = false;
+            return;
+        }
+    }
+
+    // Funkcja pulsu serca z mniejszymi wartościami dla bardziej subtelnego efektu
+    double pulseStrength;
+
+    if (m_heartbeatPhase < M_PI * 0.25) {
+        // Szybki skurcz - zmniejszony z 1.0 na 0.5
+        pulseStrength = 0.5 * std::sin(m_heartbeatPhase * 4);
+    } else if (m_heartbeatPhase < M_PI * 0.5) {
+        // Krótka pauza - zmniejszona z 0.3 na 0.2
+        pulseStrength = 0.3 * std::sin(m_heartbeatPhase * 4);
+    } else if (m_heartbeatPhase < M_PI * 0.75) {
+        // Powolny rozkurcz - zmniejszony z 0.8 na 0.4
+        pulseStrength = 0.4 * std::sin((m_heartbeatPhase - M_PI * 0.5) * 0.8);
+    } else {
+        // Długa pauza przed następnym biciem - zmniejszona i przyspieszona
+        // Zmiana z 0.5 na 0.2 i dodanie mnożnika 1.2 dla kąta, aby skrócić pauzę
+        pulseStrength = 0.5 * std::sin(m_heartbeatPhase * 1.2);
+    }
+
+    // Stosujemy efekt pulsu do wszystkich punktów kontrolnych
+    for (size_t i = 0; i < controlPoints.size(); ++i) {
+        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
+        QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
+
+        // Siła pulsu - ekspansja i kontrakcja
+        double distanceRatio = QVector2D(vectorFromCenter).length() / params.blobRadius;
+        // Zmniejszamy mnożnik z 0.8 na 0.5 dla subtelniejszego efektu
+        double scaledPulse = pulseStrength * distanceRatio * 0.5;
+
+        QPointF pulseForce = QPointF(normalizedVector.x(), normalizedVector.y()) * scaledPulse;
+        velocity[i] += pulseForce;
+    }
 }
