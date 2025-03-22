@@ -26,14 +26,15 @@
 #include "../files/audio/player/inline_audio_player.h"
 #include "../files/gif/player/inline_gif_player.h"
 #include "../files/image/displayer/image_viewer.h"
-
+#include "../ui/messages/message_bubble.h" // Dodajemy nagłówek nowej klasy
 
 // Główna klasa wyświetlająca czat
 class WavelengthTextDisplay : public QWidget {
     Q_OBJECT
 
 public:
-    QMap<QString, QLabel*> m_messageLabels;
+    QMap<QString, MessageBubble*> m_messageWidgets; // Zmieniamy z QLabel na MessageBubble
+
     WavelengthTextDisplay(QWidget* parent = nullptr) : QWidget(parent) {
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -49,8 +50,8 @@ public:
         m_contentWidget = new QWidget(m_scrollArea);
         m_contentLayout = new QVBoxLayout(m_contentWidget);
         m_contentLayout->setAlignment(Qt::AlignTop);
-        m_contentLayout->setSpacing(5);
-        m_contentLayout->setContentsMargins(10, 10, 10, 10);
+        m_contentLayout->setSpacing(12); // Zwiększamy odstęp między wiadomościami
+        m_contentLayout->setContentsMargins(15, 15, 15, 15); // Zwiększamy marginesy
 
         m_scrollArea->setWidget(m_contentWidget);
         mainLayout->addWidget(m_scrollArea);
@@ -59,69 +60,100 @@ public:
     void appendMessage(const QString& formattedMessage, const QString& messageId = QString()) {
         qDebug() << "Appending message:" << formattedMessage.left(50) << "...";
 
+        // Określamy typ wiadomości (własna, odebrana, systemowa)
+        MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage;
+
+        if (formattedMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>")) {
+            bubbleType = MessageBubble::SentMessage;
+        } else if (formattedMessage.contains("<span style=\"color:#ffcc00;\">")) {
+            bubbleType = MessageBubble::SystemMessage;
+        }
+
         // Sprawdzamy czy wiadomość zawiera media
         if (formattedMessage.contains("video-placeholder")) {
-            processMessageWithVideo(formattedMessage);
+            processMessageWithVideo(formattedMessage, messageId, bubbleType);
         } else if (formattedMessage.contains("audio-placeholder")) {
-            processMessageWithAudio(formattedMessage);
+            processMessageWithAudio(formattedMessage, messageId, bubbleType);
         } else if (formattedMessage.contains("gif-placeholder")) {
-            processMessageWithGif(formattedMessage);
+            processMessageWithGif(formattedMessage, messageId, bubbleType);
         } else if (formattedMessage.contains("image-placeholder")) {
-            processMessageWithImage(formattedMessage);
+            processMessageWithImage(formattedMessage, messageId, bubbleType);
         } else {
-            // Standardowa wiadomość tekstowa
-            QLabel* messageLabel = new QLabel(formattedMessage, m_contentWidget);
-            messageLabel->setTextFormat(Qt::RichText);
-            messageLabel->setWordWrap(true);
-            messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            messageLabel->setOpenExternalLinks(true);
+            // Standardowa wiadomość tekstowa w dymku
+            MessageBubble* messageBubble = new MessageBubble(formattedMessage, bubbleType, m_contentWidget);
 
-            // Jeśli podano ID, zapisz referencję do etykiety
+            // Jeśli podano ID, zapisz referencję do widgetu
             if (!messageId.isEmpty()) {
-                // Usuń starą etykietę, jeśli istnieje
-                if (m_messageLabels.contains(messageId)) {
-                    QLabel* oldLabel = m_messageLabels[messageId];
-                    m_contentLayout->removeWidget(oldLabel);
-                    delete oldLabel;
+                // Usuń stary dymek, jeśli istnieje
+                if (m_messageWidgets.contains(messageId)) {
+                    MessageBubble* oldBubble = m_messageWidgets[messageId];
+                    m_contentLayout->removeWidget(oldBubble);
+                    delete oldBubble;
                 }
-                m_messageLabels[messageId] = messageLabel;
+                m_messageWidgets[messageId] = messageBubble;
             }
 
-            m_contentLayout->addWidget(messageLabel);
+            m_contentLayout->addWidget(messageBubble);
+
+            // Uruchom animację wejścia
+            QTimer::singleShot(50, messageBubble, &MessageBubble::startEntryAnimation);
         }
 
         // Przewiń do najnowszej wiadomości
-        QTimer::singleShot(0, this, &WavelengthTextDisplay::scrollToBottom);
+        QTimer::singleShot(100, this, &WavelengthTextDisplay::scrollToBottom);
     }
 
     // Metoda do zastępowania wiadomości według ID
     void replaceMessage(const QString& messageId, const QString& newMessage) {
-        if (messageId.isEmpty() || !m_messageLabels.contains(messageId)) {
+        if (messageId.isEmpty() || !m_messageWidgets.contains(messageId)) {
             // Jeśli nie istnieje, po prostu dodaj nową wiadomość
             appendMessage(newMessage);
             return;
         }
 
-        QLabel* label = m_messageLabels[messageId];
-        label->setText(newMessage);
+        MessageBubble* bubble = m_messageWidgets[messageId];
+
+        // Określamy typ wiadomości
+        MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage;
+
+        if (newMessage.contains("<span style=\"color:#60ff8a;\">[You]:</span>")) {
+            bubbleType = MessageBubble::SentMessage;
+        } else if (newMessage.contains("<span style=\"color:#ffcc00;\">")) {
+            bubbleType = MessageBubble::SystemMessage;
+        }
+
+        // Tworzymy nowy dymek
+        MessageBubble* newBubble = new MessageBubble(newMessage, bubbleType, m_contentWidget);
+
+        // Zastępujemy stary dymek nowym
+        int index = m_contentLayout->indexOf(bubble);
+        m_contentLayout->removeWidget(bubble);
+        delete bubble;
+
+        m_contentLayout->insertWidget(index, newBubble);
+        m_messageWidgets[messageId] = newBubble;
+
+        // Animacja wejścia
+        newBubble->startEntryAnimation();
     }
 
     // Metoda do usuwania wiadomości według ID
     void removeMessage(const QString& messageId) {
-        if (messageId.isEmpty() || !m_messageLabels.contains(messageId)) {
+        if (messageId.isEmpty() || !m_messageWidgets.contains(messageId)) {
             return;
         }
 
-        QLabel* label = m_messageLabels[messageId];
-        m_contentLayout->removeWidget(label);
-        m_messageLabels.remove(messageId);
-        delete label;
+        MessageBubble* bubble = m_messageWidgets[messageId];
+        m_contentLayout->removeWidget(bubble);
+        m_messageWidgets.remove(messageId);
+        delete bubble;
     }
 
-    // Funkcje przetwarzające różne typy wiadomości z załącznikami
+    // Funkcje przetwarzające różne typy wiadomości z załącznikami zostają podobne,
+    // ale modyfikujemy je tak, by używały MessageBubble:
 
 // Przetwarzanie wiadomości z obrazkiem
-void processMessageWithImage(const QString& formattedMessage, const QString& messageId = QString()) {
+void processMessageWithImage(const QString& formattedMessage, const QString& messageId = QString(), MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage) {
     // Sprawdź czy wiadomość zawiera placeholder obrazu
     int placeholderStart = formattedMessage.indexOf("<div class='image-placeholder'");
     if (placeholderStart >= 0) {
@@ -135,19 +167,20 @@ void processMessageWithImage(const QString& formattedMessage, const QString& mes
         QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
         QString filename = extractAttribute(formattedMessage, "data-filename");
 
-        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
-        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        // Tworzymy dymek dla tekstu wiadomości (część przed placeholderem)
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage.left(placeholderStart),
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
 
         // Tworzymy placeholder załącznika
         AttachmentPlaceholder* imagePlaceholder = new AttachmentPlaceholder(
@@ -157,30 +190,31 @@ void processMessageWithImage(const QString& formattedMessage, const QString& mes
         imagePlaceholder->setAttachmentReference(attachmentId, mimeType);
         m_contentLayout->addWidget(imagePlaceholder);
 
-        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobny dymek
         if (placeholderEnd < formattedMessage.length()) {
-            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
-            afterLabel->setWordWrap(true);
-            afterLabel->setTextFormat(Qt::RichText);
-            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            afterLabel->setOpenExternalLinks(true);
-            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-            m_contentLayout->addWidget(afterLabel);
+            MessageBubble* afterBubble = new MessageBubble(
+                formattedMessage.mid(placeholderEnd + 6),  // +6 dla "</div>"
+                bubbleType,
+                m_contentWidget
+            );
+            m_contentLayout->addWidget(afterBubble);
+            afterBubble->startEntryAnimation();
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
-        QLabel* messageLabel = new QLabel(formattedMessage);
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage,
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
     }
 
     // Przewijamy obszar przewijania do dołu
@@ -190,7 +224,7 @@ void processMessageWithImage(const QString& formattedMessage, const QString& mes
 }
 
 // Przetwarzanie wiadomości z animacją GIF
-void processMessageWithGif(const QString& formattedMessage, const QString& messageId = QString()) {
+void processMessageWithGif(const QString& formattedMessage, const QString& messageId = QString(), MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage) {
     // Sprawdź czy wiadomość zawiera placeholder GIF-a
     int placeholderStart = formattedMessage.indexOf("<div class='gif-placeholder'");
     if (placeholderStart >= 0) {
@@ -204,19 +238,20 @@ void processMessageWithGif(const QString& formattedMessage, const QString& messa
         QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
         QString filename = extractAttribute(formattedMessage, "data-filename");
 
-        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
-        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        // Tworzymy dymek dla tekstu wiadomości (część przed placeholderem)
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage.left(placeholderStart),
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
 
         // Tworzymy placeholder załącznika GIF
         AttachmentPlaceholder* gifPlaceholder = new AttachmentPlaceholder(
@@ -226,30 +261,31 @@ void processMessageWithGif(const QString& formattedMessage, const QString& messa
         gifPlaceholder->setAttachmentReference(attachmentId, mimeType);
         m_contentLayout->addWidget(gifPlaceholder);
 
-        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobny dymek
         if (placeholderEnd < formattedMessage.length()) {
-            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
-            afterLabel->setWordWrap(true);
-            afterLabel->setTextFormat(Qt::RichText);
-            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            afterLabel->setOpenExternalLinks(true);
-            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-            m_contentLayout->addWidget(afterLabel);
+            MessageBubble* afterBubble = new MessageBubble(
+                formattedMessage.mid(placeholderEnd + 6),  // +6 dla "</div>"
+                bubbleType,
+                m_contentWidget
+            );
+            m_contentLayout->addWidget(afterBubble);
+            afterBubble->startEntryAnimation();
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
-        QLabel* messageLabel = new QLabel(formattedMessage);
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage,
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
     }
 
     // Przewijamy obszar przewijania do dołu
@@ -259,7 +295,7 @@ void processMessageWithGif(const QString& formattedMessage, const QString& messa
 }
 
 // Przetwarzanie wiadomości z plikiem audio
-void processMessageWithAudio(const QString& formattedMessage, const QString& messageId = QString()) {
+void processMessageWithAudio(const QString& formattedMessage, const QString& messageId = QString(), MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage) {
     // Sprawdź czy wiadomość zawiera placeholder audio
     int placeholderStart = formattedMessage.indexOf("<div class='audio-placeholder'");
     if (placeholderStart >= 0) {
@@ -273,19 +309,20 @@ void processMessageWithAudio(const QString& formattedMessage, const QString& mes
         QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
         QString filename = extractAttribute(formattedMessage, "data-filename");
 
-        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
-        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        // Tworzymy dymek dla tekstu wiadomości (część przed placeholderem)
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage.left(placeholderStart),
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
 
         // Tworzymy placeholder załącznika audio
         AttachmentPlaceholder* audioPlaceholder = new AttachmentPlaceholder(
@@ -295,30 +332,31 @@ void processMessageWithAudio(const QString& formattedMessage, const QString& mes
         audioPlaceholder->setAttachmentReference(attachmentId, mimeType);
         m_contentLayout->addWidget(audioPlaceholder);
 
-        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobny dymek
         if (placeholderEnd < formattedMessage.length()) {
-            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
-            afterLabel->setWordWrap(true);
-            afterLabel->setTextFormat(Qt::RichText);
-            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            afterLabel->setOpenExternalLinks(true);
-            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-            m_contentLayout->addWidget(afterLabel);
+            MessageBubble* afterBubble = new MessageBubble(
+                formattedMessage.mid(placeholderEnd + 6),  // +6 dla "</div>"
+                bubbleType,
+                m_contentWidget
+            );
+            m_contentLayout->addWidget(afterBubble);
+            afterBubble->startEntryAnimation();
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
-        QLabel* messageLabel = new QLabel(formattedMessage);
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage,
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
     }
 
     // Przewijamy obszar przewijania do dołu
@@ -328,7 +366,7 @@ void processMessageWithAudio(const QString& formattedMessage, const QString& mes
 }
 
 // Przetwarzanie wiadomości z filmem wideo
-void processMessageWithVideo(const QString& formattedMessage, const QString& messageId = QString()) {
+void processMessageWithVideo(const QString& formattedMessage, const QString& messageId = QString(), MessageBubble::BubbleType bubbleType = MessageBubble::ReceivedMessage) {
     // Sprawdź czy wiadomość zawiera placeholder wideo
     int placeholderStart = formattedMessage.indexOf("<div class='video-placeholder'");
     if (placeholderStart >= 0) {
@@ -342,19 +380,20 @@ void processMessageWithVideo(const QString& formattedMessage, const QString& mes
         QString attachmentId = extractAttribute(formattedMessage, "data-attachment-id");
         QString filename = extractAttribute(formattedMessage, "data-filename");
 
-        // Tworzymy etykietę dla tekstu wiadomości (część przed placeholderem)
-        QLabel* messageLabel = new QLabel(formattedMessage.left(placeholderStart));
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        // Tworzymy dymek dla tekstu wiadomości (część przed placeholderem)
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage.left(placeholderStart),
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
 
         // Tworzymy placeholder załącznika wideo
         AttachmentPlaceholder* videoPlaceholder = new AttachmentPlaceholder(
@@ -364,30 +403,31 @@ void processMessageWithVideo(const QString& formattedMessage, const QString& mes
         videoPlaceholder->setAttachmentReference(attachmentId, mimeType);
         m_contentLayout->addWidget(videoPlaceholder);
 
-        // Jeśli jest tekst po placeholderze, dodajemy go jako osobną etykietę
+        // Jeśli jest tekst po placeholderze, dodajemy go jako osobny dymek
         if (placeholderEnd < formattedMessage.length()) {
-            QLabel* afterLabel = new QLabel(formattedMessage.mid(placeholderEnd + 6)); // +6 dla "</div>"
-            afterLabel->setWordWrap(true);
-            afterLabel->setTextFormat(Qt::RichText);
-            afterLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            afterLabel->setOpenExternalLinks(true);
-            afterLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-            m_contentLayout->addWidget(afterLabel);
+            MessageBubble* afterBubble = new MessageBubble(
+                formattedMessage.mid(placeholderEnd + 6),  // +6 dla "</div>"
+                bubbleType,
+                m_contentWidget
+            );
+            m_contentLayout->addWidget(afterBubble);
+            afterBubble->startEntryAnimation();
         }
     } else {
         // Standardowe wyświetlanie wiadomości bez załącznika
-        QLabel* messageLabel = new QLabel(formattedMessage);
-        messageLabel->setWordWrap(true);
-        messageLabel->setTextFormat(Qt::RichText);
-        messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        messageLabel->setOpenExternalLinks(true);
-        messageLabel->setStyleSheet("background-color: transparent; color: #e0e0e0;");
-        m_contentLayout->addWidget(messageLabel);
+        MessageBubble* messageBubble = new MessageBubble(
+            formattedMessage,
+            bubbleType,
+            m_contentWidget
+        );
 
-        // Jeśli przekazano messageId, zapisujemy etykietę w mapie
+        // Jeśli przekazano messageId, zapisujemy dymek w mapie
         if (!messageId.isEmpty()) {
-            m_messageLabels[messageId] = messageLabel;
+            m_messageWidgets[messageId] = messageBubble;
         }
+
+        m_contentLayout->addWidget(messageBubble);
+        messageBubble->startEntryAnimation();
     }
 
     // Przewijamy obszar przewijania do dołu
@@ -416,6 +456,7 @@ QString extractAttribute(const QString& html, const QString& attribute) {
             delete item->widget();
             delete item;
         }
+        m_messageWidgets.clear();
     }
 
 public slots:
