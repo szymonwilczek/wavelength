@@ -19,14 +19,16 @@ class WavelengthChatView : public QWidget {
 
 public:
     explicit WavelengthChatView(QWidget *parent = nullptr) : QWidget(parent) {
-        setStyleSheet("background-color: #2d2d2d; color: #e0e0e0;");
+        setObjectName("chatViewContainer");
+
+        setStyleSheet(ChatStyle::getChatStyleSheet());
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(20, 20, 20, 20);
         mainLayout->setSpacing(15);
 
         headerLabel = new QLabel(this);
-        headerLabel->setStyleSheet("font-size: 16pt; color: #a0a0a0; margin-bottom: 10px;");
+        headerLabel->setObjectName("headerLabel");
         mainLayout->addWidget(headerLabel);
 
         // Zastępujemy QTextEdit naszą nową klasą
@@ -37,46 +39,17 @@ public:
 
         attachButton = new QPushButton(this);
         attachButton->setToolTip("Attach file");
-        attachButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: #333333;"
-            "  border: 1px solid #444444;"
-            "  border-radius: 5px;"
-            "  padding: 8px;"
-            "}"
-            "QPushButton:hover { background-color: #444444; }"
-            "QPushButton:pressed { background-color: #2a2a2a; }"
-        );
+        attachButton->setStyleSheet(ChatStyle::getAttachButtonStyle());
         attachButton->setFixedSize(36, 36);
         inputLayout->addWidget(attachButton);
 
         inputField = new QLineEdit(this);
         inputField->setPlaceholderText("Enter message...");
-        inputField->setStyleSheet(
-            "QLineEdit {"
-            "  background-color: #333333;"
-            "  border: 1px solid #444444;"
-            "  border-radius: 5px;"
-            "  padding: 8px;"
-            "  color: #e0e0e0;"
-            "  font-size: 11pt;"
-            "}"
-        );
+        inputField->setStyleSheet(ChatStyle::getInputFieldStyle());
         inputLayout->addWidget(inputField, 1);
 
         sendButton = new QPushButton("Send", this);
-        sendButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: #4a6db5;"
-            "  color: white;"
-            "  border: none;"
-            "  border-radius: 5px;"
-            "  padding: 8px 16px;"
-            "}"
-            "QPushButton:hover { background-color: #5a7dc5; }"
-            "QPushButton:pressed { background-color: #3a5da5; }"
-            "QPushButton:disabled { background-color: #2c3e66; color: #aaaaaa; }"
-        );
+        sendButton->setStyleSheet(ChatStyle::getSendButtonStyle());
         inputLayout->addWidget(sendButton);
 
         mainLayout->addLayout(inputLayout);
