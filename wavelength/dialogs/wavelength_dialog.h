@@ -25,7 +25,7 @@ class WavelengthDialog : public AnimatedDialog {
 public:
     explicit WavelengthDialog(QWidget *parent = nullptr)
         : AnimatedDialog(parent, AnimatedDialog::SlideFromBottom),
-          m_shadowSize(15)
+          m_shadowSize(10)
     {
         setWindowTitle("Create New Wavelength");
         setModal(true);
@@ -149,7 +149,7 @@ public:
 
         // Parametry cienia
         const int cornerRadius = 15;
-        const int shadowSteps = 25;
+        const int shadowSteps = 15;
 
         // Rysowanie złożonego cienia z większą liczbą warstw
         for (int i = 0; i < shadowSteps; i++) {

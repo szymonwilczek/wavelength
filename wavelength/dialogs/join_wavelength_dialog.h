@@ -143,8 +143,8 @@ public:
 
         // Parametry cienia i zaokrąglonych rogów
         const int cornerRadius = 15;
-        const int shadowSize = 15;
-        const int shadowSteps = 20;
+        const int shadowSize = 10;
+        const int shadowSteps = 15;
 
         // Rysowanie złożonego cienia z większą liczbą warstw
         for (int i = 0; i < shadowSteps; i++) {
