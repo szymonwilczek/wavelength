@@ -2,7 +2,6 @@
 #define JOIN_WAVELENGTH_DIALOG_H
 
 #include <QApplication>
-#include <QDialog>
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
@@ -10,19 +9,26 @@
 #include <QFormLayout>
 #include <QDoubleValidator>
 #include <QComboBox>
+#include <QPainter>
 #include "../session/wavelength_session_coordinator.h"
+#include "../ui/dialogs/animated_dialog.h"
 
-class JoinWavelengthDialog : public QDialog {
+class JoinWavelengthDialog : public AnimatedDialog {
     Q_OBJECT
 
 public:
-    explicit JoinWavelengthDialog(QWidget *parent = nullptr) : QDialog(parent) {
+    explicit JoinWavelengthDialog(QWidget *parent = nullptr)
+        : AnimatedDialog(parent, AnimatedDialog::SlideFromBottom)
+    {
         setWindowTitle("Join Wavelength");
         setModal(true);
-        setFixedSize(400, 250); // Zwiększona wysokość dla dodatkowej etykiety
-        setStyleSheet("background-color: #2d2d2d; color: #e0e0e0;");
+        setFixedSize(400, 250);
+
+        // Ustaw odpowiedni czas trwania animacji
+        setAnimationDuration(400);
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(20, 20, 20, 20);
 
         QLabel *infoLabel = new QLabel("Enter wavelength frequency to join (130Hz - 180MHz):", this);
         mainLayout->addWidget(infoLabel);
@@ -128,6 +134,44 @@ public:
         connect(joiner, &WavelengthJoiner::connectionError, this, &JoinWavelengthDialog::onConnectionError);
 
         validateInput();
+    }
+
+    // Metoda do renderowania tła i cienia (dodajemy funkcję paintEvent)
+    void paintEvent(QPaintEvent *event) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+
+        // Parametry cienia i zaokrąglonych rogów
+        const int cornerRadius = 15;
+        const int shadowSize = 15;
+        const int shadowSteps = 20;
+
+        // Rysowanie złożonego cienia z większą liczbą warstw
+        for (int i = 0; i < shadowSteps; i++) {
+            qreal ratio = (qreal)i / shadowSteps;
+            qreal size = shadowSize * pow(ratio, 0.8);
+            int alpha = 30 * pow(1.0 - ratio, 0.7);
+
+            QColor shadowColor(20, 20, 20, alpha);
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(shadowColor);
+
+            QRect shadowRect = rect().adjusted(
+                shadowSize - size,
+                shadowSize - size,
+                size - shadowSize,
+                size - shadowSize
+            );
+
+            painter.drawRoundedRect(shadowRect, cornerRadius, cornerRadius);
+        }
+
+        // Główne tło dialogu
+        QColor bgColor(24, 24, 27);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(bgColor);
+        QRect mainRect = rect().adjusted(shadowSize, shadowSize, -shadowSize, -shadowSize);
+        painter.drawRoundedRect(mainRect, cornerRadius, cornerRadius);
     }
 
     double getFrequency() const {

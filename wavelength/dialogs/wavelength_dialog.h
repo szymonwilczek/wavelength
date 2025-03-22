@@ -1,7 +1,6 @@
 #ifndef WAVELENGTH_DIALOG_H
 #define WAVELENGTH_DIALOG_H
 
-#include <QDialog>
 #include <QLineEdit>
 #include <QLabel>
 #include <QCheckBox>
@@ -16,23 +15,24 @@
 #include <QGraphicsOpacityEffect>
 #include <QProgressBar>
 #include <QPropertyAnimation>
-#include <QShowEvent>  // Dodany nagłówek
-#include <QCloseEvent> // Dodany nagłówek
 #include <QPainter>
 #include "../session/wavelength_session_coordinator.h"
+#include "../ui/dialogs/animated_dialog.h"
 
-class WavelengthDialog : public QDialog {
+class WavelengthDialog : public AnimatedDialog {
     Q_OBJECT
 
 public:
-    explicit WavelengthDialog(QWidget *parent = nullptr) : QDialog(parent) {
-        setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
+    explicit WavelengthDialog(QWidget *parent = nullptr)
+        : AnimatedDialog(parent, AnimatedDialog::SlideFromBottom),
+          m_shadowSize(15)
+    {
         setWindowTitle("Create New Wavelength");
         setModal(true);
         setFixedSize(450 + m_shadowSize, 250 + m_shadowSize);
-        setAttribute(Qt::WA_TranslucentBackground); // Kluczowe dla zaokrąglonych rogów
 
-        setAutoFillBackground(false);
+        // Ustaw czas trwania animacji
+        setAnimationDuration(400);
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10, m_shadowSize + 10);
@@ -143,37 +143,18 @@ public:
         frequencyLabel->setText("...");
     }
 
-    double getFrequency() const {
-        return m_frequency;
-    }
-
-
-    bool isPasswordProtected() const {
-        return passwordProtectedCheckbox->isChecked();
-    }
-
-    QString getPassword() const {
-        return passwordEdit->text();
-    }
-
-protected:
-
     void paintEvent(QPaintEvent *event) override {
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing, true);
 
         // Parametry cienia
         const int cornerRadius = 15;
-        const int shadowSteps = 25; // Zwiększ dla bardziej rozmytego cienia (było 15)
+        const int shadowSteps = 25;
 
         // Rysowanie złożonego cienia z większą liczbą warstw
         for (int i = 0; i < shadowSteps; i++) {
             qreal ratio = (qreal)i / shadowSteps;
-
-            // Modyfikacja wzoru dla bardziej rozmytego efektu
-            qreal size = m_shadowSize * pow(ratio, 0.8); // Wykładnik < 1 daje bardziej rozmyty efekt
-
-            // Wolniejszy spadek przezroczystości = bardziej rozmyty cień
+            qreal size = m_shadowSize * pow(ratio, 0.8);
             int alpha = 30 * pow(1.0 - ratio, 0.7);
 
             QColor shadowColor(20, 20, 20, alpha);
@@ -198,64 +179,19 @@ protected:
         painter.drawRoundedRect(mainRect, cornerRadius, cornerRadius);
     }
 
-    void showEvent(QShowEvent *event) override {
-        QDialog::showEvent(event);
-
-        // Pobierz aktualną pozycję finalną dialogu - to jest docelowa geometria
-        QRect endGeometry = geometry();
-
-        // Znajdź rzeczywisty środek okna
-        QPoint centerPoint = endGeometry.center();
-
-        // Utwórz początkową geometrię jako mały punkt dokładnie w środku
-        int smallSize = 20; // Bardzo mały rozmiar początkowy
-        QRect startGeometry(0, 0, smallSize, smallSize);
-        startGeometry.moveCenter(centerPoint);
-
-        setGeometry(startGeometry);
-
-        layout()->activate();
-        repaint();
-
-        // Utwórz animację
-        QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
-        animation->setDuration(500);
-        animation->setStartValue(startGeometry);
-        animation->setEndValue(endGeometry);
-        animation->setEasingCurve(QEasingCurve::OutExpo);
-
-        // Uruchom animację
-        animation->start(QAbstractAnimation::DeleteWhenStopped);
+    double getFrequency() const {
+        return m_frequency;
     }
 
-void closeEvent(QCloseEvent *event) override {
-    event->ignore();
+    bool isPasswordProtected() const {
+        return passwordProtectedCheckbox->isChecked();
+    }
 
-    QRect startGeometry = geometry();
-    QPoint centerPoint = startGeometry.center();
-    QRect endGeometry = QRect(0, 0, startGeometry.width() * 0.1, startGeometry.height() * 0.1);
-    endGeometry.moveCenter(centerPoint);
-
-    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
-    animation->setDuration(400);  // Długość animacji
-    animation->setStartValue(startGeometry);
-    animation->setEndValue(endGeometry);
-    animation->setEasingCurve(QEasingCurve::InBack);
-
-    // Dodatkowe punkty pośrednie dla płynniejszego efektu
-    animation->setKeyValueAt(0.5, QRect(
-        centerPoint.x() - startGeometry.width() * 0.35,
-        centerPoint.y() - startGeometry.height() * 0.35,
-        startGeometry.width() * 0.7,
-        startGeometry.height() * 0.7
-    ));
-
-    connect(animation, &QPropertyAnimation::finished, this, &QDialog::reject);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
+    QString getPassword() const {
+        return passwordEdit->text();
+    }
 
 private slots:
-
     void validateInputs() {
         statusLabel->hide();
 
@@ -290,92 +226,85 @@ private slots:
     }
 
     void onFrequencyFound() {
-    // Pobierz wynik asynchronicznego wyszukiwania
-    m_frequency = frequencyWatcher->result();
-    m_frequencyFound = true;
+        // Pobierz wynik asynchronicznego wyszukiwania
+        m_frequency = frequencyWatcher->result();
+        m_frequencyFound = true;
 
-    // Przygotuj tekst częstotliwości, ale jeszcze go nie wyświetlaj
-    QString frequencyText = formatFrequencyText(m_frequency);
+        // Przygotuj tekst częstotliwości, ale jeszcze go nie wyświetlaj
+        QString frequencyText = formatFrequencyText(m_frequency);
 
-    // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
-    QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
-    loaderSlideAnimation->setDuration(400); // Skrócony czas dla lepszej responsywności
-    loaderSlideAnimation->setStartValue(loadingIndicator->sizeHint().height());
-    loaderSlideAnimation->setEndValue(0);
-    loaderSlideAnimation->setEasingCurve(QEasingCurve::OutQuint); // Płynniejsza krzywa
+        // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
+        QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
+        loaderSlideAnimation->setDuration(400);
+        loaderSlideAnimation->setStartValue(loadingIndicator->sizeHint().height());
+        loaderSlideAnimation->setEndValue(0);
+        loaderSlideAnimation->setEasingCurve(QEasingCurve::OutQuint);
 
-    // Dodanie efektu przezroczystości dla etykiety częstotliwości
-    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(frequencyLabel);
-    frequencyLabel->setGraphicsEffect(opacityEffect);
-    opacityEffect->setOpacity(0.0); // Początkowo niewidoczny
+        // Dodanie efektu przezroczystości dla etykiety częstotliwości
+        QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(frequencyLabel);
+        frequencyLabel->setGraphicsEffect(opacityEffect);
+        opacityEffect->setOpacity(0.0); // Początkowo niewidoczny
 
-    // Animacja pojawiania się etykiety częstotliwości
-    QPropertyAnimation *frequencyAnimation = new QPropertyAnimation(opacityEffect, "opacity");
-    frequencyAnimation->setDuration(600);
-    frequencyAnimation->setStartValue(0.0);
-    frequencyAnimation->setEndValue(1.0);
-    frequencyAnimation->setEasingCurve(QEasingCurve::InQuad);
+        // Animacja pojawiania się etykiety częstotliwości
+        QPropertyAnimation *frequencyAnimation = new QPropertyAnimation(opacityEffect, "opacity");
+        frequencyAnimation->setDuration(600);
+        frequencyAnimation->setStartValue(0.0);
+        frequencyAnimation->setEndValue(1.0);
+        frequencyAnimation->setEasingCurve(QEasingCurve::InQuad);
 
-    // Utwórz grupę animacji, która zostanie uruchomiona sekwencyjnie
-    QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
-    animGroup->addAnimation(loaderSlideAnimation);
+        // Utwórz grupę animacji, która zostanie uruchomiona sekwencyjnie
+        QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
+        animGroup->addAnimation(loaderSlideAnimation);
 
-    // Sygnalizacja kiedy pierwsza animacja się kończy
-    connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyText]() {
-        // Ukryj loadingIndicator
-        loadingIndicator->hide();
+        // Sygnalizacja kiedy pierwsza animacja się kończy
+        connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyText]() {
+            // Ukryj loadingIndicator
+            loadingIndicator->hide();
 
-        // Ustaw tekst częstotliwości
-        frequencyLabel->setText(frequencyText);
-    });
+            // Ustaw tekst częstotliwości
+            frequencyLabel->setText(frequencyText);
+        });
 
-    // Połączenie sekwencyjne - druga animacja po zakończeniu pierwszej
-    connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyAnimation]() {
-        frequencyAnimation->start(QAbstractAnimation::DeleteWhenStopped);
-    });
+        // Połączenie sekwencyjne - druga animacja po zakończeniu pierwszej
+        connect(loaderSlideAnimation, &QPropertyAnimation::finished, [this, frequencyAnimation]() {
+            frequencyAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+        });
 
-    // Aby uzyskać wysoką płynność animacji:
-    // 1. Wyłączamy cache tła dla animowanych widżetów
-    loadingIndicator->setAttribute(Qt::WA_OpaquePaintEvent, false);
-    frequencyLabel->setAttribute(Qt::WA_OpaquePaintEvent, false);
+        // Dla większej płynności animacji
+        loadingIndicator->setAttribute(Qt::WA_OpaquePaintEvent, false);
+        frequencyLabel->setAttribute(Qt::WA_OpaquePaintEvent, false);
 
-    // 2. Ustaw wyższą częstotliwość aktualizacji dla animacji
-    frequencyAnimation->setDuration(600);  // 600ms
-    loaderSlideAnimation->setDuration(400);  // 400ms
+        frequencyAnimation->setKeyValueAt(0.2, 0.3);
+        frequencyAnimation->setKeyValueAt(0.4, 0.6);
+        frequencyAnimation->setKeyValueAt(0.6, 0.8);
+        frequencyAnimation->setKeyValueAt(0.8, 0.95);
 
-    // Dla większej płynności możemy ustawić więcej klatek animacji
-    const int framesPerSecond = 60;
-    frequencyAnimation->setKeyValueAt(0.2, 0.3);
-    frequencyAnimation->setKeyValueAt(0.4, 0.6);
-    frequencyAnimation->setKeyValueAt(0.6, 0.8);
-    frequencyAnimation->setKeyValueAt(0.8, 0.95);
+        // Rozpocznij pierwszą animację
+        animGroup->start(QAbstractAnimation::DeleteWhenStopped);
 
-    // Rozpocznij pierwszą animację
-    animGroup->start(QAbstractAnimation::DeleteWhenStopped);
-
-    // Sprawdź czy przycisk powinien być aktywowany
-    validateInputs();
-}
-
-// Nowa pomocnicza metoda do formatowania tekstu częstotliwości
-QString formatFrequencyText(double frequency) {
-    QString unitText;
-    double displayValue;
-
-    if (frequency >= 1000000) {
-        displayValue = frequency / 1000000.0;
-        unitText = " MHz";
-    } else if (frequency >= 1000) {
-        displayValue = frequency / 1000.0;
-        unitText = " kHz";
-    } else {
-        displayValue = frequency;
-        unitText = " Hz";
+        // Sprawdź czy przycisk powinien być aktywowany
+        validateInputs();
     }
 
-    // Formatuj z jednym miejscem po przecinku
-    return QString::number(displayValue, 'f', 1) + unitText;
-}
+    // Nowa pomocnicza metoda do formatowania tekstu częstotliwości
+    QString formatFrequencyText(double frequency) {
+        QString unitText;
+        double displayValue;
+
+        if (frequency >= 1000000) {
+            displayValue = frequency / 1000000.0;
+            unitText = " MHz";
+        } else if (frequency >= 1000) {
+            displayValue = frequency / 1000.0;
+            unitText = " kHz";
+        } else {
+            displayValue = frequency;
+            unitText = " Hz";
+        }
+
+        // Formatuj z jednym miejscem po przecinku
+        return QString::number(displayValue, 'f', 1) + unitText;
+    }
 
 private:
     static double findLowestAvailableFrequency() {
@@ -409,10 +338,6 @@ private:
         return 130.0;
     }
 
-    void updateFrequencyLabel() {
-        frequencyLabel->setText(formatFrequencyText(m_frequency));
-    }
-
 private:
     QLabel *frequencyLabel;
     QLabel *loadingIndicator;
@@ -424,7 +349,7 @@ private:
     QFutureWatcher<double> *frequencyWatcher;
     double m_frequency = 130.0; // Domyślna wartość
     bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
-    const int m_shadowSize = 4; // Rozmiar cienia
+    const int m_shadowSize; // Rozmiar cienia
 };
 
 #endif // WAVELENGTH_DIALOG_H
