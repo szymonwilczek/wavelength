@@ -83,8 +83,45 @@ public:
         processMessageWithGif(formattedMessage, messageId, bubbleType);
     } else if (formattedMessage.contains("image-placeholder")) {
         processMessageWithImage(formattedMessage, messageId, bubbleType);
+    } else if (bubbleType == MessageBubble::SystemMessage) {
+        // Dla wiadomości systemowych używamy zwykłego QLabel zamiast dymka
+        QLabel* systemLabel = new QLabel(formattedMessage, m_contentWidget);
+        systemLabel->setTextFormat(Qt::RichText);
+        systemLabel->setWordWrap(true);
+        systemLabel->setAlignment(Qt::AlignCenter);
+        systemLabel->setStyleSheet("color: #ffcc00; font-weight: bold; background: transparent; padding: 5px;");
+
+        // Efekt przezroczystości dla animacji
+        QGraphicsOpacityEffect* opacityEffect = new QGraphicsOpacityEffect(systemLabel);
+        opacityEffect->setOpacity(0.0);
+        systemLabel->setGraphicsEffect(opacityEffect);
+
+        // Dodajemy label do środka layoutu
+        QHBoxLayout* labelLayout = new QHBoxLayout();
+        labelLayout->addStretch(1);
+        labelLayout->addWidget(systemLabel, 0);
+        labelLayout->addStretch(1);
+
+        QWidget* wrapperWidget = new QWidget(m_contentWidget);
+        wrapperWidget->setLayout(labelLayout);
+        wrapperWidget->setContentsMargins(0, 0, 0, 0);
+        m_contentLayout->addWidget(wrapperWidget);
+
+        // Animacja pojawiania się
+        QPropertyAnimation* opacityAnim = new QPropertyAnimation(opacityEffect, "opacity");
+        opacityAnim->setDuration(400);
+        opacityAnim->setStartValue(0.0);
+        opacityAnim->setEndValue(1.0);
+        opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
+        opacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
+
+        // Jeśli podano ID, zapisz referencję do widgetu
+        if (!messageId.isEmpty()) {
+            // Nie obsługujemy referencji dla wiadomości systemowych
+            // Można by zmodyfikować mapę, aby przechowywała QWidget* zamiast MessageBubble*
+        }
     } else {
-        // Standardowa wiadomość tekstowa w dymku
+        // Standardowa wiadomość tekstowa w dymku (dla wysłanych i odebranych)
         MessageBubble* messageBubble = new MessageBubble(formattedMessage, bubbleType, m_contentWidget);
 
         // Jeśli podano ID, zapisz referencję do widgetu
@@ -106,14 +143,9 @@ public:
         if (bubbleType == MessageBubble::SentMessage) {
             bubbleLayout->addStretch(1); // Dodaje elastyczną przestrzeń po lewej stronie
             bubbleLayout->addWidget(messageBubble, 0);  // Widget bez rozciągania
-        } else if (bubbleType == MessageBubble::ReceivedMessage) {
+        } else {
             bubbleLayout->addWidget(messageBubble, 0);  // Widget bez rozciągania
             bubbleLayout->addStretch(1); // Dodaje elastyczną przestrzeń po prawej stronie
-        } else {
-            // Wiadomości systemowe są wyśrodkowane
-            bubbleLayout->addStretch(1);
-            bubbleLayout->addWidget(messageBubble, 0);
-            bubbleLayout->addStretch(1);
         }
 
         // Dodajemy wrapper do głównego układu

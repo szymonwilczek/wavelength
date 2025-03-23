@@ -129,9 +129,9 @@ public:
 
         messageArea->clear();
 
-        QString welcomeMsg = QString("<span style=\"color:#888888;\">Connected to wavelength %1 Hz at %2</span>")
-            .arg(frequency)
-            .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
+        QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Connected to wavelength %1 Hz at %2</span>")
+        .arg(frequency)
+        .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
         messageArea->appendMessage(welcomeMsg);
 
         setVisible(true);
