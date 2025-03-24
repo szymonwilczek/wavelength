@@ -13,7 +13,6 @@
 
 #include "attachment_queue_manager.h"
 #include "../messages/formatter/message_formatter.h"
-#include "../ui/auto_scaling_attachment.h"
 #include "../ui/cyber_attachment_viewer.h"
 #include "gif/player/inline_gif_player.h"
 #include "image/displayer/image_viewer.h"
@@ -228,13 +227,12 @@ public slots:
     InlineImageViewer* imageViewer = new InlineImageViewer(data, viewer);
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(imageViewer, viewer);
-    viewer->setContent(scalingWrapper);
+    viewer->setContent(imageViewer);
 
     // Dodajemy opóźnione dostosowanie rozmiaru i emisję sygnału
-    QTimer::singleShot(100, this, [this, scalingWrapper]() {
-        scalingWrapper->adjustSize();
-        QMetaObject::invokeMethod(scalingWrapper, "adjustContentSize");
+    QTimer::singleShot(100, this, [this, viewer]() {
+        viewer->adjustSize();
+        QMetaObject::invokeMethod(viewer, "adjustContentSize");
         emit attachmentLoaded(); // Emitujemy sygnał o załadowaniu załącznika
 
         // Wymuszamy przeliczenie układu na widget-rodzicach
@@ -264,8 +262,8 @@ void showCyberGif(const QByteArray& data) {
     InlineGifPlayer* gifPlayer = new InlineGifPlayer(data, viewer);
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(gifPlayer, viewer);
-    viewer->setContent(scalingWrapper);
+
+    viewer->setContent(gifPlayer);
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
@@ -285,8 +283,8 @@ void showCyberAudio(const QByteArray& data) {
     InlineAudioPlayer* audioPlayer = new InlineAudioPlayer(data, m_mimeType, viewer);
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(audioPlayer, viewer);
-    viewer->setContent(scalingWrapper);
+
+    viewer->setContent(audioPlayer);
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
@@ -337,8 +335,8 @@ void showCyberVideo(const QByteArray& data) {
     previewLayout->addWidget(playButton);
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(videoPreview, viewer);
-    viewer->setContent(scalingWrapper);
+
+    viewer->setContent(videoPreview);
 
     // Po kliknięciu miniaturki lub przycisku, otwórz dialog z odtwarzaczem
     auto openPlayer = [this, data]() {

@@ -133,8 +133,6 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/cyber_attachment_viewer.h
         wavelength/ui/chat/cyber_text_display.cpp
         wavelength/ui/chat/cyber_text_display.h
-        wavelength/ui/auto_scaling_attachment.cpp
-        wavelength/ui/auto_scaling_attachment.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
