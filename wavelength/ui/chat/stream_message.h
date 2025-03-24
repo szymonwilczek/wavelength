@@ -236,29 +236,54 @@ public:
     }
     
     void startDisintegrationAnimation() {
-        // Usuwamy poprzedni efekt, jeśli istnieje
+#ifdef QT_OPENGL_SUPPORT
+        // Wersja OpenGL - tylko gdy OpenGL jest dostępny
+
+        // Renderujemy zawartość widgetu do pixmapy
+        QPixmap widgetPixmap(size());
+        widgetPixmap.fill(Qt::transparent);
+        render(&widgetPixmap);
+
+        // Tworzymy i konfigurujemy widget OpenGL
+        OpenGLDisintegration* disintegrationWidget = new OpenGLDisintegration(parentWidget());
+        disintegrationWidget->setGeometry(geometry());
+        disintegrationWidget->setSourcePixmap(widgetPixmap);
+        disintegrationWidget->show();
+
+        // Ukrywamy oryginalny widget
+        hide();
+
+        // Po zakończeniu animacji, emitujemy sygnał i usuwamy efekt
+        connect(disintegrationWidget, &OpenGLDisintegration::animationFinished, this, [this, disintegrationWidget]() {
+            disintegrationWidget->deleteLater();
+            emit hidden();
+        });
+
+        // Rozpoczynamy animację
+        disintegrationWidget->startAnimation(1500);
+#else
+        // Optymalizowana wersja bez OpenGL
         if (graphicsEffect() && graphicsEffect() != m_disintegrationEffect) {
             delete graphicsEffect();
         }
-        
-        // Tworzymy nowy efekt rozpadu
+
         m_disintegrationEffect = new DisintegrationEffect(this);
         m_disintegrationEffect->setProgress(0.0);
         setGraphicsEffect(m_disintegrationEffect);
-        
-        // Animacja rozpadu
+
         QPropertyAnimation* disintegrationAnim = new QPropertyAnimation(this, "disintegrationProgress");
-        disintegrationAnim->setDuration(1500); // 1.5 sekund
+        disintegrationAnim->setDuration(1500);
         disintegrationAnim->setStartValue(0.0);
         disintegrationAnim->setEndValue(1.0);
         disintegrationAnim->setEasingCurve(QEasingCurve::InQuad);
-        
+
         connect(disintegrationAnim, &QPropertyAnimation::finished, this, [this]() {
             hide();
             emit hidden();
         });
-        
+
         disintegrationAnim->start(QAbstractAnimation::DeleteWhenStopped);
+#endif
     }
 
     void showNavigationButtons(bool hasPrev, bool hasNext) {
