@@ -113,6 +113,16 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/messages/message_bubble.h
         wavelength/ui/chat/chat_style.cpp
         wavelength/ui/chat/chat_style.h
+        wavelength/ui/messages/radio_message.cpp
+        wavelength/ui/messages/radio_message.h
+        wavelength/messages/wavelength_radio_display.cpp
+        wavelength/messages/wavelength_radio_display.h
+        wavelength/ui/messages/system_radio_message.cpp
+        wavelength/ui/messages/system_radio_message.h
+        wavelength/ui/chat/communication_stream.cpp
+        wavelength/ui/chat/communication_stream.h
+        wavelength/messages/wavelength_stream_display.cpp
+        wavelength/messages/wavelength_stream_display.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

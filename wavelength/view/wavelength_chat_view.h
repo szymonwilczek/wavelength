@@ -11,6 +11,8 @@
 #include <QTimer>
 #include <QFileDialog>
 
+#include "../messages/wavelength_radio_display.h"
+#include "../messages/wavelength_stream_display.h"
 #include "../session/wavelength_session_coordinator.h"
 #include "../messages/wavelength_text_display.h"
 
@@ -32,7 +34,7 @@ public:
         mainLayout->addWidget(headerLabel);
 
         // Zastępujemy QTextEdit naszą nową klasą
-        messageArea = new WavelengthTextDisplay(this);
+        messageArea = new WavelengthStreamDisplay(this);
         mainLayout->addWidget(messageArea, 1);
 
         QHBoxLayout *inputLayout = new QHBoxLayout();
@@ -104,15 +106,16 @@ public:
         // Wyświetlamy początkowy komunikat
         QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
             .arg(fileName);
-        messageArea->appendMessage(processingMsg, progressMsgId);
+
+        messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
 
         // Uruchamiamy asynchroniczny proces przetwarzania pliku
         WavelengthMessageService* service = WavelengthMessageService::getInstance();
         bool started = service->sendFileMessage(filePath, progressMsgId);
 
         if (!started) {
-            messageArea->replaceMessage(progressMsgId,
-                "<span style=\"color:#ff5555;\">Failed to start file processing.</span>");
+            messageArea->addMessage(progressMsgId,
+                "<span style=\"color:#ff5555;\">Failed to start file processing.</span>", StreamMessage::MessageType::Transmitted);
         }
     }
 
@@ -132,7 +135,7 @@ public:
         QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Connected to wavelength %1 Hz at %2</span>")
         .arg(frequency)
         .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
-        messageArea->appendMessage(welcomeMsg);
+        messageArea->addMessage(welcomeMsg, "system", StreamMessage::MessageType::System);
 
         setVisible(true);
 
@@ -154,7 +157,7 @@ public:
 
         // W przypadku bardzo dużych wiadomości (z załącznikami), zapobiegaj zawieszeniom UI
         QTimer::singleShot(0, this, [this, message]() {
-            messageArea->appendMessage(message);
+            messageArea->addMessage(message, "received", StreamMessage::MessageType::Received);
             qDebug() << "Message added to display";
         });
     }
@@ -164,7 +167,7 @@ public:
             return;
         }
 
-        messageArea->appendMessage(message);
+        messageArea->addMessage(message, "sent", StreamMessage::MessageType::Transmitted);
     }
 
     void onWavelengthClosed(double frequency) {
@@ -173,7 +176,7 @@ public:
         }
 
         QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by the host.</span>");
-        messageArea->appendMessage(closeMsg);
+        messageArea->addMessage(closeMsg, "system", StreamMessage::MessageType::System);
 
         QTimer::singleShot(2000, this, [this]() {
             clear();
@@ -192,11 +195,11 @@ public:
 private slots:
 
     void updateProgressMessage(const QString& messageId, const QString& message) {
-        messageArea->replaceMessage(messageId, message);
+        messageArea->addMessage(message,messageId,  StreamMessage::MessageType::Transmitted);
     }
 
     void removeProgressMessage(const QString& messageId) {
-        messageArea->removeMessage(messageId);
+        messageArea->addMessage( "<span style=\"color:#ff5555);\">File transfer completed.</span>",messageId, StreamMessage::MessageType::Transmitted);
     }
 
     void sendMessage() {
@@ -255,7 +258,7 @@ signals:
 
 private:
     QLabel *headerLabel;
-    WavelengthTextDisplay *messageArea;  // Zmieniony typ
+    WavelengthStreamDisplay *messageArea;  // Zmieniony typ
     QLineEdit *inputField;
     QPushButton *attachButton;
     QList<QFile> attachedFiles;
