@@ -127,6 +127,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/chat/effects/disintegration_effect.h
         wavelength/ui/chat/stream_message.cpp
         wavelength/ui/chat/stream_message.h
+        wavelength/ui/chat/effects/opengl_disintegration_effect.cpp
+        wavelength/ui/chat/effects/opengl_disintegration_effect.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
