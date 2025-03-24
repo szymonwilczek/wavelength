@@ -50,7 +50,7 @@ public:
     m_contentLabel->setTextFormat(Qt::RichText);
     m_contentLabel->setWordWrap(true);
     m_contentLabel->setStyleSheet(
-        "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
+    "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
     m_mainLayout->addWidget(m_contentLabel);
 
     // Czyścimy treść z tagów HTML i ustawiamy
@@ -325,98 +325,84 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent* event) override {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
-        // Wybieramy kolory w stylu cyberpunk zależnie od typu wiadomości
-        QColor bgColor, borderColor, glowColor, textColor;
+    // Wybieramy kolory w stylu cyberpunk zależnie od typu wiadomości
+    QColor bgColor, borderColor, glowColor, textColor;
 
-        switch (m_type) {
-            case Transmitted:
-                // Neonowy niebieski dla wysyłanych
-                bgColor = QColor(0, 20, 40, 180);
-                borderColor = QColor(0, 200, 255);
-                glowColor = QColor(0, 150, 255, 80);
-                textColor = QColor(0, 220, 255);
-                break;
-            case Received:
-                // Różowo-fioletowy dla przychodzących
-                bgColor = QColor(30, 0, 30, 180);
-                borderColor = QColor(220, 50, 255);
-                glowColor = QColor(180, 0, 255, 80);
-                textColor = QColor(240, 150, 255);
-                break;
-            case System:
-                // Żółto-pomarańczowy dla systemowych
-                bgColor = QColor(40, 25, 0, 180);
-                borderColor = QColor(255, 180, 0);
-                glowColor = QColor(255, 150, 0, 80);
-                textColor = QColor(255, 200, 0);
-                break;
-        }
+    switch (m_type) {
+        case Transmitted:
+            // Neonowy niebieski dla wysyłanych
+            bgColor = QColor(0, 20, 40, 180);
+            borderColor = QColor(0, 200, 255);
+            glowColor = QColor(0, 150, 255, 80);
+            textColor = QColor(0, 220, 255);
+            break;
+        case Received:
+            // Różowo-fioletowy dla przychodzących
+            bgColor = QColor(30, 0, 30, 180);
+            borderColor = QColor(220, 50, 255);
+            glowColor = QColor(180, 0, 255, 80);
+            textColor = QColor(240, 150, 255);
+            break;
+        case System:
+            // Żółto-pomarańczowy dla systemowych
+            bgColor = QColor(40, 25, 0, 180);
+            borderColor = QColor(255, 180, 0);
+            glowColor = QColor(255, 150, 0, 80);
+            textColor = QColor(255, 200, 0);
+            break;
+    }
 
-        // Tworzymy ściętą formę geometryczną (cyberpunk style)
-        QPainterPath path;
-        int clipSize = 20; // rozmiar ścięcia rogu
+    // Tworzymy ściętą formę geometryczną (cyberpunk style)
+    QPainterPath path;
+    int clipSize = 20; // rozmiar ścięcia rogu
 
-        path.moveTo(clipSize, 0);
-        path.lineTo(width() - clipSize, 0);
-        path.lineTo(width(), clipSize);
-        path.lineTo(width(), height() - clipSize);
-        path.lineTo(width() - clipSize, height());
-        path.lineTo(clipSize, height());
-        path.lineTo(0, height() - clipSize);
-        path.lineTo(0, clipSize);
-        path.closeSubpath();
+    path.moveTo(clipSize, 0);
+    path.lineTo(width() - clipSize, 0);
+    path.lineTo(width(), clipSize);
+    path.lineTo(width(), height() - clipSize);
+    path.lineTo(width() - clipSize, height());
+    path.lineTo(clipSize, height());
+    path.lineTo(0, height() - clipSize);
+    path.lineTo(0, clipSize);
+    path.closeSubpath();
 
-        // Tło z gradientem
-        QLinearGradient bgGradient(0, 0, width(), height());
-        bgGradient.setColorAt(0, bgColor.lighter(110));
-        bgGradient.setColorAt(1, bgColor);
+    // Tło z gradientem
+    QLinearGradient bgGradient(0, 0, width(), height());
+    bgGradient.setColorAt(0, bgColor.lighter(110));
+    bgGradient.setColorAt(1, bgColor);
 
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(bgGradient);
-        painter.drawPath(path);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgGradient);
+    painter.drawPath(path);
 
-        // Poświata neonu
-        if (m_glowIntensity > 0.1) {
-            painter.setPen(QPen(glowColor, 6 + m_glowIntensity * 6));
-            painter.setBrush(Qt::NoBrush);
-            painter.drawPath(path);
-        }
-
-        // Neonowe obramowanie
-        painter.setPen(QPen(borderColor, 1));
+    // Poświata neonu
+    if (m_glowIntensity > 0.1) {
+        painter.setPen(QPen(glowColor, 6 + m_glowIntensity * 6));
         painter.setBrush(Qt::NoBrush);
         painter.drawPath(path);
-
-        // Linie dekoracyjne
-        painter.setPen(QPen(borderColor.lighter(120), 1, Qt::SolidLine));
-        painter.drawLine(clipSize, 30, width() - clipSize, 30);
-
-        // Tekst nagłówka (nadawca)
-        painter.setPen(QPen(textColor, 1));
-        painter.setFont(QFont("Consolas", 10, QFont::Bold));
-        painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
-                         Qt::AlignLeft | Qt::AlignVCenter, m_sender);
-
-        // Tekst wiadomości - dzieli się na dwie części: przed załącznikiem i po
-        if (!m_content.isEmpty()) {
-            painter.setPen(QPen(Qt::white, 1));
-            painter.setFont(QFont("Segoe UI", 10));
-            
-            // Miejsce na tekst - uwzględnia miejsce dla załącznika, jeśli istnieje
-            QRect contentRect;
-            if (m_attachmentWidget) {
-                contentRect = QRect(clipSize + 5, 35, width() - 2*clipSize - 10, 
-                                   m_attachmentWidget->y() - 45);
-            } else {
-                contentRect = QRect(clipSize + 5, 35, width() - 2*clipSize - 10, height() - 45);
-            }
-            
-            painter.drawText(contentRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_cleanContent);
-        }
     }
+
+    // Neonowe obramowanie
+    painter.setPen(QPen(borderColor, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(path);
+
+    // Linie dekoracyjne
+    painter.setPen(QPen(borderColor.lighter(120), 1, Qt::SolidLine));
+    painter.drawLine(clipSize, 30, width() - clipSize, 30);
+
+    // Tekst nagłówka (nadawca)
+    painter.setPen(QPen(textColor, 1));
+    painter.setFont(QFont("Consolas", 10, QFont::Bold));
+    painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
+                     Qt::AlignLeft | Qt::AlignVCenter, m_sender);
+
+    // USUNIĘTY KOD: nie rysujemy już tekstu wiadomości bezpośrednio w paintEvent
+    // ponieważ jest już wyświetlany przez QLabel (m_contentLabel)
+}
 
     void resizeEvent(QResizeEvent* event) override {
         updateLayout();
