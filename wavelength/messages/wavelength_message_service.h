@@ -80,7 +80,7 @@ public:
 
         QJsonDocument doc(messageObj);
         QString jsonMessage = doc.toJson(QJsonDocument::Compact);
-        qDebug() << "Sending message to server:" << jsonMessage;
+        // qDebug() << "Sending message to server:" << jsonMessage;
         socket->sendTextMessage(jsonMessage);
 
         qDebug() << "WavelengthMessageService: Message sent:" << messageId;

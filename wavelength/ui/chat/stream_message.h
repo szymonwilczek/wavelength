@@ -1,23 +1,23 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #ifndef STREAM_MESSAGE_H
 #define STREAM_MESSAGE_H
-#include <QDateTime>
-#include <QGraphicsOpacityEffect>
-#include <QKeyEvent>
-#include <QPainterPath>
-#include <QParallelAnimationGroup>
-#include <QPropertyAnimation>
-#include <QPushButton>
-#include <QTimer>
-#include <QWidget>
 
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
+#include <QGraphicsOpacityEffect>
+#include <QGraphicsEffect>
+#include <QTimer>
+#include <QDateTime>
+#include <QRandomGenerator>
+#include <QPainter>
+#include <QPainterPath>
+#include <QVBoxLayout>
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
 
-
+// Klasa reprezentująca pojedynczą wiadomość w strumieniu
 class StreamMessage : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
@@ -31,10 +31,6 @@ public:
         System
     };
 
-    QString sender() const { return m_sender; }
-    QString content() const { return m_content; }
-    MessageType type() const { return m_type; }
-
     StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
         : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
           m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
@@ -43,6 +39,11 @@ public:
         setMinimumWidth(400);
         setMaximumWidth(600);
         setMinimumHeight(120);
+
+        // Podstawowy layout
+        m_mainLayout = new QVBoxLayout(this);
+        m_mainLayout->setContentsMargins(25, 40, 25, 15);
+        m_mainLayout->setSpacing(10);
 
         // Efekt przeźroczystości
         QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
@@ -91,14 +92,11 @@ public:
         m_animationTimer = new QTimer(this);
         connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
         m_animationTimer->start(50);
-
-        // Automatyczne dopasowanie wysokości
-        updateLayout();
-
+        
         // Automatyczne ustawienie focusu na widgecie
         setFocusPolicy(Qt::StrongFocus);
     }
-
+    
     // Właściwości do animacji
     qreal opacity() const { return m_opacity; }
     void setOpacity(qreal opacity) {
@@ -113,7 +111,7 @@ public:
         m_glowIntensity = intensity;
         update();
     }
-
+    
     qreal disintegrationProgress() const { return m_disintegrationProgress; }
     void setDisintegrationProgress(qreal progress) {
         m_disintegrationProgress = progress;
@@ -123,6 +121,57 @@ public:
     }
 
     bool isRead() const { return m_isRead; }
+    QString sender() const { return m_sender; }
+    QString content() const { return m_content; }
+    MessageType type() const { return m_type; }
+
+    void addAttachment(const QString& html) {
+        // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
+        QString type, attachmentId, mimeType, filename;
+
+        if (html.contains("video-placeholder")) {
+            type = "video";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("audio-placeholder")) {
+            type = "audio";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("gif-placeholder")) {
+            type = "gif";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("image-placeholder")) {
+            type = "image";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else {
+            return; // Brak rozpoznanego załącznika
+        }
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
+            filename, type, this, false);
+        attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+
+        // Usuwamy poprzedni załącznik jeśli istnieje
+        if (m_attachmentWidget) {
+            m_mainLayout->removeWidget(m_attachmentWidget);
+            delete m_attachmentWidget;
+        }
+
+        // Ustawiamy nowy załącznik
+        m_attachmentWidget = attachmentWidget;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Zwiększamy wysokość wiadomości, żeby pomieścić załącznik
+        setMinimumHeight(180);
+        updateLayout();
+    }
 
     void fadeIn() {
         QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
@@ -143,7 +192,7 @@ public:
         group->addAnimation(opacityAnim);
         group->addAnimation(glowAnim);
         group->start(QAbstractAnimation::DeleteWhenStopped);
-
+        
         // Ustawiamy focus na tym widgecie
         QTimer::singleShot(100, this, QOverload<>::of(&StreamMessage::setFocus));
     }
@@ -162,30 +211,30 @@ public:
 
         opacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
-
+    
     void startDisintegrationAnimation() {
         // Usuwamy poprzedni efekt, jeśli istnieje
         if (graphicsEffect() && graphicsEffect() != m_disintegrationEffect) {
             delete graphicsEffect();
         }
-
+        
         // Tworzymy nowy efekt rozpadu
         m_disintegrationEffect = new DisintegrationEffect(this);
         m_disintegrationEffect->setProgress(0.0);
         setGraphicsEffect(m_disintegrationEffect);
-
+        
         // Animacja rozpadu
         QPropertyAnimation* disintegrationAnim = new QPropertyAnimation(this, "disintegrationProgress");
         disintegrationAnim->setDuration(1500); // 1.5 sekund
         disintegrationAnim->setStartValue(0.0);
         disintegrationAnim->setEndValue(1.0);
         disintegrationAnim->setEasingCurve(QEasingCurve::InQuad);
-
+        
         connect(disintegrationAnim, &QPropertyAnimation::finished, this, [this]() {
             hide();
             emit hidden();
         });
-
+        
         disintegrationAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
@@ -195,9 +244,7 @@ public:
         m_prevButton->setVisible(hasPrev);
         m_markReadButton->setVisible(true);
 
-        m_nextButton->move(width() - m_nextButton->width() - 10, height() / 2 - m_nextButton->height() / 2);
-        m_prevButton->move(10, height() / 2 - m_prevButton->height() / 2);
-        m_markReadButton->move(width() - m_markReadButton->width() - 10, height() - m_markReadButton->height() - 10);
+        updateLayout();
 
         // Frontowanie przycisków
         m_nextButton->raise();
@@ -209,21 +256,7 @@ public:
     QPushButton* prevButton() const { return m_prevButton; }
 
     QSize sizeHint() const override {
-        return QSize(500, 150);
-    }
-
-    void addAttachment(const QString& html) {
-        // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
-        if (html.contains("video-placeholder")) {
-            processVideoAttachment(html);
-        } else if (html.contains("audio-placeholder")) {
-            processAudioAttachment(html);
-        } else if (html.contains("gif-placeholder")) {
-            processGifAttachment(html);
-        } else if (html.contains("image-placeholder")) {
-            processImageAttachment(html);
-        }
-        updateLayout();
+        return QSize(500, 180);
     }
 
 signals:
@@ -234,10 +267,10 @@ public slots:
     void markAsRead() {
         if (!m_isRead) {
             m_isRead = true;
-
+            
             // Animacja rozpadu zamiast przenikania
             startDisintegrationAnimation();
-
+            
             emit messageRead();
         }
     }
@@ -319,18 +352,29 @@ protected:
         painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
                          Qt::AlignLeft | Qt::AlignVCenter, m_sender);
 
-        // Tekst wiadomości
-        painter.setPen(QPen(Qt::white, 1));
-        painter.setFont(QFont("Segoe UI", 10));
-        painter.drawText(QRect(clipSize + 5, 35, width() - 2*clipSize - 10, height() - 45),
-                         Qt::AlignLeft | Qt::AlignTop, m_content);
+        // Tekst wiadomości - dzieli się na dwie części: przed załącznikiem i po
+        if (!m_content.isEmpty()) {
+            painter.setPen(QPen(Qt::white, 1));
+            painter.setFont(QFont("Segoe UI", 10));
+            
+            // Miejsce na tekst - uwzględnia miejsce dla załącznika, jeśli istnieje
+            QRect contentRect;
+            if (m_attachmentWidget) {
+                contentRect = QRect(clipSize + 5, 35, width() - 2*clipSize - 10, 
+                                   m_attachmentWidget->y() - 45);
+            } else {
+                contentRect = QRect(clipSize + 5, 35, width() - 2*clipSize - 10, height() - 45);
+            }
+            
+            painter.drawText(contentRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_cleanContent);
+        }
     }
 
     void resizeEvent(QResizeEvent* event) override {
         updateLayout();
         QWidget::resizeEvent(event);
     }
-
+    
     void keyPressEvent(QKeyEvent* event) override {
         // Obsługa klawiszy bezpośrednio w widgecie wiadomości
         if (event->key() == Qt::Key_Space || event->key() == Qt::Key_Return) {
@@ -346,14 +390,14 @@ protected:
             QWidget::keyPressEvent(event);
         }
     }
-
+    
     void focusInEvent(QFocusEvent* event) override {
         // Dodajemy subtelny efekt podświetlenia przy focusie
         m_glowIntensity += 0.2;
         update();
         QWidget::focusInEvent(event);
     }
-
+    
     void focusOutEvent(QFocusEvent* event) override {
         // Wracamy do normalnego stanu
         m_glowIntensity -= 0.2;
@@ -369,6 +413,143 @@ private slots:
     }
 
 private:
+    // Wyciąga atrybut z HTML
+    QString extractAttribute(const QString& html, const QString& attribute) {
+        int attrPos = html.indexOf(attribute + "='");
+        if (attrPos >= 0) {
+            attrPos += attribute.length() + 2; // przesunięcie za ='
+            int endPos = html.indexOf("'", attrPos);
+            if (endPos >= 0) {
+                return html.mid(attrPos, endPos - attrPos);
+            }
+        }
+        return QString();
+    }
+    
+    void processImageAttachment(const QString& html) {
+        QString attachmentId = extractAttribute(html, "data-attachment-id");
+        QString mimeType = extractAttribute(html, "data-mime-type");
+        QString filename = extractAttribute(html, "data-filename");
+        
+        // Tworzymy widget zawierający placeholder załącznika
+        QWidget* container = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(container);
+        containerLayout->setContentsMargins(5, 5, 5, 5);
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+            filename, "image", container, false);
+        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+
+        containerLayout->addWidget(placeholderWidget);
+
+        // Ustawiamy widget załącznika
+        m_attachmentWidget = container;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Zwiększamy rozmiar wiadomości
+        setMinimumHeight(150 + placeholderWidget->sizeHint().height());
+    }
+
+    void processGifAttachment(const QString& html) {
+        QString attachmentId = extractAttribute(html, "data-attachment-id");
+        QString mimeType = extractAttribute(html, "data-mime-type");
+        QString filename = extractAttribute(html, "data-filename");
+
+        // Tworzymy widget zawierający placeholder załącznika
+        QWidget* container = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(container);
+        containerLayout->setContentsMargins(5, 5, 5, 5);
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+            filename, "gif", container, false);
+        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+
+        containerLayout->addWidget(placeholderWidget);
+
+        // Ustawiamy widget załącznika
+        m_attachmentWidget = container;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Zwiększamy rozmiar wiadomości
+        setMinimumHeight(150 + placeholderWidget->sizeHint().height());
+    }
+
+    void processAudioAttachment(const QString& html) {
+        QString attachmentId = extractAttribute(html, "data-attachment-id");
+        QString mimeType = extractAttribute(html, "data-mime-type");
+        QString filename = extractAttribute(html, "data-filename");
+
+        // Tworzymy widget zawierający placeholder załącznika
+        QWidget* container = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(container);
+        containerLayout->setContentsMargins(5, 5, 5, 5);
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+            filename, "audio", container, false);
+        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+
+        containerLayout->addWidget(placeholderWidget);
+
+        // Ustawiamy widget załącznika
+        m_attachmentWidget = container;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Zwiększamy rozmiar wiadomości
+        setMinimumHeight(150 + placeholderWidget->sizeHint().height());
+    }
+
+    void processVideoAttachment(const QString& html) {
+        QString attachmentId = extractAttribute(html, "data-attachment-id");
+        QString mimeType = extractAttribute(html, "data-mime-type");
+        QString filename = extractAttribute(html, "data-filename");
+
+        // Tworzymy widget zawierający placeholder załącznika
+        QWidget* container = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(container);
+        containerLayout->setContentsMargins(5, 5, 5, 5);
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+            filename, "video", container, false);
+        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+
+        containerLayout->addWidget(placeholderWidget);
+
+        // Ustawiamy widget załącznika
+        m_attachmentWidget = container;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Zwiększamy rozmiar wiadomości
+        setMinimumHeight(150 + placeholderWidget->sizeHint().height());
+    }
+    
+    // Funkcja do czyszczenia zawartości wiadomości, usuwania HTML i placeholderów
+    void cleanupContent() {
+        m_cleanContent = m_content;
+
+        // Usuń wszystkie znaczniki HTML
+        m_cleanContent.remove(QRegExp("<[^>]*>"));
+
+        // Znajdź i usuń tekst placeholdera załącznika
+        if (m_content.contains("placeholder")) {
+            int placeholderStart = m_content.indexOf("<div class='");
+            if (placeholderStart >= 0) {
+                int placeholderEnd = m_content.indexOf("</div>", placeholderStart);
+                if (placeholderEnd > 0) {
+                    QString before = m_cleanContent.left(placeholderStart);
+                    QString after = m_cleanContent.mid(placeholderEnd + 6);
+                    m_cleanContent = before.trimmed() + " " + after.trimmed();
+                }
+            }
+        }
+
+        // Usuwamy nadmiarowe whitespace
+        m_cleanContent = m_cleanContent.simplified();
+    }
+
     void updateLayout() {
         // Pozycjonowanie przycisków nawigacyjnych
         if (m_nextButton->isVisible()) {
@@ -381,121 +562,16 @@ private:
             // Zmieniona pozycja przycisku odczytu - prawy dolny róg
             m_markReadButton->move(width() - m_markReadButton->width() - 10, height() - m_markReadButton->height() - 10);
         }
-    }
 
-    QString extractAttribute(const QString& html, const QString& attribute) {
-        int attrPos = html.indexOf(attribute + "='");
-        if (attrPos >= 0) {
-            attrPos += attribute.length() + 2; // przesunięcie za ='
-            int endPos = html.indexOf("'", attrPos);
-            if (endPos >= 0) {
-                return html.mid(attrPos, endPos - attrPos);
-            }
-        }
-        return QString();
-    }
-
-    void processImageAttachment(const QString& html) {
-        QString attachmentId = extractAttribute(html, "data-attachment-id");
-        QString mimeType = extractAttribute(html, "data-mime-type");
-        QString filename = extractAttribute(html, "data-filename");
-
-        // Tworzenie placeholdera załącznika
-        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
-            filename, "image", this, false);
-        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
-
-        // Dodajemy placeholder pod treścią wiadomości
+        // Dostosuj wysokość, jeśli mamy załącznik
         if (m_attachmentWidget) {
-            delete m_attachmentWidget;
+            int minHeight = 120 + m_attachmentWidget->sizeHint().height();
+            setMinimumHeight(minHeight);
         }
-        m_attachmentWidget = placeholderWidget;
-
-        // Dostawiamy widget załącznika na dole layoutu
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(25, 35, 25, 15);
-        layout->addWidget(m_attachmentWidget);
-
-        // Powiększamy widget, aby zmieścić załącznik
-        setMinimumHeight(180);
-    }
-
-    void processGifAttachment(const QString& html) {
-        QString attachmentId = extractAttribute(html, "data-attachment-id");
-        QString mimeType = extractAttribute(html, "data-mime-type");
-        QString filename = extractAttribute(html, "data-filename");
-
-        // Tworzenie placeholdera załącznika
-        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
-            filename, "gif", this, false);
-        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
-
-        // Dodajemy placeholder pod treścią wiadomości
-        if (m_attachmentWidget) {
-            delete m_attachmentWidget;
-        }
-        m_attachmentWidget = placeholderWidget;
-
-        // Dostawiamy widget załącznika na dole layoutu
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(25, 35, 25, 15);
-        layout->addWidget(m_attachmentWidget);
-
-        // Powiększamy widget, aby zmieścić załącznik
-        setMinimumHeight(180);
-    }
-
-    void processAudioAttachment(const QString& html) {
-        QString attachmentId = extractAttribute(html, "data-attachment-id");
-        QString mimeType = extractAttribute(html, "data-mime-type");
-        QString filename = extractAttribute(html, "data-filename");
-
-        // Tworzenie placeholdera załącznika
-        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
-            filename, "audio", this, false);
-        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
-
-        // Dodajemy placeholder pod treścią wiadomości
-        if (m_attachmentWidget) {
-            delete m_attachmentWidget;
-        }
-        m_attachmentWidget = placeholderWidget;
-
-        // Dostawiamy widget załącznika na dole layoutu
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(25, 35, 25, 15);
-        layout->addWidget(m_attachmentWidget);
-
-        // Powiększamy widget, aby zmieścić załącznik
-        setMinimumHeight(180);
-    }
-
-    void processVideoAttachment(const QString& html) {
-        QString attachmentId = extractAttribute(html, "data-attachment-id");
-        QString mimeType = extractAttribute(html, "data-mime-type");
-        QString filename = extractAttribute(html, "data-filename");
-
-        // Tworzenie placeholdera załącznika
-        AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
-            filename, "video", this, false);
-        placeholderWidget->setAttachmentReference(attachmentId, mimeType);
-
-        // Dodajemy placeholder pod treścią wiadomości
-        if (m_attachmentWidget) {
-            delete m_attachmentWidget;
-        }
-        m_attachmentWidget = placeholderWidget;
-
-        // Dostawiamy widget załącznika na dole layoutu
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(25, 35, 25, 15);
-        layout->addWidget(m_attachmentWidget);
-
-        // Powiększamy widget, aby zmieścić załącznik
-        setMinimumHeight(180);
     }
 
     QString m_content;
+    QString m_cleanContent;
     QString m_sender;
     MessageType m_type;
     qreal m_opacity;
@@ -503,6 +579,7 @@ private:
     qreal m_disintegrationProgress;
     bool m_isRead;
 
+    QVBoxLayout* m_mainLayout;
     QPushButton* m_nextButton;
     QPushButton* m_prevButton;
     QPushButton* m_markReadButton;
@@ -511,6 +588,4 @@ private:
     QWidget* m_attachmentWidget = nullptr;
 };
 
-
-
-#endif //STREAM_MESSAGE_H
+#endif // STREAM_MESSAGE_H

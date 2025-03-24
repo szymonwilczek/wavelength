@@ -54,6 +54,14 @@ public:
         data.id = messageId;
         data.type = type;
 
+        // NOWY KOD: Sprawdzamy, czy wiadomość zawiera załączniki
+        data.hasAttachment = message.contains("image-placeholder") ||
+                              message.contains("video-placeholder") ||
+                              message.contains("audio-placeholder") ||
+                              message.contains("gif-placeholder");
+
+        qDebug() << "Wiadomość zawiera załącznik: " << data.hasAttachment;
+
         // Wyodrębniamy dane nadawcy
         if (message.contains("<span style=")) {
             QRegularExpression re("<span[^>]*>([^<]+)</span>");
@@ -71,10 +79,12 @@ public:
                          (type == StreamMessage::System) ? "SYSTEM" : "Unknown";
         }
 
-        // Czyścimy treść wiadomości z tagów HTML
-        QString cleanContent = message;
-        cleanContent.remove(QRegularExpression("<[^>]*>"));
-        data.content = cleanContent;
+        // Czyścimy treść wiadomości z tagów HTML tylko gdy nie ma załącznika
+        if (!data.hasAttachment) {
+            QString cleanContent = message;
+            cleanContent.remove(QRegularExpression("<[^>]*>"));
+            data.content = cleanContent;
+        }
 
         m_messageQueue.enqueue(data);
 
@@ -146,6 +156,11 @@ private slots:
         // Wyświetlamy wiadomość w strumieniu
         StreamMessage* message = nullptr;
 
+        // Sprawdź czy hasAttachment jest faktycznie ustawione na true
+        // dla wiadomości z załącznikami
+        qDebug() << "Przetwarzanie wiadomości: " << data.content.left(30)
+                 << "... hasAttachment=" << data.hasAttachment;
+
         // Tworzymy wiadomość i sprawdzamy, czy zawiera załącznik
         if (data.hasAttachment) {
             // Tworzymy wiadomość z załącznikiem
@@ -180,8 +195,14 @@ private:
     QTimer* m_messageTimer;
 
     void addMessage(const QString& rawHtml, const QString& sender, StreamMessage::MessageType type, const QString& messageId) {
-        // Sprawdzamy, czy wiadomość zawiera załączniki
-        bool hasAttachment = rawHtml.contains("placeholder");
+        // Sprawdzamy, czy wiadomość zawiera załączniki - dokładniejsze sprawdzenie
+        bool hasAttachment = rawHtml.contains("image-placeholder") ||
+                             rawHtml.contains("video-placeholder") ||
+                             rawHtml.contains("audio-placeholder") ||
+                             rawHtml.contains("gif-placeholder");
+
+        qDebug() << "Dodawanie wiadomości do kolejki: " << rawHtml.left(30)
+                 << "... zawiera załącznik: " << hasAttachment;
 
         // Dodaj wiadomość do kolejki
         MessageData data;

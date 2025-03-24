@@ -305,7 +305,9 @@ public:
         message->hide();
 
         // Dodajemy obsługę załącznika
-        message->addAttachment(content);
+        // Najpierw wypisujemy info o zawartości dla debugowania
+        qDebug() << "Dodawanie załącznika dla wiadomości: " << content.left(30) << "...";
+        message->addAttachment(content); // Ten punkt może być problemem
 
         // Dodajemy wiadomość do kolejki
         m_messages.append(message);
