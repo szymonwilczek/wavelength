@@ -13,6 +13,8 @@
 
 #include "attachment_queue_manager.h"
 #include "../messages/formatter/message_formatter.h"
+#include "../ui/auto_scaling_attachment.h"
+#include "../ui/cyber_attachment_viewer.h"
 #include "gif/player/inline_gif_player.h"
 #include "image/displayer/image_viewer.h"
 #include "video/player/video_player_overlay.h"
@@ -35,14 +37,29 @@ public:
         else if (type == "gif") icon = "🎞️";
         else icon = "📎";
 
-        // Etykieta informacyjna
-        m_infoLabel = new QLabel(QString("%1 <span style='color:#aaaaaa; font-size:9pt;'>%2</span>").arg(icon, filename), this);
+        m_infoLabel = new QLabel(QString("<span style='color:#00ccff;'>%1</span> <span style='color:#aaaaaa; font-size:9pt;'>%2</span>").arg(icon, filename), this);
         m_infoLabel->setTextFormat(Qt::RichText);
         layout->addWidget(m_infoLabel);
 
-        // Przycisk do ładowania załącznika
-        m_loadButton = new QPushButton("Załaduj załącznik", this);
-        m_loadButton->setStyleSheet("QPushButton { background-color: #2c5e9e; color: white; padding: 4px; border-radius: 3px; }");
+        // Przycisk do ładowania załącznika - cyberpunkowy styl
+        m_loadButton = new QPushButton("INICJUJ DEKODOWANIE", this);
+        m_loadButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: #002b3d;"
+            "  color: #00ffff;"
+            "  border: 1px solid #00aaff;"
+            "  border-radius: 2px;"
+            "  padding: 6px;"
+            "  font-family: 'Consolas', monospace;"
+            "  font-weight: bold;"
+            "}"
+            "QPushButton:hover {"
+            "  background-color: #003e59;"
+            "}"
+            "QPushButton:pressed {"
+            "  background-color: #005580;"
+            "}"
+        );
         layout->addWidget(m_loadButton);
 
         // Placeholder dla załącznika
@@ -84,25 +101,25 @@ public:
         m_mimeType = mimeType;
     }
 
-    void setError(const QString& errorMsg) {
-        m_loadButton->setEnabled(true);
-        m_loadButton->setText("Załaduj ponownie");
-        m_progressLabel->setText(errorMsg);
-        m_progressLabel->setVisible(true);
-        m_isLoaded = false;
-    }
-
     void setLoading(bool loading) {
         if (loading) {
             m_loadButton->setEnabled(false);
-            m_loadButton->setText("Ładowanie...");
-            m_progressLabel->setText("Dekodowanie zawartości...");
+            m_loadButton->setText("DEKODOWANIE W TOKU...");
+            m_progressLabel->setText("<span style='color:#00ccff;'>Pozyskiwanie zaszyfrowanych danych...</span>");
             m_progressLabel->setVisible(true);
         } else {
             m_loadButton->setEnabled(true);
-            m_loadButton->setText("Załaduj załącznik");
+            m_loadButton->setText("INICJUJ DEKODOWANIE");
             m_progressLabel->setVisible(false);
         }
+    }
+
+    void setError(const QString& errorMsg) {
+        m_loadButton->setEnabled(true);
+        m_loadButton->setText("PONÓW DEKODOWANIE");
+        m_progressLabel->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + errorMsg + "</span>");
+        m_progressLabel->setVisible(true);
+        m_isLoaded = false;
     }
 
 private slots:
@@ -137,22 +154,22 @@ private slots:
                 // Wybieramy odpowiednią metodę wyświetlania na podstawie MIME type
                 if (m_mimeType.startsWith("image/")) {
                     if (m_mimeType == "image/gif") {
-                        QMetaObject::invokeMethod(this, "showGif",
+                        QMetaObject::invokeMethod(this, "showCyberGif",
                             Qt::QueuedConnection,
                             Q_ARG(QByteArray, data));
                     } else {
-                        QMetaObject::invokeMethod(this, "showImage",
+                        QMetaObject::invokeMethod(this, "showCyberImage",
                             Qt::QueuedConnection,
                             Q_ARG(QByteArray, data));
                     }
                 }
                 else if (m_mimeType.startsWith("audio/")) {
-                    QMetaObject::invokeMethod(this, "showAudio",
+                    QMetaObject::invokeMethod(this, "showCyberAudio",
                         Qt::QueuedConnection,
                         Q_ARG(QByteArray, data));
                 }
                 else if (m_mimeType.startsWith("video/")) {
-                    QMetaObject::invokeMethod(this, "showVideo",
+                    QMetaObject::invokeMethod(this, "showCyberVideo",
                         Qt::QueuedConnection,
                         Q_ARG(QByteArray, data));
                 }
@@ -199,6 +216,154 @@ public slots:
         setContent(audioPlayer);
         setLoading(false);
     }
+
+    void showCyberImage(const QByteArray& data) {
+    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+
+    // Tworzymy widget z obrazem
+    InlineImageViewer* imageViewer = new InlineImageViewer(data, viewer);
+
+    // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(imageViewer, viewer);
+    viewer->setContent(scalingWrapper);
+
+    // Podłączamy sygnał zakończenia
+    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setVisible(true);
+        m_contentContainer->setVisible(false);
+    });
+
+    setContent(viewer);
+    setLoading(false);
+}
+
+void showCyberGif(const QByteArray& data) {
+    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+
+    // Tworzymy widget z gifem
+    InlineGifPlayer* gifPlayer = new InlineGifPlayer(data, viewer);
+
+    // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(gifPlayer, viewer);
+    viewer->setContent(scalingWrapper);
+
+    // Podłączamy sygnał zakończenia
+    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setVisible(true);
+        m_contentContainer->setVisible(false);
+    });
+
+    setContent(viewer);
+    setLoading(false);
+}
+
+void showCyberAudio(const QByteArray& data) {
+    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+
+    // Tworzymy widget z audio
+    InlineAudioPlayer* audioPlayer = new InlineAudioPlayer(data, m_mimeType, viewer);
+
+    // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(audioPlayer, viewer);
+    viewer->setContent(scalingWrapper);
+
+    // Podłączamy sygnał zakończenia
+    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setVisible(true);
+        m_contentContainer->setVisible(false);
+    });
+
+    setContent(viewer);
+    setLoading(false);
+}
+
+void showCyberVideo(const QByteArray& data) {
+    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+
+    // Tworzymy widget z miniaturką wideo
+    QWidget* videoPreview = new QWidget(viewer);
+    QVBoxLayout* previewLayout = new QVBoxLayout(videoPreview);
+    previewLayout->setContentsMargins(0, 0, 0, 0);
+
+    // Tworzymy miniaturkę
+    QLabel* thumbnailLabel = new QLabel(videoPreview);
+    thumbnailLabel->setFixedSize(480, 270);
+    thumbnailLabel->setAlignment(Qt::AlignCenter);
+    thumbnailLabel->setStyleSheet("background-color: #000000; color: white; font-size: 48px;");
+    thumbnailLabel->setText("▶");
+    thumbnailLabel->setCursor(Qt::PointingHandCursor);
+
+    // Generujemy miniaturkę z pierwszej klatki
+    generateThumbnail(data, thumbnailLabel);
+
+    previewLayout->addWidget(thumbnailLabel);
+
+    // Dodajemy przycisk odtwarzania pod miniaturką
+    QPushButton* playButton = new QPushButton("ODTWÓRZ WIDEO", videoPreview);
+    playButton->setStyleSheet(
+        "QPushButton { "
+        "  background-color: #002b3d; "
+        "  color: #00ffff; "
+        "  border: 1px solid #00aaff; "
+        "  padding: 6px; "
+        "  border-radius: 2px; "
+        "  font-family: 'Consolas', monospace; "
+        "  font-weight: bold; "
+        "}"
+        "QPushButton:hover { background-color: #003e59; }"
+    );
+    previewLayout->addWidget(playButton);
+
+    // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(videoPreview, viewer);
+    viewer->setContent(scalingWrapper);
+
+    // Po kliknięciu miniaturki lub przycisku, otwórz dialog z odtwarzaczem
+    auto openPlayer = [this, data]() {
+        m_videoData = data;
+        VideoPlayerOverlay* playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
+
+        // Dodajemy cyberpunkowy styl do overlay'a
+        playerOverlay->setStyleSheet(
+            "QDialog { "
+            "  background-color: #001520; "
+            "  border: 2px solid #00aaff; "
+            "}"
+        );
+
+        playerOverlay->setAttribute(Qt::WA_DeleteOnClose);
+
+        // Rozłącz połączenia przed zamknięciem
+        QMetaObject::Connection conn = connect(playerOverlay, &QDialog::finished,
+            [this, playerOverlay]() {
+                disconnect(playerOverlay, nullptr, this, nullptr);
+                m_videoData.clear();
+            });
+
+        playerOverlay->show();
+    };
+
+    connect(thumbnailLabel, &QLabel::linkActivated, this, openPlayer);
+    connect(playButton, &QPushButton::clicked, this, openPlayer);
+
+    // Dodatkowe połączenie dla kliknięcia w miniaturkę
+    thumbnailLabel->installEventFilter(this);
+    m_thumbnailLabel = thumbnailLabel;
+    m_clickHandler = openPlayer;
+
+    // Podłączamy sygnał zakończenia
+    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setVisible(true);
+        m_contentContainer->setVisible(false);
+    });
+
+    setContent(viewer);
+    setLoading(false);
+}
 
     void showVideo(const QByteArray& data) {
     // Zamiast osadzać odtwarzacz bezpośrednio, tworzymy miniaturkę z przyciskiem odtwarzania
