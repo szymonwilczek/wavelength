@@ -32,6 +32,7 @@ public:
         m_resizeTimer = new QTimer(this);
         m_resizeTimer->setSingleShot(true);
         connect(m_resizeTimer, &QTimer::timeout, this, &AutoScalingAttachment::adjustContentSize);
+        QTimer::singleShot(0, this, &AutoScalingAttachment::initializeContent);
     }
     
     QSize sizeHint() const override {
@@ -47,6 +48,19 @@ protected:
     }
     
 private slots:
+
+    void initializeContent() {
+        // Wymuszamy przeliczenie layoutu
+        if (m_originalContent) {
+            if (m_originalContent->inherits("InlineImageViewer") ||
+                m_originalContent->inherits("InlineGifPlayer")) {
+                // Aktualizujemy rozmiar po pełnym załadowaniu
+                m_originalSize = m_originalContent->sizeHint();
+                adjustContentSize();
+                }
+        }
+    }
+
     void adjustContentSize() {
         // Pobieramy aktualny rozmiar widgetu
         QSize currentSize = size();
