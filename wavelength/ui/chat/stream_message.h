@@ -32,70 +32,89 @@ public:
     };
 
     StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
-        : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
-          m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
-    {
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        setMinimumWidth(400);
-        setMaximumWidth(600);
-        setMinimumHeight(120);
+    : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
+      m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
+{
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMinimumWidth(400);
+    setMaximumWidth(600);
+    setMinimumHeight(120);
 
-        // Podstawowy layout
-        m_mainLayout = new QVBoxLayout(this);
-        m_mainLayout->setContentsMargins(25, 40, 25, 15);
-        m_mainLayout->setSpacing(10);
+    // Podstawowy layout
+    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout->setContentsMargins(25, 40, 25, 15);
+    m_mainLayout->setSpacing(10);
 
-        // Efekt przeźroczystości
-        QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
-        opacity->setOpacity(0.0);
-        setGraphicsEffect(opacity);
+    // NOWY KOD: Dodajemy label do wyświetlania treści tekstowej
+    m_contentLabel = new QLabel(this);
+    m_contentLabel->setTextFormat(Qt::RichText);
+    m_contentLabel->setWordWrap(true);
+    m_contentLabel->setStyleSheet(
+        "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
+    m_mainLayout->addWidget(m_contentLabel);
 
-        // Inicjalizacja przycisków nawigacyjnych
-        m_nextButton = new QPushButton(">", this);
-        m_nextButton->setFixedSize(40, 40);
-        m_nextButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: rgba(0, 200, 255, 0.3);"
-            "  color: #00ffff;"
-            "  border: 1px solid #00ccff;"
-            "  border-radius: 20px;"
-            "  font-weight: bold;"
-            "  font-size: 16px;"
-            "}"
-            "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
-            "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
-        m_nextButton->hide();
+    // Czyścimy treść z tagów HTML i ustawiamy
+    cleanupContent();
 
-        m_prevButton = new QPushButton("<", this);
-        m_prevButton->setFixedSize(40, 40);
-        m_prevButton->setStyleSheet(m_nextButton->styleSheet());
-        m_prevButton->hide();
-
-        m_markReadButton = new QPushButton("✓", this);
-        m_markReadButton->setFixedSize(40, 40);
-        m_markReadButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: rgba(0, 255, 150, 0.3);"
-            "  color: #00ffaa;"
-            "  border: 1px solid #00ffcc;"
-            "  border-radius: 20px;"
-            "  font-weight: bold;"
-            "  font-size: 16px;"
-            "}"
-            "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
-            "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
-        m_markReadButton->hide();
-
-        connect(m_markReadButton, &QPushButton::clicked, this, &StreamMessage::markAsRead);
-
-        // Timer dla subtelnych animacji
-        m_animationTimer = new QTimer(this);
-        connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
-        m_animationTimer->start(50);
-        
-        // Automatyczne ustawienie focusu na widgecie
-        setFocusPolicy(Qt::StrongFocus);
+    // Jeśli to wiadomość HTML, używamy oryginalnej zawartości
+    if (m_content.contains("<") && m_content.contains(">")) {
+        m_contentLabel->setText(m_content);
+    } else {
+        // Jeśli to zwykły tekst, używamy oczyszczonej wersji
+        m_contentLabel->setText(m_cleanContent);
     }
+
+    // Efekt przeźroczystości
+    QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
+    opacity->setOpacity(0.0);
+    setGraphicsEffect(opacity);
+
+    // Inicjalizacja przycisków nawigacyjnych
+    m_nextButton = new QPushButton(">", this);
+    m_nextButton->setFixedSize(40, 40);
+    m_nextButton->setStyleSheet(
+        "QPushButton {"
+        "  background-color: rgba(0, 200, 255, 0.3);"
+        "  color: #00ffff;"
+        "  border: 1px solid #00ccff;"
+        "  border-radius: 20px;"
+        "  font-weight: bold;"
+        "  font-size: 16px;"
+        "}"
+        "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
+        "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
+    m_nextButton->hide();
+
+    m_prevButton = new QPushButton("<", this);
+    m_prevButton->setFixedSize(40, 40);
+    m_prevButton->setStyleSheet(m_nextButton->styleSheet());
+    m_prevButton->hide();
+
+    m_markReadButton = new QPushButton("✓", this);
+    m_markReadButton->setFixedSize(40, 40);
+    m_markReadButton->setStyleSheet(
+        "QPushButton {"
+        "  background-color: rgba(0, 255, 150, 0.3);"
+        "  color: #00ffaa;"
+        "  border: 1px solid #00ffcc;"
+        "  border-radius: 20px;"
+        "  font-weight: bold;"
+        "  font-size: 16px;"
+        "}"
+        "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
+        "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
+    m_markReadButton->hide();
+
+    connect(m_markReadButton, &QPushButton::clicked, this, &StreamMessage::markAsRead);
+
+    // Timer dla subtelnych animacji
+    m_animationTimer = new QTimer(this);
+    connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
+    m_animationTimer->start(50);
+
+    // Automatyczne ustawienie focusu na widgecie
+    setFocusPolicy(Qt::StrongFocus);
+}
     
     // Właściwości do animacji
     qreal opacity() const { return m_opacity; }
@@ -126,52 +145,56 @@ public:
     MessageType type() const { return m_type; }
 
     void addAttachment(const QString& html) {
-        // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
-        QString type, attachmentId, mimeType, filename;
+    // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
+    QString type, attachmentId, mimeType, filename;
 
-        if (html.contains("video-placeholder")) {
-            type = "video";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("audio-placeholder")) {
-            type = "audio";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("gif-placeholder")) {
-            type = "gif";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("image-placeholder")) {
-            type = "image";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else {
-            return; // Brak rozpoznanego załącznika
-        }
-
-        // Tworzymy placeholder załącznika
-        AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
-            filename, type, this, false);
-        attachmentWidget->setAttachmentReference(attachmentId, mimeType);
-
-        // Usuwamy poprzedni załącznik jeśli istnieje
-        if (m_attachmentWidget) {
-            m_mainLayout->removeWidget(m_attachmentWidget);
-            delete m_attachmentWidget;
-        }
-
-        // Ustawiamy nowy załącznik
-        m_attachmentWidget = attachmentWidget;
-        m_mainLayout->addWidget(m_attachmentWidget);
-
-        // Zwiększamy wysokość wiadomości, żeby pomieścić załącznik
-        setMinimumHeight(180);
-        updateLayout();
+    if (html.contains("video-placeholder")) {
+        type = "video";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("audio-placeholder")) {
+        type = "audio";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("gif-placeholder")) {
+        type = "gif";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("image-placeholder")) {
+        type = "image";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else {
+        return; // Brak rozpoznanego załącznika
     }
+
+    // Tworzymy placeholder załącznika
+    AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
+        filename, type, this, false);
+    attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+
+    // Usuwamy poprzedni załącznik jeśli istnieje
+    if (m_attachmentWidget) {
+        m_mainLayout->removeWidget(m_attachmentWidget);
+        delete m_attachmentWidget;
+    }
+
+    // Ustawiamy nowy załącznik
+    m_attachmentWidget = attachmentWidget;
+    m_mainLayout->addWidget(m_attachmentWidget);
+
+    // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
+    cleanupContent();
+    m_contentLabel->setText(m_cleanContent);
+
+    // Zwiększamy wysokość wiadomości, żeby pomieścić załącznik
+    setMinimumHeight(180);
+    updateLayout();
+}
 
     void fadeIn() {
         QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
@@ -586,6 +609,7 @@ private:
     QTimer* m_animationTimer;
     DisintegrationEffect* m_disintegrationEffect = nullptr;
     QWidget* m_attachmentWidget = nullptr;
+    QLabel* m_contentLabel = nullptr;
 };
 
 #endif // STREAM_MESSAGE_H
