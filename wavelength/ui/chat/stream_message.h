@@ -154,68 +154,54 @@ public:
     MessageType type() const { return m_type; }
 
     void addAttachment(const QString& html) {
-    // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
-    QString type, attachmentId, mimeType, filename;
+        // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
+        QString type, attachmentId, mimeType, filename;
 
-    if (html.contains("video-placeholder")) {
-        type = "video";
-        attachmentId = extractAttribute(html, "data-attachment-id");
-        mimeType = extractAttribute(html, "data-mime-type");
-        filename = extractAttribute(html, "data-filename");
-    } else if (html.contains("audio-placeholder")) {
-        type = "audio";
-        attachmentId = extractAttribute(html, "data-attachment-id");
-        mimeType = extractAttribute(html, "data-mime-type");
-        filename = extractAttribute(html, "data-filename");
-    } else if (html.contains("gif-placeholder")) {
-        type = "gif";
-        attachmentId = extractAttribute(html, "data-attachment-id");
-        mimeType = extractAttribute(html, "data-mime-type");
-        filename = extractAttribute(html, "data-filename");
-    } else if (html.contains("image-placeholder")) {
-        type = "image";
-        attachmentId = extractAttribute(html, "data-attachment-id");
-        mimeType = extractAttribute(html, "data-mime-type");
-        filename = extractAttribute(html, "data-filename");
-    } else {
-        return; // Brak rozpoznanego załącznika
+        if (html.contains("video-placeholder")) {
+            type = "video";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("audio-placeholder")) {
+            type = "audio";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("gif-placeholder")) {
+            type = "gif";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else if (html.contains("image-placeholder")) {
+            type = "image";
+            attachmentId = extractAttribute(html, "data-attachment-id");
+            mimeType = extractAttribute(html, "data-mime-type");
+            filename = extractAttribute(html, "data-filename");
+        } else {
+            return; // Brak rozpoznanego załącznika
+        }
+
+        // Tworzymy placeholder załącznika
+        AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
+            filename, type, this, false);
+        attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+
+        // Usuwamy poprzedni załącznik jeśli istnieje
+        if (m_attachmentWidget) {
+            m_mainLayout->removeWidget(m_attachmentWidget);
+            delete m_attachmentWidget;
+        }
+
+        // Ustawiamy nowy załącznik
+        m_attachmentWidget = attachmentWidget;
+        m_mainLayout->addWidget(m_attachmentWidget);
+
+        // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
+        cleanupContent();
+        if (m_contentLabel) {
+            m_contentLabel->setText(m_cleanContent);
+        }
     }
-
-    // Tworzymy placeholder załącznika
-    AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
-        filename, type, this, false);
-    attachmentWidget->setAttachmentReference(attachmentId, mimeType);
-
-    // Ograniczamy maksymalną wysokość i szerokość załącznika
-    attachmentWidget->setMaximumHeight(350);  // Maksymalna wysokość
-    attachmentWidget->setMaximumWidth(520);   // Maksymalna szerokość
-
-    // Usuwamy poprzedni załącznik jeśli istnieje
-    if (m_attachmentWidget) {
-        m_mainLayout->removeWidget(m_attachmentWidget);
-        delete m_attachmentWidget;
-    }
-
-    // Ustawiamy nowy załącznik
-    m_attachmentWidget = attachmentWidget;
-    m_mainLayout->addWidget(m_attachmentWidget);
-
-    // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
-    cleanupContent();
-    if (m_contentLabel) {
-        m_contentLabel->setText(m_cleanContent);
-    }
-
-    // Dostosowujemy wysokość wiadomości
-    int baseHeight = 180;  // Podstawowa wysokość
-    int contentHeight = m_cleanContent.isEmpty() ? 0 : 60;  // Wysokość dla tekstu
-    setMinimumHeight(baseHeight + contentHeight);
-
-    // Zwiększamy maksymalną szerokość, aby pomieścić szersze załączniki
-    setMaximumWidth(550);
-
-    updateLayout();
-}
 
     void fadeIn() {
         QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
@@ -751,12 +737,6 @@ private:
         if (m_markReadButton->isVisible()) {
             // Zmieniona pozycja przycisku odczytu - prawy dolny róg
             m_markReadButton->move(width() - m_markReadButton->width() - 10, height() - m_markReadButton->height() - 10);
-        }
-
-        // Dostosuj wysokość, jeśli mamy załącznik
-        if (m_attachmentWidget) {
-            int minHeight = 120 + m_attachmentWidget->sizeHint().height();
-            setMinimumHeight(minHeight);
         }
     }
 

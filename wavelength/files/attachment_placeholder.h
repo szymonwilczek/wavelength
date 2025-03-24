@@ -229,20 +229,6 @@ public slots:
     // Opakowujemy w AutoScalingAttachment
     viewer->setContent(imageViewer);
 
-    // Dodajemy opóźnione dostosowanie rozmiaru i emisję sygnału
-    QTimer::singleShot(100, this, [this, viewer]() {
-        viewer->adjustSize();
-        QMetaObject::invokeMethod(viewer, "adjustContentSize");
-        emit attachmentLoaded(); // Emitujemy sygnał o załadowaniu załącznika
-
-        // Wymuszamy przeliczenie układu na widget-rodzicach
-        QWidget* parent = parentWidget();
-        while (parent) {
-            parent->adjustSize();
-            parent = parent->parentWidget();
-        }
-    });
-
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
         m_loadButton->setText("PONÓW DEKODOWANIE");
@@ -527,23 +513,8 @@ private:
     }
 
     void notifyLoaded() {
-        // Dodajemy opóźnione dostosowanie rozmiaru i emisję sygnału
-        QTimer::singleShot(200, this, [this]() {
-            // Emitujemy sygnał o załadowaniu załącznika
-            emit attachmentLoaded();
-
-            // Wymuszamy przeliczenie układu na widget-rodzicach
-            QWidget* parent = parentWidget();
-            while (parent) {
-                parent->updateGeometry();
-                parent->adjustSize();
-                parent = parent->parentWidget();
-            }
-
-            // Wymuszamy update samego załącznika
-            updateGeometry();
-            adjustSize();
-        });
+        // Emitujemy sygnał o załadowaniu załącznika bez dodatkowych operacji resize
+        emit attachmentLoaded();
     }
 };
 
