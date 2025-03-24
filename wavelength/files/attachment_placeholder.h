@@ -23,7 +23,7 @@ class AttachmentPlaceholder : public QWidget {
     Q_OBJECT
 
 public:
-    AttachmentPlaceholder(const QString& filename, const QString& type, QWidget* parent = nullptr, bool autoLoad = false)
+     AttachmentPlaceholder(const QString& filename, const QString& type, QWidget* parent = nullptr, bool autoLoad = true)
     : QWidget(parent), m_filename(filename), m_isLoaded(false) {
 
         QVBoxLayout* layout = new QVBoxLayout(this);
@@ -41,8 +41,8 @@ public:
         m_infoLabel->setTextFormat(Qt::RichText);
         layout->addWidget(m_infoLabel);
 
-        // Przycisk do ładowania załącznika - cyberpunkowy styl
-        m_loadButton = new QPushButton("INICJUJ DEKODOWANIE", this);
+        // Przycisk do ładowania załącznika - teraz ukryty domyślnie
+        m_loadButton = new QPushButton("PONÓW DEKODOWANIE", this);
         m_loadButton->setStyleSheet(
             "QPushButton {"
             "  background-color: #002b3d;"
@@ -60,6 +60,7 @@ public:
             "  background-color: #005580;"
             "}"
         );
+        m_loadButton->setVisible(false); // Domyślnie ukryty
         layout->addWidget(m_loadButton);
 
         // Placeholder dla załącznika
@@ -70,25 +71,23 @@ public:
         layout->addWidget(m_contentContainer);
 
         // Status ładowania
-        m_progressLabel = new QLabel("", this);
-        m_progressLabel->setVisible(false);
+        m_progressLabel = new QLabel("<span style='color:#00ccff;'>Inicjowanie sekwencji dekodowania...</span>", this);
         layout->addWidget(m_progressLabel);
 
         // Połączenia sygnałów
         connect(m_loadButton, &QPushButton::clicked, this, &AttachmentPlaceholder::onLoadButtonClicked);
 
-        // Jeśli autoLoad jest true, automatycznie załaduj załącznik
-        if (autoLoad) {
-            QTimer::singleShot(100, this, &AttachmentPlaceholder::onLoadButtonClicked);
-        }
+        // Automatycznie rozpocznij ładowanie po krótkim opóźnieniu
+        QTimer::singleShot(300, this, &AttachmentPlaceholder::onLoadButtonClicked);
     }
 
     void setContent(QWidget* content) {
-        m_contentLayout->addWidget(content);
-        m_contentContainer->setVisible(true);
-        m_loadButton->setVisible(false);
-        m_isLoaded = true;
-    }
+         m_contentLayout->addWidget(content);
+         m_contentContainer->setVisible(true);
+         m_loadButton->setVisible(false);
+         m_isLoaded = true;
+         notifyLoaded(); // Dodajemy wywołanie po ustawieniu zawartości
+     }
 
     void setAttachmentReference(const QString& attachmentId, const QString& mimeType) {
         m_attachmentId = attachmentId;
@@ -115,12 +114,16 @@ public:
     }
 
     void setError(const QString& errorMsg) {
-        m_loadButton->setEnabled(true);
-        m_loadButton->setText("PONÓW DEKODOWANIE");
-        m_progressLabel->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + errorMsg + "</span>");
-        m_progressLabel->setVisible(true);
-        m_isLoaded = false;
-    }
+         m_loadButton->setEnabled(true);
+         m_loadButton->setText("PONÓW DEKODOWANIE");
+         m_loadButton->setVisible(true); // Pokaż przycisk przy błędzie
+         m_progressLabel->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + errorMsg + "</span>");
+         m_progressLabel->setVisible(true);
+         m_isLoaded = false;
+     }
+
+    signals:
+    void attachmentLoaded();
 
 private slots:
     void onLoadButtonClicked() {
@@ -198,6 +201,7 @@ private slots:
         }
     }
 
+
 public slots:
     void showImage(const QByteArray& data) {
         InlineImageViewer* imageViewer = new InlineImageViewer(data, m_contentContainer);
@@ -227,11 +231,26 @@ public slots:
     AutoScalingAttachment* scalingWrapper = new AutoScalingAttachment(imageViewer, viewer);
     viewer->setContent(scalingWrapper);
 
+    // Dodajemy opóźnione dostosowanie rozmiaru i emisję sygnału
+    QTimer::singleShot(100, this, [this, scalingWrapper]() {
+        scalingWrapper->adjustSize();
+        QMetaObject::invokeMethod(scalingWrapper, "adjustContentSize");
+        emit attachmentLoaded(); // Emitujemy sygnał o załadowaniu załącznika
+
+        // Wymuszamy przeliczenie układu na widget-rodzicach
+        QWidget* parent = parentWidget();
+        while (parent) {
+            parent->adjustSize();
+            parent = parent->parentWidget();
+        }
+    });
+
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setText("PONÓW DEKODOWANIE");
         m_loadButton->setVisible(true);
         m_contentContainer->setVisible(false);
+        emit attachmentLoaded(); // Emitujemy sygnał również przy zamknięciu
     });
 
     setContent(viewer);
@@ -507,6 +526,26 @@ private:
             }
         }
         return QWidget::eventFilter(watched, event);
+    }
+
+    void notifyLoaded() {
+        // Dodajemy opóźnione dostosowanie rozmiaru i emisję sygnału
+        QTimer::singleShot(200, this, [this]() {
+            // Emitujemy sygnał o załadowaniu załącznika
+            emit attachmentLoaded();
+
+            // Wymuszamy przeliczenie układu na widget-rodzicach
+            QWidget* parent = parentWidget();
+            while (parent) {
+                parent->updateGeometry();
+                parent->adjustSize();
+                parent = parent->parentWidget();
+            }
+
+            // Wymuszamy update samego załącznika
+            updateGeometry();
+            adjustSize();
+        });
     }
 };
 
