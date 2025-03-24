@@ -87,6 +87,8 @@ public:
 
         // Ustaw minimalne rozmiary
         setMinimumSize(400, 250);
+
+        QTimer::singleShot(500, this, &CyberAttachmentViewer::onActionButtonClicked);
     }
 
     ~CyberAttachmentViewer() {
@@ -247,11 +249,13 @@ private slots:
 
         // Tworzymy efekt skanowania
         QTimer* scanTimer = new QTimer(this);
-        int scanProgress = 0;
 
-        connect(scanTimer, &QTimer::timeout, this, [this, scanTimer, &scanProgress]() {
-            scanProgress += 5;
-            if (scanProgress >= 100) {
+        // Używamy zmiennej członkowskiej zamiast zmiennej lokalnej
+        m_scanProgress = 0;
+
+        connect(scanTimer, &QTimer::timeout, this, [this, scanTimer]() {
+            m_scanProgress += 5;
+            if (m_scanProgress >= 100) {
                 scanTimer->stop();
                 scanTimer->deleteLater();
 
@@ -260,33 +264,8 @@ private slots:
                 m_actionButton->setText("DESZYFRUJ");
                 m_actionButton->setEnabled(true);
 
-                // Migające podświetlenie przycisku
-                QTimer* blinkTimer = new QTimer(this);
-                bool blink = false;
-
-                connect(blinkTimer, &QTimer::timeout, this, [this, blinkTimer, &blink]() {
-                    blink = !blink;
-                    m_actionButton->setStyleSheet(
-                        QString("QPushButton {"
-                        "  background-color: %1;"
-                        "  color: #00ffff;"
-                        "  border: 1px solid #00aaff;"
-                        "  border-radius: 2px;"
-                        "  padding: 5px 10px;"
-                        "  font-family: 'Consolas', monospace;"
-                        "  font-weight: bold;"
-                        "}"
-                        "QPushButton:hover {"
-                        "  background-color: #003e59;"
-                        "}"
-                        "QPushButton:pressed {"
-                        "  background-color: #005580;"
-                        "}").arg(blink ? "#003e59" : "#002b3d")
-                    );
-                });
-
-                blinkTimer->start(500);
-                m_blinkTimer = blinkTimer;
+                // Automatycznie rozpocznij dekodowanie po krótkim opóźnieniu
+                QTimer::singleShot(800, this, &CyberAttachmentViewer::startDecryptionAnimation);
             }
 
             // Aktualizuj UI podczas skanowania
@@ -381,23 +360,9 @@ private slots:
         m_actionButton->setText("ZAMKNIJ PODGLĄD");
         m_actionButton->setEnabled(true);
 
-        // Efekt udanej deszyfracji - migotanie zawartości
-        QTimer* successTimer = new QTimer(this);
-        int flashCount = 0;
-
-        connect(successTimer, &QTimer::timeout, this, [this, successTimer, &flashCount]() {
-            flashCount++;
-            m_contentWidget->setVisible(flashCount % 2 == 0);
-
-            if (flashCount > 6) {
-                successTimer->stop();
-                successTimer->deleteLater();
-                m_contentWidget->setVisible(true);
-                update();
-            }
-        });
-
-        successTimer->start(100);
+        // Upewniamy się, że zawartość jest widoczna (bez efektu migotania)
+        m_contentWidget->setVisible(true);
+        update();
     }
 
     void closeViewer() {
@@ -421,6 +386,7 @@ private:
     QPushButton* m_actionButton;
     QTimer* m_animTimer;
     QTimer* m_blinkTimer = nullptr;
+    int m_scanProgress = 0;
 };
 
 #endif // CYBER_ATTACHMENT_VIEWER_H
