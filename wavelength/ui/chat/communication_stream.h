@@ -1,333 +1,233 @@
 #ifndef COMMUNICATION_STREAM_H
 #define COMMUNICATION_STREAM_H
 
-#include <QWidget>
-#include <QPainter>
+#include <qcoreapplication.h>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QVector3D>
+#include <QMatrix4x4>
 #include <QTimer>
 #include <QDateTime>
 #include <QRandomGenerator>
+#include <QPainter>
 #include <QLabel>
 #include <QPushButton>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
-#include <QSoundEffect>
+#include <QGraphicsEffect>
+#include <QSequentialAnimationGroup>
+#include <QKeyEvent>
 #include <QQueue>
 #include <QPainterPath>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QScroller>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QKeyEvent>
 
-// Klasa reprezentująca pojedynczą wiadomość w strumieniu
-class StreamMessage : public QWidget {
+#include "stream_message.h"
+
+// Nowy komponent sidebar do wyświetlania listy wiadomości po prawej stronie
+class MessageSidebar : public QWidget {
     Q_OBJECT
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
-    Q_PROPERTY(qreal glowIntensity READ glowIntensity WRITE setGlowIntensity)
+    Q_PROPERTY(int width READ width WRITE setFixedWidth)
 
 public:
-    enum MessageType {
-        Received,
-        Transmitted,
-        System
-    };
+    explicit MessageSidebar(QWidget* parent = nullptr) : QWidget(parent), m_expanded(false) {
+        setFixedWidth(0); // Początkowo zwinięty
+        setMinimumHeight(200);
 
-    StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
-        : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
-          m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false)
-    {
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        setMinimumWidth(400);
-        setMaximumWidth(600);
-        setMinimumHeight(120);
+        // Główny układ pionowy
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(0, 0, 0, 0);
+        mainLayout->setSpacing(1);
 
-        // Efekt przeźroczystości
-        QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
-        opacity->setOpacity(0.0);
-        setGraphicsEffect(opacity);
-
-        // Inicjalizacja przycisków nawigacyjnych
-        m_nextButton = new QPushButton(">", this);
-        m_nextButton->setFixedSize(40, 40);
-        m_nextButton->setStyleSheet(
+        // Przycisk rozwijania/zwijania
+        m_toggleButton = new QPushButton(">", this);
+        m_toggleButton->setFixedSize(30, 60);
+        m_toggleButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: rgba(0, 200, 255, 0.3);"
-            "  color: #00ffff;"
-            "  border: 1px solid #00ccff;"
-            "  border-radius: 20px;"
+            "  background-color: rgba(0, 80, 120, 0.7);"
+            "  color: #00ccff;"
+            "  border: 1px solid #00aaff;"
+            "  border-top-left-radius: 15px;"
+            "  border-bottom-left-radius: 15px;"
+            "  border-right: none;"
             "  font-weight: bold;"
-            "  font-size: 16px;"
             "}"
-            "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
-            "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
-        m_nextButton->hide();
+            "QPushButton:hover { background-color: rgba(0, 100, 150, 0.8); }");
 
-        m_prevButton = new QPushButton("<", this);
-        m_prevButton->setFixedSize(40, 40);
-        m_prevButton->setStyleSheet(m_nextButton->styleSheet());
-        m_prevButton->hide();
+        // Obszar przewijania dla wiadomości
+        m_scrollArea = new QScrollArea(this);
+        m_scrollArea->setWidgetResizable(true);
+        m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_scrollArea->setStyleSheet(
+            "QScrollArea { background-color: transparent; border: none; }"
+            "QScrollBar:vertical { background: rgba(20, 30, 40, 0.5); width: 10px; }"
+            "QScrollBar::handle:vertical { background: rgba(0, 150, 200, 0.5); border-radius: 4px; min-height: 20px; }"
+            "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }");
 
-        m_markReadButton = new QPushButton("✓", this);
-        m_markReadButton->setFixedSize(40, 40);
-        m_markReadButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: rgba(0, 255, 150, 0.3);"
-            "  color: #00ffaa;"
-            "  border: 1px solid #00ffcc;"
-            "  border-radius: 20px;"
-            "  font-weight: bold;"
-            "  font-size: 16px;"
-            "}"
-            "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
-            "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
-        m_markReadButton->hide();
+        // Kontener na wiadomości
+        m_messageContainer = new QWidget();
+        m_messageContainer->setStyleSheet("background-color: transparent;");
+        m_messageLayout = new QVBoxLayout(m_messageContainer);
+        m_messageLayout->setAlignment(Qt::AlignTop);
+        m_messageLayout->setContentsMargins(2, 5, 2, 5);
+        m_messageLayout->setSpacing(5);
 
-        connect(m_markReadButton, &QPushButton::clicked, this, &StreamMessage::markAsRead);
+        m_scrollArea->setWidget(m_messageContainer);
+        mainLayout->addWidget(m_scrollArea);
 
-        // Timer dla subtelnych animacji
-        m_animationTimer = new QTimer(this);
-        connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
-        m_animationTimer->start(50);
+        // Umieszczamy przycisk na lewo od panelu
+        m_toggleButton->move(-m_toggleButton->width(), height()/2 - m_toggleButton->height()/2);
+        m_toggleButton->raise();
 
-        // Automatyczne dopasowanie wysokości
-        updateLayout();
+        // Podłączamy sygnał przycisku
+        connect(m_toggleButton, &QPushButton::clicked, this, &MessageSidebar::toggleExpanded);
+
+        // Włączamy płynne przewijanie dotykiem
+        QScroller::grabGesture(m_scrollArea->viewport(), QScroller::TouchGesture);
     }
 
-    qreal opacity() const { return m_opacity; }
-    void setOpacity(qreal opacity) {
-        m_opacity = opacity;
-        if (QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(graphicsEffect())) {
-            effect->setOpacity(opacity);
+    void addMessageItem(const QString& sender, const QString& preview, StreamMessage::MessageType type, int index) {
+        // Tworzymy element reprezentujący wiadomość
+        QWidget* item = new QWidget(m_messageContainer);
+        item->setProperty("index", index);
+
+        QVBoxLayout* itemLayout = new QVBoxLayout(item);
+        itemLayout->setContentsMargins(8, 8, 8, 8);
+        itemLayout->setSpacing(3);
+
+        // Etykieta nadawcy
+        QLabel* senderLabel = new QLabel(sender, item);
+        senderLabel->setStyleSheet(
+            "color: #ffffff; font-weight: bold; font-size: 9pt; "
+            "font-family: 'Consolas', monospace;");
+
+        // Podgląd treści
+        QLabel* previewLabel = new QLabel(preview.left(20) + (preview.length() > 20 ? "..." : ""), item);
+        previewLabel->setStyleSheet("color: #cccccc; font-size: 8pt;");
+
+        itemLayout->addWidget(senderLabel);
+        itemLayout->addWidget(previewLabel);
+
+        // Stylizacja elementu zależnie od typu wiadomości
+        QString borderColor;
+        switch (type) {
+            case StreamMessage::Transmitted:
+                borderColor = "#00ccff";
+                break;
+            case StreamMessage::Received:
+                borderColor = "#cc55ff";
+                break;
+            case StreamMessage::System:
+                borderColor = "#ffcc33";
+                break;
+        }
+
+        item->setStyleSheet(QString(
+            "QWidget {"
+            "  background-color: rgba(10, 15, 20, 180);"
+            "  border-left: 3px solid %1;"
+            "  border-radius: 2px;"
+            "}"
+            "QWidget:hover {"
+            "  background-color: rgba(20, 30, 40, 220);"
+            "}").arg(borderColor));
+
+        item->setCursor(Qt::PointingHandCursor);
+
+        // Instalujemy filtr zdarzeń do obsługi kliknięć
+        item->installEventFilter(this);
+
+        // Dodajemy element do layoutu
+        m_messageLayout->addWidget(item);
+
+        // Przewijamy do najnowszego elementu
+        QTimer::singleShot(100, this, [this]() {
+            m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
+        });
+    }
+
+    void clearItems() {
+        // Usuń wszystkie elementy
+        QLayoutItem* item;
+        while ((item = m_messageLayout->takeAt(0)) != nullptr) {
+            if (item->widget()) {
+                delete item->widget();
+            }
+            delete item;
         }
     }
-
-    qreal glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(qreal intensity) {
-        m_glowIntensity = intensity;
-        update();
-    }
-
-    bool isRead() const { return m_isRead; }
-
-    void fadeIn() {
-        QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
-        opacityAnim->setDuration(800);
-        opacityAnim->setStartValue(0.0);
-        opacityAnim->setEndValue(1.0);
-        opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-        QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
-        glowAnim->setDuration(1500);
-        glowAnim->setStartValue(1.0);
-        glowAnim->setKeyValueAt(0.4, 0.7);
-        glowAnim->setKeyValueAt(0.7, 0.9);
-        glowAnim->setEndValue(0.5);
-        glowAnim->setEasingCurve(QEasingCurve::InOutSine);
-
-        QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
-        group->addAnimation(opacityAnim);
-        group->addAnimation(glowAnim);
-        group->start(QAbstractAnimation::DeleteWhenStopped);
-    }
-
-    void fadeOut() {
-        QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
-        opacityAnim->setDuration(500);
-        opacityAnim->setStartValue(opacity());
-        opacityAnim->setEndValue(0.0);
-        opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-        connect(opacityAnim, &QPropertyAnimation::finished, this, [this]() {
-            hide();
-            emit hidden();
-        });
-
-        opacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
-    }
-
-    void showNavigationButtons(bool hasPrev, bool hasNext) {
-        // Pozycjonowanie przycisków nawigacyjnych
-        m_nextButton->setVisible(hasNext);
-        m_prevButton->setVisible(hasPrev);
-        m_markReadButton->setVisible(true);
-
-        m_nextButton->move(width() - m_nextButton->width() - 10, height() / 2 - m_nextButton->height() / 2);
-        m_prevButton->move(10, height() / 2 - m_prevButton->height() / 2);
-        m_markReadButton->move(width() - m_markReadButton->width() - 10, 10);
-
-        // Frontowanie przycisków
-        m_nextButton->raise();
-        m_prevButton->raise();
-        m_markReadButton->raise();
-    }
-
-    QPushButton* nextButton() const { return m_nextButton; }
-    QPushButton* prevButton() const { return m_prevButton; }
-
-    QSize sizeHint() const override {
-        return QSize(500, 150);
-    }
-
-signals:
-    void messageRead();
-    void hidden();
 
 public slots:
-    void markAsRead() {
-        if (!m_isRead) {
-            m_isRead = true;
+    void toggleExpanded() {
+        m_expanded = !m_expanded;
 
-            // Animacja zanikania poświaty i stopniowej przezroczystości
-            QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
-            glowAnim->setDuration(1000);
-            glowAnim->setStartValue(m_glowIntensity);
-            glowAnim->setEndValue(0.2);
-            glowAnim->setEasingCurve(QEasingCurve::OutQuad);
+        // Animacja rozwijania/zwijania
+        QPropertyAnimation* anim = new QPropertyAnimation(this, "width");
+        anim->setDuration(300);
+        anim->setStartValue(width());
+        anim->setEndValue(m_expanded ? 200 : 0);
+        anim->setEasingCurve(QEasingCurve::OutCubic);
 
-            QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
-            opacityAnim->setDuration(1000);
-            opacityAnim->setStartValue(m_opacity);
-            opacityAnim->setEndValue(0.7);
-            opacityAnim->setEasingCurve(QEasingCurve::OutQuad);
+        // Zmiana tekstu przycisku
+        m_toggleButton->setText(m_expanded ? "<" : ">");
 
-            QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
-            group->addAnimation(glowAnim);
-            group->addAnimation(opacityAnim);
-            group->start(QAbstractAnimation::DeleteWhenStopped);
+        // Po zakończeniu animacji aktualizujemy pozycję przycisku
+        connect(anim, &QPropertyAnimation::finished, this, [this]() {
+            updateToggleButtonPosition();
+        });
 
-            emit messageRead();
-        }
-    }
-
-protected:
-    void paintEvent(QPaintEvent* event) override {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
-
-        // Wybieramy kolory w stylu cyberpunk zależnie od typu wiadomości
-        QColor bgColor, borderColor, glowColor, textColor;
-
-        switch (m_type) {
-            case Transmitted:
-                // Neonowy niebieski dla wysyłanych
-                bgColor = QColor(0, 20, 40, 180);
-                borderColor = QColor(0, 200, 255);
-                glowColor = QColor(0, 150, 255, 80);
-                textColor = QColor(0, 220, 255);
-                break;
-            case Received:
-                // Różowo-fioletowy dla przychodzących
-                bgColor = QColor(30, 0, 30, 180);
-                borderColor = QColor(220, 50, 255);
-                glowColor = QColor(180, 0, 255, 80);
-                textColor = QColor(240, 150, 255);
-                break;
-            case System:
-                // Żółto-pomarańczowy dla systemowych
-                bgColor = QColor(40, 25, 0, 180);
-                borderColor = QColor(255, 180, 0);
-                glowColor = QColor(255, 150, 0, 80);
-                textColor = QColor(255, 200, 0);
-                break;
-        }
-
-        // Tworzymy ściętą formę geometryczną (cyberpunk style)
-        QPainterPath path;
-        int clipSize = 20; // rozmiar ścięcia rogu
-
-        path.moveTo(clipSize, 0);
-        path.lineTo(width() - clipSize, 0);
-        path.lineTo(width(), clipSize);
-        path.lineTo(width(), height() - clipSize);
-        path.lineTo(width() - clipSize, height());
-        path.lineTo(clipSize, height());
-        path.lineTo(0, height() - clipSize);
-        path.lineTo(0, clipSize);
-        path.closeSubpath();
-
-        // Tło z gradientem
-        QLinearGradient bgGradient(0, 0, width(), height());
-        bgGradient.setColorAt(0, bgColor.lighter(110));
-        bgGradient.setColorAt(1, bgColor);
-
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(bgGradient);
-        painter.drawPath(path);
-
-        // Poświata neonu
-        if (m_glowIntensity > 0.1) {
-            painter.setPen(QPen(glowColor, 6 + m_glowIntensity * 6));
-            painter.setBrush(Qt::NoBrush);
-            painter.drawPath(path);
-        }
-
-        // Neonowe obramowanie
-        painter.setPen(QPen(borderColor, 1));
-        painter.setBrush(Qt::NoBrush);
-        painter.drawPath(path);
-
-        // Linie dekoracyjne
-        painter.setPen(QPen(borderColor.lighter(120), 1, Qt::SolidLine));
-        painter.drawLine(clipSize, 30, width() - clipSize, 30);
-
-        // Tekst nagłówka (nadawca)
-        painter.setPen(QPen(textColor, 1));
-        painter.setFont(QFont("Consolas", 10, QFont::Bold));
-        painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
-                         Qt::AlignLeft | Qt::AlignVCenter, m_sender);
-
-        // Tekst wiadomości
-        painter.setPen(QPen(Qt::white, 1));
-        painter.setFont(QFont("Segoe UI", 10));
-        painter.drawText(QRect(clipSize + 5, 35, width() - 2*clipSize - 10, height() - 45),
-                         Qt::AlignLeft | Qt::AlignTop, m_content);
+        anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     void resizeEvent(QResizeEvent* event) override {
-        updateLayout();
         QWidget::resizeEvent(event);
+        updateToggleButtonPosition();
     }
 
-private slots:
-    void updateAnimation() {
-        // Subtelna pulsacja poświaty
-        qreal pulse = 0.05 * sin(QDateTime::currentMSecsSinceEpoch() * 0.002);
-        setGlowIntensity(m_glowIntensity + pulse * (!m_isRead ? 1.0 : 0.3));
+signals:
+    void messageSelected(int index);
+
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override {
+        if (event->type() == QEvent::MouseButtonRelease) {
+            QWidget* widget = qobject_cast<QWidget*>(watched);
+            if (widget && widget->property("index").isValid()) {
+                int index = widget->property("index").toInt();
+                emit messageSelected(index);
+                return true;
+            }
+        }
+        return QWidget::eventFilter(watched, event);
     }
 
 private:
-    void updateLayout() {
-        // Pozycjonowanie przycisków nawigacyjnych
-        if (m_nextButton->isVisible()) {
-            m_nextButton->move(width() - m_nextButton->width() - 10, height() / 2 - m_nextButton->height() / 2);
-        }
-        if (m_prevButton->isVisible()) {
-            m_prevButton->move(10, height() / 2 - m_prevButton->height() / 2);
-        }
-        if (m_markReadButton->isVisible()) {
-            m_markReadButton->move(width() - m_markReadButton->width() - 10, 10);
-        }
+    void updateToggleButtonPosition() {
+        // Ustawiamy przycisk po lewej stronie sidebara
+        m_toggleButton->move(-m_toggleButton->width(), height()/2 - m_toggleButton->height()/2);
+        m_toggleButton->raise();
     }
 
-    QString m_content;
-    QString m_sender;
-    MessageType m_type;
-    qreal m_opacity;
-    qreal m_glowIntensity;
-    bool m_isRead;
-
-    QPushButton* m_nextButton;
-    QPushButton* m_prevButton;
-    QPushButton* m_markReadButton;
-    QTimer* m_animationTimer;
+    bool m_expanded;
+    QPushButton* m_toggleButton;
+    QScrollArea* m_scrollArea;
+    QWidget* m_messageContainer;
+    QVBoxLayout* m_messageLayout;
 };
 
-// Główny widget strumienia komunikacji - zamieniamy OpenGL na standardowy QWidget
-class CommunicationStream : public QWidget {
+// Główny widget strumienia komunikacji - poprawiona wersja z OpenGL
+class CommunicationStream : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
     Q_PROPERTY(qreal waveAmplitude READ waveAmplitude WRITE setWaveAmplitude)
     Q_PROPERTY(qreal waveFrequency READ waveFrequency WRITE setWaveFrequency)
     Q_PROPERTY(qreal waveSpeed READ waveSpeed WRITE setWaveSpeed)
     Q_PROPERTY(qreal glitchIntensity READ glitchIntensity WRITE setGlitchIntensity)
+    Q_PROPERTY(qreal waveThickness READ waveThickness WRITE setWaveThickness)
 
 public:
     enum StreamState {
@@ -337,10 +237,12 @@ public:
     };
 
     explicit CommunicationStream(QWidget* parent = nullptr)
-        : QWidget(parent),
-          m_waveAmplitude(0.05), m_waveFrequency(5.0), m_waveSpeed(1.0),
-          m_glitchIntensity(0.0), m_state(Idle), m_currentMessageIndex(-1),
-          m_timeOffset(0.0)
+        : QOpenGLWidget(parent),
+          m_waveAmplitude(0.01), m_waveFrequency(2.0), m_waveSpeed(1.0),
+          m_glitchIntensity(0.0), m_waveThickness(0.008), // Grubsza linia
+          m_state(Idle), m_currentMessageIndex(-1),
+          m_initialized(false), m_timeOffset(0.0), m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
+          m_shaderProgram(nullptr)
     {
         setMinimumSize(600, 200);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -353,7 +255,7 @@ public:
         // Timer losowych zakłóceń w trybie Idle
         m_glitchTimer = new QTimer(this);
         connect(m_glitchTimer, &QTimer::timeout, this, &CommunicationStream::triggerRandomGlitch);
-        m_glitchTimer->start(5000 + QRandomGenerator::global()->bounded(5000));
+        m_glitchTimer->start(3000 + QRandomGenerator::global()->bounded(2000)); // Częstsze zakłócenia
 
         // Etykieta nazwy strumienia
         m_streamNameLabel = new QLabel("COMMUNICATION STREAM", this);
@@ -372,6 +274,58 @@ public:
         m_streamNameLabel->setAlignment(Qt::AlignCenter);
         m_streamNameLabel->adjustSize();
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
+
+        // Sidebar z wiadomościami
+        m_sidebar = new MessageSidebar(this);
+        m_sidebar->move(width(), 0);
+        connect(m_sidebar, &MessageSidebar::messageSelected, this, &CommunicationStream::showMessageAtIndex);
+
+        // Format dla OpenGL
+        QSurfaceFormat format;
+        format.setDepthBufferSize(24);
+        format.setStencilBufferSize(8);
+        format.setSamples(4); // MSAA
+        setFormat(format);
+    }
+
+    ~CommunicationStream() {
+        makeCurrent();
+        m_vao.destroy();
+        m_vertexBuffer.destroy();
+        delete m_shaderProgram;
+        doneCurrent();
+    }
+
+    StreamMessage* addMessageWithAttachment(const QString& content, const QString& sender, StreamMessage::MessageType type, const QString& messageId = QString()) {
+        // Najpierw rozpoczynamy animację odbioru
+        startReceivingAnimation();
+
+        // Tworzymy nową wiadomość, ale nie wyświetlamy jej od razu
+        StreamMessage* message = new StreamMessage(content, sender, type, this);
+        message->hide();
+
+        // Dodajemy obsługę załącznika
+        message->addAttachment(content);
+
+        // Dodajemy wiadomość do kolejki
+        m_messages.append(message);
+
+        // Dodajemy element w sidebarze
+        m_sidebar->addMessageItem(sender, content, type, m_messages.size() - 1);
+
+        // Podłączamy sygnały do nawigacji między wiadomościami
+        connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
+        connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
+        connect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage);
+
+        // Jeśli nie ma wyświetlanej wiadomości, pokaż tę po zakończeniu animacji odbioru
+        if (m_currentMessageIndex == -1) {
+            QTimer::singleShot(1200, this, [this]() {
+                showMessageAtIndex(m_messages.size() - 1);
+            });
+        }
+
+        return message;
     }
 
     // Settery i gettery dla animacji fali
@@ -399,153 +353,273 @@ public:
         update();
     }
 
+    qreal waveThickness() const { return m_waveThickness; }
+    void setWaveThickness(qreal thickness) {
+        m_waveThickness = thickness;
+        update();
+    }
+
     void setStreamName(const QString& name) {
         m_streamNameLabel->setText(name);
         m_streamNameLabel->adjustSize();
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
     }
 
-    void addMessage(const QString& content, const QString& sender, StreamMessage::MessageType type) {
+    StreamMessage *addMessage(const QString &content, const QString &sender, StreamMessage::MessageType type) {
         // Najpierw rozpoczynamy animację odbioru
         startReceivingAnimation();
 
         // Tworzymy nową wiadomość, ale nie wyświetlamy jej od razu
         StreamMessage* message = new StreamMessage(content, sender, type, this);
         message->hide();
-        m_messages.enqueue(message);
 
-        // Jeśli nie ma wyświetlanej wiadomości, pokaż tę po zakończeniu animacji odbioru
-        if (m_currentMessageIndex == -1) {
-            QTimer::singleShot(1200, this, &CommunicationStream::showNextMessage);
-        }
+        // Dodajemy wiadomość do kolejki
+        m_messages.append(message);
+
+        // Dodajemy element w sidebarze
+        m_sidebar->addMessageItem(sender, content, type, m_messages.size() - 1);
 
         // Podłączamy sygnały do nawigacji między wiadomościami
         connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
         connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
         connect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage);
+
+        // Jeśli nie ma wyświetlanej wiadomości lub używamy nowego podejścia z zakładkami,
+        // pokazujemy tę wiadomość po zakończeniu animacji odbioru
+        if (m_currentMessageIndex == -1) {
+            QTimer::singleShot(1200, this, [this]() {
+                showMessageAtIndex(m_messages.size() - 1);
+            });
+        }
+        return message;
     }
 
     void clearMessages() {
         // Ukrywamy i usuwamy wszystkie wiadomości
-        while (!m_messages.isEmpty()) {
-            StreamMessage* message = m_messages.dequeue();
+        for (auto message : m_messages) {
             message->deleteLater();
         }
 
+        m_messages.clear();
+        m_sidebar->clearItems();
         m_currentMessageIndex = -1;
         returnToIdleAnimation();
     }
 
 protected:
-    void paintEvent(QPaintEvent* event) override {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
+    void initializeGL() override {
+        initializeOpenGLFunctions();
 
-        // Tło - ciemne z subtelnymi liniami siatki
-        painter.fillRect(rect(), QColor(10, 12, 18));
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-        // Rysujemy linie siatki w tle
-        painter.setPen(QPen(QColor(30, 40, 70, 40), 1, Qt::SolidLine));
-        int gridSize = 20;
-        for (int x = 0; x < width(); x += gridSize) {
-            painter.drawLine(x, 0, x, height());
-        }
-        for (int y = 0; y < height(); y += gridSize) {
-            painter.drawLine(0, y, width(), y);
-        }
+        // Inicjalizujemy shader program
+        m_shaderProgram = new QOpenGLShaderProgram();
 
-        // Główna linia sygnału (fala)
-        int centerY = height() / 2;
-        int margin = 20;
+        // Vertex shader
+        const char* vertexShaderSource = R"(
+            #version 330 core
+            layout (location = 0) in vec2 aPos;
 
-        QPainterPath wavePath;
-        QPainterPath glowPath;
+            uniform vec2 resolution;
 
-        // Generujemy ścieżkę fali
-        wavePath.moveTo(margin, centerY);
+            void main() {
+                gl_Position = vec4(aPos, 0.0, 1.0);
+            }
+        )";
 
-        for (int x = margin; x < width() - margin; x++) {
-            float phase = (x - margin) / (float)(width() - 2 * margin);
-            float time = m_timeOffset;
+        // Fragment shader - poprawiony dla lepszego wyglądu gridu i grubszej fali
+        const char* fragmentShaderSource = R"(
+            #version 330 core
+            out vec4 FragColor;
 
-            // Obliczamy wysokość fali
-            float waveY = centerY;
+            uniform vec2 resolution;
+            uniform float time;
+            uniform float amplitude;
+            uniform float frequency;
+            uniform float speed;
+            uniform float glitchIntensity;
+            uniform float waveThickness;
 
-            // Dodajemy falę sinusoidalną o zmiennej amplitudzie
-            waveY += sin(phase * m_waveFrequency * 10.0 + time * m_waveSpeed) * m_waveAmplitude * 100;
-
-            // Dodajemy zakłócenia, jeśli są aktywne
-            if (m_glitchIntensity > 0.01) {
-                // Dodajemy losowe zakłócenia w określonych miejscach
-                float noise = QRandomGenerator::global()->bounded(100) / 100.0;
-                if (noise > 0.7) {
-                    waveY += sin(phase * m_waveFrequency * 30.0 + time * m_waveSpeed * 2.0) *
-                              m_glitchIntensity * 50 * noise;
-                }
+            // Funkcja pseudolosowa
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
             }
 
-            wavePath.lineTo(x, waveY);
-            glowPath.lineTo(x, waveY);
-        }
+            void main() {
+                // Znormalizowane koordynaty ekranu
+                vec2 uv = gl_FragCoord.xy / resolution.xy;
+                uv = uv * 2.0 - 1.0;  // Przeskalowanie do -1..1
 
-        wavePath.lineTo(width() - margin, centerY);
-        glowPath.lineTo(width() - margin, centerY);
+                // Centralna linia pozioma
+                float yPos = 0.0;
 
-        // Rysujemy poświatę fali
-        QPen glowPen(QColor(0, 150, 255, 50), 8);
-        painter.setPen(glowPen);
-        painter.drawPath(glowPath);
+                // Grubsza linia
+                float lineThickness = waveThickness;
+                float glow = 0.03; // Większa poświata
+                vec3 lineColor = vec3(0.0, 0.7, 1.0);  // Neonowy niebieski
+                vec3 glowColor = vec3(0.0, 0.4, 0.8);  // Ciemniejszy niebieski dla poświaty
 
-        // Używamy bardziej intensywnej poświaty dla zakłóceń
-        if (m_glitchIntensity > 0.1) {
-            QPen strongGlowPen(QColor(50, 200, 255, 80), 12);
-            painter.setPen(strongGlowPen);
-            painter.drawPath(glowPath);
-        }
+                // Główna fala - domyślnie płaska linia z lokalnymi zakłóceniami
+                float xFreq = frequency * 3.14159;
+                float tOffset = time * speed;
 
-        // Rysujemy główną linię
-        QPen wavePen(QColor(0, 200, 255), 2);
-        painter.setPen(wavePen);
-        painter.drawPath(wavePath);
+                // Bazowa sinusoida, bardzo mała przy Idle, widoczna przy Receiving
+                float wave = sin(uv.x * xFreq + tOffset) * amplitude;
 
-        // Dodajemy małe markery na linii (futurystyczne akcenty)
-        painter.setPen(QPen(QColor(0, 230, 255), 4, Qt::SolidLine, Qt::RoundCap));
-        for (int i = 0; i < 5; i++) {
-            int x = margin + (i + 1) * (width() - 2 * margin) / 6;
-            int y = centerY + sin((x - margin) / (float)(width() - 2 * margin) *
-                       m_waveFrequency * 10.0 + m_timeOffset * m_waveSpeed) * m_waveAmplitude * 100;
-            painter.drawPoint(x, y);
-        }
+                // Dodajemy losowe zakłócenia co 1-3 sekundy
+                float glitchChance = glitchIntensity * 0.5 + 0.2; // Większa bazowa szansa
+
+                // Dodajemy lokalne zakłócenia - małe gwałtowne wybrzuszenia na linii
+                float noiseScale = 15.0; // Więcej lokalizacji zakłóceń
+                for (float i = 0.0; i < 5.0; i++) {
+                    float xCell = floor(uv.x * noiseScale + i) / noiseScale;
+                    float noise = random(vec2(xCell, floor(time * 0.5 + i)));
+
+                    // Zakłócenia występują częściej
+                    if (noise > 1.0 - glitchChance) {
+                        float localNoiseScale = 30.0 + i * 5.0;
+                        float localFreq = frequency * (2.0 + i);
+                        float localGlitch = sin(uv.x * localFreq + time * (5.0 + i)) *
+                                          (glitchIntensity * 0.08 + 0.02) * (noise - (1.0 - glitchChance)) * 5.0;
+
+                        // Lokalizujemy zakłócenie blisko pozycji x
+                        float distX = abs(uv.x - xCell);
+                        float falloff = smoothstep(0.2, 0.0, distX);
+
+                        wave += localGlitch * falloff;
+                    }
+                }
+
+                // Dodatkowe zakłócenia czasowe dla aktywnej animacji
+                if (glitchIntensity > 0.05) {
+                    for (float j = 0.0; j < 3.0; j++) {
+                        float timeNoise = random(vec2(floor((time + j) * 8.0) / 8.0, j));
+                        if (timeNoise > 0.7) {
+                            float extraGlitch = sin(uv.x * frequency * (3.0 + j) + time * (2.0 + j)) *
+                                              glitchIntensity * 0.15 * (timeNoise - 0.7) * 3.33;
+                            wave += extraGlitch;
+                        }
+                    }
+                }
+
+                // Obliczamy odległość od punktu do linii fali
+                float dist = abs(uv.y - wave);
+
+                // Rysujemy linię z gradient glow
+                float line = smoothstep(lineThickness, 0.0, dist);
+                float glowFactor = smoothstep(glow, lineThickness, dist);
+
+                // Końcowy kolor
+                vec3 color = lineColor * line + glowColor * glowFactor * (0.3 + glitchIntensity);
+
+                // Siatka w tle - jaśniejsza
+                float gridIntensity = 0.1; // Zwiększona intensywność siatki
+                vec2 gridCoord = uv * 20.0;
+                if (mod(gridCoord.x, 1.0) < 0.05 || mod(gridCoord.y, 1.0) < 0.05) {
+                    // Użyj jaśniejszego koloru dla linii
+                    color += vec3(0.0, 0.3, 0.4) * gridIntensity;
+                }
+
+                // Subtelne linie drugorzędne
+                gridCoord = uv * 40.0;
+                if (mod(gridCoord.x, 1.0) < 0.02 || mod(gridCoord.y, 1.0) < 0.02) {
+                    color += vec3(0.0, 0.1, 0.2) * gridIntensity * 0.5;
+                }
+
+                // Opacity bazujące na intensywności koloru z lekkim tłem
+                float alpha = line * 0.9 + glowFactor * 0.4 + 0.1; // Zwiększona bazowa widoczność
+
+                FragColor = vec4(color, alpha);
+            }
+        )";
+
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
+        m_shaderProgram->link();
+
+        m_vao.create();
+        m_vao.bind();
+
+        // Wierzchołki prostokąta dla fullscreen quad
+        static const GLfloat vertices[] = {
+           -1.0f,  1.0f,
+           -1.0f, -1.0f,
+            1.0f, -1.0f,
+            1.0f,  1.0f
+        };
+
+        m_vertexBuffer.create();
+        m_vertexBuffer.bind();
+        m_vertexBuffer.allocate(vertices, sizeof(vertices));
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+
+        m_vertexBuffer.release();
+        m_vao.release();
+
+        m_initialized = true;
     }
 
-    void resizeEvent(QResizeEvent* event) override {
-        QWidget::resizeEvent(event);
+    void resizeGL(int w, int h) override {
+        glViewport(0, 0, w, h);
 
         // Aktualizujemy pozycję etykiety nazwy strumienia
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
+
+        // Aktualizujemy pozycję sidebara
+        m_sidebar->setFixedHeight(height());
+        m_sidebar->move(width() - m_sidebar->width(), 0);
 
         // Aktualizujemy pozycję aktualnie wyświetlanej wiadomości
         updateMessagePosition();
     }
 
+    void paintGL() override {
+        if (!m_initialized) return;
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Używamy shadera
+        m_shaderProgram->bind();
+
+        // Ustawiamy uniformy
+        m_shaderProgram->setUniformValue("resolution", QVector2D(width(), height()));
+        m_shaderProgram->setUniformValue("time", static_cast<float>(m_timeOffset));
+        m_shaderProgram->setUniformValue("amplitude", static_cast<float>(m_waveAmplitude));
+        m_shaderProgram->setUniformValue("frequency", static_cast<float>(m_waveFrequency));
+        m_shaderProgram->setUniformValue("speed", static_cast<float>(m_waveSpeed));
+        m_shaderProgram->setUniformValue("glitchIntensity", static_cast<float>(m_glitchIntensity));
+        m_shaderProgram->setUniformValue("waveThickness", static_cast<float>(m_waveThickness));
+
+        // Rysujemy quad
+        m_vao.bind();
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        m_vao.release();
+
+        m_shaderProgram->release();
+    }
+
     void keyPressEvent(QKeyEvent* event) override {
-        // Obsługa nawigacji klawiaturą
-        if (event->key() == Qt::Key_Right) {
-            showNextMessage();
-        } else if (event->key() == Qt::Key_Left) {
-            showPreviousMessage();
-        } else if (event->key() == Qt::Key_Space) {
-            if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.count()) {
-                m_messages[m_currentMessageIndex]->markAsRead();
-            }
+        // Globalna obsługa klawiszy
+        if (event->key() == Qt::Key_Tab) {
+            // Przełączamy widoczność sidebara
+            m_sidebar->toggleExpanded();
+            event->accept();
+        } else if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
+            // Przekazujemy obsługę klawiszy do aktywnej wiadomości
+            QKeyEvent* newEvent = new QKeyEvent(event->type(), event->key(), event->modifiers(),
+                                               event->text(), event->isAutoRepeat(), event->count());
+            QCoreApplication::postEvent(m_messages[m_currentMessageIndex], newEvent);
+            event->accept();
         } else {
-            QWidget::keyPressEvent(event);
+            QOpenGLWidget::keyPressEvent(event);
         }
     }
 
 private slots:
     void updateAnimation() {
-        // Aktualizujemy czas animacji
+        // Aktualizujemy czas animacji - mniejsza prędkość dla mniej intensywnej animacji
         m_timeOffset += 0.02 * m_waveSpeed;
 
         // Stopniowo zmniejszamy intensywność zakłóceń
@@ -553,17 +627,20 @@ private slots:
             m_glitchIntensity = qMax(0.0, m_glitchIntensity - 0.005);
         }
 
-        update();
+        // Odświeżamy tylko gdy potrzeba
+        if (m_state != Idle || m_glitchIntensity > 0.01) {
+            update();
+        }
     }
 
     void triggerRandomGlitch() {
         // Wywołujemy losowe zakłócenia tylko w trybie bezczynności
         if (m_state == Idle) {
-            startGlitchAnimation(0.1 + QRandomGenerator::global()->bounded(10) / 100.0);
+            startGlitchAnimation(0.15 + QRandomGenerator::global()->bounded(15) / 100.0);
         }
 
-        // Ustawiamy kolejny losowy interwał
-        m_glitchTimer->setInterval(4000 + QRandomGenerator::global()->bounded(8000));
+        // Ustawiamy kolejny losowy interwał - krótszy dla częstszych zakłóceń
+        m_glitchTimer->setInterval(2000 + QRandomGenerator::global()->bounded(3000));
     }
 
     void startReceivingAnimation() {
@@ -574,33 +651,40 @@ private slots:
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1000);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.15);
+        ampAnim->setEndValue(0.15);  // Większa amplituda
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
         freqAnim->setDuration(1000);
         freqAnim->setStartValue(m_waveFrequency);
-        freqAnim->setEndValue(12.0);
+        freqAnim->setEndValue(6.0);  // Wyższa częstotliwość
         freqAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* speedAnim = new QPropertyAnimation(this, "waveSpeed");
         speedAnim->setDuration(1000);
         speedAnim->setStartValue(m_waveSpeed);
-        speedAnim->setEndValue(3.0);
+        speedAnim->setEndValue(2.5);  // Szybsza prędkość
         speedAnim->setEasingCurve(QEasingCurve::OutQuad);
+
+        QPropertyAnimation* thicknessAnim = new QPropertyAnimation(this, "waveThickness");
+        thicknessAnim->setDuration(1000);
+        thicknessAnim->setStartValue(m_waveThickness);
+        thicknessAnim->setEndValue(0.012);  // Grubsza linia podczas aktywności
+        thicknessAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
         glitchAnim->setDuration(1000);
         glitchAnim->setStartValue(0.0);
-        glitchAnim->setKeyValueAt(0.3, 0.4);
-        glitchAnim->setKeyValueAt(0.6, 0.2);
-        glitchAnim->setEndValue(0.1);
+        glitchAnim->setKeyValueAt(0.3, 0.6);  // Większe zakłócenia
+        glitchAnim->setKeyValueAt(0.6, 0.3);
+        glitchAnim->setEndValue(0.2);
         glitchAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
         group->addAnimation(ampAnim);
         group->addAnimation(freqAnim);
         group->addAnimation(speedAnim);
+        group->addAnimation(thicknessAnim);
         group->addAnimation(glitchAnim);
         group->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -618,13 +702,13 @@ private slots:
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1500);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.05);
+        ampAnim->setEndValue(0.01);
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
         freqAnim->setDuration(1500);
         freqAnim->setStartValue(m_waveFrequency);
-        freqAnim->setEndValue(5.0);
+        freqAnim->setEndValue(2.0);
         freqAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* speedAnim = new QPropertyAnimation(this, "waveSpeed");
@@ -633,10 +717,17 @@ private slots:
         speedAnim->setEndValue(1.0);
         speedAnim->setEasingCurve(QEasingCurve::OutQuad);
 
+        QPropertyAnimation* thicknessAnim = new QPropertyAnimation(this, "waveThickness");
+        thicknessAnim->setDuration(1500);
+        thicknessAnim->setStartValue(m_waveThickness);
+        thicknessAnim->setEndValue(0.008);  // Powrót do normalnej grubości
+        thicknessAnim->setEasingCurve(QEasingCurve::OutQuad);
+
         QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
         group->addAnimation(ampAnim);
         group->addAnimation(freqAnim);
         group->addAnimation(speedAnim);
+        group->addAnimation(thicknessAnim);
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
@@ -651,85 +742,82 @@ private slots:
         glitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    void showNextMessage() {
-        if (m_messages.isEmpty()) return;
+    void showMessageAtIndex(int index) {
+        if (index < 0 || index >= m_messages.size()) return;
 
         // Ukrywamy aktualnie wyświetlaną wiadomość
-        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.count()) {
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
             m_messages[m_currentMessageIndex]->fadeOut();
         }
 
-        // Przechodzimy do następnej wiadomości
-        m_currentMessageIndex++;
-        if (m_currentMessageIndex >= m_messages.count()) {
-            m_currentMessageIndex = 0;
-        }
+        m_currentMessageIndex = index;
 
-        // Wyświetlamy nową wiadomość
+        // Wyświetlamy wybraną wiadomość
         StreamMessage* message = m_messages[m_currentMessageIndex];
         message->show();
         updateMessagePosition();
         message->fadeIn();
 
         // Aktualizujemy przyciski nawigacyjne
-        bool hasNext = m_messages.count() > 1;
-        bool hasPrev = m_messages.count() > 1;
+        bool hasNext = index < m_messages.size() - 1;
+        bool hasPrev = index > 0;
         message->showNavigationButtons(hasPrev, hasNext);
+    }
+
+    void showNextMessage() {
+        if (m_currentMessageIndex >= m_messages.size() - 1) return;
+        showMessageAtIndex(m_currentMessageIndex + 1);
     }
 
     void showPreviousMessage() {
-        if (m_messages.isEmpty()) return;
-
-        // Ukrywamy aktualnie wyświetlaną wiadomość
-        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.count()) {
-            m_messages[m_currentMessageIndex]->fadeOut();
-        }
-
-        // Przechodzimy do poprzedniej wiadomości
-        m_currentMessageIndex--;
-        if (m_currentMessageIndex < 0) {
-            m_currentMessageIndex = m_messages.count() - 1;
-        }
-
-        // Wyświetlamy nową wiadomość
-        StreamMessage* message = m_messages[m_currentMessageIndex];
-        message->show();
-        updateMessagePosition();
-        message->fadeIn();
-
-        // Aktualizujemy przyciski nawigacyjne
-        bool hasNext = m_messages.count() > 1;
-        bool hasPrev = m_messages.count() > 1;
-        message->showNavigationButtons(hasPrev, hasNext);
+        if (m_currentMessageIndex <= 0) return;
+        showMessageAtIndex(m_currentMessageIndex - 1);
     }
 
     void onMessageRead() {
-        // Jeżeli wszystkie wiadomości zostały przeczytane, powróć do stanu bezczynności
-        bool allRead = true;
-        for (const auto& message : m_messages) {
-            if (!message->isRead()) {
-                allRead = false;
-                break;
-            }
+        if (m_currentMessageIndex < 0 || m_currentMessageIndex >= m_messages.size()) return;
+
+        StreamMessage* message = m_messages[m_currentMessageIndex];
+
+        // Przejdź do następnej wiadomości, jeśli istnieje
+        if (m_currentMessageIndex < m_messages.size() - 1) {
+            showNextMessage();
+        } else {
+            // Jeśli to była ostatnia wiadomość, wróć do stanu bezczynności
+            m_currentMessageIndex = -1;
+            QTimer::singleShot(1500, this, &CommunicationStream::returnToIdleAnimation);
         }
 
-        if (allRead) {
-            // Oznacz wiadomości jako przeczytane po krótkim czasie
-            QTimer::singleShot(2000, this, [this]() {
-                // Ukrywamy aktualnie wyświetlaną wiadomość
-                if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.count()) {
-                    m_messages[m_currentMessageIndex]->fadeOut();
+        // Usuń przeczytaną wiadomość z naszej listy
+        connect(message, &StreamMessage::hidden, this, [this, message]() {
+            int index = m_messages.indexOf(message);
+            if (index >= 0) {
+                m_messages.removeAt(index);
+
+                // Aktualizujemy indeksy w sidebarze
+                m_sidebar->clearItems();
+                for (int i = 0; i < m_messages.size(); ++i) {
+                    m_sidebar->addMessageItem(
+                        m_messages[i]->sender(),
+                        m_messages[i]->content(),
+                        m_messages[i]->type(),
+                        i
+                    );
                 }
 
-                // Usuwamy wszystkie wiadomości z kolejki
-                clearMessages();
-            });
-        }
+                // Aktualizujemy bieżący indeks
+                if (m_currentMessageIndex >= index && m_currentMessageIndex > 0) {
+                    m_currentMessageIndex--;
+                }
+            }
+
+            message->deleteLater();
+        });
     }
 
 private:
     void updateMessagePosition() {
-        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.count()) {
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
             StreamMessage* message = m_messages[m_currentMessageIndex];
             // Centrujemy wiadomość na fali (w środku ekranu)
             message->move((width() - message->width()) / 2, (height() - message->height()) / 2);
@@ -741,16 +829,24 @@ private:
     qreal m_waveFrequency;
     qreal m_waveSpeed;
     qreal m_glitchIntensity;
+    qreal m_waveThickness;
 
     StreamState m_state;
-    QQueue<StreamMessage*> m_messages;
+    QList<StreamMessage*> m_messages;  // Zmienione z QQueue na QList dla indeksowania
     int m_currentMessageIndex;
 
     QLabel* m_streamNameLabel;
+    MessageSidebar* m_sidebar;
+    bool m_initialized;
     qreal m_timeOffset;
 
     QTimer* m_animTimer;
     QTimer* m_glitchTimer;
+
+    // OpenGL
+    QOpenGLShaderProgram* m_shaderProgram;
+    QOpenGLVertexArrayObject m_vao;
+    QOpenGLBuffer m_vertexBuffer;
 };
 
 #endif // COMMUNICATION_STREAM_H
