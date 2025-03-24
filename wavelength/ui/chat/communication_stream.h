@@ -430,110 +430,89 @@ protected:
         )";
 
         // Fragment shader - poprawiony dla lepszego wyglądu gridu i grubszej fali
-        const char* fragmentShaderSource = R"(
-            #version 330 core
-            out vec4 FragColor;
+       // W metodzie initializeGL() zmodyfikuj fragment shader:
 
-            uniform vec2 resolution;
-            uniform float time;
-            uniform float amplitude;
-            uniform float frequency;
-            uniform float speed;
-            uniform float glitchIntensity;
-            uniform float waveThickness;
+// Fragment shader - naprawiony, aby zachować podstawową linię
+const char* fragmentShaderSource = R"(
+    #version 330 core
+    out vec4 FragColor;
 
-            // Funkcja pseudolosowa
-            float random(vec2 st) {
-                return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-            }
+    uniform vec2 resolution;
+    uniform float time;
+    uniform float amplitude;
+    uniform float frequency;
+    uniform float speed;
+    uniform float glitchIntensity;
+    uniform float waveThickness;
 
-            void main() {
-                // Znormalizowane koordynaty ekranu
-                vec2 uv = gl_FragCoord.xy / resolution.xy;
-                uv = uv * 2.0 - 1.0;  // Przeskalowanie do -1..1
+    // Funkcja pseudolosowa
+    float random(vec2 st) {
+        return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+    }
 
-                // Centralna linia pozioma
-                float yPos = 0.0;
+    void main() {
+        // Znormalizowane koordynaty ekranu
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        uv = uv * 2.0 - 1.0;  // Przeskalowanie do -1..1
 
-                // Grubsza linia
-                float lineThickness = waveThickness;
-                float glow = 0.03; // Większa poświata
-                vec3 lineColor = vec3(0.0, 0.7, 1.0);  // Neonowy niebieski
-                vec3 glowColor = vec3(0.0, 0.4, 0.8);  // Ciemniejszy niebieski dla poświaty
+        // Parametry linii
+        float lineThickness = waveThickness;
+        float glow = 0.03;
+        vec3 lineColor = vec3(0.0, 0.7, 1.0);  // Neonowy niebieski
+        vec3 glowColor = vec3(0.0, 0.4, 0.8);  // Ciemniejszy niebieski dla poświaty
 
-                // Główna fala - domyślnie płaska linia z lokalnymi zakłóceniami
-                float xFreq = frequency * 3.14159;
-                float tOffset = time * speed;
+        // Podstawowa fala
+        float xFreq = frequency * 3.14159;
+        float tOffset = time * speed;
+        float wave = sin(uv.x * xFreq + tOffset) * amplitude;
 
-                // Bazowa sinusoida, bardzo mała przy Idle, widoczna przy Receiving
-                float wave = sin(uv.x * xFreq + tOffset) * amplitude;
+        // Przesuwające się zakłócenie
+        if (glitchIntensity > 0.01) {
+            // Kierunek (zmienia się co kilka sekund)
+            float direction = sin(floor(time * 0.2) * 0.5) > 0.0 ? 1.0 : -1.0;
 
-                // Dodajemy losowe zakłócenia co 1-3 sekundy
-                float glitchChance = glitchIntensity * 0.5 + 0.2; // Większa bazowa szansa
+            // Pozycja zakłócenia (-1..1)
+            float glitchPos = fract(time * 0.5) * 2.0 - 1.0;
+            glitchPos = direction > 0.0 ? glitchPos : -glitchPos;
 
-                // Dodajemy lokalne zakłócenia - małe gwałtowne wybrzuszenia na linii
-                float noiseScale = 15.0; // Więcej lokalizacji zakłóceń
-                for (float i = 0.0; i < 5.0; i++) {
-                    float xCell = floor(uv.x * noiseScale + i) / noiseScale;
-                    float noise = random(vec2(xCell, floor(time * 0.5 + i)));
+            // Szerokość i siła zakłócenia
+            float glitchWidth = 0.1 + glitchIntensity * 0.2;
+            float distFromGlitch = abs(uv.x - glitchPos);
+            float glitchFactor = smoothstep(glitchWidth, 0.0, distFromGlitch);
 
-                    // Zakłócenia występują częściej
-                    if (noise > 1.0 - glitchChance) {
-                        float localNoiseScale = 30.0 + i * 5.0;
-                        float localFreq = frequency * (2.0 + i);
-                        float localGlitch = sin(uv.x * localFreq + time * (5.0 + i)) *
-                                          (glitchIntensity * 0.08 + 0.02) * (noise - (1.0 - glitchChance)) * 5.0;
+            // Dodajemy zakłócenie do fali
+            wave += glitchFactor * glitchIntensity * 0.3 * sin(uv.x * 30.0 + time * 10.0);
+        }
 
-                        // Lokalizujemy zakłócenie blisko pozycji x
-                        float distX = abs(uv.x - xCell);
-                        float falloff = smoothstep(0.2, 0.0, distX);
+        // Odległość od punktu do linii fali
+        float dist = abs(uv.y - wave);
 
-                        wave += localGlitch * falloff;
-                    }
-                }
+        // Rysujemy linię z poświatą
+        float line = smoothstep(lineThickness, 0.0, dist);
+        float glowFactor = smoothstep(glow, lineThickness, dist);
 
-                // Dodatkowe zakłócenia czasowe dla aktywnej animacji
-                if (glitchIntensity > 0.05) {
-                    for (float j = 0.0; j < 3.0; j++) {
-                        float timeNoise = random(vec2(floor((time + j) * 8.0) / 8.0, j));
-                        if (timeNoise > 0.7) {
-                            float extraGlitch = sin(uv.x * frequency * (3.0 + j) + time * (2.0 + j)) *
-                                              glitchIntensity * 0.15 * (timeNoise - 0.7) * 3.33;
-                            wave += extraGlitch;
-                        }
-                    }
-                }
+        // Końcowy kolor
+        vec3 color = lineColor * line + glowColor * glowFactor * (0.3 + glitchIntensity);
 
-                // Obliczamy odległość od punktu do linii fali
-                float dist = abs(uv.y - wave);
+        // Siatka w tle - jaśniejsza
+        float gridIntensity = 0.1;
+        vec2 gridCoord = uv * 20.0;
+        if (mod(gridCoord.x, 1.0) < 0.05 || mod(gridCoord.y, 1.0) < 0.05) {
+            color += vec3(0.0, 0.3, 0.4) * gridIntensity;
+        }
 
-                // Rysujemy linię z gradient glow
-                float line = smoothstep(lineThickness, 0.0, dist);
-                float glowFactor = smoothstep(glow, lineThickness, dist);
+        // Subtelne linie drugorzędne
+        gridCoord = uv * 40.0;
+        if (mod(gridCoord.x, 1.0) < 0.02 || mod(gridCoord.y, 1.0) < 0.02) {
+            color += vec3(0.0, 0.1, 0.2) * gridIntensity * 0.5;
+        }
 
-                // Końcowy kolor
-                vec3 color = lineColor * line + glowColor * glowFactor * (0.3 + glitchIntensity);
+        // Końcowa przezroczystość
+        float alpha = line + glowFactor * 0.6 + 0.1;
 
-                // Siatka w tle - jaśniejsza
-                float gridIntensity = 0.1; // Zwiększona intensywność siatki
-                vec2 gridCoord = uv * 20.0;
-                if (mod(gridCoord.x, 1.0) < 0.05 || mod(gridCoord.y, 1.0) < 0.05) {
-                    // Użyj jaśniejszego koloru dla linii
-                    color += vec3(0.0, 0.3, 0.4) * gridIntensity;
-                }
-
-                // Subtelne linie drugorzędne
-                gridCoord = uv * 40.0;
-                if (mod(gridCoord.x, 1.0) < 0.02 || mod(gridCoord.y, 1.0) < 0.02) {
-                    color += vec3(0.0, 0.1, 0.2) * gridIntensity * 0.5;
-                }
-
-                // Opacity bazujące na intensywności koloru z lekkim tłem
-                float alpha = line * 0.9 + glowFactor * 0.4 + 0.1; // Zwiększona bazowa widoczność
-
-                FragColor = vec4(color, alpha);
-            }
-        )";
+        FragColor = vec4(color, alpha);
+    }
+)";
 
         m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
         m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
@@ -638,11 +617,15 @@ private slots:
     void triggerRandomGlitch() {
         // Wywołujemy losowe zakłócenia tylko w trybie bezczynności
         if (m_state == Idle) {
-            startGlitchAnimation(0.15 + QRandomGenerator::global()->bounded(15) / 100.0);
+            // Silniejsza intensywność dla lepszej widoczności
+            float intensity = 0.3 + QRandomGenerator::global()->bounded(40) / 100.0;
+
+            // Wywołujemy animację zakłócenia
+            startGlitchAnimation(intensity);
         }
 
-        // Ustawiamy kolejny losowy interwał - krótszy dla częstszych zakłóceń
-        m_glitchTimer->setInterval(2000 + QRandomGenerator::global()->bounded(3000));
+        // Ustawiamy kolejny losowy interwał - częstsze zakłócenia
+        m_glitchTimer->setInterval(1000 + QRandomGenerator::global()->bounded(2000));
     }
 
     void startReceivingAnimation() {
@@ -734,11 +717,14 @@ private slots:
     }
 
     void startGlitchAnimation(qreal intensity) {
+        // Krótszy czas dla szybszego efektu
+        int duration = 600 + QRandomGenerator::global()->bounded(400);
+
         QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
-        glitchAnim->setDuration(800);
+        glitchAnim->setDuration(duration);
         glitchAnim->setStartValue(m_glitchIntensity);
-        glitchAnim->setKeyValueAt(0.2, intensity);
-        glitchAnim->setKeyValueAt(0.7, intensity * 0.3);
+        glitchAnim->setKeyValueAt(0.1, intensity); // Szybki wzrost
+        glitchAnim->setKeyValueAt(0.5, intensity * 0.7);
         glitchAnim->setEndValue(0.0);
         glitchAnim->setEasingCurve(QEasingCurve::OutQuad);
         glitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
