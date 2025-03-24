@@ -14,6 +14,8 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QVBoxLayout>
+
+#include "cyber_text_display.h"
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
 
@@ -34,87 +36,94 @@ public:
     StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
     : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
       m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
-{
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setMinimumWidth(400);
-    setMaximumWidth(600);
-    setMinimumHeight(120);
+    {
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        setMinimumWidth(400);
+        setMaximumWidth(600);
+        setMinimumHeight(120);
 
-    // Podstawowy layout
-    m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->setContentsMargins(25, 40, 25, 15);
-    m_mainLayout->setSpacing(10);
+        // Podstawowy layout
+        m_mainLayout = new QVBoxLayout(this);
+        m_mainLayout->setContentsMargins(25, 40, 25, 15);
+        m_mainLayout->setSpacing(10);
 
-    // NOWY KOD: Dodajemy label do wyświetlania treści tekstowej
-    m_contentLabel = new QLabel(this);
-    m_contentLabel->setTextFormat(Qt::RichText);
-    m_contentLabel->setWordWrap(true);
-    m_contentLabel->setStyleSheet(
-    "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
-    m_mainLayout->addWidget(m_contentLabel);
+        // Czyścimy treść z tagów HTML
+        cleanupContent();
 
-    // Czyścimy treść z tagów HTML i ustawiamy
-    cleanupContent();
+        // Sprawdzamy czy to wiadomość z załącznikiem
+        bool hasAttachment = m_content.contains("placeholder");
 
-    // Jeśli to wiadomość HTML, używamy oryginalnej zawartości
-    if (m_content.contains("<") && m_content.contains(">")) {
-        m_contentLabel->setText(m_content);
-    } else {
-        // Jeśli to zwykły tekst, używamy oczyszczonej wersji
-        m_contentLabel->setText(m_cleanContent);
+        // Tworzymy CyberTextDisplay dla tekstu zwykłego
+        if (!hasAttachment) {
+            m_textDisplay = new CyberTextDisplay(m_cleanContent, this);
+            m_mainLayout->addWidget(m_textDisplay);
+
+            // Połączenie sygnału zakończenia animacji tekstu
+            connect(m_textDisplay, &CyberTextDisplay::fullTextRevealed, this, [this]() {
+                // Możemy tu dodać dodatkowe akcje po wyświetleniu całego tekstu
+            });
+        } else {
+            // Dla załączników używamy QLabel jako w oryginalnym kodzie
+            m_contentLabel = new QLabel(this);
+            m_contentLabel->setTextFormat(Qt::RichText);
+            m_contentLabel->setWordWrap(true);
+            m_contentLabel->setStyleSheet(
+                "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
+            m_contentLabel->setText(m_cleanContent);
+            m_mainLayout->addWidget(m_contentLabel);
+        }
+
+        // Efekt przeźroczystości
+        QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
+        opacity->setOpacity(0.0);
+        setGraphicsEffect(opacity);
+
+        // Inicjalizacja przycisków nawigacyjnych
+        m_nextButton = new QPushButton(">", this);
+        m_nextButton->setFixedSize(40, 40);
+        m_nextButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: rgba(0, 200, 255, 0.3);"
+            "  color: #00ffff;"
+            "  border: 1px solid #00ccff;"
+            "  border-radius: 20px;"
+            "  font-weight: bold;"
+            "  font-size: 16px;"
+            "}"
+            "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
+            "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
+        m_nextButton->hide();
+
+        m_prevButton = new QPushButton("<", this);
+        m_prevButton->setFixedSize(40, 40);
+        m_prevButton->setStyleSheet(m_nextButton->styleSheet());
+        m_prevButton->hide();
+
+        m_markReadButton = new QPushButton("✓", this);
+        m_markReadButton->setFixedSize(40, 40);
+        m_markReadButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: rgba(0, 255, 150, 0.3);"
+            "  color: #00ffaa;"
+            "  border: 1px solid #00ffcc;"
+            "  border-radius: 20px;"
+            "  font-weight: bold;"
+            "  font-size: 16px;"
+            "}"
+            "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
+            "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
+        m_markReadButton->hide();
+
+        connect(m_markReadButton, &QPushButton::clicked, this, &StreamMessage::markAsRead);
+
+        // Timer dla subtelnych animacji
+        m_animationTimer = new QTimer(this);
+        connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
+        m_animationTimer->start(50);
+
+        // Automatyczne ustawienie focusu na widgecie
+        setFocusPolicy(Qt::StrongFocus);
     }
-
-    // Efekt przeźroczystości
-    QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
-    opacity->setOpacity(0.0);
-    setGraphicsEffect(opacity);
-
-    // Inicjalizacja przycisków nawigacyjnych
-    m_nextButton = new QPushButton(">", this);
-    m_nextButton->setFixedSize(40, 40);
-    m_nextButton->setStyleSheet(
-        "QPushButton {"
-        "  background-color: rgba(0, 200, 255, 0.3);"
-        "  color: #00ffff;"
-        "  border: 1px solid #00ccff;"
-        "  border-radius: 20px;"
-        "  font-weight: bold;"
-        "  font-size: 16px;"
-        "}"
-        "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
-        "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
-    m_nextButton->hide();
-
-    m_prevButton = new QPushButton("<", this);
-    m_prevButton->setFixedSize(40, 40);
-    m_prevButton->setStyleSheet(m_nextButton->styleSheet());
-    m_prevButton->hide();
-
-    m_markReadButton = new QPushButton("✓", this);
-    m_markReadButton->setFixedSize(40, 40);
-    m_markReadButton->setStyleSheet(
-        "QPushButton {"
-        "  background-color: rgba(0, 255, 150, 0.3);"
-        "  color: #00ffaa;"
-        "  border: 1px solid #00ffcc;"
-        "  border-radius: 20px;"
-        "  font-weight: bold;"
-        "  font-size: 16px;"
-        "}"
-        "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
-        "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
-    m_markReadButton->hide();
-
-    connect(m_markReadButton, &QPushButton::clicked, this, &StreamMessage::markAsRead);
-
-    // Timer dla subtelnych animacji
-    m_animationTimer = new QTimer(this);
-    connect(m_animationTimer, &QTimer::timeout, this, &StreamMessage::updateAnimation);
-    m_animationTimer->start(50);
-
-    // Automatyczne ustawienie focusu na widgecie
-    setFocusPolicy(Qt::StrongFocus);
-}
     
     // Właściwości do animacji
     qreal opacity() const { return m_opacity; }
@@ -177,6 +186,10 @@ public:
         filename, type, this, false);
     attachmentWidget->setAttachmentReference(attachmentId, mimeType);
 
+    // Ograniczamy maksymalną wysokość i szerokość załącznika
+    attachmentWidget->setMaximumHeight(350);  // Maksymalna wysokość
+    attachmentWidget->setMaximumWidth(520);   // Maksymalna szerokość
+
     // Usuwamy poprzedni załącznik jeśli istnieje
     if (m_attachmentWidget) {
         m_mainLayout->removeWidget(m_attachmentWidget);
@@ -189,10 +202,18 @@ public:
 
     // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
     cleanupContent();
-    m_contentLabel->setText(m_cleanContent);
+    if (m_contentLabel) {
+        m_contentLabel->setText(m_cleanContent);
+    }
 
-    // Zwiększamy wysokość wiadomości, żeby pomieścić załącznik
-    setMinimumHeight(180);
+    // Dostosowujemy wysokość wiadomości
+    int baseHeight = 180;  // Podstawowa wysokość
+    int contentHeight = m_cleanContent.isEmpty() ? 0 : 60;  // Wysokość dla tekstu
+    setMinimumHeight(baseHeight + contentHeight);
+
+    // Zwiększamy maksymalną szerokość, aby pomieścić szersze załączniki
+    setMaximumWidth(550);
+
     updateLayout();
 }
 
@@ -214,6 +235,14 @@ public:
         QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
         group->addAnimation(opacityAnim);
         group->addAnimation(glowAnim);
+
+        // Uruchamiamy animację wpisywania tekstu po pokazaniu wiadomości
+        connect(opacityAnim, &QPropertyAnimation::finished, this, [this]() {
+            if (m_textDisplay) {
+                m_textDisplay->startReveal();
+            }
+        });
+
         group->start(QAbstractAnimation::DeleteWhenStopped);
         
         // Ustawiamy focus na tym widgecie
@@ -325,84 +354,211 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent* event) override {
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
 
-    // Wybieramy kolory w stylu cyberpunk zależnie od typu wiadomości
-    QColor bgColor, borderColor, glowColor, textColor;
+        // Wybieramy kolory w stylu cyberpunk zależnie od typu wiadomości
+        QColor bgColor, borderColor, glowColor, textColor;
 
-    switch (m_type) {
-        case Transmitted:
-            // Neonowy niebieski dla wysyłanych
-            bgColor = QColor(0, 20, 40, 180);
-            borderColor = QColor(0, 200, 255);
-            glowColor = QColor(0, 150, 255, 80);
-            textColor = QColor(0, 220, 255);
-            break;
-        case Received:
-            // Różowo-fioletowy dla przychodzących
-            bgColor = QColor(30, 0, 30, 180);
-            borderColor = QColor(220, 50, 255);
-            glowColor = QColor(180, 0, 255, 80);
-            textColor = QColor(240, 150, 255);
-            break;
-        case System:
-            // Żółto-pomarańczowy dla systemowych
-            bgColor = QColor(40, 25, 0, 180);
-            borderColor = QColor(255, 180, 0);
-            glowColor = QColor(255, 150, 0, 80);
-            textColor = QColor(255, 200, 0);
-            break;
-    }
+        switch (m_type) {
+            case Transmitted:
+                // Neonowy niebieski dla wysyłanych
+                bgColor = QColor(0, 20, 40, 180);
+                borderColor = QColor(0, 200, 255);
+                glowColor = QColor(0, 150, 255, 80);
+                textColor = QColor(0, 220, 255);
+                break;
+            case Received:
+                // Różowo-fioletowy dla przychodzących
+                bgColor = QColor(30, 0, 30, 180);
+                borderColor = QColor(220, 50, 255);
+                glowColor = QColor(180, 0, 255, 80);
+                textColor = QColor(240, 150, 255);
+                break;
+            case System:
+                // Żółto-pomarańczowy dla systemowych
+                bgColor = QColor(40, 25, 0, 180);
+                borderColor = QColor(255, 180, 0);
+                glowColor = QColor(255, 150, 0, 80);
+                textColor = QColor(255, 200, 0);
+                break;
+        }
 
-    // Tworzymy ściętą formę geometryczną (cyberpunk style)
-    QPainterPath path;
-    int clipSize = 20; // rozmiar ścięcia rogu
+        // Tworzymy ściętą formę geometryczną z większą liczbą ścięć (bardziej futurystyczną)
+        QPainterPath path;
+        int clipSize = 20; // rozmiar ścięcia rogu
+        int notchSize = 10; // rozmiar wcięcia
 
-    path.moveTo(clipSize, 0);
-    path.lineTo(width() - clipSize, 0);
-    path.lineTo(width(), clipSize);
-    path.lineTo(width(), height() - clipSize);
-    path.lineTo(width() - clipSize, height());
-    path.lineTo(clipSize, height());
-    path.lineTo(0, height() - clipSize);
-    path.lineTo(0, clipSize);
-    path.closeSubpath();
+        // Górna krawędź z wcięciami
+        path.moveTo(clipSize, 0);
+        path.lineTo(width() / 3 - notchSize, 0);
+        path.lineTo(width() / 3, notchSize);
+        path.lineTo(width() / 3 + 2 * notchSize, 0);
+        path.lineTo(width() * 2/3 - notchSize, 0);
+        path.lineTo(width() * 2/3 + notchSize, notchSize);
+        path.lineTo(width() - clipSize, 0);
 
-    // Tło z gradientem
-    QLinearGradient bgGradient(0, 0, width(), height());
-    bgGradient.setColorAt(0, bgColor.lighter(110));
-    bgGradient.setColorAt(1, bgColor);
+        // Prawy górny róg i prawa krawędź z wcięciem
+        path.lineTo(width(), clipSize);
+        path.lineTo(width(), height() / 2 - notchSize);
+        path.lineTo(width() - notchSize, height() / 2);
+        path.lineTo(width(), height() / 2 + notchSize);
+        path.lineTo(width(), height() - clipSize);
 
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(bgGradient);
-    painter.drawPath(path);
+        // Prawy dolny róg i dolna krawędź
+        path.lineTo(width() - clipSize, height());
+        path.lineTo(clipSize, height());
 
-    // Poświata neonu
-    if (m_glowIntensity > 0.1) {
-        painter.setPen(QPen(glowColor, 6 + m_glowIntensity * 6));
+        // Lewy dolny róg i lewa krawędź z wcięciem
+        path.lineTo(0, height() - clipSize);
+        path.lineTo(0, height() / 2 + notchSize);
+        path.lineTo(notchSize, height() / 2);
+        path.lineTo(0, height() / 2 - notchSize);
+        path.lineTo(0, clipSize);
+
+        // Zamknięcie ścieżki
+        path.closeSubpath();
+
+        // Tło z gradientem
+        QLinearGradient bgGradient(0, 0, width(), height());
+        bgGradient.setColorAt(0, bgColor.lighter(110));
+        bgGradient.setColorAt(1, bgColor);
+
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(bgGradient);
+        painter.drawPath(path);
+
+        // Poświata neonu
+        if (m_glowIntensity > 0.1) {
+            painter.setPen(QPen(glowColor, 6 + m_glowIntensity * 6));
+            painter.setBrush(Qt::NoBrush);
+            painter.drawPath(path);
+        }
+
+        // Neonowe obramowanie
+        painter.setPen(QPen(borderColor, 1));
         painter.setBrush(Qt::NoBrush);
         painter.drawPath(path);
+
+        // Linie dekoracyjne (poziome)
+        painter.setPen(QPen(borderColor.lighter(120), 1, Qt::DashLine));
+        painter.drawLine(clipSize, 30, width() - clipSize, 30);
+        painter.drawLine(40, height() - 25, width() - 40, height() - 25);
+
+        // Linie dekoracyjne (pionowe)
+        painter.setPen(QPen(borderColor.lighter(120), 1, Qt::DotLine));
+        painter.drawLine(40, 30, 40, height() - 25);
+        painter.drawLine(width() - 40, 30, width() - 40, height() - 25);
+
+        // Znaczniki AR w rogach
+        int arMarkerSize = 15;
+        painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
+
+        // Lewy górny marker
+        painter.drawLine(clipSize, 10, clipSize + arMarkerSize, 10);
+        painter.drawLine(clipSize, 10, clipSize, 10 + arMarkerSize);
+
+        // Prawy górny marker
+        painter.drawLine(width() - clipSize - arMarkerSize, 10, width() - clipSize, 10);
+        painter.drawLine(width() - clipSize, 10, width() - clipSize, 10 + arMarkerSize);
+
+        // Prawy dolny marker
+        painter.drawLine(width() - clipSize - arMarkerSize, height() - 10, width() - clipSize, height() - 10);
+        painter.drawLine(width() - clipSize, height() - 10, width() - clipSize, height() - 10 - arMarkerSize);
+
+        // Lewy dolny marker
+        painter.drawLine(clipSize, height() - 10, clipSize + arMarkerSize, height() - 10);
+        painter.drawLine(clipSize, height() - 10, clipSize, height() - 10 - arMarkerSize);
+
+        // Tekst nagłówka (nadawca)
+        painter.setPen(QPen(textColor, 1));
+        painter.setFont(QFont("Consolas", 10, QFont::Bold));
+        painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
+                        Qt::AlignLeft | Qt::AlignVCenter, m_sender);
+
+        // Znacznik czasu i lokalizacji w stylu AR
+        QDateTime currentTime = QDateTime::currentDateTime();
+        QString timeStr = currentTime.toString("HH:mm:ss");
+
+        // Losowy identyfikator lokalizacji w stylu cyberpunk
+        QString locId = QString("SEC-%1-Z%2")
+            .arg(QRandomGenerator::global()->bounded(1000, 9999))
+            .arg(QRandomGenerator::global()->bounded(10, 99));
+
+        // Wskaźnik priorytetów i wiarygodności (składa się z cyfr i liter)
+        int trustLevel = 60 + QRandomGenerator::global()->bounded(40); // 60-99%
+        QString trustIndicator = QString("[%1%]").arg(trustLevel);
+
+        // Dodanie znaczników w prawym górnym rogu
+        painter.setFont(QFont("Consolas", 8));
+        painter.setPen(QPen(textColor.lighter(120), 1));
+
+        // Timestamp
+        painter.drawText(QRect(width() - 150, 8, 120, 12),
+                        Qt::AlignRight | Qt::AlignVCenter,
+                        QString("TS: %1").arg(timeStr));
+
+        // Lokalizacja
+        painter.drawText(QRect(width() - 150, 20, 120, 12),
+                        Qt::AlignRight | Qt::AlignVCenter,
+                        QString("LOC: %1").arg(locId));
+
+        // Wskaźnik priorytetu
+        QColor priorityColor;
+        QString priorityText;
+
+        switch (m_type) {
+            case Transmitted:
+                priorityText = "OUT";
+                priorityColor = QColor(0, 220, 255);
+                break;
+            case Received:
+                priorityText = "IN";
+                priorityColor = QColor(255, 50, 240);
+                break;
+            case System:
+                priorityText = "SYS";
+                priorityColor = QColor(255, 220, 0);
+                break;
+        }
+
+        // Rysujemy ramkę wskaźnika priorytetów
+        QRect priorityRect(width() - 70, height() - 40, 60, 20);
+        painter.setPen(QPen(priorityColor, 1, Qt::SolidLine));
+        painter.setBrush(QBrush(priorityColor.darker(600)));
+        painter.drawRect(priorityRect);
+
+        // Rysujemy tekst priorytetów
+        painter.setPen(QPen(priorityColor, 1));
+        painter.setFont(QFont("Consolas", 8, QFont::Bold));
+        painter.drawText(priorityRect, Qt::AlignCenter, priorityText);
+
+        // Rysujemy wskaźnik wiarygodności
+        QRect trustRect(8, height() - 22, 90, 16);
+        painter.setFont(QFont("Consolas", 7));
+        painter.setPen(QPen(textColor, 1));
+
+        // Kolor zależny od poziomu wiarygodności
+        QColor trustColor = (trustLevel >= 90) ? QColor(0, 255, 0) :
+                          (trustLevel >= 75) ? QColor(255, 255, 0) :
+                          QColor(255, 100, 0);
+
+        painter.setPen(trustColor);
+        painter.drawText(trustRect, Qt::AlignLeft | Qt::AlignVCenter,
+                      QString("TRUST: %1").arg(trustIndicator));
+
+        // Skanowanie - efekt pulsującego paska u dołu
+        static const qreal scanProgress = [this]() -> qreal {
+            return (QDateTime::currentMSecsSinceEpoch() % 2000) / 2000.0;
+        }();
+
+        int scanWidth = static_cast<int>(width() * scanProgress);
+        QRect scanRect(0, height() - 3, scanWidth, 3);
+
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(textColor.lighter(150)));
+        painter.drawRect(scanRect);
     }
-
-    // Neonowe obramowanie
-    painter.setPen(QPen(borderColor, 1));
-    painter.setBrush(Qt::NoBrush);
-    painter.drawPath(path);
-
-    // Linie dekoracyjne
-    painter.setPen(QPen(borderColor.lighter(120), 1, Qt::SolidLine));
-    painter.drawLine(clipSize, 30, width() - clipSize, 30);
-
-    // Tekst nagłówka (nadawca)
-    painter.setPen(QPen(textColor, 1));
-    painter.setFont(QFont("Consolas", 10, QFont::Bold));
-    painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
-                     Qt::AlignLeft | Qt::AlignVCenter, m_sender);
-
-    // USUNIĘTY KOD: nie rysujemy już tekstu wiadomości bezpośrednio w paintEvent
-    // ponieważ jest już wyświetlany przez QLabel (m_contentLabel)
-}
 
     void resizeEvent(QResizeEvent* event) override {
         updateLayout();
@@ -621,6 +777,7 @@ private:
     DisintegrationEffect* m_disintegrationEffect = nullptr;
     QWidget* m_attachmentWidget = nullptr;
     QLabel* m_contentLabel = nullptr;
+    CyberTextDisplay* m_textDisplay = nullptr;
 };
 
 #endif // STREAM_MESSAGE_H
