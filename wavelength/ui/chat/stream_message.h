@@ -267,8 +267,22 @@ void adjustSizeToContent() {
     m_mainLayout->invalidate();
     m_mainLayout->activate();
 
+    // Pobieramy informacje o dostępnym miejscu na ekranie
+    QScreen* screen = QApplication::primaryScreen();
+    if (window()) {
+        screen = window()->screen();
+    }
+
+    QRect availableGeometry = screen->availableGeometry();
+
+    // Maksymalne dozwolone wymiary wiadomości (80% dostępnej przestrzeni)
+    int maxWidth = availableGeometry.width() * 0.8;
+    int maxHeight = availableGeometry.height() * 0.35;
+
+    qDebug() << "Maksymalny dozwolony rozmiar wiadomości:" << maxWidth << "x" << maxHeight;
+
     // Dajemy czas na poprawne renderowanie zawartości
-    QTimer::singleShot(100, this, [this]() {
+    QTimer::singleShot(100, this, [this, maxWidth, maxHeight]() {
         if (m_attachmentWidget) {
             // Pobieramy rozmiar załącznika
             QSize attachmentSize = m_attachmentWidget->sizeHint();
@@ -286,13 +300,17 @@ void adjustSizeToContent() {
                 qDebug() << "CyberAttachmentViewer sizeHint:" << viewerSize;
 
                 // Obliczamy rozmiar, uwzględniając marginesy i dodatkową przestrzeń
-                int newWidth = qMax(viewerSize.width() +
-                                    m_mainLayout->contentsMargins().left() +
-                                    m_mainLayout->contentsMargins().right() + 50, 500);
+                int newWidth = qMin(
+                    qMax(viewerSize.width() +
+                         m_mainLayout->contentsMargins().left() +
+                         m_mainLayout->contentsMargins().right() + 50, 500),
+                    maxWidth);
 
-                int newHeight = viewerSize.height() +
-                              m_mainLayout->contentsMargins().top() +
-                              m_mainLayout->contentsMargins().bottom() + 80;
+                int newHeight = qMin(
+                    viewerSize.height() +
+                    m_mainLayout->contentsMargins().top() +
+                    m_mainLayout->contentsMargins().bottom() + 80,
+                    maxHeight);
 
                 // Ustawiamy nowy rozmiar minimalny
                 setMinimumSize(newWidth, newHeight);
@@ -301,6 +319,18 @@ void adjustSizeToContent() {
 
                 // Wymuszamy ponowne obliczenie rozmiaru
                 updateGeometry();
+
+                // Szukamy AutoScalingAttachment
+                QList<AutoScalingAttachment*> scalers = viewer->findChildren<AutoScalingAttachment*>();
+                if (!scalers.isEmpty()) {
+                    // Ustawiamy maksymalny dozwolony rozmiar dla auto-skalowanej zawartości
+                    QSize contentMaxSize(
+                        maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() - 60,
+                        maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 150
+                    );
+
+                    scalers.first()->setMaxAllowedSize(contentMaxSize);
+                }
 
                 // Wymuszamy aktualizację layoutu rodzica
                 if (parentWidget() && parentWidget()->layout()) {
