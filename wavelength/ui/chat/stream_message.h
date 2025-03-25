@@ -153,54 +153,211 @@ public:
     QString content() const { return m_content; }
     MessageType type() const { return m_type; }
 
-    void addAttachment(const QString& html) {
-        // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
-        QString type, attachmentId, mimeType, filename;
+void addAttachment(const QString& html) {
+    // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
+    QString type, attachmentId, mimeType, filename;
 
-        if (html.contains("video-placeholder")) {
-            type = "video";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("audio-placeholder")) {
-            type = "audio";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("gif-placeholder")) {
-            type = "gif";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else if (html.contains("image-placeholder")) {
-            type = "image";
-            attachmentId = extractAttribute(html, "data-attachment-id");
-            mimeType = extractAttribute(html, "data-mime-type");
-            filename = extractAttribute(html, "data-filename");
-        } else {
-            return; // Brak rozpoznanego załącznika
-        }
+    if (html.contains("video-placeholder")) {
+        type = "video";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("audio-placeholder")) {
+        type = "audio";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("gif-placeholder")) {
+        type = "gif";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else if (html.contains("image-placeholder")) {
+        type = "image";
+        attachmentId = extractAttribute(html, "data-attachment-id");
+        mimeType = extractAttribute(html, "data-mime-type");
+        filename = extractAttribute(html, "data-filename");
+    } else {
+        return; // Brak rozpoznanego załącznika
+    }
 
-        // Tworzymy placeholder załącznika
-        AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
-            filename, type, this, false);
-        attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+    // Usuwamy poprzedni załącznik jeśli istnieje
+    if (m_attachmentWidget) {
+        m_mainLayout->removeWidget(m_attachmentWidget);
+        delete m_attachmentWidget;
+    }
 
-        // Usuwamy poprzedni załącznik jeśli istnieje
+    // KLUCZOWA ZMIANA: Całkowicie usuwamy ograniczenia rozmiaru wiadomości
+    setMinimumHeight(0);
+    setMaximumHeight(QWIDGETSIZE_MAX);
+    setMinimumWidth(0);
+    setMaximumWidth(QWIDGETSIZE_MAX);
+
+    // Tworzymy placeholder załącznika i ustawiamy referencję
+    AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
+        filename, type, this, false);
+    attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+
+    // Ustawiamy nowy załącznik
+    m_attachmentWidget = attachmentWidget;
+    m_mainLayout->addWidget(m_attachmentWidget);
+
+    // Ustawiamy politykę rozmiaru dla attachmentWidget (Preferred zamiast Expanding)
+    attachmentWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
+    cleanupContent();
+    if (m_contentLabel) {
+        m_contentLabel->setText(m_cleanContent);
+    }
+
+    // Bezpośrednie połączenie sygnału zmiany rozmiaru załącznika
+    connect(attachmentWidget, &AttachmentPlaceholder::attachmentLoaded,
+            this, [this]() {
+                qDebug() << "StreamMessage: Załącznik załadowany, dostosowuję rozmiar...";
+
+                // Ustanawiamy timer, aby dać widgetowi czas na pełne renderowanie
+                QTimer::singleShot(200, this, [this]() {
+                    if (m_attachmentWidget) {
+                        // Określamy rozmiar widgetu załącznika
+                        QSize attachSize = m_attachmentWidget->sizeHint();
+                        qDebug() << "Rozmiar załącznika po załadowaniu:" << attachSize;
+
+                        // Znajdujemy wszystkie widgety CyberAttachmentViewer w hierarchii
+                        QList<CyberAttachmentViewer*> viewers =
+                            m_attachmentWidget->findChildren<CyberAttachmentViewer*>();
+
+                        if (!viewers.isEmpty()) {
+                            qDebug() << "Znaleziony CyberAttachmentViewer, rozmiar:"
+                                     << viewers.first()->size()
+                                     << "sizeHint:" << viewers.first()->sizeHint();
+
+                            // Wymuszamy prawidłowe obliczenie rozmiarów po całkowitym renderowaniu
+                            QTimer::singleShot(100, this, [this, viewers]() {
+                                // Odświeżamy rozmiar widgetu z załącznikiem
+                                viewers.first()->updateGeometry();
+
+                                // Dostosowujemy rozmiar wiadomości do załącznika
+                                adjustSizeToContent();
+                            });
+                        } else {
+                            // Jeśli nie ma CyberAttachmentViewer, po prostu dostosowujemy rozmiar
+                            adjustSizeToContent();
+                        }
+                    }
+                });
+            });
+
+    // Dostosuj początkowy rozmiar wiadomości
+    QTimer::singleShot(100, this, [this]() {
         if (m_attachmentWidget) {
-            m_mainLayout->removeWidget(m_attachmentWidget);
-            delete m_attachmentWidget;
+            QSize initialSize = m_attachmentWidget->sizeHint();
+            setMinimumSize(qMax(initialSize.width() + 60, 500),
+                          initialSize.height() + 100);
+            qDebug() << "StreamMessage: Początkowy minimalny rozmiar:" << minimumSize();
+        }
+    });
+}
+
+// Nowa metoda do dostosowywania rozmiaru wiadomości
+void adjustSizeToContent() {
+    qDebug() << "StreamMessage::adjustSizeToContent - Dostosowywanie rozmiaru wiadomości";
+
+    // Wymuszamy recalkulację layoutu
+    m_mainLayout->invalidate();
+    m_mainLayout->activate();
+
+    // Dajemy czas na poprawne renderowanie zawartości
+    QTimer::singleShot(100, this, [this]() {
+        if (m_attachmentWidget) {
+            // Pobieramy rozmiar załącznika
+            QSize attachmentSize = m_attachmentWidget->sizeHint();
+            qDebug() << "Rozmiar załącznika (sizeHint):" << attachmentSize;
+
+            // Szukamy wszystkich CyberAttachmentViewer
+            QList<CyberAttachmentViewer*> viewers = m_attachmentWidget->findChildren<CyberAttachmentViewer*>();
+            if (!viewers.isEmpty()) {
+                CyberAttachmentViewer* viewer = viewers.first();
+
+                // Aktualizujemy dane widgetu
+                viewer->updateGeometry();
+                QSize viewerSize = viewer->sizeHint();
+
+                qDebug() << "CyberAttachmentViewer sizeHint:" << viewerSize;
+
+                // Obliczamy rozmiar, uwzględniając marginesy i dodatkową przestrzeń
+                int newWidth = qMax(viewerSize.width() +
+                                    m_mainLayout->contentsMargins().left() +
+                                    m_mainLayout->contentsMargins().right() + 50, 500);
+
+                int newHeight = viewerSize.height() +
+                              m_mainLayout->contentsMargins().top() +
+                              m_mainLayout->contentsMargins().bottom() + 80;
+
+                // Ustawiamy nowy rozmiar minimalny
+                setMinimumSize(newWidth, newHeight);
+
+                qDebug() << "Ustawiam nowy minimalny rozmiar wiadomości:" << newWidth << "x" << newHeight;
+
+                // Wymuszamy ponowne obliczenie rozmiaru
+                updateGeometry();
+
+                // Wymuszamy aktualizację layoutu rodzica
+                if (parentWidget() && parentWidget()->layout()) {
+                    parentWidget()->layout()->invalidate();
+                    parentWidget()->layout()->activate();
+                    parentWidget()->updateGeometry();
+                    parentWidget()->update();
+                }
+            }
         }
 
-        // Ustawiamy nowy załącznik
-        m_attachmentWidget = attachmentWidget;
-        m_mainLayout->addWidget(m_attachmentWidget);
+        // Aktualizujemy pozycję przycisków
+        updateLayout();
+        update();
+    });
+}
 
-        // Oczyszczamy treść HTML z tagów i aktualizujemy tekst
-        cleanupContent();
-        if (m_contentLabel) {
-            m_contentLabel->setText(m_cleanContent);
+    QSize sizeHint() const override {
+        QSize baseSize(500, 180);
+
+        // Jeśli mamy załącznik, dostosuj rozmiar na jego podstawie
+        if (m_attachmentWidget) {
+            QSize attachmentSize = m_attachmentWidget->sizeHint();
+
+            // Szukamy CyberAttachmentViewer w hierarchii
+            QList<const CyberAttachmentViewer*> viewers =
+                m_attachmentWidget->findChildren<const CyberAttachmentViewer*>();
+
+            if (!viewers.isEmpty()) {
+                // Użyj rozmiaru CyberAttachmentViewer zamiast bezpośredniego attachmentSize
+                QSize viewerSize = viewers.first()->sizeHint();
+
+                // Dodajemy marginesy i przestrzeń
+                int totalHeight = viewerSize.height() +
+                                m_mainLayout->contentsMargins().top() +
+                                m_mainLayout->contentsMargins().bottom() + 80;
+
+                int totalWidth = qMax(viewerSize.width() +
+                                   m_mainLayout->contentsMargins().left() +
+                                   m_mainLayout->contentsMargins().right() + 40, baseSize.width());
+
+                return QSize(totalWidth, totalHeight);
+            } else {
+                // Standardowe zachowanie dla innych załączników
+                int totalHeight = attachmentSize.height() +
+                                m_mainLayout->contentsMargins().top() +
+                                m_mainLayout->contentsMargins().bottom() + 70;
+
+                int totalWidth = qMax(attachmentSize.width() +
+                                   m_mainLayout->contentsMargins().left() +
+                                   m_mainLayout->contentsMargins().right() + 30, baseSize.width());
+
+                return QSize(totalWidth, totalHeight);
+            }
         }
+
+        return baseSize;
     }
 
     void fadeIn() {
@@ -318,9 +475,9 @@ public:
     QPushButton* nextButton() const { return m_nextButton; }
     QPushButton* prevButton() const { return m_prevButton; }
 
-    QSize sizeHint() const override {
-        return QSize(500, 180);
-    }
+    // QSize sizeHint() const override {
+    //     return QSize(500, 180);
+    // }
 
 signals:
     void messageRead();

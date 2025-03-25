@@ -1,6 +1,7 @@
 #ifndef CYBER_ATTACHMENT_VIEWER_H
 #define CYBER_ATTACHMENT_VIEWER_H
 
+#include <QApplication>
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -11,6 +12,8 @@
 #include <QPainter>
 #include <QRandomGenerator>
 #include <QPainterPath>
+#include <QDebug>
+#include <QEvent>
 
 class CyberAttachmentViewer : public QWidget {
     Q_OBJECT
@@ -18,78 +21,60 @@ class CyberAttachmentViewer : public QWidget {
 
 public:
     CyberAttachmentViewer(QWidget* parent = nullptr)
-        : QWidget(parent), m_decryptionCounter(0),
-          m_isScanning(false), m_isDecrypted(false)
-    {
-        // Główny układ
-        m_layout = new QVBoxLayout(this);
-        m_layout->setContentsMargins(10, 10, 10, 10);
-        m_layout->setSpacing(10);
+    : QWidget(parent), m_decryptionCounter(0),
+      m_isScanning(false), m_isDecrypted(false)
+{
+    // Główny układ
+    m_layout = new QVBoxLayout(this);
+    m_layout->setContentsMargins(10, 10, 10, 10);
+    m_layout->setSpacing(10);
 
-        // Label statusu
-        m_statusLabel = new QLabel("INICJALIZACJA SEKWENCJI DESZYFRUJĄCEJ", this);
-        m_statusLabel->setStyleSheet(
-            "QLabel {"
-            "  color: #00ffff;"
-            "  background-color: #001822;"
-            "  border: 1px solid #00aaff;"
-            "  font-family: 'Consolas', monospace;"
-            "  font-size: 9pt;"
-            "  padding: 4px;"
-            "  border-radius: 2px;"
-            "  font-weight: bold;"
-            "}"
-        );
-        m_statusLabel->setAlignment(Qt::AlignCenter);
-        m_layout->addWidget(m_statusLabel);
+    // Label statusu
+    m_statusLabel = new QLabel("INICJALIZACJA SEKWENCJI DESZYFRUJĄCEJ", this);
+    m_statusLabel->setStyleSheet(
+        "QLabel {"
+        "  color: #00ffff;"
+        "  background-color: #001822;"
+        "  border: 1px solid #00aaff;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-size: 9pt;"
+        "  padding: 4px;"
+        "  border-radius: 2px;"
+        "  font-weight: bold;"
+        "}"
+    );
+    m_statusLabel->setAlignment(Qt::AlignCenter);
+    m_layout->addWidget(m_statusLabel);
 
-        // Kontener na zawartość
-        m_contentContainer = new QWidget(this);
-        m_contentLayout = new QVBoxLayout(m_contentContainer);
-        m_contentLayout->setContentsMargins(3, 3, 3, 3);
-        m_layout->addWidget(m_contentContainer, 1);
+    // Kontener na zawartość
+    m_contentContainer = new QWidget(this);
+    m_contentLayout = new QVBoxLayout(m_contentContainer);
+    m_contentLayout->setContentsMargins(3, 3, 3, 3);
+    m_layout->addWidget(m_contentContainer, 1);
 
-        // Przyciski akcji
-        m_actionButton = new QPushButton("ROZPOCZNIJ DESZYFROWANIE", this);
-        m_actionButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: #002b3d;"
-            "  color: #00ffff;"
-            "  border: 1px solid #00aaff;"
-            "  border-radius: 2px;"
-            "  padding: 5px 10px;"
-            "  font-family: 'Consolas', monospace;"
-            "  font-weight: bold;"
-            "}"
-            "QPushButton:hover {"
-            "  background-color: #003e59;"
-            "}"
-            "QPushButton:pressed {"
-            "  background-color: #005580;"
-            "}"
-        );
-        m_layout->addWidget(m_actionButton);
 
-        // Połączenia sygnałów
-        connect(m_actionButton, &QPushButton::clicked, this, &CyberAttachmentViewer::onActionButtonClicked);
+    // Timer dla animacji
+    m_animTimer = new QTimer(this);
+    connect(m_animTimer, &QTimer::timeout, this, &CyberAttachmentViewer::updateAnimation);
 
-        // Timer dla animacji
-        m_animTimer = new QTimer(this);
-        connect(m_animTimer, &QTimer::timeout, this, &CyberAttachmentViewer::updateAnimation);
+    // Ustaw styl tła
+    setStyleSheet(
+        "CyberAttachmentViewer {"
+        "  background-color: rgba(10, 20, 30, 200);"
+        "  border: 1px solid #00aaff;"
+        "}"
+    );
 
-        // Ustaw styl tła
-        setStyleSheet(
-            "CyberAttachmentViewer {"
-            "  background-color: rgba(10, 20, 30, 200);"
-            "  border: 1px solid #00aaff;"
-            "}"
-        );
+    // Usuwamy ograniczenia minimum, aby mógł się dostosować do zawartości
+    setMinimumSize(0, 0);
 
-        // Ustaw minimalne rozmiary
-        setMinimumSize(400, 250);
+    // Ustawiamy dobrą politykę rozmiaru
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-        QTimer::singleShot(500, this, &CyberAttachmentViewer::onActionButtonClicked);
-    }
+    qDebug() << "CyberAttachmentViewer: utworzono z rozmiarem początkowym" << size();
+
+    QTimer::singleShot(500, this, &CyberAttachmentViewer::onActionButtonClicked);
+}
 
     ~CyberAttachmentViewer() {
         if (m_contentWidget) {
@@ -103,7 +88,34 @@ public:
         updateDecryptionStatus();
     }
 
+    void updateContentLayout() {
+        if (m_contentWidget) {
+            // Wymuszamy aktualizację layoutu
+            m_contentLayout->invalidate();
+            m_contentLayout->activate();
+
+            // Aktualizujemy geometrię
+            m_contentWidget->updateGeometry();
+            updateGeometry();
+
+            // Aktualizujemy rozmiar i propagujemy zmianę w górę hierarchii
+            QTimer::singleShot(50, this, [this]() {
+                // Powiadom rodziców o zmianie rozmiaru
+                QEvent event(QEvent::LayoutRequest);
+                QApplication::sendEvent(this, &event);
+
+                if (parentWidget()) {
+                    parentWidget()->updateGeometry();
+                    QApplication::sendEvent(parentWidget(), &event);
+                }
+            });
+        }
+    }
+
+
     void setContent(QWidget* content) {
+        qDebug() << "CyberAttachmentViewer::setContent - ustawianie zawartości";
+
         // Usunięcie poprzedniej zawartości
         QLayoutItem* item;
         while ((item = m_contentLayout->takeAt(0)) != nullptr) {
@@ -115,17 +127,71 @@ public:
         m_contentLayout->addWidget(content);
         m_contentWidget = content;
 
+        // Usuń ograniczenia rozmiaru na zawartości
+        content->setMinimumSize(0, 0);
+        content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+
+        if (content->sizeHint().isValid()) {
+            qDebug() << "Rozmiar docelowej zawartości (sizeHint):" << content->sizeHint();
+        }
+
+        // Użyj Preferred zamiast Expanding dla lepszego dopasowania
+        content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
         // Ukrywamy zawartość początkowo
         content->setVisible(false);
-
-        // Aktualizujemy przycisk
-        m_actionButton->setText("ROZPOCZNIJ DESZYFROWANIE");
-        m_actionButton->setEnabled(true);
 
         // Aktualizujemy status
         m_statusLabel->setText("WYKRYTO ZASZYFROWANE DANE");
         m_isDecrypted = false;
+
+        // Aktywujemy layout i odświeżamy wymiary
+        m_contentLayout->activate();
+        updateGeometry();
+
+        // Informujemy rodzica o zmianie rozmiaru
+        QTimer::singleShot(0, this, [this]() {
+            if (parentWidget()) {
+                parentWidget()->updateGeometry();
+                parentWidget()->layout()->activate();
+
+                // Emituj sygnał o zmianie rozmiaru dla całej hierarchii widgetów
+                QEvent event(QEvent::LayoutRequest);
+                QApplication::sendEvent(parentWidget(), &event);
+            }
+        });
+
+        updateContentLayout();
     }
+
+QSize sizeHint() const override {
+    if (m_contentWidget) {
+        // Pobieramy preferowany rozmiar zawartości
+        QSize contentSize = m_contentWidget->sizeHint();
+        if (contentSize.isValid() && contentSize.width() > 0 && contentSize.height() > 0) {
+            // Dodajemy przestrzeń na ramki, przyciski i etykiety
+            int totalHeight = contentSize.height() +
+                            m_layout->contentsMargins().top() +
+                            m_layout->contentsMargins().bottom() +
+                            m_statusLabel->sizeHint().height() +
+                            m_layout->spacing() * 2;
+
+            int totalWidth = contentSize.width() +
+                           m_layout->contentsMargins().left() +
+                           m_layout->contentsMargins().right();
+
+            QSize result(totalWidth, totalHeight);
+            qDebug() << "CyberAttachmentViewer::sizeHint zwraca:" << result;
+            return result;
+        }
+    }
+
+    // Podstawowy rozmiar, jeśli nie mamy zawartości
+    QSize defaultSize(400, 250);
+    qDebug() << "CyberAttachmentViewer::sizeHint zwraca domyślny:" << defaultSize;
+    return defaultSize;
+}
 
 protected:
     void paintEvent(QPaintEvent* event) override {
@@ -241,7 +307,6 @@ private slots:
 
     void startScanningAnimation() {
         m_isScanning = true;
-        m_actionButton->setEnabled(false);
         m_statusLabel->setText("SKANOWANIE ZABEZPIECZEŃ...");
 
         // Pokazujemy zawartość (będzie skanowana)
@@ -261,8 +326,6 @@ private slots:
 
                 // Po zakończeniu skanowania
                 m_statusLabel->setText("SKANOWANIE ZAKOŃCZONE. PRZYGOTOWANIE DESZYFRACJI...");
-                m_actionButton->setText("DESZYFRUJ");
-                m_actionButton->setEnabled(true);
 
                 // Automatycznie rozpocznij dekodowanie po krótkim opóźnieniu
                 QTimer::singleShot(800, this, &CyberAttachmentViewer::startDecryptionAnimation);
@@ -281,30 +344,8 @@ private slots:
             m_blinkTimer->stop();
             m_blinkTimer->deleteLater();
             m_blinkTimer = nullptr;
-
-            // Przywracamy normalny styl przycisku
-            m_actionButton->setStyleSheet(
-                "QPushButton {"
-                "  background-color: #002b3d;"
-                "  color: #00ffff;"
-                "  border: 1px solid #00aaff;"
-                "  border-radius: 2px;"
-                "  padding: 5px 10px;"
-                "  font-family: 'Consolas', monospace;"
-                "  font-weight: bold;"
-                "}"
-                "QPushButton:hover {"
-                "  background-color: #003e59;"
-                "}"
-                "QPushButton:pressed {"
-                "  background-color: #005580;"
-                "}"
-            );
         }
 
-        // Zmieniamy stan UI
-        m_actionButton->setEnabled(false);
-        m_actionButton->setText("DEKODOWANIE W TOKU...");
         m_statusLabel->setText("ROZPOCZĘTO DEKODOWANIE... 0%");
 
         // Animacja dekodowania
@@ -357,8 +398,6 @@ private slots:
 
         // Aktualizujemy UI
         m_statusLabel->setText("DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY");
-        m_actionButton->setText("ZAMKNIJ PODGLĄD");
-        m_actionButton->setEnabled(true);
 
         // Upewniamy się, że zawartość jest widoczna (bez efektu migotania)
         m_contentWidget->setVisible(true);
@@ -383,7 +422,6 @@ private:
     QVBoxLayout* m_contentLayout;
     QWidget* m_contentWidget = nullptr;
     QLabel* m_statusLabel;
-    QPushButton* m_actionButton;
     QTimer* m_animTimer;
     QTimer* m_blinkTimer = nullptr;
     int m_scanProgress = 0;

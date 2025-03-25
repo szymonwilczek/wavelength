@@ -81,12 +81,74 @@ public:
     }
 
     void setContent(QWidget* content) {
+         qDebug() << "AttachmentPlaceholder::setContent - ustawianie zawartości";
+
+         // Sprawdzamy rozmiar nowej zawartości
+         if (content->sizeHint().isValid()) {
+             qDebug() << "Rozmiar zawartości (sizeHint):" << content->sizeHint();
+         }
+
+         // Dodajemy zawartość do layoutu
          m_contentLayout->addWidget(content);
          m_contentContainer->setVisible(true);
          m_loadButton->setVisible(false);
          m_isLoaded = true;
-         notifyLoaded(); // Dodajemy wywołanie po ustawieniu zawartości
+
+         // Usuwamy wszystkie ograniczenia rozmiaru
+         content->setMinimumSize(0, 0);
+         content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+
+         // Ustawiamy politykę rozmiaru - preferowana, nie ekspansywna
+         content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+         m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+         // Aktywujemy layout
+         m_contentLayout->activate();
+         updateGeometry();
+
+         // Dajemy trochę czasu na ustalenie rozmiaru widgetu
+         QTimer::singleShot(100, this, [this, content]() {
+             // Wymuszamy update całej hierarchii widgetów
+             if (CyberAttachmentViewer* viewer = qobject_cast<CyberAttachmentViewer*>(content)) {
+                 viewer->updateContentLayout();
+             }
+
+             // Emitujemy sygnał po ustawieniu zawartości z opóźnieniem
+             QTimer::singleShot(50, this, &AttachmentPlaceholder::notifyLoaded);
+         });
      }
+
+QSize sizeHint() const override {
+    // Bazowy rozmiar dla widgetu bez zawartości
+    QSize baseSize(400, 100);
+
+    // Jeśli mamy zawartość, sprawdzamy jej rozmiar
+    QWidget* content = nullptr;
+    if (m_contentContainer && m_contentContainer->isVisible() && m_contentLayout->count() > 0) {
+        content = m_contentLayout->itemAt(0)->widget();
+    }
+
+    if (content) {
+        QSize contentSize = content->sizeHint();
+        if (contentSize.isValid() && contentSize.width() > 0 && contentSize.height() > 0) {
+            // Dodajemy przestrzeń na etykietę i przyciski
+            int totalHeight = contentSize.height() +
+                            m_infoLabel->sizeHint().height() +
+                            (m_progressLabel->isVisible() ? m_progressLabel->sizeHint().height() : 0) +
+                            (m_loadButton->isVisible() ? m_loadButton->sizeHint().height() : 0) +
+                            20; // dodatkowy margines
+
+            int totalWidth = qMax(contentSize.width(), baseSize.width());
+
+            QSize result(totalWidth, totalHeight);
+            qDebug() << "AttachmentPlaceholder::sizeHint - dla zawartości:" << result;
+            return result;
+        }
+    }
+
+    qDebug() << "AttachmentPlaceholder::sizeHint - bazowy:" << baseSize;
+    return baseSize;
+}
 
     void setAttachmentReference(const QString& attachmentId, const QString& mimeType) {
         m_attachmentId = attachmentId;
@@ -223,10 +285,13 @@ public slots:
     void showCyberImage(const QByteArray& data) {
     CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
 
-    // Tworzymy widget z obrazem
+    // Tworzymy widget z obrazem z zachowaniem oryginalnych wymiarów
     InlineImageViewer* imageViewer = new InlineImageViewer(data, viewer);
+    imageViewer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    // Opakowujemy w AutoScalingAttachment
+    qDebug() << "showCyberImage - rozmiar obrazu:" << imageViewer->sizeHint();
+
+    // Ustawiamy zawartość viewera
     viewer->setContent(imageViewer);
 
     // Podłączamy sygnał zakończenia
@@ -239,6 +304,9 @@ public slots:
 
     setContent(viewer);
     setLoading(false);
+
+    qDebug() << "showCyberImage - rozmiar viewera po ustawieniu:" << viewer->size();
+    qDebug() << "showCyberImage - rozmiar placeholdera po ustawieniu:" << size();
 }
 
 void showCyberGif(const QByteArray& data) {
@@ -513,7 +581,11 @@ private:
     }
 
     void notifyLoaded() {
-        // Emitujemy sygnał o załadowaniu załącznika bez dodatkowych operacji resize
+        qDebug() << "AttachmentPlaceholder::notifyLoaded - powiadamianie o załadowaniu załącznika";
+        qDebug() << "Aktualny rozmiar:" << size();
+        qDebug() << "SizeHint:" << sizeHint();
+
+        // Informujemy o załadowaniu załącznika
         emit attachmentLoaded();
     }
 };
