@@ -50,6 +50,7 @@ public:
     m_contentContainer = new QWidget(this);
     m_contentLayout = new QVBoxLayout(m_contentContainer);
     m_contentLayout->setContentsMargins(3, 3, 3, 3);
+    m_contentLayout->setAlignment(Qt::AlignCenter);
     m_layout->addWidget(m_contentContainer, 1);
 
 
@@ -126,6 +127,8 @@ public:
         // Dodanie nowej zawartości
         m_contentLayout->addWidget(content);
         m_contentWidget = content;
+
+        m_contentLayout->setAlignment(content, Qt::AlignCenter);
 
         // Usuń ograniczenia rozmiaru na zawartości
         content->setMinimumSize(0, 0);
