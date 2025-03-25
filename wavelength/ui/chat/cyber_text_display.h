@@ -21,6 +21,7 @@ public:
         : QWidget(parent), m_fullText(text), m_revealedChars(0), 
           m_glitchIntensity(0.0), m_isFullyRevealed(false)
     {
+        setMinimumWidth(400);
         setMinimumHeight(60);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         
@@ -254,7 +255,15 @@ private:
     
     void recalculateHeight() {
         QFontMetrics fm(m_font);
-        int textWidth = width() - 30; // marginesy
+        int textWidth = qMax(300, width() - 30); // Minimalna szerokość 300px
+
+        // Zachowaj oryginalny tekst jeśli się mieści w jednej linii
+        if (fm.horizontalAdvance(m_plainText) <= textWidth) {
+            // Tekst mieści się, nie trzeba nic robić
+            int requiredHeight = fm.lineSpacing() + 20;
+            setMinimumHeight(requiredHeight);
+            return;
+        }
         
         // Wrapowanie tekstu
         QStringList words = m_plainText.split(' ', Qt::SkipEmptyParts);
@@ -270,7 +279,7 @@ private:
                 currentLine = word;
             }
         }
-        
+
         if (!currentLine.isEmpty()) {
             wrappedText += currentLine;
         }
