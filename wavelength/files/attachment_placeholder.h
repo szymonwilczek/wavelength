@@ -12,6 +12,7 @@
 #include <QWidget>
 
 #include "attachment_queue_manager.h"
+#include "auto_scaling_attachment.h"
 #include "../messages/formatter/message_formatter.h"
 #include "../ui/cyber_attachment_viewer.h"
 #include "gif/player/inline_gif_player.h"
@@ -282,7 +283,7 @@ public slots:
         setLoading(false);
     }
 
-    void showCyberImage(const QByteArray& data) {
+void showCyberImage(const QByteArray& data) {
     CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
 
     // Tworzymy widget z obrazem z zachowaniem oryginalnych wymiarów
@@ -291,22 +292,69 @@ public slots:
 
     qDebug() << "showCyberImage - rozmiar obrazu:" << imageViewer->sizeHint();
 
+    // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(imageViewer, viewer);
+
+    // Ustawiamy maksymalny dozwolony rozmiar (np. 80% szerokości wiadomości, 60% wysokości ekranu)
+    QScreen* screen = QApplication::primaryScreen();
+    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    scalingAttachment->setMaxAllowedSize(maxSize);
+
+    // Podłączamy obsługę kliknięcia
+    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [data, this]() {
+        // Utworzenie osobnego widgetu dla pełnowymiarowego obrazu
+        QDialog* fullSizeViewer = new QDialog(nullptr, Qt::Window | Qt::FramelessWindowHint);
+        fullSizeViewer->setWindowTitle("Podgląd załącznika");
+        fullSizeViewer->setModal(true);
+
+        QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
+
+        // Dodajemy pełnowymiarowy obraz
+        InlineImageViewer* fullImage = new InlineImageViewer(data, fullSizeViewer);
+        layout->addWidget(fullImage, 0, Qt::AlignCenter);
+
+        // Dodaj przycisk zamknięcia
+        QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
+        closeButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: #002b3d;"
+            "  color: #00ffff;"
+            "  border: 1px solid #00aaff;"
+            "  border-radius: 2px;"
+            "  padding: 6px;"
+            "  font-family: 'Consolas', monospace;"
+            "  font-weight: bold;"
+            "}"
+        );
+        layout->addWidget(closeButton, 0, Qt::AlignHCenter);
+
+        connect(closeButton, &QPushButton::clicked, fullSizeViewer, &QDialog::accept);
+
+        // Ustaw styl okna w stylu cyberpunkowym
+        fullSizeViewer->setStyleSheet(
+            "QDialog {"
+            "  background-color: #001822;"
+            "  border: 2px solid #00aaff;"
+            "}"
+        );
+
+        fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
+        fullSizeViewer->show();
+    });
+
     // Ustawiamy zawartość viewera
-    viewer->setContent(imageViewer);
+    viewer->setContent(scalingAttachment);
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
         m_loadButton->setText("PONÓW DEKODOWANIE");
         m_loadButton->setVisible(true);
         m_contentContainer->setVisible(false);
-        emit attachmentLoaded(); // Emitujemy sygnał również przy zamknięciu
+        emit attachmentLoaded();
     });
 
     setContent(viewer);
     setLoading(false);
-
-    qDebug() << "showCyberImage - rozmiar viewera po ustawieniu:" << viewer->size();
-    qDebug() << "showCyberImage - rozmiar placeholdera po ustawieniu:" << size();
 }
 
 void showCyberGif(const QByteArray& data) {
@@ -316,14 +364,63 @@ void showCyberGif(const QByteArray& data) {
     InlineGifPlayer* gifPlayer = new InlineGifPlayer(data, viewer);
 
     // Opakowujemy w AutoScalingAttachment
+    AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(gifPlayer, viewer);
 
-    viewer->setContent(gifPlayer);
+    // Ustawiamy maksymalny dozwolony rozmiar
+    QScreen* screen = QApplication::primaryScreen();
+    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    scalingAttachment->setMaxAllowedSize(maxSize);
+
+    // Podłączamy obsługę kliknięcia
+    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [data, this]() {
+        // Utworzenie osobnego widgetu dla pełnowymiarowego gifa
+        QDialog* fullSizeViewer = new QDialog(nullptr, Qt::Window | Qt::FramelessWindowHint);
+        fullSizeViewer->setWindowTitle("Podgląd animacji");
+        fullSizeViewer->setModal(true);
+
+        QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
+
+        // Dodajemy pełnowymiarowy gif
+        InlineGifPlayer* fullGif = new InlineGifPlayer(data, fullSizeViewer);
+        layout->addWidget(fullGif, 0, Qt::AlignCenter);
+
+        // Dodaj przycisk zamknięcia
+        QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
+        closeButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: #002b3d;"
+            "  color: #00ffff;"
+            "  border: 1px solid #00aaff;"
+            "  border-radius: 2px;"
+            "  padding: 6px;"
+            "  font-family: 'Consolas', monospace;"
+            "  font-weight: bold;"
+            "}"
+        );
+        layout->addWidget(closeButton, 0, Qt::AlignHCenter);
+
+        connect(closeButton, &QPushButton::clicked, fullSizeViewer, &QDialog::accept);
+
+        // Ustaw styl okna w stylu cyberpunkowym
+        fullSizeViewer->setStyleSheet(
+            "QDialog {"
+            "  background-color: #001822;"
+            "  border: 2px solid #00aaff;"
+            "}"
+        );
+
+        fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
+        fullSizeViewer->show();
+    });
+
+    viewer->setContent(scalingAttachment);
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        m_loadButton->setText("Załaduj ponownie");
+        m_loadButton->setText("PONÓW DEKODOWANIE");
         m_loadButton->setVisible(true);
         m_contentContainer->setVisible(false);
+        emit attachmentLoaded();
     });
 
     setContent(viewer);
