@@ -405,6 +405,11 @@ public:
         av_opt_set_int(m_swrContext, "out_sample_rate", 44100, 0);
         av_opt_set_sample_fmt(m_swrContext, "in_sample_fmt", m_audioCodecContext->sample_fmt, 0);
         av_opt_set_sample_fmt(m_swrContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+        av_opt_set_int(m_swrContext, "filter_size", 32, 0);
+        av_opt_set_int(m_swrContext, "linear_interp", 1, 0);
+        av_opt_set_int(m_swrContext, "phase_shift", 10, 0);
+        av_opt_set_int(m_swrContext, "cutoff", 0.95, 0);
+
 
         if (swr_init(m_swrContext) < 0) {
             qDebug() << "Nie można zainicjalizować kontekstu resamplingu audio";
@@ -425,6 +430,7 @@ public:
         m_audioOutput = new QAudioOutput(m_audioFormat, nullptr);
         m_audioOutput->setVolume(1.0);
         m_audioOutputBuffer.setBuffer(&m_audioBuffer);
+        m_audioOutput->setBufferSize(32768); // 32kb
         m_audioOutputBuffer.open(QIODevice::ReadWrite);
         m_audioDevice = m_audioOutput->start();
 
@@ -627,6 +633,7 @@ protected:
         av_frame_free(&audioFrame);
     }
 
+    // Zamień funkcję decodeAudioFrame na poniższą wersję:
     void decodeAudioFrame(AVFrame* audioFrame) {
         if (!m_hasAudio || !m_audioDevice)
             return;
@@ -647,11 +654,12 @@ protected:
             QByteArray buffer((char*)outBuffer, actualSize);
 
             m_mutex.lock();
+            // Dodaj do bufora
             m_audioOutputBuffer.write(buffer);
 
-            if (m_audioBuffer.size() > 8192 && !m_paused) {
-                m_audioOutputBuffer.seek(0);
-                m_audioDevice->write(m_audioOutputBuffer.readAll());
+            if (m_audioBuffer.size() > 4096 && !m_paused) {
+                QByteArray audioData = m_audioOutputBuffer.data();
+                m_audioDevice->write(audioData);
                 m_audioBuffer.clear();
                 m_audioOutputBuffer.seek(0);
             }
