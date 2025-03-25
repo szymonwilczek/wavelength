@@ -294,7 +294,8 @@ public:
         emit videoInfo(
             m_codecContext->width,
             m_codecContext->height,
-            m_formatContext->duration / AV_TIME_BASE
+            m_formatContext->duration / AV_TIME_BASE,
+            m_frameRate
         );
 
         if (m_audioStream != -1) {
@@ -492,7 +493,7 @@ public:
 signals:
     void frameReady(const QImage& frame);
     void error(const QString& message);
-    void videoInfo(int width, int height, double duration);
+    void videoInfo(int width, int height, double duration, double fps = 0);
     void playbackFinished();
     void positionChanged(double position);
 
