@@ -18,6 +18,7 @@
 #include "cyber_text_display.h"
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
+#include "effects/electronic_shutdown_effect.h"
 
 // Klasa reprezentująca pojedynczą wiadomość w strumieniu
 class StreamMessage : public QWidget {
@@ -25,6 +26,7 @@ class StreamMessage : public QWidget {
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
     Q_PROPERTY(qreal glowIntensity READ glowIntensity WRITE setGlowIntensity)
     Q_PROPERTY(qreal disintegrationProgress READ disintegrationProgress WRITE setDisintegrationProgress)
+    Q_PROPERTY(qreal shutdownProgress READ shutdownProgress WRITE setShutdownProgress)
 
 public:
     enum MessageType {
@@ -145,6 +147,14 @@ public:
         m_disintegrationProgress = progress;
         if (m_disintegrationEffect) {
             m_disintegrationEffect->setProgress(progress);
+        }
+    }
+
+    qreal shutdownProgress() const { return m_shutdownProgress; }
+    void setShutdownProgress(qreal progress) {
+        m_shutdownProgress = progress;
+        if (m_shutdownEffect) {
+            m_shutdownEffect->setProgress(progress);
         }
     }
 
@@ -438,54 +448,26 @@ void adjustSizeToContent() {
     }
     
     void startDisintegrationAnimation() {
-#ifdef QT_OPENGL_SUPPORT
-        // Wersja OpenGL - tylko gdy OpenGL jest dostępny
-
-        // Renderujemy zawartość widgetu do pixmapy
-        QPixmap widgetPixmap(size());
-        widgetPixmap.fill(Qt::transparent);
-        render(&widgetPixmap);
-
-        // Tworzymy i konfigurujemy widget OpenGL
-        OpenGLDisintegration* disintegrationWidget = new OpenGLDisintegration(parentWidget());
-        disintegrationWidget->setGeometry(geometry());
-        disintegrationWidget->setSourcePixmap(widgetPixmap);
-        disintegrationWidget->show();
-
-        // Ukrywamy oryginalny widget
-        hide();
-
-        // Po zakończeniu animacji, emitujemy sygnał i usuwamy efekt
-        connect(disintegrationWidget, &OpenGLDisintegration::animationFinished, this, [this, disintegrationWidget]() {
-            disintegrationWidget->deleteLater();
-            emit hidden();
-        });
-
-        // Rozpoczynamy animację
-        disintegrationWidget->startAnimation(1500);
-#else
-        // Optymalizowana wersja bez OpenGL
-        if (graphicsEffect() && graphicsEffect() != m_disintegrationEffect) {
+        if (graphicsEffect() && graphicsEffect() != m_shutdownEffect) {
             delete graphicsEffect();
         }
 
-        m_disintegrationEffect = new DisintegrationEffect(this);
-        m_disintegrationEffect->setProgress(0.0);
-        setGraphicsEffect(m_disintegrationEffect);
+        m_shutdownEffect = new ElectronicShutdownEffect(this);
+        m_shutdownEffect->setProgress(0.0);
+        setGraphicsEffect(m_shutdownEffect);
 
-        QPropertyAnimation* disintegrationAnim = new QPropertyAnimation(this, "disintegrationProgress");
-        disintegrationAnim->setDuration(1500);
-        disintegrationAnim->setStartValue(0.0);
-        disintegrationAnim->setEndValue(1.0);
-        disintegrationAnim->setEasingCurve(QEasingCurve::InQuad);
+        QPropertyAnimation* shutdownAnim = new QPropertyAnimation(this, "shutdownProgress");
+        shutdownAnim->setDuration(1200); // Nieco szybsza animacja (1.2 sekundy)
+        shutdownAnim->setStartValue(0.0);
+        shutdownAnim->setEndValue(1.0);
+        shutdownAnim->setEasingCurve(QEasingCurve::InQuad);
 
-        connect(disintegrationAnim, &QPropertyAnimation::finished, this, [this]() {
+        connect(shutdownAnim, &QPropertyAnimation::finished, this, [this]() {
             hide();
             emit hidden();
         });
 
-        disintegrationAnim->start(QAbstractAnimation::DeleteWhenStopped);
-#endif
+        shutdownAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     void showNavigationButtons(bool hasPrev, bool hasNext) {
@@ -945,6 +927,8 @@ private:
     QWidget* m_attachmentWidget = nullptr;
     QLabel* m_contentLabel = nullptr;
     CyberTextDisplay* m_textDisplay = nullptr;
+    ElectronicShutdownEffect* m_shutdownEffect = nullptr;
+    qreal m_shutdownProgress = 0.0;
 };
 
 #endif // STREAM_MESSAGE_H
