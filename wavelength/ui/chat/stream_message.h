@@ -17,7 +17,6 @@
 
 #include "cyber_text_display.h"
 #include "../../files/attachment_placeholder.h"
-#include "effects/cyber_slide_effect.h"
 #include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
 
@@ -448,74 +447,6 @@ void adjustSizeToContent() {
         opacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    // Dodaj do klasy StreamMessage
-void slideIn(CyberSlideEffect::SlideDirection dir = CyberSlideEffect::SlideRight) {
-    // Usuwamy poprzedni efekt jeśli istnieje
-    if (graphicsEffect()) {
-        graphicsEffect()->setEnabled(false);
-        delete graphicsEffect();
-    }
-
-    // Tworzymy nowy efekt
-    CyberSlideEffect* slideEffect = new CyberSlideEffect(this);
-    slideEffect->setDirection(dir);
-    slideEffect->setProgress(1.0); // Zaczynamy od ukrytego
-    setGraphicsEffect(slideEffect);
-    show();
-
-    // Animacja wejścia
-    QPropertyAnimation* slideAnim = new QPropertyAnimation(slideEffect, "progress");
-    slideAnim->setDuration(400); // Krótszy czas dla wydajności
-    slideAnim->setStartValue(1.0);
-    slideAnim->setEndValue(0.0);
-    slideAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    // Po zakończeniu animacji rozpoczynamy renderowanie tekstu
-    connect(slideAnim, &QPropertyAnimation::finished, this, [this, slideEffect]() {
-        // Wyłączamy efekt po zakończeniu animacji dla wydajności
-        slideEffect->setEnabled(false);
-
-        // Uruchamiamy animację tekstu
-        if (m_textDisplay) {
-            m_textDisplay->startReveal();
-        }
-    });
-
-    slideAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-    // Ustawiamy focus
-    QTimer::singleShot(100, this, QOverload<>::of(&StreamMessage::setFocus));
-}
-
-void slideOut(CyberSlideEffect::SlideDirection dir = CyberSlideEffect::SlideLeft) {
-    // Usuwamy poprzedni efekt jeśli istnieje
-    if (graphicsEffect()) {
-        graphicsEffect()->setEnabled(false);
-        delete graphicsEffect();
-    }
-
-    // Tworzymy nowy efekt
-    CyberSlideEffect* slideEffect = new CyberSlideEffect(this);
-    slideEffect->setDirection(dir);
-    slideEffect->setProgress(0.0); // Zaczynamy od widocznego
-    setGraphicsEffect(slideEffect);
-
-    // Animacja wyjścia
-    QPropertyAnimation* slideAnim = new QPropertyAnimation(slideEffect, "progress");
-    slideAnim->setDuration(300); // Jeszcze krótszy czas dla wyjścia
-    slideAnim->setStartValue(0.0);
-    slideAnim->setEndValue(1.0);
-    slideAnim->setEasingCurve(QEasingCurve::InCubic);
-
-    // Po zakończeniu animacji ukrywamy widget
-    connect(slideAnim, &QPropertyAnimation::finished, this, [this]() {
-        hide();
-        emit hidden();
-    });
-
-    slideAnim->start(QAbstractAnimation::DeleteWhenStopped);
-}
-    
     void startDisintegrationAnimation() {
         if (graphicsEffect() && graphicsEffect() != m_shutdownEffect) {
             delete graphicsEffect();

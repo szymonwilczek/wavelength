@@ -733,32 +733,18 @@ private slots:
     void showMessageAtIndex(int index) {
         if (index < 0 || index >= m_messages.size()) return;
 
-        int previousIndex = m_currentMessageIndex;
-        m_currentMessageIndex = index;
-
-        // Określ kierunek animacji na podstawie indeksów
-        CyberSlideEffect::SlideDirection inDirection, outDirection;
-
-        if (previousIndex < 0 || index > previousIndex) {
-            // Nowa wiadomość wchodzi z prawej, stara wychodzi w lewo
-            inDirection = CyberSlideEffect::SlideRight;
-            outDirection = CyberSlideEffect::SlideLeft;
-        } else {
-            // Nowa wiadomość wchodzi z lewej, stara wychodzi w prawo
-            inDirection = CyberSlideEffect::SlideLeft;
-            outDirection = CyberSlideEffect::SlideRight;
-        }
-
         // Ukrywamy aktualnie wyświetlaną wiadomość
-        if (previousIndex >= 0 && previousIndex < m_messages.size() && previousIndex != index) {
-            m_messages[previousIndex]->slideOut(outDirection);
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
+            m_messages[m_currentMessageIndex]->fadeOut();
         }
+
+        m_currentMessageIndex = index;
 
         // Wyświetlamy wybraną wiadomość
         StreamMessage* message = m_messages[m_currentMessageIndex];
         message->show();
         updateMessagePosition();
-        message->slideIn(inDirection);
+        message->fadeIn();
 
         // Aktualizujemy przyciski nawigacyjne
         bool hasNext = index < m_messages.size() - 1;
@@ -825,6 +811,7 @@ private:
             message->move((width() - message->width()) / 2, (height() - message->height()) / 2);
         }
     }
+
 
     // Parametry animacji fali
     qreal m_waveAmplitude;
