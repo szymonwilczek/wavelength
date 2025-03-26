@@ -733,18 +733,32 @@ private slots:
     void showMessageAtIndex(int index) {
         if (index < 0 || index >= m_messages.size()) return;
 
-        // Ukrywamy aktualnie wyświetlaną wiadomość
-        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
-            m_messages[m_currentMessageIndex]->fadeOut();
+        int previousIndex = m_currentMessageIndex;
+        m_currentMessageIndex = index;
+
+        // Określ kierunek animacji na podstawie indeksów
+        CyberSlideEffect::SlideDirection inDirection, outDirection;
+
+        if (previousIndex < 0 || index > previousIndex) {
+            // Nowa wiadomość wchodzi z prawej, stara wychodzi w lewo
+            inDirection = CyberSlideEffect::SlideRight;
+            outDirection = CyberSlideEffect::SlideLeft;
+        } else {
+            // Nowa wiadomość wchodzi z lewej, stara wychodzi w prawo
+            inDirection = CyberSlideEffect::SlideLeft;
+            outDirection = CyberSlideEffect::SlideRight;
         }
 
-        m_currentMessageIndex = index;
+        // Ukrywamy aktualnie wyświetlaną wiadomość
+        if (previousIndex >= 0 && previousIndex < m_messages.size() && previousIndex != index) {
+            m_messages[previousIndex]->slideOut(outDirection);
+        }
 
         // Wyświetlamy wybraną wiadomość
         StreamMessage* message = m_messages[m_currentMessageIndex];
         message->show();
         updateMessagePosition();
-        message->fadeIn();
+        message->slideIn(inDirection);
 
         // Aktualizujemy przyciski nawigacyjne
         bool hasNext = index < m_messages.size() - 1;
