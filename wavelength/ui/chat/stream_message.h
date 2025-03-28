@@ -2,19 +2,9 @@
 #define STREAM_MESSAGE_H
 
 #include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
-#include <QGraphicsOpacityEffect>
 #include <QGraphicsEffect>
-#include <QTimer>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QPainter>
-#include <QPainterPath>
 #include <QScrollArea>
-#include <QVBoxLayout>
+#include <utility>
 
 #include "cyber_long_text_display.h"
 #include "cyber_text_display.h"
@@ -22,7 +12,6 @@
 #include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
 
-// Klasa reprezentująca pojedynczą wiadomość w strumieniu
 class StreamMessage : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
@@ -37,8 +26,8 @@ public:
         System
     };
 
-    StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
-: QWidget(parent), m_content(content), m_sender(sender), m_type(type),
+    StreamMessage(QString  content, QString  sender, MessageType type, QWidget* parent = nullptr)
+: QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
   m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -616,13 +605,8 @@ protected:
         int clipSize = 20; // rozmiar ścięcia rogu
         int notchSize = 10; // rozmiar wcięcia
 
-        // Górna krawędź z wcięciami
+        // Górna krawędź - prosta bez wcięć
         path.moveTo(clipSize, 0);
-        path.lineTo(width() / 3 - notchSize, 0);
-        path.lineTo(width() / 3, notchSize);
-        path.lineTo(width() / 3 + 2 * notchSize, 0);
-        path.lineTo(width() * 2/3 - notchSize, 0);
-        path.lineTo(width() * 2/3 + notchSize, notchSize);
         path.lineTo(width() - clipSize, 0);
 
         // Prawy górny róg i prawa krawędź z wcięciem
