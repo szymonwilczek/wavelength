@@ -773,18 +773,6 @@ protected:
         painter.setPen(trustColor);
         painter.drawText(trustRect, Qt::AlignLeft | Qt::AlignVCenter,
                       QString("TRUST: %1").arg(trustIndicator));
-
-        // Skanowanie - efekt pulsującego paska u dołu
-        static const qreal scanProgress = [this]() -> qreal {
-            return (QDateTime::currentMSecsSinceEpoch() % 2000) / 2000.0;
-        }();
-
-        int scanWidth = static_cast<int>(width() * scanProgress);
-        QRect scanRect(0, height() - 3, scanWidth, 3);
-
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(QBrush(textColor.lighter(150)));
-        painter.drawRect(scanRect);
     }
 
     void resizeEvent(QResizeEvent* event) override {
