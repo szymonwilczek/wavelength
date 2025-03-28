@@ -13,6 +13,7 @@
 #include <QRandomGenerator>
 #include <QPainter>
 #include <QPainterPath>
+#include <QScrollArea>
 #include <QVBoxLayout>
 
 #include "cyber_text_display.h"
@@ -36,49 +37,92 @@ public:
     };
 
     StreamMessage(const QString& content, const QString& sender, MessageType type, QWidget* parent = nullptr)
-    : QWidget(parent), m_content(content), m_sender(sender), m_type(type),
-      m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
-    {
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        setMinimumWidth(400);
-        setMaximumWidth(600);
-        setMinimumHeight(120);
+: QWidget(parent), m_content(content), m_sender(sender), m_type(type),
+  m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
+{
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMinimumWidth(400);
+    setMaximumWidth(600);
+    setMinimumHeight(120);
 
-        // Podstawowy layout
-        m_mainLayout = new QVBoxLayout(this);
-        m_mainLayout->setContentsMargins(25, 40, 25, 15);
-        m_mainLayout->setSpacing(10);
+    // Podstawowy layout
+    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout->setContentsMargins(25, 40, 25, 15);
+    m_mainLayout->setSpacing(10);
 
-        // Czyścimy treść z tagów HTML
-        cleanupContent();
+    // Wyczyść treść z tagów HTML
+    cleanupContent();
 
-        // Sprawdzamy czy to wiadomość z załącznikiem
-        bool hasAttachment = m_content.contains("placeholder");
+    // Sprawdzamy czy to wiadomość z załącznikiem
+    bool hasAttachment = m_content.contains("placeholder");
 
-        // Tworzymy CyberTextDisplay dla tekstu zwykłego
-        if (!hasAttachment) {
+    // Określamy, czy wiadomość jest długa
+    bool isLongMessage = m_cleanContent.length() > 500;
+
+    if (!hasAttachment) {
+        if (isLongMessage) {
+            // Dla długich wiadomości używamy QScrollArea z QLabel
+            QScrollArea* scrollArea = new QScrollArea(this);
+            scrollArea->setObjectName("cyberpunkScrollArea");
+            scrollArea->setWidgetResizable(true);
+            scrollArea->setFrameShape(QFrame::NoFrame);
+            scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+            // Styl dla scrollbara - czarno-niebieski z neonowymi elementami
+            scrollArea->setStyleSheet(
+                "QScrollArea { background: transparent; border: none; }"
+                "QScrollBar:vertical { background: rgba(10, 20, 30, 150); width: 10px; margin: 0; }"
+                "QScrollBar::handle:vertical { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00c8ff, stop:1 #0080ff); "
+                "border-radius: 5px; min-height: 30px; }"
+                "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }"
+                "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: rgba(0, 20, 40, 100); }");
+
+            // Kontener na tekst z odpowiednim tłem
+            QWidget* contentWidget = new QWidget();
+            contentWidget->setObjectName("scrollContent");
+            contentWidget->setStyleSheet("#scrollContent { background-color: transparent; }");
+
+            QVBoxLayout* contentLayout = new QVBoxLayout(contentWidget);
+            contentLayout->setContentsMargins(5, 5, 5, 5);
+
+            // QLabel z tekstem - podobny styl do CyberTextDisplay
+            QLabel* contentLabel = new QLabel(m_cleanContent);
+            contentLabel->setTextFormat(Qt::PlainText);
+            contentLabel->setWordWrap(true);
+            contentLabel->setStyleSheet(
+                "QLabel { color: #00ffcc; font-family: Consolas, Monospace; font-size: 10pt; "
+                "background-color: transparent; padding: 5px; }");
+
+            contentLayout->addWidget(contentLabel);
+            scrollArea->setWidget(contentWidget);
+
+            // Dodajemy scrollArea do głównego layoutu
+            m_mainLayout->addWidget(scrollArea);
+            m_scrollArea = scrollArea;
+
+            // Ustawiamy większą wysokość dla długich wiadomości
+            setMinimumHeight(350);
+        } else {
+            // Standardowe zachowanie dla krótkich wiadomości
             m_textDisplay = new CyberTextDisplay(m_cleanContent, this);
             m_mainLayout->addWidget(m_textDisplay);
-
-            // Połączenie sygnału zakończenia animacji tekstu
-            connect(m_textDisplay, &CyberTextDisplay::fullTextRevealed, this, [this]() {
-                // Możemy tu dodać dodatkowe akcje po wyświetleniu całego tekstu
-            });
-        } else {
-            // Dla załączników używamy QLabel jako w oryginalnym kodzie
-            m_contentLabel = new QLabel(this);
-            m_contentLabel->setTextFormat(Qt::RichText);
-            m_contentLabel->setWordWrap(true);
-            m_contentLabel->setStyleSheet(
-                "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
-            m_contentLabel->setText(m_cleanContent);
-            m_mainLayout->addWidget(m_contentLabel);
         }
+    } else {
+        // Dla załączników - bez zmian
+        m_contentLabel = new QLabel(this);
+        m_contentLabel->setTextFormat(Qt::RichText);
+        m_contentLabel->setWordWrap(true);
+        m_contentLabel->setStyleSheet(
+            "QLabel { color: white; background-color: transparent; font-size: 10pt; }");
+        m_contentLabel->setText(m_cleanContent);
+        m_mainLayout->addWidget(m_contentLabel);
+    }
 
-        // Efekt przeźroczystości
-        QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
-        opacity->setOpacity(0.0);
-        setGraphicsEffect(opacity);
+    // Efekt przeźroczystości
+    QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
+    opacity->setOpacity(0.0);
+    setGraphicsEffect(opacity);
 
         // Inicjalizacja przycisków nawigacyjnych
         m_nextButton = new QPushButton(">", this);
@@ -125,8 +169,13 @@ public:
 
         // Automatyczne ustawienie focusu na widgecie
         setFocusPolicy(Qt::StrongFocus);
+
+        if (m_scrollArea) {
+            adjustScrollAreaStyle();
+            QTimer::singleShot(100, this, &StreamMessage::updateScrollAreaMaxHeight);
+        }
     }
-    
+
     // Właściwości do animacji
     qreal opacity() const { return m_opacity; }
     void setOpacity(qreal opacity) {
@@ -141,7 +190,7 @@ public:
         m_glowIntensity = intensity;
         update();
     }
-    
+
     qreal disintegrationProgress() const { return m_disintegrationProgress; }
     void setDisintegrationProgress(qreal progress) {
         m_disintegrationProgress = progress;
@@ -361,6 +410,10 @@ void adjustSizeToContent() {
     QSize sizeHint() const override {
         QSize baseSize(500, 180);
 
+        if (m_scrollArea) {
+            return QSize(550, 300); // Docelowy rozmiar dla długich wiadomości
+        }
+
         // Jeśli mamy załącznik, dostosuj rozmiar na jego podstawie
         if (m_attachmentWidget) {
             QSize attachmentSize = m_attachmentWidget->sizeHint();
@@ -420,6 +473,7 @@ void adjustSizeToContent() {
         group->addAnimation(glowAnim);
 
         // Uruchamiamy animację wpisywania tekstu po pokazaniu wiadomości
+        // TYLKO jeśli to krótka wiadomość i używamy CyberTextDisplay
         connect(opacityAnim, &QPropertyAnimation::finished, this, [this]() {
             if (m_textDisplay) {
                 m_textDisplay->startReveal();
@@ -427,7 +481,7 @@ void adjustSizeToContent() {
         });
 
         group->start(QAbstractAnimation::DeleteWhenStopped);
-        
+
         // Ustawiamy focus na tym widgecie
         QTimer::singleShot(100, this, QOverload<>::of(&StreamMessage::setFocus));
     }
@@ -445,6 +499,28 @@ void adjustSizeToContent() {
         });
 
         opacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
+    void updateScrollAreaMaxHeight() {
+        if (!m_scrollArea)
+            return;
+
+        // Znajdź ekran, na którym wyświetlana jest wiadomość
+        QScreen* screen = QApplication::primaryScreen();
+        if (window()) {
+            screen = window()->screen();
+        }
+        QRect availableGeometry = screen->availableGeometry();
+
+        // Ograniczamy maksymalną wysokość scrollArea do 50% dostępnej wysokości ekranu
+        int maxHeight = availableGeometry.height() * 0.5;
+        m_scrollArea->setMaximumHeight(maxHeight);
+
+        // Aktualizujemy rozmiar widget'u wewnątrz scrollArea
+        QWidget* contentWidget = m_scrollArea->widget();
+        if (contentWidget) {
+            contentWidget->setMinimumWidth(m_scrollArea->width() - 20); // Uwzględniamy szerokość scrollbara
+        }
     }
 
     void startDisintegrationAnimation() {
@@ -499,10 +575,10 @@ public slots:
     void markAsRead() {
         if (!m_isRead) {
             m_isRead = true;
-            
+
             // Animacja rozpadu zamiast przenikania
             startDisintegrationAnimation();
-            
+
             emit messageRead();
         }
     }
@@ -716,10 +792,20 @@ protected:
     }
 
     void resizeEvent(QResizeEvent* event) override {
-        updateLayout();
+        updateLayout(); // Istniejąca funkcja do aktualizacji przycisków
+
+        // Dostosuj rozmiar scrollArea jeśli istnieje
+        if (m_scrollArea) {
+            QWidget* contentWidget = m_scrollArea->widget();
+            if (contentWidget) {
+                // Ustaw minimalną szerokość contentu, aby zapewnić poprawne przewijanie
+                contentWidget->setMinimumWidth(m_scrollArea->width() - 30);
+            }
+        }
+
         QWidget::resizeEvent(event);
     }
-    
+
     void keyPressEvent(QKeyEvent* event) override {
         // Obsługa klawiszy bezpośrednio w widgecie wiadomości
         if (event->key() == Qt::Key_Space || event->key() == Qt::Key_Return) {
@@ -735,14 +821,14 @@ protected:
             QWidget::keyPressEvent(event);
         }
     }
-    
+
     void focusInEvent(QFocusEvent* event) override {
         // Dodajemy subtelny efekt podświetlenia przy focusie
         m_glowIntensity += 0.2;
         update();
         QWidget::focusInEvent(event);
     }
-    
+
     void focusOutEvent(QFocusEvent* event) override {
         // Wracamy do normalnego stanu
         m_glowIntensity -= 0.2;
@@ -755,6 +841,36 @@ private slots:
         // Subtelna pulsacja poświaty
         qreal pulse = 0.05 * sin(QDateTime::currentMSecsSinceEpoch() * 0.002);
         setGlowIntensity(m_glowIntensity + pulse * (!m_isRead ? 1.0 : 0.3));
+    }
+
+    void adjustScrollAreaStyle() {
+        if (!m_scrollArea) return;
+
+        // Typy wiadomości mają różne kolory
+        QString handleColor;
+        switch (m_type) {
+            case Transmitted:
+                handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00c8ff, stop:1 #0080ff)";
+            break;
+            case Received:
+                handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ff50dd, stop:1 #b000ff)";
+            break;
+            case System:
+                handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ffb400, stop:1 #ff8000)";
+            break;
+        }
+
+        // Utwórz styl z odpowiednim kolorem
+        QString style = QString(
+            "QScrollArea { background: transparent; border: none; }"
+            "QScrollBar:vertical { background: rgba(10, 20, 30, 150); width: 10px; margin: 0; }"
+            "QScrollBar::handle:vertical { background: %1; "
+            "border-radius: 5px; min-height: 30px; }"
+            "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }"
+            "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: rgba(0, 20, 40, 100); }")
+            .arg(handleColor);
+
+        m_scrollArea->setStyleSheet(style);
     }
 
 private:
@@ -770,12 +886,12 @@ private:
         }
         return QString();
     }
-    
+
     void processImageAttachment(const QString& html) {
         QString attachmentId = extractAttribute(html, "data-attachment-id");
         QString mimeType = extractAttribute(html, "data-mime-type");
         QString filename = extractAttribute(html, "data-filename");
-        
+
         // Tworzymy widget zawierający placeholder załącznika
         QWidget* container = new QWidget(this);
         QVBoxLayout* containerLayout = new QVBoxLayout(container);
@@ -870,7 +986,7 @@ private:
         // Zwiększamy rozmiar wiadomości
         setMinimumHeight(150 + placeholderWidget->sizeHint().height());
     }
-    
+
     // Funkcja do czyszczenia zawartości wiadomości, usuwania HTML i placeholderów
     void cleanupContent() {
         m_cleanContent = m_content;
@@ -878,7 +994,7 @@ private:
         // Usuń wszystkie znaczniki HTML
         m_cleanContent.remove(QRegExp("<[^>]*>"));
 
-        // Znajdź i usuń tekst placeholdera załącznika
+        // Zajmij się placeholderami załączników
         if (m_content.contains("placeholder")) {
             int placeholderStart = m_content.indexOf("<div class='");
             if (placeholderStart >= 0) {
@@ -891,8 +1007,27 @@ private:
             }
         }
 
-        // Usuwamy nadmiarowe whitespace
-        m_cleanContent = m_cleanContent.simplified();
+        // Poprawki dla znaków specjalnych HTML
+        m_cleanContent.replace("&nbsp;", " ");
+        m_cleanContent.replace("&lt;", "<");
+        m_cleanContent.replace("&gt;", ">");
+        m_cleanContent.replace("&amp;", "&");
+
+        // Dla długich tekstów zachowaj formatowanie akapitów
+        if (m_cleanContent.length() > 300) {
+            // Zachowaj oryginalny podział na linie
+            m_cleanContent.replace("\n\n", "||PARAGRAPH||");
+            m_cleanContent = m_cleanContent.simplified();
+            m_cleanContent.replace("||PARAGRAPH||", "\n\n");
+
+            // Dodatkowe poprawki dla bardziej czytelnego formatowania
+            m_cleanContent.replace(". ", ".\n");
+            m_cleanContent.replace("? ", "?\n");
+            m_cleanContent.replace("! ", "!\n");
+            m_cleanContent.replace(":\n", ": ");
+        } else {
+            m_cleanContent = m_cleanContent.simplified();
+        }
     }
 
     void updateLayout() {
@@ -929,6 +1064,7 @@ private:
     CyberTextDisplay* m_textDisplay = nullptr;
     ElectronicShutdownEffect* m_shutdownEffect = nullptr;
     qreal m_shutdownProgress = 0.0;
+    QScrollArea* m_scrollArea = nullptr;
 };
 
 #endif // STREAM_MESSAGE_H
