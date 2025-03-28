@@ -16,6 +16,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
+#include "cyber_long_text_display.h"
 #include "cyber_text_display.h"
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
@@ -59,56 +60,50 @@ public:
     // Określamy, czy wiadomość jest długa
     bool isLongMessage = m_cleanContent.length() > 500;
 
-    if (!hasAttachment) {
-        if (isLongMessage) {
-            // Dla długich wiadomości używamy QScrollArea z QLabel
-            QScrollArea* scrollArea = new QScrollArea(this);
-            scrollArea->setObjectName("cyberpunkScrollArea");
-            scrollArea->setWidgetResizable(true);
-            scrollArea->setFrameShape(QFrame::NoFrame);
-            scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-            scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        if (!hasAttachment) {
+            if (isLongMessage) {
+                // Określamy kolor tekstu w zależności od typu wiadomości
+                QColor textColor;
+                switch (m_type) {
+                    case Transmitted:
+                        textColor = QColor(0, 220, 255); // Neonowy niebieski
+                    break;
+                    case Received:
+                        textColor = QColor(240, 150, 255); // Różowo-fioletowy
+                    break;
+                    case System:
+                        textColor = QColor(255, 200, 0); // Żółto-pomarańczowy
+                    break;
+                }
 
-            // Styl dla scrollbara - czarno-niebieski z neonowymi elementami
-            scrollArea->setStyleSheet(
-                "QScrollArea { background: transparent; border: none; }"
-                "QScrollBar:vertical { background: rgba(10, 20, 30, 150); width: 10px; margin: 0; }"
-                "QScrollBar::handle:vertical { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00c8ff, stop:1 #0080ff); "
-                "border-radius: 5px; min-height: 30px; }"
-                "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }"
-                "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: rgba(0, 20, 40, 100); }");
+                // Dla długich wiadomości używamy QScrollArea z CyberLongTextDisplay
+                QScrollArea* scrollArea = new QScrollArea(this);
+                scrollArea->setObjectName("cyberpunkScrollArea");
+                scrollArea->setWidgetResizable(true);
+                scrollArea->setFrameShape(QFrame::NoFrame);
+                scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+                scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-            // Kontener na tekst z odpowiednim tłem
-            QWidget* contentWidget = new QWidget();
-            contentWidget->setObjectName("scrollContent");
-            contentWidget->setStyleSheet("#scrollContent { background-color: transparent; }");
+                // Ustawiamy przezroczyste tło dla obszaru przewijania
+                scrollArea->setStyleSheet("QScrollArea { background: transparent; border: none; }");
 
-            QVBoxLayout* contentLayout = new QVBoxLayout(contentWidget);
-            contentLayout->setContentsMargins(5, 5, 5, 5);
+                // Tworzymy widget do wyświetlania tekstu
+                CyberLongTextDisplay* longTextDisplay = new CyberLongTextDisplay(m_cleanContent, textColor);
+                scrollArea->setWidget(longTextDisplay);
 
-            // QLabel z tekstem - podobny styl do CyberTextDisplay
-            QLabel* contentLabel = new QLabel(m_cleanContent);
-            contentLabel->setTextFormat(Qt::PlainText);
-            contentLabel->setWordWrap(true);
-            contentLabel->setStyleSheet(
-                "QLabel { color: #00ffcc; font-family: Consolas, Monospace; font-size: 10pt; "
-                "background-color: transparent; padding: 5px; }");
+                // Dodajemy scrollArea do głównego layoutu
+                m_mainLayout->addWidget(scrollArea);
+                m_scrollArea = scrollArea;
+                m_longTextDisplay = longTextDisplay;
 
-            contentLayout->addWidget(contentLabel);
-            scrollArea->setWidget(contentWidget);
-
-            // Dodajemy scrollArea do głównego layoutu
-            m_mainLayout->addWidget(scrollArea);
-            m_scrollArea = scrollArea;
-
-            // Ustawiamy większą wysokość dla długich wiadomości
-            setMinimumHeight(350);
+                // Ustawiamy większą wysokość dla długich wiadomości
+                setMinimumHeight(350);
+            } else {
+                // Standardowe zachowanie dla krótkich wiadomości
+                m_textDisplay = new CyberTextDisplay(m_cleanContent, this);
+                m_mainLayout->addWidget(m_textDisplay);
+            }
         } else {
-            // Standardowe zachowanie dla krótkich wiadomości
-            m_textDisplay = new CyberTextDisplay(m_cleanContent, this);
-            m_mainLayout->addWidget(m_textDisplay);
-        }
-    } else {
         // Dla załączników - bez zmian
         m_contentLabel = new QLabel(this);
         m_contentLabel->setTextFormat(Qt::RichText);
@@ -519,7 +514,8 @@ void adjustSizeToContent() {
         // Aktualizujemy rozmiar widget'u wewnątrz scrollArea
         QWidget* contentWidget = m_scrollArea->widget();
         if (contentWidget) {
-            contentWidget->setMinimumWidth(m_scrollArea->width() - 20); // Uwzględniamy szerokość scrollbara
+            // Upewniamy się, że widget ma wystarczającą szerokość
+            contentWidget->setMinimumWidth(m_scrollArea->width() - 20);
         }
     }
 
@@ -848,19 +844,24 @@ private slots:
 
         // Typy wiadomości mają różne kolory
         QString handleColor;
+        QColor textColor;
+
         switch (m_type) {
             case Transmitted:
                 handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00c8ff, stop:1 #0080ff)";
+            textColor = QColor(0, 220, 255);
             break;
             case Received:
                 handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ff50dd, stop:1 #b000ff)";
+            textColor = QColor(240, 150, 255);
             break;
             case System:
                 handleColor = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ffb400, stop:1 #ff8000)";
+            textColor = QColor(255, 200, 0);
             break;
         }
 
-        // Utwórz styl z odpowiednim kolorem
+        // Utwórz styl z odpowiednim kolorem scrollbara
         QString style = QString(
             "QScrollArea { background: transparent; border: none; }"
             "QScrollBar:vertical { background: rgba(10, 20, 30, 150); width: 10px; margin: 0; }"
@@ -871,7 +872,14 @@ private slots:
             .arg(handleColor);
 
         m_scrollArea->setStyleSheet(style);
+
+        // Aktualizacja koloru tekstu jeśli istnieje longTextDisplay
+        if (m_longTextDisplay) {
+            m_longTextDisplay->setTextColor(textColor);
+        }
     }
+
+
 
 private:
     // Wyciąga atrybut z HTML
@@ -1065,6 +1073,7 @@ private:
     ElectronicShutdownEffect* m_shutdownEffect = nullptr;
     qreal m_shutdownProgress = 0.0;
     QScrollArea* m_scrollArea = nullptr;
+    CyberLongTextDisplay* m_longTextDisplay = nullptr;
 };
 
 #endif // STREAM_MESSAGE_H
