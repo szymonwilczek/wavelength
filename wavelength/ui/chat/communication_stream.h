@@ -250,6 +250,7 @@ public:
         // Timer animacji
         m_animTimer = new QTimer(this);
         connect(m_animTimer, &QTimer::timeout, this, &CommunicationStream::updateAnimation);
+        m_animTimer->setTimerType(Qt::PreciseTimer);
         m_animTimer->start(16); // ~60fps
 
         // Timer losowych zakłóceń w trybie Idle
@@ -285,7 +286,12 @@ public:
         format.setDepthBufferSize(24);
         format.setStencilBufferSize(8);
         format.setSamples(4); // MSAA
+        format.setSwapInterval(1); // Włącza V-Sync
         setFormat(format);
+
+        // Dodanie opcji dla lepszego buforowania
+        setAttribute(Qt::WA_OpaquePaintEvent, true);  // Optymalizacja dla nieprzezroczystych widżetów
+        setAttribute(Qt::WA_NoSystemBackground, true);
     }
 
     ~CommunicationStream() {
@@ -600,7 +606,7 @@ const char* fragmentShaderSource = R"(
 
 private slots:
     void updateAnimation() {
-        // Aktualizujemy czas animacji - mniejsza prędkość dla mniej intensywnej animacji
+        // Aktualizujemy czas animacji
         m_timeOffset += 0.02 * m_waveSpeed;
 
         // Stopniowo zmniejszamy intensywność zakłóceń
@@ -608,10 +614,10 @@ private slots:
             m_glitchIntensity = qMax(0.0, m_glitchIntensity - 0.005);
         }
 
-        // Odświeżamy tylko gdy potrzeba
-        if (m_state != Idle || m_glitchIntensity > 0.01) {
-            update();
-        }
+        // Wymuszamy aktualizację tylko warstwy OpenGL, nie całego interfejsu
+        // Będzie to odświeżać tylko część z animacją fali, bez wpływu na wiadomości
+        QRegion updateRegion(0, 0, width(), height());
+        update(updateRegion);
     }
 
     void triggerRandomGlitch() {
@@ -731,6 +737,7 @@ private slots:
     }
 
     void showMessageAtIndex(int index) {
+        optimizeForMessageTransition();
         if (index < 0 || index >= m_messages.size()) return;
 
         // Ukrywamy aktualnie wyświetlaną wiadomość
@@ -753,11 +760,13 @@ private slots:
     }
 
     void showNextMessage() {
+        optimizeForMessageTransition();
         if (m_currentMessageIndex >= m_messages.size() - 1) return;
         showMessageAtIndex(m_currentMessageIndex + 1);
     }
 
     void showPreviousMessage() {
+        optimizeForMessageTransition();
         if (m_currentMessageIndex <= 0) return;
         showMessageAtIndex(m_currentMessageIndex - 1);
     }
@@ -804,6 +813,28 @@ private slots:
     }
 
 private:
+    void optimizeForMessageTransition() {
+        // Czasowo zmniejszamy priorytet odświeżania animacji tła podczas przechodzenia między wiadomościami
+        static QElapsedTimer transitionTimer;
+        static bool inTransition = false;
+
+        if (!inTransition) {
+            inTransition = true;
+            transitionTimer.start();
+
+            // Podczas przejścia zmniejszamy częstotliwość odświeżania tła
+            if (m_animTimer->interval() == 16) {
+                m_animTimer->setInterval(33); // Tymczasowo 30fps zamiast 60fps
+            }
+
+            // Po 500ms wracamy do normalnego odświeżania
+            QTimer::singleShot(500, this, [this]() {
+                m_animTimer->setInterval(16); // Powrót do 60fps
+                inTransition = false;
+            });
+        }
+    }
+
     void updateMessagePosition() {
         if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
             StreamMessage* message = m_messages[m_currentMessageIndex];

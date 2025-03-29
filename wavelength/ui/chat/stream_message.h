@@ -449,88 +449,74 @@ void adjustSizeToContent() {
         return baseSize;
     }
 
-    void fadeIn() {
-    // Używamy QTimeLine do prostej, wydajnej animacji
-    QTimeLine *timeline = new QTimeLine(500, this);
-    timeline->setFrameRange(0, 20);
-    timeline->setCurveShape(QTimeLine::EaseOutCurve);
+// Zoptymalizowane metody fadeIn i fadeOut
 
-    // Efekt "skanowania" od góry do dołu
-    connect(timeline, &QTimeLine::frameChanged, this, [this](int frame) {
-        // Aktualizuj przezroczystość
-        m_opacity = frame / 20.0;
+void fadeIn() {
+    // Używamy QPropertyAnimation zamiast QTimeLine dla lepszej wydajności
+    QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
+    opacityAnim->setDuration(400); // krótszy czas dla lepszej responsywności
+    opacityAnim->setStartValue(0.0);
+    opacityAnim->setEndValue(1.0);
+    opacityAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-        // Aplikuj efekt poprzez istniejący OpacityEffect
-        if (QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(graphicsEffect())) {
-            effect->setOpacity(m_opacity);
-        }
+    // Krótkotrwały efekt poświaty
+    QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
+    glowAnim->setDuration(600);
+    glowAnim->setStartValue(0.9);
+    glowAnim->setKeyValueAt(0.4, 0.7);
+    glowAnim->setEndValue(0.5);
+    glowAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-        // Aktualizujemy tylko wymagane części interfejsu
-        update();
-    });
+    // Grupa animacji - oddziela renderowanie animacji od głównej pętli
+    QParallelAnimationGroup* animGroup = new QParallelAnimationGroup(this);
+    animGroup->addAnimation(opacityAnim);
+    animGroup->addAnimation(glowAnim);
 
-    // Obsługa zakończenia animacji
-    connect(timeline, &QTimeLine::finished, this, [this, timeline]() {
-        timeline->deleteLater();
+    // Podłączamy sygnał zakończenia
+    connect(animGroup, &QParallelAnimationGroup::finished, this, [this, animGroup]() {
+        animGroup->deleteLater();
 
-        // Uruchamiamy animację wpisywania tekstu gdy widok jest już w pełni widoczny
+        // Uruchamiamy animację wpisywania tekstu dopiero gdy widget jest w pełni widoczny
         if (m_textDisplay) {
-            m_textDisplay->startReveal();
+            QTimer::singleShot(50, m_textDisplay, &CyberTextDisplay::startReveal);
         }
-
-        // Końcowe ustawienia
-        m_opacity = 1.0;
     });
 
-    // Dodajemy krótki poświetlny błysk (glitch) na początku animacji
-    m_glowIntensity = 0.9;
-    QTimer::singleShot(300, this, [this]() {
-        m_glowIntensity = 0.5;
-    });
-
-    timeline->start();
+    animGroup->start(QAbstractAnimation::DeleteWhenStopped);
 
     // Ustawiamy focus na widgecie
-    QTimer::singleShot(100, this, QOverload<>::of(&StreamMessage::setFocus));
+    QTimer::singleShot(50, this, QOverload<>::of(&StreamMessage::setFocus));
 }
 
 void fadeOut() {
-    // Krótszy timeline dla znikania
-    QTimeLine *timeline = new QTimeLine(300, this);
-    timeline->setFrameRange(0, 15);
-    timeline->setCurveShape(QTimeLine::EaseInCurve);
+    // Używamy QPropertyAnimation dla lepszej wydajności renderowania
+    QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
+    opacityAnim->setDuration(300);
+    opacityAnim->setStartValue(1.0);
+    opacityAnim->setEndValue(0.0);
+    opacityAnim->setEasingCurve(QEasingCurve::InQuad);
 
-    // Efekt elektronicznego "wyłączania się"
-    connect(timeline, &QTimeLine::frameChanged, this, [this](int frame) {
-        // Stopniowa zmiana przezroczystości
-        m_opacity = 1.0 - (frame / 15.0);
+    // Efekt błysku przy znikaniu
+    QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
+    glowAnim->setDuration(300);
+    glowAnim->setStartValue(0.8);
+    glowAnim->setKeyValueAt(0.3, 0.6);
+    glowAnim->setKeyValueAt(0.6, 0.3);
+    glowAnim->setEndValue(0.0);
 
-        // Aplikuj przez istniejący efekt
-        if (QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(graphicsEffect())) {
-            effect->setOpacity(m_opacity);
-        }
+    // Grupa animacji - używa osobnej pętli czasowej
+    QParallelAnimationGroup* animGroup = new QParallelAnimationGroup(this);
+    animGroup->addAnimation(opacityAnim);
+    animGroup->addAnimation(glowAnim);
 
-        // Dodajemy subtelny efekt migotania przy znikaniu
-        if (frame % 3 == 0) {
-            m_glowIntensity = 0.7 - (frame / 15.0 * 0.7);
-        } else {
-            m_glowIntensity = 0.4 - (frame / 15.0 * 0.4);
-        }
-
-        update();
-    });
-
-    // Po zakończeniu animacji
-    connect(timeline, &QTimeLine::finished, this, [this, timeline]() {
-        timeline->deleteLater();
+    // Podłączamy sygnał zakończenia
+    connect(animGroup, &QParallelAnimationGroup::finished, this, [this, animGroup]() {
+        animGroup->deleteLater();
         hide();
         emit hidden();
     });
 
-    // Krótki efekt błysku przy rozpoczęciu znikania
-    m_glowIntensity = 0.8;
-
-    timeline->start();
+    animGroup->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
     void updateScrollAreaMaxHeight() {
