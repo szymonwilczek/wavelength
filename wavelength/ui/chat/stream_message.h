@@ -55,13 +55,13 @@ public:
                 QColor textColor;
                 switch (m_type) {
                     case Transmitted:
-                        textColor = QColor(0, 220, 255); // Neonowy niebieski
+                        textColor = QColor(0, 220, 255);
                     break;
                     case Received:
-                        textColor = QColor(240, 150, 255); // Różowo-fioletowy
+                        textColor = QColor(240, 150, 255);
                     break;
                     case System:
-                        textColor = QColor(255, 200, 0); // Żółto-pomarańczowy
+                        textColor = QColor(255, 200, 0);
                     break;
                 }
 
@@ -84,6 +84,17 @@ public:
                 m_mainLayout->addWidget(scrollArea);
                 m_scrollArea = scrollArea;
                 m_longTextDisplay = longTextDisplay;
+
+                // Połącz sygnał przewijania ze slotami
+                connect(scrollArea->verticalScrollBar(), &QScrollBar::valueChanged,
+                        longTextDisplay, &CyberLongTextDisplay::setScrollPosition);
+
+                // Połącz sygnał zmiany wysokości z aktualizacją obszaru przewijania
+                connect(longTextDisplay, &CyberLongTextDisplay::contentHeightChanged, this,
+                        [scrollArea](int height) {
+                            // Aktualizuj rzeczywistą wysokość widgetu
+                            scrollArea->widget()->setMinimumHeight(height);
+                        });
 
                 // Ustawiamy większą wysokość dla długich wiadomości
                 setMinimumHeight(350);

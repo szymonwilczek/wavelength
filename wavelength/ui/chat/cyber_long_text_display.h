@@ -7,29 +7,39 @@
 #include <QDateTime>
 #include <QFontMetrics>
 #include <QDebug>
+#include <QScrollBar>
+#include <QTimer>
 
 class CyberLongTextDisplay : public QWidget {
     Q_OBJECT
 
 public:
     CyberLongTextDisplay(const QString& text, const QColor& textColor, QWidget* parent = nullptr)
-        : QWidget(parent), m_originalText(text), m_textColor(textColor)
+        : QWidget(parent), m_originalText(text), m_textColor(textColor),
+          m_scrollPosition(0), m_cachedTextValid(false)
     {
         setMinimumWidth(400);
         setMinimumHeight(60);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-        // Inicjalizacja czcionki (taka sama jak w CyberTextDisplay)
+        // Inicjalizacja czcionki
         m_font = QFont("Consolas", 10);
         m_font.setStyleHint(QFont::Monospace);
 
-        // Przetwarzamy tekst - dzielimy na linie respektując oryginalne podziały
-        processText();
+        // Timer dla opóźnionego przetwarzania tekstu (przeciwdziała zbyt częstemu odświeżaniu)
+        m_updateTimer = new QTimer(this);
+        m_updateTimer->setSingleShot(true);
+        m_updateTimer->setInterval(50);
+        connect(m_updateTimer, &QTimer::timeout, this, &CyberLongTextDisplay::processTextDelayed);
+
+        // Zainicjuj podstawowe przetwarzanie tekstu
+        m_updateTimer->start();
     }
 
     void setText(const QString& text) {
         m_originalText = text;
-        processText();
+        m_cachedTextValid = false;
+        m_updateTimer->start();
         update();
     }
 
@@ -42,12 +52,24 @@ public:
         return m_sizeHint;
     }
 
+    void setScrollPosition(int position) {
+        if (m_scrollPosition != position) {
+            m_scrollPosition = position;
+            update();
+        }
+    }
+
 protected:
     void paintEvent(QPaintEvent* event) override {
+        // Upewnij się, że tekst jest przetworzony
+        if (!m_cachedTextValid) {
+            processText();
+        }
+
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
 
-        // Tło z gradientem (takie samo jak w CyberTextDisplay)
+        // Tło z gradientem
         QLinearGradient bgGradient(0, 0, width(), height());
         bgGradient.setColorAt(0, QColor(5, 10, 15, 150));
         bgGradient.setColorAt(1, QColor(10, 20, 30, 150));
@@ -62,16 +84,22 @@ protected:
         int topMargin = 10;
         int leftMargin = 15;
 
-        // Rysujemy przetworzone linie tekstu
-        painter.setPen(m_textColor);
-        int y = topMargin + fm.ascent();
+        // Oblicz zakres widocznych linii
+        int firstVisibleLine = m_scrollPosition / lineHeight;
+        int lastVisibleLine = (m_scrollPosition + height()) / lineHeight + 1;
 
-        for (const QString& line : m_processedLines) {
-            painter.drawText(leftMargin, y, line);
-            y += lineHeight;
+        // Ogranicz do rzeczywistego zakresu
+        firstVisibleLine = qMax(0, firstVisibleLine);
+        lastVisibleLine = qMin(lastVisibleLine, m_processedLines.size() - 1);
+
+        // Rysujemy tylko widoczne linie tekstu
+        painter.setPen(m_textColor);
+        for (int i = firstVisibleLine; i <= lastVisibleLine; ++i) {
+            int y = topMargin + fm.ascent() + i * lineHeight - m_scrollPosition;
+            painter.drawText(leftMargin, y, m_processedLines[i]);
         }
 
-        // Efekt skanowanych linii (jak w CyberTextDisplay)
+        // Efekt skanowanych linii - tylko w widocznym obszarze
         painter.setOpacity(0.1);
         painter.setPen(QPen(m_textColor, 1, Qt::DotLine));
 
@@ -82,12 +110,22 @@ protected:
 
     void resizeEvent(QResizeEvent* event) override {
         QWidget::resizeEvent(event);
-        // Przy zmianie rozmiaru przetwarzamy ponownie tekst
+        // Przy zmianie rozmiaru nie przetwarzamy od razu, tylko uruchamiamy timer
+        m_cachedTextValid = false;
+        m_updateTimer->start();
+    }
+
+private slots:
+    void processTextDelayed() {
         processText();
+        update();
     }
 
 private:
     void processText() {
+        // Jeśli tekst jest już przetworzony - pomijamy
+        if (m_cachedTextValid) return;
+
         // Czyścimy poprzednie przetworzone linie
         m_processedLines.clear();
 
@@ -157,19 +195,26 @@ private:
 
         // Aktualizujemy sizeHint
         m_sizeHint = QSize(qMax(availableWidth + 30, 400), requiredHeight);
-        setMinimumHeight(requiredHeight);
 
-        // Debug info
-        qDebug() << "CyberLongTextDisplay: Processed" << m_processedLines.size()
-                 << "lines, required height:" << requiredHeight
-                 << "available width:" << availableWidth;
+        // Oznaczamy, że cache jest aktualny
+        m_cachedTextValid = true;
+
+        // Informujemy o całkowitej wysokości zawartości
+        emit contentHeightChanged(requiredHeight);
     }
 
+signals:
+    void contentHeightChanged(int newHeight);
+
+private:
     QString m_originalText;
     QStringList m_processedLines;
     QColor m_textColor;
     QFont m_font;
     QSize m_sizeHint;
+    int m_scrollPosition;
+    bool m_cachedTextValid;
+    QTimer *m_updateTimer;
 };
 
 #endif // CYBER_LONG_TEXT_DISPLAY_H
