@@ -1,9 +1,9 @@
 #include <QOperatingSystemVersion>
 
 #ifdef Q_OS_WINDOWS
-    #include <windows.h>
-    #include <dwmapi.h>
-    #pragma comment(lib, "dwmapi.lib")
+#include <windows.h>
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
 #endif
 
 #include <QApplication>
@@ -23,9 +23,10 @@
 
 #include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
+#include "wavelength/ui/cyberpunk_style.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
 
-void centerLabel(QLabel* label, BlobAnimation* animation) {
+void centerLabel(QLabel *label, BlobAnimation *animation) {
     if (label && animation) {
         label->setGeometry(
             (animation->width() - label->sizeHint().width()) / 2,
@@ -39,11 +40,12 @@ void centerLabel(QLabel* label, BlobAnimation* animation) {
 
 class ResizeEventFilter : public QObject {
 public:
-    ResizeEventFilter(QLabel* label, BlobAnimation* animation)
-        : QObject(animation), m_label(label), m_animation(animation) {}
+    ResizeEventFilter(QLabel *label, BlobAnimation *animation)
+        : QObject(animation), m_label(label), m_animation(animation) {
+    }
 
 protected:
-    bool eventFilter(QObject* watched, QEvent* event) override {
+    bool eventFilter(QObject *watched, QEvent *event) override {
         if (watched == m_animation && event->type() == QEvent::Resize) {
             centerLabel(m_label, m_animation);
             return false;
@@ -52,8 +54,8 @@ protected:
     }
 
 private:
-    QLabel* m_label;
-    BlobAnimation* m_animation;
+    QLabel *m_label;
+    BlobAnimation *m_animation;
 };
 
 
@@ -78,27 +80,14 @@ int main(int argc, char *argv[]) {
 
     app.setStyle(QStyleFactory::create("Fusion"));
 
-    QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, QColor(45, 45, 45));
-    darkPalette.setColor(QPalette::WindowText, QColor(200, 200, 200));
-    darkPalette.setColor(QPalette::Base, QColor(35, 35, 35));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(55, 55, 55));
-    darkPalette.setColor(QPalette::ToolTipBase, QColor(35, 35, 35));
-    darkPalette.setColor(QPalette::ToolTipText, QColor(200, 200, 200));
-    darkPalette.setColor(QPalette::Text, QColor(200, 200, 200));
-    darkPalette.setColor(QPalette::Button, QColor(60, 60, 60));
-    darkPalette.setColor(QPalette::ButtonText, QColor(200, 200, 200));
-    darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+    CyberpunkStyle::applyStyle();
 
-    app.setPalette(darkPalette);
-    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
+    // app.setPalette(darkPalette);
+    // app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
 
     QMainWindow window;
     window.setWindowTitle("Pk4");
-    window.setStyleSheet("QMainWindow { background-color: #2d2d2d; }");
+    // window.setStyleSheet("QMainWindow { background-color: #2d2d2d; }");
 
     auto *navbar = new Navbar(&window);
     window.addToolBar(Qt::TopToolBarArea, navbar);
@@ -165,8 +154,8 @@ int main(int argc, char *argv[]) {
 
     outlineLabel->lower();
 
-    ResizeEventFilter* eventFilter = new ResizeEventFilter(titleLabel, animation);
-    ResizeEventFilter* outlineFilter = new ResizeEventFilter(outlineLabel, animation);
+    ResizeEventFilter *eventFilter = new ResizeEventFilter(titleLabel, animation);
+    ResizeEventFilter *outlineFilter = new ResizeEventFilter(outlineLabel, animation);
 
     // animation->installEventFilter(eventFilter);
     // animation->installEventFilter(outlineFilter);
@@ -175,33 +164,36 @@ int main(int argc, char *argv[]) {
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
 
-    AppInstanceManager* instanceManager = new AppInstanceManager(&window, animation, &window);
+    AppInstanceManager *instanceManager = new AppInstanceManager(&window, animation, &window);
     instanceManager->start();
 
 
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [](const QString& targetId) {
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [](const QString &targetId) {
         qDebug() << "[MAIN] Rozpoczęto absorpcję instancji:" << targetId;
     });
 
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [animation, instanceManager](const QString& targetId) {
-        if (targetId == instanceManager->getInstanceId()) {
-            animation->startBeingAbsorbed();
-        }
-    });
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted,
+                     [animation, instanceManager](const QString &targetId) {
+                         if (targetId == instanceManager->getInstanceId()) {
+                             animation->startBeingAbsorbed();
+                         }
+                     });
 
-    QObject::connect(instanceManager, &AppInstanceManager::instanceAbsorbed, [animation, instanceManager](const QString& targetId) {
-        if (targetId == instanceManager->getInstanceId()) {
-            animation->finishBeingAbsorbed();
-        }
-    });
+    QObject::connect(instanceManager, &AppInstanceManager::instanceAbsorbed,
+                     [animation, instanceManager](const QString &targetId) {
+                         if (targetId == instanceManager->getInstanceId()) {
+                             animation->finishBeingAbsorbed();
+                         }
+                     });
 
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionCancelled, [animation, instanceManager](const QString& targetId) {
-        if (targetId == instanceManager->getInstanceId()) {
-            animation->cancelAbsorption();
-        }
-    });
+    QObject::connect(instanceManager, &AppInstanceManager::absorptionCancelled,
+                     [animation, instanceManager](const QString &targetId) {
+                         if (targetId == instanceManager->getInstanceId()) {
+                             animation->cancelAbsorption();
+                         }
+                     });
 
-    WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+    WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
     auto toggleEventListening = [animation, eventFilter, outlineFilter](bool enable) {
@@ -221,70 +213,70 @@ int main(int argc, char *argv[]) {
     toggleEventListening(true);
 
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
-                    [stackedWidget, animationWidget, toggleEventListening](int index) {
-        // Sprawdź, czy aktywny widget to animationWidget
-        QWidget* currentWidget = stackedWidget->widget(index);
-        toggleEventListening(currentWidget == animationWidget);
-    });
+                     [stackedWidget, animationWidget, toggleEventListening](int index) {
+                         // Sprawdź, czy aktywny widget to animationWidget
+                         QWidget *currentWidget = stackedWidget->widget(index);
+                         toggleEventListening(currentWidget == animationWidget);
+                     });
 
     auto switchToChatView = [chatView, stackedWidget, toggleEventListening](const double frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
-        toggleEventListening(false);  // Wyłączamy nasłuchiwanie zanim przełączymy widok
+        toggleEventListening(false); // Wyłączamy nasłuchiwanie zanim przełączymy widok
         stackedWidget->slideToWidget(chatView);
         chatView->show();
     };
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
-                chatView, &WavelengthChatView::onMessageReceived);
+                     chatView, &WavelengthChatView::onMessageReceived);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageSent,
-                    chatView, &WavelengthChatView::onMessageSent);
+                     chatView, &WavelengthChatView::onMessageSent);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
-                    chatView, &WavelengthChatView::onWavelengthClosed);
+                     chatView, &WavelengthChatView::onWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
-             [switchToChatView](double frequency) {
-    qDebug() << "Wavelength created signal received";
-    switchToChatView(frequency);
-});
+                     [switchToChatView](double frequency) {
+                         qDebug() << "Wavelength created signal received";
+                         switchToChatView(frequency);
+                     });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
-                    [switchToChatView](double frequency) {
-        qDebug() << "Wavelength joined signal received";
-        switchToChatView(frequency);
-    });
+                     [switchToChatView](double frequency) {
+                         qDebug() << "Wavelength joined signal received";
+                         switchToChatView(frequency);
+                     });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-                    [stackedWidget, animationWidget, animation, toggleEventListening]() {
-        qDebug() << "Wavelength aborted, switching back to animation view";
-        animation->resetLifeColor();
-        stackedWidget->slideToWidget(animationWidget);
-        toggleEventListening(true);  // Włączamy nasłuchiwanie po powrocie do widoku głównego
-    });
+                     [stackedWidget, animationWidget, animation, toggleEventListening]() {
+                         qDebug() << "Wavelength aborted, switching back to animation view";
+                         animation->resetLifeColor();
+                         stackedWidget->slideToWidget(animationWidget);
+                         toggleEventListening(true); // Włączamy nasłuchiwanie po powrocie do widoku głównego
+                     });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
-    qDebug() << "Create wavelength button clicked";
+        qDebug() << "Create wavelength button clicked";
 
-    animation->setLifeColor(QColor(0, 200, 0));
+        animation->setLifeColor(QColor(0, 200, 0));
 
-    WavelengthDialog dialog(&window);
-    if (dialog.exec() == QDialog::Accepted) {
-        double frequency = dialog.getFrequency();
-        bool isPasswordProtected = dialog.isPasswordProtected();
-        QString password = dialog.getPassword();
+        WavelengthDialog dialog(&window);
+        if (dialog.exec() == QDialog::Accepted) {
+            double frequency = dialog.getFrequency();
+            bool isPasswordProtected = dialog.isPasswordProtected();
+            QString password = dialog.getPassword();
 
-        if (coordinator->createWavelength(frequency, isPasswordProtected, password)) {
-            qDebug() << "Created and joined wavelength:" << frequency << "Hz";
+            if (coordinator->createWavelength(frequency, isPasswordProtected, password)) {
+                qDebug() << "Created and joined wavelength:" << frequency << "Hz";
+            } else {
+                qDebug() << "Failed to create wavelength";
+                animation->resetLifeColor();
+            }
         } else {
-            qDebug() << "Failed to create wavelength";
             animation->resetLifeColor();
         }
-    } else {
-        animation->resetLifeColor();
-    }
-});
+    });
 
     QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Join wavelength button clicked";
@@ -314,7 +306,7 @@ int main(int argc, char *argv[]) {
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
         // Windows 10 1809>=
-        HWND hwnd = (HWND)window.winId();
+        HWND hwnd = (HWND) window.winId();
 
         BOOL darkMode = TRUE;
 
