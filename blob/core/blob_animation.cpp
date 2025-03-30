@@ -13,8 +13,8 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
     m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
     m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
-    m_params.glowRadius = 15; // Większy promień poświaty
-    m_params.borderWidth = 5; // Grubość obramowania
+    m_params.glowRadius = 10; // Większy promień poświaty
+    m_params.borderWidth = 3; // Grubość obramowania
     m_params.gridSpacing = 20; // Odstęp siatki
 
     m_idleParams.waveAmplitude = 2.0; // Nieco większa amplituda
