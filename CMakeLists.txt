@@ -139,6 +139,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/chat/effects/electronic_shutdown_effect.h
         wavelength/ui/chat/cyber_long_text_display.cpp
         wavelength/ui/chat/cyber_long_text_display.h
+        wavelength/ui/cyberpunk_style.cpp
+        wavelength/ui/cyberpunk_style.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
