@@ -25,20 +25,7 @@ struct BlobRenderState {
 
 class BlobRenderer {
 public:
-    BlobRenderer() {
-        m_glitchTimer = new QTimer();
-        m_glitchTimer->setInterval(3000 + QRandomGenerator::global()->bounded(4000));
-        QObject::connect(m_glitchTimer, &QTimer::timeout, [this]() {
-            if (QRandomGenerator::global()->bounded(100) < 40) {
-                // 40% szans na glitch
-                triggerGlitch(0.2 + QRandomGenerator::global()->bounded(40) / 100.0);
-            }
-
-            // Ustaw następny interwał
-            m_glitchTimer->setInterval(3000 + QRandomGenerator::global()->bounded(4000));
-        });
-        m_glitchTimer->start();
-    }
+    BlobRenderer() = default;
 
     void renderBlob(QPainter &painter,
                     const std::vector<QPointF> &controlPoints,
@@ -71,17 +58,6 @@ public:
 
     void drawHUD(QPainter &painter, const QPointF &blobCenter, double blobRadius, const QColor &hudColor, int width,
                  int height);
-
-    void triggerGlitch(double intensity = 0.5) {
-        m_glitchIntensity = intensity;
-
-        // Za 300-700ms zmniejsz intensywność
-        QTimer::singleShot(300 + QRandomGenerator::global()->bounded(400),
-                           [this]() { m_glitchIntensity *= 0.3; });
-
-        // Po 1s całkowicie wyłącz
-        QTimer::singleShot(1000, [this]() { m_glitchIntensity = 0.0; });
-    }
 
 private:
     QPixmap m_gridBuffer;
