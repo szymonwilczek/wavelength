@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QGraphicsEffect>
 #include <QScrollArea>
+#include <QSequentialAnimationGroup>
 #include <qtimeline.h>
 #include <utility>
 
@@ -592,15 +593,21 @@ signals:
 
 public slots:
     void markAsRead() {
-        if (!m_isRead) {
-            m_isRead = true;
+    if (!m_isRead) {
+        m_isRead = true;
 
-            // Animacja rozpadu zamiast przenikania
+        // Wybierz odpowiednią animację zamykania w zależności od typu wiadomości
+        if (m_scrollArea && m_longTextDisplay) {
+            // Dla długich wiadomości używamy prostszej animacji
+            startLongMessageClosingAnimation();
+        } else {
+            // Dla standardowych wiadomości zachowujemy oryginalną animację
             startDisintegrationAnimation();
-
-            emit messageRead();
         }
+
+        emit messageRead();
     }
+}
 
 protected:
     void paintEvent(QPaintEvent* event) override {
@@ -899,6 +906,39 @@ private:
             }
         }
         return QString();
+    }
+
+    void startLongMessageClosingAnimation() {
+        // Prostszy, ale nadal cyberpunkowy efekt dla długich wiadomości
+        QSequentialAnimationGroup* animGroup = new QSequentialAnimationGroup(this);
+
+        // Faza 1: Szybkie migotanie (efekt glitch)
+        QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glowIntensity");
+        glitchAnim->setDuration(300);
+        glitchAnim->setStartValue(0.8);
+        glitchAnim->setKeyValueAt(0.2, 1.2);
+        glitchAnim->setKeyValueAt(0.4, 0.3);
+        glitchAnim->setKeyValueAt(0.6, 1.0);
+        glitchAnim->setKeyValueAt(0.8, 0.5);
+        glitchAnim->setEndValue(0.9);
+        glitchAnim->setEasingCurve(QEasingCurve::OutInQuad);
+        animGroup->addAnimation(glitchAnim);
+
+        // Faza 2: Szybkie zniknięcie całej wiadomości
+        QPropertyAnimation* fadeAnim = new QPropertyAnimation(this, "opacity");
+        fadeAnim->setDuration(250);  // krótki czas = szybka animacja
+        fadeAnim->setStartValue(1.0);
+        fadeAnim->setEndValue(0.0);
+        fadeAnim->setEasingCurve(QEasingCurve::OutQuad);
+        animGroup->addAnimation(fadeAnim);
+
+        // Po zakończeniu animacji - ukryj wiadomość i wyemituj sygnał
+        connect(animGroup, &QSequentialAnimationGroup::finished, this, [this]() {
+            hide();
+            emit hidden();
+        });
+
+        animGroup->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     void processImageAttachment(const QString& html) {
