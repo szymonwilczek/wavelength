@@ -92,6 +92,9 @@ private:
     double m_glitchIntensity = 0.0;
     QTimer *m_glitchTimer = nullptr;
 
+    QPixmap m_staticBackgroundTexture;
+    bool m_staticBackgroundInitialized = false;
+
     void updateGridBuffer(const QColor &backgroundColor,
                           const QColor &gridColor,
                           int gridSpacing,
