@@ -79,7 +79,7 @@ public:
         connect(attachButton, &QPushButton::clicked, this, &WavelengthChatView::attachFile);
         connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
 
-        WavelengthMessageService* messageService = WavelengthMessageService::getInstance();
+        WavelengthMessageService *messageService = WavelengthMessageService::getInstance();
         connect(messageService, &WavelengthMessageService::progressMessageUpdated,
                 this, &WavelengthChatView::updateProgressMessage);
         connect(messageService, &WavelengthMessageService::removeProgressMessage,
@@ -88,9 +88,9 @@ public:
 
     void attachFile() {
         QString filePath = QFileDialog::getOpenFileName(this,
-            "Select File to Attach",
-            QString(),
-            "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
+                                                        "Select File to Attach",
+                                                        QString(),
+                                                        "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
 
         if (filePath.isEmpty()) {
             return;
@@ -105,21 +105,22 @@ public:
 
         // Wyświetlamy początkowy komunikat
         QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
-            .arg(fileName);
+                .arg(fileName);
 
         messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
 
         // Uruchamiamy asynchroniczny proces przetwarzania pliku
-        WavelengthMessageService* service = WavelengthMessageService::getInstance();
+        WavelengthMessageService *service = WavelengthMessageService::getInstance();
         bool started = service->sendFileMessage(filePath, progressMsgId);
 
         if (!started) {
             messageArea->addMessage(progressMsgId,
-                "<span style=\"color:#ff5555;\">Failed to start file processing.</span>", StreamMessage::MessageType::Transmitted);
+                                    "<span style=\"color:#ff5555;\">Failed to start file processing.</span>",
+                                    StreamMessage::MessageType::Transmitted);
         }
     }
 
-    void setWavelength(double frequency, const QString& name = QString()) {
+    void setWavelength(double frequency, const QString &name = QString()) {
         currentFrequency = frequency;
 
         QString title;
@@ -133,8 +134,8 @@ public:
         messageArea->clear();
 
         QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Connected to wavelength %1 Hz at %2</span>")
-        .arg(frequency)
-        .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
+                .arg(frequency)
+                .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
         messageArea->addMessage(welcomeMsg, "system", StreamMessage::MessageType::System);
 
         setVisible(true);
@@ -143,9 +144,9 @@ public:
         inputField->clear();
     }
 
-    void onMessageReceived(double frequency, const QString& message) {
+    void onMessageReceived(double frequency, const QString &message) {
         qDebug() << "onMessageReceived called - frequency:" << frequency
-                 << "Current frequency:" << currentFrequency;
+                << "Current frequency:" << currentFrequency;
 
         if (frequency != currentFrequency) {
             qDebug() << "Ignoring message for different frequency";
@@ -162,7 +163,7 @@ public:
         });
     }
 
-    void onMessageSent(double frequency, const QString& message) {
+    void onMessageSent(double frequency, const QString &message) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -193,13 +194,13 @@ public:
     }
 
 private slots:
-
-    void updateProgressMessage(const QString& messageId, const QString& message) {
-        messageArea->addMessage(message,messageId,  StreamMessage::MessageType::Transmitted);
+    void updateProgressMessage(const QString &messageId, const QString &message) {
+        messageArea->addMessage(message, messageId, StreamMessage::MessageType::Transmitted);
     }
 
-    void removeProgressMessage(const QString& messageId) {
-        messageArea->addMessage( "<span style=\"color:#ff5555);\">File transfer completed.</span>",messageId, StreamMessage::MessageType::Transmitted);
+    void removeProgressMessage(const QString &messageId) {
+        messageArea->addMessage("<span style=\"color:#ff5555);\">File transfer completed.</span>", messageId,
+                                StreamMessage::MessageType::Transmitted);
     }
 
     void sendMessage() {
@@ -210,9 +211,8 @@ private slots:
 
         inputField->clear();
 
-        WavelengthMessageService* manager = WavelengthMessageService::getInstance();
+        WavelengthMessageService *manager = WavelengthMessageService::getInstance();
         manager->sendMessage(message);
-
     }
 
     void abortWavelength() {
@@ -223,7 +223,7 @@ private slots:
         qDebug() << "===== ABORT SEQUENCE START (UI) =====";
         qDebug() << "Aborting wavelength" << currentFrequency;
 
-        WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+        WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
 
         bool isHost = false;
         if (coordinator->getWavelengthInfo(currentFrequency, &isHost).isHost) {
@@ -258,7 +258,7 @@ signals:
 
 private:
     QLabel *headerLabel;
-    WavelengthStreamDisplay *messageArea;  // Zmieniony typ
+    WavelengthStreamDisplay *messageArea; // Zmieniony typ
     QLineEdit *inputField;
     QPushButton *attachButton;
     QList<QFile> attachedFiles;
