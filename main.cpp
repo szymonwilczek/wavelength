@@ -168,8 +168,8 @@ int main(int argc, char *argv[]) {
     ResizeEventFilter* eventFilter = new ResizeEventFilter(titleLabel, animation);
     ResizeEventFilter* outlineFilter = new ResizeEventFilter(outlineLabel, animation);
 
-    animation->installEventFilter(eventFilter);
-    animation->installEventFilter(outlineFilter);
+    // animation->installEventFilter(eventFilter);
+    // animation->installEventFilter(outlineFilter);
 
     window.setMinimumSize(800, 600);
     window.setMaximumSize(1600, 900);
@@ -204,9 +204,33 @@ int main(int argc, char *argv[]) {
     WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
-    auto switchToChatView = [chatView, stackedWidget](const double frequency) {
+    auto toggleEventListening = [animation, eventFilter, outlineFilter](bool enable) {
+        if (enable) {
+            // Włącz nasłuchiwanie eventów
+            animation->installEventFilter(eventFilter);
+            animation->installEventFilter(outlineFilter);
+            qDebug() << "Włączono nasłuchiwanie eventów animacji";
+        } else {
+            // Wyłącz nasłuchiwanie eventów
+            animation->removeEventFilter(eventFilter);
+            animation->removeEventFilter(outlineFilter);
+            qDebug() << "Wyłączono nasłuchiwanie eventów animacji";
+        }
+    };
+
+    toggleEventListening(true);
+
+    QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
+                    [stackedWidget, animationWidget, toggleEventListening](int index) {
+        // Sprawdź, czy aktywny widget to animationWidget
+        QWidget* currentWidget = stackedWidget->widget(index);
+        toggleEventListening(currentWidget == animationWidget);
+    });
+
+    auto switchToChatView = [chatView, stackedWidget, toggleEventListening](const double frequency) {
         qDebug() << "Switching to chat view for frequency:" << frequency;
         chatView->setWavelength(frequency, "");
+        toggleEventListening(false);  // Wyłączamy nasłuchiwanie zanim przełączymy widok
         stackedWidget->slideToWidget(chatView);
         chatView->show();
     };
@@ -232,10 +256,12 @@ int main(int argc, char *argv[]) {
         switchToChatView(frequency);
     });
 
-    QObject::connect(chatView, &WavelengthChatView::wavelengthAborted, [stackedWidget, animationWidget, animation]() {
+    QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
+                    [stackedWidget, animationWidget, animation, toggleEventListening]() {
         qDebug() << "Wavelength aborted, switching back to animation view";
         animation->resetLifeColor();
         stackedWidget->slideToWidget(animationWidget);
+        toggleEventListening(true);  // Włączamy nasłuchiwanie po powrocie do widoku głównego
     });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
