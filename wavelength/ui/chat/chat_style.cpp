@@ -3,55 +3,77 @@
 QString ChatStyle::getChatStyleSheet() {
     return QString(
         "QWidget#chatViewContainer {"
-        "    background-color: #1a1a1a;"
+        "  background-color: #0a1520;"
+        "  color: #00ccff;"
+        "  font-family: 'Consolas';"
+        "  border: 1px solid #00aaff;"
         "}"
         "QLabel#headerLabel {"
-        "    font-size: 16pt;"
-        "    color: #a0a0a0;"
-        "    margin-bottom: 10px;"
-        "    padding: 5px;"
-        "    border-bottom: 1px solid #333333;"
+        "  font-size: 16px;"
+        "  font-weight: bold;"
+        "  color: #00ffff;"
+        "  background-color: #001822;"
+        "  border: 1px solid #00aaff;"
+        "  padding: 8px 12px;"
+        "  border-radius: 0px;"
         "}"
     );
 }
 
 QString ChatStyle::getSentMessageStyle() {
+    // Cyberpunkowy styl dla wysłanych wiadomości
     return QString(
-        "background-color: transparent;"  // Tło przezroczyste - używamy QPainter
-        "padding: 0px;"                   // Padding obsługiwany przez layout
+        "background-color: rgba(0, 60, 80, 180);"
+        "border: 1px solid #00aaff;"
+        "border-radius: 3px;"
+        "padding: 8px 12px;"
+        "margin: 2px 10% 2px 5px;"
+        "color: #e0ffff;"
+        "font-family: 'Consolas';"
     );
 }
 
 QString ChatStyle::getReceivedMessageStyle() {
+    // Cyberpunkowy styl dla otrzymanych wiadomości
     return QString(
-        "background-color: transparent;"  // Tło przezroczyste - używamy QPainter
-        "padding: 0px;"                   // Padding obsługiwany przez layout
+        "background-color: rgba(40, 20, 60, 180);"
+        "border: 1px solid #aa60ff;"
+        "border-radius: 3px;"
+        "padding: 8px 12px;"
+        "margin: 2px 5px 2px 10%;"
+        "color: #f0e0ff;"
+        "font-family: 'Consolas';"
     );
 }
 
 QString ChatStyle::getSystemMessageStyle() {
+    // Cyberpunkowy styl dla wiadomości systemowych
     return QString(
-        "background-color: transparent;"
-        "padding: 4px 8px;"
-        "font-weight: bold;" // Dodajemy pogrubienie dla wiadomości systemowych
-        "color: #ffcc00;"
-        "font-size: 14px;" // Nieco większa czcionka dla wiadomości systemowych
+        "background-color: rgba(40, 40, 10, 180);"
+        "border: 1px solid #ffaa00;"
+        "border-radius: 3px;"
+        "padding: 5px 10px;"
+        "margin: 2px 20% 2px 20%;"
+        "color: #ffee88;"
+        "font-family: 'Consolas';"
+        "font-size: 90%;"
     );
 }
 
 QString ChatStyle::getInputFieldStyle() {
     return QString(
         "QLineEdit {"
-        "    background-color: #333333;"
-        "    border: 1px solid #444444;"
-        "    border-radius: 5px;"
-        "    padding: 8px 12px;"
-        "    color: #e0e0e0;"
-        "    font-size: 11pt;"
-        "    selection-background-color: #4a6db5;"
+        "  background-color: rgba(0, 30, 40, 200);"
+        "  color: #00ffff;"
+        "  border: 1px solid #00aaff;"
+        "  border-radius: 3px;"
+        "  padding: 8px;"
+        "  font-family: 'Consolas';"
+        "  font-size: 14px;"
         "}"
         "QLineEdit:focus {"
-        "    border: 1px solid #5a7dc5;"
+        "  border: 1px solid #00ddff;"
+        "  background-color: rgba(0, 35, 45, 220);"
         "}"
     );
 }
@@ -59,22 +81,20 @@ QString ChatStyle::getInputFieldStyle() {
 QString ChatStyle::getSendButtonStyle() {
     return QString(
         "QPushButton {"
-        "    background-color: #4a6db5;"
-        "    color: white;"
-        "    border: none;"
-        "    border-radius: 5px;"
-        "    padding: 8px 16px;"
-        "    font-weight: bold;"
+        "  background-color: #004466;"
+        "  color: #00ddff;"
+        "  border: 1px solid #00aaff;"
+        "  border-radius: 3px;"
+        "  padding: 8px 16px;"
+        "  font-family: 'Consolas';"
+        "  font-weight: bold;"
         "}"
         "QPushButton:hover {"
-        "    background-color: #5a7dc5;"
+        "  background-color: #005577;"
+        "  border: 1px solid #00ddff;"
         "}"
         "QPushButton:pressed {"
-        "    background-color: #3a5da5;"
-        "}"
-        "QPushButton:disabled {"
-        "    background-color: #2c3e66;"
-        "    color: #aaaaaa;"
+        "  background-color: #003344;"
         "}"
     );
 }
@@ -82,16 +102,20 @@ QString ChatStyle::getSendButtonStyle() {
 QString ChatStyle::getAttachButtonStyle() {
     return QString(
         "QPushButton {"
-        "    background-color: #333333;"
-        "    border: 1px solid #444444;"
-        "    border-radius: 5px;"
-        "    padding: 8px;"
+        "  background-color: #004466;"
+        "  color: #00ddff;"
+        "  border: 1px solid #00aaff;"
+        "  border-radius: 3px;"
+        "  padding: 4px;"
+        "  qproperty-icon: url(:/icons/attach-icon.png);"
+        "  qproperty-iconSize: 20px 20px;"
         "}"
         "QPushButton:hover {"
-        "    background-color: #444444;"
+        "  background-color: #005577;"
+        "  border: 1px solid #00ddff;"
         "}"
         "QPushButton:pressed {"
-        "    background-color: #2a2a2a;"
+        "  background-color: #003344;"
         "}"
     );
 }
@@ -99,21 +123,20 @@ QString ChatStyle::getAttachButtonStyle() {
 QString ChatStyle::getScrollBarStyle() {
     return QString(
         "QScrollBar:vertical {"
-        "    border: none;"
-        "    background: rgba(45, 45, 45, 100);"
-        "    width: 8px;"
-        "    margin: 0px;"
+        "  background: rgba(0, 20, 30, 100);"
+        "  width: 12px;"
+        "  margin: 0px;"
         "}"
         "QScrollBar::handle:vertical {"
-        "    background: rgba(120, 120, 120, 120);"
-        "    min-height: 20px;"
-        "    border-radius: 4px;"
+        "  background: rgba(0, 150, 220, 150);"
+        "  min-height: 20px;"
+        "  border-radius: 3px;"
         "}"
         "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
-        "    height: 0px;"
+        "  height: 0px;"
         "}"
         "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {"
-        "    background: none;"
+        "  background: none;"
         "}"
     );
 }
