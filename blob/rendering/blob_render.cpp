@@ -53,25 +53,60 @@ void BlobRenderer::drawBackground(QPainter &painter,
                                   const QColor &gridColor,
                                   int gridSpacing,
                                   int width, int height) {
-    bool needsUpdate = m_gridBuffer.isNull() ||
-                       backgroundColor != m_lastBgColor ||
-                       gridColor != m_lastGridColor ||
-                       gridSpacing != m_lastGridSpacing ||
-                       QSize(width, height) != m_lastSize;
+    bool needsGridUpdate = m_gridBuffer.isNull() ||
+                           backgroundColor != m_lastBgColor ||
+                           gridColor != m_lastGridColor ||
+                           gridSpacing != m_lastGridSpacing ||
+                           QSize(width, height) != m_lastSize;
 
-    if (needsUpdate) {
-        // Tworzenie nowego tła w stylu cyberpunkowym
+    // Tworzymy statyczną teksturę tła tylko raz (z neonowymi punktami)
+    if (!m_staticBackgroundInitialized) {
+        // Stała wielkość tekstury bazowej (niezależnie od rozmiaru okna)
+        const int textureSize = 800;
+        m_staticBackgroundTexture = QPixmap(textureSize, textureSize);
+        m_staticBackgroundTexture.fill(Qt::transparent);
+
+        QPainter texturePainter(&m_staticBackgroundTexture);
+        texturePainter.setRenderHint(QPainter::Antialiasing, true);
+
+        // Ciemniejsze tło z gradientem
+        QLinearGradient bgGradient(0, 0, textureSize, textureSize);
+        bgGradient.setColorAt(0, QColor(0, 15, 30));
+        bgGradient.setColorAt(1, QColor(10, 25, 40));
+        texturePainter.fillRect(QRect(0, 0, textureSize, textureSize), bgGradient);
+
+        // Dodaj losowe punkty świecące (małe neony)
+        QColor glowPointColor = QColor(0, 200, 255, 100);
+        texturePainter.setPen(Qt::NoPen);
+
+        // Stała liczba punktów dla stałego rozmiaru tekstury
+        int numPoints = 200;
+        QRandomGenerator *rng = QRandomGenerator::global();
+        for (int i = 0; i < numPoints; i++) {
+            int x = rng->bounded(textureSize);
+            int y = rng->bounded(textureSize);
+            int size = rng->bounded(2, 5);
+
+            QRadialGradient pointGlow(x, y, size * 2);
+            pointGlow.setColorAt(0, glowPointColor);
+            pointGlow.setColorAt(1, QColor(0, 0, 0, 0));
+
+            texturePainter.setBrush(pointGlow);
+            texturePainter.drawEllipse(QPointF(x, y), size, size);
+        }
+
+        m_staticBackgroundInitialized = true;
+    }
+
+    // Najpierw rysujemy statyczne tło z punktami
+    painter.drawPixmap(QRect(0, 0, width, height), m_staticBackgroundTexture);
+
+    // Następnie rysujemy tylko siatkę (bez punktów) jeśli potrzeba aktualizacji
+    if (needsGridUpdate) {
         m_gridBuffer = QPixmap(width, height);
         m_gridBuffer.fill(Qt::transparent);
 
         QPainter bufferPainter(&m_gridBuffer);
-        bufferPainter.setRenderHint(QPainter::Antialiasing, true);
-
-        // Ciemniejsze tło z gradientem
-        QLinearGradient bgGradient(0, 0, width, height);
-        bgGradient.setColorAt(0, QColor(0, 15, 30));
-        bgGradient.setColorAt(1, QColor(10, 25, 40));
-        bufferPainter.fillRect(QRect(0, 0, width, height), bgGradient);
 
         // Rysowanie głównej siatki
         bufferPainter.setPen(QPen(gridColor, 1, Qt::SolidLine));
@@ -99,32 +134,13 @@ void BlobRenderer::drawBackground(QPainter &painter,
             bufferPainter.drawLine(x, 0, x, height);
         }
 
-        // Dodaj losowe punkty świecące (małe neony)
-        QColor glowPointColor = QColor(0, 200, 255, 100);
-        bufferPainter.setPen(Qt::NoPen);
-        bufferPainter.setBrush(glowPointColor);
-
-        int numPoints = width * height / 20000; // Ilość punktów zależnie od rozmiaru
-        QRandomGenerator *rng = QRandomGenerator::global();
-        for (int i = 0; i < numPoints; i++) {
-            int x = rng->bounded(width);
-            int y = rng->bounded(height);
-            int size = rng->bounded(2, 5);
-
-            QRadialGradient pointGlow(x, y, size * 2);
-            pointGlow.setColorAt(0, glowPointColor);
-            pointGlow.setColorAt(1, QColor(0, 0, 0, 0));
-
-            bufferPainter.setBrush(pointGlow);
-            bufferPainter.drawEllipse(QPointF(x, y), size, size);
-        }
-
         m_lastBgColor = backgroundColor;
         m_lastGridColor = gridColor;
         m_lastGridSpacing = gridSpacing;
         m_lastSize = QSize(width, height);
     }
 
+    // Rysuj siatkę na wierzchu statycznego tła
     painter.drawPixmap(0, 0, m_gridBuffer);
 }
 
@@ -260,14 +276,15 @@ void BlobRenderer::drawFilling(QPainter &painter,
     painter.setPen(Qt::NoPen);
     painter.drawPath(blobPath);
 
-    // Dodajmy linie skanowania wewnątrz bloba
+    // Dodajmy subtelniejsze linie skanowania wewnątrz bloba
     painter.setClipPath(blobPath);
-    painter.setPen(QPen(QColor(borderColor.lighter(150)), 1));
+    painter.setPen(QPen(QColor(borderColor.lighter(150)), 0.5)); // Cieńsza linia (0.5 zamiast 1)
 
-    for (int y = 0; y < blobRadius * 2; y += 4) {
+    // Zwiększamy odstęp między liniami z 4 na 12 (3x mniej linii)
+    for (int y = 0; y < blobRadius * 2; y += 12) {
         int yPos = blobCenter.y() - blobRadius + y;
         QLineF line(blobCenter.x() - blobRadius, yPos, blobCenter.x() + blobRadius, yPos);
-        painter.setOpacity(0.1);
+        painter.setOpacity(0.04); // Zmniejszam nieprzezroczystość z 0.1 na 0.04
         painter.drawLine(line);
     }
     painter.setOpacity(1.0);
@@ -277,13 +294,13 @@ void BlobRenderer::drawFilling(QPainter &painter,
     painter.setClipPath(blobPath);
 
     QColor techColor = borderColor.lighter(150);
-    techColor.setAlpha(40);
+    techColor.setAlpha(30); // Zmniejszam z 40 na 30 dla mniejszej agresywności
     QPen techPen(techColor, 1, Qt::DotLine);
     painter.setPen(techPen);
 
-    // Dodaj losowo rozmieszczone linie technologiczne
+    // Mniej linii wewnętrznych (z 3+4 na 2+2)
     QRandomGenerator *rng = QRandomGenerator::global();
-    int numLines = 3 + rng->bounded(4);
+    int numLines = 2 + rng->bounded(2);
 
     for (int i = 0; i < numLines; i++) {
         double angle = rng->bounded(2.0 * M_PI);
