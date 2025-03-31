@@ -11,6 +11,7 @@
 #include "../core/blob_config.h"
 #include "../utils/blob_path.h"
 
+
 // Struktura do przechowywania stanu wyświetlania bloba
 struct BlobRenderState {
     bool isBeingAbsorbed = false;
@@ -21,6 +22,13 @@ struct BlobRenderState {
     double scale = 1.0;
     BlobConfig::AnimationState animationState = BlobConfig::IDLE;
     bool isInTransitionToIdle = false;
+};
+
+struct PathMarker {
+    double position; // Pozycja na ścieżce (0.0 - 1.0)
+    int markerType; // 0-krzyżyk, 1-kwadrat, 2-okrąg
+    int size; // Rozmiar znacznika
+    int direction;
 };
 
 class BlobRenderer {
@@ -70,6 +78,10 @@ private:
 
     QPixmap m_staticBackgroundTexture;
     bool m_staticBackgroundInitialized = false;
+
+    std::vector<PathMarker> m_pathMarkers;
+    double m_markerSpeed = 0.1;
+    qint64 m_lastUpdateTime = 0;
 
     void updateGridBuffer(const QColor &backgroundColor,
                           const QColor &gridColor,

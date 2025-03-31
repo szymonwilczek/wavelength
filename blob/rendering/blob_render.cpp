@@ -189,21 +189,47 @@ void BlobRenderer::drawBorder(QPainter &painter,
     painter.setPen(innerPen);
     painter.drawPath(blobPath);
 
-    // Dodaj znaczniki technologiczne na konturze
+    // Inicjalizacja markerów, jeśli jeszcze nie istnieją
     QRandomGenerator *rng = QRandomGenerator::global();
-    int numMarkers = 4 + rng->bounded(3);
-    double pathLength = 0;
+    if (m_pathMarkers.empty()) {
+        int numMarkers = rng->bounded(8, 15); // Liczba markerów
+        for (int i = 0; i < numMarkers; i++) {
+            PathMarker marker;
+            marker.position = rng->bounded(1.0); // Pozycja 0.0-1.0 wzdłuż ścieżki
+            marker.markerType = rng->bounded(3); // 0-krzyżyk, 1-kwadrat, 2-okrąg
+            marker.size = 4;
+            marker.direction = rng->bounded(2) * 2 - 1; // Losowo 1 lub -1
+            m_pathMarkers.push_back(marker);
+        }
+        m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
+    }
 
     // Oblicz długość ścieżki
+    double pathLength = 0;
     for (int i = 0; i < blobPath.elementCount() - 1; i++) {
         QPointF p1 = blobPath.elementAt(i);
         QPointF p2 = blobPath.elementAt(i + 1);
         pathLength += QLineF(p1, p2).length();
     }
 
-    // Dodaj znaczniki
-    for (int i = 0; i < numMarkers; i++) {
-        double pos = rng->bounded(pathLength);
+    // Aktualizacja pozycji markerów
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    double deltaTime = (currentTime - m_lastUpdateTime) / 1000.0; // Czas w sekundach
+    m_lastUpdateTime = currentTime;
+
+    // Przesuń markery wzdłuż ścieżki
+    for (auto &marker: m_pathMarkers) {
+        marker.position += marker.direction * m_markerSpeed * deltaTime;
+        if (marker.position > 1.0) {
+            marker.position -= 1.0; // Zapętlenie po osiągnięciu końca
+        } else if (marker.position < 0.0) {
+            marker.position += 1.0; // Zapętlenie po osiągnięciu początku
+        }
+    }
+
+    // Rysuj markery w ich aktualnych pozycjach
+    for (const auto &marker: m_pathMarkers) {
+        double pos = marker.position * pathLength;
         double currentLength = 0;
 
         // Znajdź punkt na ścieżce
@@ -220,13 +246,11 @@ void BlobRenderer::drawBorder(QPainter &painter,
                 QColor markerColor = borderColor.lighter(180);
                 painter.setPen(QPen(markerColor, 2));
 
-                int markerSize = 4 + rng->bounded(5);
-                QRectF markerRect(markerPos.x() - markerSize / 2, markerPos.y() - markerSize / 2,
-                                  markerSize, markerSize);
+                QRectF markerRect(markerPos.x() - marker.size / 2, markerPos.y() - marker.size / 2,
+                                  marker.size, marker.size);
 
-                // Losowo wybierz styl znacznika
-                int markerType = rng->bounded(3);
-                switch (markerType) {
+                // Rysuj wybrany styl znacznika
+                switch (marker.markerType) {
                     case 0: // Krzyżyk
                         painter.drawLine(markerPos.x() - 3, markerPos.y(), markerPos.x() + 3, markerPos.y());
                         painter.drawLine(markerPos.x(), markerPos.y() - 3, markerPos.x(), markerPos.y() + 3);
