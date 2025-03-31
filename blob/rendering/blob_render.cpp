@@ -261,84 +261,37 @@ void BlobRenderer::drawBorder(QPainter &painter,
 
                 // Rysuj wybrany styl znacznika - symbole korporacyjne
                 switch (marker.markerType) {
-                    case 0: // Heksagonalne logo
+                    case 0: // Krzyżyk (zamiast heksagonu)
                     {
                         int size = marker.size * 2;
 
-                        // Rysuj sześciokąt
-                        QPainterPath hexPath;
-                        for (int i = 0; i < 6; i++) {
-                            double angle = i * M_PI / 3.0;
-                            if (i == 0) {
-                                hexPath.moveTo(markerPos.x() + size / 2 * cos(angle),
-                                               markerPos.y() + size / 2 * sin(angle));
-                            } else {
-                                hexPath.lineTo(markerPos.x() + size / 2 * cos(angle),
-                                               markerPos.y() + size / 2 * sin(angle));
-                            }
-                        }
-                        hexPath.closeSubpath();
-                        painter.drawPath(hexPath);
-
-                        // Wewnętrzny symbol korporacji (styl "X")
-                        double innerSize = size * 0.4;
-                        painter.drawLine(markerPos.x() - innerSize / 2, markerPos.y() - innerSize / 2,
-                                         markerPos.x() + innerSize / 2, markerPos.y() + innerSize / 2);
-                        painter.drawLine(markerPos.x() - innerSize / 2, markerPos.y() + innerSize / 2,
-                                         markerPos.x() + innerSize / 2, markerPos.y() - innerSize / 2);
+                        // Prosty krzyżyk
+                        painter.drawLine(markerPos.x() - size / 2, markerPos.y(),
+                                         markerPos.x() + size / 2, markerPos.y());
+                        painter.drawLine(markerPos.x(), markerPos.y() - size / 2,
+                                         markerPos.x(), markerPos.y() + size / 2);
                     }
                     break;
 
-                    case 1: // Trójkątna odznaka
+                    case 1: // Trójkąt (uproszczony)
                     {
                         int size = marker.size * 2;
 
-                        // Rysuj trójkąt
+                        // Prosty trójkąt bez dodatków
                         QPainterPath trianglePath;
                         trianglePath.moveTo(markerPos.x(), markerPos.y() - size / 2);
                         trianglePath.lineTo(markerPos.x() - size / 2, markerPos.y() + size / 2);
                         trianglePath.lineTo(markerPos.x() + size / 2, markerPos.y() + size / 2);
                         trianglePath.closeSubpath();
                         painter.drawPath(trianglePath);
-
-                        // Linia przecinająca
-                        painter.drawLine(markerPos.x() - size / 2 + size / 4, markerPos.y(),
-                                         markerPos.x() + size / 2 - size / 4, markerPos.y());
-
-                        // Mały punkt w środku
-                        painter.setBrush(markerColor);
-                        painter.drawEllipse(markerPos, size / 10, size / 10);
-                        painter.setBrush(Qt::NoBrush);
                     }
                     break;
 
-                    case 2: // Okręg z kodem kreskowym
+                    case 2: // Okrąg (uproszczony)
                     {
                         int size = marker.size * 2;
-                        QRectF circleRect(markerPos.x() - size / 2, markerPos.y() - size / 2, size, size);
-
-                        // Rysuj okrąg
-                        painter.drawEllipse(circleRect);
-
-                        // Rysuj linie kodu kreskowego wewnątrz
-                        painter.save();
-                        painter.setClipPath(QPainterPath());
-                        painter.setClipRegion(QRegion(circleRect.toRect(), QRegion::Ellipse));
-
-                        double barWidth = size / 12.0;
-                        double startX = markerPos.x() - size / 2 + barWidth;
-
-                        // Rysuj alternatywnie różnej grubości linie (kod kreskowy)
-                        for (int i = 0; i < 5; i++) {
-                            double x = startX + i * barWidth * 2;
-                            double height = size * (0.4 + (i % 3) * 0.15);
-                            double y1 = markerPos.y() - height / 2;
-                            double y2 = markerPos.y() + height / 2;
-
-                            painter.drawLine(QPointF(x, y1), QPointF(x, y2));
-                        }
-
-                        painter.restore();
+                        // Prosty okrąg bez dodatków
+                        painter.drawEllipse(markerPos, size / 2, size / 2);
                     }
                     break;
                 }
