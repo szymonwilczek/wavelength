@@ -220,7 +220,7 @@ void BlobRenderer::drawBorder(QPainter &painter,
                 QColor markerColor = borderColor.lighter(180);
                 painter.setPen(QPen(markerColor, 2));
 
-                int markerSize = 6 + rng->bounded(5);
+                int markerSize = 4 + rng->bounded(5);
                 QRectF markerRect(markerPos.x() - markerSize / 2, markerPos.y() - markerSize / 2,
                                   markerSize, markerSize);
 
