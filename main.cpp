@@ -24,7 +24,7 @@
 #include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
 #include "wavelength/ui/cyberpunk_style.h"
-#include "wavelength/ui/cyberpunk_text_effect.h"
+#include "wavelength/view/main_window/cyberpunk_text_effect.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
 
 void centerLabel(QLabel *label, BlobAnimation *animation) {
