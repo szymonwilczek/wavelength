@@ -24,6 +24,7 @@
 #include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
 #include "wavelength/ui/cyberpunk_style.h"
+#include "wavelength/ui/cyberpunk_text_effect.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
 
 void centerLabel(QLabel *label, BlobAnimation *animation) {
@@ -133,32 +134,37 @@ int main(int argc, char *argv[]) {
 
     window.setCentralWidget(centralWidget);
 
-    QLabel *titleLabel = new QLabel("Hello, World!", animation);
-    QLabel *outlineLabel = new QLabel("Hello, World!", animation);
-
-    QFont titleFont = FontManager::instance().getFont(FontFamily::Poppins, FontStyle::Bold, 40);
-    titleLabel->setFont(titleFont);
-    outlineLabel->setFont(titleFont);
-
-    titleLabel->setStyleSheet("QLabel { color: #bbbbbb; letter-spacing: 2px; background-color: transparent; }");
-    outlineLabel->setStyleSheet("QLabel { color: #555555; letter-spacing: 2px; background-color: transparent; }");
-
+    QLabel *titleLabel = new QLabel("WAVELENGTH", animation);
+    titleLabel->setFont(QFont("Poppins", 40, QFont::Bold));
     titleLabel->setAlignment(Qt::AlignCenter);
-    outlineLabel->setAlignment(Qt::AlignCenter);
 
-    QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect(titleLabel);
-    shadowEffect->setBlurRadius(15);
-    shadowEffect->setColor(QColor(0, 0, 0, 200));
-    shadowEffect->setOffset(2, 2);
-    titleLabel->setGraphicsEffect(shadowEffect);
+    // Aby uzyskać efekt obramowania z półprzezroczystym wypełnieniem,
+    // będziemy musieli użyć stylów CSS bardziej kreatywnie
+    titleLabel->setStyleSheet(
+        "QLabel {"
+        "   letter-spacing: 8px;"
+        "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
+        "   background-color: transparent;"
+        "   border: 2px solid #e0b0ff;" // Jasnofioletowy neonowy border
+        "   border-radius: 8px;"
+        "   padding: 10px 20px;"
+        "   text-transform: uppercase;"
+        "}"
+    );
 
-    outlineLabel->lower();
+    // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
+    QGraphicsDropShadowEffect *glowEffect = new QGraphicsDropShadowEffect(titleLabel);
+    glowEffect->setBlurRadius(15);
+    glowEffect->setColor(QColor("#e0b0ff"));
+    glowEffect->setOffset(0, 0);
+    titleLabel->setGraphicsEffect(glowEffect);
 
+    titleLabel->raise();
+
+    // Zmodyfikuj filtr zdarzeń dla nowej warstwy
     ResizeEventFilter *eventFilter = new ResizeEventFilter(titleLabel, animation);
-    ResizeEventFilter *outlineFilter = new ResizeEventFilter(outlineLabel, animation);
 
-    // animation->installEventFilter(eventFilter);
-    // animation->installEventFilter(outlineFilter);
+    auto *textEffect = new CyberpunkTextEffect(titleLabel, animation);
 
     window.setMinimumSize(800, 600);
     window.setMaximumSize(1600, 900);
@@ -196,16 +202,14 @@ int main(int argc, char *argv[]) {
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
-    auto toggleEventListening = [animation, eventFilter, outlineFilter](bool enable) {
+    auto toggleEventListening = [animation, eventFilter](bool enable) {
         if (enable) {
             // Włącz nasłuchiwanie eventów
             animation->installEventFilter(eventFilter);
-            animation->installEventFilter(outlineFilter);
             qDebug() << "Włączono nasłuchiwanie eventów animacji";
         } else {
             // Wyłącz nasłuchiwanie eventów
             animation->removeEventFilter(eventFilter);
-            animation->removeEventFilter(outlineFilter);
             qDebug() << "Wyłączono nasłuchiwanie eventów animacji";
         }
     };
@@ -249,11 +253,15 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-                     [stackedWidget, animationWidget, animation, toggleEventListening]() {
+                     [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
                          qDebug() << "Wavelength aborted, switching back to animation view";
                          animation->resetLifeColor();
                          stackedWidget->slideToWidget(animationWidget);
-                         toggleEventListening(true); // Włączamy nasłuchiwanie po powrocie do widoku głównego
+
+                         QTimer::singleShot(300, [textEffect]() {
+                             // Po zakończeniu animacji przesuwania widoku
+                             textEffect->startAnimation();
+                         });
                      });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
@@ -316,9 +324,17 @@ int main(int argc, char *argv[]) {
 
     window.show();
 
-    QTimer::singleShot(10, [titleLabel, outlineLabel, animation]() {
+    QTimer::singleShot(500, [titleLabel, animation, textEffect]() {
+        // Upewnij się, że etykieta jest widoczna
+        titleLabel->setText("WAVELENGTH");
+        titleLabel->adjustSize();
         centerLabel(titleLabel, animation);
-        centerLabel(outlineLabel, animation);
+        titleLabel->show();
+
+        // Rozpocznij animację z większym opóźnieniem
+        QTimer::singleShot(300, [textEffect]() {
+            textEffect->startAnimation();
+        });
     });
 
     return app.exec();
