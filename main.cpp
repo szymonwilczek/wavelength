@@ -8,12 +8,9 @@
 
 #include <QApplication>
 #include <QMainWindow>
-#include <QPalette>
-#include <QStyleFactory>
 #include "wavelength/ui/navigation/navbar.h"
 #include "blob/core/blob_animation.h"
 #include <QLabel>
-#include <QStackedWidget>
 #include <QTimer>
 
 #include "blob/core/app_instance_manager.h"
