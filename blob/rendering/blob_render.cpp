@@ -196,9 +196,11 @@ void BlobRenderer::drawBorder(QPainter &painter,
         for (int i = 0; i < numMarkers; i++) {
             PathMarker marker;
             marker.position = rng->bounded(1.0); // Pozycja 0.0-1.0 wzdłuż ścieżki
-            marker.markerType = rng->bounded(3); // 0-krzyżyk, 1-kwadrat, 2-okrąg
-            marker.size = 4;
+            marker.markerType = rng->bounded(3); // 0-heksagon, 1-trójkąt, 2-okrąg
+            marker.size = 4; // Rozmiar bazowy znaczników
             marker.direction = rng->bounded(2) * 2 - 1; // Losowo 1 lub -1
+            marker.colorPhase = rng->bounded(1.0); // Losowa początkowa faza koloru
+            marker.colorSpeed = 0.3 + rng->bounded(0.4); // Losowa prędkość zmiany koloru
             m_pathMarkers.push_back(marker);
         }
         m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
@@ -225,6 +227,12 @@ void BlobRenderer::drawBorder(QPainter &painter,
         } else if (marker.position < 0.0) {
             marker.position += 1.0; // Zapętlenie po osiągnięciu początku
         }
+
+        // Aktualizacja fazy koloru
+        marker.colorPhase += marker.colorSpeed * deltaTime;
+        if (marker.colorPhase > 1.0) {
+            marker.colorPhase -= 1.0; // Zapętlenie fazy koloru
+        }
     }
 
     // Rysuj markery w ich aktualnych pozycjach
@@ -243,24 +251,96 @@ void BlobRenderer::drawBorder(QPainter &painter,
                 QPointF markerPos = p1 * (1 - t) + p2 * t;
 
                 // Rysuj znacznik w stylu cyberpunk
-                QColor markerColor = borderColor.lighter(180);
+                QColor markerColor = getMarkerColor(marker.markerType, marker.colorPhase);
                 painter.setPen(QPen(markerColor, 2));
 
                 QRectF markerRect(markerPos.x() - marker.size / 2, markerPos.y() - marker.size / 2,
                                   marker.size, marker.size);
 
-                // Rysuj wybrany styl znacznika
+                // W metodzie drawBorder, zmień fragment switch-case rysujący znaczniki na:
+
+                // Rysuj wybrany styl znacznika - symbole korporacyjne
                 switch (marker.markerType) {
-                    case 0: // Krzyżyk
-                        painter.drawLine(markerPos.x() - 3, markerPos.y(), markerPos.x() + 3, markerPos.y());
-                        painter.drawLine(markerPos.x(), markerPos.y() - 3, markerPos.x(), markerPos.y() + 3);
-                        break;
-                    case 1: // Kwadrat
-                        painter.drawRect(markerRect.adjusted(1, 1, -1, -1));
-                        break;
-                    case 2: // Okrąg
-                        painter.drawEllipse(markerRect);
-                        break;
+                    case 0: // Heksagonalne logo
+                    {
+                        int size = marker.size * 2;
+
+                        // Rysuj sześciokąt
+                        QPainterPath hexPath;
+                        for (int i = 0; i < 6; i++) {
+                            double angle = i * M_PI / 3.0;
+                            if (i == 0) {
+                                hexPath.moveTo(markerPos.x() + size / 2 * cos(angle),
+                                               markerPos.y() + size / 2 * sin(angle));
+                            } else {
+                                hexPath.lineTo(markerPos.x() + size / 2 * cos(angle),
+                                               markerPos.y() + size / 2 * sin(angle));
+                            }
+                        }
+                        hexPath.closeSubpath();
+                        painter.drawPath(hexPath);
+
+                        // Wewnętrzny symbol korporacji (styl "X")
+                        double innerSize = size * 0.4;
+                        painter.drawLine(markerPos.x() - innerSize / 2, markerPos.y() - innerSize / 2,
+                                         markerPos.x() + innerSize / 2, markerPos.y() + innerSize / 2);
+                        painter.drawLine(markerPos.x() - innerSize / 2, markerPos.y() + innerSize / 2,
+                                         markerPos.x() + innerSize / 2, markerPos.y() - innerSize / 2);
+                    }
+                    break;
+
+                    case 1: // Trójkątna odznaka
+                    {
+                        int size = marker.size * 2;
+
+                        // Rysuj trójkąt
+                        QPainterPath trianglePath;
+                        trianglePath.moveTo(markerPos.x(), markerPos.y() - size / 2);
+                        trianglePath.lineTo(markerPos.x() - size / 2, markerPos.y() + size / 2);
+                        trianglePath.lineTo(markerPos.x() + size / 2, markerPos.y() + size / 2);
+                        trianglePath.closeSubpath();
+                        painter.drawPath(trianglePath);
+
+                        // Linia przecinająca
+                        painter.drawLine(markerPos.x() - size / 2 + size / 4, markerPos.y(),
+                                         markerPos.x() + size / 2 - size / 4, markerPos.y());
+
+                        // Mały punkt w środku
+                        painter.setBrush(markerColor);
+                        painter.drawEllipse(markerPos, size / 10, size / 10);
+                        painter.setBrush(Qt::NoBrush);
+                    }
+                    break;
+
+                    case 2: // Okręg z kodem kreskowym
+                    {
+                        int size = marker.size * 2;
+                        QRectF circleRect(markerPos.x() - size / 2, markerPos.y() - size / 2, size, size);
+
+                        // Rysuj okrąg
+                        painter.drawEllipse(circleRect);
+
+                        // Rysuj linie kodu kreskowego wewnątrz
+                        painter.save();
+                        painter.setClipPath(QPainterPath());
+                        painter.setClipRegion(QRegion(circleRect.toRect(), QRegion::Ellipse));
+
+                        double barWidth = size / 12.0;
+                        double startX = markerPos.x() - size / 2 + barWidth;
+
+                        // Rysuj alternatywnie różnej grubości linie (kod kreskowy)
+                        for (int i = 0; i < 5; i++) {
+                            double x = startX + i * barWidth * 2;
+                            double height = size * (0.4 + (i % 3) * 0.15);
+                            double y1 = markerPos.y() - height / 2;
+                            double y2 = markerPos.y() + height / 2;
+
+                            painter.drawLine(QPointF(x, y1), QPointF(x, y2));
+                        }
+
+                        painter.restore();
+                    }
+                    break;
                 }
 
                 break;
@@ -512,4 +592,20 @@ void BlobRenderer::drawHUD(QPainter &painter, const QPointF &blobCenter,
 
     QString sizeText = QString("R: %1").arg(int(blobRadius));
     painter.drawText(width - 70, height - 25, sizeText);
+}
+
+QColor BlobRenderer::getMarkerColor(int markerType, double colorPhase) {
+    switch (markerType) {
+        case 0: // Heksagon - zielono-niebieskawa gama
+            return QColor::fromHsvF(0.45 + 0.1 * sin(colorPhase * 2 * M_PI), 0.9, 0.95);
+
+        case 1: // Trójkąt - żółto-pomarańczowa gama
+            return QColor::fromHsvF(0.11 + 0.05 * sin(colorPhase * 2 * M_PI), 0.9, 0.95);
+
+        case 2: // Okrąg - czerwono-różowa gama
+            return QColor::fromHsvF(0.93 + 0.07 * sin(colorPhase * 2 * M_PI), 0.9, 0.95);
+
+        default:
+            return QColor(255, 255, 255); // Biały jako fallback
+    }
 }

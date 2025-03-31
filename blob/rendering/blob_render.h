@@ -26,9 +26,11 @@ struct BlobRenderState {
 
 struct PathMarker {
     double position; // Pozycja na ścieżce (0.0 - 1.0)
-    int markerType; // 0-krzyżyk, 1-kwadrat, 2-okrąg
+    int markerType; // 0-heksagon, 1-trójkąt, 2-okrąg
     int size; // Rozmiar znacznika
-    int direction;
+    int direction; // 1 = zgodnie z ruchem wskazówek zegara, -1 = przeciwnie
+    double colorPhase; // Faza animacji koloru (0.0 - 1.0)
+    double colorSpeed; // Prędkość zmiany koloru
 };
 
 class BlobRenderer {
@@ -103,6 +105,8 @@ private:
                      const QPointF &blobCenter,
                      double blobRadius,
                      const QColor &borderColor);
+
+    QColor getMarkerColor(int markerType, double colorPhase);
 };
 
 #endif // BLOBRENDERER_H
