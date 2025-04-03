@@ -73,10 +73,10 @@ public:
             // Ustaw prędkość w zależności od typu markera
             switch (marker.markerType) {
             case 0: // Impulsy energii - stała prędkość 0.05
-                marker.speed = 0.05;  // Stała prędkość
+                marker.speed = 0.1 + (rng->bounded(11) * 0.01);  // Losowa prędkość
                 break;
             case 1: // Pakiety (fale zakłóceń) - losowa 0.1-0.2 co 0.01
-                marker.speed = 0.1 + (rng->bounded(11) * 0.01);  // Losowa prędkość
+                marker.speed = 0.05;  // Stała prędkość
                 break;
             case 2: // Quantum computing - losowa 0.14-0.2 co 0.02
                 marker.speed = 0.14 + (rng->bounded(4) * 0.02); // 0.14, 0.16, 0.18, 0.2
