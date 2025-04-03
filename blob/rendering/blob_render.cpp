@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QRadialGradient>
 #include <QRandomGenerator>
+#include <QDebug>
 
 void BlobRenderer::renderBlob(QPainter &painter,
                               const std::vector<QPointF> &controlPoints,
@@ -108,8 +109,11 @@ void BlobRenderer::drawBackground(QPainter &painter,
 
         QPainter bufferPainter(&m_gridBuffer);
 
+
         // Rysowanie głównej siatki
-        bufferPainter.setPen(QPen(gridColor, 1, Qt::SolidLine));
+        QColor mainGridColor = QColor(0, 195, 255, 50);
+        qDebug() << "Grid color:" << mainGridColor;
+        bufferPainter.setPen(QPen(mainGridColor, 1, Qt::SolidLine));
 
         // Główne linie siatki
         for (int y = 0; y < height; y += gridSpacing) {
@@ -121,7 +125,8 @@ void BlobRenderer::drawBackground(QPainter &painter,
         }
 
         // Dodajemy podsiatkę o mniejszej intensywności
-        QColor subgridColor = gridColor;
+        QColor subgridColor = QColor(0,130, 200, 35);
+        qDebug() << "Subgrid color:" << subgridColor;
         subgridColor.setAlphaF(0.3);
         bufferPainter.setPen(QPen(subgridColor, 0.5, Qt::DotLine));
 

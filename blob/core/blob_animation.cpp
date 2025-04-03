@@ -583,7 +583,7 @@ void BlobAnimation::paintGL() {
     std::lock_guard<std::mutex> lock(m_pointsMutex);
 
     // Renderuj siatkę (możesz użyć własnej metody renderGrid)
-    drawGrid();
+    // drawGrid();
 
     // Konwertuj punkty kontrolne na wierzchołki OpenGL
     updateBlobGeometry();
@@ -682,9 +682,9 @@ void BlobAnimation::drawGrid() {
     gridShader->setUniformValue("projection", projection);
 
     // Ustaw kolor siatki
-    QColor color = m_params.backgroundColor;
+    QColor color = m_params.gridColor;
     gridShader->setUniformValue("gridColor", QVector4D(
-                                    color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.5f));
+                                   color.redF(), color.greenF(), color.blueF(), color.alphaF()));  // Usunięto mnożnik 0.5f
 
     // Przygotuj bufor dla linii siatki
     QOpenGLBuffer gridVBO(QOpenGLBuffer::VertexBuffer);
@@ -693,7 +693,7 @@ void BlobAnimation::drawGrid() {
 
     // Generuj wierzchołki dla linii siatki
     std::vector<GLfloat> gridVertices;
-    int gridSpacing = 25; // Możesz dostosować lub pobrać z konfiguracji
+    int gridSpacing = m_params.gridSpacing;
 
     // Linie poziome
     for (int y = 0; y < height(); y += gridSpacing) {
