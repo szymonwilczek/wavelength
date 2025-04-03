@@ -155,15 +155,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWid
 find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/libpqxx_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)
 
-find_package(mongocxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
-find_package(bsoncxx REQUIRED HINTS "C:/.vcpkg-clion/pk4/packages/mongo-cxx-driver_x64-windows")
-
-find_package(bsoncxx CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-
-find_package(mongocxx CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-
 list(APPEND CMAKE_PREFIX_PATH "C:/.vcpkg-clion/pk4/packages/ffmpeg_x64-windows")
 
 # Bezpośrednie linkowanie bibliotek FFmpeg
