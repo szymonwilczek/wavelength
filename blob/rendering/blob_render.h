@@ -1,18 +1,14 @@
-#ifndef BLOBRENDERER_H
-#define BLOBRENDERER_H
+#ifndef BLOB_RENDERER_H
+#define BLOB_RENDERER_H
 
 #include <QPainter>
-#include <QPainterPath>
-#include <QColor>
-#include <QPointF>
+#include <QPixmap>
 #include <QRandomGenerator>
-#include <QTimer>
 #include <vector>
+
+#include "path_markers_manager.h"
 #include "../core/blob_config.h"
-#include "../utils/blob_path.h"
 
-
-// Struktura do przechowywania stanu wyświetlania bloba
 struct BlobRenderState {
     bool isBeingAbsorbed = false;
     bool isAbsorbing = false;
@@ -21,39 +17,28 @@ struct BlobRenderState {
     double opacity = 1.0;
     double scale = 1.0;
     BlobConfig::AnimationState animationState = BlobConfig::IDLE;
-    bool isInTransitionToIdle = false;
-};
-
-struct PathMarker {
-    double position;     // Pozycja na ścieżce (0.0-1.0)
-    int markerType;      // 0-impulsy energii, 1-fale zakłóceń, 2-efekt kwantowy
-    int size;            // Rozmiar znacznika
-    int direction;       // Kierunek ruchu (1 lub -1)
-    double colorPhase;   // Faza koloru (0.0-1.0)
-    double colorSpeed;   // Prędkość zmiany koloru
-    double tailLength;   // Długość śladu impulsu (tylko dla typu 0)
-    double wavePhase;    // Faza fali zakłóceń (tylko dla typu 1)
-    double quantumOffset;// Przesunięcie kwantowe (tylko dla typu 2)
-    double speed;        // Indywidualna prędkość markera
-    std::vector<QPointF> trailPoints; // Punkty śladu dla impulsu energii
 };
 
 class BlobRenderer {
 public:
-    BlobRenderer() = default;
+
+
+    BlobRenderer() :
+        m_lastUpdateTime(0),
+        m_staticBackgroundInitialized(false),
+        m_glitchIntensity(0) {}
 
     void renderBlob(QPainter &painter,
-                const std::vector<QPointF> &controlPoints,
-                const QPointF &blobCenter,
-                const BlobConfig::BlobParameters &params,
-                int width, int height,
-                BlobConfig::AnimationState animationState);  // Dodany parametr
+                    const std::vector<QPointF> &controlPoints,
+                    const QPointF &blobCenter,
+                    const BlobConfig::BlobParameters &params,
+                    int width, int height,
+                    BlobConfig::AnimationState animationState);
 
-
-
-    void resetGridBuffer() {
-        m_gridBuffer = QPixmap();
-    }
+    void updateGridBuffer(const QColor &backgroundColor,
+                          const QColor &gridColor,
+                          int gridSpacing,
+                          int width, int height);
 
     void drawBackground(QPainter &painter,
                         const QColor &backgroundColor,
@@ -61,7 +46,6 @@ public:
                         int gridSpacing,
                         int width, int height);
 
-    // Nowa metoda do renderowania całej sceny
     void renderScene(QPainter &painter,
                      const std::vector<QPointF> &controlPoints,
                      const QPointF &blobCenter,
@@ -74,49 +58,50 @@ public:
                      QColor &lastGridColor,
                      int &lastGridSpacing);
 
-    void drawHUD(QPainter &painter, const QPointF &blobCenter, double blobRadius, const QColor &hudColor, int width,
-                 int height);
+    void resetGridBuffer() {
+        m_gridBuffer = QPixmap();
+    }
+
+    void setGlitchIntensity(double intensity) {
+        m_glitchIntensity = intensity;
+    }
 
 private:
+    QPixmap m_staticBackgroundTexture;
+    bool m_staticBackgroundInitialized;
     QPixmap m_gridBuffer;
     QColor m_lastBgColor;
     QColor m_lastGridColor;
-    int m_lastGridSpacing = 0;
+    int m_lastGridSpacing;
     QSize m_lastSize;
-    double m_glitchIntensity = 0.0;
-    QTimer *m_glitchTimer = nullptr;
+    double m_glitchIntensity;
 
-    QPixmap m_staticBackgroundTexture;
-    bool m_staticBackgroundInitialized = false;
-
-    std::vector<PathMarker> m_pathMarkers;
-    double m_markerSpeed = 0.05;
-    qint64 m_lastUpdateTime = 0;
-
-    void updateGridBuffer(const QColor &backgroundColor,
-                          const QColor &gridColor,
-                          int gridSpacing,
-                          int width, int height);
+    // Nowy obiekt zarządzający markerami
+    PathMarkersManager m_markersManager;
+    qint64 m_lastUpdateTime;
 
     void drawGlowEffect(QPainter &painter,
-                        const QPainterPath &blobPath,
-                        const QColor &borderColor,
-                        int glowRadius);
+                       const QPainterPath &blobPath,
+                       const QColor &borderColor,
+                       int glowRadius);
 
     void drawBorder(QPainter &painter,
-                    const QPainterPath &blobPath,
-                    const QColor &borderColor,
-                    int borderWidth);
+                   const QPainterPath &blobPath,
+                   const QColor &borderColor,
+                   int borderWidth);
 
-    // Zaktualizuj deklarację metody drawFilling w nagłówku:
     void drawFilling(QPainter &painter,
-                     const QPainterPath &blobPath,
-                     const QPointF &blobCenter,
-                     double blobRadius,
-                     const QColor &borderColor,
-                     BlobConfig::AnimationState animationState);  // Dodany parametr
+                   const QPainterPath &blobPath,
+                   const QPointF &blobCenter,
+                   double blobRadius,
+                   const QColor &borderColor,
+                   BlobConfig::AnimationState animationState);
 
-    QColor getMarkerColor(int markerType, double colorPhase);
+    void drawHUD(QPainter &painter,
+                const QPointF &blobCenter,
+                double blobRadius,
+                const QColor &hudColor,
+                int width, int height);
 };
 
-#endif // BLOBRENDERER_H
+#endif // BLOB_RENDERER_H
