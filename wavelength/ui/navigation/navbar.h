@@ -2,8 +2,10 @@
 #define NAVBAR_H
 
 #include <QToolBar>
-#include <QPushButton>
 #include <QLabel>
+#include <QHBoxLayout>
+
+class CyberpunkButton;
 
 class Navbar : public QToolBar {
     Q_OBJECT
@@ -20,8 +22,8 @@ protected:
 
 private:
     QLabel *logoLabel;
-    QPushButton *createWavelengthButton;
-    QPushButton *joinWavelengthButton;
+    CyberpunkButton *createWavelengthButton;
+    CyberpunkButton *joinWavelengthButton;
 };
 
 #endif // NAVBAR_H
