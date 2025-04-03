@@ -113,7 +113,7 @@ void BlobRenderer::drawBackground(QPainter &painter,
 
 
         // Rysowanie głównej siatki
-        QColor mainGridColor = QColor(0, 195, 255, 50);
+        QColor mainGridColor = QColor(0, 195, 255, 40);
         qDebug() << "Grid color:" << mainGridColor;
         bufferPainter.setPen(QPen(mainGridColor, 1, Qt::SolidLine));
 
