@@ -196,23 +196,54 @@ void BlobRenderer::drawBorder(QPainter &painter,
 
     // Inicjalizacja markerów, jeśli jeszcze nie istnieją
     QRandomGenerator *rng = QRandomGenerator::global();
-    if (m_pathMarkers.empty()) {
-        int numMarkers = rng->bounded(8, 15); // Liczba markerów
-        for (int i = 0; i < numMarkers; i++) {
-            PathMarker marker;
-            marker.position = rng->bounded(1.0); // Pozycja 0.0-1.0 wzdłuż ścieżki
-            marker.markerType = rng->bounded(3); // 0-impuls, 1-fala, 2-kwantowy
-            marker.size = 4 + rng->bounded(3); // Rozmiar bazowy znaczników (4-6)
-            marker.direction = rng->bounded(2) * 2 - 1; // Losowo 1 lub -1
-            marker.colorPhase = rng->bounded(1.0); // Losowa początkowa faza koloru
-            marker.colorSpeed = 0.3 + rng->bounded(0.4); // Losowa prędkość zmiany koloru
-            marker.tailLength = 0.02 + rng->bounded(0.03); // 2-5% długości ścieżki
-            marker.wavePhase = 0.0; // Początkowa faza fali
-            marker.quantumOffset = rng->bounded(10.0); // Losowe przesunięcie kwantowe
-            m_pathMarkers.push_back(marker);
+if (m_pathMarkers.empty()) {
+    int numMarkers = rng->bounded(8, 15); // Liczba markerów
+    int lastMarkerType = -1; // Zmienna śledząca ostatni wygenerowany typ
+
+    for (int i = 0; i < numMarkers; i++) {
+        PathMarker marker;
+        marker.position = rng->bounded(1.0); // Pozycja 0.0-1.0 wzdłuż ścieżki
+
+        // Logika zapobiegająca wylosowaniu tego samego typu dwa razy pod rząd
+        int newMarkerType;
+        if (lastMarkerType == -1) {
+            // Pierwszy marker - losuj dowolny typ
+            newMarkerType = rng->bounded(3);
+        } else {
+            // Kolejne markery - losuj typ różny od poprzedniego
+            // Najpierw wybieramy losowo jeden z dwóch pozostałych typów
+            int offset = 1 + rng->bounded(2);  // 1 lub 2
+            newMarkerType = (lastMarkerType + offset) % 3;
         }
-        m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
+
+        marker.markerType = newMarkerType;
+        lastMarkerType = newMarkerType; // Aktualizuj ostatni typ
+
+        marker.size = 4 + rng->bounded(3); // Rozmiar bazowy znaczników (4-6)
+        marker.direction = rng->bounded(2) * 2 - 1; // Losowo 1 lub -1
+        marker.colorPhase = rng->bounded(1.0); // Losowa początkowa faza koloru
+        marker.colorSpeed = 0.3 + rng->bounded(0.4); // Losowa prędkość zmiany koloru
+        marker.tailLength = 0.02 + rng->bounded(0.03); // 2-5% długości ścieżki
+        marker.wavePhase = 0.0; // Początkowa faza fali
+        marker.quantumOffset = rng->bounded(10.0); // Losowe przesunięcie kwantowe
+
+        // Ustaw prędkość w zależności od typu markera
+        switch (marker.markerType) {
+        case 0: // Impulsy energii - stała prędkość 0.05
+            marker.speed = 0.1 + (rng->bounded(11) * 0.01);  // Poprawiona wartość
+            break;
+        case 1: // Pakiety (fale zakłóceń) - losowa 0.1-0.2 co 0.01
+            marker.speed = 0.05;  // Poprawiona wartość
+            break;
+        case 2: // Quantum computing - losowa 0.14-0.2 co 0.02
+            marker.speed = 0.14 + (rng->bounded(4) * 0.02); // 0.14, 0.16, 0.18, 0.2
+            break;
+        }
+
+        m_pathMarkers.push_back(marker);
     }
+    m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
+}
 
     // Oblicz długość ścieżki
     double pathLength = 0;
@@ -229,7 +260,7 @@ void BlobRenderer::drawBorder(QPainter &painter,
 
     // Przesuń markery wzdłuż ścieżki
     for (auto &marker: m_pathMarkers) {
-        marker.position += marker.direction * m_markerSpeed * deltaTime;
+        marker.position += marker.direction * marker.speed * deltaTime;
         if (marker.position > 1.0) {
             marker.position -= 1.0; // Zapętlenie po osiągnięciu końca
         } else if (marker.position < 0.0) {
@@ -275,16 +306,19 @@ void BlobRenderer::drawBorder(QPainter &painter,
 
                 // Dla impulsów energii, zapisz punkty śladu
                 if (marker.markerType == 0) {
-                    double tailPos = pos - (marker.tailLength * pathLength);
-                    if (tailPos < 0) tailPos += pathLength;
+                    marker.trailPoints.clear(); // Czyścimy poprzednie punkty śladu
 
-                    double trailCurrentLength = 0;
                     int numTrailPoints = 15; // Liczba punktów w śladzie
 
                     for (int k = 0; k < numTrailPoints; k++) {
                         double trailT = static_cast<double>(k) / numTrailPoints;
-                        double trailPosOnPath = pos - (trailT * marker.tailLength * pathLength);
+
+                        // Kluczowa zmiana - uwzględniamy kierunek ruchu markera
+                        double trailPosOnPath = pos - (marker.direction * trailT * marker.tailLength * pathLength);
+
+                        // Zawijamy pozycję wokół ścieżki, jeśli wyjdzie poza zakres
                         if (trailPosOnPath < 0) trailPosOnPath += pathLength;
+                        if (trailPosOnPath > pathLength) trailPosOnPath -= pathLength;
 
                         // Znajdź punkt na ścieżce dla śladu
                         double trailLength = 0;
@@ -312,15 +346,16 @@ void BlobRenderer::drawBorder(QPainter &painter,
         // Rysuj wybrany efekt
         QColor markerColor = getMarkerColor(marker.markerType, marker.colorPhase);
 
-        switch (marker.markerType) {
-            case 0: // Impulsy energii
+        switch (marker.markerType)
+        {
+        case 0: // Ulepszony efekt pakietu (impulsu energii)
             {
-                // Rysuj ślad impulsu
+                // Rysuj ślad - to już działa dobrze
                 if (!marker.trailPoints.empty()) {
                     for (size_t i = 0; i < marker.trailPoints.size(); i++) {
                         double fadeRatio = static_cast<double>(i) / marker.trailPoints.size();
                         QColor trailColor = markerColor;
-                        trailColor.setAlphaF(1.0 - fadeRatio);
+                        trailColor.setAlphaF(0.8 - fadeRatio * 0.8);
 
                         int pointSize = marker.size * (1.0 - fadeRatio * 0.7);
                         painter.setPen(Qt::NoPen);
@@ -329,40 +364,116 @@ void BlobRenderer::drawBorder(QPainter &painter,
                     }
                 }
 
-                // Rysuj główny impuls
-                painter.setPen(Qt::NoPen);
-                painter.setBrush(markerColor);
-                painter.drawEllipse(markerPos, marker.size * 1.5, marker.size * 1.5);
+                // Nowa cyberpunkowa głowica pakietu
+                QPointF pos = markerPos;
+                const double headSize = marker.size * 1.8; // Podstawowy rozmiar głowicy
 
-                // Dodaj jasny środek impulsu
-                QColor centerColor = markerColor.lighter(150);
+                // Warstwa 1: Podstawowy kształt - romb (diament)
+                QPainterPath head;
+                head.moveTo(pos.x(), pos.y() - headSize/2);        // góra
+                head.lineTo(pos.x() + headSize/2, pos.y());        // prawo
+                head.lineTo(pos.x(), pos.y() + headSize/2);        // dół
+                head.lineTo(pos.x() - headSize/2, pos.y());        // lewo
+                head.closeSubpath();
+
+                // Główny gradient dla głowicy
+                QRadialGradient headGradient(pos, headSize/2);
+                QColor coreColor = markerColor.lighter(130);
+                QColor edgeColor = markerColor;
+                coreColor.setAlphaF(0.9);
+                edgeColor.setAlphaF(0.7);
+                headGradient.setColorAt(0, coreColor);
+                headGradient.setColorAt(1, edgeColor);
+
+                // Rysujemy główną głowicę
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(headGradient);
+                painter.drawPath(head);
+
+                // Warstwa 2: Wewnętrzne linie technologiczne
+                QColor techColor = markerColor.lighter(140);
+                techColor.setAlphaF(0.85);
+                painter.setPen(QPen(techColor, 0.8));
+
+                // Wewnętrzne linie tworzące krzyż
+                painter.drawLine(QPointF(pos.x() - headSize/3, pos.y()),
+                                QPointF(pos.x() + headSize/3, pos.y()));
+                painter.drawLine(QPointF(pos.x(), pos.y() - headSize/3),
+                                QPointF(pos.x(), pos.y() + headSize/3));
+
+                // Warstwa 3: Centralny punkt energii
+                QColor centerColor = QColor::fromHsvF(
+                    markerColor.hsvHueF(),
+                    markerColor.hsvSaturationF() * 0.6,
+                    qMin(1.0, markerColor.valueF() * 1.4)
+                );
+                centerColor.setAlphaF(0.95);
+
+                painter.setPen(Qt::NoPen);
                 painter.setBrush(centerColor);
-                painter.drawEllipse(markerPos, marker.size * 0.7, marker.size * 0.7);
+                double innerSize = marker.size * 0.5;
+
+                // Małe migotanie rozmiaru centralnego punktu
+                double time = QDateTime::currentMSecsSinceEpoch() * 0.002;
+                innerSize *= (0.9 + 0.2 * sin(time + marker.position * 10));
+
+                // Rysowanie centralnego sześciokąta zamiast koła
+                QPainterPath centerHex;
+                for (int i = 0; i < 6; i++) {
+                    double angle = 2.0 * M_PI * i / 6;
+                    double x = pos.x() + innerSize * cos(angle);
+                    double y = pos.y() + innerSize * sin(angle);
+
+                    if (i == 0)
+                        centerHex.moveTo(x, y);
+                    else
+                        centerHex.lineTo(x, y);
+                }
+                centerHex.closeSubpath();
+                painter.drawPath(centerHex);
+
+                // Warstwa 4: Efekt migotania na brzegach (glitch)
+                if (QRandomGenerator::global()->bounded(100) < 30) {
+                    double glitchAngle = QRandomGenerator::global()->bounded(2.0 * M_PI);
+                    double glitchDist = headSize/2 * 0.9;
+                    QPointF glitchPos(
+                        pos.x() + cos(glitchAngle) * glitchDist,
+                        pos.y() + sin(glitchAngle) * glitchDist
+                    );
+
+                    QColor glitchColor = markerColor.lighter(150);
+                    glitchColor.setAlphaF(0.7);
+                    painter.setPen(Qt::NoPen);
+                    painter.setBrush(glitchColor);
+                    painter.drawEllipse(glitchPos, marker.size * 0.3, marker.size * 0.3);
+                }
             }
             break;
 
-            case 1: // Fale zakłóceń
+        case 1: // Fale zakłóceń - zmniejszone
             {
                 if (marker.wavePhase > 0.0) {
-                    double waveRadius = marker.size * 5 * marker.wavePhase;
+                    // Zmniejszony promień fali o 60% (z 5 na 2)
+                    double waveRadius = marker.size * 1.5 * marker.wavePhase;
                     double opacity = 1.0 - (marker.wavePhase / 5.0);
 
                     QColor waveColor = markerColor;
                     waveColor.setAlphaF(opacity * 0.7);
 
-                    painter.setPen(QPen(waveColor, 0.8));
+                    painter.setPen(QPen(waveColor, 0.6)); // Cieńsza linia
                     painter.setBrush(Qt::NoBrush);
 
-                    // Rysuj koncentryczne fale
-                    for (int i = 0; i < 3; i++) {
-                        double ringRadius = waveRadius * (0.6 + 0.2 * i);
+                    // Rysuj delikatniejsze fale
+                    for (int i = 0; i < 2; i++) { // Zmniejszone z 3 do 2 pierścieni
+                        double ringRadius = waveRadius * (0.7 + 0.3 * i);
                         painter.drawEllipse(markerPos, ringRadius, ringRadius);
                     }
 
-                    // Dodaj zniekształcenia fali
+                    // Mniej zaburzony kształt fali
                     QPainterPath distortionPath;
                     int points = 12;
-                    double noiseAmplitude = waveRadius * 0.15;
+                    // Zmniejszenie amplitudy zniekształcenia o 50%
+                    double noiseAmplitude = waveRadius * 0.07;
 
                     for (int i = 0; i <= points; i++) {
                         double angle = (2.0 * M_PI * i) / points;
@@ -377,70 +488,82 @@ void BlobRenderer::drawBorder(QPainter &painter,
                     }
 
                     distortionPath.closeSubpath();
-                    waveColor.setAlphaF(opacity * 0.3);
-                    painter.setPen(QPen(waveColor, 0.5, Qt::DotLine));
+                    waveColor.setAlphaF(opacity * 0.25); // Mniejsza nieprzezroczystość
+                    painter.setPen(QPen(waveColor, 0.3, Qt::DotLine)); // Cieńsza linia
                     painter.drawPath(distortionPath);
                 }
 
-                // Zawsze rysuj punkt źródłowy fali
+                // Punkt źródłowy fali - niezmienny
                 painter.setPen(Qt::NoPen);
                 painter.setBrush(markerColor);
                 painter.drawEllipse(markerPos, marker.size * 0.8, marker.size * 0.8);
             }
             break;
 
-            case 2: // Efekt quantum computing
+        case 2: // Efekt quantum computing - poprawiony
             {
-                // Generuj kilka "kopii" punktu dla efektu kwantowego
-                QRandomGenerator *rng = QRandomGenerator::global();
+                // Płynniejszy efekt kwantowy z mniej przypadkowymi pozycjami
                 const int numQuantumCopies = 5;
+                QPainterPath quantumPath;
+                QVector<QPointF> quantumPoints;
 
-                // Rysuj rozmyte punkty w różnych pozycjach
+                // Bardziej spójne punkty kwantowe
                 for (int i = 0; i < numQuantumCopies; i++) {
-                    // Wylicz pozycję względną dla kopii kwantowej
-                    double quantumNoiseX = (rng->generateDouble() * 2.0 - 1.0) * marker.size * 2;
-                    double quantumNoiseY = (rng->generateDouble() * 2.0 - 1.0) * marker.size * 2;
+                    // Bardziej płynne przejście między punktami zamiast całkowicie losowych pozycji
+                    double theta = (2.0 * M_PI * i) / numQuantumCopies;
+                    double phase = currentTime * 0.0005 + marker.quantumOffset;
 
-                    // Dodaj sinusoidalne przemieszczenie zależne od czasu
-                    double timeOffset = marker.quantumOffset + currentTime * 0.001;
-                    quantumNoiseX += sin(timeOffset * 3.0 + i) * marker.size * 0.8;
-                    quantumNoiseY += cos(timeOffset * 2.5 + i) * marker.size * 0.8;
+                    // Płynna animacja po eliptycznej orbicie z lekką zmiennością
+                    double orbitA = marker.size * (1.2 + 0.6 * sin(phase * 1.5 + i * 0.7));
+                    double orbitB = marker.size * (1.0 + 0.4 * sin(phase * 2.0 + i * 0.5));
 
-                    QPointF quantumPos = markerPos + QPointF(quantumNoiseX, quantumNoiseY);
+                    // Płynne przejście pozycji z dodatkowym subtelnym efektem pulsacji
+                    double x = sin(theta + phase) * orbitA;
+                    double y = cos(theta + phase * 1.3) * orbitB;
 
-                    // Ustaw kolor i przezroczystość
+                    QPointF quantumPos = markerPos + QPointF(x, y);
+                    quantumPoints.append(quantumPos);
+
+                    // Ustaw kolor z efektem pulsacji
                     QColor quantumColor = markerColor;
-                    quantumColor.setAlphaF(0.3 + 0.4 * (1.0 - static_cast<double>(i) / numQuantumCopies));
+                    double pulseIntensity = 0.4 + 0.6 * (0.5 + 0.5 * sin(phase * 3.0 + i));
+                    quantumColor.setAlphaF(0.4 * pulseIntensity);
 
                     // Rysuj punkt kwantowy z efektem rozmycia
                     painter.setPen(Qt::NoPen);
                     painter.setBrush(quantumColor);
 
-                    double pointSize = marker.size * (0.8 + 0.4 * (1.0 - static_cast<double>(i) / numQuantumCopies));
+                    // Płynnie zmieniający się rozmiar
+                    double pointSize = marker.size * (0.6 + 0.3 * pulseIntensity);
                     painter.drawEllipse(quantumPos, pointSize, pointSize);
 
-                    // Dodaj wewnętrzną poświatę
-                    QColor glowColor = quantumColor.lighter(120);
-                    glowColor.setAlphaF(quantumColor.alphaF() * 0.7);
+                    // Wewnętrzna poświata - zwiększona jasność, zmniejszona przezroczystość
+                    QColor glowColor = quantumColor.lighter(130);
+                    glowColor.setAlphaF(quantumColor.alphaF() * 0.8);
                     painter.setBrush(glowColor);
                     painter.drawEllipse(quantumPos, pointSize * 0.5, pointSize * 0.5);
+
+                    // Zbieramy punkty do ścieżki
+                    if (i == 0)
+                        quantumPath.moveTo(quantumPos);
+                    else
+                        quantumPath.lineTo(quantumPos);
                 }
 
-                // Dodaj linie łączące kopie kwantowe (entanglement)
-                painter.setPen(QPen(markerColor, 0.5, Qt::DotLine));
-                for (int i = 0; i < numQuantumCopies - 1; i++) {
-                    QPointF p1 = markerPos + QPointF(
-                        sin(marker.quantumOffset + currentTime * 0.001 * 3.0 + i) * marker.size * 0.8,
-                        cos(marker.quantumOffset + currentTime * 0.001 * 2.5 + i) * marker.size * 0.8
-                    );
+                // Zamknij ścieżkę
+                if (!quantumPoints.isEmpty())
+                    quantumPath.lineTo(quantumPoints.first());
 
-                    QPointF p2 = markerPos + QPointF(
-                        sin(marker.quantumOffset + currentTime * 0.001 * 3.0 + i + 1) * marker.size * 0.8,
-                        cos(marker.quantumOffset + currentTime * 0.001 * 2.5 + i + 1) * marker.size * 0.8
-                    );
+                // Rysuj delikatną ścieżkę łączącą punkty (efekt splątania kwantowego)
+                QColor pathColor = markerColor;
+                pathColor.setAlphaF(0.2);
+                painter.setPen(QPen(pathColor, 0.5, Qt::DotLine));
+                painter.setBrush(Qt::NoBrush);
+                painter.drawPath(quantumPath);
 
-                    painter.drawLine(p1, p2);
-                }
+                // Dodaj centralny punkt
+                painter.setBrush(markerColor.lighter(110));
+                painter.drawEllipse(markerPos, marker.size * 0.4, marker.size * 0.4);
             }
             break;
         }
@@ -696,14 +819,14 @@ void BlobRenderer::drawHUD(QPainter &painter, const QPointF &blobCenter,
 
 QColor BlobRenderer::getMarkerColor(int markerType, double colorPhase) {
     switch (markerType) {
-    case 0: // Impulsy energii - intensywny elektryczny niebieski
-        return QColor::fromHsvF(0.55 + 0.05 * sin(colorPhase * 2 * M_PI), 0.95, 0.99);
+    case 0: // Impulsy energii - Neonowa zieleń
+        return QColor::fromHsvF(0.33 + 0.05 * sin(colorPhase * 2 * M_PI), 1.0, 0.95);
 
-    case 1: // Fale zakłóceń - turkusowy do fioletowego
-        return QColor::fromHsvF(0.48 + 0.15 * sin(colorPhase * 2 * M_PI), 0.9, 0.95);
+    case 1: // Fale zakłóceń - Złoto-żółty
+        return QColor::fromHsvF(0.13 + 0.07 * sin(colorPhase * 2 * M_PI), 0.9, 0.95);
 
-    case 2: // Efekt kwantowy - głęboki niebieski z odcieniami fioletu
-        return QColor::fromHsvF(0.65 + 0.08 * sin(colorPhase * 2 * M_PI), 0.85, 0.95);
+    case 2: // Efekt kwantowy - Neo-purpura
+        return QColor::fromHsvF(0.78 + 0.1 * sin(colorPhase * 2 * M_PI), 0.85, 1.0);
 
     default:
         return QColor(0, 200, 255); // Domyślny niebieski neon

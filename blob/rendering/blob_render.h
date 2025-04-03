@@ -25,15 +25,16 @@ struct BlobRenderState {
 };
 
 struct PathMarker {
-    double position;   // Pozycja na ścieżce (0.0-1.0)
-    int markerType;    // 0-impulsy energii, 1-fale zakłóceń, 2-efekt kwantowy
-    int size;          // Rozmiar znacznika
-    int direction;     // Kierunek ruchu (1 lub -1)
-    double colorPhase; // Faza koloru (0.0-1.0)
-    double colorSpeed; // Prędkość zmiany koloru
-    double tailLength; // Długość śladu impulsu (tylko dla typu 0)
-    double wavePhase;  // Faza fali zakłóceń (tylko dla typu 1)
-    double quantumOffset; // Przesunięcie kwantowe (tylko dla typu 2)
+    double position;     // Pozycja na ścieżce (0.0-1.0)
+    int markerType;      // 0-impulsy energii, 1-fale zakłóceń, 2-efekt kwantowy
+    int size;            // Rozmiar znacznika
+    int direction;       // Kierunek ruchu (1 lub -1)
+    double colorPhase;   // Faza koloru (0.0-1.0)
+    double colorSpeed;   // Prędkość zmiany koloru
+    double tailLength;   // Długość śladu impulsu (tylko dla typu 0)
+    double wavePhase;    // Faza fali zakłóceń (tylko dla typu 1)
+    double quantumOffset;// Przesunięcie kwantowe (tylko dla typu 2)
+    double speed;        // Indywidualna prędkość markera
     std::vector<QPointF> trailPoints; // Punkty śladu dla impulsu energii
 };
 
@@ -89,7 +90,7 @@ private:
     bool m_staticBackgroundInitialized = false;
 
     std::vector<PathMarker> m_pathMarkers;
-    double m_markerSpeed = 0.2;
+    double m_markerSpeed = 0.05;
     qint64 m_lastUpdateTime = 0;
 
     void updateGridBuffer(const QColor &backgroundColor,
