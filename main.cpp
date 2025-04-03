@@ -66,6 +66,9 @@ int main(int argc, char *argv[]) {
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
 
+    const QIcon appIcon(":/assets/icons/wavelength_logo_upscaled.png");
+    QApplication::setWindowIcon(appIcon);
+
     if (!FontManager::instance().initialize()) {
         qWarning() << "Nie udało się załadować wszystkich czcionek!";
     }
@@ -84,7 +87,7 @@ int main(int argc, char *argv[]) {
     // app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
 
     QMainWindow window;
-    window.setWindowTitle("Pk4");
+    window.setWindowTitle("Wavelength");
     // window.setStyleSheet("QMainWindow { background-color: #2d2d2d; }");
 
     auto *navbar = new Navbar(&window);
@@ -305,7 +308,7 @@ int main(int argc, char *argv[]) {
     });
 
     if (!instanceManager->isCreator()) {
-        window.setWindowTitle("Pk4 - Instancja podrzędna");
+        window.setWindowTitle("Wavelength - Sub Instance");
     }
 
 #ifdef Q_OS_WINDOWS

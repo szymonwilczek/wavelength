@@ -26,5 +26,8 @@
         <file>assets/fonts/Poppins/Poppins-Medium.ttf</file>
         <file>assets/fonts/Poppins/Poppins-Light.ttf</file>
         <file>assets/fonts/Poppins/Poppins-SemiBold.ttf</file>
+
+        <!-- Ikony aplikacji -->
+        <file>assets/icons/wavelength_logo_upscaled.png</file>
     </qresource>
 </RCC>
