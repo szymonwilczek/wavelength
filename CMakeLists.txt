@@ -143,6 +143,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/cyberpunk_style.h
         wavelength/view/main_window/cyberpunk_text_effect.cpp
         wavelength/view/main_window/cyberpunk_text_effect.h
+        wavelength/ui/button/cyberpunk_button.cpp
+        wavelength/ui/button/cyberpunk_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
