@@ -38,10 +38,13 @@ public:
     BlobRenderer() = default;
 
     void renderBlob(QPainter &painter,
-                    const std::vector<QPointF> &controlPoints,
-                    const QPointF &blobCenter,
-                    const BlobConfig::BlobParameters &params,
-                    int width, int height);
+                const std::vector<QPointF> &controlPoints,
+                const QPointF &blobCenter,
+                const BlobConfig::BlobParameters &params,
+                int width, int height,
+                BlobConfig::AnimationState animationState);  // Dodany parametr
+
+
 
     void resetGridBuffer() {
         m_gridBuffer = QPixmap();
@@ -100,11 +103,13 @@ private:
                     const QColor &borderColor,
                     int borderWidth);
 
+    // Zaktualizuj deklarację metody drawFilling w nagłówku:
     void drawFilling(QPainter &painter,
                      const QPainterPath &blobPath,
                      const QPointF &blobCenter,
                      double blobRadius,
-                     const QColor &borderColor);
+                     const QColor &borderColor,
+                     BlobConfig::AnimationState animationState);  // Dodany parametr
 
     QColor getMarkerColor(int markerType, double colorPhase);
 };

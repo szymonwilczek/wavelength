@@ -6,12 +6,12 @@
 #include <QDebug>
 
 void BlobRenderer::renderBlob(QPainter &painter,
-                              const std::vector<QPointF> &controlPoints,
-                              const QPointF &blobCenter,
-                              const BlobConfig::BlobParameters &params,
-                              int width, int height) {
+                           const std::vector<QPointF> &controlPoints,
+                           const QPointF &blobCenter,
+                           const BlobConfig::BlobParameters &params,
+                           int width, int height,
+                           BlobConfig::AnimationState animationState) {  // Dodany parametr
     painter.setRenderHint(QPainter::Antialiasing, true);
-
 
     QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
 
@@ -19,7 +19,7 @@ void BlobRenderer::renderBlob(QPainter &painter,
 
     drawBorder(painter, blobPath, params.borderColor, params.borderWidth);
 
-    drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor);
+    drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor, animationState);  // Przekazujemy stan animacji
 }
 
 void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
@@ -311,10 +311,11 @@ void BlobRenderer::drawBorder(QPainter &painter,
 
 
 void BlobRenderer::drawFilling(QPainter &painter,
-                               const QPainterPath &blobPath,
-                               const QPointF &blobCenter,
-                               double blobRadius,
-                               const QColor &borderColor) {
+                            const QPainterPath &blobPath,
+                            const QPointF &blobCenter,
+                            double blobRadius,
+                            const QColor &borderColor,
+                            BlobConfig::AnimationState animationState) {  // Dodany parametr
     // Cyfrowy gradient z zanikaniem dla bloba
     QRadialGradient gradient(blobCenter, blobRadius);
 
@@ -338,44 +339,47 @@ void BlobRenderer::drawFilling(QPainter &painter,
     painter.setPen(Qt::NoPen);
     painter.drawPath(blobPath);
 
-    // Dodajmy subtelniejsze linie skanowania wewnątrz bloba
-    painter.setClipPath(blobPath);
-    painter.setPen(QPen(QColor(borderColor.lighter(150)), 0.5)); // Cieńsza linia (0.5 zamiast 1)
+    // Rysuj linie skanowania tylko w stanie IDLE
+    if (animationState == BlobConfig::IDLE) {
+        // Dodajmy subtelniejsze linie skanowania wewnątrz bloba
+        painter.setClipPath(blobPath);
+        painter.setPen(QPen(QColor(borderColor.lighter(150)), 0.5)); // Cieńsza linia (0.5 zamiast 1)
 
-    // Zwiększamy odstęp między liniami z 4 na 12 (3x mniej linii)
-    for (int y = 0; y < blobRadius * 2; y += 12) {
-        int yPos = blobCenter.y() - blobRadius + y;
-        QLineF line(blobCenter.x() - blobRadius, yPos, blobCenter.x() + blobRadius, yPos);
-        painter.setOpacity(0.04); // Zmniejszam nieprzezroczystość z 0.1 na 0.04
-        painter.drawLine(line);
+        // Zwiększamy odstęp między liniami z 4 na 12 (3x mniej linii)
+        for (int y = 0; y < blobRadius * 2; y += 12) {
+            int yPos = blobCenter.y() - blobRadius + y;
+            QLineF line(blobCenter.x() - blobRadius, yPos, blobCenter.x() + blobRadius, yPos);
+            painter.setOpacity(0.04); // Zmniejszam nieprzezroczystość z 0.1 na 0.04
+            painter.drawLine(line);
+        }
+        painter.setOpacity(1.0);
+        painter.setClipping(false);
+
+        // Dodajmy cyfrowe artefakty/linie wewnątrz bloba
+        painter.setClipPath(blobPath);
+
+        QColor techColor = borderColor.lighter(150);
+        techColor.setAlpha(30); // Zmniejszam z 40 na 30 dla mniejszej agresywności
+        QPen techPen(techColor, 1, Qt::DotLine);
+        painter.setPen(techPen);
+
+        // Mniej linii wewnętrznych (z 3+4 na 2+2)
+        QRandomGenerator *rng = QRandomGenerator::global();
+        int numLines = 2 + rng->bounded(2);
+
+        for (int i = 0; i < numLines; i++) {
+            double angle = rng->bounded(2.0 * M_PI);
+            double startDist = 0.2 * blobRadius;
+            double endDist = 0.8 * blobRadius;
+
+            QPointF start = blobCenter + QPointF(cos(angle) * startDist, sin(angle) * startDist);
+            QPointF end = blobCenter + QPointF(cos(angle) * endDist, sin(angle) * endDist);
+
+            painter.drawLine(start, end);
+        }
+
+        painter.setClipping(false);
     }
-    painter.setOpacity(1.0);
-    painter.setClipping(false);
-
-    // Dodajmy cyfrowe artefakty/linie wewnątrz bloba
-    painter.setClipPath(blobPath);
-
-    QColor techColor = borderColor.lighter(150);
-    techColor.setAlpha(30); // Zmniejszam z 40 na 30 dla mniejszej agresywności
-    QPen techPen(techColor, 1, Qt::DotLine);
-    painter.setPen(techPen);
-
-    // Mniej linii wewnętrznych (z 3+4 na 2+2)
-    QRandomGenerator *rng = QRandomGenerator::global();
-    int numLines = 2 + rng->bounded(2);
-
-    for (int i = 0; i < numLines; i++) {
-        double angle = rng->bounded(2.0 * M_PI);
-        double startDist = 0.2 * blobRadius;
-        double endDist = 0.8 * blobRadius;
-
-        QPointF start = blobCenter + QPointF(cos(angle) * startDist, sin(angle) * startDist);
-        QPointF end = blobCenter + QPointF(cos(angle) * endDist, sin(angle) * endDist);
-
-        painter.drawLine(start, end);
-    }
-
-    painter.setClipping(false);
 }
 
 void BlobRenderer::renderScene(QPainter &painter,
@@ -490,7 +494,7 @@ void BlobRenderer::renderScene(QPainter &painter,
     }
 
     // Renderuj blob
-    renderBlob(painter, controlPoints, blobCenter, params, width, height);
+    renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
 
     if (renderState.animationState == BlobConfig::IDLE) {
         drawHUD(painter, blobCenter, params.blobRadius, params.borderColor, width, height);
