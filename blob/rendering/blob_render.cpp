@@ -230,48 +230,6 @@ void BlobRenderer::drawFilling(QPainter &painter,
     painter.setBrush(gradient);
     painter.setPen(Qt::NoPen);
     painter.drawPath(blobPath);
-
-    // Rysuj linie skanowania tylko w stanie IDLE
-    if (animationState == BlobConfig::IDLE) {
-        // Dodajmy subtelniejsze linie skanowania wewnątrz bloba
-        painter.setClipPath(blobPath);
-        painter.setPen(QPen(QColor(borderColor.lighter(150)), 0.5)); // Cieńsza linia (0.5 zamiast 1)
-
-        // Zwiększamy odstęp między liniami z 4 na 12 (3x mniej linii)
-        for (int y = 0; y < blobRadius * 2; y += 12) {
-            int yPos = blobCenter.y() - blobRadius + y;
-            QLineF line(blobCenter.x() - blobRadius, yPos, blobCenter.x() + blobRadius, yPos);
-            painter.setOpacity(0.04); // Zmniejszam nieprzezroczystość z 0.1 na 0.04
-            painter.drawLine(line);
-        }
-        painter.setOpacity(1.0);
-        painter.setClipping(false);
-
-        // Dodajmy cyfrowe artefakty/linie wewnątrz bloba
-        painter.setClipPath(blobPath);
-
-        QColor techColor = borderColor.lighter(150);
-        techColor.setAlpha(30); // Zmniejszam z 40 na 30 dla mniejszej agresywności
-        QPen techPen(techColor, 1, Qt::DotLine);
-        painter.setPen(techPen);
-
-        // Mniej linii wewnętrznych (z 3+4 na 2+2)
-        QRandomGenerator *rng = QRandomGenerator::global();
-        int numLines = 2 + rng->bounded(2);
-
-        for (int i = 0; i < numLines; i++) {
-            double angle = rng->bounded(2.0 * M_PI);
-            double startDist = 0.2 * blobRadius;
-            double endDist = 0.8 * blobRadius;
-
-            QPointF start = blobCenter + QPointF(cos(angle) * startDist, sin(angle) * startDist);
-            QPointF end = blobCenter + QPointF(cos(angle) * endDist, sin(angle) * endDist);
-
-            painter.drawLine(start, end);
-        }
-
-        painter.setClipping(false);
-    }
 }
 
 void BlobRenderer::renderScene(QPainter &painter,
