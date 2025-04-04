@@ -6,53 +6,56 @@
 #include <QHBoxLayout>
 #include <QDateTime>
 #include <qeventloop.h>
-#include <QPainterPath>
 #include <QPaintEvent>
 
 NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     : QWidget(parent)
     , m_currentQuality(NONE)
 {
-    // Układ poziomy dla ikon i tekstu
+    // Ustawienie minimum/fixed size dla widgetu
+    setFixedHeight(36);
+    setMinimumWidth(180);
+
+    // Układ poziomy dla ikon i tekstu z większymi marginesami
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(5, 0, 5, 0);
-    layout->setSpacing(8);
+    layout->setContentsMargins(15, 5, 15, 5);
+    layout->setSpacing(10);
 
     // Ikona połączenia
     m_iconLabel = new QLabel(this);
-    m_iconLabel->setFixedSize(32, 24);
-    
+    m_iconLabel->setFixedSize(28, 24);
+
     // Etykieta statusu
     m_statusLabel = new QLabel("SYSTEM READY", this);
-    
-    // Ustawienie fontu BlenderPro dla napisu SYSTEM READY
+
+    // Ustawienie fontu BlenderPro dla napisu
     QFont statusFont = FontManager::instance().getFont(FontFamily::BlenderPro, FontStyle::Medium, 10);
     m_statusLabel->setFont(statusFont);
-    
-    // Stylizacja cyberpunkowa etykiety
-    m_statusLabel->setStyleSheet("QLabel { color: #00C3FF; }");
-    
-    // Dodanie efektu poświaty dla napisu
-    QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(m_statusLabel);
-    textGlow->setBlurRadius(5);
-    textGlow->setOffset(0, 0);
-    textGlow->setColor(QColor(0, 195, 255, 100));
-    m_statusLabel->setGraphicsEffect(textGlow);
 
     // Dodanie elementów do layoutu
     layout->addWidget(m_iconLabel);
     layout->addWidget(m_statusLabel);
-    
+
     setLayout(layout);
-    
+
+    // Ustawienie tła na przezroczyste
+    setAttribute(Qt::WA_TranslucentBackground);
+
+    // Efekt poświaty dla całego widgetu
+    QGraphicsDropShadowEffect* widgetGlow = new QGraphicsDropShadowEffect(this);
+    widgetGlow->setBlurRadius(8);
+    widgetGlow->setOffset(0, 0);
+    widgetGlow->setColor(QColor(0, 195, 255, 100));
+    setGraphicsEffect(widgetGlow);
+
     // Utworzenie managera sieci
     m_networkManager = new QNetworkAccessManager(this);
-    
+
     // Timer do regularnej aktualizacji statusu
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, &QTimer::timeout, this, &NetworkStatusWidget::checkNetworkStatus);
     m_updateTimer->start(5000); // Aktualizacja co 5 sekund
-    
+
     // Początkowe sprawdzenie
     checkNetworkStatus();
 }
@@ -61,36 +64,60 @@ NetworkStatusWidget::~NetworkStatusWidget() {
     m_updateTimer->stop();
 }
 
+void NetworkStatusWidget::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Tworzymy zaokrągloną ramkę
+    QRect frameRect = rect().adjusted(1, 1, -1, -1);
+    int cornerRadius = 8;
+
+    // Rysowanie półprzezroczystego tła
+    QColor bgColor(20, 20, 30, 180);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgColor);
+    painter.drawRoundedRect(frameRect, cornerRadius, cornerRadius);
+
+    // Rysowanie ramki z kolorem zależnym od jakości połączenia
+    QPen borderPen(m_borderColor);
+    borderPen.setWidth(2);
+    painter.setPen(borderPen);
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRoundedRect(frameRect, cornerRadius, cornerRadius);
+
+    QWidget::paintEvent(event);
+}
+
 void NetworkStatusWidget::checkNetworkStatus() {
     // Wykonanie testowego żądania do Google, aby sprawdzić łączność
     QNetworkRequest request(QUrl("https://www.google.com"));
     QNetworkReply *reply = m_networkManager->get(request);
-    
+
     // Timeout dla żądania
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
-    
+
     // Połączenie sygnałów timera i odpowiedzi
     connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    
+
     // Uruchomienie timera na 2 sekundy
     timer.start(2000);
-    
+
     // Start pomiaru czasu
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
-    
+
     // Oczekiwanie na odpowiedź lub timeout
     loop.exec();
-    
+
     // Obliczenie czasu odpowiedzi
     qint64 responseTime = QDateTime::currentMSecsSinceEpoch() - startTime;
-    
+
     // Określenie jakości połączenia na podstawie czasu odpowiedzi
     if (timer.isActive() && reply->error() == QNetworkReply::NoError) {
         timer.stop();
-        
+
         if (responseTime < 200) {
             m_currentQuality = EXCELLENT;
         } else if (responseTime < 500) {
@@ -103,9 +130,9 @@ void NetworkStatusWidget::checkNetworkStatus() {
     } else {
         m_currentQuality = NONE;
     }
-    
+
     reply->deleteLater();
-    
+
     // Aktualizacja wyświetlania
     updateStatusDisplay();
 }
@@ -129,90 +156,90 @@ void NetworkStatusWidget::updateStatusDisplay() {
             m_statusLabel->setText("OFFLINE");
             break;
     }
-    
+
+    // Aktualizacja koloru ramki i tekstu
+    m_borderColor = getQualityColor(m_currentQuality);
+    m_statusLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(m_borderColor.name()));
+
     // Utworzenie ikony dla aktualnego statusu
     createNetworkIcon(m_currentQuality);
+
+    // Odświeżenie widgetu
+    update();
+}
+
+QColor NetworkStatusWidget::getQualityColor(NetworkQuality quality) {
+    switch (quality) {
+        case EXCELLENT:
+            return QColor(0, 255, 170); // Neonowy cyjan
+        case GOOD:
+            return QColor(0, 195, 255); // Niebieski
+        case FAIR:
+            return QColor(255, 165, 0); // Pomarańczowy
+        case POOR:
+            return QColor(255, 50, 50); // Czerwony
+        case NONE:
+            return QColor(100, 100, 100); // Szary
+    }
+    return QColor(100, 100, 100);
 }
 
 void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
     // Rozmiary ikony
-    const int iconWidth = 32;
+    const int iconWidth = 28;
     const int iconHeight = 24;
-    
+
     QPixmap pixmap(iconWidth, iconHeight);
     pixmap.fill(Qt::transparent);
-    
+
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
-    
-    // Kolory dla różnych poziomów sygnału
-    QColor activeColor;
-    QColor inactiveColor(80, 80, 80, 100);
-    
-    switch (quality) {
-        case EXCELLENT:
-            activeColor = QColor(0, 255, 170); // Neonowy cyjan
-            break;
-        case GOOD: 
-            activeColor = QColor(0, 195, 255); // Niebieski
-            break;
-        case FAIR:
-            activeColor = QColor(255, 165, 0); // Pomarańczowy
-            break;
-        case POOR:
-            activeColor = QColor(255, 50, 50); // Czerwony
-            break;
-        case NONE:
-            activeColor = QColor(100, 100, 100); // Szary
-            break;
-    }
-    
-    // Szerokość i wysokość kresek
-    int barWidth = 4;
-    int spacing = 2;
-    int startX = 2;
-    int totalBars = 4;
-    
-    // Rysowanie kresek sygnału WiFi
-    for (int i = 0; i < totalBars; i++) {
-        int barHeight = 4 + (i * 4); // Rosnąca wysokość
-        int y = iconHeight - barHeight;
-        QColor color = (i < qualityToBarNumber(quality)) ? activeColor : inactiveColor;
-        
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(color);
-        
-        // Rysowanie prostokąta
-        QRect barRect(startX + i * (barWidth + spacing), y, barWidth, barHeight);
-        painter.drawRoundedRect(barRect, 1, 1);
-        
-        // Dodanie delikatnej poświaty dla aktywnych kresek
-        if (i < qualityToBarNumber(quality)) {
-            QPainterPath path;
-            path.addRoundedRect(barRect, 1, 1);
-            
-            QColor glowColor = activeColor;
-            glowColor.setAlpha(80);
-            
-            for (int j = 3; j > 0; j--) {
-                QPen glowPen(glowColor);
-                glowPen.setWidth(j);
-                painter.setPen(glowPen);
-                painter.drawPath(path);
-            }
-        }
-    }
-    
-    m_iconLabel->setPixmap(pixmap);
-}
 
-int NetworkStatusWidget::qualityToBarNumber(NetworkQuality quality) {
-    switch (quality) {
-        case EXCELLENT: return 4;
-        case GOOD: return 3;
-        case FAIR: return 2;
-        case POOR: return 1;
-        case NONE: return 0;
+    QColor signalColor = getQualityColor(quality);
+    QColor inactiveColor(80, 80, 80, 100);
+
+    // Rysuj symbol WiFi - łuki o rosnącym promieniu
+    QPointF center(iconWidth/2, iconHeight*0.8);
+    int maxArcs = 4;
+    int activeArcs = 0;
+
+    switch(quality) {
+        case EXCELLENT: activeArcs = 4; break;
+        case GOOD:      activeArcs = 3; break;
+        case FAIR:      activeArcs = 2; break;
+        case POOR:      activeArcs = 1; break;
+        case NONE:      activeArcs = 0; break;
     }
-    return 0;
+
+    // Rysuj punkt źródłowy
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(activeArcs > 0 ? signalColor : inactiveColor);
+    painter.drawEllipse(center, 2, 2);
+
+    // Rysuj łuki WiFi
+    for (int i = 0; i < maxArcs; i++) {
+        // Wielkość łuku zależy od numeru (większe na zewnątrz)
+        int arcRadius = 5 + (i * 4);
+
+        QPen arcPen;
+        if (i < activeArcs) {
+            arcPen = QPen(signalColor, 2);
+            // Dodanie subtelnej poświaty dla aktywnych łuków
+            if (quality != NONE) {
+                painter.setPen(QPen(QColor(signalColor.red(), signalColor.green(), signalColor.blue(), 80), 3));
+                painter.drawArc(QRectF(center.x() - arcRadius, center.y() - arcRadius,
+                                      arcRadius * 2, arcRadius * 2),
+                               45 * 16, 90 * 16);
+            }
+        } else {
+            arcPen = QPen(inactiveColor, 2);
+        }
+
+        painter.setPen(arcPen);
+        painter.drawArc(QRectF(center.x() - arcRadius, center.y() - arcRadius,
+                              arcRadius * 2, arcRadius * 2),
+                       45 * 16, 90 * 16);
+    }
+
+    m_iconLabel->setPixmap(pixmap);
 }

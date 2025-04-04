@@ -17,6 +17,9 @@ public:
     public slots:
         void checkNetworkStatus();
 
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
 private:
     enum NetworkQuality {
         NONE,
@@ -31,10 +34,11 @@ private:
     QNetworkAccessManager *m_networkManager;
     QTimer *m_updateTimer;
     NetworkQuality m_currentQuality;
+    QColor m_borderColor;
 
     void updateStatusDisplay();
     void createNetworkIcon(NetworkQuality quality);
-    int qualityToBarNumber(NetworkQuality quality);
+    QColor getQualityColor(NetworkQuality quality);
 };
 
 #endif // NETWORK_STATUS_WIDGET_H
