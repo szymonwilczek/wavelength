@@ -9,6 +9,9 @@
 #include <QFontDatabase>
 #include <QGraphicsDropShadowEffect>
 
+#include "network_status_widget.h"
+#include "../../../font_manager.h"
+
 Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     setMovable(false);
     setFloatable(false);
@@ -28,34 +31,13 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
         "}"
     );
 
-    // Główny kontener z layoutem horyzontalnym
+    // Główny kontener z layoutem horyzontalnym na całą szerokość
     QWidget* mainContainer = new QWidget(this);
     QHBoxLayout* mainLayout = new QHBoxLayout(mainContainer);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // Logo z neonowym efektem poświaty - przyciągnięte do lewej
-    logoLabel = new QLabel("WAVELENGTH", this);
-    QFont logoFont("Blender Pro", 12);
-    logoFont.setWeight(QFont::Bold);
-    logoFont.setStyleStrategy(QFont::PreferAntialias);
-    logoLabel->setFont(logoFont);
-    logoLabel->setStyleSheet(
-        "QLabel {"
-        "  color: #f0f0f0;"
-        "  padding: 5px 0px;"
-        "  margin-right: 20px;"
-        "}"
-    );
-
-    // Dodanie neonowego efektu poświaty
-    QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(logoLabel);
-    textGlow->setBlurRadius(8);
-    textGlow->setOffset(0, 0);
-    textGlow->setColor(QColor(0, 195, 255, 150));
-    logoLabel->setGraphicsEffect(textGlow);
-
-    // Dodanie elementu narożnego do logo
+    // Element narożny po lewej
     QLabel* cornerElement1 = new QLabel(this);
     cornerElement1->setStyleSheet(
         "QLabel {"
@@ -68,7 +50,27 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
         "}"
     );
 
-    // Kontener na logo z elementem narożnym
+    // Logo z neonowym efektem poświaty
+    logoLabel = new QLabel("WAVELENGTH", this);
+
+    // Użyj FontManager do pobrania czcionki BlenderPro
+    QFont logoFont = FontManager::instance().getFont(FontFamily::BlenderPro, FontStyle::Bold, 12);
+    logoLabel->setFont(logoFont);
+    logoLabel->setStyleSheet(
+        "QLabel {"
+        "  color: #f0f0f0;"
+        "  padding: 5px 0px;"
+        "}"
+    );
+
+    // Dodanie neonowego efektu poświaty
+    QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(logoLabel);
+    textGlow->setBlurRadius(8);
+    textGlow->setOffset(0, 0);
+    textGlow->setColor(QColor(0, 195, 255, 150));
+    logoLabel->setGraphicsEffect(textGlow);
+
+    // Sekcja logo (lewa strona)
     QWidget* logoContainer = new QWidget(this);
     QHBoxLayout* logoLayout = new QHBoxLayout(logoContainer);
     logoLayout->setContentsMargins(0, 0, 0, 0);
@@ -76,19 +78,20 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     logoLayout->addWidget(cornerElement1);
     logoLayout->addWidget(logoLabel);
 
-    // Centralny kontener na przyciski z justify-between
+    // NOWY ELEMENT: Widget statusu sieci (środek)
+    NetworkStatusWidget* networkStatus = new NetworkStatusWidget(this);
+    networkStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    // Kontener na przyciski (prawa strona)
     QWidget* buttonsContainer = new QWidget(this);
     QHBoxLayout* buttonsLayout = new QHBoxLayout(buttonsContainer);
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
-    buttonsLayout->setSpacing(0);
+    buttonsLayout->setSpacing(40); // Stały odstęp między przyciskami
 
-    // Utworzenie przycisków
+    // Przyciski akcji
     createWavelengthButton = new CyberpunkButton("Generate Wavelength", buttonsContainer);
     joinWavelengthButton = new CyberpunkButton("Merge Wavelength", buttonsContainer);
-
-    // Dodanie przycisków do layoutu z odstępem między nimi (justify-between)
     buttonsLayout->addWidget(createWavelengthButton);
-    buttonsLayout->addSpacing(40); // Odstęp między przyciskami
     buttonsLayout->addWidget(joinWavelengthButton);
 
     // Element narożny po prawej
@@ -105,11 +108,12 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     );
 
     // Dodanie wszystkich elementów do głównego layoutu
-    mainLayout->addWidget(logoContainer, 0, Qt::AlignLeft); // Logo przyciągnięte do lewej
-    mainLayout->addStretch(1); // Elastyczna przestrzeń przed kontenerem z przyciskami
-    mainLayout->addWidget(buttonsContainer, 0, Qt::AlignCenter); // Kontener z przyciskami wycentrowany
-    mainLayout->addStretch(1); // Elastyczna przestrzeń po kontenerze z przyciskami
-    mainLayout->addWidget(cornerElement2, 0, Qt::AlignRight); // Element narożny po prawej stronie
+    mainLayout->addWidget(logoContainer, 0, Qt::AlignLeft);      // Logo do lewej
+    mainLayout->addStretch(1);                                   // Elastyczna przestrzeń
+    mainLayout->addWidget(networkStatus, 0, Qt::AlignCenter);    // Status sieci na środku
+    mainLayout->addStretch(1);                                   // Elastyczna przestrzeń
+    mainLayout->addWidget(buttonsContainer, 0, Qt::AlignRight);  // Przyciski do prawej
+    mainLayout->addWidget(cornerElement2, 0, Qt::AlignRight);    // Element narożny po prawej
 
     addWidget(mainContainer);
 

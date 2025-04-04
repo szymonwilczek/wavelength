@@ -147,6 +147,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/button/cyberpunk_button.h
         blob/rendering/path_markers_manager.cpp
         blob/rendering/path_markers_manager.h
+        wavelength/ui/navigation/network_status_widget.cpp
+        wavelength/ui/navigation/network_status_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
