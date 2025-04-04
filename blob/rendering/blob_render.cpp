@@ -78,26 +78,6 @@ void BlobRenderer::drawBackground(QPainter &painter,
         bgGradient.setColorAt(1, QColor(10, 25, 40));
         texturePainter.fillRect(QRect(0, 0, textureSize, textureSize), bgGradient);
 
-        // Dodaj losowe punkty świecące (małe neony)
-        QColor glowPointColor = QColor(0, 200, 255, 100);
-        texturePainter.setPen(Qt::NoPen);
-
-        // Stała liczba punktów dla stałego rozmiaru tekstury
-        int numPoints = 200;
-        QRandomGenerator *rng = QRandomGenerator::global();
-        for (int i = 0; i < numPoints; i++) {
-            int x = rng->bounded(textureSize);
-            int y = rng->bounded(textureSize);
-            int size = rng->bounded(2, 5);
-
-            QRadialGradient pointGlow(x, y, size * 2);
-            pointGlow.setColorAt(0, glowPointColor);
-            pointGlow.setColorAt(1, QColor(0, 0, 0, 0));
-
-            texturePainter.setBrush(pointGlow);
-            texturePainter.drawEllipse(QPointF(x, y), size, size);
-        }
-
         m_staticBackgroundInitialized = true;
     }
 
