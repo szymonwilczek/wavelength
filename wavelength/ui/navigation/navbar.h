@@ -4,6 +4,8 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QTimer>
+#include <QResizeEvent>
 
 class CyberpunkButton;
 
@@ -15,6 +17,7 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
     signals:
         void createWavelengthClicked();
