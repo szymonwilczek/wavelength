@@ -40,7 +40,7 @@ public:
         m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
         
         QRandomGenerator *rng = QRandomGenerator::global();
-        int numMarkers = rng->bounded(8, 15); // Liczba markerów
+        int numMarkers = rng->bounded(4, 7); // Liczba markerów
         int lastMarkerType = -1; // Zmienna śledząca ostatni wygenerowany typ
         
         for (int i = 0; i < numMarkers; i++) {
