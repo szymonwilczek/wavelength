@@ -34,7 +34,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     // Główny kontener z layoutem horyzontalnym na całą szerokość
     QWidget* mainContainer = new QWidget(this);
     QHBoxLayout* mainLayout = new QHBoxLayout(mainContainer);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(0, 3, 0, 3);
     mainLayout->setSpacing(0);
 
     // Element narożny po lewej
