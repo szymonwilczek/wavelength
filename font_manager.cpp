@@ -11,7 +11,8 @@ FontManager::FontManager() {
     m_fontFamilyNames = {
         {FontFamily::Lato, "Lato"},
         {FontFamily::NotoSans, "Noto Sans Condensed"},
-        {FontFamily::Poppins, "Poppins"}
+        {FontFamily::Poppins, "Poppins"},
+        {FontFamily::BlenderPro, "Blender Pro"}
     };
 
     m_fontStyleNames = {
@@ -52,7 +53,13 @@ FontManager::FontManager() {
         {qMakePair(FontFamily::Poppins, FontStyle::Bold), ":/assets/fonts/Poppins/Poppins-Bold.ttf"},
         {qMakePair(FontFamily::Poppins, FontStyle::Medium), ":/assets/fonts/Poppins/Poppins-Medium.ttf"},
         {qMakePair(FontFamily::Poppins, FontStyle::Light), ":/assets/fonts/Poppins/Poppins-Light.ttf"},
-        {qMakePair(FontFamily::Poppins, FontStyle::SemiBold), ":/assets/fonts/Poppins/Poppins-SemiBold.ttf"}
+        {qMakePair(FontFamily::Poppins, FontStyle::SemiBold), ":/assets/fonts/Poppins/Poppins-SemiBold.ttf"},
+
+        {qMakePair(FontFamily::BlenderPro, FontStyle::Regular), ":/assets/fonts/BlenderPro/BlenderPro-Medium.ttf"},
+        {qMakePair(FontFamily::BlenderPro, FontStyle::Bold), ":/assets/fonts/BlenderPro/BlenderPro-Bold.ttf"},
+        {qMakePair(FontFamily::BlenderPro, FontStyle::Italic), ":/assets/fonts/BlenderPro/BlenderPro-BoldItalic.ttf"},
+
+
     };
 
     m_loadedFonts[FontFamily::Lato] = false;

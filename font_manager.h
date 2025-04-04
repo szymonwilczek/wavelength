@@ -9,7 +9,8 @@
 enum class FontFamily {
     Lato,
     NotoSans,
-    Poppins
+    Poppins,
+    BlenderPro
 };
 
 enum class FontStyle {
