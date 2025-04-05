@@ -5,6 +5,7 @@
 #include <QSpacerItem>
 #include <QFont>
 #include <QContextMenuEvent>
+#include <QCoreApplication>
 #include <QPushButton>
 #include <QFontDatabase>
 #include <QGraphicsDropShadowEffect>
@@ -53,15 +54,25 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     // Logo z neonowym efektem poświaty
     logoLabel = new QLabel("WAVELENGTH", this);
 
-    // Użyj FontManager do pobrania czcionki BlenderPro
-    QFont logoFont = FontManager::instance().getFont(FontFamily::BlenderPro, FontStyle::Bold, 12);
-    logoLabel->setFont(logoFont);
+    // Ustaw czcionkę za pomocą stylu CSS
     logoLabel->setStyleSheet(
-        "QLabel {"
-        "  color: #f0f0f0;"
-        "  padding: 5px 0px;"
-        "}"
+    "QLabel {"
+   "   font-family: 'Blender Pro Heavy';"
+   "   font-size: 20px;"
+   "   letter-spacing: 1px;"
+   "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
+   "   background-color: transparent;"
+   "   text-transform: uppercase;"
+   "}"
     );
+
+    // Alternatywnie, jeśli FontManager działa poprawnie ale zwraca niewłaściwą nazwę:
+    // FontManager* fontManager = FontManager::getInstance();
+    // QFont font = fontManager->getFont("BlenderPro", 12, QFont::Bold);
+    // qDebug() << "Rzeczywista nazwa czcionki:" << font.family();
+    // logoLabel->setFont(font);
+
+    qDebug() << "Ustawiona czcionka logoLabel:" << logoLabel->font().family();
 
     // Dodanie neonowego efektu poświaty
     QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(logoLabel);

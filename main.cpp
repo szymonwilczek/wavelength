@@ -13,12 +13,12 @@
 #include <QLabel>
 #include <QTimer>
 
+#include "font_manager.h"
 #include "blob/core/app_instance_manager.h"
 #include "wavelength/dialogs/join_wavelength_dialog.h"
 #include "wavelength/view/wavelength_chat_view.h"
 #include "wavelength/dialogs/wavelength_dialog.h"
 
-#include "font_manager.h"
 #include "wavelength/session/wavelength_session_coordinator.h"
 #include "wavelength/ui/cyberpunk_style.h"
 #include "wavelength/view/main_window/cyberpunk_text_effect.h"
@@ -66,18 +66,13 @@ int main(int argc, char *argv[]) {
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
 
-    const QIcon appIcon(":/assets/icons/wavelength_logo_upscaled.png");
-    QApplication::setWindowIcon(appIcon);
-
-    if (!FontManager::instance().initialize()) {
-        qWarning() << "Nie udało się załadować wszystkich czcionek!";
+    FontManager* fontManager = FontManager::getInstance();
+    if (!fontManager->initialize()) {
+        qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";
     }
 
-    FontManager::instance().setApplicationFont(FontFamily::Lato, FontStyle::Regular, 10);
-    // FontManager::instance().setApplicationFont(FontFamily::NotoSans, FontStyle::Regular, 10);
-    // FontManager::instance().setApplicationFont(FontFamily::Poppins, FontStyle::Regular, 10);
-
-    FontManager::instance().debugFontInfo();
+    const QIcon appIcon(":/assets/icons/wavelength_logo_upscaled.png");
+    QApplication::setWindowIcon(appIcon);
 
     app.setStyle(QStyleFactory::create("Fusion"));
 
@@ -135,13 +130,14 @@ int main(int argc, char *argv[]) {
     window.setCentralWidget(centralWidget);
 
     QLabel *titleLabel = new QLabel("WAVELENGTH", animation);
-    titleLabel->setFont(QFont("Poppins", 40, QFont::Bold));
+    titleLabel->setFont(QFont("Blender Pro Heavy", 40, QFont::Bold));
     titleLabel->setAlignment(Qt::AlignCenter);
 
     // Aby uzyskać efekt obramowania z półprzezroczystym wypełnieniem,
     // będziemy musieli użyć stylów CSS bardziej kreatywnie
     titleLabel->setStyleSheet(
         "QLabel {"
+        "   font-family: 'Blender Pro Heavy';"
         "   letter-spacing: 8px;"
         "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
         "   background-color: transparent;"
