@@ -1,5 +1,4 @@
 #include "network_status_widget.h"
-#include "../../../font_manager.h"
 
 #include <QPainter>
 #include <QNetworkReply>
@@ -13,35 +12,45 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     , m_currentQuality(NONE)
     , m_pingValue(0)
 {
-    // Ustawienie minimum/fixed size dla widgetu
-    setFixedHeight(36);
-    setMinimumWidth(220);  // Zwiększona szerokość, aby zmieścić ping
+    // Zmniejszona wysokość widgetu
+    setFixedHeight(30);  // Zmniejszone z 36 na 30
+    setMinimumWidth(200);  // Nieznacznie zmniejszona szerokość
 
-    // Układ poziomy dla ikon i tekstu z większymi marginesami
+    // Układ poziomy dla ikon i tekstu z mniejszymi marginesami
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(15, 5, 15, 5);
-    layout->setSpacing(8);
+    layout->setContentsMargins(10, 3, 10, 3);  // Zmniejszone marginesy
+    layout->setSpacing(6);  // Zmniejszony odstęp między elementami
 
-    // Ikona połączenia
+    // Ikona połączenia - zmniejszony rozmiar
     m_iconLabel = new QLabel(this);
-    m_iconLabel->setFixedSize(28, 24);
+    m_iconLabel->setFixedSize(20, 18);  // Zmniejszone z 28x24 na 20x18
 
     // Etykieta statusu
     m_statusLabel = new QLabel("SYSTEM READY", this);
 
-    // Ustawienie fontu BlenderPro dla napisu
-    QFont statusFont = FontManager::instance().getFont(FontFamily::BlenderPro, FontStyle::Medium, 10);
-    m_statusLabel->setFont(statusFont);
+    // Ustaw czcionkę dla statusu
+    m_statusLabel->setStyleSheet(
+        "QLabel {"
+        "   font-family: 'Blender Pro Heavy';"
+        "   font-size: 9px;"  // Mniejszy rozmiar czcionki
+        "   letter-spacing: 0.5px;"
+        "}"
+    );
 
-    // Nowa etykieta dla pingu
+    // Nowa etykieta dla pingu - mniejsza czcionka
     m_pingLabel = new QLabel("0ms", this);
-    m_pingLabel->setFont(statusFont);
     m_pingLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    m_pingLabel->setStyleSheet(
+        "QLabel {"
+        "   font-family: 'Blender Pro Medium';"
+        "   font-size: 9px;"  // Mniejszy rozmiar czcionki
+        "}"
+    );
 
     // Dodanie elementów do layoutu
     layout->addWidget(m_iconLabel);
     layout->addWidget(m_statusLabel);
-    layout->addStretch(1);  // Elastyczna przestrzeń między statusem a pingiem
+    layout->addStretch(1);
     layout->addWidget(m_pingLabel);
 
     setLayout(layout);
@@ -49,9 +58,9 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     // Ustawienie tła na przezroczyste
     setAttribute(Qt::WA_TranslucentBackground);
 
-    // Efekt poświaty dla całego widgetu
+    // Efekt poświaty dla całego widgetu - zmniejszony blur
     QGraphicsDropShadowEffect* widgetGlow = new QGraphicsDropShadowEffect(this);
-    widgetGlow->setBlurRadius(8);
+    widgetGlow->setBlurRadius(6);  // Zmniejszone z 8 na 6
     widgetGlow->setOffset(0, 0);
     widgetGlow->setColor(QColor(0, 195, 255, 100));
     setGraphicsEffect(widgetGlow);
@@ -78,7 +87,7 @@ void NetworkStatusWidget::paintEvent(QPaintEvent *event) {
 
     // Tworzymy zaokrągloną ramkę
     QRect frameRect = rect().adjusted(1, 1, -1, -1);
-    int cornerRadius = 8;
+    int cornerRadius = 6;
 
     // Rysowanie półprzezroczystego tła
     QColor bgColor(20, 20, 30, 180);
@@ -206,9 +215,9 @@ QColor NetworkStatusWidget::getQualityColor(NetworkQuality quality) {
 }
 
 void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
-    // Rozmiary ikony
-    const int iconWidth = 28;
-    const int iconHeight = 24;
+    // Zmniejszone rozmiary ikony
+    const int iconWidth = 20;   // Zmniejszone z 28
+    const int iconHeight = 18;  // Zmniejszone z 24
 
     QPixmap pixmap(iconWidth, iconHeight);
     pixmap.fill(Qt::transparent);
@@ -232,28 +241,28 @@ void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
         case NONE:      activeArcs = 0; break;
     }
 
-    // Rysuj punkt źródłowy
+    // Rysuj punkt źródłowy - mniejszy punkt
     painter.setPen(Qt::NoPen);
     painter.setBrush(activeArcs > 0 ? signalColor : inactiveColor);
-    painter.drawEllipse(center, 2, 2);
+    painter.drawEllipse(center, 1.5, 1.5);  // Zmniejszone z 2,2
 
-    // Rysuj łuki WiFi
+    // Rysuj łuki WiFi - mniejsze i bliżej siebie
     for (int i = 0; i < maxArcs; i++) {
-        // Wielkość łuku zależy od numeru (większe na zewnątrz)
-        int arcRadius = 5 + (i * 4);
+        // Wielkość łuku zależy od numeru (większe na zewnątrz) - zmniejszone wartości
+        int arcRadius = 4 + (i * 3);  // Zmniejszone z 5+(i*4)
 
         QPen arcPen;
         if (i < activeArcs) {
-            arcPen = QPen(signalColor, 2);
+            arcPen = QPen(signalColor, 1.5);  // Cieńsza linia
             // Dodanie subtelnej poświaty dla aktywnych łuków
             if (quality != NONE) {
-                painter.setPen(QPen(QColor(signalColor.red(), signalColor.green(), signalColor.blue(), 80), 3));
+                painter.setPen(QPen(QColor(signalColor.red(), signalColor.green(), signalColor.blue(), 80), 2));
                 painter.drawArc(QRectF(center.x() - arcRadius, center.y() - arcRadius,
                                       arcRadius * 2, arcRadius * 2),
                                45 * 16, 90 * 16);
             }
         } else {
-            arcPen = QPen(inactiveColor, 2);
+            arcPen = QPen(inactiveColor, 1.5);  // Cieńsza linia
         }
 
         painter.setPen(arcPen);
