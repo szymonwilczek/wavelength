@@ -44,6 +44,7 @@ public:
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void initScanlineBuffer();
     double m_digitalizationProgress = 0.0;
     double m_cornerGlowProgress = 0.0;
     double m_glitchIntensity = 0.0;
@@ -57,6 +58,10 @@ private:
     int m_duration;
     bool m_closing;
     OverlayWidget *m_overlay;
+
+    QPixmap m_scanlineBuffer;
+    QLinearGradient m_scanGradient;
+    bool m_scanlineInitialized = false;
 
 
 };

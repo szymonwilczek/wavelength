@@ -87,6 +87,28 @@ void AnimatedDialog::closeEvent(QCloseEvent *event)
     }
 }
 
+void AnimatedDialog::initScanlineBuffer() {
+    if (!m_scanlineInitialized) {
+        // Utwórz bufor o stałej wysokości, ale pełnej szerokości
+        m_scanlineBuffer = QPixmap(width(), 20);
+        m_scanlineBuffer.fill(Qt::transparent);
+
+        // Utwórz gradient raz
+        m_scanGradient = QLinearGradient(0, 0, 0, 20);
+        m_scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
+        m_scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
+        m_scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
+
+        // Rysuj gradient do bufora
+        QPainter bufferPainter(&m_scanlineBuffer);
+        bufferPainter.setPen(Qt::NoPen);
+        bufferPainter.setBrush(m_scanGradient);
+        bufferPainter.drawRect(0, 0, width(), 20);
+
+        m_scanlineInitialized = true;
+    }
+}
+
 void AnimatedDialog::animateShow()
 {
     QPropertyAnimation *animation = nullptr;
@@ -140,55 +162,54 @@ void AnimatedDialog::animateShow()
             break;
         }
 
-        case DigitalMaterialization: {
-    // Rozpoczynamy animację od góry
-    QRect startGeometry = geometry;
-    startGeometry.moveTop(startGeometry.top() - 150);
-    this->setGeometry(startGeometry);
+// Zmodyfikuj przypadek DigitalMaterialization w funkcji animateShow()
+case DigitalMaterialization: {
+    // Zamiast animować całą geometrię, co wymusza pełne przerysowania,
+    // animuj tylko pozycję Y, co jest mniej kosztowne
+    int startY = geometry.y() - 150;
+    int endY = geometry.y();
 
-    // Animacja przesunięcia
-    animation = new QPropertyAnimation(this, "geometry");
-    animation->setStartValue(startGeometry);
-    animation->setEndValue(geometry);
-    animation->setEasingCurve(QEasingCurve::OutQuint);
-    animation->setDuration(m_duration);
+    // Ustaw dialog na początkowej pozycji
+    this->move(geometry.x(), startY);
+
+    // Animacja przesunięcia tylko współrzędnej Y
+    QPropertyAnimation* posAnim = new QPropertyAnimation(this, "pos");
+    posAnim->setStartValue(QPoint(geometry.x(), startY));
+    posAnim->setEndValue(QPoint(geometry.x(), endY));
+    posAnim->setEasingCurve(QEasingCurve::OutQuad); // Lżejsza krzywa
+    posAnim->setDuration(m_duration);
+
+    // Optymalizacja flagi dla systemu kompozycji
+    this->setWindowOpacity(1.0); // Zapewnia że system kompozycji przejmie animację
 
     // Dostęp do WavelengthDialog dla dodatkowych efektów
     if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
-        // Animacja digitalizacji
+        // Animacja digitalizacji z kontrolowanym odświeżaniem
         QPropertyAnimation* digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
         digitAnim->setStartValue(0.0);
         digitAnim->setEndValue(1.0);
         digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        digitAnim->setDuration(m_duration * 2.0);
+        digitAnim->setDuration(m_duration * 1.5); // Nieco krótsza
 
-        // Animacja rogów
-        QPropertyAnimation* cornerAnim = new QPropertyAnimation(digitalDialog, "cornerGlowProgress");
-        cornerAnim->setStartValue(0.0);
-        cornerAnim->setEndValue(1.0);
-        cornerAnim->setKeyValueAt(0.7, 0.0);
-        cornerAnim->setEasingCurve(QEasingCurve::OutQuint);
-        cornerAnim->setDuration(m_duration * 1.5);
-
-        // Animacja efektu glitch
-        QPropertyAnimation* glitchAnim = new QPropertyAnimation(digitalDialog, "glitchIntensity");
-        glitchAnim->setStartValue(0.0);
-        glitchAnim->setEndValue(0.0);
-        glitchAnim->setKeyValueAt(0.2, 0.7); // Szczyt efektu glitch
-        glitchAnim->setKeyValueAt(0.4, 0.3);
-        glitchAnim->setKeyValueAt(0.7, 0.1);
-        glitchAnim->setDuration(m_duration * 1.2);
+        // Zmniejszamy liczbę jednoczesnych animacji - usuwamy animację rogów
+        // która jest najmniej istotna wizualnie
 
         // Grupa animacji
-        QParallelAnimationGroup* group = new QParallelAnimationGroup();
-        group->addAnimation(animation);
-        group->addAnimation(digitAnim);
-        group->addAnimation(cornerAnim);
-        group->addAnimation(glitchAnim);
+        QSequentialAnimationGroup* group = new QSequentialAnimationGroup();
+        // Najpierw animujemy pozycję
+        group->addAnimation(posAnim);
 
+        // Potem efekty digitalizacji (zapobiega nakładaniu się obliczeń)
+        QParallelAnimationGroup* effectsGroup = new QParallelAnimationGroup();
+        effectsGroup->addAnimation(digitAnim);
+        group->addAnimation(effectsGroup);
+
+        connect(group, &QAbstractAnimation::finished, this, [this]() {
+            emit showAnimationFinished();
+        });
 
         group->start(QAbstractAnimation::DeleteWhenStopped);
-        finalAnimation = group; // Przypisujemy grupę jako główną animację
+        finalAnimation = group;
     }
     break;
 }
