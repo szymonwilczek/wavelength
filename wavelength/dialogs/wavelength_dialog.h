@@ -495,6 +495,13 @@ public:
         // Preferuj animacje przez GPU
         setAttribute(Qt::WA_TranslucentBackground);
 
+        setAttribute(Qt::WA_StaticContents, true);  // Optymalizuje częściowe aktualizacje
+        setAttribute(Qt::WA_ContentsPropagated, false);  // Zapobiega propagacji zawartości
+
+        QSurfaceFormat format;
+        format.setRenderableType(QSurfaceFormat::OpenGL);
+        QSurfaceFormat::setDefaultFormat(format);
+
         m_glitchLines = QList<int>();
     setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
     setModal(true);
@@ -632,33 +639,39 @@ public:
 
         // Inicjuj timer odświeżania
         m_refreshTimer = new QTimer(this);
-        m_refreshTimer->setInterval(16);
+        m_refreshTimer->setInterval(16); // ~60fps dla płynności animacji
         connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
-    // Odświeżaj tylko aktywnie animowany obszar
-    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
-        int scanLineY = height() * m_digitalizationProgress;
+            // Odświeżaj tylko jeśli są aktywne animacje
+            if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
+                int scanLineY = height() * m_digitalizationProgress;
 
-        // Odświeżaj tylko obszar wokół linii skanującej
-        update(0, scanLineY - 15, width(), 30);
-    }
-    else if (m_glitchIntensity > 0.01) {
-        // Odświeżaj tylko obszary glitchowe
-        for (int i = 0; i < m_glitchLines.size(); i++) {
-            int y = m_glitchLines[i];
-            update(0, y-5, width(), 10);
-        }
-    }
-    else {
-        m_refreshTimer->setInterval(33); // Zmniejsz częstotliwość jeśli nie ma intensywnych animacji
-    }
-});
-        m_refreshTimer->start();
+                // Używaj m_lastScanlineY do określenia czy pozycja się zmieniła
+                if (scanLineY != m_lastScanlineY) {
+                    // Odświeżaj tylko obszar wokół poprzedniej i obecnej pozycji linii skanującej
+                    int minY = qMin(scanLineY, m_lastScanlineY) - 15;
+                    int maxY = qMax(scanLineY, m_lastScanlineY) + 15;
+                    update(0, qMax(0, minY), width(), qMin(height(), maxY - minY + 30));
+                }
+            }
+            else if (m_glitchIntensity > 0.01) {
+                // Odświeżaj tylko obszary z glitchami
+                for (int i = 0; i < m_glitchLines.size(); i++) {
+                    int y = m_glitchLines[i];
+                    update(0, y - 5, width(), 10);
+                }
+            }
+            else {
+                // Jeśli nie ma co animować, zmniejsz częstotliwość odświeżania
+                m_refreshTimer->setInterval(33); // ~30fps gdy nie trzeba tak często odświeżać
+            }
+        });
 }
 
-    ~WavelengthDialog() {
+    ~WavelengthDialog()  override {
         if (m_refreshTimer) {
             m_refreshTimer->stop();
             delete m_refreshTimer;
+            m_refreshTimer = nullptr;
         }
     }
 
@@ -682,10 +695,15 @@ public:
     }
 
     void regenerateGlitchLines() {
-        m_glitchLines.clear();
-        int glitchCount = 4 + static_cast<int>(glitchIntensity() * 10);
-        for (int i = 0; i < glitchCount; i++) {
-            m_glitchLines.append(QRandomGenerator::global()->bounded(height()));
+        // Nie generuj linii glitch zbyt często - najwyżej co 100ms
+        static QElapsedTimer lastGlitchUpdate;
+        if (!lastGlitchUpdate.isValid() || lastGlitchUpdate.elapsed() > 100) {
+            m_glitchLines.clear();
+            int glitchCount = 3 + static_cast<int>(glitchIntensity() * 7); // Mniej linii dla wydajności
+            for (int i = 0; i < glitchCount; i++) {
+                m_glitchLines.append(QRandomGenerator::global()->bounded(height()));
+            }
+            lastGlitchUpdate.restart();
         }
     }
 
@@ -744,29 +762,34 @@ public:
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(dialogPath);
 
-    // NOWY KOD - efekt digitalizacji
-    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
-        // Linie skanujące dla efektu digitalizacji
-        int scanLineY = height() * m_digitalizationProgress;
+        if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
+            // Inicjalizujemy bufory, jeśli to potrzebne
+            initRenderBuffers();
 
-        // Główna linia skanująca
-        QLinearGradient scanGradient(0, scanLineY - 5, 0, scanLineY + 5);
-        scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
-        scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
-        scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
+            // Obliczamy pozycję linii skanującej
+            int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
 
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(scanGradient);
-        painter.drawRect(0, scanLineY - 5, width(), 10);
+            // Rysujemy tylko gdy pozycja się zmieni - to duża optymalizacja!
+            if (scanLineY != m_lastScanlineY) {
+                painter.setClipping(false); // Wyłącz przycinanie dla pełnego bufora
 
-        // Dodatkowe linie skanujące
-        painter.setPen(QPen(QColor(0, 180, 255, 40)));
-        for (int y = 0; y < height(); y += 3) {
-            if (y < scanLineY) {
-                painter.drawLine(0, y, width(), y);
+                // 1. Najpierw rysujemy linie poziome, ale tylko poniżej linii skanującej
+                QPainter::CompositionMode previousMode = painter.compositionMode();
+                painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+                // Używamy prostego źródłowego prostokąta z bufora
+                QRect sourceRect(0, 0, width(), scanLineY);
+                painter.drawPixmap(0, 0, m_scanLinesBuffer, 0, 0, width(), scanLineY);
+
+                // 2. Teraz rysujemy główną linię skanującą z bufora
+                painter.drawPixmap(0, scanLineY - 10, m_scanlineBuffer);
+
+                painter.setCompositionMode(previousMode);
+
+                // Zapamiętujemy ostatnią pozycję
+                m_lastScanlineY = scanLineY;
             }
         }
-    }
 
     // NOWY KOD - efekt glitch
     if (m_glitchIntensity > 0.01) {
@@ -1060,6 +1083,42 @@ private:
         return 130.0;
     }
 
+    void initRenderBuffers() {
+        if (!m_buffersInitialized || height() != m_previousHeight) {
+            // Bufor głównej linii skanującej
+            m_scanlineBuffer = QPixmap(width(), 20);
+            m_scanlineBuffer.fill(Qt::transparent);
+
+            QPainter scanPainter(&m_scanlineBuffer);
+            scanPainter.setRenderHint(QPainter::Antialiasing, false); // Wyłączenie antialiasingu dla szybkości
+
+            // Główna linia skanująca jako gradient
+            QLinearGradient scanGradient(0, 0, 0, 20);
+            scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
+            scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
+            scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
+
+            scanPainter.setPen(Qt::NoPen);
+            scanPainter.setBrush(scanGradient);
+            scanPainter.drawRect(0, 0, width(), 20);
+
+            // Bufor dla linii poziomych (cały ekran)
+            m_scanLinesBuffer = QPixmap(width(), height());
+            m_scanLinesBuffer.fill(Qt::transparent);
+
+            QPainter linesPainter(&m_scanLinesBuffer);
+            linesPainter.setPen(QPen(QColor(0, 180, 255, 40)));
+
+            // Rysujemy linie co 6 pikseli - co drugie linia dla oszczędności
+            for (int y = 0; y < height(); y += 6) {
+                linesPainter.drawLine(0, y, width(), y);
+            }
+
+            m_buffersInitialized = true;
+            m_previousHeight = height();
+        }
+    }
+
 private:
     QLabel *frequencyLabel;
     QLabel *loadingIndicator;
@@ -1074,6 +1133,11 @@ private:
     bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
     const int m_shadowSize; // Rozmiar cienia
     double m_scanlineOpacity; // Przezroczystość linii skanowania
+    QPixmap m_scanlineBuffer;
+    QPixmap m_scanLinesBuffer;
+    bool m_buffersInitialized = false;
+    int m_lastScanlineY = -1;
+    int m_previousHeight = 0;
 };
 
 #endif // WAVELENGTH_DIALOG_H
