@@ -35,7 +35,7 @@ class CyberCheckBox : public QCheckBox {
 public:
     CyberCheckBox(const QString& text, QWidget* parent = nullptr)
         : QCheckBox(text, parent), m_glowIntensity(0.5) {
-        setStyleSheet("QCheckBox { spacing: 8px; background-color: transparent; color: #00ccff; font-family: Consolas; font-size: 9pt; }");
+        setStyleSheet("QCheckBox { spacing: 8px; background-color: transparent; color: #00ccff; font-family: Consolas; font-size: 9pt; margin-top: 2px; margin-bottom: 2px; }");
     }
 
     double glowIntensity() const { return m_glowIntensity; }
@@ -505,7 +505,7 @@ public:
         m_glitchLines = QList<int>();
     setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
     setModal(true);
-    setFixedSize(450, 315);
+    setFixedSize(450, 320);
 
     setAnimationDuration(400);
 
