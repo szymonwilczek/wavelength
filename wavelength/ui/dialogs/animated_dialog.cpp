@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QMainWindow>
 
+#include "../../dialogs/join_wavelength_dialog.h"
 #include "../../dialogs/wavelength_dialog.h"
 
 // Implementacja OverlayWidget z optymalizacjami
@@ -163,6 +164,7 @@ void AnimatedDialog::animateShow()
         }
 
 // Zmodyfikuj przypadek DigitalMaterialization w funkcji animateShow()
+// W animateShow() zmodyfikuj przypadek DigitalMaterialization:
 case DigitalMaterialization: {
     // Zamiast animować całą geometrię, co wymusza pełne przerysowania,
     // animuj tylko pozycję Y, co jest mniej kosztowne
@@ -182,34 +184,79 @@ case DigitalMaterialization: {
     // Optymalizacja flagi dla systemu kompozycji
     this->setWindowOpacity(1.0); // Zapewnia że system kompozycji przejmie animację
 
-    // Dostęp do WavelengthDialog dla dodatkowych efektów
+    // Sprawdzamy typ dialogu i stosujemy odpowiednie animacje
+    bool isDialogAnimated = false;
+
+    // Obsługa WavelengthDialog
     if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
-        // Animacja digitalizacji z kontrolowanym odświeżaniem
+        isDialogAnimated = true;
+
+        // Uruchom timer odświeżania
+        digitalDialog->startRefreshTimer();
+
+        // Animacja digitalizacji
         QPropertyAnimation* digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
         digitAnim->setStartValue(0.0);
         digitAnim->setEndValue(1.0);
         digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        digitAnim->setDuration(m_duration * 1.5); // Nieco krótsza
-
-        // Zmniejszamy liczbę jednoczesnych animacji - usuwamy animację rogów
-        // która jest najmniej istotna wizualnie
+        digitAnim->setDuration(m_duration * 1.5);
 
         // Grupa animacji
         QSequentialAnimationGroup* group = new QSequentialAnimationGroup();
-        // Najpierw animujemy pozycję
         group->addAnimation(posAnim);
 
-        // Potem efekty digitalizacji (zapobiega nakładaniu się obliczeń)
         QParallelAnimationGroup* effectsGroup = new QParallelAnimationGroup();
         effectsGroup->addAnimation(digitAnim);
         group->addAnimation(effectsGroup);
 
-        connect(group, &QAbstractAnimation::finished, this, [this]() {
-            emit showAnimationFinished();
-        });
+        connect(group, &QAbstractAnimation::finished, this, [this, digitalDialog]() {
+        emit showAnimationFinished();
+        // Używaj metody zamiast bezpośredniego dostępu do pola
+        digitalDialog->setRefreshTimerInterval(33);
+    });
 
         group->start(QAbstractAnimation::DeleteWhenStopped);
         finalAnimation = group;
+    }
+    // Obsługa JoinWavelengthDialog
+    else if (auto joinDialog = qobject_cast<JoinWavelengthDialog*>(this)) {
+        isDialogAnimated = true;
+
+        // Uruchom timer odświeżania
+        joinDialog->startRefreshTimer();
+
+        // Animacja digitalizacji
+        QPropertyAnimation* digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress");
+        digitAnim->setStartValue(0.0);
+        digitAnim->setEndValue(1.0);
+        digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
+        digitAnim->setDuration(m_duration * 1.5);
+
+        // Grupa animacji
+        QSequentialAnimationGroup* group = new QSequentialAnimationGroup();
+        group->addAnimation(posAnim);
+
+        QParallelAnimationGroup* effectsGroup = new QParallelAnimationGroup();
+        effectsGroup->addAnimation(digitAnim);
+        group->addAnimation(effectsGroup);
+
+        connect(group, &QAbstractAnimation::finished, this, [this, joinDialog]() {
+        emit showAnimationFinished();
+        // Używaj metody zamiast bezpośredniego dostępu do pola
+        joinDialog->setRefreshTimerInterval(33);
+    });
+
+        group->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = group;
+    }
+    // Przypadek awaryjny - tylko posAnim
+    if (!isDialogAnimated) {
+        posAnim->setDuration(m_duration);
+        connect(posAnim, &QPropertyAnimation::finished, this, [this]() {
+            emit showAnimationFinished();
+        });
+        posAnim->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = posAnim;
     }
     break;
 }
@@ -285,7 +332,8 @@ void AnimatedDialog::animateClose()
             break;
         }
 
-        case DigitalMaterialization: {
+        // W animateClose() zmodyfikuj przypadek DigitalMaterialization:
+case DigitalMaterialization: {
     // Animacja wyjazdu do góry
     QRect endGeometry = this->geometry();
     endGeometry.moveTop(endGeometry.top() - 100);
@@ -295,8 +343,12 @@ void AnimatedDialog::animateClose()
     animation->setEndValue(endGeometry);
     animation->setEasingCurve(QEasingCurve::InQuint);
 
-    // Dostęp do WavelengthDialog dla dodatkowych efektów
+    bool isDialogAnimated = false;
+
+    // Obsługa WavelengthDialog
     if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
+        isDialogAnimated = true;
+
         // Animacja digitalizacji w odwrotną stronę
         QPropertyAnimation* digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
         digitAnim->setStartValue(digitalDialog->digitalizationProgress());
@@ -322,6 +374,45 @@ void AnimatedDialog::animateClose()
 
         group->start(QAbstractAnimation::DeleteWhenStopped);
         finalAnimation = group;
+    }
+    // Obsługa JoinWavelengthDialog
+    else if (auto joinDialog = qobject_cast<JoinWavelengthDialog*>(this)) {
+        isDialogAnimated = true;
+
+        // Animacja digitalizacji w odwrotną stronę
+        QPropertyAnimation* digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress");
+        digitAnim->setStartValue(joinDialog->digitalizationProgress());
+        digitAnim->setEndValue(0.0);
+        digitAnim->setDuration(m_duration);
+
+        // Końcowy efekt glitch
+        QPropertyAnimation* glitchAnim = new QPropertyAnimation(joinDialog, "glitchIntensity");
+        glitchAnim->setStartValue(0.0);
+        glitchAnim->setEndValue(0.0);
+        glitchAnim->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
+        glitchAnim->setDuration(m_duration);
+
+        // Grupa animacji
+        QParallelAnimationGroup* group = new QParallelAnimationGroup();
+        group->addAnimation(animation);
+        group->addAnimation(digitAnim);
+        group->addAnimation(glitchAnim);
+
+        connect(group, &QAbstractAnimation::finished, this, [this]() {
+            QDialog::close();
+        });
+
+        group->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = group;
+    }
+
+    // Przypadek awaryjny, gdy nie można rzutować na żaden z typów dialogów
+    if (!isDialogAnimated) {
+        connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            QDialog::close();
+        });
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = animation;
     }
     break;
 }
