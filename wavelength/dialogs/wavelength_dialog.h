@@ -475,13 +475,17 @@ private:
 // Główna klasa dialogu Wavelength
 class WavelengthDialog : public AnimatedDialog {
     Q_OBJECT
-    Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
+     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
+     Q_PROPERTY(double digitalizationProgress READ digitalizationProgress WRITE setDigitalizationProgress)
+     Q_PROPERTY(double cornerGlowProgress READ cornerGlowProgress WRITE setCornerGlowProgress)
+     Q_PROPERTY(double glitchIntensity READ glitchIntensity WRITE setGlitchIntensity)
 
 public:
     explicit WavelengthDialog(QWidget *parent = nullptr)
-    : AnimatedDialog(parent, AnimatedDialog::SlideFromBottom),
+    : AnimatedDialog(parent, AnimatedDialog::DigitalMaterialization),
       m_shadowSize(10), m_scanlineOpacity(0.08)
 {
+        m_glitchLines = QList<int>();
     setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
     setModal(true);
     setFixedSize(450, 315);
@@ -632,6 +636,33 @@ public:
         }
     }
 
+    double digitalizationProgress() const { return m_digitalizationProgress; }
+    void setDigitalizationProgress(double progress) {
+        m_digitalizationProgress = progress;
+        update();
+    }
+
+    double cornerGlowProgress() const { return m_cornerGlowProgress; }
+    void setCornerGlowProgress(double progress) {
+        m_cornerGlowProgress = progress;
+        update();
+    }
+
+    double glitchIntensity() const { return m_glitchIntensity; }
+    void setGlitchIntensity(double intensity) {
+        m_glitchIntensity = intensity;
+        update();
+        if (intensity > 0.4) regenerateGlitchLines();
+    }
+
+    void regenerateGlitchLines() {
+        m_glitchLines.clear();
+        int glitchCount = 4 + static_cast<int>(glitchIntensity() * 10);
+        for (int i = 0; i < glitchCount; i++) {
+            m_glitchLines.append(QRandomGenerator::global()->bounded(height()));
+        }
+    }
+
     // Akcesory dla animacji scanlines
     double scanlineOpacity() const { return m_scanlineOpacity; }
     void setScanlineOpacity(double opacity) {
@@ -639,67 +670,142 @@ public:
         update();
     }
 
-    void paintEvent(QPaintEvent *event) override {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing, true);
+    void WavelengthDialog::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
-        // Główne tło dialogu z gradientem
-        QLinearGradient bgGradient(0, 0, 0, height());
-        bgGradient.setColorAt(0, QColor(10, 21, 32));
-        bgGradient.setColorAt(1, QColor(7, 18, 24));
+    // Główne tło dialogu z gradientem
+    QLinearGradient bgGradient(0, 0, 0, height());
+    bgGradient.setColorAt(0, QColor(10, 21, 32));
+    bgGradient.setColorAt(1, QColor(7, 18, 24));
 
-        // Ścieżka dialogu ze ściętymi rogami
-        QPainterPath dialogPath;
-        int cornerRadius = 15;
-        int clipSize = 20; // rozmiar ścięcia
+    // Ścieżka dialogu ze ściętymi rogami
+    QPainterPath dialogPath;
+    int clipSize = 20; // rozmiar ścięcia
 
-        // Górna krawędź
-        dialogPath.moveTo(clipSize, 0);
-        dialogPath.lineTo(width() - clipSize, 0);
+    // Górna krawędź
+    dialogPath.moveTo(clipSize, 0);
+    dialogPath.lineTo(width() - clipSize, 0);
 
-        // Prawy górny róg
-        dialogPath.lineTo(width(), clipSize);
+    // Prawy górny róg
+    dialogPath.lineTo(width(), clipSize);
 
-        // Prawa krawędź
-        dialogPath.lineTo(width(), height() - clipSize);
+    // Prawa krawędź
+    dialogPath.lineTo(width(), height() - clipSize);
 
-        // Prawy dolny róg
-        dialogPath.lineTo(width() - clipSize, height());
+    // Prawy dolny róg
+    dialogPath.lineTo(width() - clipSize, height());
 
-        // Dolna krawędź
-        dialogPath.lineTo(clipSize, height());
+    // Dolna krawędź
+    dialogPath.lineTo(clipSize, height());
 
-        // Lewy dolny róg
-        dialogPath.lineTo(0, height() - clipSize);
+    // Lewy dolny róg
+    dialogPath.lineTo(0, height() - clipSize);
 
-        // Lewa krawędź
-        dialogPath.lineTo(0, clipSize);
+    // Lewa krawędź
+    dialogPath.lineTo(0, clipSize);
 
-        // Lewy górny róg
-        dialogPath.lineTo(clipSize, 0);
+    // Lewy górny róg
+    dialogPath.lineTo(clipSize, 0);
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgGradient);
+    painter.drawPath(dialogPath);
+
+    // Obramowanie dialogu
+    QColor borderColor(0, 195, 255, 150);
+    painter.setPen(QPen(borderColor, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(dialogPath);
+
+    // NOWY KOD - efekt digitalizacji
+    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
+        // Linie skanujące dla efektu digitalizacji
+        int scanLineY = height() * m_digitalizationProgress;
+
+        // Główna linia skanująca
+        QLinearGradient scanGradient(0, scanLineY - 5, 0, scanLineY + 5);
+        scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
+        scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
+        scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
 
         painter.setPen(Qt::NoPen);
-        painter.setBrush(bgGradient);
-        painter.drawPath(dialogPath);
+        painter.setBrush(scanGradient);
+        painter.drawRect(0, scanLineY - 5, width(), 10);
 
-        // Obramowanie dialogu
-        QColor borderColor(0, 195, 255, 150);
-        painter.setPen(QPen(borderColor, 1));
-        painter.setBrush(Qt::NoBrush);
-        painter.drawPath(dialogPath);
-
-        // Linie skanowania (scanlines)
-        if (m_scanlineOpacity > 0.01) {
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
-
-            for (int y = 0; y < height(); y += 3) {
-                painter.drawRect(0, y, width(), 1);
+        // Dodatkowe linie skanujące
+        painter.setPen(QPen(QColor(0, 180, 255, 40)));
+        for (int y = 0; y < height(); y += 3) {
+            if (y < scanLineY) {
+                painter.drawLine(0, y, width(), y);
             }
         }
-
-        // Usuwamy zbędne narożniki HUD
     }
+
+    // NOWY KOD - efekt glitch
+    if (m_glitchIntensity > 0.01) {
+        // Glitch na brzegach
+        painter.setPen(QPen(QColor(255, 50, 120, 150 * m_glitchIntensity), 1));
+
+        for (int i = 0; i < m_glitchLines.size(); i++) {
+            int y = m_glitchLines[i];
+            int offset = QRandomGenerator::global()->bounded(5, 15) * m_glitchIntensity;
+            int width = QRandomGenerator::global()->bounded(30, 80) * m_glitchIntensity;
+
+            // Losowe położenie glitchy
+            if (QRandomGenerator::global()->bounded(2) == 0) {
+                // Lewa strona
+                painter.drawLine(0, y, width, y + offset);
+            } else {
+                // Prawa strona
+                painter.drawLine(this->width() - width, y, this->width(), y + offset);
+            }
+        }
+    }
+
+    // NOWY KOD - sekwencyjne podświetlanie rogów
+    if (m_cornerGlowProgress > 0.0) {
+        QColor cornerColor(0, 220, 255, 150);
+        painter.setPen(QPen(cornerColor, 2));
+
+        // Obliczamy które rogi powinny być podświetlone
+        double step = 1.0 / 4; // 4 rogi
+
+        if (m_cornerGlowProgress >= step * 0) { // Lewy górny
+            painter.drawLine(0, clipSize * 1.5, 0, clipSize);
+            painter.drawLine(0, clipSize, clipSize, 0);
+            painter.drawLine(clipSize, 0, clipSize * 1.5, 0);
+        }
+
+        if (m_cornerGlowProgress >= step * 1) { // Prawy górny
+            painter.drawLine(width() - clipSize * 1.5, 0, width() - clipSize, 0);
+            painter.drawLine(width() - clipSize, 0, width(), clipSize);
+            painter.drawLine(width(), clipSize, width(), clipSize * 1.5);
+        }
+
+        if (m_cornerGlowProgress >= step * 2) { // Prawy dolny
+            painter.drawLine(width(), height() - clipSize * 1.5, width(), height() - clipSize);
+            painter.drawLine(width(), height() - clipSize, width() - clipSize, height());
+            painter.drawLine(width() - clipSize, height(), width() - clipSize * 1.5, height());
+        }
+
+        if (m_cornerGlowProgress >= step * 3) { // Lewy dolny
+            painter.drawLine(clipSize * 1.5, height(), clipSize, height());
+            painter.drawLine(clipSize, height(), 0, height() - clipSize);
+            painter.drawLine(0, height() - clipSize, 0, height() - clipSize * 1.5);
+        }
+    }
+
+    // Linie skanowania (scanlines)
+    if (m_scanlineOpacity > 0.01) {
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
+
+        for (int y = 0; y < height(); y += 3) {
+            painter.drawRect(0, y, width(), 1);
+        }
+    }
+}
 
     double getFrequency() const {
         return m_frequency;

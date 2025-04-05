@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QMainWindow>
 
+#include "../../dialogs/wavelength_dialog.h"
+
 // Implementacja OverlayWidget z optymalizacjami
 OverlayWidget::OverlayWidget(QWidget *parent)
     : QWidget(parent)
@@ -88,6 +90,7 @@ void AnimatedDialog::closeEvent(QCloseEvent *event)
 void AnimatedDialog::animateShow()
 {
     QPropertyAnimation *animation = nullptr;
+    QAbstractAnimation* finalAnimation = nullptr;
 
     // Przechowujemy początkową geometrię
     QRect geometry = this->geometry();
@@ -104,6 +107,7 @@ void AnimatedDialog::animateShow()
             animation->setStartValue(startGeometry);
             animation->setEndValue(geometry);
             animation->setEasingCurve(QEasingCurve::OutQuint);
+            finalAnimation = animation;
             break;
         }
 
@@ -117,6 +121,7 @@ void AnimatedDialog::animateShow()
             animation->setStartValue(0.0);
             animation->setEndValue(1.0);
             animation->setEasingCurve(QEasingCurve::InOutQuad);
+                finalAnimation = animation;
             break;
         }
 
@@ -131,18 +136,81 @@ void AnimatedDialog::animateShow()
             animation->setStartValue(startGeometry);
             animation->setEndValue(geometry);
             animation->setEasingCurve(QEasingCurve::OutBack);
+                finalAnimation = animation;
             break;
         }
+
+        case DigitalMaterialization: {
+    // Rozpoczynamy animację od góry
+    QRect startGeometry = geometry;
+    startGeometry.moveTop(startGeometry.top() - 150);
+    this->setGeometry(startGeometry);
+
+    // Animacja przesunięcia
+    animation = new QPropertyAnimation(this, "geometry");
+    animation->setStartValue(startGeometry);
+    animation->setEndValue(geometry);
+    animation->setEasingCurve(QEasingCurve::OutQuint);
+    animation->setDuration(m_duration);
+
+    // Dostęp do WavelengthDialog dla dodatkowych efektów
+    if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
+        // Animacja digitalizacji
+        QPropertyAnimation* digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
+        digitAnim->setStartValue(0.0);
+        digitAnim->setEndValue(1.0);
+        digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
+        digitAnim->setDuration(m_duration * 2.0);
+
+        // Animacja rogów
+        QPropertyAnimation* cornerAnim = new QPropertyAnimation(digitalDialog, "cornerGlowProgress");
+        cornerAnim->setStartValue(0.0);
+        cornerAnim->setEndValue(1.0);
+        cornerAnim->setKeyValueAt(0.7, 0.0);
+        cornerAnim->setEasingCurve(QEasingCurve::OutQuint);
+        cornerAnim->setDuration(m_duration * 1.5);
+
+        // Animacja efektu glitch
+        QPropertyAnimation* glitchAnim = new QPropertyAnimation(digitalDialog, "glitchIntensity");
+        glitchAnim->setStartValue(0.0);
+        glitchAnim->setEndValue(0.0);
+        glitchAnim->setKeyValueAt(0.2, 0.7); // Szczyt efektu glitch
+        glitchAnim->setKeyValueAt(0.4, 0.3);
+        glitchAnim->setKeyValueAt(0.7, 0.1);
+        glitchAnim->setDuration(m_duration * 1.2);
+
+        // Grupa animacji
+        QParallelAnimationGroup* group = new QParallelAnimationGroup();
+        group->addAnimation(animation);
+        group->addAnimation(digitAnim);
+        group->addAnimation(cornerAnim);
+        group->addAnimation(glitchAnim);
+
+
+        group->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = group; // Przypisujemy grupę jako główną animację
+    }
+    break;
+}
     }
 
-    if (animation) {
-        animation->setDuration(m_duration);
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            emit showAnimationFinished(); // Emitujemy sygnał po zakończeniu animacji
+    if (finalAnimation) {
+        // Ustawiamy czas trwania jeśli to pojedyncza animacja
+        if (auto propAnim = qobject_cast<QPropertyAnimation*>(finalAnimation)) {
+            propAnim->setDuration(m_duration);
+        }
+
+        // Podłączamy sygnał zakończenia do JEDNEGO miejsca
+        connect(finalAnimation, &QAbstractAnimation::finished, this, [this]() {
+            emit showAnimationFinished(); // Emitujemy sygnał po zakończeniu wszystkich animacji
         });
-        animation->start(QAbstractAnimation::DeleteWhenStopped);
+
+        // Jeśli to nie grupa animacji (która już została uruchomiona), startujemy animację
+        if (!qobject_cast<QParallelAnimationGroup*>(finalAnimation)) {
+            finalAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+        }
     } else {
-        // Jeśli animacja nie jest tworzona, emitujemy sygnał od razu
+        // Jeśli żadna animacja nie jest tworzona, emitujemy sygnał od razu
         emit showAnimationFinished();
     }
 }
@@ -150,6 +218,7 @@ void AnimatedDialog::animateShow()
 void AnimatedDialog::animateClose()
 {
     QPropertyAnimation *animation = nullptr;
+    QAbstractAnimation* finalAnimation = nullptr;
 
     // Przechowujemy końcową geometrię (poza ekranem)
     QRect endGeometry = this->geometry();
@@ -194,6 +263,48 @@ void AnimatedDialog::animateClose()
             animation->setEasingCurve(QEasingCurve::InBack);
             break;
         }
+
+        case DigitalMaterialization: {
+    // Animacja wyjazdu do góry
+    QRect endGeometry = this->geometry();
+    endGeometry.moveTop(endGeometry.top() - 100);
+
+    animation = new QPropertyAnimation(this, "geometry");
+    animation->setStartValue(this->geometry());
+    animation->setEndValue(endGeometry);
+    animation->setEasingCurve(QEasingCurve::InQuint);
+
+    // Dostęp do WavelengthDialog dla dodatkowych efektów
+    if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
+        // Animacja digitalizacji w odwrotną stronę
+        QPropertyAnimation* digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
+        digitAnim->setStartValue(digitalDialog->digitalizationProgress());
+        digitAnim->setEndValue(0.0);
+        digitAnim->setDuration(m_duration);
+
+        // Końcowy efekt glitch
+        QPropertyAnimation* glitchAnim = new QPropertyAnimation(digitalDialog, "glitchIntensity");
+        glitchAnim->setStartValue(0.0);
+        glitchAnim->setEndValue(0.0);
+        glitchAnim->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
+        glitchAnim->setDuration(m_duration);
+
+        // Grupa animacji
+        QParallelAnimationGroup* group = new QParallelAnimationGroup();
+        group->addAnimation(animation);
+        group->addAnimation(digitAnim);
+        group->addAnimation(glitchAnim);
+
+        connect(group, &QAbstractAnimation::finished, this, [this]() {
+            QDialog::close();
+        });
+
+        group->start(QAbstractAnimation::DeleteWhenStopped);
+        finalAnimation = group;
+    }
+    break;
+}
+
     }
 
     if (animation) {

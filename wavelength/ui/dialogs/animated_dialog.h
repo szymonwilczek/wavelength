@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QPropertyAnimation>
+#include <QRandomGenerator>
 
 // Klasa dla przyciemnienia tła
 class OverlayWidget : public QWidget {
@@ -24,7 +26,8 @@ public:
     enum AnimationType {
         SlideFromBottom,
         FadeIn,
-        ScaleFromCenter
+        ScaleFromCenter,
+        DigitalMaterialization  // Nowy typ animacji
     };
 
     explicit AnimatedDialog(QWidget *parent = nullptr, AnimationType type = SlideFromBottom);
@@ -36,9 +39,15 @@ public:
     signals:
         void showAnimationFinished(); // Nowy sygnał informujący o zakończeniu animacji
 
+
+
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    double m_digitalizationProgress = 0.0;
+    double m_cornerGlowProgress = 0.0;
+    double m_glitchIntensity = 0.0;
+    QList<int> m_glitchLines;
 
 private:
     void animateShow();
@@ -48,6 +57,8 @@ private:
     int m_duration;
     bool m_closing;
     OverlayWidget *m_overlay;
+
+
 };
 
 #endif // ANIMATED_DIALOG_H
