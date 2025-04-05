@@ -199,7 +199,7 @@ case DigitalMaterialization: {
         digitAnim->setStartValue(0.0);
         digitAnim->setEndValue(1.0);
         digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        digitAnim->setDuration(m_duration * 1.5);
+        digitAnim->setDuration(m_duration * 2);
 
         // Grupa animacji
         QSequentialAnimationGroup* group = new QSequentialAnimationGroup();
@@ -230,7 +230,7 @@ case DigitalMaterialization: {
         digitAnim->setStartValue(0.0);
         digitAnim->setEndValue(1.0);
         digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        digitAnim->setDuration(m_duration * 1.5);
+        digitAnim->setDuration(m_duration * 2);
 
         // Grupa animacji
         QSequentialAnimationGroup* group = new QSequentialAnimationGroup();
