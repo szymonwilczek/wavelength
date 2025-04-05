@@ -21,6 +21,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let activeWavelengths = new Map();
+let lastRegisteredFrequency = 130.0;
 
 async function initDatabase() {
   try {
@@ -59,6 +60,55 @@ initDatabase();
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
+});
+
+app.get("/api/next-available-frequency", async (req, res) => {
+  try {
+    // Znajdź następną dostępną częstotliwość zaczynając od ostatniej zarejestrowanej
+    let nextFreq = lastRegisteredFrequency;
+    const increment = 0.1; // Zwiększamy o 0.1 Hz
+    let foundAvailable = false;
+    let safetyCounter = 0; // Zapobiega nieskończonym pętlom
+
+    console.log(
+      `Looking for next available frequency starting from ${nextFreq} Hz`
+    );
+
+    // Sprawdź częstotliwości w pamięci
+    while (!foundAvailable && safetyCounter < 1000) {
+      nextFreq += increment;
+      nextFreq = normalizeFrequency(nextFreq); // Zaokrąglenie do 1 miejsca po przecinku
+
+      // Jeśli nie ma takiej częstotliwości w mapie aktywnych
+      if (!activeWavelengths.has(nextFreq)) {
+        // Sprawdź dodatkowo w bazie danych (na wszelki wypadek)
+        const existingResult = await pool.query(
+          "SELECT frequency FROM active_wavelengths WHERE frequency = $1",
+          [nextFreq]
+        );
+
+        if (existingResult.rows.length === 0) {
+          foundAvailable = true;
+          break;
+        }
+      }
+
+      safetyCounter++;
+    }
+
+    // Jeśli znaleźliśmy częstotliwość, zwróć ją
+    if (foundAvailable) {
+      console.log(`Found available frequency: ${nextFreq} Hz`);
+      res.json({ frequency: nextFreq });
+    } else {
+      // Jeśli nie znaleźliśmy, zwróć błąd
+      console.log("Could not find available frequency within range");
+      res.status(404).json({ error: "No available frequency found" });
+    }
+  } catch (err) {
+    console.error("Error finding available frequency:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 function normalizeFrequency(frequency) {
@@ -169,6 +219,11 @@ wss.on("connection", function connection(ws, req) {
               frequency,
             })
           );
+
+          if (frequency > lastRegisteredFrequency) {
+            lastRegisteredFrequency = frequency;
+            console.log(`Updated last registered frequency to ${frequency} Hz`);
+          }
 
           console.log(
             `Successfully registered wavelength ${frequency} with session ${sessionId}`
