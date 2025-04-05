@@ -745,6 +745,23 @@ public:
         update();
     }
 
+    QTimer* getRefreshTimer() const { return m_refreshTimer; }
+    void startRefreshTimer() {
+        if (m_refreshTimer) {
+            m_refreshTimer->start();
+        }
+    }
+    void stopRefreshTimer() {
+        if (m_refreshTimer) {
+            m_refreshTimer->stop();
+        }
+    }
+    void setRefreshTimerInterval(int interval) {
+        if (m_refreshTimer) {
+            m_refreshTimer->setInterval(interval);
+        }
+    }
+
     void WavelengthDialog::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
