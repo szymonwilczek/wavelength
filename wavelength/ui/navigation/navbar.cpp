@@ -35,20 +35,15 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     // Główny kontener z layoutem horyzontalnym na całą szerokość
     QWidget* mainContainer = new QWidget(this);
     QHBoxLayout* mainLayout = new QHBoxLayout(mainContainer);
-    mainLayout->setContentsMargins(0, 3, 0, 3);
+    mainLayout->setContentsMargins(0, 5, 0, 5);
     mainLayout->setSpacing(0);
 
-    // Element narożny po lewej
+    // // Element narożny po lewej
     QLabel* cornerElement1 = new QLabel(this);
     cornerElement1->setStyleSheet(
-        "QLabel {"
-        "  color: rgba(0, 195, 255, 120);"
-        "  border-top: 1px solid rgba(0, 195, 255, 120);"
-        "  border-left: 1px solid rgba(0, 195, 255, 120);"
-        "  min-width: 10px;"
-        "  min-height: 10px;"
-        "  margin-right: 5px;"
-        "}"
+    "QLabel {"
+    "  margin-right: 5px;"
+    "}"
     );
 
     // Logo z neonowym efektem poświaty
@@ -58,8 +53,8 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     logoLabel->setStyleSheet(
     "QLabel {"
    "   font-family: 'Blender Pro Heavy';"
-   "   font-size: 20px;"
-   "   letter-spacing: 1px;"
+   "   font-size: 28px;"
+   "   letter-spacing: 2px;"
    "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
    "   background-color: transparent;"
    "   text-transform: uppercase;"
@@ -109,11 +104,6 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     QLabel* cornerElement2 = new QLabel(this);
     cornerElement2->setStyleSheet(
         "QLabel {"
-        "  color: rgba(0, 195, 255, 120);"
-        "  border-top: 1px solid rgba(0, 195, 255, 120);"
-        "  border-right: 1px solid rgba(0, 195, 255, 120);"
-        "  min-width: 10px;"
-        "  min-height: 10px;"
         "  margin-left: 5px;"
         "}"
     );
