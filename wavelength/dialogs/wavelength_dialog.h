@@ -486,11 +486,7 @@ public:
     setModal(true);
     setFixedSize(450, 315);
 
-    // Ustaw czas trwania animacji
     setAnimationDuration(400);
-
-    // Usuwamy odwołanie do FontManager
-    // FontManager* fontManager = FontManager::getInstance();
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
@@ -610,37 +606,23 @@ public:
     connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-    // Inicjalizacja watcher'a dla asynchronicznego wyszukiwania
-    frequencyWatcher = new QFutureWatcher<double>(this);
-    connect(frequencyWatcher, &QFutureWatcher<double>::finished, this, &WavelengthDialog::onFrequencyFound);
+        frequencyWatcher = new QFutureWatcher<double>(this);
+        connect(frequencyWatcher, &QFutureWatcher<double>::finished, this, &WavelengthDialog::onFrequencyFound);
 
-    QTimer* timeoutTimer = new QTimer(this);
-timeoutTimer->setSingleShot(true);
-timeoutTimer->setInterval(5000); // 5 sekund limitu na szukanie
-connect(timeoutTimer, &QTimer::timeout, [this]() {
-    if (frequencyWatcher && frequencyWatcher->isRunning()) {
-        loadingIndicator->setText("USING DEFAULT FREQUENCY...");
-        m_frequency = 130.0;
-        m_frequencyFound = true;
-        onFrequencyFound();
-        qDebug() << "LOG: Timeout podczas szukania częstotliwości - używam wartości domyślnej";
-    }
-});
-timeoutTimer->start();
+        // Ustawiamy text w etykiecie częstotliwości na domyślną wartość
+        frequencyLabel->setText("...");
 
-// Uruchom asynchroniczne wyszukiwanie
-QFuture<double> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
-frequencyWatcher->setFuture(future);
+        // Podłączamy sygnał zakończenia animacji do rozpoczęcia wyszukiwania częstotliwości
+        connect(this, &AnimatedDialog::showAnimationFinished,
+                this, &WavelengthDialog::startFrequencySearch);
 
-    frequencyLabel->setText("...");
-
-    // Inicjuj timer odświeżania
-    m_refreshTimer = new QTimer(this);
-    m_refreshTimer->setInterval(200);
-    connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
-        update(); // Odświeża interfejs
-    });
-    m_refreshTimer->start();
+        // Inicjuj timer odświeżania
+        m_refreshTimer = new QTimer(this);
+        m_refreshTimer->setInterval(200);
+        connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
+            update(); // Odświeża interfejs
+        });
+        m_refreshTimer->start();
 }
 
     ~WavelengthDialog() {
@@ -745,6 +727,30 @@ private slots:
 
         // Przycisk jest aktywny tylko jeśli znaleziono częstotliwość i hasło jest prawidłowe (jeśli wymagane)
         generateButton->setEnabled(isPasswordValid && m_frequencyFound);
+    }
+
+    void startFrequencySearch() {
+        qDebug() << "LOG: Rozpoczynam wyszukiwanie częstotliwości po zakończeniu animacji";
+        loadingIndicator->setText("SEARCHING FOR AVAILABLE FREQUENCY...");
+
+        // Timer zabezpieczający przed zbyt długim wyszukiwaniem
+        QTimer* timeoutTimer = new QTimer(this);
+        timeoutTimer->setSingleShot(true);
+        timeoutTimer->setInterval(5000); // 5 sekund limitu na szukanie
+        connect(timeoutTimer, &QTimer::timeout, [this]() {
+            if (frequencyWatcher && frequencyWatcher->isRunning()) {
+                loadingIndicator->setText("USING DEFAULT FREQUENCY...");
+                m_frequency = 130.0;
+                m_frequencyFound = true;
+                onFrequencyFound();
+                qDebug() << "LOG: Timeout podczas szukania częstotliwości - używam wartości domyślnej";
+            }
+        });
+        timeoutTimer->start();
+
+        // Uruchom asynchroniczne wyszukiwanie
+        QFuture<double> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
+        frequencyWatcher->setFuture(future);
     }
 
     void tryGenerate() {

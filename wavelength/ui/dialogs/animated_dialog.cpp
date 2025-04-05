@@ -137,7 +137,13 @@ void AnimatedDialog::animateShow()
 
     if (animation) {
         animation->setDuration(m_duration);
+        connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            emit showAnimationFinished(); // Emitujemy sygnał po zakończeniu animacji
+        });
         animation->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+        // Jeśli animacja nie jest tworzona, emitujemy sygnał od razu
+        emit showAnimationFinished();
     }
 }
 

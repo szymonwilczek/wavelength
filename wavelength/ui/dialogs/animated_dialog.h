@@ -33,6 +33,9 @@ public:
     void setAnimationDuration(int duration) { m_duration = duration; }
     int animationDuration() const { return m_duration; }
 
+    signals:
+        void showAnimationFinished(); // Nowy sygnał informujący o zakończeniu animacji
+
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
