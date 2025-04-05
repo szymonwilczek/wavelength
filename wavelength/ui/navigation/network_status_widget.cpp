@@ -11,15 +11,16 @@
 NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     : QWidget(parent)
     , m_currentQuality(NONE)
+    , m_pingValue(0)
 {
     // Ustawienie minimum/fixed size dla widgetu
     setFixedHeight(36);
-    setMinimumWidth(180);
+    setMinimumWidth(220);  // Zwiększona szerokość, aby zmieścić ping
 
     // Układ poziomy dla ikon i tekstu z większymi marginesami
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(15, 5, 15, 5);
-    layout->setSpacing(10);
+    layout->setSpacing(8);
 
     // Ikona połączenia
     m_iconLabel = new QLabel(this);
@@ -32,9 +33,16 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     QFont statusFont = FontManager::instance().getFont(FontFamily::BlenderPro, FontStyle::Medium, 10);
     m_statusLabel->setFont(statusFont);
 
+    // Nowa etykieta dla pingu
+    m_pingLabel = new QLabel("0ms", this);
+    m_pingLabel->setFont(statusFont);
+    m_pingLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
     // Dodanie elementów do layoutu
     layout->addWidget(m_iconLabel);
     layout->addWidget(m_statusLabel);
+    layout->addStretch(1);  // Elastyczna przestrzeń między statusem a pingiem
+    layout->addWidget(m_pingLabel);
 
     setLayout(layout);
 
@@ -114,6 +122,9 @@ void NetworkStatusWidget::checkNetworkStatus() {
     // Obliczenie czasu odpowiedzi
     qint64 responseTime = QDateTime::currentMSecsSinceEpoch() - startTime;
 
+    // Zachowujemy wartość pingu
+    m_pingValue = responseTime;
+
     // Określenie jakości połączenia na podstawie czasu odpowiedzi
     if (timer.isActive() && reply->error() == QNetworkReply::NoError) {
         timer.stop();
@@ -129,6 +140,7 @@ void NetworkStatusWidget::checkNetworkStatus() {
         }
     } else {
         m_currentQuality = NONE;
+        m_pingValue = 0;  // Ping 0 przy braku połączenia
     }
 
     reply->deleteLater();
@@ -140,26 +152,35 @@ void NetworkStatusWidget::checkNetworkStatus() {
 void NetworkStatusWidget::updateStatusDisplay() {
     // Aktualizacja etykiety statusu
     switch (m_currentQuality) {
-        case EXCELLENT:
-            m_statusLabel->setText("SYSTEM READY");
-            break;
-        case GOOD:
-            m_statusLabel->setText("SYSTEM ONLINE");
-            break;
-        case FAIR:
-            m_statusLabel->setText("CONNECTION FAIR");
-            break;
-        case POOR:
-            m_statusLabel->setText("CONNECTION UNSTABLE");
-            break;
-        case NONE:
-            m_statusLabel->setText("OFFLINE");
-            break;
+    case EXCELLENT:
+        m_statusLabel->setText("SYSTEM READY");
+        break;
+    case GOOD:
+        m_statusLabel->setText("SYSTEM ONLINE");
+        break;
+    case FAIR:
+        m_statusLabel->setText("CONNECTION FAIR");
+        break;
+    case POOR:
+        m_statusLabel->setText("CONNECTION UNSTABLE");
+        break;
+    case NONE:
+        m_statusLabel->setText("OFFLINE");
+        break;
     }
 
-    // Aktualizacja koloru ramki i tekstu
+    // Aktualizacja wartości pingu
+    if (m_pingValue > 0) {
+        m_pingLabel->setText(QString("%1ms").arg(m_pingValue));
+    } else {
+        m_pingLabel->setText("---");  // Brak połączenia
+    }
+
+    // Aktualizacja koloru wszystkich elementów
     m_borderColor = getQualityColor(m_currentQuality);
-    m_statusLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(m_borderColor.name()));
+    QString colorStyle = QString("color: %1;").arg(m_borderColor.name());
+    m_statusLabel->setStyleSheet(colorStyle);
+    m_pingLabel->setStyleSheet(colorStyle);
 
     // Utworzenie ikony dla aktualnego statusu
     createNetworkIcon(m_currentQuality);
@@ -170,16 +191,16 @@ void NetworkStatusWidget::updateStatusDisplay() {
 
 QColor NetworkStatusWidget::getQualityColor(NetworkQuality quality) {
     switch (quality) {
-        case EXCELLENT:
-            return QColor(0, 255, 170); // Neonowy cyjan
-        case GOOD:
-            return QColor(0, 195, 255); // Niebieski
-        case FAIR:
-            return QColor(255, 165, 0); // Pomarańczowy
-        case POOR:
-            return QColor(255, 50, 50); // Czerwony
-        case NONE:
-            return QColor(100, 100, 100); // Szary
+    case EXCELLENT:
+        return QColor(0, 255, 170); // Neonowy cyjan
+    case GOOD:
+        return QColor(0, 195, 255); // Niebieski
+    case FAIR:
+        return QColor(255, 165, 0); // Pomarańczowy
+    case POOR:
+        return QColor(255, 50, 50); // Czerwony
+    case NONE:
+        return QColor(100, 100, 100); // Szary
     }
     return QColor(100, 100, 100);
 }

@@ -30,11 +30,13 @@ private:
     };
 
     QLabel *m_statusLabel;
+    QLabel *m_pingLabel;  // Nowa etykieta dla wartości pingu
     QLabel *m_iconLabel;
     QNetworkAccessManager *m_networkManager;
     QTimer *m_updateTimer;
     NetworkQuality m_currentQuality;
     QColor m_borderColor;
+    qint64 m_pingValue;   // Nowe pole do przechowywania pingu w ms
 
     void updateStatusDisplay();
     void createNetworkIcon(NetworkQuality quality);
