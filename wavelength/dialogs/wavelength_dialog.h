@@ -35,7 +35,17 @@ class CyberCheckBox : public QCheckBox {
 public:
     CyberCheckBox(const QString& text, QWidget* parent = nullptr)
         : QCheckBox(text, parent), m_glowIntensity(0.5) {
-        setStyleSheet("QCheckBox { spacing: 8px; background-color: transparent; color: #00ccff; font-family: Consolas; font-size: 9pt; margin-top: 2px; margin-bottom: 2px; }");
+        // Dodaj marginesy, aby zapewnić poprawny rozmiar
+        setStyleSheet("QCheckBox { spacing: 8px; background-color: transparent; color: #00ccff; font-family: Consolas; font-size: 9pt; margin-top: 4px; margin-bottom: 4px; }");
+
+        // Ustaw minimalną wysokość dla checkboxa
+        setMinimumHeight(24);
+    }
+
+    QSize sizeHint() const override {
+        QSize size = QCheckBox::sizeHint();
+        size.setHeight(qMax(size.height(), 24)); // Minimum 24px wysokości
+        return size;
     }
 
     double glowIntensity() const { return m_glowIntensity; }
@@ -148,13 +158,23 @@ class CyberLineEdit : public QLineEdit {
 public:
     CyberLineEdit(QWidget* parent = nullptr)
         : QLineEdit(parent), m_glowIntensity(0.0) {
-        setStyleSheet("border: none; background-color: transparent; padding: 5px; font-family: Consolas; font-size: 9pt;");
+        // Zwiększ padding oraz ustaw minimalny rozmiar
+        setStyleSheet("border: none; background-color: transparent; padding: 6px; font-family: Consolas; font-size: 9pt;");
         setCursor(Qt::IBeamCursor);
+
+        // Ustawienie minimalnej wysokości zapewnia poprawny rendering od początku
+        setMinimumHeight(30);
 
         // Kolor tekstu
         QPalette pal = palette();
         pal.setColor(QPalette::Text, QColor(0, 220, 255));
         setPalette(pal);
+    }
+
+    QSize sizeHint() const override {
+        QSize size = QLineEdit::sizeHint();
+        size.setHeight(30); // Wymuszamy wysokość 30px
+        return size;
     }
 
     double glowIntensity() const { return m_glowIntensity; }
@@ -248,7 +268,7 @@ protected:
             painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, content);
         }
 
-        // Rysowanie kursora jeśli ma focus i jest widoczny
+        // Poprawiony kursor - wyższy, zajmujący większą część wysokości pola
         if (hasFocus() && cursorPosition() >= 0) {
             int cursorX = 10; // Domyślna pozycja X
 
@@ -261,10 +281,14 @@ protected:
                                              textBeforeCursor);
             }
 
+            // Zwiększona wysokość kursora (75% wysokości pola)
+            int cursorHeight = height() * 0.75;
+            int cursorY = (height() - cursorHeight) / 2;
+
             // Mrugający kursor (zależnie od stanu parzystości sekund)
             if (QDateTime::currentMSecsSinceEpoch() % 1000 < 500) {
                 painter.setPen(QPen(QColor(0, 220, 255), 1));
-                painter.drawLine(QPoint(cursorX, 5), QPoint(cursorX, h - 5));
+                painter.drawLine(QPoint(cursorX, cursorY), QPoint(cursorX, cursorY + cursorHeight));
             }
         }
     }
@@ -505,7 +529,7 @@ public:
         m_glitchLines = QList<int>();
     setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
     setModal(true);
-    setFixedSize(450, 320);
+    setFixedSize(450, 350);
 
     setAnimationDuration(400);
 
@@ -549,11 +573,12 @@ public:
     mainLayout->addWidget(infoLabel);
 
     // Uprościliśmy panel formularza - bez dodatkowego kontenera
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setSpacing(10);
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-    formLayout->setContentsMargins(0, 10, 0, 10);
+        QFormLayout *formLayout = new QFormLayout();
+        formLayout->setSpacing(12); // Zwiększ odstępy
+        formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+        formLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // Wyśrodkuj w pionie
+        formLayout->setContentsMargins(0, 15, 0, 15); // Dodaj więcej przestrzeni w pionie
 
     // Etykiety w formularzu
     QLabel* frequencyTitleLabel = new QLabel("ASSIGNED FREQUENCY:", this);
@@ -583,7 +608,13 @@ public:
     passwordEdit->setEnabled(false);
     passwordEdit->setPlaceholderText("ENTER WAVELENGTH PASSWORD");
     passwordEdit->setStyleSheet("font-family: Consolas; font-size: 9pt;");
+        passwordEdit->setFixedHeight(30); // Wymuszenie wysokości 30px
+        passwordEdit->setVisible(true);   // Upewnij się, że jest widoczne
     formLayout->addRow(passwordLabel, passwordEdit);
+
+        if (!passwordProtectedCheckbox->isChecked()) {
+            passwordEdit->setStyleSheet("border: none; background-color: transparent; padding: 6px; font-family: Consolas; font-size: 9pt; color: #005577;");
+        }
 
     mainLayout->addLayout(formLayout);
 
