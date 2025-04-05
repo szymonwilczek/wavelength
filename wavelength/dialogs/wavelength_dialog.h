@@ -19,7 +19,10 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QDateTime>
+#include <QNetworkReply>
 #include <QRandomGenerator>
+#include <QSurfaceFormat>
+
 #include "../session/wavelength_session_coordinator.h"
 #include "../ui/dialogs/animated_dialog.h"
 #include "../../../font_manager.h"
@@ -485,6 +488,13 @@ public:
     : AnimatedDialog(parent, AnimatedDialog::DigitalMaterialization),
       m_shadowSize(10), m_scanlineOpacity(0.08)
 {
+
+        setAttribute(Qt::WA_OpaquePaintEvent, false);
+        setAttribute(Qt::WA_NoSystemBackground, true);
+
+        // Preferuj animacje przez GPU
+        setAttribute(Qt::WA_TranslucentBackground);
+
         m_glitchLines = QList<int>();
     setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
     setModal(true);
@@ -622,10 +632,26 @@ public:
 
         // Inicjuj timer odświeżania
         m_refreshTimer = new QTimer(this);
-        m_refreshTimer->setInterval(200);
+        m_refreshTimer->setInterval(16);
         connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
-            update(); // Odświeża interfejs
-        });
+    // Odświeżaj tylko aktywnie animowany obszar
+    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
+        int scanLineY = height() * m_digitalizationProgress;
+
+        // Odświeżaj tylko obszar wokół linii skanującej
+        update(0, scanLineY - 15, width(), 30);
+    }
+    else if (m_glitchIntensity > 0.01) {
+        // Odświeżaj tylko obszary glitchowe
+        for (int i = 0; i < m_glitchLines.size(); i++) {
+            int y = m_glitchLines[i];
+            update(0, y-5, width(), 10);
+        }
+    }
+    else {
+        m_refreshTimer->setInterval(33); // Zmniejsz częstotliwość jeśli nie ma intensywnych animacji
+    }
+});
         m_refreshTimer->start();
 }
 
@@ -992,57 +1018,45 @@ private slots:
 
 private:
     static double findLowestAvailableFrequency() {
-        DatabaseManager* manager = DatabaseManager::getInstance();
-
-        // Komunikat diagnostyczny
         qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
-        // Początek od 130Hz i szukamy do 1800MHz
-        double frequency = 130;
-        double maxFrequency = 180.0 * 1000000; // 180MHz w Hz
+        // Zapytaj serwer o następną dostępną częstotliwość
+        QNetworkAccessManager manager;
+        QEventLoop loop;
+        QNetworkReply *reply;
 
-        // Najpierw sprawdźmy częstotliwość 130 Hz, skoro wiemy że jest dostępna
-        if (manager->isFrequencyAvailable(frequency)) {
-            qDebug() << "LOG: Znaleziono dostępną częstotliwość:" << frequency << "Hz";
-            return frequency;
-        }
+        // Utwórz żądanie GET do serwera
+        QUrl url("http://localhost:3000/api/next-available-frequency");
+        QNetworkRequest request(url);
 
-        // Jeśli 130 Hz nie jest dostępne, kontynuujmy poszukiwanie
-        frequency += 0.1; // Zwiększamy od razu na 130.1
+        // Wykonaj żądanie synchronicznie (w kontekście asynchronicznego QtConcurrent::run)
+        reply = manager.get(request);
 
-        while (frequency <= maxFrequency) {
-            // Dodajemy timeout aby uniknąć zawieszenia
-            QCoreApplication::processEvents();
+        // Połącz sygnał zakończenia z pętlą zdarzeń
+        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 
-            if (manager->isFrequencyAvailable(frequency)) {
-                qDebug() << "LOG: Znaleziono dostępną częstotliwość:" << frequency << "Hz";
+        // Uruchom pętlę zdarzeń aż do zakończenia żądania
+        loop.exec();
+
+        if (reply->error() == QNetworkReply::NoError) {
+            // Parsuj odpowiedź jako JSON
+            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject obj = doc.object();
+
+            if (obj.contains("frequency")) {
+                double frequency = obj["frequency"].toDouble();
+                qDebug() << "LOG: Serwer zwrócił dostępną częstotliwość:" << frequency << "Hz";
+                reply->deleteLater();
                 return frequency;
             }
-
-            // Zwiększamy o 0.1 dla częstotliwości poniżej 1000Hz
-            // Dla większych częstotliwości zwiększamy o większe skoki
-            if (frequency < 1000) {
-                frequency += 0.1;
-            } else if (frequency < 10000) {
-                frequency += 1.0;
-            } else if (frequency < 100000) {
-                frequency += 10.0;
-            } else if (frequency < 1000000) {
-                frequency += 100.0;
-            } else {
-                frequency += 1000.0;
-            }
-
-            // Dodajmy ograniczenie liczby iteracji
-            if (frequency > 1000) {
-                // Jeśli przeszukaliśmy już spory zakres, wykorzystajmy pierwszą dostępną
-                qDebug() << "LOG: Osiągnięto limit przeszukiwania, zwracam 130 Hz";
-                return 130.0;
-            }
+        } else {
+            qDebug() << "LOG: Błąd podczas komunikacji z serwerem:" << reply->errorString();
         }
 
-        // Jeśli nie znaleziono, ustawiamy domyślną wartość
-        qDebug() << "LOG: Nie znaleziono dostępnej częstotliwości, zwracam 130 Hz";
+        reply->deleteLater();
+
+        // W przypadku błędu zwróć domyślną wartość
+        qDebug() << "LOG: Używam domyślnej częstotliwości 130 Hz";
         return 130.0;
     }
 
