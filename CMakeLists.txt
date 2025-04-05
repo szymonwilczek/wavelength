@@ -77,8 +77,6 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/blob_transition_manager.h
         blob/core/blob_event_handler.cpp
         blob/core/blob_event_handler.h
-        font_manager.cpp
-        font_manager.h
         wavelength/messages/wavelength_text_display.cpp
         wavelength/messages/wavelength_text_display.h
         wavelength/files/video/decoder/video_decoder.cpp
@@ -149,6 +147,8 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/rendering/path_markers_manager.h
         wavelength/ui/navigation/network_status_widget.cpp
         wavelength/ui/navigation/network_status_widget.h
+        font_manager.cpp
+        font_manager.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
