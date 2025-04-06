@@ -109,8 +109,6 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/chat/chat_style.h
         wavelength/ui/messages/radio_message.cpp
         wavelength/ui/messages/radio_message.h
-        wavelength/messages/wavelength_radio_display.cpp
-        wavelength/messages/wavelength_radio_display.h
         wavelength/ui/messages/system_radio_message.cpp
         wavelength/ui/messages/system_radio_message.h
         wavelength/ui/chat/communication_stream.cpp
