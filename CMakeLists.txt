@@ -139,6 +139,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/navigation/network_status_widget.h
         font_manager.cpp
         font_manager.h
+        wavelength/ui/checkbox/cyber_checkbox.cpp
+        wavelength/ui/checkbox/cyber_checkbox.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
