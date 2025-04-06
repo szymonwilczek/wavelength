@@ -339,7 +339,6 @@ void BlobAnimation::updateAnimation() {
     if (m_currentState == BlobConfig::IDLE) {
         if (m_currentBlobState) {
             m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
-            m_needsRedraw = true;
         }
     } else if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
         if (m_currentBlobState) {

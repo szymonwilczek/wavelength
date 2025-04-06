@@ -188,6 +188,7 @@ void BlobRenderer::drawFilling(QPainter &painter,
                             double blobRadius,
                             const QColor &borderColor,
                             BlobConfig::AnimationState animationState) {  // Dodany parametr
+
     // Cyfrowy gradient z zanikaniem dla bloba
     QRadialGradient gradient(blobCenter, blobRadius);
 
@@ -223,12 +224,19 @@ void BlobRenderer::renderScene(QPainter &painter,
                                QColor &lastBgColor,
                                QColor &lastGridColor,
                                int &lastGridSpacing) {
-    if (renderState.animationState == BlobConfig::MOVING || renderState.animationState == BlobConfig::RESIZING) {
-        painter.setRenderHint(QPainter::Antialiasing, false);
-    } else {
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    // Wykrycie przejścia do stanu IDLE
+    if (renderState.animationState == BlobConfig::IDLE && m_lastAnimationState != BlobConfig::IDLE) {
+        // Inicjalizacja wartości dla stanu IDLE
+        initializeIdleState(blobCenter, params.blobRadius, params.borderColor, width, height);
+        m_isRenderingActive = false;
+    } else if (renderState.animationState != BlobConfig::IDLE) {
+        // Dla innych stanów zawsze aktywujemy renderowanie
+        m_isRenderingActive = true;
+        m_idleHudInitialized = false;
     }
+
+    m_lastAnimationState = renderState.animationState;
 
     // Sprawdź czy potrzebujemy zaktualizować bufor tła
     bool shouldUpdateBackgroundCache =
@@ -238,11 +246,10 @@ void BlobRenderer::renderScene(QPainter &painter,
             lastGridColor != params.gridColor ||
             lastGridSpacing != params.gridSpacing;
 
-    // W stanie IDLE i gdy nie ma absorpcji, używamy bufora tła
-    if (renderState.animationState == BlobConfig::IDLE &&
-        !renderState.isBeingAbsorbed &&
-        !renderState.isAbsorbing) {
+    // W stanie IDLE używamy buforowanego tła
+    if (renderState.animationState == BlobConfig::IDLE) {
         if (shouldUpdateBackgroundCache) {
+            // Aktualizacja bufora tła
             backgroundCache = QPixmap(width, height);
             backgroundCache.fill(Qt::transparent);
 
@@ -258,94 +265,105 @@ void BlobRenderer::renderScene(QPainter &painter,
             lastGridSpacing = params.gridSpacing;
         }
 
+        // Rysujemy buforowane tło
         painter.drawPixmap(0, 0, backgroundCache);
-    } else {
+
+        // Rysujemy aktywny blob - ZAWSZE będzie animowany
+        renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
+
+        // Sprawdzamy czy HUD został już zbuforowany
+        if (!m_idleHudInitialized) {
+            // Tworzymy bufor HUD
+            m_staticHudBuffer = QPixmap(width, height);
+            m_staticHudBuffer.fill(Qt::transparent);
+
+            QPainter hudPainter(&m_staticHudBuffer);
+            hudPainter.setRenderHint(QPainter::Antialiasing, true);
+            drawCompleteHUD(hudPainter, blobCenter, params.blobRadius, params.borderColor, width, height);
+            hudPainter.end();
+
+            m_idleHudInitialized = true;
+        }
+
+        // Rysujemy zbuforowany HUD na wierzchu
+        painter.drawPixmap(0, 0, m_staticHudBuffer);
+    }
+    else {
+        // Standardowe renderowanie dla aktywnych stanów
         painter.setRenderHint(QPainter::Antialiasing, renderState.animationState == BlobConfig::IDLE);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, renderState.animationState == BlobConfig::IDLE);
 
+        // Rysuj dynamiczne tło
         drawBackground(painter, params.backgroundColor,
                        params.gridColor, params.gridSpacing,
                        width, height);
-    }
 
-    // Obsługa stanów absorpcji
-    if (renderState.isBeingAbsorbed || renderState.isClosingAfterAbsorption) {
-        painter.setOpacity(renderState.opacity);
-        painter.save();
-        QPointF center = blobCenter;
-        painter.translate(center);
-        painter.scale(renderState.scale, renderState.scale);
-        painter.translate(-center);
-    } else if (renderState.isAbsorbing) {
-        painter.save();
-        QPointF center = blobCenter;
+        // Obsługa stanów absorpcji
+        if (renderState.isBeingAbsorbed || renderState.isClosingAfterAbsorption) {
+            painter.setOpacity(renderState.opacity);
+            painter.save();
+            QPointF center = blobCenter;
+            painter.translate(center);
+            painter.scale(renderState.scale, renderState.scale);
+            painter.translate(-center);
+        } else if (renderState.isAbsorbing) {
+            painter.save();
+            QPointF center = blobCenter;
 
-        if (renderState.isPulseActive) {
-            QPen extraGlowPen(params.borderColor.lighter(150));
-            extraGlowPen.setWidth(params.borderWidth + 10);
-            painter.setPen(extraGlowPen);
+            if (renderState.isPulseActive) {
+                QPen extraGlowPen(params.borderColor.lighter(150));
+                extraGlowPen.setWidth(params.borderWidth + 10);
+                painter.setPen(extraGlowPen);
 
-            QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
-            painter.drawPath(blobPath);
+                QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
+                painter.drawPath(blobPath);
+            }
+
+            painter.translate(center);
+            painter.scale(renderState.scale, renderState.scale);
+            painter.translate(-center);
         }
 
-        painter.translate(center);
-        painter.scale(renderState.scale, renderState.scale);
-        painter.translate(-center);
-    }
+        // Renderuj blob
+        renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
 
-    if (m_glitchIntensity > 0.01) {
-        // Zachowaj oryginalną transformację
-        painter.save();
-
-        // Rysuj zakłócenia poziome
-        QColor glitchColor = params.borderColor;
-        glitchColor.setAlpha(120);
-        painter.setPen(QPen(glitchColor, 2));
-
-        int glitchCount = 2 + QRandomGenerator::global()->bounded(4);
-        for (int i = 0; i < glitchCount; i++) {
-            int yPos = QRandomGenerator::global()->bounded(height);
-            int xOffset = QRandomGenerator::global()->bounded(width / 10);
-            int glitchWidth = width / 4 + QRandomGenerator::global()->bounded(width / 2);
-
-            painter.drawLine(xOffset, yPos, xOffset + glitchWidth, yPos);
+        // Przywróć poprzedni stan transformacji
+        if (renderState.isBeingAbsorbed || renderState.isAbsorbing) {
+            painter.restore();
         }
 
-        // Niewielkie przesunięcie bloba dla efektu drgania
-        if (m_glitchIntensity > 0.4 && QRandomGenerator::global()->bounded(100) < 30) {
-            painter.translate(
-                QRandomGenerator::global()->bounded(5) - 2,
-                QRandomGenerator::global()->bounded(5) - 2
-            );
-        }
-
-        painter.restore();
-    }
-
-    // Renderuj blob
-    renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
-
-    if (renderState.animationState == BlobConfig::IDLE) {
-        drawHUD(painter, blobCenter, params.blobRadius, params.borderColor, width, height);
-    }
-
-    // Przywróć poprzedni stan transformacji
-    if (renderState.isBeingAbsorbed || renderState.isAbsorbing) {
-        painter.restore();
+        // USUWAMY PONIŻSZĄ LINIĘ - nie renderujemy HUD w stanach innych niż IDLE!
+        // drawCompleteHUD(painter, blobCenter, params.blobRadius, params.borderColor, width, height);
     }
 }
 
-void BlobRenderer::drawHUD(QPainter &painter, const QPointF &blobCenter,
-                           double blobRadius, const QColor &hudColor,
-                           int width, int height)
-{
+void BlobRenderer::initializeIdleState(const QPointF &blobCenter, double blobRadius,
+                                      const QColor &hudColor, int width, int height) {
+    // Losujemy wartości tylko raz przy przejściu do stanu IDLE
+    m_idleBlobId = QString("BLOB-ID: %1").arg(QRandomGenerator::global()->bounded(1000, 9999));
+    m_idleAmplitude = 1.5 + sin(QDateTime::currentMSecsSinceEpoch() * 0.001) * 0.5;
+    m_idleTimestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+
+    qDebug() << "Inicjalizacja stanu IDLE z ID:" << m_idleBlobId << "i amplitudą:" << m_idleAmplitude;
+
+    // Resetujemy bufor HUD
+    m_staticHudBuffer = QPixmap();
+    m_idleHudInitialized = false;
+}
+
+
+void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
+                             double blobRadius, const QColor &hudColor,
+                             int width, int height) {
+
+    qDebug() << "RENDER HUD";
+
     QColor techColor = hudColor.lighter(120);
     techColor.setAlpha(180);
     painter.setPen(QPen(techColor, 1));
     painter.setFont(QFont("Consolas", 8));
 
-    // Dodaj wskaźniki w rogach ekranu (styl AR)
+    // Narożniki ekranu (styl AR)
     int cornerSize = 15;
 
     // Lewy górny
@@ -353,36 +371,29 @@ void BlobRenderer::drawHUD(QPainter &painter, const QPointF &blobCenter,
     painter.drawLine(10, 10, 10, 10 + cornerSize);
     painter.drawText(15, 25, "BLOB MONITOR");
 
-    // Prawy górny
+    // Prawy górny - nie rysujemy zegara, będzie rysowany dynamicznie
     painter.drawLine(width - 10 - cornerSize, 10, width - 10, 10);
     painter.drawLine(width - 10, 10, width - 10, 10 + cornerSize);
-    QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-    painter.drawText(width - 80, 25, timestamp);
+    // Usuwamy linię z czasem, bo będzie rysowana oddzielnie
+    // painter.drawText(width - 80, 25, m_idleTimestamp);
 
     // Prawy dolny
     painter.drawLine(width - 10 - cornerSize, height - 10, width - 10, height - 10);
     painter.drawLine(width - 10, height - 10, width - 10, height - 10 - cornerSize);
+    painter.drawText(width - 70, height - 25, QString("R: %1").arg(int(blobRadius)));
 
     // Lewy dolny
     painter.drawLine(10, height - 10, 10 + cornerSize, height - 10);
     painter.drawLine(10, height - 10, 10, height - 10 - cornerSize);
+    painter.drawText(15, height - 25, QString("AMP: %1").arg(m_idleAmplitude, 0, 'f', 1));  // Ustalona amplituda
 
-    // Dodaj okrąg wokół bloba (cel)
+    // Okrąg wokół bloba (cel)
     QPen targetPen(techColor, 1, Qt::DotLine);
     painter.setPen(targetPen);
     painter.drawEllipse(blobCenter, blobRadius + 20, blobRadius + 20);
 
-    // Dodaj "identyfikator" bloba
-    QString blobId = QString("BLOB-ID: %1").arg(QRandomGenerator::global()->bounded(1000, 9999));
+    // Wyświetlamy ustalony ID bloba
     QFontMetrics fm(painter.font());
-    int textWidth = fm.horizontalAdvance(blobId);
-    painter.drawText(blobCenter.x() - textWidth / 2, blobCenter.y() + blobRadius + 30, blobId);
-
-    // Dodaj informacje techniczne
-    double amplitude = 1.5 + sin(QDateTime::currentMSecsSinceEpoch() * 0.001) * 0.5;
-    QString amplitudeText = QString("AMP: %1").arg(amplitude, 0, 'f', 1);
-    painter.drawText(15, height - 25, amplitudeText);
-
-    QString sizeText = QString("R: %1").arg(int(blobRadius));
-    painter.drawText(width - 70, height - 25, sizeText);
+    int textWidth = fm.horizontalAdvance(m_idleBlobId);
+    painter.drawText(blobCenter.x() - textWidth / 2, blobCenter.y() + blobRadius + 30, m_idleBlobId);
 }
