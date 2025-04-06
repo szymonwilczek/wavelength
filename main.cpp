@@ -170,31 +170,6 @@ int main(int argc, char *argv[]) {
     instanceManager->start();
 
 
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted, [](const QString &targetId) {
-        qDebug() << "[MAIN] Rozpoczęto absorpcję instancji:" << targetId;
-    });
-
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionStarted,
-                     [animation, instanceManager](const QString &targetId) {
-                         if (targetId == instanceManager->getInstanceId()) {
-                             animation->startBeingAbsorbed();
-                         }
-                     });
-
-    QObject::connect(instanceManager, &AppInstanceManager::instanceAbsorbed,
-                     [animation, instanceManager](const QString &targetId) {
-                         if (targetId == instanceManager->getInstanceId()) {
-                             animation->finishBeingAbsorbed();
-                         }
-                     });
-
-    QObject::connect(instanceManager, &AppInstanceManager::absorptionCancelled,
-                     [animation, instanceManager](const QString &targetId) {
-                         if (targetId == instanceManager->getInstanceId()) {
-                             animation->cancelAbsorption();
-                         }
-                     });
-
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 

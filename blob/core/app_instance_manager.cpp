@@ -26,9 +26,6 @@ AppInstanceManager::AppInstanceManager(QMainWindow* window, BlobAnimation* blob,
 {
     m_positionTimer.setInterval(UPDATE_INTERVAL_MS);
     connect(&m_positionTimer, &QTimer::timeout, this, &AppInstanceManager::sendPositionUpdate);
-
-    m_absorptionCheckTimer.setInterval(ABSORPTION_CHECK_INTERVAL_MS);
-    connect(&m_absorptionCheckTimer, &QTimer::timeout, this, &AppInstanceManager::checkForAbsorption);
 }
 
 AppInstanceManager::~AppInstanceManager() {
@@ -240,66 +237,6 @@ bool AppInstanceManager::processMessage(const QByteArray& message, QLocalSocket*
             return true;
         }
 
-        case ABSORPTION_START: {
-            QString creatorId, targetId;
-            stream >> creatorId >> targetId;
-
-            qDebug() << "Otrzymano informację o rozpoczęciu absorpcji."
-                     << "Creator:" << creatorId
-                     << "cel:" << targetId;
-
-            if (targetId == m_instanceId) {
-                qDebug() << "UWAGA: Ta instancja jest celem absorpcji!";
-                m_blob->startBeingAbsorbed();
-                emit absorptionStarted(targetId);
-            }
-            return true;
-        }
-
-        case ABSORPTION_COMPLETE: {
-            QString creatorId, targetId;
-            stream >> creatorId >> targetId;
-
-            qDebug() << "Otrzymano informację o zakończeniu absorpcji."
-                     << "Creator:" << creatorId
-                     << "cel:" << targetId;
-
-            if (targetId == m_instanceId) {
-                qDebug() << "UWAGA: Ta instancja została pochłonięta i zostanie zamknięta!";
-                m_blob->finishBeingAbsorbed();
-                emit instanceAbsorbed(targetId);
-            }
-            return true;
-        }
-
-        case ABSORPTION_CANCELLED: {
-            QString creatorId, targetId;
-            stream >> creatorId >> targetId;
-
-            qDebug() << "Otrzymano informację o anulowaniu absorpcji."
-                     << "Creator:" << creatorId
-                     << "cel:" << targetId;
-
-            if (targetId == m_instanceId) {
-                qDebug() << "Ta instancja nie będzie już pochłaniana.";
-                m_blob->cancelAbsorption();
-                emit absorptionCancelled(targetId);
-            }
-            return true;
-        }
-
-        case ABSORPTION_PROGRESS: {
-            QString creatorId, targetId;
-            float progress;
-            stream >> creatorId >> targetId >> progress;
-
-            if (targetId == m_instanceId) {
-                m_blob->updateAbsorptionProgress(progress);
-                qDebug() << "Otrzymano aktualizację postępu absorpcji: " << (progress * 100) << "%";
-            }
-            return true;
-        }
-
         default:
             qWarning() << "Nieznany typ wiadomości:" << messageType;
             return false;
@@ -355,97 +292,6 @@ void AppInstanceManager::sendToCreator(const QByteArray& message) {
     }
 }
 
-QByteArray AppInstanceManager::createAbsorptionMessage(MessageType type, QString targetId) const {
-    QByteArray message;
-    QDataStream stream(&message, QIODevice::WriteOnly);
-
-    stream << quint8(type) << m_instanceId << targetId;
-
-    return message;
-}
-
-bool AppInstanceManager::isInAbsorptionRange(const QPointF& otherBlobCenter, const QPoint& otherWindowPos) const {
-    QPointF myBlobCenter = m_blob->getBlobCenter();
-    QPoint myWindowPos = m_window->pos();
-    QPointF myGlobalPos(myWindowPos.x() + myBlobCenter.x(), myWindowPos.y() + myBlobCenter.y());
-    QPointF otherGlobalPos(otherWindowPos.x() + otherBlobCenter.x(), otherWindowPos.y() + otherBlobCenter.y());
-    qreal dx = myGlobalPos.x() - otherGlobalPos.x();
-    qreal dy = myGlobalPos.y() - otherGlobalPos.y();
-    qreal distance = qSqrt(dx*dx + dy*dy);
-
-
-
-    return distance < ABSORPTION_RANGE;
-}
-
-void AppInstanceManager::checkForAbsorption() {
-    if (!m_isCreator) {
-        return;
-    }
-
-    QMutexLocker locker(&m_instancesMutex);
-
-    if (m_absorption.inProgress) {
-        bool targetFound = false;
-        QPointF targetBlobCenter;
-        QPoint targetWindowPos;
-
-        for (const auto& instance : m_connectedInstances) {
-            if (instance.instanceId == m_absorption.targetId) {
-                targetFound = true;
-                targetBlobCenter = instance.blobCenter;
-                targetWindowPos = instance.windowPosition;
-                break;
-            }
-        }
-
-        if (!targetFound || !isInAbsorptionRange(targetBlobCenter, targetWindowPos)) {
-            qDebug() << "Cel absorpcji zniknął lub opuścił obszar, ID:" << m_absorption.targetId;
-            m_absorption.inProgress = false;
-
-            QByteArray message = createAbsorptionMessage(ABSORPTION_CANCELLED, m_absorption.targetId);
-            sendToAllClients(message);
-
-            emit absorptionCancelled(m_absorption.targetId);
-            return;
-        }
-
-    }
-    else {
-        for (const auto& instance : m_connectedInstances) {
-            if (instance.isCreator) {
-                continue;
-            }
-
-            if (isInAbsorptionRange(instance.blobCenter, instance.windowPosition)) {
-                qDebug() << "Rozpoczynanie absorpcji instancji:" << instance.instanceId;
-
-                m_absorption.inProgress = true;
-                m_absorption.targetId = instance.instanceId;
-
-                QByteArray message = createAbsorptionMessage(ABSORPTION_START, instance.instanceId);
-                sendToAllClients(message);
-
-                emit absorptionStarted(instance.instanceId);
-
-                QTimer::singleShot(8100, [this, instanceId = instance.instanceId]() {
-                    if (m_absorption.inProgress && m_absorption.targetId == instanceId) {
-                        qDebug() << "Absorpcja zakończona, cel został pochłonięty:" << instanceId;
-
-                        QByteArray message = createAbsorptionMessage(ABSORPTION_COMPLETE, instanceId);
-                        sendToAllClients(message);
-
-                        m_absorption.inProgress = false;
-
-                        emit instanceAbsorbed(instanceId);
-                    }
-                });
-
-                break;
-            }
-        }
-    }
-}
 
 void AppInstanceManager::initAttractionThread() {
     m_threadRunning = true;

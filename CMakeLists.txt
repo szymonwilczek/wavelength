@@ -71,8 +71,6 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/session/wavelength_session_coordinator.h
         wavelength/messages/formatter/message_formatter.cpp
         wavelength/messages/formatter/message_formatter.h
-        blob/core/blob_absorption.cpp
-        blob/core/blob_absorption.h
         blob/core/blob_transition_manager.cpp
         blob/core/blob_transition_manager.h
         blob/core/blob_event_handler.cpp

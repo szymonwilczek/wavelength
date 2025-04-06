@@ -23,7 +23,6 @@
 #include "../states/idle_state.h"
 #include "../states/moving_state.h"
 #include "../states/resizing_state.h"
-#include "blob_absorption.h"
 #include "blob_event_handler.h"
 #include "blob_transition_manager.h"
 
@@ -67,17 +66,6 @@ public:
     void setLifeColor(const QColor& color);
     void resetLifeColor();
 
-    void startBeingAbsorbed();
-    void finishBeingAbsorbed();
-    void cancelAbsorption();
-    void startAbsorbing(const QString& targetId);
-    void finishAbsorbing(const QString& targetId);
-    void cancelAbsorbing(const QString& targetId);
-    void updateAbsorptionProgress(float progress);
-
-    bool isBeingAbsorbed() const { return m_absorption.isBeingAbsorbed(); }
-    bool isAbsorbing() const { return m_absorption.isAbsorbing(); }
-
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -115,7 +103,6 @@ private:
 
     void applyIdleEffect();
 
-    BlobAbsorption m_absorption;
     BlobEventHandler m_eventHandler;
     BlobTransitionManager m_transitionManager;
 

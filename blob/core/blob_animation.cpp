@@ -5,7 +5,6 @@
 
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QOpenGLWidget(parent),
-      m_absorption(this),
       m_transitionManager(this),
       m_eventHandler(this) {
     m_params.blobRadius = 250.0f;
@@ -103,13 +102,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     connect(&m_eventHandler, &BlobEventHandler::eventsReEnabled, this, [this]() {
         m_eventsEnabled = true;
         qDebug() << "Events re-enabled via handler";
-    });
-
-    connect(&m_absorption, &BlobAbsorption::redrawNeeded, this, [this]() {
-        update();
-    });
-
-    connect(&m_absorption, &BlobAbsorption::absorptionFinished, this, [this] {
     });
 
     connect(&m_transitionManager, &BlobTransitionManager::transitionCompleted, this, [this]() {
@@ -241,12 +233,6 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
 
     // Przygotuj stan renderowania
     BlobRenderState renderState;
-    renderState.isBeingAbsorbed = m_absorption.isBeingAbsorbed();
-    renderState.isAbsorbing = m_absorption.isAbsorbing();
-    renderState.isClosingAfterAbsorption = m_absorption.isClosingAfterAbsorption();
-    renderState.isPulseActive = m_absorption.isPulseActive();
-    renderState.opacity = m_absorption.opacity();
-    renderState.scale = m_absorption.scale();
     renderState.animationState = m_currentState;
 
     // Deleguj renderowanie do BlobRenderer
@@ -287,41 +273,6 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
                   maxX - minX + 2 * margin, maxY - minY + 2 * margin);
 }
 
-void BlobAnimation::startBeingAbsorbed() {
-    m_absorption.startBeingAbsorbed();
-
-    if (m_currentState == BlobConfig::IDLE) {
-        m_animationTimer.stop();
-    }
-}
-
-void BlobAnimation::finishBeingAbsorbed() {
-    m_absorption.finishBeingAbsorbed();
-}
-
-void BlobAnimation::cancelAbsorption() {
-    m_absorption.cancelAbsorption();
-
-    if (m_currentState == BlobConfig::IDLE && !m_absorption.isBeingAbsorbed() && !m_absorption.isAbsorbing()) {
-        m_animationTimer.start();
-    }
-}
-
-void BlobAnimation::startAbsorbing(const QString &targetId) {
-    m_absorption.startAbsorbing(targetId);
-}
-
-void BlobAnimation::finishAbsorbing(const QString &targetId) {
-    m_absorption.finishAbsorbing(targetId);
-}
-
-void BlobAnimation::cancelAbsorbing(const QString &targetId) {
-    m_absorption.cancelAbsorbing(targetId);
-}
-
-void BlobAnimation::updateAbsorptionProgress(float progress) {
-    m_absorption.updateAbsorptionProgress(progress);
-}
 
 void BlobAnimation::updateAnimation() {
     m_needsRedraw = false;
