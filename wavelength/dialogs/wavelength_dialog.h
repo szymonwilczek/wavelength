@@ -272,21 +272,6 @@ protected:
         painter.setPen(QPen(QColor(0, 100, 150), 1, Qt::DotLine));
         painter.drawLine(clipSize * 2, h - 2, w - clipSize * 2, h - 2);
 
-        // Dodatkowe oznaczenia techniczne
-        if (hasFocus()) {
-            int markSize = 3;
-            QColor markColor(0, 200, 255);
-            painter.setPen(markColor);
-
-            // Lewy dolny
-            painter.drawLine(2, h - markSize - 2, 2 + markSize, h - markSize - 2);
-            painter.drawLine(2, h - markSize - 2, 2, h - 2);
-
-            // Prawy dolny
-            painter.drawLine(w - 2 - markSize, h - markSize - 2, w - 2, h - markSize - 2);
-            painter.drawLine(w - 2, h - markSize - 2, w - 2, h - 2);
-        }
-
         // Rysowanie tekstu
         QRect textRect = rect().adjusted(10, 0, -10, 0);
 
