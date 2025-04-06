@@ -141,6 +141,8 @@ add_executable(${PROJECT_NAME} main.cpp
         font_manager.h
         wavelength/ui/checkbox/cyber_checkbox.cpp
         wavelength/ui/checkbox/cyber_checkbox.h
+        wavelength/ui/button/cyber_button.cpp
+        wavelength/ui/button/cyber_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
