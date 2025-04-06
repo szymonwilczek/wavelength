@@ -63,9 +63,9 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
         waveStrength += m_idleParams.waveAmplitude * 0.5 *
             std::sin(m_secondPhase + m_idleParams.waveFrequency * 2.0 * angle);
 
-        // Fala 3: fala z zależnością od czasu ale nie od pozycji
-        waveStrength += m_idleParams.waveAmplitude * 0.3 *
-            std::sin(m_idleParams.wavePhase * 0.7);
+        // // Fala 3: fala z zależnością od czasu ale nie od pozycji
+        // waveStrength += m_idleParams.waveAmplitude * 0.3 *
+        //     std::sin(m_idleParams.wavePhase * 0.7);
 
         QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
         QPointF perpVector(-normalizedVector.y(), normalizedVector.x());
