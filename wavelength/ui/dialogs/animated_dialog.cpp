@@ -268,10 +268,12 @@ case DigitalMaterialization: {
             propAnim->setDuration(m_duration);
         }
 
-        // Podłączamy sygnał zakończenia do JEDNEGO miejsca
-        connect(finalAnimation, &QAbstractAnimation::finished, this, [this]() {
-            emit showAnimationFinished(); // Emitujemy sygnał po zakończeniu wszystkich animacji
-        });
+        if (!qobject_cast<QParallelAnimationGroup*>(finalAnimation) &&
+         !qobject_cast<QSequentialAnimationGroup*>(finalAnimation)) {
+            connect(finalAnimation, &QAbstractAnimation::finished, this, [this]() {
+                emit showAnimationFinished();
+            });
+         }
 
         // Jeśli to nie grupa animacji (która już została uruchomiona), startujemy animację
         if (!qobject_cast<QParallelAnimationGroup*>(finalAnimation)) {
