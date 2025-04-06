@@ -14,7 +14,6 @@ struct WavelengthInfo {
     QString password;
     QString hostId;
     bool isHost;
-    QString hostAddress;
     int hostPort;
     QPointer<QWebSocket> socket = nullptr;
     bool isClosing = false;

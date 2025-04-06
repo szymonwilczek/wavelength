@@ -47,8 +47,6 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/auth/authentication_manager.h
         wavelength/registry/wavelength_registry.cpp
         wavelength/registry/wavelength_registry.h
-        wavelength/network/network_utilities.cpp
-        wavelength/network/network_utilities.h
         wavelength/session/events/creator/wavelength_creator.cpp
         wavelength/session/events/creator/wavelength_creator.h
         wavelength/session/events/joiner/wavelength_joiner.cpp
@@ -73,8 +71,6 @@ add_executable(${PROJECT_NAME} main.cpp
         blob/core/blob_transition_manager.h
         blob/core/blob_event_handler.cpp
         blob/core/blob_event_handler.h
-        wavelength/messages/wavelength_text_display.cpp
-        wavelength/messages/wavelength_text_display.h
         wavelength/files/video/decoder/video_decoder.cpp
         wavelength/files/video/decoder/video_decoder.h
         wavelength/files/video/player/inline_video_player.cpp

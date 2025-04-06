@@ -12,7 +12,6 @@
 #include "../../../database/database_manager.h"
 #include "../../../registry/wavelength_registry.h"
 #include "../../../auth/authentication_manager.h"
-#include "../../../network/network_utilities.h"
 #include "../../../messages/handler/message_handler.h"
 #include "../../../messages/wavelength_message_processor.h"
 
@@ -89,7 +88,6 @@ public:
                     info.password = password;
                     info.hostId = hostId;
                     info.isHost = true;
-                    info.hostAddress = NetworkUtilities::getInstance()->getLocalIpAddress();
                     info.socket = socket;
 
                     registry->addWavelength(frequency, info);
