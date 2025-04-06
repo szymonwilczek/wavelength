@@ -18,7 +18,6 @@
 
 #include "../messages/wavelength_stream_display.h"
 #include "../session/wavelength_session_coordinator.h"
-#include "../messages/wavelength_text_display.h"
 #include "../ui/chat/chat_style.h"
 
 // Cyberpunkowy przycisk dla interfejsu czatu - uproszczona wersja
