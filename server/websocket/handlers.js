@@ -8,9 +8,9 @@ const {
 } = require("../utils/helpers");
 
 /**
- * Obsługa rejestracji nowego wavelength
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane żądania
+ * Support for registration of new wavelength
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - Request data
  */
 async function handleRegisterWavelength(ws, data) {
   const frequency = normalizeFrequency(data.frequency);
@@ -20,7 +20,7 @@ async function handleRegisterWavelength(ws, data) {
   try {
     console.log(`Checking if frequency ${frequency} is available...`);
 
-    // Sprawdź w pamięci
+    // Memory check
     if (connectionManager.activeWavelengths.has(frequency)) {
       console.log(`Frequency ${frequency} already exists in memory`);
       ws.send(
@@ -33,7 +33,7 @@ async function handleRegisterWavelength(ws, data) {
       return;
     }
 
-    // Sprawdź w bazie danych
+    // Database check
     const existingWavelength = await WavelengthModel.findByFrequency(frequency);
 
     if (existingWavelength) {
@@ -43,10 +43,8 @@ async function handleRegisterWavelength(ws, data) {
       await WavelengthModel.delete(frequency);
     }
 
-    // Utwórz nowy wpis
     const sessionId = generateSessionId("ws");
 
-    // Zapisz do bazy danych
     await WavelengthModel.create(
       frequency,
       name,
@@ -54,7 +52,6 @@ async function handleRegisterWavelength(ws, data) {
       sessionId
     );
 
-    // Zarejestruj w managerze połączeń
     connectionManager.registerWavelength(
       ws,
       frequency,
@@ -63,7 +60,7 @@ async function handleRegisterWavelength(ws, data) {
       sessionId
     );
 
-    // Wyślij potwierdzenie
+    // Confirmation message
     ws.send(
       JSON.stringify({
         type: "register_result",
@@ -90,9 +87,9 @@ async function handleRegisterWavelength(ws, data) {
 }
 
 /**
- * Obsługa dołączania do wavelength
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane żądania
+ * Support for joining wavelength
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - Request data
  */
 async function handleJoinWavelength(ws, data) {
   const frequency = normalizeFrequency(data.frequency);
@@ -102,7 +99,6 @@ async function handleJoinWavelength(ws, data) {
 
   if (!wavelength) {
     try {
-      // Sprawdź w bazie danych
       const dbWavelength = await WavelengthModel.findByFrequency(frequency);
 
       if (!dbWavelength) {
@@ -116,7 +112,6 @@ async function handleJoinWavelength(ws, data) {
         return;
       }
 
-      // Wavelength istnieje w bazie, ale host jest offline
       ws.send(
         JSON.stringify({
           type: "join_result",
@@ -138,7 +133,6 @@ async function handleJoinWavelength(ws, data) {
     }
   }
 
-  // Sprawdź hasło
   if (wavelength.isPasswordProtected && password !== password) {
     ws.send(
       JSON.stringify({
@@ -150,10 +144,8 @@ async function handleJoinWavelength(ws, data) {
     return;
   }
 
-  // Generuj ID sesji dla klienta
   const sessionId = generateSessionId("client");
 
-  // Dodaj klienta do wavelength
   connectionManager.addClientToWavelength(ws, frequency, sessionId);
 
   ws.send(
@@ -166,7 +158,7 @@ async function handleJoinWavelength(ws, data) {
     })
   );
 
-  // Powiadom hosta o dołączeniu klienta
+  // Notify host about new client
   if (wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
     wavelength.host.send(
       JSON.stringify({
@@ -181,9 +173,9 @@ async function handleJoinWavelength(ws, data) {
 }
 
 /**
- * Obsługa wysyłania wiadomości tekstowej
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane wiadomości
+ * Support for sending a text message
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - Message data
  */
 function handleSendMessage(ws, data) {
   const frequency = normalizeFrequency(ws.frequency);
@@ -212,12 +204,10 @@ function handleSendMessage(ws, data) {
     return;
   }
 
-  // Sprawdź, czy wiadomość była już przetworzona
   if (connectionManager.isMessageProcessed(frequency, messageId)) {
-    return; // Ignoruj duplikaty
+    return; // Ignore duplicates
   }
 
-  // Oznacz wiadomość jako przetworzoną
   connectionManager.markMessageProcessed(frequency, messageId);
 
   const isHost = ws.isHost;
@@ -229,7 +219,8 @@ function handleSendMessage(ws, data) {
     `Message in wavelength ${frequency} from ${sender}: ${message} (ID: ${messageId})`
   );
 
-  // Zawsze wysyłaj wiadomość z powrotem do nadawcy dla potwierdzenia
+  // Sending the message back to the sender for confirmation
+  // TODO: probably remove this in production mode
   ws.send(
     JSON.stringify({
       type: "message",
@@ -242,7 +233,7 @@ function handleSendMessage(ws, data) {
     })
   );
 
-  // Przygotuj wiadomość do wysłania innym
+  // Prepare a message to send to other clients
   const broadcastMessage = {
     type: "message",
     sender: sender,
@@ -254,14 +245,14 @@ function handleSendMessage(ws, data) {
 
   const broadcastStr = JSON.stringify(broadcastMessage);
 
-  // Wyślij do pozostałych klientów (oprócz nadawcy)
+  // Send to other clients (except the sender)
   wavelength.clients.forEach((client) => {
     if (client !== ws && client.readyState === WebSocket.OPEN) {
       client.send(broadcastStr);
     }
   });
 
-  // Jeśli nadawca nie jest hostem, wyślij do hosta
+  // Do not forget the host: if the sender is not the host, send to the host
   if (
     !isHost &&
     wavelength.host &&
@@ -273,9 +264,9 @@ function handleSendMessage(ws, data) {
 }
 
 /**
- * Obsługa wysyłania plików
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane pliku
+ * File upload support
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - File data
  */
 function handleSendFile(ws, data) {
   const frequency = normalizeFrequency(ws.frequency);
@@ -309,9 +300,9 @@ function handleSendFile(ws, data) {
     return;
   }
 
-  // Sprawdź rozmiar danych
   if (attachmentData && attachmentData.length > 15 * 1024 * 1024) {
-    // Limit ~10MB po dekodowaniu base64
+    // ~10MB hard-stuck limit after base64 decoding (~15MB before decoding)
+    // TODO: consider using streams for larger files or extend this limit
     ws.send(
       JSON.stringify({
         type: "error",
@@ -321,12 +312,10 @@ function handleSendFile(ws, data) {
     return;
   }
 
-  // Sprawdź, czy wiadomość była już przetworzona
   if (connectionManager.isMessageProcessed(frequency, messageId)) {
-    return; // Ignoruj duplikaty
+    return;
   }
 
-  // Oznacz wiadomość jako przetworzoną
   connectionManager.markMessageProcessed(frequency, messageId);
 
   const isHost = ws.isHost;
@@ -338,7 +327,6 @@ function handleSendFile(ws, data) {
     `File received in wavelength ${frequency} from ${sender}: ${attachmentName} (${attachmentType}, ID: ${messageId})`
   );
 
-  // Zawsze wysyłaj potwierdzenie do nadawcy
   ws.send(
     JSON.stringify({
       type: "message",
@@ -355,7 +343,6 @@ function handleSendFile(ws, data) {
     })
   );
 
-  // Przygotuj wiadomość do wysłania innym
   const broadcastMessage = {
     type: "message",
     hasAttachment: true,
@@ -372,7 +359,6 @@ function handleSendFile(ws, data) {
 
   const broadcastStr = JSON.stringify(broadcastMessage);
 
-  // Wyślij do pozostałych klientów (oprócz nadawcy)
   wavelength.clients.forEach((client) => {
     if (client !== ws && client.readyState === WebSocket.OPEN) {
       try {
@@ -383,7 +369,6 @@ function handleSendFile(ws, data) {
     }
   });
 
-  // Jeśli nadawca nie jest hostem, wyślij do hosta
   if (
     !isHost &&
     wavelength.host &&
@@ -399,9 +384,9 @@ function handleSendFile(ws, data) {
 }
 
 /**
- * Obsługa opuszczania wavelength
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane żądania
+ * Handler for leaving wavelength
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - Request data
  */
 async function handleLeaveWavelength(ws, data) {
   const frequency = normalizeFrequency(ws.frequency);
@@ -412,12 +397,9 @@ async function handleLeaveWavelength(ws, data) {
 
   if (wavelength) {
     if (ws.isHost) {
-      // Host opuszcza wavelength
       await closeWavelength(frequency, "Host left");
     } else {
-      // Klient opuszcza wavelength
       wavelength.clients.delete(ws);
-
       if (wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
         wavelength.host.send(
           JSON.stringify({
@@ -432,15 +414,15 @@ async function handleLeaveWavelength(ws, data) {
     }
   }
 
-  // Zresetuj stan socketu
+  // Resetting WebSocket properties
   ws.frequency = null;
   ws.isHost = false;
 }
 
 /**
- * Obsługa zamykania wavelength
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {Object} data - Dane żądania
+ * Handler for closing wavelength
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {Object} data - Request data
  */
 async function handleCloseWavelength(ws, data) {
   const frequency = normalizeFrequency(ws.frequency);
@@ -489,9 +471,9 @@ async function handleCloseWavelength(ws, data) {
 }
 
 /**
- * Zamyka wavelength i powiadamia wszystkich klientów
- * @param {number} frequency - Częstotliwość wavelength do zamknięcia
- * @param {string} reason - Przyczyna zamknięcia
+ * Closes wavelength and notifies all clients
+ * @param {number} frequency - Frequency of the wavelength to close
+ * @param {string} reason - Reason for closing the wavelength
  */
 async function closeWavelength(frequency, reason) {
   console.log(`Closing wavelength ${frequency}: ${reason}`);
@@ -509,7 +491,6 @@ async function closeWavelength(frequency, reason) {
     reason,
   });
 
-  // Powiadom wszystkich klientów
   wavelength.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       try {
@@ -521,28 +502,25 @@ async function closeWavelength(frequency, reason) {
   });
 
   try {
-    // Usuń z bazy danych
     await WavelengthModel.delete(frequency);
     console.log(`Wavelength ${frequency} removed from database`);
   } catch (err) {
     console.error(`Error removing wavelength ${frequency} from database:`, err);
   }
 
-  // Usuń z pamięci
   connectionManager.activeWavelengths.delete(frequency);
 }
 
 /**
- * Główny handler dla wiadomości WebSocket
- * @param {WebSocket} ws - Połączenie WebSocket
- * @param {string} message - Otrzymana wiadomość
+ * Main handler for WebSocket messages
+ * @param {WebSocket} ws - WebSocket connection
+ * @param {string} message - Received message
  */
 async function handleMessage(ws, message) {
   try {
     console.log("Received:", message.toString());
     const data = JSON.parse(message.toString());
 
-    // Wybierz odpowiedni handler na podstawie typu wiadomości
     switch (data.type) {
       case "register_wavelength":
         await handleRegisterWavelength(ws, data);

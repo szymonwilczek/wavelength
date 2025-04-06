@@ -2,26 +2,27 @@ const WebSocket = require("ws");
 const WavelengthModel = require("../models/wavelength");
 
 /**
- * Klasa zarządzająca połączeniami WebSocket i stanem aplikacji
+ * Class that manages WebSocket connections and application state
  */
 class ConnectionManager {
   constructor() {
-    // Mapa przechowująca aktywne częstotliwości i informacje o nich
+    // Map storing active frequencies and their info
     this.activeWavelengths = new Map();
 
-    // Przechowuje ostatnią zarejestrowaną częstotliwość
+    // Stores the last recorded frequency
     this.lastRegisteredFrequency = 130.0;
 
-    // Interwał pingowania (ms)
+    // Ping interval in milliseconds
     this.pingInterval = 30000;
 
-    // Inicjalizacja interwału pingowania
+    // Interval for heartbeat
     this.heartbeatInterval = null;
   }
 
   /**
-   * Inicjuje pingowanie klientów aby utrzymać połączenia
-   * @param {WebSocket.Server} wss - Serwer WebSocket
+   * Initiates pinging of customers to maintain connections
+   * @param {WebSocket.Server} wss - WebSocket server instance
+   * @returns {void}
    */
   startHeartbeat(wss) {
     this.heartbeatInterval = setInterval(() => {
@@ -38,15 +39,17 @@ class ConnectionManager {
   }
 
   /**
-   * Zatrzymuje pingowanie klientów
+   * Stops the heartbeat interval
+   * @returns {void}
    */
   stopHeartbeat() {
     clearInterval(this.heartbeatInterval);
   }
 
   /**
-   * Obsługuje rozłączenie klienta
-   * @param {WebSocket} ws - WebSocket klienta
+   * Handles client disconnection
+   * @param {WebSocket} ws - WebSocket instance of the client
+   * @returns {void}
    */
   handleDisconnect(ws) {
     if (!ws.frequency) return;
@@ -56,13 +59,13 @@ class ConnectionManager {
     const wavelength = this.activeWavelengths.get(ws.frequency);
     if (!wavelength) return;
 
-    // Jeśli to host, usuń cały wavelength
+    // If the client is the host, server will remove whole wavelength
     if (ws.isHost) {
       console.log(
         `Host disconnected from wavelength ${ws.frequency}, removing wavelength`
       );
 
-      // Powiadom klientów o usunięciu wavelength
+      // Notify customers that wavelength has been removed
       wavelength.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(
@@ -76,10 +79,10 @@ class ConnectionManager {
 
       this.removeWavelength(ws.frequency);
     } else {
-      // Jeśli to klient, usuń go z listy klientów
+      // If it is a customer (not a host), just remove it from the list of clients
       wavelength.clients.delete(ws);
 
-      // Powiadom hosta o odłączeniu klienta
+      // Notify the host that the client has been disconnected
       if (wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
         wavelength.host.send(
           JSON.stringify({
@@ -92,13 +95,13 @@ class ConnectionManager {
   }
 
   /**
-   * Rejestruje nowy wavelength
-   * @param {WebSocket} ws - WebSocket hosta
-   * @param {number} frequency - Częstotliwość
-   * @param {string} name - Nazwa wavelength
-   * @param {boolean} isPasswordProtected - Czy jest zabezpieczony hasłem
-   * @param {string} sessionId - ID sesji
-   * @returns {Object} - Informacje o zarejestrowanym wavelength
+   * Registers a new wavelength
+   * @param {WebSocket} ws - WebSocket instance of the host
+   * @param {number} frequency - Frequency of the wavelength
+   * @param {string} name - Name of the wavelength (handled automatically by the server)
+   * @param {boolean} isPasswordProtected - Whether the wavelength is password protected
+   * @param {string} sessionId - session ID
+   * @returns {Object} - Information about the registered wavelength
    */
   registerWavelength(ws, frequency, name, isPasswordProtected, sessionId) {
     ws.frequency = frequency;
@@ -110,10 +113,10 @@ class ConnectionManager {
       clients: new Set(),
       name,
       isPasswordProtected,
-      processedMessageIds: new Set(), // Do śledzenia przetworzonych wiadomości
+      processedMessageIds: new Set(), // To track processed messages (without their content)
     });
 
-    // Aktualizuj ostatnią zarejestrowaną częstotliwość
+    // Update last recorded frequency (for quicker future searches)
     if (frequency > this.lastRegisteredFrequency) {
       this.lastRegisteredFrequency = frequency;
     }
@@ -122,11 +125,12 @@ class ConnectionManager {
   }
 
   /**
-   * Dodaje klienta do istniejącego wavelength
-   * @param {WebSocket} ws - WebSocket klienta
-   * @param {number} frequency - Częstotliwość
-   * @param {string} sessionId - ID sesji klienta
-   * @returns {Object} - Informacje o dołączonym wavelength
+   * Adds client to existing wavelength
+   * @param {WebSocket} ws - WebSocket instance of the client
+   * @param {number} frequency - Frequency of the wavelength
+   * @param {string} sessionId - session ID (client)
+   * @returns {Object} - Information about the added client
+   * @returns {null} - If wavelength does not exist
    */
   addClientToWavelength(ws, frequency, sessionId) {
     const wavelength = this.activeWavelengths.get(frequency);
@@ -146,17 +150,18 @@ class ConnectionManager {
   }
 
   /**
-   * Usuwa wavelength
-   * @param {number} frequency - Częstotliwość wavelength do usunięcia
-   * @returns {boolean} - Czy udało się usunąć
+   * Deletes wavelength from memory and database
+   * @param {number} frequency - Frequency of the wavelength to be removed
+   * @returns {boolean} - Whether the wavelength was successfully removed
+   * @returns {false} - If wavelength does not exist
    */
   async removeWavelength(frequency) {
     if (!this.activeWavelengths.has(frequency)) return false;
 
-    // Usuń z pamięci
+    // Memory cleanup
     this.activeWavelengths.delete(frequency);
 
-    // Usuń z bazy danych
+    // Database cleanup
     try {
       await WavelengthModel.delete(frequency);
       return true;
@@ -170,17 +175,17 @@ class ConnectionManager {
   }
 
   /**
-   * Pobiera wavelength z pamięci lub bazy danych
-   * @param {number} frequency - Częstotliwość
-   * @returns {Promise<Object|null>} - Znaleziony wavelength lub null
+   * Retrieves wavelength from memory or database
+   * @param {number} frequency - Frequency of the wavelength
+   * @returns {Promise<Object|null>} - Wavelength information or null if not found
    */
   async getWavelength(frequency) {
-    // Sprawdź w pamięci
+    // Memory check
     if (this.activeWavelengths.has(frequency)) {
       return this.activeWavelengths.get(frequency);
     }
 
-    // Sprawdź w bazie danych
+    // Database check
     try {
       return await WavelengthModel.findByFrequency(frequency);
     } catch (error) {
@@ -193,10 +198,10 @@ class ConnectionManager {
   }
 
   /**
-   * Sprawdza czy wiadomość była już przetworzona
-   * @param {number} frequency - Częstotliwość
-   * @param {string} messageId - ID wiadomości
-   * @returns {boolean} - Czy wiadomość była przetworzona
+   * Checks if the message has already been processed
+   * @param {number} frequency - Frequency of the wavelength
+   * @param {string} messageId - ID of the message
+   * @returns {boolean} - Whether the message has been processed
    */
   isMessageProcessed(frequency, messageId) {
     const wavelength = this.activeWavelengths.get(frequency);
@@ -206,9 +211,9 @@ class ConnectionManager {
   }
 
   /**
-   * Oznacza wiadomość jako przetworzoną
-   * @param {number} frequency - Częstotliwość
-   * @param {string} messageId - ID wiadomości
+   * Marks the message as processed
+   * @param {number} frequency - Frequency of the wavelength
+   * @param {string} messageId - ID of the message
    */
   markMessageProcessed(frequency, messageId) {
     const wavelength = this.activeWavelengths.get(frequency);
@@ -216,9 +221,9 @@ class ConnectionManager {
 
     wavelength.processedMessageIds.add(messageId);
 
-    // Ogranicz rozmiar zbioru
+    // Limiting size of the collection
     if (wavelength.processedMessageIds.size > 1000) {
-      // Usuń najstarsze elementy (pierwszych 200)
+      // Remove the oldest elements (the first 200)
       const iterator = wavelength.processedMessageIds.values();
       for (let i = 0; i < 200; i++) {
         wavelength.processedMessageIds.delete(iterator.next().value);

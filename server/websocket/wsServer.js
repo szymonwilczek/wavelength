@@ -1,37 +1,30 @@
-/**
- * Inicjalizacja i konfiguracja serwera WebSocket
- */
 const WebSocket = require("ws");
 const { handleMessage } = require("./handlers");
 const connectionManager = require("./connectionManager");
 
 /**
- * Inicjalizuje i konfiguruje serwer WebSocket
- * @param {http.Server} httpServer - Serwer HTTP, na którym ma działać WebSocket
- * @returns {WebSocket.Server} - Skonfigurowany serwer WebSocket
+ * Initializes and configures the WebSocket server
+ * @param {http.Server} httpServer - HTTP server on which you want WebSocket to run
+ * @returns {WebSocket.Server} - Configured WebSocket server
  */
 function initWebSocketServer(httpServer) {
   console.log("Initializing WebSocket server...");
 
   const wss = new WebSocket.Server({
     server: httpServer,
-    // Można dodać dodatkowe opcje, np. maxPayload
-    maxPayload: 20 * 1024 * 1024, // 20MB limit na wiadomości
+    maxPayload: 20 * 1024 * 1024, // ~ 20MB limit for payload size
   });
 
-  // Obsługa nowych połączeń
   wss.on("connection", function connection(ws, req) {
     console.log("Client connected from:", req.socket.remoteAddress);
 
-    // Inicjalizacja stanu klienta
     ws.isAlive = true;
 
-    // Obsługa ping/pong do wykrywania rozłączonych klientów
     ws.on("pong", () => {
       ws.isAlive = true;
     });
 
-    // Obsługa wiadomości
+    // Message handling
     ws.on("message", async function incoming(message) {
       try {
         await handleMessage(ws, message);
@@ -46,18 +39,18 @@ function initWebSocketServer(httpServer) {
       }
     });
 
-    // Obsługa błędów
+    // Error handling
     ws.on("error", function onError(error) {
       console.error("WebSocket error:", error);
     });
 
-    // Obsługa zamknięcia połączenia
+    // Connection close handling
     ws.on("close", function onClose() {
       console.log("Client disconnected");
       connectionManager.handleDisconnect(ws);
     });
 
-    // Wyślij wiadomość powitalną
+    // Heartbeat mechanism
     ws.send(
       JSON.stringify({
         type: "welcome",
@@ -67,15 +60,15 @@ function initWebSocketServer(httpServer) {
     );
   });
 
-  // Obsługa błędów na poziomie serwera
+  // Erorr handling for the server
   wss.on("error", function onServerError(error) {
     console.error("WebSocket server error:", error);
   });
 
-  // Uruchom mechanizm heartbeat do wykrywania rozłączonych klientów
+  // Heartbeat mechanism
   connectionManager.startHeartbeat(wss);
 
-  // Zamknięcie heartbeat przy zamykaniu serwera
+  // Close heartbeat on server close
   wss.on("close", function onServerClose() {
     console.log("WebSocket server closing");
     connectionManager.stopHeartbeat();

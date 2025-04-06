@@ -1,5 +1,5 @@
 /**
- * Router API dla aplikacji Wavelength
+ * API router for Wavelength application
  */
 const express = require("express");
 const wavelengthService = require("../services/wavelengthService");
@@ -9,7 +9,7 @@ const { normalizeFrequency } = require("../utils/helpers");
 const router = express.Router();
 
 /**
- * Endpoint sprawdzający stan serwera
+ * Endpoint checking server status
  * @route GET /health
  */
 router.get("/health", (req, res) => {
@@ -17,7 +17,7 @@ router.get("/health", (req, res) => {
 });
 
 /**
- * Zwraca następną dostępną częstotliwość
+ * Returns the next available frequency
  * @route GET /api/next-available-frequency
  */
 router.get("/api/next-available-frequency", async (req, res) => {
@@ -54,14 +54,13 @@ router.get("/api/next-available-frequency", async (req, res) => {
 });
 
 /**
- * Zwraca listę wszystkich aktywnych wavelengths
+ * Returns a list of all active wavelengths
  * @route GET /api/wavelengths
  */
 router.get("/api/wavelengths", async (req, res) => {
   try {
     const wavelengths = await wavelengthService.getAllWavelengths();
 
-    // Przygotuj dane do odpowiedzi
     const response = wavelengths.map((w) => ({
       frequency: parseFloat(w.frequency),
       name: w.name,
@@ -84,14 +83,14 @@ router.get("/api/wavelengths", async (req, res) => {
 });
 
 /**
- * Zwraca informacje o określonej częstotliwości
+ * Returns information at a specific frequency
  * @route GET /api/wavelengths/:frequency
  */
 router.get("/api/wavelengths/:frequency", async (req, res) => {
   try {
     const frequency = normalizeFrequency(req.params.frequency);
 
-    // Sprawdź najpierw w pamięci
+    // At the beginning, check if the frequency is in the memory of active wavelengths
     const memoryWavelength = connectionManager.activeWavelengths.get(frequency);
     if (memoryWavelength) {
       res.json({
@@ -104,7 +103,7 @@ router.get("/api/wavelengths/:frequency", async (req, res) => {
       return;
     }
 
-    // Jeśli nie ma w pamięci, sprawdź w bazie danych
+    // Only if it is not in memory, we try to get it from the database
     const dbWavelength = await wavelengthService.getWavelength(frequency);
     if (dbWavelength) {
       res.json({
@@ -117,7 +116,6 @@ router.get("/api/wavelengths/:frequency", async (req, res) => {
       return;
     }
 
-    // Nie znaleziono
     res.status(404).json({
       error: "Wavelength not found",
       status: "error",

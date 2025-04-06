@@ -1,17 +1,18 @@
 /**
- * Model Wavelength - operacje na bazie danych dla wavelengths
+ * Wavelength model - database related operations for wavelengths
  */
 const { query } = require("../config/db");
 const { normalizeFrequency } = require("../utils/helpers");
 
 class WavelengthModel {
   /**
-   * Tworzy nowy wavelength w bazie danych
-   * @param {number} frequency - Częstotliwość
-   * @param {string} name - Nazwa wavelength
-   * @param {boolean} isPasswordProtected - Czy jest zabezpieczony hasłem
-   * @param {string} hostSocketId - ID gniazda hosta
-   * @returns {Promise<Object>} - Utworzony wavelength
+   * Creates a new wavelength in the database
+   * @param {number} frequency - Frequency of the wavelength
+   * @param {string} name - Name of the wavelength (mostly handled automatically by the server)
+   * @param {boolean} isPasswordProtected - Is the wavelength password protected?
+   * @param {string} hostSocketId - Socket ID of the host
+   * @returns {Promise<Object>} - Created wavelength object
+   * @throws {Error} - Throws an error if the creation fails
    */
   static async create(frequency, name, isPasswordProtected, hostSocketId) {
     const normalizedFrequency = normalizeFrequency(frequency);
@@ -23,9 +24,9 @@ class WavelengthModel {
   }
 
   /**
-   * Wyszukuje wavelength po częstotliwości
-   * @param {number} frequency - Częstotliwość do wyszukania
-   * @returns {Promise<Object|null>} - Znaleziony wavelength lub null
+   * Searches for wavelength by frequency
+   * @param {number} frequency - Frequency to be searched
+   * @returns {Promise<Object|null>} - Found wavelength or null (if not found)
    */
   static async findByFrequency(frequency) {
     const normalizedFrequency = normalizeFrequency(frequency);
@@ -37,8 +38,8 @@ class WavelengthModel {
   }
 
   /**
-   * Pobiera wszystkie aktywne wavelengths
-   * @returns {Promise<Array>} - Lista aktywnych wavelengths
+   * Retrieves all active wavelengths from the database
+   * @returns {Promise<Array>} - List of active wavelengths
    */
   static async findAll() {
     const result = await query(`
@@ -53,9 +54,10 @@ class WavelengthModel {
   }
 
   /**
-   * Usuwa wavelength o podanej częstotliwości
-   * @param {number} frequency - Częstotliwość do usunięcia
-   * @returns {Promise<boolean>} - Czy udało się usunąć
+   * Removes the wavelength of the specified frequency from the database
+   * @param {number} frequency - Frequency to be removed
+   * @returns {Promise<boolean>} - True if the wavelength was successfully removed, false otherwise
+   * @throws {Error} - Throws an error if the deletion fails
    */
   static async delete(frequency) {
     const normalizedFrequency = normalizeFrequency(frequency);
@@ -67,7 +69,7 @@ class WavelengthModel {
   }
 
   /**
-   * Usuwa wszystkie wavelengths z bazy danych
+   * Deletes all wavelengths from the database
    * @returns {Promise<void>}
    */
   static async deleteAll() {
@@ -75,10 +77,11 @@ class WavelengthModel {
   }
 
   /**
-   * Znajduje następną dostępną częstotliwość
-   * @param {number} startFrequency - Częstotliwość startowa
-   * @param {number} increment - Przyrost częstotliwości
-   * @returns {Promise<number|null>} - Znaleziona częstotliwość lub null
+   * Finds the next available frequency in the database
+   * @param {number} startFrequency - Start frequencyStart frequency (from it the algorithm starts the search)
+   * @param {number} increment - Frequency increment (default is 0.1 for every Hz/MHz/GHz)
+   * @returns {Promise<number|null>} - Next available frequency or null (if not found)
+   * @throws {Error} - Throws an error if the search fails
    */
   static async findNextAvailableFrequency(startFrequency, increment = 0.1) {
     let nextFreq = normalizeFrequency(startFrequency);
