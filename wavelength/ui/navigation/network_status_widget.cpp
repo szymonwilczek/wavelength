@@ -107,7 +107,7 @@ void NetworkStatusWidget::paintEvent(QPaintEvent *event) {
 
 void NetworkStatusWidget::checkNetworkStatus() {
     // Wykonanie testowego żądania do Google, aby sprawdzić łączność
-    QNetworkRequest request(QUrl("https://www.google.com"));
+    QNetworkRequest request(QUrl("https://www.google.com")); //TODO: change to ping a wavelength socket server
     QNetworkReply *reply = m_networkManager->get(request);
 
     // Timeout dla żądania
