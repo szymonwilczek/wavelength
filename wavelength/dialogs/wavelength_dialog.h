@@ -157,7 +157,7 @@ class CyberLineEdit : public QLineEdit {
 
 public:
     CyberLineEdit(QWidget* parent = nullptr)
-        : QLineEdit(parent), m_glowIntensity(0.0) {
+        : QLineEdit(parent), m_glowIntensity(0.0), m_cursorVisible(true) {
         // Zwiększ padding oraz ustaw minimalny rozmiar
         setStyleSheet("border: none; background-color: transparent; padding: 6px; font-family: Consolas; font-size: 9pt;");
         setCursor(Qt::IBeamCursor);
@@ -169,6 +169,26 @@ public:
         QPalette pal = palette();
         pal.setColor(QPalette::Text, QColor(0, 220, 255));
         setPalette(pal);
+
+        // Własny timer mrugania kursora
+        m_cursorBlinkTimer = new QTimer(this);
+        m_cursorBlinkTimer->setInterval(530); // Standardowy czas mrugania kursora
+        connect(m_cursorBlinkTimer, &QTimer::timeout, this, [this]() {
+            m_cursorVisible = !m_cursorVisible;
+
+            // Wymuszamy odświeżenie tylko obszaru kursora dla lepszej wydajności
+            if (hasFocus()) {
+                QRect cursorRect = this->cursorRect();
+                cursorRect.adjust(-2, -2, 2, 2); // Dodajemy mały margines
+                update(cursorRect);
+            }
+        });
+    }
+
+    ~CyberLineEdit() override {
+        if (m_cursorBlinkTimer) {
+            m_cursorBlinkTimer->stop();
+        }
     }
 
     QSize sizeHint() const override {
@@ -181,6 +201,25 @@ public:
     void setGlowIntensity(double intensity) {
         m_glowIntensity = intensity;
         update();
+    }
+
+    QRect cursorRect() const {
+        // Obliczamy pozycję kursora
+        int cursorX = 10;
+        QString content = text();
+
+        if (!content.isEmpty()) {
+            QString textBeforeCursor = content.left(cursorPosition());
+            QFontMetrics fm(font());
+            cursorX += fm.horizontalAdvance(echoMode() == QLineEdit::Password ?
+                                         QString(textBeforeCursor.length(), '•') :
+                                         textBeforeCursor);
+        }
+
+        int cursorHeight = height() * 0.75;
+        int cursorY = (height() - cursorHeight) / 2;
+
+        return QRect(cursorX - 1, cursorY, 2, cursorHeight);
     }
 
 protected:
@@ -268,8 +307,8 @@ protected:
             painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, content);
         }
 
-        // Poprawiony kursor - wyższy, zajmujący większą część wysokości pola
-        if (hasFocus() && cursorPosition() >= 0) {
+        // Poprawiona obsługa kursora - konsekwentna wysokość i pozycja
+        if (hasFocus() && m_cursorVisible) {
             int cursorX = 10; // Domyślna pozycja X
 
             // Oblicz szerokość tekstu przed kursorem
@@ -281,33 +320,44 @@ protected:
                                              textBeforeCursor);
             }
 
-            // Zwiększona wysokość kursora (75% wysokości pola)
+            // Stała wysokość kursora (75% wysokości pola)
             int cursorHeight = height() * 0.75;
             int cursorY = (height() - cursorHeight) / 2;
 
-            // Mrugający kursor (zależnie od stanu parzystości sekund)
-            if (QDateTime::currentMSecsSinceEpoch() % 1000 < 500) {
-                painter.setPen(QPen(QColor(0, 220, 255), 1));
-                painter.drawLine(QPoint(cursorX, cursorY), QPoint(cursorX, cursorY + cursorHeight));
-            }
+            painter.setPen(QPen(QColor(0, 220, 255), 1));
+            painter.drawLine(QPoint(cursorX, cursorY), QPoint(cursorX, cursorY + cursorHeight));
         }
     }
 
     void focusInEvent(QFocusEvent* event) override {
+        m_cursorVisible = true;
+
+        // Uruchom timer mrugania kursora
+        if (m_cursorBlinkTimer && !m_cursorBlinkTimer->isActive()) {
+            m_cursorBlinkTimer->start();
+        }
+
         QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
         anim->setDuration(200);
         anim->setStartValue(0.0);
         anim->setEndValue(1.0);
         anim->start(QPropertyAnimation::DeleteWhenStopped);
+
         QLineEdit::focusInEvent(event);
     }
 
     void focusOutEvent(QFocusEvent* event) override {
+        // Zatrzymaj timer mrugania kursora
+        if (m_cursorBlinkTimer && m_cursorBlinkTimer->isActive()) {
+            m_cursorBlinkTimer->stop();
+        }
+
         QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
         anim->setDuration(300);
         anim->setStartValue(1.0);
         anim->setEndValue(0.0);
         anim->start(QPropertyAnimation::DeleteWhenStopped);
+
         QLineEdit::focusOutEvent(event);
     }
 
@@ -333,8 +383,23 @@ protected:
         QLineEdit::leaveEvent(event);
     }
 
+    // Obsługa zdarzeń klawiatury - zresetuj kursor
+    void keyPressEvent(QKeyEvent* event) override {
+        // Resetuj stan mrugania po każdym naciśnięciu klawisza
+        m_cursorVisible = true;
+
+        // Resetuj timer mrugania
+        if (m_cursorBlinkTimer && m_cursorBlinkTimer->isActive()) {
+            m_cursorBlinkTimer->start();
+        }
+
+        QLineEdit::keyPressEvent(event);
+    }
+
 private:
     double m_glowIntensity;
+    QTimer* m_cursorBlinkTimer;
+    bool m_cursorVisible;
 };
 
 // Cyberpunkowy przycisk - alternatywna implementacja dla tej aplikacji
