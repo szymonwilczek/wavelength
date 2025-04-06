@@ -55,8 +55,6 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/session/events/joiner/wavelength_joiner.h
         wavelength/session/events/leaver/wavelength_leaver.cpp
         wavelength/session/events/leaver/wavelength_leaver.h
-        wavelength/socket/wavelength_socket_handler.cpp
-        wavelength/socket/wavelength_socket_handler.h
         wavelength/messages/wavelength_message_service.cpp
         wavelength/messages/wavelength_message_service.h
         wavelength/messages/wavelength_message_processor.cpp

@@ -12,7 +12,6 @@
 #include "../messages/wavelength_message_service.h"
 #include "../messages/wavelength_message_processor.h"
 #include "../managers/wavelength_state_manager.h"
-#include "../socket/wavelength_socket_handler.h"
 #include "../managers/wavelength_event_broker.h"
 #include "../util/wavelength_config.h"
 
