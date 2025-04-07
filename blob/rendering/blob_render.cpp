@@ -310,14 +310,6 @@ void BlobRenderer::renderScene(QPainter &painter,
 
         // Renderuj blob
         renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
-
-        // Przywróć poprzedni stan transformacji
-        if (renderState.isBeingAbsorbed || renderState.isAbsorbing) {
-            painter.restore();
-        }
-
-        // USUWAMY PONIŻSZĄ LINIĘ - nie renderujemy HUD w stanach innych niż IDLE!
-        // drawCompleteHUD(painter, blobCenter, params.blobRadius, params.borderColor, width, height);
     }
 }
 
