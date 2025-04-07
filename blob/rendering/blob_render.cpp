@@ -21,13 +21,14 @@ void BlobRenderer::renderBlob(QPainter &painter,
 
     drawBorder(painter, blobPath, params.borderColor, params.borderWidth);
 
-    drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor, animationState);  // Przekazujemy stan animacji
+    // drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor, animationState);  // Przekazujemy stan animacji
 }
 
 void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
                                     const QColor &gridColor,
                                     int gridSpacing,
                                     int width, int height) {
+    qDebug() << "UPDATE GRID BUFFER";
     m_gridBuffer = QPixmap(width, height);
 
     QPainter bufferPainter(&m_gridBuffer);
@@ -61,6 +62,8 @@ void BlobRenderer::drawBackground(QPainter &painter,
                            gridColor != m_lastGridColor ||
                            gridSpacing != m_lastGridSpacing ||
                            QSize(width, height) != m_lastSize;
+
+    qDebug() << "DRAW BACKGROUND";
 
     // Tworzymy statyczną teksturę tła tylko raz (z neonowymi punktami)
     if (!m_staticBackgroundInitialized) {
@@ -135,6 +138,8 @@ void BlobRenderer::drawGlowEffect(QPainter &painter,
                                   const QPainterPath &blobPath,
                                   const QColor &borderColor,
                                   int glowRadius) {
+
+    qDebug() << "GLOW EFFECT";
     // Intensywniejszy efekt poświaty
     QColor glowColor = borderColor;
     glowColor.setAlpha(100);
@@ -164,6 +169,8 @@ void BlobRenderer::drawBorder(QPainter &painter,
                               const QPainterPath &blobPath,
                               const QColor &borderColor,
                               int borderWidth) {
+
+    qDebug() << "DRAW BORDER";
     // Główne obramowanie neonowe
     QPen borderPen(borderColor);
     borderPen.setWidth(borderWidth);
@@ -177,8 +184,8 @@ void BlobRenderer::drawBorder(QPainter &painter,
     painter.drawPath(blobPath);
 
     // Rysuj markery na ścieżce używając naszego managera
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    m_markersManager.drawMarkers(painter, blobPath, currentTime);
+    // qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    // m_markersManager.drawMarkers(painter, blobPath, currentTime);
 }
 
 
@@ -189,6 +196,7 @@ void BlobRenderer::drawFilling(QPainter &painter,
                             const QColor &borderColor,
                             BlobConfig::AnimationState animationState) {  // Dodany parametr
 
+    qDebug() << "DRAW FILLING";
     // Cyfrowy gradient z zanikaniem dla bloba
     QRadialGradient gradient(blobCenter, blobRadius);
 
@@ -224,6 +232,7 @@ void BlobRenderer::renderScene(QPainter &painter,
                                QColor &lastBgColor,
                                QColor &lastGridColor,
                                int &lastGridSpacing) {
+    qDebug() << "RENDER SCENE";
 
     // Wykrycie przejścia do stanu IDLE
     if (renderState.animationState == BlobConfig::IDLE && m_lastAnimationState != BlobConfig::IDLE) {
@@ -298,31 +307,6 @@ void BlobRenderer::renderScene(QPainter &painter,
                        params.gridColor, params.gridSpacing,
                        width, height);
 
-        // Obsługa stanów absorpcji
-        if (renderState.isBeingAbsorbed || renderState.isClosingAfterAbsorption) {
-            painter.setOpacity(renderState.opacity);
-            painter.save();
-            QPointF center = blobCenter;
-            painter.translate(center);
-            painter.scale(renderState.scale, renderState.scale);
-            painter.translate(-center);
-        } else if (renderState.isAbsorbing) {
-            painter.save();
-            QPointF center = blobCenter;
-
-            if (renderState.isPulseActive) {
-                QPen extraGlowPen(params.borderColor.lighter(150));
-                extraGlowPen.setWidth(params.borderWidth + 10);
-                painter.setPen(extraGlowPen);
-
-                QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
-                painter.drawPath(blobPath);
-            }
-
-            painter.translate(center);
-            painter.scale(renderState.scale, renderState.scale);
-            painter.translate(-center);
-        }
 
         // Renderuj blob
         renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
