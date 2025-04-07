@@ -8,7 +8,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
       m_transitionManager(this),
       m_eventHandler(this) {
     m_params.blobRadius = 250.0f;
-    m_params.numPoints = 20;
+    m_params.numPoints = 32;
     m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
     m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
     m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
@@ -212,9 +212,6 @@ BlobAnimation::~BlobAnimation() {
 }
 
 void BlobAnimation::initializeBlob() {
-    // Zmodyfikujmy tę metodę, aby korzystała z bezpośrednio ustawionych wartości,
-    // a nie z wyników fizyki, która może prowadzić do zniekształceń
-
     // Wyczyść aktualne punkty
     m_controlPoints.clear();
     m_targetPoints.clear();
@@ -223,18 +220,12 @@ void BlobAnimation::initializeBlob() {
     // Ustaw bloba na środek ekranu
     m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
 
-    // Generuj punkty kontrolne w idealnym okręgu wokół środka
-    for (int i = 0; i < m_params.numPoints; ++i) {
-        double angle = 2.0 * M_PI * i / m_params.numPoints;
-        QPointF point(
-            m_blobCenter.x() + m_params.blobRadius * cos(angle),
-            m_blobCenter.y() + m_params.blobRadius * sin(angle)
-        );
+    // Generuj punkty kontrolne w nieregularnym, organicznym kształcie
+    m_controlPoints = generateOrganicShape(m_blobCenter, m_params.blobRadius, m_params.numPoints);
 
-        m_controlPoints.push_back(point);
-        m_targetPoints.push_back(point);
-        m_velocity.push_back(QPointF(0, 0));
-    }
+    // Ustawiamy punkty docelowe i prędkości
+    m_targetPoints = m_controlPoints;
+    m_velocity.resize(m_params.numPoints, QPointF(0, 0));
 
     // To zapewni, że nawet jeśli parametry fizyki będą próbować
     // zmienić rozmiar, to my go zawsze resetujemy do określonej wartości
