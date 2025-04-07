@@ -262,6 +262,8 @@ public:
     void setWavelength(double frequency, const QString &name = QString()) {
         currentFrequency = frequency;
 
+        resetStatusIndicator();
+
         QString title;
         if (name.isEmpty()) {
             title = QString("Wavelength: %1 Hz").arg(frequency);
@@ -512,6 +514,18 @@ private:
     QPushButton *abortButton;
     double currentFrequency = -1.0;
     double m_scanlineOpacity;
+
+    void resetStatusIndicator() {
+        m_statusIndicator->setText("AKTYWNE POŁĄCZENIE");
+        m_statusIndicator->setStyleSheet(
+            "color: #00ffaa;"
+            "background-color: rgba(0, 40, 30, 150);"
+            "border: 1px solid #00aa77;"
+            "padding: 4px 8px;"
+            "font-family: 'Consolas';"
+            "font-size: 9pt;"
+        );
+    }
 };
 
 #endif // WAVELENGTH_CHAT_VIEW_H
