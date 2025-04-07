@@ -145,6 +145,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/button/cyber_button.h
         wavelength/ui/input/cyber_line_edit.cpp
         wavelength/ui/input/cyber_line_edit.h
+        wavelength/view/settings_view.cpp
+        wavelength/view/settings_view.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

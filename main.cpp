@@ -6,7 +6,6 @@
 #pragma comment(lib, "dwmapi.lib")
 #endif
 
-#include <QApplication>
 #include <QMainWindow>
 #include "wavelength/ui/navigation/navbar.h"
 #include "blob/core/blob_animation.h"
@@ -23,6 +22,7 @@
 #include "wavelength/ui/cyberpunk_style.h"
 #include "wavelength/view/main_window/cyberpunk_text_effect.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
+#include "wavelength/view/settings_view.h"
 
 void centerLabel(QLabel *label, BlobAnimation *animation) {
     if (label && animation) {
@@ -65,6 +65,12 @@ int main(int argc, char *argv[]) {
 
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
+
+    WavelengthConfig *config = WavelengthConfig::getInstance();
+
+    // Ustawienie nazwy aplikacji i organizacji dla QSettings
+    QCoreApplication::setOrganizationName("Wavelength");
+    QCoreApplication::setApplicationName("WavelengthApp");
 
     FontManager* fontManager = FontManager::getInstance();
     if (!fontManager->initialize()) {
@@ -124,6 +130,9 @@ int main(int argc, char *argv[]) {
 
     WavelengthChatView *chatView = new WavelengthChatView(stackedWidget);
     stackedWidget->addWidget(chatView);
+
+    SettingsView *settingsView = new SettingsView(stackedWidget);
+    stackedWidget->addWidget(settingsView);
 
     stackedWidget->setCurrentWidget(animationWidget);
 
@@ -257,6 +266,15 @@ int main(int argc, char *argv[]) {
                          // Ponownie wycentruj etykietę po zresetowaniu wizualizacji
                          centerLabel(titleLabel, animation);
                      });
+
+    QObject::connect(navbar, &Navbar::settingsClicked, [stackedWidget, settingsView]() {
+        stackedWidget->setCurrentWidget(settingsView);
+    });
+
+    // Powrót z widoku ustawień do ekranu głównego
+    QObject::connect(settingsView, &SettingsView::backToMainView, [stackedWidget, animationWidget]() {
+        stackedWidget->setCurrentWidget(animationWidget);
+    });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Create wavelength button clicked";

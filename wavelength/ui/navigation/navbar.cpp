@@ -38,7 +38,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     mainLayout->setContentsMargins(0, 5, 0, 5);
     mainLayout->setSpacing(0);
 
-    // // Element narożny po lewej
+    // Element narożny po lewej
     QLabel* cornerElement1 = new QLabel(this);
     cornerElement1->setStyleSheet(
     "QLabel {"
@@ -55,19 +55,11 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
    "   font-family: 'Blender Pro Heavy';"
    "   font-size: 28px;"
    "   letter-spacing: 2px;"
-   "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
+   "   color: #ffffff;"
    "   background-color: transparent;"
    "   text-transform: uppercase;"
    "}"
     );
-
-    // Alternatywnie, jeśli FontManager działa poprawnie ale zwraca niewłaściwą nazwę:
-    // FontManager* fontManager = FontManager::getInstance();
-    // QFont font = fontManager->getFont("BlenderPro", 12, QFont::Bold);
-    // qDebug() << "Rzeczywista nazwa czcionki:" << font.family();
-    // logoLabel->setFont(font);
-
-    qDebug() << "Ustawiona czcionka logoLabel:" << logoLabel->font().family();
 
     // Dodanie neonowego efektu poświaty
     QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(logoLabel);
@@ -84,7 +76,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     logoLayout->addWidget(cornerElement1);
     logoLayout->addWidget(logoLabel);
 
-    // NOWY ELEMENT: Widget statusu sieci (środek)
+    // Widget statusu sieci (środek)
     NetworkStatusWidget* networkStatus = new NetworkStatusWidget(this);
     networkStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -97,8 +89,11 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     // Przyciski akcji
     createWavelengthButton = new CyberpunkButton("Generate Wavelength", buttonsContainer);
     joinWavelengthButton = new CyberpunkButton("Merge Wavelength", buttonsContainer);
+    settingsButton = new CyberpunkButton("Settings", buttonsContainer);
+
     buttonsLayout->addWidget(createWavelengthButton);
     buttonsLayout->addWidget(joinWavelengthButton);
+    buttonsLayout->addWidget(settingsButton);
 
     // Element narożny po prawej
     QLabel* cornerElement2 = new QLabel(this);
@@ -120,6 +115,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
 
     connect(createWavelengthButton, &QPushButton::clicked, this, &Navbar::createWavelengthClicked);
     connect(joinWavelengthButton, &QPushButton::clicked, this, &Navbar::joinWavelengthClicked);
+    connect(settingsButton, &QPushButton::clicked, this, &Navbar::settingsClicked);
 }
 
 void Navbar::contextMenuEvent(QContextMenuEvent *event) {

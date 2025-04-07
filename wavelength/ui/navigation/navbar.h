@@ -19,11 +19,13 @@ protected:
     signals:
         void createWavelengthClicked();
     void joinWavelengthClicked();
+    void settingsClicked();  // Nowy sygnał dla przycisku ustawień
 
 private:
     QLabel *logoLabel;
     CyberpunkButton *createWavelengthButton;
     CyberpunkButton *joinWavelengthButton;
+    CyberpunkButton *settingsButton;  // Nowy przycisk ustawień
 };
 
 #endif // NAVBAR_H
