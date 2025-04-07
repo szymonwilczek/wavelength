@@ -95,7 +95,7 @@ private:
     double m_glitchIntensity;
 
     // Nowy obiekt zarządzający markerami
-    PathMarkersManager m_markersManager;
+    // PathMarkersManager m_markersManager;
     qint64 m_lastUpdateTime;
 
     QString m_idleBlobId;
