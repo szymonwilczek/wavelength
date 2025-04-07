@@ -28,7 +28,6 @@ void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
                                     const QColor &gridColor,
                                     int gridSpacing,
                                     int width, int height) {
-    qDebug() << "UPDATE GRID BUFFER";
     m_gridBuffer = QPixmap(width, height);
 
     QPainter bufferPainter(&m_gridBuffer);
@@ -63,7 +62,6 @@ void BlobRenderer::drawBackground(QPainter &painter,
                            gridSpacing != m_lastGridSpacing ||
                            QSize(width, height) != m_lastSize;
 
-    qDebug() << "DRAW BACKGROUND";
 
     // Tworzymy statyczną teksturę tła tylko raz (z neonowymi punktami)
     if (!m_staticBackgroundInitialized) {
@@ -97,7 +95,6 @@ void BlobRenderer::drawBackground(QPainter &painter,
 
         // Rysowanie głównej siatki
         QColor mainGridColor = QColor(0, 195, 255, 40);
-        qDebug() << "Grid color:" << mainGridColor;
         bufferPainter.setPen(QPen(mainGridColor, 1, Qt::SolidLine));
 
         // Główne linie siatki
@@ -111,7 +108,6 @@ void BlobRenderer::drawBackground(QPainter &painter,
 
         // Dodajemy podsiatkę o mniejszej intensywności
         QColor subgridColor = QColor(0,130, 200, 35);
-        qDebug() << "Subgrid color:" << subgridColor;
         subgridColor.setAlphaF(0.3);
         bufferPainter.setPen(QPen(subgridColor, 0.5, Qt::DotLine));
 
@@ -170,7 +166,6 @@ void BlobRenderer::drawBorder(QPainter &painter,
                               const QColor &borderColor,
                               int borderWidth) {
 
-    qDebug() << "DRAW BORDER";
     // Główne obramowanie neonowe
     QPen borderPen(borderColor);
     borderPen.setWidth(borderWidth);
@@ -196,7 +191,6 @@ void BlobRenderer::drawFilling(QPainter &painter,
                             const QColor &borderColor,
                             BlobConfig::AnimationState animationState) {  // Dodany parametr
 
-    qDebug() << "DRAW FILLING";
     // Cyfrowy gradient z zanikaniem dla bloba
     QRadialGradient gradient(blobCenter, blobRadius);
 
@@ -232,7 +226,6 @@ void BlobRenderer::renderScene(QPainter &painter,
                                QColor &lastBgColor,
                                QColor &lastGridColor,
                                int &lastGridSpacing) {
-    qDebug() << "RENDER SCENE";
 
     // Wykrycie przejścia do stanu IDLE
     if (renderState.animationState == BlobConfig::IDLE && m_lastAnimationState != BlobConfig::IDLE) {
@@ -332,7 +325,6 @@ void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
                              double blobRadius, const QColor &hudColor,
                              int width, int height) {
 
-    qDebug() << "RENDER HUD";
 
     QColor techColor = hudColor.lighter(120);
     techColor.setAlpha(180);
