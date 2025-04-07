@@ -110,15 +110,22 @@ private:
 
     QPixmap m_staticHudBuffer;  // Tylko dla elementów HUD
 
+    QPixmap m_glowBuffer;
+    QPainterPath m_lastGlowPath;
+    QColor m_lastGlowColor;
+    int m_lastGlowRadius;
+    QSize m_lastGlowSize;
+
     void drawGlowEffect(QPainter &painter,
                        const QPainterPath &blobPath,
                        const QColor &borderColor,
                        int glowRadius);
+    void renderGlowEffect(QPainter& painter, const QPainterPath& blobPath, const QColor& borderColor, int glowRadius);
 
     void drawBorder(QPainter &painter,
-                   const QPainterPath &blobPath,
-                   const QColor &borderColor,
-                   int borderWidth);
+                    const QPainterPath &blobPath,
+                    const QColor &borderColor,
+                    int borderWidth);
 
     void drawFilling(QPainter &painter,
                    const QPainterPath &blobPath,
