@@ -13,26 +13,26 @@ void ResizingState::handleResize(std::vector<QPointF>& controlPoints,
                                std::vector<QPointF>& targetPoints,
                                std::vector<QPointF>& velocity,
                                QPointF& blobCenter,
-                               const QSize& oldSize, 
+                               const QSize& oldSize,
                                const QSize& newSize) {
-    
+
     QPointF oldCenter = blobCenter;
-    
+
     blobCenter = QPointF(newSize.width() / 2.0, newSize.height() / 2.0);
-    
+
     QPointF delta = blobCenter - oldCenter;
-    
+
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         controlPoints[i] += delta;
         targetPoints[i] += delta;
     }
-    
+
     if (oldSize.isValid()) {
         QVector2D resizeForce(
             (newSize.width() - oldSize.width()) * 0.05,
             (newSize.height() - oldSize.height()) * 0.05
         );
-        
+
         applyForce(resizeForce, velocity, blobCenter, controlPoints, oldSize.width() / 2.0);
     }
 }

@@ -128,10 +128,14 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 }
 
 void BlobAnimation::handleResizeTimeout() {
-    QSize currentSize = size();
+    // Po każdym zdarzeniu resize, resetujemy bloba do oryginalnego rozmiaru i środka
+    resetBlobToCenter();
 
+    // Resetujemy bufor siatki
     m_renderer.resetGridBuffer();
-    m_lastSize = currentSize;
+    m_lastSize = size();
+
+    // Odświeżamy widok
     update();
 }
 
@@ -208,9 +212,32 @@ BlobAnimation::~BlobAnimation() {
 }
 
 void BlobAnimation::initializeBlob() {
-    m_physics.initializeBlob(m_controlPoints, m_targetPoints, m_velocity,
-                             m_blobCenter, m_params, width(), height());
+    // Zmodyfikujmy tę metodę, aby korzystała z bezpośrednio ustawionych wartości,
+    // a nie z wyników fizyki, która może prowadzić do zniekształceń
 
+    // Wyczyść aktualne punkty
+    m_controlPoints.clear();
+    m_targetPoints.clear();
+    m_velocity.clear();
+
+    // Ustaw bloba na środek ekranu
+    m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
+
+    // Generuj punkty kontrolne w idealnym okręgu wokół środka
+    for (int i = 0; i < m_params.numPoints; ++i) {
+        double angle = 2.0 * M_PI * i / m_params.numPoints;
+        QPointF point(
+            m_blobCenter.x() + m_params.blobRadius * cos(angle),
+            m_blobCenter.y() + m_params.blobRadius * sin(angle)
+        );
+
+        m_controlPoints.push_back(point);
+        m_targetPoints.push_back(point);
+        m_velocity.push_back(QPointF(0, 0));
+    }
+
+    // To zapewni, że nawet jeśli parametry fizyki będą próbować
+    // zmienić rozmiar, to my go zawsze resetujemy do określonej wartości
     m_precalcMinDistance = m_params.blobRadius * m_physicsParams.minNeighborDistance;
     m_precalcMaxDistance = m_params.blobRadius * m_physicsParams.maxNeighborDistance;
 }
@@ -714,6 +741,9 @@ void BlobAnimation::resumeAllEventTracking() {
 
     // Poinformuj handler eventów o wznowieniu śledzenia
     m_eventHandler.enableEvents();
+
+    // Wymuś reset hudu
+    m_renderer.resetHUD();
 
     // Wymuś odświeżenie animacji
     switchToState(BlobConfig::IDLE);

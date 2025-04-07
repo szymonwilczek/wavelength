@@ -224,20 +224,39 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-                 [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
-                     qDebug() << "Wavelength aborted, switching back to animation view";
+             [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
+                 qDebug() << "Wavelength aborted, switching back to animation view";
 
-                     animation->resetLifeColor();
+                 animation->resetLifeColor();
 
-                     // Najpierw przełączamy widok
-                     stackedWidget->slideToWidget(animationWidget);
+                 // Najpierw przełączamy widok
+                 stackedWidget->slideToWidget(animationWidget);
 
-                     // Po zakończeniu animacji przywracamy śledzenie eventów
-                     QTimer::singleShot(600, [animation, textEffect]() {
-                         animation->resumeAllEventTracking();
-                         textEffect->startAnimation();
+                 // Po zakończeniu animacji przywracamy śledzenie eventów i resetujemy wizualizację
+                 QTimer::singleShot(600, [animation, textEffect, titleLabel]() {
+                     // Resetuj wszystkie aspekty wizualizacji
+                     animation->resumeAllEventTracking();
+
+                     // Wywołaj resetVisualization po krótkim opóźnieniu,
+                     // aby widok zdążył się ustabilizować
+                     QTimer::singleShot(50, [animation]() {
+                         animation->resetVisualization();
                      });
+
+                     // Ponownie wycentruj etykietę
+                     centerLabel(titleLabel, animation);
+
+                     // Zrestartuj animację tekstu
+                     textEffect->startAnimation();
                  });
+             });
+
+    // Dodaj połączenie z nowym sygnałem dla synchronizacji pozycji tekstu
+    QObject::connect(animation, &BlobAnimation::visualizationReset,
+                     [titleLabel, animation]() {
+                         // Ponownie wycentruj etykietę po zresetowaniu wizualizacji
+                         centerLabel(titleLabel, animation);
+                     });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Create wavelength button clicked";

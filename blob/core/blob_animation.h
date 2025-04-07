@@ -69,6 +69,24 @@ public:
     void pauseAllEventTracking();
     void resumeAllEventTracking();
 
+    void resetVisualization() {
+        // Całkowicie resetujemy bloba do stanu początkowego
+        // z oryginalnym rozmiarem i pozycją na środku
+        resetBlobToCenter();
+
+        // Wymuś reset hudu
+        m_renderer.resetHUD();
+
+        // Sygnał informujący o konieczności aktualizacji innych elementów UI
+        emit visualizationReset();
+
+        // Odśwież widok
+        update();
+    }
+
+    signals:
+    void visualizationReset();
+
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -105,6 +123,37 @@ private:
     void applyForces(const QVector2D &force);
 
     void applyIdleEffect();
+
+    void resetBlobToCenter() {
+        // Zapamiętaj aktualny promień bloba
+        double originalRadius = m_params.blobRadius;
+
+        // Całkowicie zresetuj bloba
+        initializeBlob();
+
+        // Upewnij się, że promień jest zachowany z oryginalnej konfiguracji
+        m_params.blobRadius = originalRadius;
+
+        // Ustaw bloba dokładnie na środku
+        m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
+
+        // Rozmieść punkty kontrolne wokół środka według promienia
+        for (size_t i = 0; i < m_controlPoints.size(); ++i) {
+            double angle = 2.0 * M_PI * i / m_controlPoints.size();
+            m_controlPoints[i] = QPointF(
+                m_blobCenter.x() + originalRadius * cos(angle),
+                m_blobCenter.y() + originalRadius * sin(angle)
+            );
+            m_targetPoints[i] = m_controlPoints[i];
+            m_velocity[i] = QPointF(0, 0); // Zerujemy prędkość
+        }
+
+        // Przełącz na stan IDLE i zresetuj zachowanie
+        if (m_idleState) {
+            static_cast<IdleState*>(m_idleState.get())->resetInitialization();
+        }
+        switchToState(BlobConfig::IDLE);
+    }
 
     BlobEventHandler m_eventHandler;
     BlobTransitionManager m_transitionManager;

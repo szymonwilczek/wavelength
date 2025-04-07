@@ -78,6 +78,12 @@ public:
         m_glitchIntensity = intensity;
     }
 
+    void resetHUD() {
+        // Wymuś ponowną inicjalizację HUD
+        m_idleHudInitialized = false;
+        m_staticHudBuffer = QPixmap();
+    }
+
 private:
     QPixmap m_staticBackgroundTexture;
     bool m_staticBackgroundInitialized;
