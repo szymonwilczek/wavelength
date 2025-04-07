@@ -31,6 +31,10 @@ public:
         std::function<void(const QPointF&)> setLastWindowPos
     );
 
+    void clearAllMovementBuffers() {
+        m_movementBuffer.clear();
+    }
+
     void addMovementSample(const QPointF& position, qint64 timestamp);
     void clearMovementBuffer();
     

@@ -679,3 +679,43 @@ void BlobAnimation::drawGrid() {
     gridShader->release();
     gridVBO.destroy();
 }
+
+void BlobAnimation::pauseAllEventTracking() {
+    qDebug() << "Pauzowanie wszystkich mechanizmów śledzenia eventów";
+
+    // Wyłącz flagę śledzenia eventów
+    m_eventsEnabled = false;
+
+    // Zatrzymaj wszystkie timery związane ze śledzeniem eventów
+    m_windowPositionTimer.stop();
+    m_stateResetTimer.stop();
+
+    // Wyczyść wszystkie bufory ruchu
+    m_transitionManager.clearAllMovementBuffers();
+
+    // Poinformuj handler eventów o zatrzymaniu śledzenia
+    m_eventHandler.disableEvents();
+
+    // Upewnij się, że fizyka bloba jest w stabilnym stanie
+    switchToState(BlobConfig::IDLE);
+}
+
+void BlobAnimation::resumeAllEventTracking() {
+    qDebug() << "Wznawianie śledzenia eventów";
+
+    // Zresetuj stan bloba
+    initializeBlob();
+
+    // Włącz flagę śledzenia eventów
+    m_eventsEnabled = true;
+
+    // Uruchom ponownie timery
+    m_windowPositionTimer.start();
+
+    // Poinformuj handler eventów o wznowieniu śledzenia
+    m_eventHandler.enableEvents();
+
+    // Wymuś odświeżenie animacji
+    switchToState(BlobConfig::IDLE);
+    update();
+}

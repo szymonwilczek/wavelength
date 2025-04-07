@@ -194,10 +194,10 @@ int main(int argc, char *argv[]) {
                          toggleEventListening(currentWidget == animationWidget);
                      });
 
-    auto switchToChatView = [chatView, stackedWidget, toggleEventListening](const double frequency) {
-        qDebug() << "Switching to chat view for frequency:" << frequency;
+    auto switchToChatView = [chatView, stackedWidget, animation](const double frequency) {
+        animation->pauseAllEventTracking();
+
         chatView->setWavelength(frequency, "");
-        toggleEventListening(false); // Wyłączamy nasłuchiwanie zanim przełączymy widok
         stackedWidget->slideToWidget(chatView);
         chatView->show();
     };
@@ -224,16 +224,20 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-                     [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
-                         qDebug() << "Wavelength aborted, switching back to animation view";
-                         animation->resetLifeColor();
-                         stackedWidget->slideToWidget(animationWidget);
+                 [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
+                     qDebug() << "Wavelength aborted, switching back to animation view";
 
-                         QTimer::singleShot(300, [textEffect]() {
-                             // Po zakończeniu animacji przesuwania widoku
-                             textEffect->startAnimation();
-                         });
+                     animation->resetLifeColor();
+
+                     // Najpierw przełączamy widok
+                     stackedWidget->slideToWidget(animationWidget);
+
+                     // Po zakończeniu animacji przywracamy śledzenie eventów
+                     QTimer::singleShot(600, [animation, textEffect]() {
+                         animation->resumeAllEventTracking();
+                         textEffect->startAnimation();
                      });
+                 });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Create wavelength button clicked";

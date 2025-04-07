@@ -66,6 +66,9 @@ public:
     void setLifeColor(const QColor& color);
     void resetLifeColor();
 
+    void pauseAllEventTracking();
+    void resumeAllEventTracking();
+
 
 protected:
     void paintEvent(QPaintEvent *event) override;

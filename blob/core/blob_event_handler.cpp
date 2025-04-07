@@ -33,6 +33,7 @@ bool BlobEventHandler::processEvent(QEvent* event) {
 }
 
 bool BlobEventHandler::processResizeEvent(QResizeEvent* event) {
+    if (!m_eventsEnabled) return false;
     if (!m_eventsEnabled || m_transitionInProgress) {
         return false;
     }
@@ -111,6 +112,7 @@ void BlobEventHandler::handleMoveEvent(QMoveEvent* moveEvent) {
 
 
 bool BlobEventHandler::eventFilter(QObject* watched, QEvent* event) {
+    if (!m_eventsEnabled) return false;
     if (!m_eventsEnabled || m_transitionInProgress) {
         return QObject::eventFilter(watched, event);
     }
@@ -126,12 +128,11 @@ bool BlobEventHandler::eventFilter(QObject* watched, QEvent* event) {
 
 void BlobEventHandler::enableEvents() {
     m_eventsEnabled = true;
-    qDebug() << "Events enabled";
+    emit eventsReEnabled();
 }
 
 void BlobEventHandler::disableEvents() {
     m_eventsEnabled = false;
-    qDebug() << "Events disabled";
 }
 
 void BlobEventHandler::onEventReEnableTimeout() {
