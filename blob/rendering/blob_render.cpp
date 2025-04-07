@@ -134,35 +134,36 @@ void BlobRenderer::drawGlowEffect(QPainter &painter,
                                   const QPainterPath &blobPath,
                                   const QColor &borderColor,
                                   int glowRadius) {
-
     QSize viewportSize = QSize(painter.device()->width(), painter.device()->height());
+
+    // Sprawdzamy, czy możemy użyć istniejącego bufora
     bool bufferNeedsUpdate = m_glowBuffer.isNull() ||
                             blobPath != m_lastGlowPath ||
                             borderColor != m_lastGlowColor ||
                             glowRadius != m_lastGlowRadius ||
-                            viewportSize != m_lastGlowSize ||
-                            m_lastAnimationState != BlobConfig::IDLE;
+                            viewportSize != m_lastGlowSize;
 
-    // Użyj zbuforowanego efektu glow w stanie IDLE jeśli to możliwe
-    if (m_lastAnimationState == BlobConfig::IDLE && !bufferNeedsUpdate) {
-        // Rysuj zbuforowany efekt glow
+    // W stanie IDLE zawsze używaj zbuforowanego efektu jeśli to możliwe
+    if (m_lastAnimationState == BlobConfig::IDLE && !bufferNeedsUpdate && !m_glowBuffer.isNull()) {
         painter.drawPixmap(0, 0, m_glowBuffer);
         return;
     }
 
-    // Przygotuj nowy bufor przed resetowaniem starego
-    QPixmap newGlowBuffer;
+    // W stanie animacji buforuj efekt co kilka klatek dla lepszej wydajności
+    static int frameCounter = 0;
+    bool shouldUpdateBuffer = bufferNeedsUpdate ||
+                             (m_lastAnimationState != BlobConfig::IDLE &&
+                              frameCounter++ % 5 == 0);  // Aktualizuj co 5 klatek
 
-    // Musimy zaktualizować bufor lub jesteśmy w stanie animacji
-    if (m_lastAnimationState == BlobConfig::IDLE && bufferNeedsUpdate) {
-        // Tworzymy nowy bufor tylko dla stanu IDLE
-        newGlowBuffer = QPixmap(viewportSize);
+    if (shouldUpdateBuffer) {
+        // Tworzymy nowy bufor
+        QPixmap newGlowBuffer(viewportSize);
         newGlowBuffer.fill(Qt::transparent);
 
         QPainter bufferPainter(&newGlowBuffer);
         bufferPainter.setRenderHint(QPainter::Antialiasing, true);
 
-        // Rysujemy efekt glow do bufora
+        // Rysujemy zoptymalizowany efekt glow do bufora
         renderGlowEffect(bufferPainter, blobPath, borderColor, glowRadius);
         bufferPainter.end();
 
@@ -174,12 +175,10 @@ void BlobRenderer::drawGlowEffect(QPainter &painter,
         m_lastGlowColor = borderColor;
         m_lastGlowRadius = glowRadius;
         m_lastGlowSize = viewportSize;
-
-        // Użyj nowego zbuforowanego efektu
-        painter.drawPixmap(0, 0, m_glowBuffer);
-    } else {
-        renderGlowEffect(painter, blobPath, borderColor, glowRadius);
     }
+
+    // Zawsze używaj zbuforowanego efektu (aktualnego lub poprzedniego)
+    painter.drawPixmap(0, 0, m_glowBuffer);
 }
 
 void BlobRenderer::renderGlowEffect(QPainter &painter,
@@ -189,57 +188,67 @@ void BlobRenderer::renderGlowEffect(QPainter &painter,
     // Zapisz stan malarza
     painter.save();
 
-    // 1. Rysujemy główny efekt poświaty (zewnętrzny glow)
-    QColor outerGlowColor = borderColor;
-    outerGlowColor.setAlpha(50);
+    // Używamy kompozycji SourceOver dla najbardziej realistycznych efektów
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    // Używamy gradient radialny dla lepszego efektu zanikania
-    for (int i = glowRadius; i > 0; i -= 2) {
-        // Stopniowo zmniejszamy nieprzezroczystość
-        int alpha = qMax(5, 50 - (glowRadius - i) * 3);
-        outerGlowColor.setAlpha(alpha);
+    // OPTYMALIZACJA: Rysujemy tylko 3 warstwy zamiast wielu pętli
 
-        QPen glowPen(outerGlowColor);
-        glowPen.setWidth(i);
-        glowPen.setCapStyle(Qt::RoundCap);  // Zaokrąglone końce
-        glowPen.setJoinStyle(Qt::RoundJoin);  // Zaokrąglone połączenia
-        painter.setPen(glowPen);
+    // 1. Warstwa podstawowa (łagodna poświata) - najbardziej zewnętrzna
+    {
+        QColor outerColor = borderColor;
+        // Zmniejszamy nasycenie dla bardziej realistycznego efektu
+        outerColor = QColor::fromHslF(
+            outerColor.hslHueF(),
+            qMin(0.9, outerColor.hslSaturationF() * 0.7),
+            outerColor.lightnessF(),
+            0.2  // Niska nieprzezroczystość dla łagodnego efektu
+        );
+
+        QPen outerPen(outerColor);
+        outerPen.setWidth(glowRadius);
+        outerPen.setCapStyle(Qt::RoundCap);
+        outerPen.setJoinStyle(Qt::RoundJoin);
+        painter.setPen(outerPen);
         painter.drawPath(blobPath);
     }
 
-    // 2. Dodajemy drugą warstwę poświaty (bardziej intensywna, bliżej krawędzi)
-    QColor midGlowColor = borderColor.lighter(120);
-    midGlowColor.setAlpha(80);
+    // 2. Warstwa środkowa (intensywny blask) - typowa dla neonów
+    {
+        QColor midColor = borderColor.lighter(115);
+        // Neony mają charakterystyczny blask pośredni
+        midColor = QColor::fromHslF(
+            midColor.hslHueF(),
+            qMin(1.0, midColor.hslSaturationF() * 1.1),
+            qMin(0.9, midColor.lightnessF() * 1.2),
+            0.6  // Wyższa nieprzezroczystość dla intensywnego blasku
+        );
 
-    for (int i = glowRadius/2; i > 0; i -= 1) {
-        int alpha = qMin(80, 40 + i * 4);
-        midGlowColor.setAlpha(alpha);
-
-        QPen midGlowPen(midGlowColor);
-        midGlowPen.setWidth(i);
-        midGlowPen.setCapStyle(Qt::RoundCap);
-        midGlowPen.setJoinStyle(Qt::RoundJoin);
-        painter.setPen(midGlowPen);
+        QPen midPen(midColor);
+        midPen.setWidth(glowRadius/2);
+        midPen.setCapStyle(Qt::RoundCap);
+        midPen.setJoinStyle(Qt::RoundJoin);
+        painter.setPen(midPen);
         painter.drawPath(blobPath);
     }
 
-    // 3. Dodajemy jasny wewnętrzny blask (efekt jarzenia się)
-    QColor innerGlowColor = borderColor.lighter(160);
-    innerGlowColor.setAlpha(100);
+    // 3. Warstwa wewnętrzna (jasne jądro) - charakterystyczna dla neonówek
+    {
+        // Prawie biały kolor w środku - typowe dla neonów
+        QColor coreColor = borderColor.lighter(160);
+        coreColor = QColor::fromHslF(
+            coreColor.hslHueF(),
+            qMin(0.3, coreColor.hslSaturationF() * 0.5), // Niższe nasycenie
+            0.9, // Wysokie rozjaśnienie - charakterystyczne dla neonów
+            0.95 // Wysoka nieprzezroczystość
+        );
 
-    QPen innerGlowPen(innerGlowColor);
-    innerGlowPen.setWidth(2);
-    painter.setPen(innerGlowPen);
-    painter.drawPath(blobPath);
-
-    // 4. Dodajemy bardzo intensywne punktowe "iskrzenie" wzdłuż ścieżki
-    QColor sparkColor = borderColor.lighter(200);
-    sparkColor.setAlpha(180);
-
-    QPen sparkPen(sparkColor);
-    sparkPen.setWidth(1);
-    painter.setPen(sparkPen);
-    painter.drawPath(blobPath);
+        QPen corePen(coreColor);
+        corePen.setWidth(3); // Stały wąski rdzeń
+        corePen.setCapStyle(Qt::RoundCap);
+        corePen.setJoinStyle(Qt::RoundJoin);
+        painter.setPen(corePen);
+        painter.drawPath(blobPath);
+    }
 
     // Przywróć stan malarza
     painter.restore();
