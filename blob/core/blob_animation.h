@@ -74,8 +74,10 @@ public:
         // z oryginalnym rozmiarem i pozycją na środku
         resetBlobToCenter();
 
-        // Wymuś reset hudu
+        // Wymuś reset i reinicjalizację HUD
         m_renderer.resetHUD();
+        m_renderer.forceHUDInitialization(m_blobCenter, m_params.blobRadius,
+                                        m_params.borderColor, width(), height());
 
         // Sygnał informujący o konieczności aktualizacji innych elementów UI
         emit visualizationReset();

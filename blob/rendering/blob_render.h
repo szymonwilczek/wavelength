@@ -84,6 +84,21 @@ public:
         m_staticHudBuffer = QPixmap();
     }
 
+    void forceHUDInitialization(const QPointF& blobCenter, double blobRadius,
+                           const QColor& hudColor, int width, int height) {
+        initializeIdleState(blobCenter, blobRadius, hudColor, width, height);
+
+        m_staticHudBuffer = QPixmap(width, height);
+        m_staticHudBuffer.fill(Qt::transparent);
+
+        QPainter hudPainter(&m_staticHudBuffer);
+        hudPainter.setRenderHint(QPainter::Antialiasing, true);
+        drawCompleteHUD(hudPainter, blobCenter, blobRadius, hudColor, width, height);
+        hudPainter.end();
+
+        m_idleHudInitialized = true;
+    }
+
 private:
     QPixmap m_staticBackgroundTexture;
     bool m_staticBackgroundInitialized;
