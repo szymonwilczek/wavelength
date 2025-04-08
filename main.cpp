@@ -197,11 +197,14 @@ int main(int argc, char *argv[]) {
     toggleEventListening(true);
 
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
-                     [stackedWidget, animationWidget, toggleEventListening](int index) {
-                         // Sprawdź, czy aktywny widget to animationWidget
-                         QWidget *currentWidget = stackedWidget->widget(index);
-                         toggleEventListening(currentWidget == animationWidget);
-                     });
+                [stackedWidget, animationWidget, toggleEventListening](int index) {
+                    static int lastIndex = -1;
+                    if (lastIndex == index) return;  // Zabezpieczenie przed podwójnym wywołaniem
+                    lastIndex = index;
+
+                    QWidget *currentWidget = stackedWidget->widget(index);
+                    toggleEventListening(currentWidget == animationWidget);
+                });
 
     auto switchToChatView = [chatView, stackedWidget, animation](const double frequency) {
         animation->pauseAllEventTracking();
@@ -233,32 +236,23 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-             [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
-                 qDebug() << "Wavelength aborted, switching back to animation view";
+        [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
+            qDebug() << "Wavelength aborted, switching back to animation view";
 
-                 animation->resetLifeColor();
+            // Resetuj kolory
+            animation->resetLifeColor();
 
-                 // Najpierw przełączamy widok
-                 stackedWidget->slideToWidget(animationWidget);
+            // Bezpośrednie przejście do widoku animacji
+            stackedWidget->slideToWidget(animationWidget);
 
-                 // Po zakończeniu animacji przywracamy śledzenie eventów i resetujemy wizualizację
-                 QTimer::singleShot(600, [animation, textEffect, titleLabel]() {
-                     // Resetuj wszystkie aspekty wizualizacji
-                     animation->resumeAllEventTracking();
-
-                     // Wywołaj resetVisualization po krótkim opóźnieniu,
-                     // aby widok zdążył się ustabilizować
-                     QTimer::singleShot(50, [animation]() {
-                         animation->resetVisualization();
-                     });
-
-                     // Ponownie wycentruj etykietę
-                     centerLabel(titleLabel, animation);
-
-                     // Zrestartuj animację tekstu
-                     textEffect->startAnimation();
-                 });
-             });
+            // Przywrócenie śledzenia zdarzeń po zakończeniu animacji
+            QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
+                animation->resumeAllEventTracking();
+                animation->resetVisualization();
+                centerLabel(titleLabel, animation);
+                textEffect->startAnimation();
+            });
+        });
 
     // Dodaj połączenie z nowym sygnałem dla synchronizacji pozycji tekstu
     QObject::connect(animation, &BlobAnimation::visualizationReset,
@@ -267,13 +261,28 @@ int main(int argc, char *argv[]) {
                          centerLabel(titleLabel, animation);
                      });
 
-    QObject::connect(navbar, &Navbar::settingsClicked, [stackedWidget, settingsView]() {
-        stackedWidget->setCurrentWidget(settingsView);
-    });
+    QObject::connect(navbar, &Navbar::settingsClicked, [stackedWidget, settingsView, animation]() {
+    qDebug() << "Settings button clicked";
+
+    // Wstrzymaj śledzenie zdarzeń dla animacji
+    animation->pauseAllEventTracking();
+
+    // Przejście do widoku ustawień
+    stackedWidget->slideToWidget(settingsView);
+});
 
     // Powrót z widoku ustawień do ekranu głównego
-    QObject::connect(settingsView, &SettingsView::backToMainView, [stackedWidget, animationWidget]() {
-        stackedWidget->setCurrentWidget(animationWidget);
+    QObject::connect(settingsView, &SettingsView::backToMainView, [stackedWidget, animationWidget, animation]() {
+        qDebug() << "Back button clicked in settings";
+
+        // Przejście do widoku animacji
+        stackedWidget->slideToWidget(animationWidget);
+
+        // Przywrócenie śledzenia zdarzeń po zakończeniu animacji
+        QTimer::singleShot(stackedWidget->duration(), [animation]() {
+            animation->resumeAllEventTracking();
+            animation->resetVisualization();
+        });
     });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {

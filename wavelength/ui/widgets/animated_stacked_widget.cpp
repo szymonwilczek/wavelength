@@ -5,15 +5,23 @@ AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
       m_duration(500),
       m_animationType(Fade),
       m_animationGroup(new QParallelAnimationGroup(this)),
-      m_animationRunning(false)
+      m_animationRunning(false),
+      m_targetIndex(-1)
 {
     connect(m_animationGroup, &QParallelAnimationGroup::finished, [this]() {
-        m_animationRunning = false;
-        setCurrentIndex(currentIndex() + 1 >= count() ? 0 : currentIndex() + 1);
-        for (int i = 0; i < count(); ++i) {
-            widget(i)->setGraphicsEffect(nullptr);
-        }
-    });
+    m_animationRunning = false;
+
+    // Ustaw właściwy widget docelowy
+    if (m_targetIndex >= 0 && m_targetIndex < count()) {
+        setCurrentIndex(m_targetIndex);  // To wyemituje currentChanged
+    }
+
+    // Czyszczenie efektów graficznych po animacji
+    cleanupAfterAnimation();
+
+    // Zresetuj docelowy indeks
+    m_targetIndex = -1;
+});
 }
 
 AnimatedStackedWidget::~AnimatedStackedWidget()
@@ -23,32 +31,77 @@ AnimatedStackedWidget::~AnimatedStackedWidget()
 
 void AnimatedStackedWidget::slideToIndex(int index)
 {
-    if (m_animationRunning || index == currentIndex() || index < 0 || index >= count())
+    // Sprawdź, czy animacja już trwa lub czy indeks jest nieprawidłowy
+    if (m_animationRunning || index == currentIndex() || index < 0 || index >= count()) {
         return;
-
-    m_animationRunning = true;
-
-    switch (m_animationType) {
-    case Fade:
-        animateFade(index);
-        break;
-    case Slide:
-        animateSlide(index);
-        break;
-    case SlideAndFade:
-        animateSlideAndFade(index);
-        break;
-    case Push:
-        animatePush(index);
-        break;
     }
 
-    m_animationGroup->start();
+    // Zatrzymaj poprzednią animację, jeśli istnieje
+    if (m_animationGroup->state() == QAbstractAnimation::Running) {
+        m_animationGroup->stop();
+        cleanupAfterAnimation();
+    }
+
+    m_animationRunning = true;
+    m_targetIndex = index;
+
+    // Przygotuj i uruchom animację
+    prepareAnimation(index);
 }
 
 void AnimatedStackedWidget::slideToWidget(QWidget *widget)
 {
-    slideToIndex(indexOf(widget));
+    int index = indexOf(widget);
+    if (index != -1) {
+        slideToIndex(index);
+    }
+}
+
+void AnimatedStackedWidget::slideToNextIndex()
+{
+    // Metoda do automatycznego przesuwania w karuzeli
+    int nextIndex = currentIndex() + 1;
+    if (nextIndex >= count()) {
+        nextIndex = 0;
+    }
+    slideToIndex(nextIndex);
+}
+
+void AnimatedStackedWidget::prepareAnimation(int nextIndex)
+{
+    // Przygotowanie animacji w zależności od wybranego typu
+    switch (m_animationType) {
+    case Fade:
+        animateFade(nextIndex);
+        break;
+    case Slide:
+        animateSlide(nextIndex);
+        break;
+    case SlideAndFade:
+        animateSlideAndFade(nextIndex);
+        break;
+    case Push:
+        animatePush(nextIndex);
+        break;
+    }
+
+    // Uruchom animację
+    m_animationGroup->start();
+}
+
+void AnimatedStackedWidget::cleanupAfterAnimation()
+{
+    // Wyczyść efekty graficzne dla wszystkich widgetów
+    for (int i = 0; i < count(); ++i) {
+        if (widget(i)->graphicsEffect()) {
+            widget(i)->setGraphicsEffect(nullptr);
+        }
+
+        // Przywróć pozycje widgetów
+        if (i != currentIndex()) {
+            widget(i)->setGeometry(0, 0, width(), height());
+        }
+    }
 }
 
 void AnimatedStackedWidget::animateFade(int nextIndex)

@@ -309,7 +309,7 @@ public:
     }
 
     void onWavelengthClosed(double frequency) {
-        if (frequency != currentFrequency) {
+        if (frequency != currentFrequency || m_isAborting) {
             return;
         }
 
@@ -440,6 +440,8 @@ private slots:
             return;
         }
 
+        m_isAborting = true;  // Ustawiamy flagę
+
         m_statusIndicator->setText("ROZŁĄCZANIE...");
         m_statusIndicator->setStyleSheet(
             "color: #ffaa55;"
@@ -467,6 +469,7 @@ private slots:
 
         QTimer::singleShot(250, this, [this]() {
             emit wavelengthAborted();
+            m_isAborting = false;  // Resetujemy flagę
         });
     }
 
@@ -514,6 +517,7 @@ private:
     QPushButton *abortButton;
     double currentFrequency = -1.0;
     double m_scanlineOpacity;
+    bool m_isAborting = false;
 
     void resetStatusIndicator() {
         m_statusIndicator->setText("AKTYWNE POŁĄCZENIE");
