@@ -8,26 +8,75 @@
 
 #include "../../dialogs/join_wavelength_dialog.h"
 #include "../../dialogs/wavelength_dialog.h"
+#include "../navigation/navbar.h"
 
 // Implementacja OverlayWidget z optymalizacjami
 OverlayWidget::OverlayWidget(QWidget *parent)
     : QWidget(parent)
+    , m_bufferDirty(true)
+    , m_opacity(0.0)
 {
-    setAttribute(Qt::WA_TransparentForMouseEvents); // Pozwala klikać przez overlay
-    setAttribute(Qt::WA_TranslucentBackground);     // Przezroczyste tło
-    setAttribute(Qt::WA_OpaquePaintEvent, false);   // Nie wymaga pełnego odświeżenia
-    setAttribute(Qt::WA_NoSystemBackground, true);  // Brak systemowego tła
+    setAttribute(Qt::WA_TransparentForMouseEvents);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_NoSystemBackground);
+
+    // Wyłączamy niektóre flagi, które powodowały konflikt
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    setAttribute(Qt::WA_StaticContents, false);
+
+    // Instalujemy filtr zdarzeń na rodzicu
+    if (parent) {
+        parent->installEventFilter(this);
+    }
+
+    // Znajdź Navbar i zapisz jego geometrię
+    QList<Navbar*> navbars = parent->findChildren<Navbar*>();
+    if (!navbars.isEmpty()) {
+        m_excludeRect = navbars.first()->geometry();
+    }
+}
+
+void OverlayWidget::setOpacity(qreal opacity)
+{
+    if (m_opacity != opacity) {
+        m_opacity = opacity;
+        update();
+    }
+}
+
+bool OverlayWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == parent()) {
+        if (event->type() == QEvent::Resize) {
+            QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
+            updateGeometry(QRect(QPoint(0,0), resizeEvent->size()));
+        }
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+void OverlayWidget::updateGeometry(const QRect& rect)
+{
+    setGeometry(rect);
+    m_bufferDirty = true;
 }
 
 void OverlayWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, false); // Wyłączamy antialiasing dla wydajności
+    painter.setRenderHint(QPainter::Antialiasing, false);
 
-    // Półprzezroczysty kolor tła - ustaw alpha na poziomie, który zapewni odpowiednie przyciemnienie
-    // ale wciąż pozwoli zobaczyć tło aplikacji
-    QColor overlayColor(0, 0, 0, 120); // Kolor czarny z alpha 120/255 (ok. 47% przezroczystości)
-    painter.fillRect(rect(), overlayColor);
+    // Używamy kompozycji dla płynnego przejścia
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+    // Rysujemy tło z wyłączeniem obszaru nawigacji
+    QRegion region = rect();
+    if (!m_excludeRect.isNull()) {
+        region = region.subtracted(QRegion(m_excludeRect));
+    }
+
+    painter.setClipRegion(region);
+    painter.fillRect(rect(), QColor(0, 0, 0, m_opacity * 120));
 }
 
 // Implementacja AnimatedDialog
@@ -53,18 +102,27 @@ AnimatedDialog::~AnimatedDialog()
 
 void AnimatedDialog::showEvent(QShowEvent *event)
 {
-    // Tworzenie overlay'a dla przyciemnienia tła
     QWidget *parent_widget = QDialog::parentWidget();
     if (!parent_widget) {
         parent_widget = QApplication::activeWindow();
     }
 
     if (parent_widget) {
-        m_overlay = new OverlayWidget(parent_widget);
-        m_overlay->setGeometry(parent_widget->rect());
-        m_overlay->show();
+        if (!m_overlay) {
+            m_overlay = new OverlayWidget(parent_widget);
+        }
 
-        // Zapewnienie, że dialog będzie zawsze na wierzchu
+        // Animacja pokazywania overlay'a
+        QPropertyAnimation *overlayAnim = new QPropertyAnimation(m_overlay, "opacity");
+        overlayAnim->setDuration(200);
+        overlayAnim->setStartValue(0.0);
+        overlayAnim->setEndValue(1.0);
+        overlayAnim->setEasingCurve(QEasingCurve::InOutQuad);
+
+        m_overlay->updateGeometry(parent_widget->rect());
+        m_overlay->show();
+        overlayAnim->start(QAbstractAnimation::DeleteWhenStopped);
+
         raise();
     }
 
@@ -77,13 +135,27 @@ void AnimatedDialog::closeEvent(QCloseEvent *event)
     if (!m_closing) {
         event->ignore();
         m_closing = true;
+
+        if (m_overlay) {
+            // Animacja ukrywania overlay'a
+            QPropertyAnimation *overlayAnim = new QPropertyAnimation(m_overlay, "opacity");
+            overlayAnim->setDuration(200);
+            overlayAnim->setStartValue(m_overlay->opacity());
+            overlayAnim->setEndValue(0.0);
+            overlayAnim->setEasingCurve(QEasingCurve::InOutQuad);
+
+            connect(overlayAnim, &QPropertyAnimation::finished, this, [this]() {
+                if (m_overlay) {
+                    m_overlay->deleteLater();
+                    m_overlay = nullptr;
+                }
+            });
+
+            overlayAnim->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+
         animateClose();
     } else {
-        // Usuwamy overlay przy zamykaniu
-        if (m_overlay) {
-            m_overlay->deleteLater();
-            m_overlay = nullptr;
-        }
         event->accept();
     }
 }
