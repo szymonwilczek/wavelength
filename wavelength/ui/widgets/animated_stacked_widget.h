@@ -6,6 +6,8 @@
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
 
+#include "gl_transition_widget.h"
+
 class AnimatedStackedWidget : public QStackedWidget
 {
     Q_OBJECT
@@ -43,12 +45,14 @@ protected:
 private:
     void prepareAnimation(int nextIndex);
     void cleanupAfterAnimation();
+    void onGLTransitionFinished();
 
     int m_duration;
     AnimationType m_animationType;
     QParallelAnimationGroup *m_animationGroup;
     bool m_animationRunning;
     int m_targetIndex;  // Nowe pole dla przechowywanego indeksu docelowego
+    GLTransitionWidget *m_glTransitionWidget = nullptr;
 };
 
 #endif // ANIMATED_STACKED_WIDGET_H

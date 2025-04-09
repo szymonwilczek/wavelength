@@ -147,6 +147,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/ui/input/cyber_line_edit.h
         wavelength/view/settings_view.cpp
         wavelength/view/settings_view.h
+        wavelength/ui/widgets/gl_transition_widget.cpp
+        wavelength/ui/widgets/gl_transition_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
