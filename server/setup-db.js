@@ -14,20 +14,21 @@ async function setupDatabase() {
     // Utwórz tabelę
     await pool.query(`
       CREATE TABLE IF NOT EXISTS active_wavelengths (
-        id SERIAL PRIMARY KEY,
-        frequency NUMERIC(12, 1) UNIQUE NOT NULL,
+                                                      id SERIAL PRIMARY KEY,
+                                                      frequency NUMERIC(12, 1) UNIQUE NOT NULL,
         name VARCHAR(255) NOT NULL,
         is_password_protected BOOLEAN DEFAULT FALSE,
         host_socket_id VARCHAR(255) NOT NULL,
+        password_hash VARCHAR(64),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
+                               );
     `);
     console.log("Table 'active_wavelengths' created or already exists");
 
     // Utwórz indeksy
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_active_wavelengths_frequency
-      ON active_wavelengths(frequency);
+        ON active_wavelengths(frequency);
     `);
     console.log("Index created or already exists");
 
