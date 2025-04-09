@@ -3,6 +3,7 @@
 #include <QPaintEvent>
 #include <QApplication>
 #include <QScreen>
+#include <QDebug>
 
 GLTransitionWidget::GLTransitionWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -28,37 +29,13 @@ void GLTransitionWidget::setWidgets(QWidget *currentWidget, QWidget *nextWidget)
     if (!currentWidget || !nextWidget)
         return;
 
-    // Pobierz współczynnik skalowania pikseli dla ekranu
-    qreal devicePixelRatio = QApplication::primaryScreen()->devicePixelRatio();
+    const qreal devicePixelRatio = QApplication::primaryScreen()->devicePixelRatio();
 
-    // Rozmiar widgetu w pikselach urządzenia
-    QSize pixmapSize = size() * devicePixelRatio;
-
-    // Renderowanie bieżącego widgetu do pixmap z wysoką jakością
-    m_currentPixmap = QPixmap(pixmapSize);
-    m_currentPixmap.fill(Qt::transparent);
+    m_currentPixmap = currentWidget->grab();
     m_currentPixmap.setDevicePixelRatio(devicePixelRatio);
 
-    QPainter currentPainter(&m_currentPixmap);
-    currentPainter.setRenderHints(QPainter::Antialiasing |
-                                 QPainter::TextAntialiasing |
-                                 QPainter::SmoothPixmapTransform |
-                                 QPainter::HighQualityAntialiasing);
-    currentWidget->render(&currentPainter, QPoint(), QRegion(), QWidget::DrawChildren | QWidget::DrawWindowBackground);
-    currentPainter.end();
-
-    // Renderowanie następnego widgetu do pixmap z wysoką jakością
-    m_nextPixmap = QPixmap(pixmapSize);
-    m_nextPixmap.fill(Qt::transparent);
+    m_nextPixmap = nextWidget->grab();
     m_nextPixmap.setDevicePixelRatio(devicePixelRatio);
-
-    QPainter nextPainter(&m_nextPixmap);
-    nextPainter.setRenderHints(QPainter::Antialiasing |
-                              QPainter::TextAntialiasing |
-                              QPainter::SmoothPixmapTransform |
-                              QPainter::HighQualityAntialiasing);
-    nextWidget->render(&nextPainter, QPoint(), QRegion(), QWidget::DrawChildren | QWidget::DrawWindowBackground);
-    nextPainter.end();
 }
 
 void GLTransitionWidget::startTransition(int duration)
