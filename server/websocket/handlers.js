@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+const crypto = require("crypto");
 const WavelengthModel = require("../models/wavelength");
 const connectionManager = require("./connectionManager");
 const {
@@ -16,6 +17,7 @@ async function handleRegisterWavelength(ws, data) {
   const frequency = normalizeFrequency(data.frequency);
   const name = data.name || `Wavelength-${frequency}`;
   const isPasswordProtected = data.isPasswordProtected || false;
+    const password = data.password || "";
 
   try {
     console.log(`Checking if frequency ${frequency} is available...`);
@@ -49,7 +51,8 @@ async function handleRegisterWavelength(ws, data) {
       frequency,
       name,
       isPasswordProtected,
-      sessionId
+      sessionId,
+      password
     );
 
     connectionManager.registerWavelength(
@@ -57,6 +60,7 @@ async function handleRegisterWavelength(ws, data) {
       frequency,
       name,
       isPasswordProtected,
+      password,
       sessionId
     );
 
@@ -133,15 +137,33 @@ async function handleJoinWavelength(ws, data) {
     }
   }
 
-  if (wavelength.isPasswordProtected && password !== password) {
-    ws.send(
-      JSON.stringify({
-        type: "join_result",
-        success: false,
-        error: "Invalid password",
-      })
-    );
-    return;
+  if (wavelength.isPasswordProtected) {
+    console.log("Wavelength is password protected");
+    if (!password) {
+      ws.send(
+          JSON.stringify({
+            type: "join_result",
+            success: false,
+            error: "Password required"
+          })
+      );
+      return;
+    }
+
+      const hashedInputPassword = crypto.createHash('sha256').update(password).digest('hex');
+      const hashedStoredPassword = wavelength.password;
+
+      console.log("Checking password hash:", hashedInputPassword);
+      if (hashedInputPassword !== hashedStoredPassword) {
+          ws.send(
+              JSON.stringify({
+                  type: "join_result",
+                  success: false,
+                  error: "Invalid password"
+              })
+          );
+          return;
+      }
   }
 
   const sessionId = generateSessionId("client");

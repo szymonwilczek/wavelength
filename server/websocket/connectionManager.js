@@ -1,5 +1,6 @@
 const WebSocket = require("ws");
 const WavelengthModel = require("../models/wavelength");
+const crypto = require("crypto");
 
 /**
  * Class that manages WebSocket connections and application state
@@ -100,20 +101,26 @@ class ConnectionManager {
    * @param {number} frequency - Frequency of the wavelength
    * @param {string} name - Name of the wavelength (handled automatically by the server)
    * @param {boolean} isPasswordProtected - Whether the wavelength is password protected
+   * @param {string} password - Password for the wavelength (if applicable)
    * @param {string} sessionId - session ID
    * @returns {Object} - Information about the registered wavelength
    */
-  registerWavelength(ws, frequency, name, isPasswordProtected, sessionId) {
+  registerWavelength(ws, frequency, name, isPasswordProtected, password, sessionId) {
     ws.frequency = frequency;
     ws.isHost = true;
     ws.sessionId = sessionId;
+    const hashedPassword = isPasswordProtected ?
+        crypto.createHash('sha256').update(password).digest('hex') :
+        null;
 
     this.activeWavelengths.set(frequency, {
       host: ws,
       clients: new Set(),
       name,
       isPasswordProtected,
-      processedMessageIds: new Set(), // To track processed messages (without their content)
+      password: hashedPassword,
+      sessionId,
+      processedMessageIds: new Set()
     });
 
     // Update last recorded frequency (for quicker future searches)
