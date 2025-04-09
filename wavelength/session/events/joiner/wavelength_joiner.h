@@ -11,6 +11,11 @@
 #include "../../../messages/handler/message_handler.h"
 #include "../../../util/wavelength_config.h"
 
+struct JoinResult {
+    bool success;
+    QString errorReason;
+};
+
 class WavelengthJoiner : public QObject {
     Q_OBJECT
 
@@ -20,7 +25,7 @@ public:
         return &instance;
     }
 
-    bool joinWavelength(double frequency, const QString& password = QString()) {
+    JoinResult joinWavelength(double frequency, const QString& password = QString()) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     DatabaseManager* dbManager = DatabaseManager::getInstance();
 
@@ -29,13 +34,13 @@ public:
         qDebug() << "Already joined wavelength" << frequency;
         registry->setActiveWavelength(frequency);
         emit wavelengthJoined(frequency);
-        return true;
+        return {true, QString()};
     }
 
     // Check if we have a pending registration for this frequency
     if (registry->isPendingRegistration(frequency)) {
         qDebug() << "Wavelength" << frequency << "registration is already pending";
-        return false;
+        return {false, "WAVELENGTH UNAVAILABLE"};
     }
 
     // Mark as pending
@@ -48,8 +53,14 @@ public:
         registry->removePendingRegistration(frequency);
         qDebug() << "Failed to get wavelength details from database";
         emit connectionError("Częstotliwość nie istnieje lub nie jest dostępna");
-        return false;
+        return {false, "WAVELENGTH UNAVAILABLE"};
     }
+
+        if (isPasswordProtected && password.isEmpty()) {
+            registry->removePendingRegistration(frequency);
+            emit connectionError("Ta częstotliwość wymaga hasła");
+            return {false, "WAVELENGTH PASSWORD PROTECTED"};
+        }
 
     qDebug() << "Joining existing wavelength:" << frequency << "Name:" << name
              << "Password protected:" << isPasswordProtected;
@@ -64,7 +75,7 @@ public:
     QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
     // Definiujemy obsługę wiadomości
-    connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency, clientId, name, isPasswordProtected, socket](const QString& message) {
+    connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency, clientId, name, isPasswordProtected, socket, registry](const QString& message) {
         qDebug() << "Received message from server for frequency" << frequency << ":" << message;
 
         bool ok;
@@ -78,42 +89,43 @@ public:
         qDebug() << "Message type:" << msgType;
 
         if (msgType == "join_result") {
-            bool success = msgObj["success"].toBool();
-            QString errorMessage = msgObj["error"].toString();
+    bool success = msgObj["success"].toBool();
+    QString errorMessage = msgObj["error"].toString();
 
-            qDebug() << "Join result received: success =" << success;
-
-            WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-
-            if (success) {
-                // Join successful
-                registry->removePendingRegistration(frequency);
-
-                WavelengthInfo info;
-                info.frequency = frequency;
-                info.isPasswordProtected = isPasswordProtected;
-                info.hostId = msgObj["hostId"].toString();
-                info.isHost = false;
-                info.socket = socket; // Bezpośrednie przypisanie socketa
-
-                // Add wavelength to registry
-                qDebug() << "Adding joined wavelength" << frequency << "to registry";
-                registry->addWavelength(frequency, info);
-                registry->setActiveWavelength(frequency);
-
-                qDebug() << "Emitting wavelengthJoined signal for frequency" << frequency;
-                emit wavelengthJoined(frequency);
-            } else {
-                // Join failed
-                qDebug() << "Join failed:" << errorMessage;
-                registry->removePendingRegistration(frequency);
-                emit connectionError(errorMessage.isEmpty() ? "Nie udało się dołączyć do pokoju" : errorMessage);
-
-                // Disconnect socket
-                socket->close();
-            }
+            if (!success) {
+        if (errorMessage == "Password required") {
+            emit connectionError("Ta częstotliwość wymaga hasła");
+            qDebug() << "Password required for frequency" << frequency;
+        } else if (errorMessage == "Invalid password") {
+            emit connectionError("Nieprawidłowe hasło");
+            qDebug() << "Invalid password for frequency" << frequency;
+        } else {
+            emit connectionError("Częstotliwość jest niedostępna");
+            qDebug() << "Frequency" << frequency << "is unavailable";
         }
-        else if (msgType == "message" || msgType == "send_message") {
+        registry->removePendingRegistration(frequency);
+        socket->close();
+        return;
+    }
+
+    if (success) {
+        // Join successful
+        registry->removePendingRegistration(frequency);
+
+        WavelengthInfo info;
+        info.frequency = frequency;
+        info.isPasswordProtected = isPasswordProtected;
+        info.hostId = msgObj["hostId"].toString();
+        info.isHost = false;
+        info.socket = socket;
+
+        // Add wavelength to registry
+        registry->addWavelength(frequency, info);
+        registry->setActiveWavelength(frequency);
+
+        emit wavelengthJoined(frequency);
+    }
+} else if (msgType == "message" || msgType == "send_message") {
             qDebug() << "Received chat message in wavelength" << frequency;
 
             // Używamy MessageFormatter do formatowania wiadomości
@@ -198,7 +210,7 @@ public:
     qDebug() << "Opening WebSocket connection to URL for joining:" << url;
     socket->open(QUrl(url));
 
-    return true;
+    return {true, QString()};
 }
 
 signals:
