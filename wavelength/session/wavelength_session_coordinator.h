@@ -60,13 +60,13 @@ public:
     // Dołączanie do istniejącego wavelength
     bool joinWavelength(double frequency, const QString& password = QString()) {
         qDebug() << "Coordinator: Joining wavelength" << frequency;
-        bool success = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
+        auto result = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
 
-        if (success) {
+        if (result.success) {
             WavelengthStateManager::getInstance()->registerJoinedWavelength(frequency);
         }
 
-        return success;
+        return result.success;
     }
 
     // Opuszczanie wavelength
