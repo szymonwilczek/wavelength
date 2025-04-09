@@ -274,19 +274,30 @@ int main(int argc, char *argv[]) {
     QObject::connect(navbar, &Navbar::settingsClicked, [stackedWidget, settingsView, animation]() {
     qDebug() << "Settings button clicked";
 
-    // Wstrzymaj śledzenie zdarzeń dla animacji
+    animation->hide();
+
     animation->pauseAllEventTracking();
 
-    // Przejście do widoku ustawień
     stackedWidget->slideToWidget(settingsView);
 });
 
-    // Powrót z widoku ustawień do ekranu głównego
     QObject::connect(settingsView, &SettingsView::backToMainView,
-    [stackedWidget, animationWidget, animation]() {
-        animation->hide();
-        stackedWidget->slideToWidget(animationWidget);
+[stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
+    qDebug() << "Back from settings, switching to animation view";
+
+    animation->hide();
+
+    animation->resetLifeColor();
+
+    stackedWidget->slideToWidget(animationWidget);
+
+    QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
+        animation->show();
+        animation->resetVisualization();
+        centerLabel(titleLabel, animation);
+        textEffect->startAnimation();
     });
+});
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Create wavelength button clicked";
