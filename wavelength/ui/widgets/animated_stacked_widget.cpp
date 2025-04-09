@@ -1,5 +1,7 @@
 #include "animated_stacked_widget.h"
 
+#include <QCoreApplication>
+
 AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
     : QStackedWidget(parent),
       m_duration(500),
@@ -22,11 +24,17 @@ AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
     // Zresetuj docelowy indeks
     m_targetIndex = -1;
 });
+
+    m_glTransitionWidget = new GLTransitionWidget(this);
+    m_glTransitionWidget->hide();
+    connect(m_glTransitionWidget, &GLTransitionWidget::transitionFinished,
+            this, &AnimatedStackedWidget::onGLTransitionFinished);
 }
 
 AnimatedStackedWidget::~AnimatedStackedWidget()
 {
     delete m_animationGroup;
+    delete m_glTransitionWidget;
 }
 
 void AnimatedStackedWidget::slideToIndex(int index)
@@ -75,6 +83,32 @@ void AnimatedStackedWidget::prepareAnimation(int nextIndex)
         animateFade(nextIndex);
         break;
     case Slide:
+        if (m_glTransitionWidget) {
+            // Pobieramy widgety
+            QWidget *currentWidget = widget(currentIndex());
+            QWidget *nextWidget = widget(nextIndex);
+
+            // Upewnij się, że oba widgety mają prawidłową wielkość
+            currentWidget->resize(size());
+            nextWidget->resize(size());
+
+            // Ustaw tekstury dla widgetu OpenGL
+            m_glTransitionWidget->resize(size());
+            m_glTransitionWidget->setWidgets(currentWidget, nextWidget);
+
+            // Pokaż OpenGL widget
+            m_glTransitionWidget->show();
+            m_glTransitionWidget->raise();
+
+            // Ukryj oryginalne widgety podczas animacji
+            currentWidget->hide();
+            nextWidget->hide();
+
+            // Rozpocznij animację
+            m_glTransitionWidget->startTransition(m_duration);
+            return;
+        }
+        // Fallback do standardowej animacji
         animateSlide(nextIndex);
         break;
     case SlideAndFade:
@@ -269,4 +303,23 @@ void AnimatedStackedWidget::animatePush(int nextIndex)
     m_animationGroup->addAnimation(currentAnimation);
     m_animationGroup->addAnimation(fadeOutAnimation);
     m_animationGroup->addAnimation(nextAnimation);
+}
+
+void AnimatedStackedWidget::onGLTransitionFinished()
+{
+    // Ukryj widget OpenGL
+    m_glTransitionWidget->hide();
+
+    // Aktualizuj bieżący indeks
+    setCurrentIndex(m_targetIndex);
+
+    // Pokaż właściwy widget
+    widget(m_targetIndex)->show();
+
+    // Resetuj flagi
+    m_animationRunning = false;
+    m_targetIndex = -1;
+
+    // Emituj sygnał zakończenia animacji
+    emit currentChanged(currentIndex());
 }
