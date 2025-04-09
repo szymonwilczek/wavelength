@@ -9,6 +9,7 @@
 #include <QVector>
 #include <memory>
 #include <atomic>
+#include <QPropertyAnimation>
 #include <QSizeF>
 #include <thread>
 
@@ -28,7 +29,7 @@ class AppInstanceManager : public QObject {
 
 public:
     explicit AppInstanceManager(QMainWindow* window, BlobAnimation* blob, QObject* parent = nullptr);
-    ~AppInstanceManager();
+    ~AppInstanceManager() override;
 
     bool isCreator() const { return m_isCreator; }
     QString getInstanceId() const { return m_instanceId; }
@@ -41,8 +42,6 @@ signals:
     void instanceConnected(QString instanceId);
     void instanceDisconnected(QString instanceId);
 
-public slots:
-    void updateBlobPosition();
 
 private slots:
     void onNewConnection();
@@ -61,11 +60,9 @@ private:
     void connectToServer();
     bool processMessage(const QByteArray& message, QLocalSocket* sender = nullptr);
     void sendToAllClients(const QByteArray& message);
-    void sendToCreator(const QByteArray& message);
     QByteArray createPositionMessage() const;
     void initAttractionThread();
 
-private:
     QMainWindow* m_window;
     BlobAnimation* m_blob;
     QLocalServer* m_server = nullptr;
@@ -84,6 +81,18 @@ private:
 
     static constexpr int UPDATE_INTERVAL_MS = 50;
     static const QString SERVER_NAME;
+
+    static constexpr double ATTRACTION_FORCE = 0.5;
+    static constexpr double ABSORPTION_DISTANCE = 50.0;
+
+    void applyAttractionForce(const QPointF& targetPos);
+    void startAbsorptionAnimation();
+    void finalizeAbsorption();
+
+    QPropertyAnimation* m_windowAnimation = nullptr;
+    bool m_isBeingAbsorbed = false;
+    bool m_isAbsorbing = false;
+    QTimer m_absorptionTimer;
 };
 
 #endif // APP_INSTANCE_MANAGER_H

@@ -166,7 +166,6 @@ int main(int argc, char *argv[]) {
 
     titleLabel->raise();
 
-    // Zmodyfikuj filtr zdarzeń dla nowej warstwy
     ResizeEventFilter *eventFilter = new ResizeEventFilter(titleLabel, animation);
 
     auto *textEffect = new CyberpunkTextEffect(titleLabel, animation);
@@ -175,8 +174,13 @@ int main(int argc, char *argv[]) {
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
 
-    AppInstanceManager *instanceManager = new AppInstanceManager(&window, animation, &window);
+    const auto instanceManager = new AppInstanceManager(&window, animation, &window);
     instanceManager->start();
+
+    QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
+    window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    window.setEnabled(false);
+});
 
 
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
