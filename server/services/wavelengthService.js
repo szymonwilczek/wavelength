@@ -110,7 +110,7 @@ class WavelengthService {
       }
     }
 
-    if (wavelength.isPasswordProtected && password !== password) {
+    if (wavelength.isPasswordProtected && password !== wavelength.password) {
       return {
         success: false,
         error: "Invalid password",
