@@ -1,6 +1,7 @@
 const WavelengthModel = require("../models/wavelength");
 const connectionManager = require("../websocket/connectionManager");
 const { normalizeFrequency, generateSessionId } = require("../utils/helpers");
+const {removeTakenFrequency, addTakenFrequency} = require("./frequencyGapTracker");
 
 /**
  * Wavelength service - logic handler for wavelengths
@@ -12,10 +13,11 @@ class WavelengthService {
    * @param {number} frequency - Frequency to register
    * @param {string} name - Name of the wavelength (handled automatically by the server)
    * @param {boolean} isPasswordProtected - Is the wavelength password protected?
+   * @param {string} password - Password for the wavelength (if applicable)
    * @returns {Promise<Object>} - Object with the result of the registration
    * @throws {Error} - Throws an error if the registration fails
    */
-  async registerWavelength(ws, frequency, name, isPasswordProtected) {
+  async registerWavelength(ws, frequency, name, isPasswordProtected, password) {
     const normalizedFrequency = normalizeFrequency(frequency);
 
     if (connectionManager.activeWavelengths.has(normalizedFrequency)) {
@@ -27,7 +29,7 @@ class WavelengthService {
 
     try {
       const existingWavelength = await WavelengthModel.findByFrequency(
-        normalizedFrequency
+          normalizedFrequency
       );
 
       if (existingWavelength) {
@@ -37,18 +39,22 @@ class WavelengthService {
       const sessionId = generateSessionId("ws");
 
       await WavelengthModel.create(
-        normalizedFrequency,
-        name,
-        isPasswordProtected,
-        sessionId
+          normalizedFrequency,
+          name,
+          isPasswordProtected,
+          sessionId,
+          isPasswordProtected ? password : null
       );
 
+      await addTakenFrequency(normalizedFrequency);
+
       connectionManager.registerWavelength(
-        ws,
-        normalizedFrequency,
-        name,
-        isPasswordProtected,
-        sessionId
+          ws,
+          normalizedFrequency,
+          name,
+          isPasswordProtected,
+          password,
+          sessionId
       );
 
       return {
@@ -58,8 +64,8 @@ class WavelengthService {
       };
     } catch (error) {
       console.error(
-        `Error registering wavelength ${normalizedFrequency}:`,
-        error
+          `Error registering wavelength ${normalizedFrequency}:`,
+          error
       );
       return {
         success: false,
@@ -142,6 +148,8 @@ class WavelengthService {
     try {
       await WavelengthModel.delete(normalizedFrequency);
 
+      await removeTakenFrequency(normalizedFrequency);
+
       if (connectionManager.activeWavelengths.has(normalizedFrequency)) {
         connectionManager.activeWavelengths.delete(normalizedFrequency);
       }
@@ -212,6 +220,20 @@ class WavelengthService {
     } catch (error) {
       console.error("Error initializing database:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Retrieves wavelength by frequency
+   * @param {number} frequency - Frequency to search for
+   * @returns {Promise<Object|null>} - Wavelength object or null if not found
+   */
+  async getWavelength(frequency) {
+    try {
+      return await WavelengthModel.findByFrequency(frequency);
+    } catch (error) {
+      console.error(`Error getting wavelength ${frequency}:`, error);
+      return null;
     }
   }
 }

@@ -6,6 +6,7 @@ const apiRouter = require("./routes/api");
 const { initWebSocketServer } = require("./websocket/wsServer");
 const { initDb } = require("./config/db");
 const wavelengthService = require("./services/wavelengthService");
+const frequencyTracker = require("./services/frequencyGapTracker");
 
 const PORT = process.env.PORT || 3000;
 
@@ -47,6 +48,9 @@ async function initializeApp() {
 
     console.log("Setting up wavelength service...");
     await wavelengthService.initializeDatabase();
+
+    console.log("Initializing frequency tracker...");
+    await frequencyTracker.initialize();
 
     console.log("Starting WebSocket server...");
     const wss = initWebSocketServer(server);

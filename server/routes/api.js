@@ -5,6 +5,7 @@ const express = require("express");
 const wavelengthService = require("../services/wavelengthService");
 const connectionManager = require("../websocket/connectionManager");
 const { normalizeFrequency } = require("../utils/helpers");
+const frequencyTracker = require("../services/frequencyGapTracker");
 
 const router = express.Router();
 
@@ -22,17 +23,25 @@ router.get("/health", (req, res) => {
  */
 router.get("/api/next-available-frequency", async (req, res) => {
   try {
-    const startFrequency = connectionManager.lastRegisteredFrequency;
-    console.log(
-      `Looking for next available frequency starting from ${startFrequency} Hz`
-    );
+    console.log("Looking for next available frequency using FrequencyGapTracker");
 
-    const nextFrequency = await wavelengthService.findNextAvailableFrequency(
-      startFrequency
-    );
+    await frequencyTracker.updateGapsCache();
 
-    if (nextFrequency) {
+    const nextFrequency = frequencyTracker.findLowestAvailableFrequency();
+
+    if (nextFrequency !== null) {
       console.log(`Found next available frequency: ${nextFrequency} Hz`);
+
+      const existingInDb = await wavelengthService.getWavelength(nextFrequency);
+      const existingInMemory = connectionManager.activeWavelengths.has(nextFrequency);
+
+      if (existingInDb || existingInMemory) {
+        console.warn(`Frequency ${nextFrequency} is actually taken. Updating cache...`);
+        await frequencyTracker.addTakenFrequency(nextFrequency);
+
+        return router.handle(req, res);
+      }
+
       res.json({
         frequency: nextFrequency,
         status: "success",
