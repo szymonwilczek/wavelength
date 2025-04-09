@@ -86,6 +86,21 @@ public:
         update();
     }
 
+    public slots:
+    void show() {
+        if (!isVisible()) {
+            setVisible(true);
+            resumeAllEventTracking();
+        }
+    }
+
+    void hide() {
+        if (isVisible()) {
+            setVisible(false);
+            pauseAllEventTracking();
+        }
+    }
+
     signals:
     void visualizationReset();
 

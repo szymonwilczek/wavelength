@@ -440,7 +440,7 @@ private slots:
             return;
         }
 
-        m_isAborting = true;  // Ustawiamy flagę
+        m_isAborting = true;
 
         m_statusIndicator->setText("ROZŁĄCZANIE...");
         m_statusIndicator->setStyleSheet(
@@ -465,11 +465,13 @@ private slots:
             coordinator->leaveWavelength();
         }
 
-        clear();
+        // Emitujemy sygnał przed czyszczeniem widoku
+        emit wavelengthAborted();
 
+        // Opóźniamy czyszczenie widoku do momentu zakończenia animacji przejścia
         QTimer::singleShot(250, this, [this]() {
-            emit wavelengthAborted();
-            m_isAborting = false;  // Resetujemy flagę
+            clear();
+            m_isAborting = false;
         });
     }
 
