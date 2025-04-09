@@ -3,6 +3,7 @@
  */
 const { query } = require("../config/db");
 const { normalizeFrequency } = require("../utils/helpers");
+const crypto = require('crypto');
 
 class WavelengthModel {
   /**
@@ -11,14 +12,21 @@ class WavelengthModel {
    * @param {string} name - Name of the wavelength (mostly handled automatically by the server)
    * @param {boolean} isPasswordProtected - Is the wavelength password protected?
    * @param {string} hostSocketId - Socket ID of the host
+   * @param {string} password - Password for the wavelength (if applicable)
    * @returns {Promise<Object>} - Created wavelength object
    * @throws {Error} - Throws an error if the creation fails
    */
-  static async create(frequency, name, isPasswordProtected, hostSocketId) {
+  static async create(frequency, name, isPasswordProtected, hostSocketId, password) {
     const normalizedFrequency = normalizeFrequency(frequency);
+    const hashedPassword = isPasswordProtected ?
+        crypto.createHash('sha256').update(password).digest('hex') :
+        null;
     const result = await query(
-      "INSERT INTO active_wavelengths (frequency, name, is_password_protected, host_socket_id, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [normalizedFrequency, name, isPasswordProtected, hostSocketId, new Date()]
+        `INSERT INTO active_wavelengths 
+    (frequency, name, is_password_protected, host_socket_id, password_hash, created_at) 
+    VALUES ($1, $2, $3, $4, $5, $6) 
+    RETURNING *`,
+        [normalizedFrequency, name, isPasswordProtected, hostSocketId, hashedPassword, new Date()]
     );
     return result.rows[0];
   }
@@ -31,8 +39,16 @@ class WavelengthModel {
   static async findByFrequency(frequency) {
     const normalizedFrequency = normalizeFrequency(frequency);
     const result = await query(
-      "SELECT * FROM active_wavelengths WHERE frequency = $1",
-      [normalizedFrequency]
+        `SELECT 
+      frequency, 
+      name, 
+      is_password_protected,
+      host_socket_id,
+      password_hash,
+      created_at 
+    FROM active_wavelengths 
+    WHERE frequency = $1`,
+        [normalizedFrequency]
     );
     return result.rows.length > 0 ? result.rows[0] : null;
   }
