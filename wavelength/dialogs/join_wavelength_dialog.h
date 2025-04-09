@@ -28,6 +28,8 @@
 #include "../session/wavelength_session_coordinator.h"
 #include "../ui/dialogs/animated_dialog.h"
 
+
+
 class JoinWavelengthDialog : public AnimatedDialog {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
@@ -503,11 +505,11 @@ private slots:
         WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        bool success = joiner->joinWavelength(frequency, password);
+        auto result = joiner->joinWavelength(frequency, password);
         QApplication::restoreOverrideCursor();
 
-        if (!success) {
-            statusLabel->setText("CONNECTION FAILED: WAVELENGTH UNAVAILABLE");
+        if (!result.success) {
+            statusLabel->setText(result.errorReason);
             statusLabel->show();
 
             // Animacja błędu (więcej glitchy)
@@ -536,7 +538,17 @@ private slots:
     }
 
     void onConnectionError(const QString& errorMessage) {
-        statusLabel->setText("CONNECTION ERROR: " + errorMessage.toUpper());
+        QString displayMessage;
+
+        if (errorMessage.contains("Password required")) {
+            displayMessage = "WAVELENGTH PASSWORD PROTECTED";
+        } else if (errorMessage.contains("Invalid password")) {
+            displayMessage = "INCORRECT PASSWORD";
+        } else {
+            displayMessage = "WAVELENGTH UNAVAILABLE";
+        }
+
+        statusLabel->setText(displayMessage);
         statusLabel->show();
 
         // Animacja błędu połączenia
