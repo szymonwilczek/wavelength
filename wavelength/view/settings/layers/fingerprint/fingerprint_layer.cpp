@@ -89,21 +89,39 @@ void FingerprintLayer::updateProgress() {
 
 void FingerprintLayer::processFingerprint(bool completed) {
     if (completed) {
-        // Animacja zanikania
-        auto* effect = new QGraphicsOpacityEffect(m_fingerprintImage);
-        m_fingerprintImage->setGraphicsEffect(effect);
+        // Zmiana kolorów na zielony po pomyślnym przejściu
+        m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
 
-        auto* animation = new QPropertyAnimation(effect, "opacity");
-        animation->setDuration(500);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        animation->setEasingCurve(QEasingCurve::OutQuad);
+        m_fingerprintProgress->setStyleSheet(
+            "QProgressBar {"
+            "  background-color: rgba(30, 30, 30, 150);"
+            "  border: 1px solid #33ff33;"
+            "  border-radius: 4px;"
+            "}"
+            "QProgressBar::chunk {"
+            "  background-color: #33ff33;"
+            "  border-radius: 3px;"
+            "}"
+        );
 
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            emit layerCompleted();
+        // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
+        QTimer::singleShot(500, this, [this]() {
+            // Animacja zanikania
+            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(m_fingerprintImage);
+            m_fingerprintImage->setGraphicsEffect(effect);
+
+            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            animation->setDuration(500);
+            animation->setStartValue(1.0);
+            animation->setEndValue(0.0);
+            animation->setEasingCurve(QEasingCurve::OutQuad);
+
+            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+                emit layerCompleted();
+            });
+
+            animation->start(QPropertyAnimation::DeleteWhenStopped);
         });
-
-        animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
 }
 

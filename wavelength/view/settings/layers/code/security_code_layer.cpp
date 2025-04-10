@@ -98,23 +98,40 @@ void SecurityCodeLayer::reset() {
 
 void SecurityCodeLayer::checkSecurityCode() {
     if (m_securityCodeInput->text().toInt() == m_currentSecurityCode) {
-        // Animacja zanikania
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
-        this->setGraphicsEffect(effect);
+        // Zmiana kolorów na zielony po pomyślnym przejściu
+        m_securityCodeInput->setStyleSheet(
+            "QLineEdit {"
+            "  color: #33ff33;"
+            "  background-color: rgba(10, 25, 40, 220);"
+            "  border: 2px solid #33ff33;"
+            "  border-radius: 5px;"
+            "  padding: 8px;"
+            "  font-family: Consolas;"
+            "  font-size: 14pt;"
+            "  text-align: center;"
+            "}"
+        );
 
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
-        animation->setDuration(500);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        animation->setEasingCurve(QEasingCurve::OutQuad);
+        // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
+        QTimer::singleShot(800, this, [this]() {
+            // Animacja zanikania
+            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            this->setGraphicsEffect(effect);
 
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            emit layerCompleted();
+            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            animation->setDuration(500);
+            animation->setStartValue(1.0);
+            animation->setEndValue(0.0);
+            animation->setEasingCurve(QEasingCurve::OutQuad);
+
+            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+                emit layerCompleted();
+            });
+
+            animation->start(QPropertyAnimation::DeleteWhenStopped);
         });
-
-        animation->start(QPropertyAnimation::DeleteWhenStopped);
     } else {
-        // Efekt błędu
+        // Efekt błędu (pozostaje bez zmian)
         QString currentStyle = m_securityCodeInput->styleSheet();
         m_securityCodeInput->setStyleSheet(
             "QLineEdit {"
