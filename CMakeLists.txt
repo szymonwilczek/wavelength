@@ -159,6 +159,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/layers/code/security_code_layer.h
         wavelength/view/settings/layers/question/security_question_layer.cpp
         wavelength/view/settings/layers/question/security_question_layer.h
+        wavelength/view/settings/layers/retina_scan/retina_scan_layer.cpp
+        wavelength/view/settings/layers/retina_scan/retina_scan_layer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

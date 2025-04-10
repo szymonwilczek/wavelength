@@ -162,6 +162,7 @@ void SettingsView::setupClassifiedTab() {
     m_handprintLayer = new HandprintLayer(m_securityLayersStack);
     m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
     m_securityQuestionLayer = new SecurityQuestionLayer(m_securityLayersStack);
+    m_retinaScanLayer = new RetinaScanLayer(m_securityLayersStack); // Nowa warstwa
 
     // Ekran dostępu przyznanego
     m_accessGrantedWidget = new QWidget(m_securityLayersStack);
@@ -186,14 +187,15 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack->addWidget(m_handprintLayer);
     m_securityLayersStack->addWidget(m_securityCodeLayer);
     m_securityLayersStack->addWidget(m_securityQuestionLayer);
+    m_securityLayersStack->addWidget(m_retinaScanLayer); // Nowa warstwa
     m_securityLayersStack->addWidget(m_accessGrantedWidget);
 
     // Połączenia warstw
     connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
-    m_currentLayerIndex = HandprintIndex;
-    m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-    m_handprintLayer->initialize();
-});
+        m_currentLayerIndex = HandprintIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_handprintLayer->initialize();
+    });
 
     connect(m_handprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SecurityCodeIndex;
@@ -208,6 +210,12 @@ void SettingsView::setupClassifiedTab() {
     });
 
     connect(m_securityQuestionLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = RetinaScanIndex; // Zmiana na RetinaScanIndex
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_retinaScanLayer->initialize(); // Inicjalizacja nowej warstwy
+    });
+
+    connect(m_retinaScanLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = AccessGrantedIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
     });
@@ -385,6 +393,11 @@ void SettingsView::setupNextSecurityLayer() {
     case SecurityQuestionIndex:
         m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
         m_securityQuestionLayer->initialize();
+        break;
+
+    case RetinaScanIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_retinaScanLayer->initialize();
         break;
 
     case AccessGrantedIndex:
