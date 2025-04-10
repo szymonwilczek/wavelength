@@ -5,13 +5,20 @@
 #include <QLabel>
 #include <QHBoxLayout>
 
-class CyberpunkButton;
+#include "../button/cyberpunk_button.h"
+
 
 class Navbar : public QToolBar {
     Q_OBJECT
 
 public:
     explicit Navbar(QWidget *parent = nullptr);
+
+    public slots:
+    void setChatMode(const bool inChat) {
+        createWavelengthButton->setVisible(!inChat);
+        joinWavelengthButton->setVisible(!inChat);
+    }
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;

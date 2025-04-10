@@ -215,8 +215,9 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    auto switchToChatView = [chatView, stackedWidget, animation](const double frequency) {
+    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const double frequency) {
         animation->hide();
+        navbar->setChatMode(true);
         chatView->setWavelength(frequency, "");
         stackedWidget->slideToWidget(chatView);
     };
@@ -243,8 +244,10 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chatView, &WavelengthChatView::wavelengthAborted,
-    [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
+    [stackedWidget, animationWidget, animation, titleLabel, textEffect, navbar]() {
         qDebug() << "Wavelength aborted, switching back to animation view";
+
+        navbar->setChatMode(false);
 
         // Ukrywamy bloba na czas przejścia
         animation->hide();
