@@ -19,6 +19,10 @@
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
+#include "settings/layers/code/security_code_layer.h"
+#include "settings/layers/fingerprint/fingerprint_layer.h"
+#include "settings/layers/handprint/handprint_layer.h"
+#include "settings/layers/question/security_question_layer.h"
 
 // Klasa dla przycisków zakładek z efektem podkreślenia
 class TabButton : public QPushButton {
@@ -166,17 +170,6 @@ private:
     void generateRandomHandprint(QLabel* targetLabel);
     int getRandomSecurityCode(QString& hint);
 
-    enum SecurityLayer {
-        Fingerprint = 0,
-        Handprint,
-        SecurityCode,
-        SecurityQuestion,
-        AccessGranted
-    };
-
-    SecurityLayer m_currentSecurityLayer;
-    QStackedWidget* m_securityLayersStack;
-
     // Widgets dla poszczególnych zabezpieczeń
     QWidget* m_fingerprintWidget;
     QLabel* m_fingerprintImage;
@@ -195,8 +188,6 @@ private:
     QLabel* m_securityQuestionLabel;
     QLineEdit* m_securityQuestionInput;
     QTimer* m_securityQuestionTimer;
-
-    QWidget* m_accessGrantedWidget;
 
     // Timery i animacje
     QTimer* m_fingerprintTimer;
@@ -241,6 +232,24 @@ private:
     CyberButton *m_backButton;
 
     QTimer *m_refreshTimer;
+
+    FingerprintLayer* m_fingerprintLayer;
+    HandprintLayer* m_handprintLayer;
+    SecurityCodeLayer* m_securityCodeLayer;
+    SecurityQuestionLayer* m_securityQuestionLayer;
+    QWidget* m_accessGrantedWidget;
+
+    QStackedWidget* m_securityLayersStack;
+
+    enum SecurityLayerIndex {
+        FingerprintIndex = 0,
+        HandprintIndex,
+        SecurityCodeIndex,
+        SecurityQuestionIndex,
+        AccessGrantedIndex
+    };
+
+    SecurityLayerIndex m_currentLayerIndex;
 };
 
 #endif // SETTINGS_VIEW_H

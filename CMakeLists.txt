@@ -149,6 +149,16 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings_view.h
         wavelength/ui/widgets/gl_transition_widget.cpp
         wavelength/ui/widgets/gl_transition_widget.h
+        wavelength/view/settings/layers/security_layer.cpp
+        wavelength/view/settings/layers/security_layer.h
+        wavelength/view/settings/layers/fingerprint/fingerprint_layer.cpp
+        wavelength/view/settings/layers/fingerprint/fingerprint_layer.h
+        wavelength/view/settings/layers/handprint/handprint_layer.cpp
+        wavelength/view/settings/layers/handprint/handprint_layer.h
+        wavelength/view/settings/layers/code/security_code_layer.cpp
+        wavelength/view/settings/layers/code/security_code_layer.h
+        wavelength/view/settings/layers/question/security_question_layer.cpp
+        wavelength/view/settings/layers/question/security_question_layer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

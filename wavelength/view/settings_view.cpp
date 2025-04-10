@@ -157,181 +157,13 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack = new QStackedWidget(tab);
     layout->addWidget(m_securityLayersStack, 1);
 
-    // 1. Zabezpieczenie: Odcisk palca
-    m_fingerprintWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *fingerprintLayout = new QVBoxLayout(m_fingerprintWidget);
-    fingerprintLayout->setAlignment(Qt::AlignCenter);
+    // Tworzenie warstw zabezpieczeń
+    m_fingerprintLayer = new FingerprintLayer(m_securityLayersStack);
+    m_handprintLayer = new HandprintLayer(m_securityLayersStack);
+    m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
+    m_securityQuestionLayer = new SecurityQuestionLayer(m_securityLayersStack);
 
-    QLabel *fingerprintTitle = new QLabel("FINGERPRINT AUTHENTICATION", m_fingerprintWidget);
-    fingerprintTitle->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
-    fingerprintTitle->setAlignment(Qt::AlignCenter);
-
-    m_fingerprintImage = new QLabel(m_fingerprintWidget);
-    m_fingerprintImage->setFixedSize(200, 200);
-    m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;");
-    m_fingerprintImage->setCursor(Qt::PointingHandCursor);
-    m_fingerprintImage->setAlignment(Qt::AlignCenter);
-
-    QLabel *fingerprintInstructions = new QLabel("Press and hold on fingerprint to scan", m_fingerprintWidget);
-    fingerprintInstructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
-    fingerprintInstructions->setAlignment(Qt::AlignCenter);
-
-    m_fingerprintProgress = new QProgressBar(m_fingerprintWidget);
-    m_fingerprintProgress->setRange(0, 100);
-    m_fingerprintProgress->setValue(0);
-    m_fingerprintProgress->setTextVisible(false);
-    m_fingerprintProgress->setFixedHeight(8);
-    m_fingerprintProgress->setStyleSheet(
-        "QProgressBar {"
-        "  background-color: rgba(30, 30, 30, 150);"
-        "  border: 1px solid #333333;"
-        "  border-radius: 4px;"
-        "}"
-        "QProgressBar::chunk {"
-        "  background-color: #ff3333;"
-        "  border-radius: 3px;"
-        "}"
-    );
-
-    fingerprintLayout->addWidget(fingerprintTitle);
-    fingerprintLayout->addSpacing(20);
-    fingerprintLayout->addWidget(m_fingerprintImage, 0, Qt::AlignCenter);
-    fingerprintLayout->addSpacing(10);
-    fingerprintLayout->addWidget(fingerprintInstructions);
-    fingerprintLayout->addWidget(m_fingerprintProgress);
-    fingerprintLayout->addStretch();
-
-    // 2. Zabezpieczenie: Odcisk dłoni
-    m_handprintWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *handprintLayout = new QVBoxLayout(m_handprintWidget);
-    handprintLayout->setAlignment(Qt::AlignCenter);
-
-    QLabel *handprintTitle = new QLabel("HANDPRINT AUTHENTICATION", m_handprintWidget);
-    handprintTitle->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
-    handprintTitle->setAlignment(Qt::AlignCenter);
-
-    m_handprintImage = new QLabel(m_handprintWidget);
-    m_handprintImage->setFixedSize(250, 250);
-    m_handprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;");
-    m_handprintImage->setCursor(Qt::PointingHandCursor);
-    m_handprintImage->setAlignment(Qt::AlignCenter);
-
-    QLabel *handprintInstructions = new QLabel("Press and hold on handprint to scan", m_handprintWidget);
-    handprintInstructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
-    handprintInstructions->setAlignment(Qt::AlignCenter);
-
-    m_handprintProgress = new QProgressBar(m_handprintWidget);
-    m_handprintProgress->setRange(0, 100);
-    m_handprintProgress->setValue(0);
-    m_handprintProgress->setTextVisible(false);
-    m_handprintProgress->setFixedHeight(8);
-    m_handprintProgress->setStyleSheet(
-        "QProgressBar {"
-        "  background-color: rgba(30, 30, 30, 150);"
-        "  border: 1px solid #333333;"
-        "  border-radius: 4px;"
-        "}"
-        "QProgressBar::chunk {"
-        "  background-color: #ff3333;"
-        "  border-radius: 3px;"
-        "}"
-    );
-
-    handprintLayout->addWidget(handprintTitle);
-    handprintLayout->addSpacing(20);
-    handprintLayout->addWidget(m_handprintImage, 0, Qt::AlignCenter);
-    handprintLayout->addSpacing(10);
-    handprintLayout->addWidget(handprintInstructions);
-    handprintLayout->addWidget(m_handprintProgress);
-    handprintLayout->addStretch();
-
-    // 3. Zabezpieczenie: Kod bezpieczeństwa
-    m_securityCodeWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *securityCodeLayout = new QVBoxLayout(m_securityCodeWidget);
-    securityCodeLayout->setAlignment(Qt::AlignCenter);
-
-    QLabel *securityCodeTitle = new QLabel("SECURITY CODE VERIFICATION", m_securityCodeWidget);
-    securityCodeTitle->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
-    securityCodeTitle->setAlignment(Qt::AlignCenter);
-
-    QLabel *securityCodeInstructions = new QLabel("Enter the 4-digit security code", m_securityCodeWidget);
-    securityCodeInstructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
-    securityCodeInstructions->setAlignment(Qt::AlignCenter);
-
-    m_securityCodeInput = new QLineEdit(m_securityCodeWidget);
-    m_securityCodeInput->setFixedWidth(150);
-    m_securityCodeInput->setStyleSheet(
-        "QLineEdit {"
-        "  color: #ff3333;"
-        "  background-color: rgba(10, 25, 40, 220);"
-        "  border: 1px solid #ff3333;"
-        "  border-radius: 5px;"
-        "  padding: 8px;"
-        "  font-family: Consolas;"
-        "  font-size: 14pt;"
-        "  text-align: center;"
-        "}"
-    );
-    m_securityCodeInput->setAlignment(Qt::AlignCenter);
-    m_securityCodeInput->setMaxLength(4);
-    m_securityCodeInput->setInputMask("9999");
-
-    m_securityCodeHint = new QLabel("", m_securityCodeWidget);
-    m_securityCodeHint->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt; font-style: italic;");
-    m_securityCodeHint->setAlignment(Qt::AlignCenter);
-
-    securityCodeLayout->addWidget(securityCodeTitle);
-    securityCodeLayout->addSpacing(20);
-    securityCodeLayout->addWidget(securityCodeInstructions);
-    securityCodeLayout->addSpacing(10);
-    securityCodeLayout->addWidget(m_securityCodeInput, 0, Qt::AlignCenter);
-    securityCodeLayout->addSpacing(20);
-    securityCodeLayout->addWidget(m_securityCodeHint);
-    securityCodeLayout->addStretch();
-
-    // 4. Zabezpieczenie: Pytanie bezpieczeństwa
-    m_securityQuestionWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *securityQuestionLayout = new QVBoxLayout(m_securityQuestionWidget);
-    securityQuestionLayout->setAlignment(Qt::AlignCenter);
-
-    QLabel *securityQuestionTitle = new QLabel("SECURITY QUESTION VERIFICATION", m_securityQuestionWidget);
-    securityQuestionTitle->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
-    securityQuestionTitle->setAlignment(Qt::AlignCenter);
-
-    QLabel *securityQuestionInstructions = new QLabel("Answer your security question", m_securityQuestionWidget);
-    securityQuestionInstructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
-    securityQuestionInstructions->setAlignment(Qt::AlignCenter);
-
-    m_securityQuestionLabel = new QLabel("", m_securityQuestionWidget);
-    m_securityQuestionLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    m_securityQuestionLabel->setAlignment(Qt::AlignCenter);
-    m_securityQuestionLabel->setWordWrap(true);
-    m_securityQuestionLabel->setFixedWidth(400);
-
-    m_securityQuestionInput = new QLineEdit(m_securityQuestionWidget);
-    m_securityQuestionInput->setFixedWidth(300);
-    m_securityQuestionInput->setStyleSheet(
-        "QLineEdit {"
-        "  color: #ff3333;"
-        "  background-color: rgba(10, 25, 40, 220);"
-        "  border: 1px solid #ff3333;"
-        "  border-radius: 5px;"
-        "  padding: 8px;"
-        "  font-family: Consolas;"
-        "  font-size: 11pt;"
-        "}"
-    );
-
-    securityQuestionLayout->addWidget(securityQuestionTitle);
-    securityQuestionLayout->addSpacing(20);
-    securityQuestionLayout->addWidget(securityQuestionInstructions);
-    securityQuestionLayout->addSpacing(10);
-    securityQuestionLayout->addWidget(m_securityQuestionLabel);
-    securityQuestionLayout->addSpacing(20);
-    securityQuestionLayout->addWidget(m_securityQuestionInput, 0, Qt::AlignCenter);
-    securityQuestionLayout->addStretch();
-
-    // 5. Dostęp przyznany
+    // Ekran dostępu przyznanego
     m_accessGrantedWidget = new QWidget(m_securityLayersStack);
     QVBoxLayout *accessGrantedLayout = new QVBoxLayout(m_accessGrantedWidget);
     accessGrantedLayout->setAlignment(Qt::AlignCenter);
@@ -350,88 +182,43 @@ void SettingsView::setupClassifiedTab() {
     accessGrantedLayout->addStretch();
 
     // Dodajemy wszystkie widgety do stosu
-    m_securityLayersStack->addWidget(m_fingerprintWidget);
-    m_securityLayersStack->addWidget(m_handprintWidget);
-    m_securityLayersStack->addWidget(m_securityCodeWidget);
-    m_securityLayersStack->addWidget(m_securityQuestionWidget);
+    m_securityLayersStack->addWidget(m_fingerprintLayer);
+    m_securityLayersStack->addWidget(m_handprintLayer);
+    m_securityLayersStack->addWidget(m_securityCodeLayer);
+    m_securityLayersStack->addWidget(m_securityQuestionLayer);
     m_securityLayersStack->addWidget(m_accessGrantedWidget);
 
-    // Inicjalizacja timerów
-    m_fingerprintTimer = new QTimer(this);
-    m_fingerprintTimer->setInterval(50); // 50ms dla płynnej animacji
-    connect(m_fingerprintTimer, &QTimer::timeout, this, [this]() {
-        int value = m_fingerprintProgress->value() + 1;
-        m_fingerprintProgress->setValue(value);
-        if (value >= 100) {
-            m_fingerprintTimer->stop();
-            processFingerprint(true);
-        }
+    // Połączenia warstw
+    connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
+    m_currentLayerIndex = HandprintIndex;
+    m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+    m_handprintLayer->initialize();
+});
+
+    connect(m_handprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = SecurityCodeIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_securityCodeLayer->initialize();
     });
 
-    m_handprintTimer = new QTimer(this);
-    m_handprintTimer->setInterval(50);
-    connect(m_handprintTimer, &QTimer::timeout, this, [this]() {
-        int value = m_handprintProgress->value() + 1;
-        m_handprintProgress->setValue(value);
-        if (value >= 100) {
-            m_handprintTimer->stop();
-            processHandprint(true);
-        }
+    connect(m_securityCodeLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = SecurityQuestionIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_securityQuestionLayer->initialize();
     });
 
-    m_securityQuestionTimer = new QTimer(this);
-    m_securityQuestionTimer->setSingleShot(true);
-    m_securityQuestionTimer->setInterval(10000); // 10 sekund
-    connect(m_securityQuestionTimer, &QTimer::timeout, this, &SettingsView::securityQuestionTimeout);
-
-    // Event filters dla obsługi kliknięć myszy
-    m_fingerprintImage->installEventFilter(this);
-    m_handprintImage->installEventFilter(this);
-
-    // Połączenia dla walidacji kodów
-    connect(m_securityCodeInput, &QLineEdit::returnPressed, this, &SettingsView::checkSecurityCode);
-    connect(m_securityQuestionInput, &QLineEdit::returnPressed, this, [this]() {
-        if (m_securityQuestionInput->text().toLower() == "yes") {
-            setupNextSecurityLayer();
-        } else {
-            m_securityQuestionInput->clear();
-            m_securityQuestionInput->setStyleSheet(
-                "QLineEdit {"
-                "  color: #ff3333;"
-                "  background-color: rgba(40, 10, 10, 220);"
-                "  border: 1px solid #ff3333;"
-                "  border-radius: 5px;"
-                "  padding: 8px;"
-                "  font-family: Consolas;"
-                "  font-size: 11pt;"
-                "}"
-            );
-            QTimer::singleShot(500, this, [this]() {
-                m_securityQuestionInput->setStyleSheet(
-                    "QLineEdit {"
-                    "  color: #ff3333;"
-                    "  background-color: rgba(10, 25, 40, 220);"
-                    "  border: 1px solid #ff3333;"
-                    "  border-radius: 5px;"
-                    "  padding: 8px;"
-                    "  font-family: Consolas;"
-                    "  font-size: 11pt;"
-                    "}"
-                );
-            });
-        }
+    connect(m_securityQuestionLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = AccessGrantedIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
     });
 
     layout->addStretch();
-
     m_tabContent->addWidget(tab);
 
     // Ustawiamy początkowy stan zabezpieczeń
-    m_currentSecurityLayer = Fingerprint;
-    m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-
-    // Generujemy losowy odcisk palca
-    generateRandomFingerprint(m_fingerprintImage);
+    m_currentLayerIndex = FingerprintIndex;
+    m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+    m_fingerprintLayer->initialize();
 }
 
 void SettingsView::generateRandomFingerprint(QLabel* targetLabel) {
@@ -579,37 +366,30 @@ int SettingsView::getRandomSecurityCode(QString& hint) {
 }
 
 void SettingsView::setupNextSecurityLayer() {
-    // Przejście do następnego poziomu zabezpieczeń
-    m_currentSecurityLayer = static_cast<SecurityLayer>(static_cast<int>(m_currentSecurityLayer) + 1);
+    // Zaktualizowane nazwy enumów
+    m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
 
     // Przygotowanie następnego zabezpieczenia
     QString hint;
-    switch (m_currentSecurityLayer) {
-        case Handprint:
-            m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-            generateRandomHandprint(m_handprintImage);
-            m_handprintProgress->setValue(0);
-            break;
+    switch (m_currentLayerIndex) {
+    case HandprintIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_handprintLayer->initialize();
+        break;
 
-        case SecurityCode:
-            m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-            m_currentSecurityCode = getRandomSecurityCode(hint);
-            m_securityCodeHint->setText("HINT: " + hint);
-            m_securityCodeInput->clear();
-            m_securityCodeInput->setFocus();
-            break;
+    case SecurityCodeIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_securityCodeLayer->initialize();
+        break;
 
-        case SecurityQuestion:
-            m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-            m_securityQuestionLabel->setText("");
-            m_securityQuestionInput->clear();
-            m_securityQuestionInput->setFocus();
-            m_securityQuestionTimer->start();
-            break;
+    case SecurityQuestionIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_securityQuestionLayer->initialize();
+        break;
 
-        case AccessGranted:
-            m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-            break;
+    case AccessGrantedIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        break;
     }
 }
 
@@ -1045,19 +825,29 @@ void SettingsView::restoreDefaults() {
 }
 
 void SettingsView::switchToTab(int tabIndex) {
-    // Aktualizacja stanu przycisków
+    // Ustaw aktywny przycisk zakładki
     for (int i = 0; i < m_tabButtons.size(); i++) {
         m_tabButtons[i]->setActive(i == tabIndex);
         m_tabButtons[i]->setChecked(i == tabIndex);
     }
 
-    if (tabIndex == 5) { // Zakładka CLASSIFIED (indeks 5)
-        m_currentSecurityLayer = Fingerprint;
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentSecurityLayer));
-        m_fingerprintProgress->setValue(0);
-        generateRandomFingerprint(m_fingerprintImage);
-    }
-
-    // Zmiana widocznej zakładki
+    // Przełącz zawartość zakładki
     m_tabContent->setCurrentIndex(tabIndex);
+
+    // Jeśli wybrano zakładkę CLASSIFIED (zakładamy, że ma indeks 5),
+    // zainicjuj pierwszy poziom zabezpieczeń
+    if (tabIndex == 5) { // indeks zakładki CLASSIFIED
+        // Używaj nowego enuma SecurityLayerIndex zamiast starego SecurityLayer
+        m_currentLayerIndex = FingerprintIndex;
+
+        // Zresetuj wszystkie warstwy zabezpieczeń
+        m_fingerprintLayer->reset();
+        m_handprintLayer->reset();
+        m_securityCodeLayer->reset();
+        m_securityQuestionLayer->reset();
+
+        // Ustaw pierwszą warstwę zabezpieczeń
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_fingerprintLayer->initialize();
+    }
 }
