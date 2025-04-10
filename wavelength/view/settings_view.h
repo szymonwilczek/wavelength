@@ -249,6 +249,7 @@ private:
         SecurityCodeIndex,
         SecurityQuestionIndex,
         RetinaScanIndex,
+        VoiceRecognitionIndex,
         AccessGrantedIndex
     };
 
