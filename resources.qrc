@@ -18,5 +18,6 @@
 
         <!-- Resourcy dla warstw zabezpieczeń -->
         <file>assets/security_resources/fingerprint.svg</file>
+        <file>assets/security_resources/handprint.svg</file>
     </qresource>
 </RCC>
