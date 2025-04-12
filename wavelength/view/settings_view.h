@@ -13,11 +13,17 @@
 #include <QParallelAnimationGroup>
 #include <QDateTime>
 #include <QPainter>
+#include <QProgressBar>
 
 #include "../ui/button/cyber_button.h"
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
+#include "settings/layers/code/security_code_layer.h"
+#include "settings/layers/fingerprint/fingerprint_layer.h"
+#include "settings/layers/handprint/handprint_layer.h"
+#include "settings/layers/question/security_question_layer.h"
+#include "settings/layers/retina_scan/retina_scan_layer.h"
 
 // Klasa dla przycisków zakładek z efektem podkreślenia
 class TabButton : public QPushButton {
@@ -140,11 +146,16 @@ signals:
 
 protected:
     void showEvent(QShowEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void saveSettings();
     void restoreDefaults();
     void switchToTab(int tabIndex);
+    void processFingerprint(bool completed = false);
+    void processHandprint(bool completed = false);
+    void checkSecurityCode();
+    void securityQuestionTimeout();
 
 private:
     void loadSettingsFromRegistry();
@@ -154,6 +165,34 @@ private:
     void setupAppearanceTab();
     void setupNetworkTab();
     void setupAdvancedTab();
+    void setupClassifiedTab();
+    void setupNextSecurityLayer();
+    void generateRandomFingerprint(QLabel* targetLabel);
+    void generateRandomHandprint(QLabel* targetLabel);
+    int getRandomSecurityCode(QString& hint);
+
+    // Widgets dla poszczególnych zabezpieczeń
+    QWidget* m_fingerprintWidget;
+    QLabel* m_fingerprintImage;
+    QProgressBar* m_fingerprintProgress;
+
+    QWidget* m_handprintWidget;
+    QLabel* m_handprintImage;
+    QProgressBar* m_handprintProgress;
+
+    QWidget* m_securityCodeWidget;
+    QLineEdit* m_securityCodeInput;
+    QLabel* m_securityCodeHint;
+    int m_currentSecurityCode;
+
+    QWidget* m_securityQuestionWidget;
+    QLabel* m_securityQuestionLabel;
+    QLineEdit* m_securityQuestionInput;
+    QTimer* m_securityQuestionTimer;
+
+    // Timery i animacje
+    QTimer* m_fingerprintTimer;
+    QTimer* m_handprintTimer;
 
     void createHeaderPanel();
 
@@ -194,6 +233,26 @@ private:
     CyberButton *m_backButton;
 
     QTimer *m_refreshTimer;
+
+    FingerprintLayer* m_fingerprintLayer;
+    HandprintLayer* m_handprintLayer;
+    SecurityCodeLayer* m_securityCodeLayer;
+    SecurityQuestionLayer* m_securityQuestionLayer;
+    RetinaScanLayer* m_retinaScanLayer;
+    QWidget* m_accessGrantedWidget;
+
+    QStackedWidget* m_securityLayersStack;
+
+    enum SecurityLayerIndex {
+        FingerprintIndex = 0,
+        HandprintIndex,
+        SecurityCodeIndex,
+        SecurityQuestionIndex,
+        RetinaScanIndex,
+        AccessGrantedIndex
+    };
+
+    SecurityLayerIndex m_currentLayerIndex;
 };
 
 #endif // SETTINGS_VIEW_H

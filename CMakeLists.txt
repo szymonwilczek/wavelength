@@ -7,8 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_PREFIX_PATH "C:/Qt/5.15.18/msvc2019_64")
-find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-base_x64-windows")
 
 add_executable(${PROJECT_NAME} main.cpp
         resources.qrc
@@ -150,29 +149,41 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings_view.h
         wavelength/ui/widgets/gl_transition_widget.cpp
         wavelength/ui/widgets/gl_transition_widget.h
+        wavelength/view/settings/layers/security_layer.cpp
+        wavelength/view/settings/layers/security_layer.h
+        wavelength/view/settings/layers/fingerprint/fingerprint_layer.cpp
+        wavelength/view/settings/layers/fingerprint/fingerprint_layer.h
+        wavelength/view/settings/layers/handprint/handprint_layer.cpp
+        wavelength/view/settings/layers/handprint/handprint_layer.h
+        wavelength/view/settings/layers/code/security_code_layer.cpp
+        wavelength/view/settings/layers/code/security_code_layer.h
+        wavelength/view/settings/layers/question/security_question_layer.cpp
+        wavelength/view/settings/layers/question/security_question_layer.h
+        wavelength/view/settings/layers/retina_scan/retina_scan_layer.cpp
+        wavelength/view/settings/layers/retina_scan/retina_scan_layer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
-find_package(Qt5 COMPONENTS WebSockets REQUIRED)
+find_package(Qt5 COMPONENTS WebSockets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-websockets_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED)
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-multimedia_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
 
-find_package(libpqxx REQUIRED HINTS "C:/src/vcpkg/packages/libpqxx_x64-windows")
+find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/packages/libpqxx_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)
 
-list(APPEND CMAKE_PREFIX_PATH "C:/src/vcpkg/packages/ffmpeg_x64-windows")
+list(APPEND CMAKE_PREFIX_PATH "C:/.vcpkg-clion/packages/ffmpeg_x64-windows")
 
 # Bezpośrednie linkowanie bibliotek FFmpeg
-find_library(AVCODEC_LIBRARY avcodec HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/lib")
-find_library(AVFORMAT_LIBRARY avformat HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/lib")
-find_library(AVUTIL_LIBRARY avutil HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/lib")
-find_library(SWSCALE_LIBRARY swscale HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/lib")
-find_library(SWRESAMPLE_LIBRARY swresample HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/lib")
+find_library(AVCODEC_LIBRARY avcodec HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
+find_library(AVFORMAT_LIBRARY avformat HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
+find_library(AVUTIL_LIBRARY avutil HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
+find_library(SWSCALE_LIBRARY swscale HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
+find_library(SWRESAMPLE_LIBRARY swresample HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
 
 # Dodaj ścieżkę do plików nagłówkowych
-find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h HINTS "C:/src/vcpkg/packages/ffmpeg_x64-windows/include")
+find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/include")
 
 # Wyświetl znalezione ścieżki
 message(STATUS "FFmpeg libraries:")
