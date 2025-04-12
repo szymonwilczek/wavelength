@@ -176,6 +176,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-multimedia_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
 
+find_package(Qt5 COMPONENTS Svg REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-svg_x64-windows")
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
+
 find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/packages/libpqxx_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)
 

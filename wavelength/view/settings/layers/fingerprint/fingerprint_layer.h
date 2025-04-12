@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QTimer>
+#include <QSvgRenderer>
+#include <QVector>
 
 class FingerprintLayer : public SecurityLayer {
     Q_OBJECT
@@ -21,12 +23,18 @@ public:
     void processFingerprint(bool completed);
 
 private:
-    void generateRandomFingerprint();
+    void loadRandomFingerprint();
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void updateFingerprintScan(int progressValue);
 
     QLabel* m_fingerprintImage;
     QProgressBar* m_fingerprintProgress;
     QTimer* m_fingerprintTimer;
+
+    QSvgRenderer* m_svgRenderer;
+    QImage m_baseFingerprint;
+    QStringList m_fingerprintFiles;
+    QString m_currentFingerprint;
 };
 
 #endif // FINGERPRINT_LAYER_H

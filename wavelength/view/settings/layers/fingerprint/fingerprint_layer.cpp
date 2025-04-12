@@ -4,11 +4,12 @@
 #include <QMouseEvent>
 #include <QRandomGenerator>
 #include <QGraphicsOpacityEffect>
-#include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QDir>
+#include <QCoreApplication>
 
-FingerprintLayer::FingerprintLayer(QWidget *parent) 
-    : SecurityLayer(parent), m_fingerprintTimer(nullptr)
+FingerprintLayer::FingerprintLayer(QWidget *parent)
+    : SecurityLayer(parent), m_fingerprintTimer(nullptr), m_svgRenderer(nullptr)
 {
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -19,7 +20,7 @@ FingerprintLayer::FingerprintLayer(QWidget *parent)
 
     m_fingerprintImage = new QLabel(this);
     m_fingerprintImage->setFixedSize(200, 200);
-    m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;");
+    m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
     m_fingerprintImage->setCursor(Qt::PointingHandCursor);
     m_fingerprintImage->setAlignment(Qt::AlignCenter);
     m_fingerprintImage->installEventFilter(this);
@@ -40,7 +41,7 @@ FingerprintLayer::FingerprintLayer(QWidget *parent)
         "  border-radius: 4px;"
         "}"
         "QProgressBar::chunk {"
-        "  background-color: #ff3333;"
+        "  background-color: #3399ff;" // Jasny niebieski
         "  border-radius: 3px;"
         "}"
     );
@@ -54,8 +55,17 @@ FingerprintLayer::FingerprintLayer(QWidget *parent)
     layout->addStretch();
 
     m_fingerprintTimer = new QTimer(this);
-    m_fingerprintTimer->setInterval(50);
+    m_fingerprintTimer->setInterval(30); // Szybki postęp
     connect(m_fingerprintTimer, &QTimer::timeout, this, &FingerprintLayer::updateProgress);
+
+    // Inicjalizacja listy dostępnych plików daktylogramów
+    m_fingerprintFiles = QStringList()
+        << ":/assets/security_resources/fingerprint.svg";
+
+    // Jeśli powyższe ścieżki nie działają, możesz użyć tej pojedynczej
+    // m_fingerprintFiles = QStringList() << ":/assets/security_resources/fingerprint.svg";
+
+    m_svgRenderer = new QSvgRenderer(this);
 }
 
 FingerprintLayer::~FingerprintLayer() {
@@ -64,11 +74,16 @@ FingerprintLayer::~FingerprintLayer() {
         delete m_fingerprintTimer;
         m_fingerprintTimer = nullptr;
     }
+
+    if (m_svgRenderer) {
+        delete m_svgRenderer;
+        m_svgRenderer = nullptr;
+    }
 }
 
 void FingerprintLayer::initialize() {
     reset();
-    generateRandomFingerprint();
+    loadRandomFingerprint();
 }
 
 void FingerprintLayer::reset() {
@@ -78,9 +93,76 @@ void FingerprintLayer::reset() {
     m_fingerprintProgress->setValue(0);
 }
 
+void FingerprintLayer::loadRandomFingerprint() {
+    // Wybierz losowy plik daktylogramu
+    if (m_fingerprintFiles.isEmpty()) {
+        // Jeśli nie ma plików, użyj placeholder
+        m_currentFingerprint = "";
+        m_baseFingerprint = QImage(200, 200, QImage::Format_ARGB32);
+        m_baseFingerprint.fill(Qt::transparent);
+
+        QPainter painter(&m_baseFingerprint);
+        painter.setPen(QPen(Qt::white));
+        painter.drawText(m_baseFingerprint.rect(), Qt::AlignCenter, "No fingerprint files");
+        painter.end();
+
+        m_fingerprintImage->setPixmap(QPixmap::fromImage(m_baseFingerprint));
+        return;
+    }
+
+    int index = QRandomGenerator::global()->bounded(m_fingerprintFiles.size());
+    m_currentFingerprint = m_fingerprintFiles[index];
+
+    if (!m_svgRenderer->load(m_currentFingerprint)) {
+        // Jeśli nie można załadować SVG, wyświetl komunikat o błędzie
+        m_baseFingerprint = QImage(200, 200, QImage::Format_ARGB32);
+        m_baseFingerprint.fill(Qt::transparent);
+
+        QPainter painter(&m_baseFingerprint);
+        painter.setPen(QPen(Qt::red));
+        painter.drawText(m_baseFingerprint.rect(), Qt::AlignCenter, "Error loading SVG");
+        painter.end();
+
+        m_fingerprintImage->setPixmap(QPixmap::fromImage(m_baseFingerprint));
+        return;
+    }
+
+    // Renderowanie SVG do obrazu bazowego w kolorze jasno-szarym
+    m_baseFingerprint = QImage(200, 200, QImage::Format_ARGB32);
+    m_baseFingerprint.fill(Qt::transparent);
+
+    QPainter painter(&m_baseFingerprint);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    // Renderowanie odcisku w kolorze jasno-szarym z przezroczystością
+    QColor lightGrayColor(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
+
+    // Ustawienie koloru dla SVG poprzez kompozycję
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.fillRect(m_baseFingerprint.rect(), Qt::transparent);
+
+    // Rysowanie SVG
+    m_svgRenderer->render(&painter, QRectF(20, 20, 160, 160));
+
+    // Nałożenie koloru jasno-szarego na wygenerowany obraz
+    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    painter.fillRect(m_baseFingerprint.rect(), lightGrayColor);
+
+    painter.end();
+
+    m_fingerprintImage->setPixmap(QPixmap::fromImage(m_baseFingerprint));
+}
+
 void FingerprintLayer::updateProgress() {
-    int value = m_fingerprintProgress->value() + 1;
+    int value = m_fingerprintProgress->value() + 1; // Szybki postęp (wzrost o 3)
+    if (value > 100) value = 100;
+
     m_fingerprintProgress->setValue(value);
+
+    // Aktualizacja wyglądu odcisku palca podczas skanowania
+    updateFingerprintScan(value);
+
     if (value >= 100) {
         m_fingerprintTimer->stop();
         processFingerprint(true);
@@ -104,11 +186,32 @@ void FingerprintLayer::processFingerprint(bool completed) {
             "}"
         );
 
+        // Pełne wypełnienie odcisku kolorem zielonym
+        if (m_svgRenderer->isValid()) {
+            QImage successImage(200, 200, QImage::Format_ARGB32);
+            successImage.fill(Qt::transparent);
+
+            QPainter painter(&successImage);
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+            // Renderowanie SVG
+            m_svgRenderer->render(&painter, QRectF(20, 20, 160, 160));
+
+            // Nałożenie koloru zielonego
+            painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+            painter.fillRect(successImage.rect(), QColor(50, 240, 50, 200));
+
+            painter.end();
+
+            m_fingerprintImage->setPixmap(QPixmap::fromImage(successImage));
+        }
+
         // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(500, this, [this]() {
             // Animacja zanikania
-            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(m_fingerprintImage);
-            m_fingerprintImage->setGraphicsEffect(effect);
+            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            this->setGraphicsEffect(effect);
 
             QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
             animation->setDuration(500);
@@ -125,48 +228,38 @@ void FingerprintLayer::processFingerprint(bool completed) {
     }
 }
 
-void FingerprintLayer::generateRandomFingerprint() {
-    QImage fingerprint(200, 200, QImage::Format_ARGB32);
-    fingerprint.fill(Qt::transparent);
-
-    QPainter painter(&fingerprint);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.setPen(QPen(QColor(150, 150, 150, 100), 1));
-    painter.setBrush(QBrush(QColor(80, 80, 80, 60)));
-
-    QPainterPath path;
-    path.addEllipse(QRectF(50, 30, 100, 140));
-
-    QRandomGenerator* rng = QRandomGenerator::global();
-    int numLines = rng->bounded(20, 40);
-
-    for (int i = 0; i < numLines; i++) {
-        QPainterPath linePath;
-        int startX = rng->bounded(60, 140);
-        int startY = rng->bounded(40, 160);
-        linePath.moveTo(startX, startY);
-
-        for (int j = 0; j < rng->bounded(3, 8); j++) {
-            int controlX1 = startX + rng->bounded(-20, 20);
-            int controlY1 = startY + rng->bounded(-15, 15);
-            int controlX2 = startX + rng->bounded(-20, 20);
-            int controlY2 = startY + rng->bounded(-15, 15);
-            int endX = startX + rng->bounded(-30, 30);
-            int endY = startY + rng->bounded(-20, 20);
-
-            linePath.cubicTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
-            startX = endX;
-            startY = endY;
-        }
-
-        path.addPath(linePath);
+void FingerprintLayer::updateFingerprintScan(int progressValue) {
+    if (!m_svgRenderer->isValid()) {
+        return; // Brak prawidłowego SVG do renderowania
     }
 
-    painter.drawPath(path);
+    // Tworzymy nowy obraz dla aktualnego stanu skanowania
+    QImage scanningFingerprint(200, 200, QImage::Format_ARGB32);
+    scanningFingerprint.fill(Qt::transparent);
+
+    QPainter painter(&scanningFingerprint);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    // Renderowanie SVG
+    m_svgRenderer->render(&painter, QRectF(20, 20, 160, 160));
+
+    // Obliczenie wysokości niebieskiej części (wypełnionej)
+    int totalHeight = 160;
+    int filledHeight = static_cast<int>((progressValue / 100.0) * totalHeight);
+
+    // Nałożenie koloru dla całego obrazu - najpierw szary
+    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    painter.fillRect(20, 20, 160, totalHeight, QColor(180, 180, 180, 120));
+
+    // Następnie nałożenie niebieskiego koloru na zeskanowaną część
+    if (filledHeight > 0) {
+        painter.fillRect(20, 20, 160, filledHeight, QColor(51, 153, 255, 200)); // Jasny niebieski
+    }
+
     painter.end();
 
-    m_fingerprintImage->setPixmap(QPixmap::fromImage(fingerprint));
+    m_fingerprintImage->setPixmap(QPixmap::fromImage(scanningFingerprint));
 }
 
 bool FingerprintLayer::eventFilter(QObject *obj, QEvent *event) {
