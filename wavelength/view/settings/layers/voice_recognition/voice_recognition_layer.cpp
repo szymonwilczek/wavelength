@@ -12,7 +12,11 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
       m_audioProcessTimer(nullptr),
       m_audioInput(nullptr),
       m_audioDevice(nullptr),
-      m_isRecording(false)
+      m_isRecording(false),
+      m_noiseThreshold(0.05f),  // Próg detekcji mowy - można dostosować eksperymentalnie
+      m_isSpeaking(false),
+      m_silenceCounter(0),
+      m_currentAudioLevel(0.0f)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -69,7 +73,7 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
     m_recognitionTimer->setSingleShot(true);
     m_recognitionTimer->setInterval(8000); // 8 sekund nagrywania
     connect(m_recognitionTimer, &QTimer::timeout, this, &VoiceRecognitionLayer::finishRecognition);
-    
+
     m_audioProcessTimer = new QTimer(this);
     m_audioProcessTimer->setInterval(50); // Odświeżanie co 50ms
     connect(m_audioProcessTimer, &QTimer::timeout, this, &VoiceRecognitionLayer::processAudioInput);
@@ -77,19 +81,19 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
 
 VoiceRecognitionLayer::~VoiceRecognitionLayer() {
     stopRecording();
-    
+
     if (m_progressTimer) {
         m_progressTimer->stop();
         delete m_progressTimer;
         m_progressTimer = nullptr;
     }
-    
+
     if (m_recognitionTimer) {
         m_recognitionTimer->stop();
         delete m_recognitionTimer;
         m_recognitionTimer = nullptr;
     }
-    
+
     if (m_audioProcessTimer) {
         m_audioProcessTimer->stop();
         delete m_audioProcessTimer;
@@ -104,29 +108,32 @@ void VoiceRecognitionLayer::initialize() {
 
 void VoiceRecognitionLayer::reset() {
     stopRecording();
-    
+
     if (m_progressTimer && m_progressTimer->isActive()) {
         m_progressTimer->stop();
     }
-    
+
     if (m_recognitionTimer && m_recognitionTimer->isActive()) {
         m_recognitionTimer->stop();
     }
-    
+
     if (m_audioProcessTimer && m_audioProcessTimer->isActive()) {
         m_audioProcessTimer->stop();
     }
-    
+
     m_recognitionProgress->setValue(0);
     m_audioBuffer.clear();
     m_visualizerData.fill(0);
     updateAudioVisualizer(QByteArray());
+    m_isSpeaking = false;
+    m_silenceCounter = 0;
+    m_currentAudioLevel = 0.0f;
 }
 
 void VoiceRecognitionLayer::startRecording() {
     if (m_isRecording)
         return;
-    
+
     // Ustawienie formatu audio
     QAudioFormat format;
     format.setSampleRate(8000);
@@ -135,17 +142,17 @@ void VoiceRecognitionLayer::startRecording() {
     format.setSampleType(QAudioFormat::SignedInt);
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setCodec("audio/pcm");
-    
+
     // Sprawdzenie dostępnych urządzeń
     QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
     if (!inputDevice.isFormatSupported(format)) {
         format = inputDevice.nearestFormat(format);
     }
-    
+
     // Inicjalizacja źródła audio
     m_audioInput = new QAudioInput(inputDevice, format, this);
     m_audioDevice = m_audioInput->start();
-    
+
     if (m_audioDevice) {
         m_isRecording = true;
         m_progressTimer->start();
@@ -157,33 +164,75 @@ void VoiceRecognitionLayer::startRecording() {
 void VoiceRecognitionLayer::stopRecording() {
     if (!m_isRecording)
         return;
-    
+
     if (m_audioInput) {
         m_audioInput->stop();
         delete m_audioInput;
         m_audioInput = nullptr;
         m_audioDevice = nullptr;
     }
-    
+
     if (m_audioProcessTimer && m_audioProcessTimer->isActive()) {
         m_audioProcessTimer->stop();
     }
-    
+
     m_isRecording = false;
+}
+
+bool VoiceRecognitionLayer::isSpeaking(float audioLevel) {
+    return audioLevel > m_noiseThreshold;
 }
 
 void VoiceRecognitionLayer::processAudioInput() {
     if (!m_audioDevice || !m_isRecording)
         return;
-    
+
     // Odczytaj dane audio
     QByteArray data;
     qint64 len = m_audioInput->bytesReady();
-    
+
     if (len > 0) {
         data.resize(len);
         m_audioDevice->read(data.data(), len);
-        m_audioBuffer.append(data);
+
+        // Obliczenie poziomu głośności dla progu detekcji mowy
+        float currentLevel = 0.0f;
+        if (data.size() > 0) {
+            const qint16 *samples = reinterpret_cast<const qint16*>(data.constData());
+            int numSamples = data.size() / sizeof(qint16);
+
+            // Obliczenie poziomu dźwięku jako średniej wartości bezwzględnej
+            float sum = 0;
+            for (int i = 0; i < numSamples; i++) {
+                sum += qAbs(samples[i]) / 32768.0f; // Normalizacja do 0-1
+            }
+
+            if (numSamples > 0) {
+                currentLevel = sum / numSamples;
+            }
+        }
+
+        // Aktualizacja stanu mówienia z zastosowaniem histerezy
+        // Histereza zapobiega szybkiemu przełączaniu między stanami przy granicznych wartościach
+        if (m_isSpeaking) {
+            // Jeśli obecnie wykrywamy mowę, stosujemy niższy próg dla wyłączenia
+            m_isSpeaking = currentLevel > (m_noiseThreshold * 0.8f);
+        } else {
+            // Jeśli obecnie nie wykrywamy mowy, stosujemy wyższy próg dla włączenia
+            m_isSpeaking = currentLevel > (m_noiseThreshold * 1.2f);
+        }
+
+        // Aktualizuj licznik ciszy
+        if (m_isSpeaking) {
+            m_silenceCounter = 0;
+
+            // Dodaj dane do bufora tylko gdy użytkownik mówi
+            m_audioBuffer.append(data);
+        } else {
+            m_silenceCounter += m_audioProcessTimer->interval();
+        }
+
+        m_currentAudioLevel = currentLevel;
         updateAudioVisualizer(data);
     }
 }
@@ -193,96 +242,118 @@ void VoiceRecognitionLayer::updateAudioVisualizer(const QByteArray &data) {
     if (data.size() > 0) {
         const qint16 *samples = reinterpret_cast<const qint16*>(data.constData());
         int numSamples = data.size() / sizeof(qint16);
-        
+
         // Przesunięcie wszystkich wartości w lewo
         for (int i = 0; i < m_visualizerData.size() - 1; i++) {
             m_visualizerData[i] = m_visualizerData[i + 1];
         }
-        
+
         // Dodanie nowej wartości na koniec (średnia z próbek)
         float sum = 0;
         for (int i = 0; i < numSamples; i++) {
             sum += qAbs(samples[i]) / 32768.0f; // Normalizacja do 0-1
         }
-        
+
         if (numSamples > 0) {
             m_visualizerData[m_visualizerData.size() - 1] = sum / numSamples;
         }
     }
-    
+
     // Rysowanie wizualizacji
     QImage visualizer(400, 200, QImage::Format_ARGB32);
     visualizer.fill(Qt::transparent);
-    
+
     QPainter painter(&visualizer);
     painter.setRenderHint(QPainter::Antialiasing);
-    
+
     // Rysowanie tła
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(10, 25, 40, 220));
     painter.drawRect(0, 0, visualizer.width(), visualizer.height());
-    
+
+    // Rysowanie linii progu detekcji mowy
+    int thresholdY = visualizer.height() / 2 - m_noiseThreshold * 80.0f;
+    int thresholdY2 = visualizer.height() / 2 + m_noiseThreshold * 80.0f;
+    painter.setPen(QPen(QColor(200, 200, 200, 100), 1, Qt::DashLine));
+    painter.drawLine(0, thresholdY, visualizer.width(), thresholdY);
+    painter.drawLine(0, thresholdY2, visualizer.width(), thresholdY2);
+
     // Rysowanie wizualizacji dźwięku
     QPainterPath path;
     int centerY = visualizer.height() / 2;
     int barWidth = visualizer.width() / m_visualizerData.size();
-    
-    painter.setPen(QPen(QColor(255, 51, 51, 200), 2));
-    painter.setBrush(QBrush(QColor(255, 51, 51, 50)));
-    
+
+    // Wybór koloru w zależności od tego, czy wykryto mowę
+    QColor waveColor = m_isSpeaking ? QColor(51, 153, 255, 200) : QColor(180, 180, 180, 150);
+    QColor fillColor = m_isSpeaking ? QColor(51, 153, 255, 50) : QColor(100, 100, 100, 30);
+
+    painter.setPen(QPen(waveColor, 2));
+    painter.setBrush(QBrush(fillColor));
+
     // Górna część fali
     path.moveTo(0, centerY);
     for (int i = 0; i < m_visualizerData.size(); i++) {
         float amplitude = m_visualizerData[i] * 80.0f; // Skalowanie amplitudy
         path.lineTo(i * barWidth, centerY - amplitude);
     }
-    
+
     // Dolna część fali (lustrzane odbicie)
     for (int i = m_visualizerData.size() - 1; i >= 0; i--) {
         float amplitude = m_visualizerData[i] * 80.0f;
         path.lineTo(i * barWidth, centerY + amplitude);
     }
-    
+
     path.closeSubpath();
     painter.drawPath(path);
-    
+
     // Dodanie siatki
     painter.setPen(QPen(QColor(100, 100, 100, 50), 1, Qt::DotLine));
     for (int i = 0; i < 4; i++) {
         int y = visualizer.height() * (i + 1) / 5;
         painter.drawLine(0, y, visualizer.width(), y);
     }
-    
+
     for (int i = 0; i < 5; i++) {
         int x = visualizer.width() * i / 5;
         painter.drawLine(x, 0, x, visualizer.height());
     }
-    
+
+    // Dodanie wskaźnika stanu mowy
+    QString speakingStatus = m_isSpeaking ? "Mowa wykryta" : "Cisza";
+    painter.setPen(QPen(m_isSpeaking ? Qt::green : Qt::red));
+    painter.drawText(10, 20, speakingStatus);
+
     painter.end();
-    
+
     m_audioVisualizerLabel->setPixmap(QPixmap::fromImage(visualizer));
 }
 
 void VoiceRecognitionLayer::updateProgress() {
-    int value = m_recognitionProgress->value() + 1;
-    if (value > 100)
-        value = 100;
-    
-    m_recognitionProgress->setValue(value);
-    
-    // Jeśli zebraliśmy wystarczająco dużo danych, możemy zakończyć wcześniej
-    if (m_audioBuffer.size() > 16000 && value >= 50) { // 2 sekundy nagrania przy 8kHz
-        finishRecognition();
+    int currentValue = m_recognitionProgress->value();
+    int newValue = currentValue;
+
+    // Aktualizacja postępu w zależności od stanu mowy
+    if (m_isSpeaking) {
+        // Zwiększ postęp - ale wolniej
+        int newValue = currentValue + 1;
+        if (newValue > 100) newValue = 100;
+
+        m_recognitionProgress->setValue(newValue);
+
+        // Zakończ weryfikację TYLKO gdy postęp osiągnie 100%
+        if (newValue >= 100) {
+            finishRecognition();
+        }
     }
 }
 
 void VoiceRecognitionLayer::finishRecognition() {
     stopRecording();
     m_progressTimer->stop();
-    
+
     // Zmiana kolorów na zielony po pomyślnym skanowaniu
     m_audioVisualizerLabel->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
-    
+
     m_recognitionProgress->setStyleSheet(
         "QProgressBar {"
         "  background-color: rgba(30, 30, 30, 150);"
@@ -295,6 +366,51 @@ void VoiceRecognitionLayer::finishRecognition() {
         "}"
     );
     m_recognitionProgress->setValue(100);
+
+    // Renderowanie finalnej wizualizacji w zielonym kolorze
+    QImage finalVisualizer(400, 200, QImage::Format_ARGB32);
+    finalVisualizer.fill(Qt::transparent);
+
+    QPainter painter(&finalVisualizer);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Rysowanie tła
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(10, 25, 40, 220));
+    painter.drawRect(0, 0, finalVisualizer.width(), finalVisualizer.height());
+
+    // Rysowanie wizualizacji dźwięku w kolorze zielonym
+    QPainterPath path;
+    int centerY = finalVisualizer.height() / 2;
+    int barWidth = finalVisualizer.width() / m_visualizerData.size();
+
+    painter.setPen(QPen(QColor(50, 200, 50, 200), 2));
+    painter.setBrush(QBrush(QColor(50, 200, 50, 50)));
+
+    // Górna część fali
+    path.moveTo(0, centerY);
+    for (int i = 0; i < m_visualizerData.size(); i++) {
+        float amplitude = m_visualizerData[i] * 80.0f;
+        path.lineTo(i * barWidth, centerY - amplitude);
+    }
+
+    // Dolna część fali
+    for (int i = m_visualizerData.size() - 1; i >= 0; i--) {
+        float amplitude = m_visualizerData[i] * 80.0f;
+        path.lineTo(i * barWidth, centerY + amplitude);
+    }
+
+    path.closeSubpath();
+    painter.drawPath(path);
+
+    // Tekst sukcesu
+    painter.setPen(QPen(Qt::green));
+    painter.setFont(QFont("Consolas", 12));
+    painter.drawText(finalVisualizer.rect(), Qt::AlignCenter, "Weryfikacja głosu zakończona");
+
+    painter.end();
+
+    m_audioVisualizerLabel->setPixmap(QPixmap::fromImage(finalVisualizer));
     
     // Animacja zanikania po krótkim pokazaniu sukcesu
     QTimer::singleShot(800, this, [this]() {
