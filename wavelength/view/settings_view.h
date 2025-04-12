@@ -24,6 +24,7 @@
 #include "settings/layers/handprint/handprint_layer.h"
 #include "settings/layers/question/security_question_layer.h"
 #include "settings/layers/retina_scan/retina_scan_layer.h"
+#include "settings/layers/voice_recognition/voice_recognition_layer.h"
 
 // Klasa dla przycisków zakładek z efektem podkreślenia
 class TabButton : public QPushButton {
@@ -239,6 +240,7 @@ private:
     SecurityCodeLayer* m_securityCodeLayer;
     SecurityQuestionLayer* m_securityQuestionLayer;
     RetinaScanLayer* m_retinaScanLayer;
+    VoiceRecognitionLayer* m_voiceRecognitionLayer;
     QWidget* m_accessGrantedWidget;
 
     QStackedWidget* m_securityLayersStack;
@@ -249,6 +251,7 @@ private:
         SecurityCodeIndex,
         SecurityQuestionIndex,
         RetinaScanIndex,
+        VoiceRecognitionIndex,
         AccessGrantedIndex
     };
 

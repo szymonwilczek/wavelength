@@ -162,7 +162,8 @@ void SettingsView::setupClassifiedTab() {
     m_handprintLayer = new HandprintLayer(m_securityLayersStack);
     m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
     m_securityQuestionLayer = new SecurityQuestionLayer(m_securityLayersStack);
-    m_retinaScanLayer = new RetinaScanLayer(m_securityLayersStack); // Nowa warstwa
+    m_retinaScanLayer = new RetinaScanLayer(m_securityLayersStack);
+    m_voiceRecognitionLayer = new VoiceRecognitionLayer(m_securityLayersStack);
 
     // Ekran dostępu przyznanego
     m_accessGrantedWidget = new QWidget(m_securityLayersStack);
@@ -187,7 +188,8 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack->addWidget(m_handprintLayer);
     m_securityLayersStack->addWidget(m_securityCodeLayer);
     m_securityLayersStack->addWidget(m_securityQuestionLayer);
-    m_securityLayersStack->addWidget(m_retinaScanLayer); // Nowa warstwa
+    m_securityLayersStack->addWidget(m_retinaScanLayer);
+    m_securityLayersStack->addWidget(m_voiceRecognitionLayer);
     m_securityLayersStack->addWidget(m_accessGrantedWidget);
 
     // Połączenia warstw
@@ -216,6 +218,12 @@ void SettingsView::setupClassifiedTab() {
     });
 
     connect(m_retinaScanLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = VoiceRecognitionIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_voiceRecognitionLayer->initialize();
+    });
+
+    connect(m_voiceRecognitionLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = AccessGrantedIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
     });
@@ -398,6 +406,11 @@ void SettingsView::setupNextSecurityLayer() {
     case RetinaScanIndex:
         m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
         m_retinaScanLayer->initialize();
+        break;
+
+    case VoiceRecognitionIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_voiceRecognitionLayer->initialize();
         break;
 
     case AccessGrantedIndex:
