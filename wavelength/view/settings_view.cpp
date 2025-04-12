@@ -165,6 +165,7 @@ void SettingsView::setupClassifiedTab() {
     m_retinaScanLayer = new RetinaScanLayer(m_securityLayersStack);
     m_voiceRecognitionLayer = new VoiceRecognitionLayer(m_securityLayersStack);
     m_typingTestLayer = new TypingTestLayer(m_securityLayersStack);
+    m_snakeGameLayer = new SnakeGameLayer(m_securityLayersStack);
 
     // Ekran dostępu przyznanego
     m_accessGrantedWidget = new QWidget(m_securityLayersStack);
@@ -192,6 +193,7 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack->addWidget(m_retinaScanLayer);
     m_securityLayersStack->addWidget(m_voiceRecognitionLayer);
     m_securityLayersStack->addWidget(m_typingTestLayer);
+    m_securityLayersStack->addWidget(m_snakeGameLayer);
     m_securityLayersStack->addWidget(m_accessGrantedWidget);
 
     // Połączenia warstw
@@ -232,6 +234,12 @@ void SettingsView::setupClassifiedTab() {
     });
 
     connect(m_typingTestLayer, &SecurityLayer::layerCompleted, this, [this]() {
+        m_currentLayerIndex = SnakeGameIndex;
+        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        m_snakeGameLayer->initialize();
+    });
+
+    connect(m_snakeGameLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = AccessGrantedIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
     });
@@ -424,6 +432,11 @@ void SettingsView::setupNextSecurityLayer() {
     case TypingTestIndex:
         m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
         m_typingTestLayer->initialize();
+        break;
+
+    case SnakeGameIndex:
+        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        m_snakeGameLayer->initialize();
         break;
 
     case AccessGrantedIndex:

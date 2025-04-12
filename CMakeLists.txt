@@ -165,6 +165,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/layers/voice_recognition/voice_recognition_layer.h
         wavelength/view/settings/layers/typing_test/typing_test_layer.cpp
         wavelength/view/settings/layers/typing_test/typing_test_layer.h
+        wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
+        wavelength/view/settings/layers/snake_game/snake_game_layer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
