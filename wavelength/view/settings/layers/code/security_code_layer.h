@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QPair>
 #include <QVector>
+#include <QList>
 
 class SecurityCodeLayer : public SecurityLayer {
     Q_OBJECT
@@ -17,13 +18,23 @@ public:
     void initialize() override;
     void reset() override;
 
+
     private slots:
         void checkSecurityCode();
+        void onDigitEntered();
+
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     int getRandomSecurityCode(QString& hint);
+    void setupCodeInputs();
+    void resetInputs();
+    QString getEnteredCode() const;
+    void showErrorEffect();
 
-    QLineEdit* m_securityCodeInput;
+    QList<QLineEdit*> m_codeInputs;
     QLabel* m_securityCodeHint;
     int m_currentSecurityCode;
 
