@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QTimer>
+#include <QImage>
 
 class RetinaScanLayer : public SecurityLayer {
     Q_OBJECT
@@ -18,18 +19,19 @@ public:
 
     private slots:
         void updateScan();
-    void finishScan();
+        void finishScan();
 
 private:
     void generateEyeImage();
     void startScanAnimation();
 
     QLabel* m_eyeImage;
-    QLabel* m_scannerOverlay;
     QProgressBar* m_scanProgress;
     QTimer* m_scanTimer;
     QTimer* m_completeTimer;
     int m_scanLine;
+
+    QImage m_baseEyeImage;
 };
 
 #endif // RETINA_SCAN_LAYER_H

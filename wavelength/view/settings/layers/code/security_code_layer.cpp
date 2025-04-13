@@ -1,12 +1,15 @@
 #include "security_code_layer.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QRandomGenerator>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QKeyEvent>
+#include <QRegularExpressionValidator>
 
-SecurityCodeLayer::SecurityCodeLayer(QWidget *parent) 
-    : SecurityLayer(parent), m_currentSecurityCode(0)
+SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
+    : SecurityLayer(parent), m_isCurrentCodeNumeric(true)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -15,27 +18,51 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    QLabel *instructions = new QLabel("Enter the 4-digit security code", this);
+    QLabel *instructions = new QLabel("Enter the security code", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
-    m_securityCodeInput = new QLineEdit(this);
-    m_securityCodeInput->setFixedWidth(150);
-    m_securityCodeInput->setStyleSheet(
-        "QLineEdit {"
-        "  color: #ff3333;"
-        "  background-color: rgba(10, 25, 40, 220);"
-        "  border: 1px solid #ff3333;"
-        "  border-radius: 5px;"
-        "  padding: 8px;"
-        "  font-family: Consolas;"
-        "  font-size: 14pt;"
-        "  text-align: center;"
-        "}"
-    );
-    m_securityCodeInput->setAlignment(Qt::AlignCenter);
-    m_securityCodeInput->setMaxLength(4);
-    m_securityCodeInput->setInputMask("9999");
+    // Kontener dla inputów
+    QWidget* codeInputContainer = new QWidget(this);
+    QHBoxLayout* codeLayout = new QHBoxLayout(codeInputContainer);
+    codeLayout->setSpacing(12); // Odstęp między polami
+    codeLayout->setContentsMargins(0, 0, 0, 0);
+    codeLayout->setAlignment(Qt::AlignCenter);
+
+    // Tworzenie 4 pól na znaki
+    for (int i = 0; i < 4; i++) {
+        QLineEdit* digitInput = new QLineEdit(this);
+        digitInput->setFixedSize(60, 70);
+        digitInput->setAlignment(Qt::AlignCenter);
+        digitInput->setMaxLength(1);
+        digitInput->setProperty("index", i); // Zapamiętujemy indeks pola
+
+        digitInput->setStyleSheet(
+            "QLineEdit {"
+            "  color: #ff3333;"
+            "  background-color: rgba(10, 25, 40, 220);"
+            "  border: 1px solid #ff3333;"
+            "  border-radius: 5px;"
+            "  padding: 5px;"
+            "  font-family: Consolas;"
+            "  font-size: 30pt;"
+            "  font-weight: bold;"
+            "}"
+            "QLineEdit:focus {"
+            "  border: 2px solid #ff3333;"
+            "  background-color: rgba(25, 40, 65, 220);"
+            "}"
+        );
+
+        // Obsługa zmian w polu
+        connect(digitInput, &QLineEdit::textChanged, this, &SecurityCodeLayer::onDigitEntered);
+
+        // Instalujemy filtr zdarzeń do obsługi klawiszy nawigacji
+        digitInput->installEventFilter(this);
+
+        m_codeInputs.append(digitInput);
+        codeLayout->addWidget(digitInput);
+    }
 
     m_securityCodeHint = new QLabel("", this);
     m_securityCodeHint->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt; font-style: italic;");
@@ -47,37 +74,56 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     layout->addSpacing(20);
     layout->addWidget(instructions);
     layout->addSpacing(10);
-    layout->addWidget(m_securityCodeInput, 0, Qt::AlignCenter);
+    layout->addWidget(codeInputContainer, 0, Qt::AlignCenter);
     layout->addSpacing(20);
     layout->addWidget(m_securityCodeHint);
     layout->addStretch();
 
     // Inicjalizacja bazy kodów bezpieczeństwa
     m_securityCodes = {
-        {1969, "First human moon landing (Apollo 11)"},
-        {1944, "Warsaw Uprising"},
-        {1984, "Orwell's dystopian novel"},
-        {1947, "Roswell incident"},
-        {2001, "Space Odyssey movie by Kubrick"},
-        {1903, "Wright brothers' first flight"},
-        {1989, "Fall of the Berlin Wall"},
-        {1986, "Chernobyl disaster"},
-        {1955, "Einstein's death year"},
-        {1962, "Cuban Missile Crisis"},
-        {1215, "Magna Carta signing"},
-        {1939, "Start of World War II"},
-        {1969, "Woodstock music festival"},
-        {1776, "US Declaration of Independence"},
-        {1789, "French Revolution began"},
-        {1917, "Russian Revolution"},
-        {1957, "Sputnik launch (first satellite)"},
-        {1912, "Titanic sank"},
-        {1859, "Darwin's Origin of Species published"},
-        {1994, "Genocide in Rwanda"},
-        {1963, "JFK assassination"}
-    };
+        // Cyberpunk & technologiczne kody
+        SecurityCode("2077", "Night City's most notorious year (Cyberpunk game)"),
+        SecurityCode("1337", "Elite hacker language code"),
+        SecurityCode("C0DE", "Base representation of what you're entering", false),
+        SecurityCode("HACK", "What hackers do best", false),
+        SecurityCode("N3T0", "Abbreviation for the digital realm (leet)", false),
+        SecurityCode("GHOS", "In the machine (famous cyberpunk concept)", false),
+        SecurityCode("D3CK", "Cyberdeck connection interface (leet)", false),
+        SecurityCode("5YNT", "Artificial humanoid in cyberpunk lore (abbreviated)", false),
 
-    connect(m_securityCodeInput, &QLineEdit::returnPressed, this, &SecurityCodeLayer::checkSecurityCode);
+        // Matematyczne i naukowe kody
+        SecurityCode("3141", "First digits of π (pi)"),
+        SecurityCode("1618", "Golden ratio φ (phi) first digits"),
+        SecurityCode("2718", "Euler's number (e) first digits"),
+        SecurityCode("1729", "Hardy-Ramanujan number (taxicab)"),
+        SecurityCode("6174", "Kaprekar's constant"),
+        SecurityCode("2048", "Binary: 2^11, popular game"),
+
+        // Daty związane z technologią, cyberpunkiem i sci-fi
+        SecurityCode("1984", "Orwell's dystopian surveillance society"),
+        SecurityCode("2001", "Kubrick's space odyssey with HAL"),
+        SecurityCode("1982", "Blade Runner release year"),
+        SecurityCode("1999", "The Matrix release year"),
+        SecurityCode("1969", "ARPANET created (Internet precursor)"),
+        SecurityCode("1989", "World Wide Web invented"),
+
+        // Kulturowe i kryptograficzne
+        SecurityCode("42", "Ultimate answer in sci-fi (Hitchhiker's Guide)", true),
+        SecurityCode("101", "Binary introduction / Beginner's guide"),
+        SecurityCode("B00K", "Digital knowledge container", false),
+        SecurityCode("EV1L", "C0RP - Cyberpunk antagonist trope", false),
+        SecurityCode("L0CK", "Security metaphor", false),
+        SecurityCode("2FA", "Security measure for accounts (abbreviated)", false),
+
+        // Easter eggi
+        SecurityCode("R1CK", "Never gonna give you up... (meme)", false),
+        SecurityCode("1138", "George Lucas' first film THX reference"),
+        SecurityCode("0451", "Immersive sim reference (System Shock, Deus Ex)"),
+        SecurityCode("1701", "Famous sci-fi starship registry"),
+        SecurityCode("8080", "Classic Intel processor"),
+        SecurityCode("6502", "CPU used in Apple II and Commodore 64"),
+        SecurityCode("FF7", "Iconic RPG with cyberpunk elements (abbreviated)", false)
+    };
 }
 
 SecurityCodeLayer::~SecurityCodeLayer() {
@@ -85,32 +131,161 @@ SecurityCodeLayer::~SecurityCodeLayer() {
 
 void SecurityCodeLayer::initialize() {
     reset();
+    bool isNumeric;
     QString hint;
-    m_currentSecurityCode = getRandomSecurityCode(hint);
+    m_currentSecurityCode = getRandomSecurityCode(hint, isNumeric);
+    m_isCurrentCodeNumeric = isNumeric;
+
+    // Ustaw odpowiednie walidatory
+    setInputValidators(isNumeric);
+
     m_securityCodeHint->setText("HINT: " + hint);
-    m_securityCodeInput->setFocus();
+
+    // Ustaw fokus na pierwszym polu
+    if (!m_codeInputs.isEmpty()) {
+        m_codeInputs.first()->setFocus();
+    }
 }
 
 void SecurityCodeLayer::reset() {
-    m_securityCodeInput->clear();
+    resetInputs();
     m_securityCodeHint->setText("");
 }
 
-void SecurityCodeLayer::checkSecurityCode() {
-    if (m_securityCodeInput->text().toInt() == m_currentSecurityCode) {
-        // Zmiana kolorów na zielony po pomyślnym przejściu
-        m_securityCodeInput->setStyleSheet(
+void SecurityCodeLayer::resetInputs() {
+    // Resetujemy wszystkie pola
+    for (QLineEdit* input : m_codeInputs) {
+        input->clear();
+        input->setStyleSheet(
             "QLineEdit {"
-            "  color: #33ff33;"
+            "  color: #ff3333;"
             "  background-color: rgba(10, 25, 40, 220);"
-            "  border: 2px solid #33ff33;"
+            "  border: 1px solid #ff3333;"
             "  border-radius: 5px;"
-            "  padding: 8px;"
+            "  padding: 5px;"
             "  font-family: Consolas;"
-            "  font-size: 14pt;"
-            "  text-align: center;"
+            "  font-size: 30pt;"
+            "  font-weight: bold;"
+            "}"
+            "QLineEdit:focus {"
+            "  border: 2px solid #ff3333;"
+            "  background-color: rgba(25, 40, 65, 220);"
             "}"
         );
+    }
+
+    // Ustawiamy fokus na pierwszym polu
+    if (!m_codeInputs.isEmpty()) {
+        m_codeInputs.first()->setFocus();
+    }
+}
+
+void SecurityCodeLayer::setInputValidators(bool numericOnly) {
+    for (QLineEdit* input : m_codeInputs) {
+        if (numericOnly) {
+            // Tylko cyfry
+            QRegularExpressionValidator* validator = new QRegularExpressionValidator(QRegularExpression("[0-9]"), input);
+            input->setValidator(validator);
+        } else {
+            // Cyfry i wielkie litery (styl cyberpunk)
+            QRegularExpressionValidator* validator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Z]"), input);
+            input->setValidator(validator);
+        }
+    }
+}
+
+void SecurityCodeLayer::onDigitEntered() {
+    // Sprawdzamy, które pole zostało zmienione
+    QLineEdit* currentInput = qobject_cast<QLineEdit*>(sender());
+    if (!currentInput)
+        return;
+
+    int currentIndex = currentInput->property("index").toInt();
+
+    // Automatyczna konwersja na wielkie litery dla kodów alfanumerycznych
+    if (!m_isCurrentCodeNumeric && !currentInput->text().isEmpty()) {
+        QString text = currentInput->text().toUpper();
+        if (text != currentInput->text()) {
+            currentInput->setText(text);
+            return; // Zapobiega nieskończonej pętli
+        }
+    }
+
+    // Jeśli pole jest wypełnione, przechodzimy do następnego
+    if (currentInput->text().length() == 1 && currentIndex < m_codeInputs.size() - 1) {
+        m_codeInputs[currentIndex + 1]->setFocus();
+    }
+
+    // Sprawdzamy, czy wszystkie pola są wypełnione
+    bool allFilled = true;
+    for (QLineEdit* input : m_codeInputs) {
+        if (input->text().isEmpty()) {
+            allFilled = false;
+            break;
+        }
+    }
+
+    // Jeśli wszystkie pola są wypełnione, sprawdzamy kod
+    if (allFilled) {
+        checkSecurityCode();
+    }
+}
+
+bool SecurityCodeLayer::eventFilter(QObject *obj, QEvent *event) {
+    // Obsługa klawiszy w inputach
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        QLineEdit* input = qobject_cast<QLineEdit*>(obj);
+
+        if (input && m_codeInputs.contains(input)) {
+            int key = keyEvent->key();
+            int currentIndex = input->property("index").toInt();
+
+            // Obsługa klawisza Backspace
+            if (key == Qt::Key_Backspace && input->text().isEmpty() && currentIndex > 0) {
+                // Jeśli pole jest puste i naciśnięto Backspace, przechodzimy do poprzedniego pola
+                m_codeInputs[currentIndex - 1]->setFocus();
+                m_codeInputs[currentIndex - 1]->setText("");
+                return true;
+            }
+
+            // Obsługa strzałek
+            if (key == Qt::Key_Left && currentIndex > 0) {
+                m_codeInputs[currentIndex - 1]->setFocus();
+                return true;
+            }
+
+            if (key == Qt::Key_Right && currentIndex < m_codeInputs.size() - 1) {
+                m_codeInputs[currentIndex + 1]->setFocus();
+                return true;
+            }
+        }
+    }
+
+    return SecurityLayer::eventFilter(obj, event);
+}
+
+void SecurityCodeLayer::checkSecurityCode() {
+    // Pobieramy wprowadzony kod
+    QString enteredCode = getEnteredCode();
+
+    // Sprawdzamy, czy wprowadzony kod zgadza się z wylosowanym
+    if (enteredCode == m_currentSecurityCode) {
+        // Zmiana kolorów na zielony po pomyślnym przejściu
+        for (QLineEdit* input : m_codeInputs) {
+            input->setStyleSheet(
+                "QLineEdit {"
+                "  color: #33ff33;"
+                "  background-color: rgba(10, 25, 40, 220);"
+                "  border: 2px solid #33ff33;"
+                "  border-radius: 5px;"
+                "  padding: 5px;"
+                "  font-family: Consolas;"
+                "  font-size: 30pt;"
+                "  font-weight: bold;"
+                "}"
+            );
+        }
 
         // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(800, this, [this]() {
@@ -131,31 +306,70 @@ void SecurityCodeLayer::checkSecurityCode() {
             animation->start(QPropertyAnimation::DeleteWhenStopped);
         });
     } else {
-        // Efekt błędu (pozostaje bez zmian)
-        QString currentStyle = m_securityCodeInput->styleSheet();
-        m_securityCodeInput->setStyleSheet(
-            "QLineEdit {"
-            "  color: #ffffff;"
-            "  background-color: rgba(255, 0, 0, 100);"
-            "  border: 1px solid #ff0000;"
-            "  border-radius: 5px;"
-            "  padding: 8px;"
-            "  font-family: Consolas;"
-            "  font-size: 14pt;"
-            "  text-align: center;"
-            "}"
-        );
-
-        QTimer::singleShot(300, this, [this, currentStyle]() {
-            m_securityCodeInput->setStyleSheet(currentStyle);
-            m_securityCodeInput->clear();
-            m_securityCodeInput->setFocus();
-        });
+        // Efekt błędu
+        showErrorEffect();
     }
 }
 
-int SecurityCodeLayer::getRandomSecurityCode(QString& hint) {
+QString SecurityCodeLayer::getEnteredCode() const {
+    QString code;
+    for (QLineEdit* input : m_codeInputs) {
+        code += input->text();
+    }
+    return code;
+}
+
+void SecurityCodeLayer::showErrorEffect() {
+    // Zapisujemy oryginalny styl
+    QString originalStyle =
+        "QLineEdit {"
+        "  color: #ff3333;"
+        "  background-color: rgba(10, 25, 40, 220);"
+        "  border: 1px solid #ff3333;"
+        "  border-radius: 5px;"
+        "  padding: 5px;"
+        "  font-family: Consolas;"
+        "  font-size: 30pt;"
+        "  font-weight: bold;"
+        "}"
+        "QLineEdit:focus {"
+        "  border: 2px solid #ff3333;"
+        "  background-color: rgba(25, 40, 65, 220);"
+        "}";
+
+    // Styl błędu
+    QString errorStyle =
+        "QLineEdit {"
+        "  color: #ffffff;"
+        "  background-color: rgba(255, 0, 0, 100);"
+        "  border: 1px solid #ff0000;"
+        "  border-radius: 5px;"
+        "  padding: 5px;"
+        "  font-family: Consolas;"
+        "  font-size: 30pt;"
+        "  font-weight: bold;"
+        "}";
+
+    // Ustawiamy styl błędu dla wszystkich pól
+    for (QLineEdit* input : m_codeInputs) {
+        input->setStyleSheet(errorStyle);
+    }
+
+    // Przywracamy oryginalny styl po krótkim czasie i resetujemy inputy
+    QTimer::singleShot(300, this, [this, originalStyle]() {
+        for (QLineEdit* input : m_codeInputs) {
+            input->setStyleSheet(originalStyle);
+        }
+        resetInputs();
+
+        // Po resecie przywracamy właściwe walidatory
+        setInputValidators(m_isCurrentCodeNumeric);
+    });
+}
+
+QString SecurityCodeLayer::getRandomSecurityCode(QString& hint, bool& isNumeric) {
     int index = QRandomGenerator::global()->bounded(m_securityCodes.size());
-    hint = m_securityCodes[index].second;
-    return m_securityCodes[index].first;
+    hint = m_securityCodes[index].hint;
+    isNumeric = m_securityCodes[index].isNumeric;
+    return m_securityCodes[index].code;
 }

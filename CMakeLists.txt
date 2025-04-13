@@ -161,6 +161,12 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/layers/question/security_question_layer.h
         wavelength/view/settings/layers/retina_scan/retina_scan_layer.cpp
         wavelength/view/settings/layers/retina_scan/retina_scan_layer.h
+        wavelength/view/settings/layers/voice_recognition/voice_recognition_layer.cpp
+        wavelength/view/settings/layers/voice_recognition/voice_recognition_layer.h
+        wavelength/view/settings/layers/typing_test/typing_test_layer.cpp
+        wavelength/view/settings/layers/typing_test/typing_test_layer.h
+        wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
+        wavelength/view/settings/layers/snake_game/snake_game_layer.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
@@ -169,6 +175,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 
 find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-multimedia_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
+
+find_package(Qt5 COMPONENTS Svg REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-svg_x64-windows")
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
 
 find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/packages/libpqxx_x64-windows")
 target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)

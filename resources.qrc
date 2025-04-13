@@ -15,5 +15,9 @@
         <file>assets/fonts/Poppins/Poppins-Regular.ttf</file>
         <file>assets/fonts/Poppins/Poppins-Bold.ttf</file>
         <file>assets/fonts/Poppins/Poppins-Medium.ttf</file>
+
+        <!-- Resourcy dla warstw zabezpieczeń -->
+        <file>assets/security_resources/fingerprint.svg</file>
+        <file>assets/security_resources/handprint.svg</file>
     </qresource>
 </RCC>
