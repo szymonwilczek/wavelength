@@ -102,32 +102,61 @@ VoiceRecognitionLayer::~VoiceRecognitionLayer() {
 }
 
 void VoiceRecognitionLayer::initialize() {
-    reset();
-    QTimer::singleShot(1000, this, &VoiceRecognitionLayer::startRecording);
+    reset(); // Reset najpierw
+
+    // Upewnij się, że widget jest widoczny przed startem
+    if (graphicsEffect()) {
+         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
+
+    // Rozpocznij nagrywanie po krótkim opóźnieniu
+    QTimer::singleShot(500, this, &VoiceRecognitionLayer::startRecording); // Krótsze opóźnienie
 }
 
 void VoiceRecognitionLayer::reset() {
-    stopRecording();
+    stopRecording(); // Zatrzymaj nagrywanie i przetwarzanie audio
 
+    // Zatrzymaj pozostałe timery
     if (m_progressTimer && m_progressTimer->isActive()) {
         m_progressTimer->stop();
     }
-
     if (m_recognitionTimer && m_recognitionTimer->isActive()) {
         m_recognitionTimer->stop();
     }
 
-    if (m_audioProcessTimer && m_audioProcessTimer->isActive()) {
-        m_audioProcessTimer->stop();
-    }
-
+    // Resetuj stan
     m_recognitionProgress->setValue(0);
     m_audioBuffer.clear();
     m_visualizerData.fill(0);
-    updateAudioVisualizer(QByteArray());
     m_isSpeaking = false;
     m_silenceCounter = 0;
     m_currentAudioLevel = 0.0f;
+
+    // Przywróć domyślne style
+    m_audioVisualizerLabel->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;"); // Czerwony border
+    m_recognitionProgress->setStyleSheet(
+        "QProgressBar {"
+        "  background-color: rgba(30, 30, 30, 150);"
+        "  border: 1px solid #333333;" // Szary border
+        "  border-radius: 4px;"
+        "}"
+        "QProgressBar::chunk {"
+        "  background-color: #ff3333;" // Czerwony chunk
+        "  border-radius: 3px;"
+        "}"
+    );
+
+    // Wyczyść wizualizator
+    updateAudioVisualizer(QByteArray());
+
+    // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+        // Opcjonalnie: Można usunąć efekt
+        // this->setGraphicsEffect(nullptr);
+        // delete effect;
+    }
 }
 
 void VoiceRecognitionLayer::startRecording() {
@@ -335,13 +364,17 @@ void VoiceRecognitionLayer::updateProgress() {
     // Aktualizacja postępu w zależności od stanu mowy
     if (m_isSpeaking) {
         // Zwiększ postęp - ale wolniej
-        int newValue = currentValue + 1;
+        newValue = currentValue + 2; // Zmniejszono przyrost dla dłuższego testu
         if (newValue > 100) newValue = 100;
-
         m_recognitionProgress->setValue(newValue);
+        // qDebug() << "Progress updated to:" << newValue; // Logowanie postępu
 
         // Zakończ weryfikację TYLKO gdy postęp osiągnie 100%
         if (newValue >= 100) {
+            // Zatrzymaj timer postępu, aby uniknąć wielokrotnego wywołania finishRecognition
+            if (m_progressTimer->isActive()) {
+                m_progressTimer->stop();
+            }
             finishRecognition();
         }
     }

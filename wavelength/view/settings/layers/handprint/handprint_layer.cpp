@@ -80,6 +80,9 @@ HandprintLayer::~HandprintLayer() {
 void HandprintLayer::initialize() {
     reset();
     loadRandomHandprint();
+    if (graphicsEffect()) {
+        dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
 }
 
 void HandprintLayer::reset() {
@@ -87,6 +90,28 @@ void HandprintLayer::reset() {
         m_handprintTimer->stop();
     }
     m_handprintProgress->setValue(0);
+
+    m_handprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
+    m_handprintProgress->setStyleSheet(
+        "QProgressBar {"
+        "  background-color: rgba(30, 30, 30, 150);"
+        "  border: 1px solid #333333;"
+        "  border-radius: 4px;"
+        "}"
+        "QProgressBar::chunk {"
+        "  background-color: #3399ff;"
+        "  border-radius: 3px;"
+        "}"
+    );
+
+    if (!m_baseHandprint.isNull()) {
+        m_handprintImage->setPixmap(QPixmap::fromImage(m_baseHandprint));
+    }
+
+    auto* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void HandprintLayer::loadRandomHandprint() {
@@ -151,17 +176,17 @@ void HandprintLayer::loadRandomHandprint() {
 }
 
 void HandprintLayer::updateProgress() {
-    int value = m_handprintProgress->value() + 1; // Wolniejszy postęp (wzrost o 1)
+    int value = m_handprintProgress->value() + 1;
     if (value > 100) value = 100;
 
     m_handprintProgress->setValue(value);
-
-    // Aktualizacja wyglądu odcisku dłoni podczas skanowania
     updateHandprintScan(value);
 
     if (value >= 100) {
-        m_handprintTimer->stop();
-        processHandprint(true);
+        if (m_handprintTimer->isActive()) {
+            m_handprintTimer->stop();
+            processHandprint(true);
+        }
     }
 }
 

@@ -101,14 +101,18 @@ RetinaScanLayer::~RetinaScanLayer() {
 void RetinaScanLayer::initialize() {
     reset();
     generateEyeImage();
-    QTimer::singleShot(1000, this, &RetinaScanLayer::startScanAnimation);
+
+    if (graphicsEffect()) {
+         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
+
+    QTimer::singleShot(500, this, &RetinaScanLayer::startScanAnimation); // Krótsze opóźnienie dla płynności
 }
 
 void RetinaScanLayer::reset() {
     if (m_scanTimer && m_scanTimer->isActive()) {
         m_scanTimer->stop();
     }
-
     if (m_completeTimer && m_completeTimer->isActive()) {
         m_completeTimer->stop();
     }
@@ -116,14 +120,33 @@ void RetinaScanLayer::reset() {
     m_scanLine = 0;
     m_scanProgress->setValue(0);
 
-    // Resetujemy też styl kontenera
-    if (m_eyeImage->parentWidget()) {
-        m_eyeImage->parentWidget()->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 100px;");
+    QWidget* eyeParent = m_eyeImage->parentWidget();
+    if (eyeParent) {
+        eyeParent->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;"); // Niebiesko-zielony border
     }
+    // Pasek postępu
+    m_scanProgress->setStyleSheet(
+        "QProgressBar {"
+        "  background-color: rgba(30, 30, 30, 150);"
+        "  border: 1px solid #333333;" // Szary border
+        "  border-radius: 4px;"
+        "}"
+        "QProgressBar::chunk {"
+        "  background-color: #33ccff;" // Niebiesko-zielony chunk
+        "  border-radius: 3px;"
+        "}"
+    );
 
-    // Resetujemy bazowy obraz oka
+    // Resetujemy bazowy obraz oka i czyścimy pixmapę
     m_baseEyeImage = QImage(200, 200, QImage::Format_ARGB32);
     m_baseEyeImage.fill(Qt::transparent);
+    m_eyeImage->clear(); // Wyczyść aktualną pixmapę
+
+    // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void RetinaScanLayer::updateScan() {

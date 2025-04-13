@@ -83,41 +83,59 @@ SnakeGameLayer::~SnakeGameLayer() {
 }
 
 void SnakeGameLayer::initialize() {
-    reset();
-    initializeGame();
-    setFocus();
-    m_gameBoard->setFocus();
-    m_gameTimer->start();
+    reset(); // Reset najpierw
+    initializeGame(); // Inicjalizuj logikę gry
+    setFocus(); // Ustaw focus na warstwie
+    m_gameBoard->setFocus(); // Ustaw focus na planszy (ważne dla eventFilter)
+
+    // Upewnij się, że widget jest widoczny przed startem
+    if (graphicsEffect()) {
+         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
+
+    // Rozpocznij grę po krótkim opóźnieniu
+    QTimer::singleShot(200, this, [this]() {
+        if (!m_gameOver) { // Sprawdź, czy gra nie została już zakończona (np. przez szybki reset)
+            m_gameTimer->start();
+        }
+    });
 }
 
 void SnakeGameLayer::reset() {
+    // Zatrzymaj timery
     if (m_gameTimer && m_gameTimer->isActive()) {
         m_gameTimer->stop();
     }
-
     if (m_borderAnimationTimer && m_borderAnimationTimer->isActive()) {
         m_borderAnimationTimer->stop();
     }
 
+    // Resetuj stan gry
     m_applesCollected = 0;
-    m_gameOver = false;
+    m_gameOver = false; // Kluczowe - resetuj stan game over
     m_gameState = GameState::Playing;
     m_borderAnimationProgress = 0;
     m_snakePartsExited = 0;
     m_exitPoints.clear();
+    m_snake.clear(); // Wyczyść węża
+    m_direction = Direction::Right; // Resetuj kierunek
+    m_lastProcessedDirection = Direction::Right;
 
-    // Ponowne losowanie strony wyjścia
+    // Ponowne losowanie strony wyjścia i pozycji
     int exitSideRandom = QRandomGenerator::global()->bounded(2);
     m_exitSide = static_cast<BorderSide>(exitSideRandom);
-
-    // Losowa pozycja Y dla wyjścia (unikamy narożników)
     m_exitPosition = QRandomGenerator::global()->bounded(1, GRID_SIZE - 1);
 
+    // Resetuj UI
     m_scoreLabel->setText("Zebrane jabłka: 0/4");
-    m_scoreLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    m_scoreLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;"); // Szary tekst wyniku
+    m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Domyślne tło planszy (bez bordera)
+    m_gameBoard->clear();
 
-    // Resetujemy styl planszy
-    m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220);");
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void SnakeGameLayer::initializeGame() {

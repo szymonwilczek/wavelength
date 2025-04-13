@@ -129,7 +129,7 @@ void SettingsView::setupUi() {
     mainLayout->addLayout(buttonLayout);
 
     // Połączenia
-    connect(m_backButton, &CyberButton::clicked, this, &SettingsView::backToMainView);
+    connect(m_backButton, &CyberButton::clicked, this, &SettingsView::handleBackButton);
     connect(m_saveButton, &CyberButton::clicked, this, &SettingsView::saveSettings);
     connect(m_defaultsButton, &CyberButton::clicked, this, &SettingsView::restoreDefaults);
 
@@ -247,328 +247,55 @@ void SettingsView::setupClassifiedTab() {
     layout->addStretch();
     m_tabContent->addWidget(tab);
 
-    // Ustawiamy początkowy stan zabezpieczeń
-    m_currentLayerIndex = FingerprintIndex;
-    m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-    m_fingerprintLayer->initialize();
-}
-
-void SettingsView::generateRandomFingerprint(QLabel* targetLabel) {
-    // Tworzymy losowy obraz odcisku palca
-    QImage fingerprint(200, 200, QImage::Format_ARGB32);
-    fingerprint.fill(Qt::transparent);
-
-    QPainter painter(&fingerprint);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    // Rysujemy przyciemniony odcisk palca
-    painter.setPen(QPen(QColor(150, 150, 150, 100), 1));
-    painter.setBrush(QBrush(QColor(80, 80, 80, 60)));
-
-    // Główny kształt odcisku
-    QPainterPath path;
-    path.addEllipse(QRectF(50, 30, 100, 140));
-
-    // Dodajemy losowe linie wewnątrz odcisku (symulacja linii papilarnych)
-    QRandomGenerator* rng = QRandomGenerator::global();
-    int numLines = rng->bounded(20, 40);
-
-    for (int i = 0; i < numLines; i++) {
-        QPainterPath linePath;
-        int startX = rng->bounded(60, 140);
-        int startY = rng->bounded(40, 160);
-        linePath.moveTo(startX, startY);
-
-        for (int j = 0; j < rng->bounded(3, 8); j++) {
-            int controlX1 = startX + rng->bounded(-20, 20);
-            int controlY1 = startY + rng->bounded(-15, 15);
-            int controlX2 = startX + rng->bounded(-20, 20);
-            int controlY2 = startY + rng->bounded(-15, 15);
-            int endX = startX + rng->bounded(-30, 30);
-            int endY = startY + rng->bounded(-20, 20);
-
-            linePath.cubicTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
-            startX = endX;
-            startY = endY;
-        }
-
-        path.addPath(linePath);
-    }
-
-    painter.drawPath(path);
-    painter.end();
-
-    // Ustawiamy obraz na etykiecie
-    targetLabel->setPixmap(QPixmap::fromImage(fingerprint));
-}
-
-void SettingsView::generateRandomHandprint(QLabel* targetLabel) {
-    // Tworzymy losowy obraz odcisku dłoni
-    QImage handprint(250, 250, QImage::Format_ARGB32);
-    handprint.fill(Qt::transparent);
-
-    QPainter painter(&handprint);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    // Rysujemy przyciemniony odcisk dłoni
-    painter.setPen(QPen(QColor(150, 150, 150, 100), 1));
-    painter.setBrush(QBrush(QColor(80, 80, 80, 60)));
-
-    // Główny kształt dłoni
-    QPainterPath palmPath;
-    palmPath.addEllipse(QRectF(75, 100, 100, 120)); // dłoń
-
-    // Palce
-    QRandomGenerator* rng = QRandomGenerator::global();
-
-    // Kciuk
-    QPainterPath thumbPath;
-    thumbPath.addEllipse(QRectF(50, 100, 40, 70));
-
-    // Pozostałe palce
-    for (int i = 0; i < 4; i++) {
-        QPainterPath fingerPath;
-        int offsetX = i * 25;
-        int randomHeight = rng->bounded(60, 90);
-        fingerPath.addEllipse(QRectF(85 + offsetX, 50, 20, randomHeight));
-        palmPath.addPath(fingerPath);
-    }
-
-    palmPath.addPath(thumbPath);
-
-    // Dodajemy losowe linie wewnątrz odcisku dłoni
-    int numLines = rng->bounded(30, 60);
-
-    for (int i = 0; i < numLines; i++) {
-        QPainterPath linePath;
-        int startX = rng->bounded(60, 190);
-        int startY = rng->bounded(60, 200);
-        linePath.moveTo(startX, startY);
-
-        for (int j = 0; j < rng->bounded(2, 6); j++) {
-            int endX = startX + rng->bounded(-40, 40);
-            int endY = startY + rng->bounded(-30, 30);
-            linePath.quadTo(
-                startX + (endX - startX) / 2 + rng->bounded(-20, 20),
-                startY + (endY - startY) / 2 + rng->bounded(-20, 20),
-                endX, endY
-            );
-            startX = endX;
-            startY = endY;
-        }
-
-        palmPath.addPath(linePath);
-    }
-
-    painter.drawPath(palmPath);
-    painter.end();
-
-    // Ustawiamy obraz na etykiecie
-    targetLabel->setPixmap(QPixmap::fromImage(handprint));
-}
-
-int SettingsView::getRandomSecurityCode(QString& hint) {
-    QVector<QPair<int, QString>> securityCodes = {
-        {1969, "First human moon landing (Apollo 11)"},
-        {1944, "Warsaw Uprising"},
-        {1984, "Orwell's dystopian novel"},
-        {1947, "Roswell incident"},
-        {2001, "Space Odyssey movie by Kubrick"},
-        {1903, "Wright brothers' first flight"},
-        {1989, "Fall of the Berlin Wall"},
-        {1986, "Chernobyl disaster"},
-        {1955, "Einstein's death year"},
-        {1962, "Cuban Missile Crisis"},
-        {1215, "Magna Carta signing"},
-        {1939, "Start of World War II"},
-        {1969, "Woodstock music festival"},
-        {1776, "US Declaration of Independence"},
-        {1789, "French Revolution began"},
-        {1917, "Russian Revolution"},
-        {1957, "Sputnik launch (first satellite)"},
-        {1912, "Titanic sank"},
-        {1859, "Darwin's Origin of Species published"},
-        {1994, "Genocide in Rwanda"},
-        {1963, "JFK assassination"}
-    };
-
-    int index = QRandomGenerator::global()->bounded(securityCodes.size());
-    hint = securityCodes[index].second;
-    return securityCodes[index].first;
+    resetSecurityLayers();
 }
 
 void SettingsView::setupNextSecurityLayer() {
-    // Zaktualizowane nazwy enumów
-    m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    // Sprawdź, czy obecny indeks jest prawidłowy i czy nie jest to ostatnia warstwa przed dostępem
+    if (m_currentLayerIndex < AccessGrantedIndex) {
+        m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    } else {
+        // Jeśli już jesteśmy na AccessGrantedIndex lub dalej, nie rób nic
+        return;
+    }
+
 
     // Przygotowanie następnego zabezpieczenia
-    QString hint;
     switch (m_currentLayerIndex) {
-    case HandprintIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case HandprintIndex:
+            m_securityLayersStack->setCurrentIndex(HandprintIndex);
         m_handprintLayer->initialize();
         break;
-
-    case SecurityCodeIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SecurityCodeIndex:
+            m_securityLayersStack->setCurrentIndex(SecurityCodeIndex);
         m_securityCodeLayer->initialize();
         break;
-
-    case SecurityQuestionIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SecurityQuestionIndex:
+            m_securityLayersStack->setCurrentIndex(SecurityQuestionIndex);
         m_securityQuestionLayer->initialize();
         break;
-
-    case RetinaScanIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case RetinaScanIndex:
+            m_securityLayersStack->setCurrentIndex(RetinaScanIndex);
         m_retinaScanLayer->initialize();
         break;
-
-    case VoiceRecognitionIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case VoiceRecognitionIndex:
+            m_securityLayersStack->setCurrentIndex(VoiceRecognitionIndex);
         m_voiceRecognitionLayer->initialize();
         break;
-
-    case TypingTestIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case TypingTestIndex:
+            m_securityLayersStack->setCurrentIndex(TypingTestIndex);
         m_typingTestLayer->initialize();
         break;
-
-    case SnakeGameIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SnakeGameIndex:
+            m_securityLayersStack->setCurrentIndex(SnakeGameIndex);
         m_snakeGameLayer->initialize();
         break;
-
-    case AccessGrantedIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case AccessGrantedIndex:
+            m_securityLayersStack->setCurrentIndex(AccessGrantedIndex);
+        // Tutaj nie ma initialize(), bo to ekran końcowy
         break;
+        // Nie powinno być default, bo wszystkie przypadki są obsłużone
     }
-}
-
-void SettingsView::processFingerprint(bool completed) {
-    if (completed) {
-        // Anmimacja zanikania
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(m_fingerprintImage);
-        m_fingerprintImage->setGraphicsEffect(effect);
-
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
-        animation->setDuration(500);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        animation->setEasingCurve(QEasingCurve::OutQuad);
-
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            setupNextSecurityLayer();
-        });
-
-        animation->start(QPropertyAnimation::DeleteWhenStopped);
-    }
-}
-
-void SettingsView::processHandprint(bool completed) {
-    if (completed) {
-        // Anmimacja zanikania
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(m_handprintImage);
-        m_handprintImage->setGraphicsEffect(effect);
-
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
-        animation->setDuration(500);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        animation->setEasingCurve(QEasingCurve::OutQuad);
-
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            setupNextSecurityLayer();
-        });
-
-        animation->start(QPropertyAnimation::DeleteWhenStopped);
-    }
-}
-
-void SettingsView::checkSecurityCode() {
-    if (m_securityCodeInput->text().toInt() == m_currentSecurityCode) {
-        // Kod poprawny, przechodzimy dalej
-        m_securityCodeInput->setStyleSheet(
-            "QLineEdit {"
-            "  color: #33ff33;"
-            "  background-color: rgba(10, 40, 10, 220);"
-            "  border: 1px solid #33ff33;"
-            "  border-radius: 5px;"
-            "  padding: 8px;"
-            "  font-family: Consolas;"
-            "  font-size: 14pt;"
-            "  text-align: center;"
-            "}"
-        );
-
-        QTimer::singleShot(1000, this, &SettingsView::setupNextSecurityLayer);
-    } else {
-        // Kod niepoprawny, resetujemy i pokazujemy efekt błędu
-        m_securityCodeInput->clear();
-        m_securityCodeInput->setStyleSheet(
-            "QLineEdit {"
-            "  color: #ff3333;"
-            "  background-color: rgba(40, 10, 10, 220);"
-            "  border: 1px solid #ff3333;"
-            "  border-radius: 5px;"
-            "  padding: 8px;"
-            "  font-family: Consolas;"
-            "  font-size: 14pt;"
-            "  text-align: center;"
-            "}"
-        );
-
-        QTimer::singleShot(500, this, [this]() {
-            m_securityCodeInput->setStyleSheet(
-                "QLineEdit {"
-                "  color: #ff3333;"
-                "  background-color: rgba(10, 25, 40, 220);"
-                "  border: 1px solid #ff3333;"
-                "  border-radius: 5px;"
-                "  padding: 8px;"
-                "  font-family: Consolas;"
-                "  font-size: 14pt;"
-                "  text-align: center;"
-                "}"
-            );
-        });
-    }
-}
-
-void SettingsView::securityQuestionTimeout() {
-    // Po 10 sekundach pokazujemy podpowiedź
-    m_securityQuestionLabel->setText("If this was really you, you would know the answer.\nYou don't need a question.");
-}
-
-bool SettingsView::eventFilter(QObject *watched, QEvent *event) {
-    // Obsługa naciskania i puszczania przycisku myszy dla odcisków
-    if (watched == m_fingerprintImage) {
-        if (event->type() == QEvent::MouseButtonPress) {
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
-                m_fingerprintTimer->start();
-                return true;
-            }
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
-                m_fingerprintTimer->stop();
-                return true;
-            }
-        }
-    } else if (watched == m_handprintImage) {
-        if (event->type() == QEvent::MouseButtonPress) {
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
-                m_handprintTimer->start();
-                return true;
-            }
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
-                m_handprintTimer->stop();
-                return true;
-            }
-        }
-    }
-
-    return QWidget::eventFilter(watched, event);
 }
 
 void SettingsView::setupUserTab() {
@@ -795,6 +522,7 @@ void SettingsView::createHeaderPanel() {
 void SettingsView::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     loadSettingsFromRegistry();
+    resetSecurityLayers();
 }
 
 
@@ -873,10 +601,18 @@ void SettingsView::restoreDefaults() {
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         m_config->restoreDefaults();
         loadSettingsFromRegistry();
-    }
+        if (m_tabContent->currentIndex() == 5) {
+            resetSecurityLayers();
+        }
+                             }
 }
 
 void SettingsView::switchToTab(int tabIndex) {
+    // Sprawdź, czy próbujemy przełączyć się do tej samej zakładki
+    if (tabIndex == m_tabContent->currentIndex()) {
+        return; // Nie rób nic, jeśli to ta sama zakładka
+    }
+
     // Ustaw aktywny przycisk zakładki
     for (int i = 0; i < m_tabButtons.size(); i++) {
         m_tabButtons[i]->setActive(i == tabIndex);
@@ -886,20 +622,44 @@ void SettingsView::switchToTab(int tabIndex) {
     // Przełącz zawartość zakładki
     m_tabContent->setCurrentIndex(tabIndex);
 
-    // Jeśli wybrano zakładkę CLASSIFIED (zakładamy, że ma indeks 5),
-    // zainicjuj pierwszy poziom zabezpieczeń
-    if (tabIndex == 5) { // indeks zakładki CLASSIFIED
-        // Używaj nowego enuma SecurityLayerIndex zamiast starego SecurityLayer
-        m_currentLayerIndex = FingerprintIndex;
-
-        // Zresetuj wszystkie warstwy zabezpieczeń
-        m_fingerprintLayer->reset();
-        m_handprintLayer->reset();
-        m_securityCodeLayer->reset();
-        m_securityQuestionLayer->reset();
-
-        // Ustaw pierwszą warstwę zabezpieczeń
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
-        m_fingerprintLayer->initialize();
-    }
+    // Usunięto blok resetujący warstwy przy każdym przejściu do CLASSIFIED
+    // Resetowanie odbywa się teraz tylko przy wejściu do widoku (showEvent)
+    // lub przez przycisk BACK (handleBackButton) lub przy restoreDefaults.
+    // Jeśli zakładka CLASSIFIED nie została jeszcze zainicjowana (np. pierwszy raz),
+    // resetSecurityLayers() w setupClassifiedTab() ustawi ją poprawnie.
+    // Jeśli użytkownik przeszedł warstwy, stan zostanie zachowany do opuszczenia widoku.
 }
+
+void SettingsView::handleBackButton() {
+    resetSecurityLayers(); // Zresetuj warstwy przed wyjściem
+    emit backToMainView(); // Wyemituj sygnał powrotu
+}
+
+
+void SettingsView::resetSecurityLayers() {
+    // Sprawdź, czy widgety warstw zostały utworzone
+    if (!m_fingerprintLayer || !m_handprintLayer || !m_securityCodeLayer ||
+        !m_securityQuestionLayer || !m_retinaScanLayer || !m_voiceRecognitionLayer ||
+        !m_typingTestLayer || !m_snakeGameLayer || !m_securityLayersStack) {
+        // Jeśli widgety nie istnieją (np. przed pełną inicjalizacją), nie rób nic
+        return;
+        }
+
+    m_currentLayerIndex = FingerprintIndex;
+
+    // Zresetuj stan każdej warstwy
+    m_fingerprintLayer->reset();
+    m_handprintLayer->reset();
+    m_securityCodeLayer->reset();
+    m_securityQuestionLayer->reset();
+    m_retinaScanLayer->reset();
+    m_voiceRecognitionLayer->reset();
+    m_typingTestLayer->reset();
+    m_snakeGameLayer->reset();
+    // Nie ma potrzeby resetować m_accessGrantedWidget
+
+    // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
+    m_securityLayersStack->setCurrentIndex(FingerprintIndex);
+    m_fingerprintLayer->initialize();
+}
+

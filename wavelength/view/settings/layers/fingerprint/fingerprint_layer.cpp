@@ -84,6 +84,9 @@ FingerprintLayer::~FingerprintLayer() {
 void FingerprintLayer::initialize() {
     reset();
     loadRandomFingerprint();
+    if (graphicsEffect()) {
+        dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
 }
 
 void FingerprintLayer::reset() {
@@ -91,12 +94,31 @@ void FingerprintLayer::reset() {
         m_fingerprintTimer->stop();
     }
     m_fingerprintProgress->setValue(0);
+
+    m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
+    m_fingerprintProgress->setStyleSheet(
+        "QProgressBar {"
+        "  background-color: rgba(30, 30, 30, 150);"
+        "  border: 1px solid #333333;"
+        "  border-radius: 4px;"
+        "}"
+        "QProgressBar::chunk {"
+        "  background-color: #3399ff;" // Jasny niebieski
+        "  border-radius: 3px;"
+        "}"
+    );
+
+    if (!m_baseFingerprint.isNull()) {
+         m_fingerprintImage->setPixmap(QPixmap::fromImage(m_baseFingerprint));
+    }
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void FingerprintLayer::loadRandomFingerprint() {
-    // Wybierz losowy plik daktylogramu
     if (m_fingerprintFiles.isEmpty()) {
-        // Jeśli nie ma plików, użyj placeholder
         m_currentFingerprint = "";
         m_baseFingerprint = QImage(200, 200, QImage::Format_ARGB32);
         m_baseFingerprint.fill(Qt::transparent);

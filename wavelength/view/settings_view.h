@@ -143,22 +143,15 @@ public:
 signals:
     void backToMainView();
     void settingsChanged();
-    // Usuń te sygnały:
-    // void enterSettingsView();
-    // void leaveSettingsView();
 
 protected:
     void showEvent(QShowEvent *event) override;
-    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void saveSettings();
     void restoreDefaults();
     void switchToTab(int tabIndex);
-    void processFingerprint(bool completed = false);
-    void processHandprint(bool completed = false);
-    void checkSecurityCode();
-    void securityQuestionTimeout();
+    void handleBackButton();
 
 private:
     void loadSettingsFromRegistry();
@@ -170,33 +163,7 @@ private:
     void setupAdvancedTab();
     void setupClassifiedTab();
     void setupNextSecurityLayer();
-    void generateRandomFingerprint(QLabel* targetLabel);
-    void generateRandomHandprint(QLabel* targetLabel);
-    int getRandomSecurityCode(QString& hint);
-
-    // Widgets dla poszczególnych zabezpieczeń
-    QWidget* m_fingerprintWidget;
-    QLabel* m_fingerprintImage;
-    QProgressBar* m_fingerprintProgress;
-
-    QWidget* m_handprintWidget;
-    QLabel* m_handprintImage;
-    QProgressBar* m_handprintProgress;
-
-    QWidget* m_securityCodeWidget;
-    QLineEdit* m_securityCodeInput;
-    QLabel* m_securityCodeHint;
-    int m_currentSecurityCode;
-
-    QWidget* m_securityQuestionWidget;
-    QLabel* m_securityQuestionLabel;
-    QLineEdit* m_securityQuestionInput;
-    QTimer* m_securityQuestionTimer;
-
-    // Timery i animacje
-    QTimer* m_fingerprintTimer;
-    QTimer* m_handprintTimer;
-
+    void resetSecurityLayers();
     void createHeaderPanel();
 
     WavelengthConfig *m_config;
