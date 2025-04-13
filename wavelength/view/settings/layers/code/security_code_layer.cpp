@@ -108,21 +108,17 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
         SecurityCode("1989", "World Wide Web invented"),
 
         // Kulturowe i kryptograficzne
-        SecurityCode("42", "Ultimate answer in sci-fi (Hitchhiker's Guide)", true),
-        SecurityCode("101", "Binary introduction / Beginner's guide"),
         SecurityCode("B00K", "Digital knowledge container", false),
         SecurityCode("EV1L", "C0RP - Cyberpunk antagonist trope", false),
         SecurityCode("L0CK", "Security metaphor", false),
-        SecurityCode("2FA", "Security measure for accounts (abbreviated)", false),
 
         // Easter eggi
-        SecurityCode("R1CK", "Never gonna give you up... (meme)", false),
+        SecurityCode("RICK", "Never gonna give you up...", false),
         SecurityCode("1138", "George Lucas' first film THX reference"),
         SecurityCode("0451", "Immersive sim reference (System Shock, Deus Ex)"),
         SecurityCode("1701", "Famous sci-fi starship registry"),
         SecurityCode("8080", "Classic Intel processor"),
         SecurityCode("6502", "CPU used in Apple II and Commodore 64"),
-        SecurityCode("FF7", "Iconic RPG with cyberpunk elements (abbreviated)", false)
     };
 }
 
