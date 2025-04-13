@@ -65,6 +65,10 @@ TypingTestLayer::~TypingTestLayer() {
 void TypingTestLayer::initialize() {
     reset();
     m_hiddenInput->setFocus();
+
+    if (graphicsEffect()) {
+         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
 }
 
 void TypingTestLayer::reset() {
@@ -75,10 +79,27 @@ void TypingTestLayer::reset() {
 
     // Generuj nowy zestaw słów
     generateWords();
-    updateDisplayText();
+    updateDisplayText(); // Wyświetl nowy tekst
 
-    // Reset stylów
+    // Reset stylów etykiety wyświetlającej tekst
     m_displayTextLabel->setStyleSheet("color: #bbbbbb; font-family: Consolas; font-size: 16pt; background-color: transparent; border: none;");
+    // Reset stylów panelu i tytułu (na wypadek gdyby były zmieniane)
+    QWidget* textPanel = m_displayTextLabel->parentWidget();
+    if (textPanel) {
+        textPanel->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;"); // Czerwony border
+    }
+    m_titleLabel->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;"); // Czerwony tytuł
+    m_instructionsLabel->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;"); // Szare instrukcje
+
+
+    // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+        // Opcjonalnie: Można usunąć efekt
+        // this->setGraphicsEffect(nullptr);
+        // delete effect;
+    }
 }
 
 void TypingTestLayer::generateWords() {

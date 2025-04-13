@@ -127,17 +127,18 @@ SecurityCodeLayer::~SecurityCodeLayer() {
 
 void SecurityCodeLayer::initialize() {
     reset();
+
     bool isNumeric;
     QString hint;
     m_currentSecurityCode = getRandomSecurityCode(hint, isNumeric);
     m_isCurrentCodeNumeric = isNumeric;
-
-    // Ustaw odpowiednie walidatory
     setInputValidators(isNumeric);
-
     m_securityCodeHint->setText("HINT: " + hint);
 
-    // Ustaw fokus na pierwszym polu
+    if (graphicsEffect()) {
+        dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
+
     if (!m_codeInputs.isEmpty()) {
         m_codeInputs.first()->setFocus();
     }
@@ -146,17 +147,23 @@ void SecurityCodeLayer::initialize() {
 void SecurityCodeLayer::reset() {
     resetInputs();
     m_securityCodeHint->setText("");
+
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void SecurityCodeLayer::resetInputs() {
     // Resetujemy wszystkie pola
     for (QLineEdit* input : m_codeInputs) {
         input->clear();
+        // Przywróć domyślny styl (czerwony)
         input->setStyleSheet(
             "QLineEdit {"
-            "  color: #ff3333;"
+            "  color: #ff3333;" // Czerwony tekst
             "  background-color: rgba(10, 25, 40, 220);"
-            "  border: 1px solid #ff3333;"
+            "  border: 1px solid #ff3333;" // Czerwona ramka
             "  border-radius: 5px;"
             "  padding: 5px;"
             "  font-family: Consolas;"
@@ -164,7 +171,7 @@ void SecurityCodeLayer::resetInputs() {
             "  font-weight: bold;"
             "}"
             "QLineEdit:focus {"
-            "  border: 2px solid #ff3333;"
+            "  border: 2px solid #ff3333;" // Czerwona ramka w focusie
             "  background-color: rgba(25, 40, 65, 220);"
             "}"
         );

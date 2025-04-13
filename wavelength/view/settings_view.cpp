@@ -129,7 +129,7 @@ void SettingsView::setupUi() {
     mainLayout->addLayout(buttonLayout);
 
     // Połączenia
-    connect(m_backButton, &CyberButton::clicked, this, &SettingsView::backToMainView);
+    connect(m_backButton, &CyberButton::clicked, this, &SettingsView::handleBackButton);
     connect(m_saveButton, &CyberButton::clicked, this, &SettingsView::saveSettings);
     connect(m_defaultsButton, &CyberButton::clicked, this, &SettingsView::restoreDefaults);
 
@@ -247,57 +247,54 @@ void SettingsView::setupClassifiedTab() {
     layout->addStretch();
     m_tabContent->addWidget(tab);
 
-    // Ustawiamy początkowy stan zabezpieczeń
-    m_currentLayerIndex = FingerprintIndex;
-    m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-    m_fingerprintLayer->initialize();
+    resetSecurityLayers();
 }
 
 void SettingsView::setupNextSecurityLayer() {
-    // Zaktualizowane nazwy enumów
-    m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    // Sprawdź, czy obecny indeks jest prawidłowy i czy nie jest to ostatnia warstwa przed dostępem
+    if (m_currentLayerIndex < AccessGrantedIndex) {
+        m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    } else {
+        // Jeśli już jesteśmy na AccessGrantedIndex lub dalej, nie rób nic
+        return;
+    }
+
 
     // Przygotowanie następnego zabezpieczenia
-    QString hint;
     switch (m_currentLayerIndex) {
-    case HandprintIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case HandprintIndex:
+            m_securityLayersStack->setCurrentIndex(HandprintIndex);
         m_handprintLayer->initialize();
         break;
-
-    case SecurityCodeIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SecurityCodeIndex:
+            m_securityLayersStack->setCurrentIndex(SecurityCodeIndex);
         m_securityCodeLayer->initialize();
         break;
-
-    case SecurityQuestionIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SecurityQuestionIndex:
+            m_securityLayersStack->setCurrentIndex(SecurityQuestionIndex);
         m_securityQuestionLayer->initialize();
         break;
-
-    case RetinaScanIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case RetinaScanIndex:
+            m_securityLayersStack->setCurrentIndex(RetinaScanIndex);
         m_retinaScanLayer->initialize();
         break;
-
-    case VoiceRecognitionIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case VoiceRecognitionIndex:
+            m_securityLayersStack->setCurrentIndex(VoiceRecognitionIndex);
         m_voiceRecognitionLayer->initialize();
         break;
-
-    case TypingTestIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case TypingTestIndex:
+            m_securityLayersStack->setCurrentIndex(TypingTestIndex);
         m_typingTestLayer->initialize();
         break;
-
-    case SnakeGameIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case SnakeGameIndex:
+            m_securityLayersStack->setCurrentIndex(SnakeGameIndex);
         m_snakeGameLayer->initialize();
         break;
-
-    case AccessGrantedIndex:
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
+        case AccessGrantedIndex:
+            m_securityLayersStack->setCurrentIndex(AccessGrantedIndex);
+        // Tutaj nie ma initialize(), bo to ekran końcowy
         break;
+        // Nie powinno być default, bo wszystkie przypadki są obsłużone
     }
 }
 
@@ -525,6 +522,7 @@ void SettingsView::createHeaderPanel() {
 void SettingsView::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     loadSettingsFromRegistry();
+    resetSecurityLayers();
 }
 
 
@@ -603,10 +601,18 @@ void SettingsView::restoreDefaults() {
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         m_config->restoreDefaults();
         loadSettingsFromRegistry();
-    }
+        if (m_tabContent->currentIndex() == 5) {
+            resetSecurityLayers();
+        }
+                             }
 }
 
 void SettingsView::switchToTab(int tabIndex) {
+    // Sprawdź, czy próbujemy przełączyć się do tej samej zakładki
+    if (tabIndex == m_tabContent->currentIndex()) {
+        return; // Nie rób nic, jeśli to ta sama zakładka
+    }
+
     // Ustaw aktywny przycisk zakładki
     for (int i = 0; i < m_tabButtons.size(); i++) {
         m_tabButtons[i]->setActive(i == tabIndex);
@@ -616,20 +622,44 @@ void SettingsView::switchToTab(int tabIndex) {
     // Przełącz zawartość zakładki
     m_tabContent->setCurrentIndex(tabIndex);
 
-    // Jeśli wybrano zakładkę CLASSIFIED (zakładamy, że ma indeks 5),
-    // zainicjuj pierwszy poziom zabezpieczeń
-    if (tabIndex == 5) { // indeks zakładki CLASSIFIED
-        // Używaj nowego enuma SecurityLayerIndex zamiast starego SecurityLayer
-        m_currentLayerIndex = FingerprintIndex;
-
-        // Zresetuj wszystkie warstwy zabezpieczeń
-        m_fingerprintLayer->reset();
-        m_handprintLayer->reset();
-        m_securityCodeLayer->reset();
-        m_securityQuestionLayer->reset();
-
-        // Ustaw pierwszą warstwę zabezpieczeń
-        m_securityLayersStack->setCurrentIndex(static_cast<int>(m_currentLayerIndex));
-        m_fingerprintLayer->initialize();
-    }
+    // Usunięto blok resetujący warstwy przy każdym przejściu do CLASSIFIED
+    // Resetowanie odbywa się teraz tylko przy wejściu do widoku (showEvent)
+    // lub przez przycisk BACK (handleBackButton) lub przy restoreDefaults.
+    // Jeśli zakładka CLASSIFIED nie została jeszcze zainicjowana (np. pierwszy raz),
+    // resetSecurityLayers() w setupClassifiedTab() ustawi ją poprawnie.
+    // Jeśli użytkownik przeszedł warstwy, stan zostanie zachowany do opuszczenia widoku.
 }
+
+void SettingsView::handleBackButton() {
+    resetSecurityLayers(); // Zresetuj warstwy przed wyjściem
+    emit backToMainView(); // Wyemituj sygnał powrotu
+}
+
+
+void SettingsView::resetSecurityLayers() {
+    // Sprawdź, czy widgety warstw zostały utworzone
+    if (!m_fingerprintLayer || !m_handprintLayer || !m_securityCodeLayer ||
+        !m_securityQuestionLayer || !m_retinaScanLayer || !m_voiceRecognitionLayer ||
+        !m_typingTestLayer || !m_snakeGameLayer || !m_securityLayersStack) {
+        // Jeśli widgety nie istnieją (np. przed pełną inicjalizacją), nie rób nic
+        return;
+        }
+
+    m_currentLayerIndex = FingerprintIndex;
+
+    // Zresetuj stan każdej warstwy
+    m_fingerprintLayer->reset();
+    m_handprintLayer->reset();
+    m_securityCodeLayer->reset();
+    m_securityQuestionLayer->reset();
+    m_retinaScanLayer->reset();
+    m_voiceRecognitionLayer->reset();
+    m_typingTestLayer->reset();
+    m_snakeGameLayer->reset();
+    // Nie ma potrzeby resetować m_accessGrantedWidget
+
+    // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
+    m_securityLayersStack->setCurrentIndex(FingerprintIndex);
+    m_fingerprintLayer->initialize();
+}
+

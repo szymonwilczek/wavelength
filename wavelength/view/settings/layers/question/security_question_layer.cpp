@@ -64,17 +64,41 @@ SecurityQuestionLayer::~SecurityQuestionLayer() {
 
 void SecurityQuestionLayer::initialize() {
     reset();
+
     m_securityQuestionLabel->setText("What is your top secret security question?");
     m_securityQuestionInput->setFocus();
     m_securityQuestionTimer->start();
+
+    if (graphicsEffect()) {
+        static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+    }
 }
 
 void SecurityQuestionLayer::reset() {
-    if (m_securityQuestionTimer->isActive()) {
+    if (m_securityQuestionTimer && m_securityQuestionTimer->isActive()) {
         m_securityQuestionTimer->stop();
     }
     m_securityQuestionInput->clear();
     m_securityQuestionLabel->setText("");
+
+    m_securityQuestionInput->setStyleSheet(
+        "QLineEdit {"
+        "  color: #ff3333;" // Czerwony tekst
+        "  background-color: rgba(10, 25, 40, 220);"
+        "  border: 1px solid #ff3333;" // Czerwona ramka
+        "  border-radius: 5px;"
+        "  padding: 8px;"
+        "  font-family: Consolas;"
+        "  font-size: 11pt;"
+        "}"
+    );
+    m_securityQuestionLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    m_securityQuestionInput->setReadOnly(false);
+
+    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
+    if (effect) {
+        effect->setOpacity(1.0);
+    }
 }
 
 void SecurityQuestionLayer::checkSecurityAnswer() {

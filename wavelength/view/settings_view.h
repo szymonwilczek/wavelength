@@ -143,9 +143,6 @@ public:
 signals:
     void backToMainView();
     void settingsChanged();
-    // Usuń te sygnały:
-    // void enterSettingsView();
-    // void leaveSettingsView();
 
 protected:
     void showEvent(QShowEvent *event) override;
@@ -154,8 +151,7 @@ private slots:
     void saveSettings();
     void restoreDefaults();
     void switchToTab(int tabIndex);
-    // void handleLayerCompletion();
-    // void handleLayerFailure();
+    void handleBackButton();
 
 private:
     void loadSettingsFromRegistry();
@@ -167,8 +163,7 @@ private:
     void setupAdvancedTab();
     void setupClassifiedTab();
     void setupNextSecurityLayer();
-    // void resetSecurityLayers();
-
+    void resetSecurityLayers();
     void createHeaderPanel();
 
     WavelengthConfig *m_config;
