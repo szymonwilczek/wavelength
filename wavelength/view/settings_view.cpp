@@ -153,11 +153,11 @@ void SettingsView::setupClassifiedTab() {
     warningLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(warningLabel);
 
-    // Kontener na wszystkie poziomy zabezpieczeń
+    // Kontener na wszystkie poziomy zabezpieczeń i nowe funkcje
     m_securityLayersStack = new QStackedWidget(tab);
     layout->addWidget(m_securityLayersStack, 1);
 
-    // Tworzenie warstw zabezpieczeń
+    // Tworzenie warstw zabezpieczeń (bez zmian)
     m_fingerprintLayer = new FingerprintLayer(m_securityLayersStack);
     m_handprintLayer = new HandprintLayer(m_securityLayersStack);
     m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
@@ -167,23 +167,54 @@ void SettingsView::setupClassifiedTab() {
     m_typingTestLayer = new TypingTestLayer(m_securityLayersStack);
     m_snakeGameLayer = new SnakeGameLayer(m_securityLayersStack);
 
-    // Ekran dostępu przyznanego
-    m_accessGrantedWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *accessGrantedLayout = new QVBoxLayout(m_accessGrantedWidget);
-    accessGrantedLayout->setAlignment(Qt::AlignCenter);
+    // --- NOWY WIDGET Z FUNKCJAMI ZAMIAST ACCESS GRANTED ---
+    m_classifiedFeaturesWidget = new QWidget(m_securityLayersStack);
+    QVBoxLayout *featuresLayout = new QVBoxLayout(m_classifiedFeaturesWidget);
+    featuresLayout->setAlignment(Qt::AlignCenter);
+    featuresLayout->setSpacing(20);
 
-    QLabel *accessGrantedTitle = new QLabel("ACCESS GRANTED", m_accessGrantedWidget);
-    accessGrantedTitle->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
-    accessGrantedTitle->setAlignment(Qt::AlignCenter);
+    QLabel *featuresTitle = new QLabel("CLASSIFIED FEATURES UNLOCKED", m_classifiedFeaturesWidget);
+    featuresTitle->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
+    featuresTitle->setAlignment(Qt::AlignCenter);
+    featuresLayout->addWidget(featuresTitle);
 
-    QLabel *accessGrantedMessage = new QLabel("All security layers bypassed successfully.\nClassified settings are now available.", m_accessGrantedWidget);
-    accessGrantedMessage->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    accessGrantedMessage->setAlignment(Qt::AlignCenter);
+    QLabel *featuresDesc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", m_classifiedFeaturesWidget);
+    featuresDesc->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    featuresDesc->setAlignment(Qt::AlignCenter);
+    featuresLayout->addWidget(featuresDesc);
 
-    accessGrantedLayout->addWidget(accessGrantedTitle);
-    accessGrantedLayout->addSpacing(20);
-    accessGrantedLayout->addWidget(accessGrantedMessage);
-    accessGrantedLayout->addStretch();
+    // Kontener na przyciski funkcji
+    QWidget* buttonContainer = new QWidget(m_classifiedFeaturesWidget);
+    QHBoxLayout* buttonLayout = new QHBoxLayout(buttonContainer);
+    buttonLayout->setSpacing(15);
+
+    // Przycisk Wave Sculptor
+    QPushButton* waveSculptorButton = new QPushButton("Wave Sculptor", buttonContainer);
+    waveSculptorButton->setMinimumHeight(40);
+    waveSculptorButton->setStyleSheet(
+        "QPushButton { background-color: #0077AA; border: 1px solid #00AAFF; padding: 10px; border-radius: 5px; color: #E0E0E0; font-family: Consolas; font-weight: bold; }"
+        "QPushButton:hover { background-color: #0099CC; }"
+        "QPushButton:pressed { background-color: #005588; }"
+    );
+    connect(waveSculptorButton, &QPushButton::clicked, this, &SettingsView::openWaveSculptor);
+    buttonLayout->addWidget(waveSculptorButton);
+
+    // Miejsca na przyciski Matrix Vision i System Override (dodamy później)
+    QPushButton* matrixVisionButton = new QPushButton("Matrix Vision (TBD)", buttonContainer);
+    matrixVisionButton->setMinimumHeight(40);
+    matrixVisionButton->setStyleSheet("QPushButton { background-color: #444; border: 1px solid #666; padding: 10px; border-radius: 5px; color: #999; }");
+    matrixVisionButton->setEnabled(false); // Na razie wyłączony
+    buttonLayout->addWidget(matrixVisionButton);
+
+    QPushButton* overrideButton = new QPushButton("SYSTEM OVERRIDE (TBD)", buttonContainer);
+    overrideButton->setMinimumHeight(40);
+    overrideButton->setStyleSheet("QPushButton { background-color: #440000; border: 1px solid #880000; padding: 10px; border-radius: 5px; color: #AA0000; font-weight: bold; }");
+    overrideButton->setEnabled(false); // Na razie wyłączony
+    buttonLayout->addWidget(overrideButton);
+
+    featuresLayout->addWidget(buttonContainer, 0, Qt::AlignCenter);
+    featuresLayout->addStretch();
+    // --- KONIEC NOWEGO WIDGETU ---
 
     // Dodajemy wszystkie widgety do stosu
     m_securityLayersStack->addWidget(m_fingerprintLayer);
@@ -194,7 +225,7 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack->addWidget(m_voiceRecognitionLayer);
     m_securityLayersStack->addWidget(m_typingTestLayer);
     m_securityLayersStack->addWidget(m_snakeGameLayer);
-    m_securityLayersStack->addWidget(m_accessGrantedWidget);
+    m_securityLayersStack->addWidget(m_classifiedFeaturesWidget);
 
     // Połączenia warstw
     connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
@@ -240,14 +271,33 @@ void SettingsView::setupClassifiedTab() {
     });
 
     connect(m_snakeGameLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = AccessGrantedIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+        // Zamiast AccessGrantedIndex, użyjemy indeksu nowego widgetu
+        int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+        if (featuresIndex != -1) {
+             m_currentLayerIndex = static_cast<SecurityLayerIndex>(featuresIndex); // Rzutowanie może być ryzykowne, jeśli indeksy się zmienią
+             m_securityLayersStack->setCurrentIndex(featuresIndex);
+             // Nie ma potrzeby initialize() dla tego widgetu
+             qDebug() << "All security layers passed. Showing classified features.";
+        } else {
+             qWarning() << "Could not find ClassifiedFeaturesWidget in the stack!";
+             // Awaryjnie, przejdź do ostatniego widgetu
+             m_securityLayersStack->setCurrentIndex(m_securityLayersStack->count() - 1);
+        }
     });
 
     layout->addStretch();
     m_tabContent->addWidget(tab);
 
     resetSecurityLayers();
+}
+
+void SettingsView::openWaveSculptor() {
+    qDebug() << "Opening Wave Sculptor...";
+    // Tworzymy nowe okno za każdym razem lub pokazujemy istniejące
+    // Prostsze podejście: tworzymy nowe za każdym razem
+    // Pamiętaj, że WaveSculptorWindow usuwa się samo po zamknięciu (deleteLater)
+    WaveSculptorWindow* sculptorWindow = new WaveSculptorWindow();
+    sculptorWindow->show();
 }
 
 void SettingsView::setupNextSecurityLayer() {
@@ -640,10 +690,11 @@ void SettingsView::resetSecurityLayers() {
     // Sprawdź, czy widgety warstw zostały utworzone
     if (!m_fingerprintLayer || !m_handprintLayer || !m_securityCodeLayer ||
         !m_securityQuestionLayer || !m_retinaScanLayer || !m_voiceRecognitionLayer ||
-        !m_typingTestLayer || !m_snakeGameLayer || !m_securityLayersStack) {
-        // Jeśli widgety nie istnieją (np. przed pełną inicjalizacją), nie rób nic
+        !m_typingTestLayer || !m_snakeGameLayer || !m_securityLayersStack || !m_classifiedFeaturesWidget) { // Dodaj sprawdzenie m_classifiedFeaturesWidget
+        qDebug() << "Security layers or stack not fully initialized, skipping reset.";
         return;
         }
+    qDebug() << "Resetting all security layers...";
 
     m_currentLayerIndex = FingerprintIndex;
 
@@ -656,10 +707,11 @@ void SettingsView::resetSecurityLayers() {
     m_voiceRecognitionLayer->reset();
     m_typingTestLayer->reset();
     m_snakeGameLayer->reset();
-    // Nie ma potrzeby resetować m_accessGrantedWidget
+    // Nie ma potrzeby resetować m_classifiedFeaturesWidget
 
     // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
     m_securityLayersStack->setCurrentIndex(FingerprintIndex);
     m_fingerprintLayer->initialize();
+    qDebug() << "Security layers reset complete. Current index:" << m_securityLayersStack->currentIndex();
 }
 

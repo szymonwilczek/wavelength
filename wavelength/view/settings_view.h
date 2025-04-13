@@ -19,6 +19,7 @@
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
+#include "settings/classified/wave_sculptor/wave_sculptor_window.h"
 #include "settings/layers/code/security_code_layer.h"
 #include "settings/layers/fingerprint/fingerprint_layer.h"
 #include "settings/layers/handprint/handprint_layer.h"
@@ -152,6 +153,7 @@ private slots:
     void restoreDefaults();
     void switchToTab(int tabIndex);
     void handleBackButton();
+    void openWaveSculptor();
 
 private:
     void loadSettingsFromRegistry();
@@ -229,6 +231,9 @@ private:
     };
 
     SecurityLayerIndex m_currentLayerIndex;
+
+    QWidget* m_classifiedFeaturesWidget;
+    WaveSculptorWindow* m_waveSculptorWindow;
 };
 
 #endif // SETTINGS_VIEW_H

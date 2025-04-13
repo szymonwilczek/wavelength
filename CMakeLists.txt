@@ -167,6 +167,10 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/layers/typing_test/typing_test_layer.h
         wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
         wavelength/view/settings/layers/snake_game/snake_game_layer.h
+        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.cpp
+        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.h
+        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.cpp
+        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
