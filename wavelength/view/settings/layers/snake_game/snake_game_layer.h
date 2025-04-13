@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QPair>
 #include <QKeyEvent>
+#include <QPropertyAnimation>
 
 class SnakeGameLayer : public SecurityLayer {
     Q_OBJECT
@@ -22,9 +23,11 @@ protected:
     void keyPressEvent(QKeyEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    private slots:
-        void updateGame();
+private slots:
+    void updateGame();
     void finishGame(bool success);
+    void openBorder();
+    void updateBorderAnimation();
 
 private:
     enum class Direction {
@@ -38,7 +41,20 @@ private:
         Empty,
         Snake,
         SnakeHead,
-        Apple
+        Apple,
+        OpenBorder
+    };
+
+    enum class GameState {
+        Playing,
+        ExitOpen,
+        Completed,
+        Failed
+    };
+
+    enum class BorderSide {
+        Left,
+        Right
     };
 
     void initializeGame();
@@ -47,14 +63,18 @@ private:
     void generateApple();
     bool isCollision(int x, int y);
     void handleInput(int key);
+    bool isExitPoint(int x, int y);
+    void checkForExitProgress();
 
     QLabel* m_gameBoard;
     QLabel* m_scoreLabel;
     QTimer* m_gameTimer;
+    QTimer* m_borderAnimationTimer;
 
-    static const int GRID_SIZE = 8;
-    static const int CELL_SIZE = 30;
+    static const int GRID_SIZE = 12; // Zwiększony rozmiar siatki
+    static const int CELL_SIZE = 20; // Zmniejszony rozmiar komórki, by całość zmieściła się na ekranie
 
+    CellType m_grid[GRID_SIZE][GRID_SIZE];
     QVector<QPair<int, int>> m_snake;
     QPair<int, int> m_apple;
     Direction m_direction;
@@ -62,7 +82,14 @@ private:
     int m_applesCollected;
     bool m_gameOver;
 
-    CellType m_grid[GRID_SIZE][GRID_SIZE];
+    // Zmienne dla trybu wyjścia
+    GameState m_gameState;
+    BorderSide m_exitSide;     // Lewa lub prawa strona
+    int m_exitPosition;        // Współrzędna Y wybranego kwadratu
+    int m_borderAnimationProgress;
+    int m_snakePartsExited;
+
+    QVector<QPair<int, int>> m_exitPoints; // Punkty wyjściowe
 };
 
 #endif // SNAKE_GAME_LAYER_H
