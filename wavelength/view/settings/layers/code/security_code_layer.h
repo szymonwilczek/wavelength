@@ -18,28 +18,38 @@ public:
     void initialize() override;
     void reset() override;
 
-
     private slots:
         void checkSecurityCode();
-        void onDigitEntered();
-
+    void onDigitEntered();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    int getRandomSecurityCode(QString& hint);
-    void setupCodeInputs();
+    // Struktura kodu zabezpieczającego
+    struct SecurityCode {
+        QString code;       // Kod jako string (może zawierać cyfry/litery)
+        QString hint;       // Podpowiedź
+        bool isNumeric;     // Czy kod jest tylko numeryczny
+
+        SecurityCode(const QString& c, const QString& h, bool num = true)
+            : code(c), hint(h), isNumeric(num) {}
+    };
+
+    QString getRandomSecurityCode(QString& hint, bool& isNumeric);
+    void setupCodeInputs(bool isNumeric);
     void resetInputs();
     QString getEnteredCode() const;
     void showErrorEffect();
+    void setInputValidators(bool numericOnly);
 
     QList<QLineEdit*> m_codeInputs;
     QLabel* m_securityCodeHint;
-    int m_currentSecurityCode;
+    QString m_currentSecurityCode;
+    bool m_isCurrentCodeNumeric;
 
     // Baza kodów bezpieczeństwa z podpowiedziami
-    QVector<QPair<int, QString>> m_securityCodes;
+    QVector<SecurityCode> m_securityCodes;
 };
 
 #endif // SECURITY_CODE_LAYER_H
