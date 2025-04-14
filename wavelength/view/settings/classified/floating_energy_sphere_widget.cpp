@@ -107,7 +107,7 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(QWidget *parent)
     : QOpenGLWidget(parent),
       QOpenGLFunctions_3_3_Core(),
       m_timeValue(0.0f),
-      m_lastFrameTimeSecs(0.0f), // <<< Inicjalizacja
+      m_lastFrameTimeSecs(0.0f),
       m_program(nullptr),
       m_vbo(QOpenGLBuffer::VertexBuffer),
       m_cameraPosition(0.0f, 0.0f, 3.5f),
@@ -118,22 +118,29 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(QWidget *parent)
       m_angularVelocity(0.0f, 0.0f, 0.0f),
       m_dampingFactor(0.96f)
 {
-    // ... (ustawienia okna, atrybuty) ...
+    // --- Ustawienia okna dla przezroczystości ---
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setAttribute(Qt::WA_TranslucentBackground); // <<< DODAJ TEN ATRYBUT
     setAttribute(Qt::WA_NoSystemBackground);
+    // setAttribute(Qt::WA_PaintOnScreen); // Upewnij się, że jest wyłączone
+
     setAttribute(Qt::WA_DeleteOnClose);
     setMouseTracking(true);
     resize(600, 600);
 
     // --- Uruchomienie timera ---
-    m_elapsedTimer.start(); // <<< Uruchom timer
-    m_lastFrameTimeSecs = m_elapsedTimer.elapsed() / 1000.0f; // <<< Zapisz początkowy czas
+    m_elapsedTimer.start();
+    m_lastFrameTimeSecs = m_elapsedTimer.elapsed() / 1000.0f;
 
     connect(&m_timer, &QTimer::timeout, this, &FloatingEnergySphereWidget::updateAnimation);
-    // Można rozważyć minimalnie krótszy interwał timera, np. 10ms,
-    // aby częściej wywoływać update, ale delta time zapewni poprawną prędkość.
-    // Jednak 16ms jest zazwyczaj wystarczające.
     m_timer.start(16);
+
+    // --- Opcjonalnie: Ustaw format powierzchni OpenGL z kanałem alfa ---
+    // Chociaż często działa domyślnie, można to jawnie ustawić
+    QSurfaceFormat fmt = format(); // Pobierz bieżący format
+    fmt.setAlphaBufferSize(8);     // Poproś o 8-bitowy bufor alfa
+    setFormat(fmt);                // Zastosuj nowy format
+    // --- Koniec opcjonalnego ustawienia formatu ---
 }
 
 FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
@@ -160,7 +167,7 @@ void FloatingEnergySphereWidget::initializeGL()
     }
     qDebug() << "OpenGL functions initialized.";
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -196,9 +203,6 @@ void FloatingEnergySphereWidget::initializeGL()
     m_vao.release();
     m_vbo.release();
     m_program->release();
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     qDebug() << "VAO/VBO configured for points.";
     qDebug() << "FloatingEnergySphereWidget::initializeGL() finished successfully.";
