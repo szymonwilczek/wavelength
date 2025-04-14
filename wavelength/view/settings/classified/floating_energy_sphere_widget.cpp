@@ -18,77 +18,72 @@ const char *vertexShaderSource = R"(
     uniform float time;
 
     out vec3 vPos;
-    out float vDeformationFactor; // Przekazanie współczynnika deformacji do fragment shadera
+    out float vDeformationFactor;
 
-    // Prosta funkcja szumu (nadal prosta, ale użyta inaczej)
     float noise(vec3 p) {
         return fract(sin(dot(p, vec3(12.9898, 78.233, 54.53))) * 43758.5453);
     }
 
-    // Funkcja do tworzenia płynniejszych fal
-    float smoothWave(vec3 pos, float freq, float amp, float speed, float timeOffset) {
-        return sin(pos.y * freq + time * speed + timeOffset) *
-               cos(pos.x * freq * 0.8 + time * speed * 0.7 + timeOffset * 0.5) *
-               sin(pos.z * freq * 1.2 + time * speed * 1.1 + timeOffset * 1.2) *
+    // Funkcja falująca z szybszą modulacją częstotliwości i offsetu
+    float evolvingWave(vec3 pos, float baseFreq, float freqVariation, float amp, float speed, float timeOffset) {
+        // Przyspieszenie zmian częstotliwości i offsetu
+        float freqTimeFactor = 0.25; // <<< Zwiększono (było 0.08)
+        float offsetTimeFactor = 0.18; // <<< Zwiększono (było 0.05)
+        float currentFreq = baseFreq + sin(time * freqTimeFactor + timeOffset * 2.0) * freqVariation;
+        float currentOffset = timeOffset + cos(time * offsetTimeFactor + pos.x * 0.1) * 2.0;
+        return sin(pos.y * currentFreq + time * speed + currentOffset) *
+               cos(pos.x * currentFreq * 0.8 + time * speed * 0.7 + currentOffset * 0.5) *
+               sin(pos.z * currentFreq * 1.2 + time * speed * 1.1 + currentOffset * 1.2) *
                amp;
     }
 
     void main()
     {
         vPos = aPos;
-        vec3 normal = normalize(aPos); // Normalna dla kuli
+        vec3 normal = normalize(aPos);
 
-        // --- Bardziej złożona i płynna deformacja ---
-        float baseAmplitude = 0.12; // Zmniejszona amplituda bazowa dla subtelności
-        float baseSpeed = 0.3;      // Zmniejszona prędkość bazowa
+        // --- Agresywniejsza i szybciej ewoluująca deformacja ---
+        float baseAmplitude = 0.28; // <<< Nieznacznie zwiększona amplituda bazowa
+        float baseSpeed = 0.35;
 
-        // Warstwa 1: Wolne, duże fale
-        float deformation1 = smoothWave(aPos, 2.5, baseAmplitude, baseSpeed, 0.0);
-        // Warstwa 2: Szybsze, mniejsze fale nałożone na pierwsze
-        float deformation2 = smoothWave(aPos * 1.8, 4.0, baseAmplitude * 0.6, baseSpeed * 1.5, 1.5);
-        // Warstwa 3: Subtelny szum dla dodania tekstury
-        float deformation3 = (noise(aPos * 3.0 + time * 0.05) - 0.5) * baseAmplitude * 0.2;
+        // Warstwa 1: Wolne, duże, ewoluujące fale
+        float deformation1 = evolvingWave(aPos, 2.0, 0.6, baseAmplitude, baseSpeed * 0.8, 0.0); // Zwiększono freqVariation
+        // Warstwa 2: Szybsze, mniejsze, ewoluujące fale
+        float deformation2 = evolvingWave(aPos * 1.5, 3.5, 1.2, baseAmplitude * 0.7, baseSpeed * 1.5, 1.5); // Zwiększono freqVariation
+        // Warstwa 3: Bardziej agresywna, globalna zmiana kształtu
+        float thinkingAmplitudeFactor = 0.9; // <<< Zwiększono (było 0.5, potem 0.8)
+        float thinkingDeformation = evolvingWave(aPos * 0.5, 1.0, 0.4, baseAmplitude * thinkingAmplitudeFactor, baseSpeed * 0.15, 5.0); // Zwiększono freqVariation i speed
+        // Warstwa 4: Subtelny szum dla tekstury
+        float noiseDeformation = (noise(aPos * 2.5 + time * 0.04) - 0.5) * baseAmplitude * 0.15;
 
-        // Połączenie deformacji
-        float totalDeformation = deformation1 + deformation2 + deformation3;
-        vDeformationFactor = smoothstep(0.0, baseAmplitude * 1.5, abs(totalDeformation)); // Normalizowany współczynnik dla koloru/blasku
+        float totalDeformation = deformation1 + deformation2 + thinkingDeformation + noiseDeformation;
+        vDeformationFactor = smoothstep(0.0, baseAmplitude * 2.2, abs(totalDeformation)); // Dostosowany zakres
 
         vec3 displacedPos = aPos + normal * totalDeformation;
 
         gl_Position = projection * view * model * vec4(displacedPos, 1.0);
 
-        // --- Płynniejsza zmiana rozmiaru punktu ---
-        float basePointSize = 1.8;
-        float sizeVariation = 1.5;
-        // Użycie sinusa z różnymi częstotliwościami dla płynniejszej zmiany
-        gl_PointSize = basePointSize + sizeVariation * (sin(time * 1.0 + aPos.x * 3.0) + cos(time * 0.7 + aPos.y * 4.0) + 1.0) / 2.0;
-        // Ograniczenie minimalnego rozmiaru
-        gl_PointSize = max(1.0, gl_PointSize);
+        float basePointSize = 1.2; // <<< Zmniejszono nieco bazowy rozmiar dla większej liczby punktów
+        float sizeVariation = 1.8;
+        gl_PointSize = basePointSize + sizeVariation * vDeformationFactor + 0.5 * (sin(time + aPos.x * 5.0) + 1.0);
+        gl_PointSize = max(0.8, gl_PointSize); // <<< Zmniejszono minimalny rozmiar
     }
 )";
 
-// Fragment Shader: Okrągłe punkty, wykorzystanie vDeformationFactor
+// Fragment Shader pozostaje bez zmian (wersja bez okrągłych punktów)
 const char *fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
 
     in vec3 vPos;
-    in float vDeformationFactor; // Współczynnik deformacji (0 do ~1)
+    in float vDeformationFactor;
     uniform float time;
 
     void main()
     {
-        /* --- Tymczasowo wyłączone okrągłe punkty ---
-        vec2 coord = gl_PointCoord - vec2(0.5); // Współrzędne wewnątrz punktu (-0.5 do 0.5)
-        if(dot(coord, coord) > 0.25) { // Jeśli poza okręgiem o promieniu 0.5
-            discard; // Odrzuć fragment
-        }
-        float edgeFactor = 1.0 - smoothstep(0.20, 0.25, dot(coord, coord)); // Wygładzenie krawędzi
-        */ // --- Koniec tymczasowego wyłączenia ---
-
-        vec3 colorBlue = vec3(0.1, 0.3, 1.0); // Nieco jaśniejszy niebieski
+        vec3 colorBlue = vec3(0.1, 0.3, 1.0);
         vec3 colorViolet = vec3(0.7, 0.2, 0.9);
-        vec3 colorPink = vec3(1.0, 0.4, 0.8); // Nieco jaśniejszy róż
+        vec3 colorPink = vec3(1.0, 0.4, 0.8);
 
         float factor = (normalize(vPos).y + 1.0) / 2.0;
 
@@ -99,14 +94,9 @@ const char *fragmentShaderSource = R"(
             baseColor = mix(colorViolet, colorPink, (factor - 0.5) * 2.0);
         }
 
-        // Blask modulowany przez vDeformationFactor i czas dla subtelniejszego efektu
-        float glow = 0.5 + 0.5 * vDeformationFactor + 0.2 * abs(sin(time * 1.2)); // Mniej intensywny, zależny od deformacji
-
-        vec3 finalColor = baseColor * (glow + 0.3); // Dodanie lekkiej jasności bazowej
-
-        // Użyj stałej alpha lub edgeFactor jeśli przywrócisz okrągłe punkty
-        float alpha = 0.8; // * edgeFactor; // Użyj stałej alpha na razie
-
+        float glow = 0.4 + 0.8 * vDeformationFactor + 0.3 * abs(sin(vPos.x * 2.0 + time * 1.5));
+        vec3 finalColor = baseColor * (glow + 0.2);
+        float alpha = 0.85;
         FragColor = vec4(finalColor, alpha);
     }
 )";
@@ -182,7 +172,7 @@ void FloatingEnergySphereWidget::initializeGL()
     qDebug() << "Shaders set up successfully.";
 
     qDebug() << "Setting up sphere geometry (points)...";
-    setupSphereGeometry(64, 128);
+    setupSphereGeometry(96, 192);
     qDebug() << "Sphere geometry set up with" << m_vertexCount << "vertices.";
 
     m_vao.create();
