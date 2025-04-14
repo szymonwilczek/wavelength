@@ -16,7 +16,20 @@
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::getInstance())
+m_config(WavelengthConfig::getInstance()),
+m_securityLayersStack(nullptr),
+m_fingerprintLayer(nullptr),
+m_handprintLayer(nullptr),
+m_securityCodeLayer(nullptr),
+m_securityQuestionLayer(nullptr),
+m_retinaScanLayer(nullptr),
+m_voiceRecognitionLayer(nullptr),
+m_typingTestLayer(nullptr),
+m_snakeGameLayer(nullptr),
+m_classifiedFeaturesWidget(nullptr),
+m_waveSculptorWindow(nullptr),
+m_currentLayerIndex(FingerprintIndex),
+m_debugModeEnabled(true) // <<< Zainicjalizuj flagę na false
 {
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("SettingsView { background-color: #101820; }");
@@ -31,6 +44,15 @@ SettingsView::SettingsView(QWidget *parent)
         m_timeLabel->setText(QString("TS: %1").arg(timestamp));
     });
     m_refreshTimer->start();
+}
+
+void SettingsView::setDebugMode(bool enabled) {
+    if (m_debugModeEnabled != enabled) {
+        m_debugModeEnabled = enabled;
+        qDebug() << "SettingsView Debug Mode:" << (enabled ? "ENABLED" : "DISABLED");
+        // Po zmianie trybu debugowania, zresetuj stan zakładki CLASSIFIED
+        resetSecurityLayers();
+    }
 }
 
 SettingsView::~SettingsView() {
@@ -687,18 +709,18 @@ void SettingsView::handleBackButton() {
 
 
 void SettingsView::resetSecurityLayers() {
-    // Sprawdź, czy widgety warstw zostały utworzone
-    if (!m_fingerprintLayer || !m_handprintLayer || !m_securityCodeLayer ||
-        !m_securityQuestionLayer || !m_retinaScanLayer || !m_voiceRecognitionLayer ||
-        !m_typingTestLayer || !m_snakeGameLayer || !m_securityLayersStack || !m_classifiedFeaturesWidget) { // Dodaj sprawdzenie m_classifiedFeaturesWidget
-        qDebug() << "Security layers or stack not fully initialized, skipping reset.";
+    // Sprawdź, czy widgety warstw i stos zostały utworzone
+    if (!m_securityLayersStack || !m_fingerprintLayer || !m_handprintLayer ||
+        !m_securityCodeLayer || !m_securityQuestionLayer || !m_retinaScanLayer ||
+        !m_voiceRecognitionLayer || !m_typingTestLayer || !m_snakeGameLayer ||
+        !m_classifiedFeaturesWidget) {
+        qWarning() << "Cannot reset security layers: Stack or layers not fully initialized.";
         return;
-        }
-    qDebug() << "Resetting all security layers...";
+    }
 
-    m_currentLayerIndex = FingerprintIndex;
+    qDebug() << "Resetting security layers... Debug mode:" << m_debugModeEnabled;
 
-    // Zresetuj stan każdej warstwy
+    // Zresetuj stan każdej warstwy (zawsze warto to zrobić)
     m_fingerprintLayer->reset();
     m_handprintLayer->reset();
     m_securityCodeLayer->reset();
@@ -707,11 +729,30 @@ void SettingsView::resetSecurityLayers() {
     m_voiceRecognitionLayer->reset();
     m_typingTestLayer->reset();
     m_snakeGameLayer->reset();
-    // Nie ma potrzeby resetować m_classifiedFeaturesWidget
 
-    // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
-    m_securityLayersStack->setCurrentIndex(FingerprintIndex);
-    m_fingerprintLayer->initialize();
+    if (m_debugModeEnabled) {
+        // --- TRYB DEBUGOWANIA ---
+        // Znajdź indeks ostatniego widgetu (funkcji)
+        int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+        if (featuresIndex != -1) {
+            m_securityLayersStack->setCurrentIndex(featuresIndex);
+            qDebug() << "Debug mode: Bypassed security layers, showing classified features.";
+            // Nie ma potrzeby wywoływania initialize() dla tego widgetu
+        } else {
+            qWarning() << "Debug mode error: Could not find ClassifiedFeaturesWidget index!";
+            // Awaryjnie, ustaw pierwszy widget
+            m_securityLayersStack->setCurrentIndex(FingerprintIndex);
+            m_currentLayerIndex = FingerprintIndex;
+            m_fingerprintLayer->initialize();
+        }
+    } else {
+        // --- TRYB NORMALNY ---
+        // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
+        m_currentLayerIndex = FingerprintIndex;
+        m_securityLayersStack->setCurrentIndex(FingerprintIndex);
+        m_fingerprintLayer->initialize();
+        qDebug() << "Normal mode: Starting security layers sequence.";
+    }
     qDebug() << "Security layers reset complete. Current index:" << m_securityLayersStack->currentIndex();
 }
 

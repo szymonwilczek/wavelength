@@ -75,6 +75,7 @@ public:
         update();
     }
 
+
 protected:
     void enterEvent(QEvent *event) override {
         if (!m_isActive) {
@@ -140,6 +141,8 @@ class SettingsView : public QWidget {
 public:
     explicit SettingsView(QWidget *parent = nullptr);
     ~SettingsView() override;
+
+    void setDebugMode(bool enabled);
 
 signals:
     void backToMainView();
@@ -231,6 +234,7 @@ private:
     };
 
     SecurityLayerIndex m_currentLayerIndex;
+    bool m_debugModeEnabled;
 
     QWidget* m_classifiedFeaturesWidget;
     WaveSculptorWindow* m_waveSculptorWindow;
