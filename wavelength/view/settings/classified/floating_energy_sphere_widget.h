@@ -21,10 +21,10 @@ public:
     explicit FloatingEnergySphereWidget(QWidget *parent = nullptr);
     ~FloatingEnergySphereWidget() override;
 
-    void setClosable(bool closable); // Metoda do kontrolowania zamykania
+    void setClosable(bool closable);
 
     signals:
-        void widgetClosed(); // Sygnał emitowany przy zamknięciu
+        void widgetClosed();
 
 protected:
     void initializeGL() override;
@@ -41,15 +41,15 @@ protected:
         void updateAnimation();
 
 private:
-    void setupGeometry(); // Zmieniona nazwa
+    void setupSphereGeometry(int rings, int sectors);
     void setupShaders();
 
     QTimer m_timer;
-    float m_timeValue;
-    float m_glitchIntensity; // Do kontrolowania glitcha
+    float m_timeValue; // Używane w shaderach do animacji
 
     QOpenGLShaderProgram *m_program;
-    QOpenGLBuffer m_vbo;
+    QOpenGLBuffer m_vbo; // Vertex Buffer Object (tylko pozycje)
+    // Usunięto m_ebo
     QOpenGLVertexArrayObject m_vao;
 
     QMatrix4x4 m_projectionMatrix;
@@ -63,11 +63,12 @@ private:
     bool m_mousePressed;
     QQuaternion m_rotation;
 
-    // Geometria - teraz tylko punkty
-    std::vector<GLfloat> m_points;
-    int m_pointCount;
+    // Geometria - tylko wierzchołki
+    std::vector<GLfloat> m_vertices;
+    // Usunięto m_indices i m_indexCount
+    int m_vertexCount; // Liczba wierzchołków do narysowania
 
-    bool m_closable; // Czy można zamknąć widget
+    bool m_closable;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H
