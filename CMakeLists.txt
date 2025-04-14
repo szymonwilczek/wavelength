@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(pk4_projekt)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -171,6 +171,8 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.h
         wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.cpp
         wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.h
+        wavelength/view/settings/classified/matrix_vision/matrix_vision_widget.cpp
+        wavelength/view/settings/classified/matrix_vision/matrix_vision_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
