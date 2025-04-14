@@ -1,6 +1,7 @@
 #ifndef FLOATING_ENERGY_SPHERE_WIDGET_H
 #define FLOATING_ENERGY_SPHERE_WIDGET_H
 
+#include <QElapsedTimer>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
@@ -72,6 +73,9 @@ private:
 
     QVector3D m_angularVelocity; // Prędkość kątowa obrotu
     float m_dampingFactor;
+
+    QElapsedTimer m_elapsedTimer;   // Timer do mierzenia czasu
+    float m_lastFrameTimeSecs;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H
