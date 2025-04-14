@@ -14,6 +14,8 @@
 #include <QRandomGenerator>
 #include <QStyle>
 
+#include "settings/classified/system_override_manager.h"
+
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
 m_config(WavelengthConfig::getInstance()),
@@ -44,6 +46,17 @@ m_debugModeEnabled(true) // <<< Zainicjalizuj flagę na false
         m_timeLabel->setText(QString("TS: %1").arg(timestamp));
     });
     m_refreshTimer->start();
+
+    m_systemOverrideManager = new SystemOverrideManager(this);
+
+    connect(m_systemOverrideManager, &SystemOverrideManager::overrideFinished, this, [this](){
+        qDebug() << "Override sequence finished signal received in SettingsView.";
+        if (m_overrideButton) {
+            m_overrideButton->setEnabled(true);
+            m_overrideButton->setText("CAUTION: SYSTEM OVERRIDE");
+        }
+        // Można dodać inne akcje po zakończeniu override
+    });
 }
 
 void SettingsView::setDebugMode(bool enabled) {
@@ -228,11 +241,46 @@ void SettingsView::setupClassifiedTab() {
     matrixVisionButton->setEnabled(false); // Na razie wyłączony
     buttonLayout->addWidget(matrixVisionButton);
 
-    QPushButton* overrideButton = new QPushButton("SYSTEM OVERRIDE (TBD)", buttonContainer);
-    overrideButton->setMinimumHeight(40);
-    overrideButton->setStyleSheet("QPushButton { background-color: #440000; border: 1px solid #880000; padding: 10px; border-radius: 5px; color: #AA0000; font-weight: bold; }");
-    overrideButton->setEnabled(false); // Na razie wyłączony
-    buttonLayout->addWidget(overrideButton);
+    // Przycisk SYSTEM OVERRIDE - Poprawiona inicjalizacja
+    m_overrideButton = new QPushButton("CAUTION: SYSTEM OVERRIDE", buttonContainer); // Poprawiony tekst
+    m_overrideButton->setMinimumHeight(50); // Wyższy przycisk
+    m_overrideButton->setMinimumWidth(250);
+    m_overrideButton->setStyleSheet( // Zastosuj od razu właściwy styl
+        "QPushButton {"
+        "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #AA0000, stop:1 #660000);"
+        "  border: 2px solid #FF3333;"
+        "  border-radius: 8px;"
+        "  color: #FFFFFF;"
+        "  font-family: 'Consolas';"
+        "  font-size: 12pt;"
+        "  font-weight: bold;"
+        "  padding: 10px;"
+        "  text-transform: uppercase;"
+        "}"
+        "QPushButton:hover {"
+        "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #CC0000, stop:1 #880000);"
+        "  border-color: #FF6666;"
+        "}"
+        "QPushButton:pressed {"
+        "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #880000, stop:1 #440000);"
+        "  border-color: #DD0000;"
+        "}"
+        "QPushButton:disabled {" // Dodaj styl dla stanu wyłączonego
+        "  background-color: #555;"
+        "  border-color: #777;"
+        "  color: #999;"
+        "}"
+    );
+    m_overrideButton->setEnabled(true); // Upewnij się, że jest włączony
+    // --- DODAJ TO POŁĄCZENIE ---
+    connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
+        m_overrideButton->setEnabled(false); // Wyłącz przycisk po kliknięciu
+        m_systemOverrideManager->initiateOverrideSequence();
+        m_overrideButton->setText("OVERRIDE IN PROGRESS...");
+    });
+    // ---------------------------
+    buttonLayout->addWidget(m_overrideButton);
+
 
     featuresLayout->addWidget(buttonContainer, 0, Qt::AlignCenter);
     featuresLayout->addStretch();
@@ -729,6 +777,11 @@ void SettingsView::resetSecurityLayers() {
     m_voiceRecognitionLayer->reset();
     m_typingTestLayer->reset();
     m_snakeGameLayer->reset();
+
+    if (m_overrideButton) {
+        m_overrideButton->setEnabled(true);
+        m_overrideButton->setText("CAUTION: SYSTEM OVERRIDE");
+    }
 
     if (m_debugModeEnabled) {
         // --- TRYB DEBUGOWANIA ---

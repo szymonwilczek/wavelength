@@ -19,6 +19,7 @@
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
+#include "settings/classified/system_override_manager.h"
 #include "settings/classified/wave_sculptor/wave_sculptor_window.h"
 #include "settings/layers/code/security_code_layer.h"
 #include "settings/layers/fingerprint/fingerprint_layer.h"
@@ -238,6 +239,10 @@ private:
 
     QWidget* m_classifiedFeaturesWidget;
     WaveSculptorWindow* m_waveSculptorWindow;
+
+    QPushButton* m_overrideButton;
+
+    SystemOverrideManager* m_systemOverrideManager;
 };
 
 #endif // SETTINGS_VIEW_H
