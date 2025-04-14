@@ -69,6 +69,9 @@ private:
     int m_vertexCount; // Liczba wierzchołków do narysowania
 
     bool m_closable;
+
+    QVector3D m_angularVelocity; // Prędkość kątowa obrotu
+    float m_dampingFactor;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H

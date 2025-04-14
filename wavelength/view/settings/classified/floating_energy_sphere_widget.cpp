@@ -10,71 +10,88 @@
 // Vertex Shader: Deformuje pozycję wierzchołka w czasie, ustawia rozmiar punktu
 const char *vertexShaderSource = R"(
     #version 330 core
-    layout (location = 0) in vec3 aPos; // Pozycja wejściowa
+    layout (location = 0) in vec3 aPos;
 
     uniform mat4 model;
     uniform mat4 view;
     uniform mat4 projection;
-    uniform float time; // Czas do animacji
+    uniform float time;
 
-    out vec3 vPos; // Przekazanie oryginalnej pozycji do fragment shadera
-    out float vDeformation; // Przekazanie wartości deformacji
+    out vec3 vPos;
+    out float vDeformationFactor; // Przekazanie współczynnika deformacji do fragment shadera
 
-    // Prosta funkcja szumu (można zastąpić bardziej złożoną)
+    // Prosta funkcja szumu (nadal prosta, ale użyta inaczej)
     float noise(vec3 p) {
-        // Prosty przykład, można użyć bardziej zaawansowanych funkcji szumu
         return fract(sin(dot(p, vec3(12.9898, 78.233, 54.53))) * 43758.5453);
+    }
+
+    // Funkcja do tworzenia płynniejszych fal
+    float smoothWave(vec3 pos, float freq, float amp, float speed, float timeOffset) {
+        return sin(pos.y * freq + time * speed + timeOffset) *
+               cos(pos.x * freq * 0.8 + time * speed * 0.7 + timeOffset * 0.5) *
+               sin(pos.z * freq * 1.2 + time * speed * 1.1 + timeOffset * 1.2) *
+               amp;
     }
 
     void main()
     {
-        vPos = aPos; // Zapamiętaj oryginalną pozycję
+        vPos = aPos;
+        vec3 normal = normalize(aPos); // Normalna dla kuli
 
-        // Deformacja oparta na czasie i pozycji
-        float frequency = 3.0;
-        float amplitude = 0.15;
-        float speed = 0.5;
+        // --- Bardziej złożona i płynna deformacja ---
+        float baseAmplitude = 0.12; // Zmniejszona amplituda bazowa dla subtelności
+        float baseSpeed = 0.3;      // Zmniejszona prędkość bazowa
 
-        // Deformacja oparta na sinusie (falowanie)
-        float deformation1 = sin(aPos.y * frequency + time * speed) * amplitude;
-        // Dodatkowa deformacja dla bardziej organicznego wyglądu
-        float deformation2 = cos(aPos.x * frequency * 0.8 + time * speed * 1.2) * amplitude * 0.7;
-        // Deformacja oparta na prostym szumie
-        float deformation3 = (noise(aPos * 2.0 + time * 0.1) - 0.5) * amplitude * 0.5;
+        // Warstwa 1: Wolne, duże fale
+        float deformation1 = smoothWave(aPos, 2.5, baseAmplitude, baseSpeed, 0.0);
+        // Warstwa 2: Szybsze, mniejsze fale nałożone na pierwsze
+        float deformation2 = smoothWave(aPos * 1.8, 4.0, baseAmplitude * 0.6, baseSpeed * 1.5, 1.5);
+        // Warstwa 3: Subtelny szum dla dodania tekstury
+        float deformation3 = (noise(aPos * 3.0 + time * 0.05) - 0.5) * baseAmplitude * 0.2;
 
-        vDeformation = deformation1 + deformation2 + deformation3; // Suma deformacji
+        // Połączenie deformacji
+        float totalDeformation = deformation1 + deformation2 + deformation3;
+        vDeformationFactor = smoothstep(0.0, baseAmplitude * 1.5, abs(totalDeformation)); // Normalizowany współczynnik dla koloru/blasku
 
-        vec3 normal = normalize(aPos); // Przybliżona normalna dla kuli
-        vec3 displacedPos = aPos + normal * vDeformation;
+        vec3 displacedPos = aPos + normal * totalDeformation;
 
         gl_Position = projection * view * model * vec4(displacedPos, 1.0);
 
-        // Ustawienie rozmiaru punktu (może być dynamiczne)
-        gl_PointSize = 2.0 + 3.0 * (sin(time * 2.0 + aPos.x * 5.0) + 1.0) / 2.0; // Dynamiczny rozmiar
-        // gl_PointSize = 2.0; // Stały rozmiar
+        // --- Płynniejsza zmiana rozmiaru punktu ---
+        float basePointSize = 1.8;
+        float sizeVariation = 1.5;
+        // Użycie sinusa z różnymi częstotliwościami dla płynniejszej zmiany
+        gl_PointSize = basePointSize + sizeVariation * (sin(time * 1.0 + aPos.x * 3.0) + cos(time * 0.7 + aPos.y * 4.0) + 1.0) / 2.0;
+        // Ograniczenie minimalnego rozmiaru
+        gl_PointSize = max(1.0, gl_PointSize);
     }
 )";
 
-// Fragment Shader: Koloruje punkty na podstawie pozycji i czasu, tworzy gradient
+// Fragment Shader: Okrągłe punkty, wykorzystanie vDeformationFactor
 const char *fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
 
-    in vec3 vPos; // Oryginalna pozycja z vertex shadera
-    in float vDeformation; // Wartość deformacji z vertex shadera
-    uniform float time; // Czas do animacji
+    in vec3 vPos;
+    in float vDeformationFactor; // Współczynnik deformacji (0 do ~1)
+    uniform float time;
 
     void main()
     {
-        // Definicja kolorów gradientu
-        vec3 colorBlue = vec3(0.1, 0.2, 0.9);
-        vec3 colorViolet = vec3(0.6, 0.1, 0.8);
-        vec3 colorPink = vec3(0.9, 0.3, 0.7);
+        /* --- Tymczasowo wyłączone okrągłe punkty ---
+        vec2 coord = gl_PointCoord - vec2(0.5); // Współrzędne wewnątrz punktu (-0.5 do 0.5)
+        if(dot(coord, coord) > 0.25) { // Jeśli poza okręgiem o promieniu 0.5
+            discard; // Odrzuć fragment
+        }
+        float edgeFactor = 1.0 - smoothstep(0.20, 0.25, dot(coord, coord)); // Wygładzenie krawędzi
+        */ // --- Koniec tymczasowego wyłączenia ---
 
-        // Współczynnik do interpolacji kolorów (np. na podstawie pozycji Y)
-        float factor = (normalize(vPos).y + 1.0) / 2.0; // Normalizowana pozycja Y (zakres 0-1)
+        vec3 colorBlue = vec3(0.1, 0.3, 1.0); // Nieco jaśniejszy niebieski
+        vec3 colorViolet = vec3(0.7, 0.2, 0.9);
+        vec3 colorPink = vec3(1.0, 0.4, 0.8); // Nieco jaśniejszy róż
 
-        // Interpolacja między kolorami
+        float factor = (normalize(vPos).y + 1.0) / 2.0;
+
         vec3 baseColor;
         if (factor < 0.5) {
             baseColor = mix(colorBlue, colorViolet, factor * 2.0);
@@ -82,16 +99,13 @@ const char *fragmentShaderSource = R"(
             baseColor = mix(colorViolet, colorPink, (factor - 0.5) * 2.0);
         }
 
-        // Dodanie efektu "blasku" / luminancji - modulacja jasności
-        // Użyjemy deformacji i czasu do modulacji
-        float glow = 0.6 + 0.4 * abs(sin(vDeformation * 10.0 + time * 1.5)); // Pulsujący blask
+        // Blask modulowany przez vDeformationFactor i czas dla subtelniejszego efektu
+        float glow = 0.5 + 0.5 * vDeformationFactor + 0.2 * abs(sin(time * 1.2)); // Mniej intensywny, zależny od deformacji
 
-        // Końcowy kolor z blaskiem
-        vec3 finalColor = baseColor * glow;
+        vec3 finalColor = baseColor * (glow + 0.3); // Dodanie lekkiej jasności bazowej
 
-        // Można dodać efekt przezroczystości w zależności od kąta patrzenia lub odległości od centrum
-        // float alpha = clamp(dot(normalize(vPos), vec3(0,0,1)), 0.1, 1.0); // Przykład alpha
-        float alpha = 0.8; // Stała alpha dla lepszego blendingu
+        // Użyj stałej alpha lub edgeFactor jeśli przywrócisz okrągłe punkty
+        float alpha = 0.8; // * edgeFactor; // Użyj stałej alpha na razie
 
         FragColor = vec4(finalColor, alpha);
     }
@@ -105,21 +119,20 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(QWidget *parent)
       m_timeValue(0.0f),
       m_program(nullptr),
       m_vbo(QOpenGLBuffer::VertexBuffer),
-      // m_ebo usunięte
-      m_cameraPosition(0.0f, 0.0f, 3.5f), // Trochę dalej na start
+      m_cameraPosition(0.0f, 0.0f, 3.5f),
       m_cameraDistance(3.5f),
       m_mousePressed(false),
-      m_vertexCount(0), // Zmieniono z m_indexCount
-      m_closable(true)
+      m_vertexCount(0),
+      m_closable(true),
+      m_angularVelocity(0.0f, 0.0f, 0.0f), // Inicjalizacja prędkości kątowej
+      m_dampingFactor(0.96f)              // Współczynnik tłumienia (bliżej 1 = dłuższa bezwładność)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    // WA_TranslucentBackground może być potrzebne dla blendingu punktów z tłem, ale zacznijmy bez
-    // setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_NoSystemBackground); // Upewnij się, że tło systemowe nie jest rysowane
-    // setAttribute(Qt::WA_PaintOnScreen);     // <<< ZAKOMENTUJ LUB USUŃ TĘ LINIĘ
+    setAttribute(Qt::WA_NoSystemBackground);
+    // setAttribute(Qt::WA_PaintOnScreen); // Upewnij się, że to jest zakomentowane/usunięte
     setAttribute(Qt::WA_DeleteOnClose);
-    setMouseTracking(true);
-    resize(600, 600); // Zwiększmy trochę rozmiar
+    setMouseTracking(true); // Ważne dla płynnego ruchu myszy
+    resize(600, 600);
 
     connect(&m_timer, &QTimer::timeout, this, &FloatingEnergySphereWidget::updateAnimation);
     m_timer.start(16); // ~60 FPS
@@ -149,19 +162,15 @@ void FloatingEnergySphereWidget::initializeGL()
     }
     qDebug() << "OpenGL functions initialized.";
 
-    // Ustaw kolor czyszczenia na czarny, nieprzezroczysty
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Włącz test głębokości, aby punkty bliżej kamery przesłaniały dalsze
     glEnable(GL_DEPTH_TEST);
-
-    // Włącz blending dla punktów, aby uzyskać efekt półprzezroczystości/blasku
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standardowy blending alpha
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE); // Alternatywnie: Additive blending dla jaśniejszego efektu
-
-    // Włącz możliwość ustawiania rozmiaru punktu w vertex shaderze
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_PROGRAM_POINT_SIZE);
+
+    // --- Włącz wygładzanie punktów ---
+    // glEnable(GL_POINT_SMOOTH); // Może, ale nie musi działać dobrze na wszystkich sterownikach
+    // --- Koniec wygładzania punktów ---
 
     qDebug() << "Setting up shaders...";
     setupShaders();
@@ -173,8 +182,7 @@ void FloatingEnergySphereWidget::initializeGL()
     qDebug() << "Shaders set up successfully.";
 
     qDebug() << "Setting up sphere geometry (points)...";
-    // Zwiększamy liczbę segmentów dla większej gęstości punktów
-    setupSphereGeometry(64, 128); // Więcej punktów (64 pierścienie, 128 sektorów)
+    setupSphereGeometry(64, 128);
     qDebug() << "Sphere geometry set up with" << m_vertexCount << "vertices.";
 
     m_vao.create();
@@ -182,19 +190,13 @@ void FloatingEnergySphereWidget::initializeGL()
 
     m_vbo.create();
     m_vbo.bind();
-    // Alokujemy tylko dane wierzchołków (pozycja x, y, z)
     m_vbo.allocate(m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
 
-    // Konfiguracja EBO jest usunięta
-
-    // Atrybut wierzchołków (tylko pozycja)
     m_program->enableAttributeArray(0);
-    // Krok (stride) to 3 * sizeof(GLfloat), bo mamy tylko pozycję (x, y, z)
     m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
     m_vao.release();
     m_vbo.release();
-    // m_ebo.release() usunięte
     m_program->release();
 
     qDebug() << "VAO/VBO configured for points.";
@@ -228,36 +230,27 @@ void FloatingEnergySphereWidget::setupShaders()
 void FloatingEnergySphereWidget::setupSphereGeometry(int rings, int sectors)
 {
     m_vertices.clear();
-    // m_indices.clear() usunięte
 
     const float PI = 3.14159265359f;
-    float radius = 1.0f; // Promień bazowej sfery
+    float radius = 1.0f;
 
     float const R = 1. / (float)(rings - 1);
     float const S = 1. / (float)(sectors - 1);
 
-    m_vertices.resize(rings * sectors * 3); // Tylko 3 floaty na wierzchołek (x, y, z)
+    m_vertices.resize(rings * sectors * 3);
     auto v = m_vertices.begin();
     for (int r = 0; r < rings; ++r) {
         for (int s = 0; s < sectors; ++s) {
-            // Współrzędne sferyczne
             float const y = sin(-PI / 2 + PI * r * R);
             float const x = cos(2 * PI * s * S) * sin(PI * r * R);
             float const z = sin(2 * PI * s * S) * sin(PI * r * R);
 
-            // Zapisanie pozycji wierzchołka
             *v++ = x * radius;
             *v++ = y * radius;
             *v++ = z * radius;
         }
     }
-
-    // Nie generujemy już indeksów
-    // m_indices.resize(...) usunięte
-    // Pętla generująca indeksy usunięta
-
-    m_vertexCount = rings * sectors; // Zapisujemy liczbę wierzchołków
-    // m_indexCount usunięte
+    m_vertexCount = rings * sectors;
 }
 
 
@@ -272,36 +265,28 @@ void FloatingEnergySphereWidget::resizeGL(int w, int h)
 
 void FloatingEnergySphereWidget::paintGL()
 {
-    // Czyszczenie buforów koloru i głębokości na czarno
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (!m_program || !m_program->isLinked()) {
-        qWarning() << "PaintGL called but shader program is not linked!";
         return;
     }
 
     m_program->bind();
-    m_vao.bind(); // Powiązanie VAO (automatycznie powiązuje VBO)
+    m_vao.bind();
 
-    // Ustawienie macierzy widoku (kamera)
     m_viewMatrix.setToIdentity();
-    // Pozycja kamery jest teraz kontrolowana przez zoom (m_cameraDistance)
     m_cameraPosition = QVector3D(0, 0, m_cameraDistance);
     m_viewMatrix.lookAt(m_cameraPosition, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
 
-    // Ustawienie macierzy modelu (transformacje obiektu - obrót myszką)
     m_modelMatrix.setToIdentity();
-    m_modelMatrix.rotate(m_rotation); // Zastosuj obrót myszką
+    m_modelMatrix.rotate(m_rotation); // Zastosuj aktualny obrót (z bezwładnością)
 
-    // Przekazanie macierzy i czasu do shadera
     m_program->setUniformValue("projection", m_projectionMatrix);
     m_program->setUniformValue("view", m_viewMatrix);
     m_program->setUniformValue("model", m_modelMatrix);
-    m_program->setUniformValue("time", m_timeValue); // Przekazanie czasu do animacji
+    m_program->setUniformValue("time", m_timeValue);
 
-    // Rysowanie punktów zamiast trójkątów
-    // qDebug() << "Drawing points:" << m_vertexCount; // Opcjonalny log
-    glDrawArrays(GL_POINTS, 0, m_vertexCount); // Rysuj punkty
+    glDrawArrays(GL_POINTS, 0, m_vertexCount);
 
     m_vao.release();
     m_program->release();
@@ -309,15 +294,43 @@ void FloatingEnergySphereWidget::paintGL()
 
 void FloatingEnergySphereWidget::updateAnimation()
 {
-    // Aktualizuj czas - napędza animację w shaderach
-    m_timeValue += 0.016f; // Zwiększaj czas (przy założeniu ~60 FPS)
-    if (m_timeValue > 3600.0f) m_timeValue -= 3600.0f; // Resetuj co jakiś czas, aby uniknąć dużych liczb
+    m_timeValue += 0.016f;
+    if (m_timeValue > 3600.0f) m_timeValue -= 3600.0f;
 
-    // Automatyczny, powolny obrót (można zakomentować, jeśli preferujesz tylko obrót myszką)
-    // m_rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 0.1f) * m_rotation;
-    // m_rotation.normalize();
+    // --- Zastosowanie bezwładności ---
+    if (!m_mousePressed && m_angularVelocity.lengthSquared() > 0.0001f) {
+        // Oblicz obrót na podstawie prędkości kątowej
+        QQuaternion deltaRotation = QQuaternion::fromAxisAndAngle(m_angularVelocity.normalized(), m_angularVelocity.length());
+        m_rotation = deltaRotation * m_rotation;
+        m_rotation.normalize(); // Normalizuj kwaternion
 
-    update(); // Poproś o przerysowanie widgetu
+        // Zastosuj tłumienie
+        m_angularVelocity *= m_dampingFactor;
+
+        // Zatrzymaj, jeśli prędkość jest bardzo mała
+        if (m_angularVelocity.lengthSquared() < 0.0001f) {
+            m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
+        }
+        update(); // Poproś o przerysowanie tylko jeśli jest ruch bezwładnościowy
+    } else if (!m_mousePressed) {
+        // Jeśli nie ma wciśniętej myszy i nie ma prędkości, nie rób nic (chyba że chcesz stały obrót)
+        // Można tu dodać powolny, stały obrót, jeśli jest pożądany:
+        QQuaternion slowSpin = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 0.05f);
+        m_rotation = slowSpin * m_rotation;
+        m_rotation.normalize();
+        update();
+    } else {
+        // Jeśli mysz jest wciśnięta, update() jest wywoływane w mouseMoveEvent
+    }
+
+    // Jeśli nie ma bezwładności ani stałego obrotu, update() jest potrzebne tylko dla animacji shadera
+    if (m_mousePressed || m_angularVelocity.lengthSquared() > 0.0001f) {
+        // Już wywołano update() wyżej lub w mouseMoveEvent
+    } else {
+        // Wywołaj update() dla samej animacji shadera, jeśli nie ma ruchu obiektu
+        update();
+    }
+    // --- Koniec bezwładności ---
 }
 
 // --- Metody obsługi myszy (mousePressEvent, mouseMoveEvent, mouseReleaseEvent, wheelEvent) ---
@@ -328,6 +341,7 @@ void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_mousePressed = true;
         m_lastMousePos = event->pos();
+        m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f); // Zatrzymaj bezwładność przy nowym chwyceniu
         event->accept();
     } else {
         event->ignore();
@@ -340,17 +354,29 @@ void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event)
         QPoint delta = event->pos() - m_lastMousePos;
         m_lastMousePos = event->pos();
 
-        float angleX = (float)delta.y() * 0.25f;
-        float angleY = (float)delta.x() * 0.25f;
+        // --- Obliczanie prędkości kątowej zamiast bezpośredniego obrotu ---
+        float sensitivity = 0.4f; // Dostosuj czułość
+        // Odwracamy osie, aby pasowały do intuicyjnego przeciągania obiektu
+        float angularSpeedX = (float)-delta.y() * sensitivity;
+        float angularSpeedY = (float)-delta.x() * sensitivity;
 
-        QQuaternion rotationX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angleX);
-        QQuaternion rotationY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angleY);
+        // Tworzymy wektor prędkości w lokalnych koordynatach kamery (oś X i Y)
+        QVector3D localAngularVelocity = QVector3D(angularSpeedX, angularSpeedY, 0.0f);
 
+        // Transformujemy prędkość do koordynatów świata używając odwrotności rotacji obiektu
+        // (lub prościej, zakładamy, że oś Y świata to góra/dół, a X to lewo/prawo na ekranie)
+        // Prostsze podejście: bezpośrednie zastosowanie prędkości do osi świata
+        m_angularVelocity = QVector3D(angularSpeedX, angularSpeedY, 0.0f);
+
+        // Zastosuj natychmiastowy obrót podczas przeciągania (opcjonalne, ale daje lepsze poczucie kontroli)
+        QQuaternion rotationX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angularSpeedX * 0.1f); // Mniejszy mnożnik dla płynności
+        QQuaternion rotationY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angularSpeedY * 0.1f);
         m_rotation = rotationY * rotationX * m_rotation;
         m_rotation.normalize();
+        // --- Koniec obliczania prędkości ---
 
         event->accept();
-        update();
+        update(); // Poproś o przerysowanie
     } else {
         event->ignore();
     }
@@ -360,6 +386,8 @@ void FloatingEnergySphereWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_mousePressed = false;
+        // Prędkość kątowa została ustawiona w ostatnim mouseMoveEvent,
+        // teraz updateAnimation() zajmie się jej wygaszaniem.
         event->accept();
     } else {
         event->ignore();
