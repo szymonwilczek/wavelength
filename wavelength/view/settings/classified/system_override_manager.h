@@ -28,7 +28,7 @@ public:
         void overrideFinished(); // Sygnał informujący o zakończeniu sekwencji
 
     public slots:
-        void initiateOverrideSequence();
+        void initiateOverrideSequence(bool isFirstTime);
     void restoreSystemState(); // Upubliczniamy, aby można było wywołać z zewnątrz
 
     private slots:
@@ -43,7 +43,7 @@ private:
     void stopMouseSimulation();
     bool sendWindowsNotification(const QString& title, const QString& message);
     bool minimizeAllWindows();
-    void showFloatingAnimationWidget();
+    void showFloatingAnimationWidget(bool isFirstTime);
     bool blockUserInput(bool block); // Funkcja do blokowania/odblokowywania wejścia
 
     QTimer* m_mouseMoveTimer;

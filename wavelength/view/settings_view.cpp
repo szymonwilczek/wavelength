@@ -275,7 +275,21 @@ void SettingsView::setupClassifiedTab() {
     // --- DODAJ TO POŁĄCZENIE ---
     connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
         m_overrideButton->setEnabled(false); // Wyłącz przycisk po kliknięciu
-        m_systemOverrideManager->initiateOverrideSequence();
+
+        // Sprawdź, czy to pierwsze uruchomienie override
+        bool isFirstTime = !m_config->isSystemOverrideInitiated(); // Zakładając, że masz tę metodę w WavelengthConfig
+
+        if (isFirstTime) {
+            qDebug() << "First time System Override initiated. Setting flag.";
+            m_config->setSystemOverrideInitiated(true); // Zakładając, że masz tę metodę
+            m_config->saveSettings(); // Zapisz zmianę flagi od razu
+        } else {
+            qDebug() << "System Override initiated previously.";
+        }
+
+        // Przekaż informację o pierwszym uruchomieniu do menedżera
+        m_systemOverrideManager->initiateOverrideSequence(isFirstTime); // Zmodyfikowana metoda menedżera
+
         m_overrideButton->setText("OVERRIDE IN PROGRESS...");
     });
     // ---------------------------

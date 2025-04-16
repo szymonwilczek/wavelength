@@ -100,7 +100,7 @@ bool SystemOverrideManager::blockUserInput(bool block) {
 #endif
 }
 
-void SystemOverrideManager::initiateOverrideSequence()
+void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
 {
     if (m_overrideActive) {
         qWarning() << "System Override sequence already active.";
@@ -141,7 +141,7 @@ void SystemOverrideManager::initiateOverrideSequence()
     startMouseSimulation();
 
     qDebug() << "Showing floating animation widget...";
-    showFloatingAnimationWidget(); // Pokazuje widget i uruchamia dźwięk wewnątrz
+    showFloatingAnimationWidget(isFirstTime); // Pokazuje widget i uruchamia dźwięk wewnątrz
 
     // Timer do zatrzymania symulacji myszy
     QTimer::singleShot(MOUSE_SIMULATION_DURATION_MS, this, &SystemOverrideManager::stopMouseSimulation);
@@ -351,29 +351,26 @@ bool SystemOverrideManager::minimizeAllWindows()
 #endif
 }
 
-void SystemOverrideManager::showFloatingAnimationWidget()
+void SystemOverrideManager::showFloatingAnimationWidget(bool isFirstTime)
 {
     if (m_floatingWidget) {
         qWarning() << "Floating widget already exists.";
         m_floatingWidget->show();
         m_floatingWidget->activateWindow();
-        qDebug() << "Existing Floating widget shown. Visible:" << m_floatingWidget->isVisible(); // Dodaj log
-        // Uruchom dźwięk, jeśli widget już istniał
-        // if (m_mediaPlayer && m_mediaPlayer->playbackState() != QMediaPlayer::PlayingState) {
-        //     m_mediaPlayer->play();
-        // }
+        qDebug() << "Existing Floating widget shown. Visible:" << m_floatingWidget->isVisible();
         return;
     }
 
-    qDebug() << "Creating and showing FloatingEnergySphereWidget";
-    m_floatingWidget = new FloatingEnergySphereWidget();
-    if (!m_floatingWidget) { // Dodaj sprawdzenie
+    qDebug() << "Creating and showing FloatingEnergySphereWidget. Is first time:" << isFirstTime; // Dodaj log
+    // Przekaż flagę isFirstTime do konstruktora widgetu
+    m_floatingWidget = new FloatingEnergySphereWidget(isFirstTime); // <<< ZMIANA TUTAJ
+    if (!m_floatingWidget) {
         qCritical() << "Failed to create FloatingEnergySphereWidget instance!";
         return;
     }
-    qDebug() << "FloatingEnergySphereWidget instance created."; // Dodaj log
+    qDebug() << "FloatingEnergySphereWidget instance created.";
 
-    m_floatingWidget->setClosable(false); // Zablokuj możliwość zamknięcia przez użytkownika
+    m_floatingWidget->setClosable(false);
 
     connect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed,
             this, &SystemOverrideManager::handleFloatingWidgetClosed);
@@ -385,18 +382,7 @@ void SystemOverrideManager::showFloatingAnimationWidget()
 
     m_floatingWidget->show();
 
-    // Uruchom dźwięk
-    // if (m_mediaPlayer) {
-    //     if (m_mediaPlayer->source().isValid()) {
-    //         qDebug() << "Playing override sound:" << m_mediaPlayer->source().toString();
-    //         m_mediaPlayer->play();
-    //         if(m_mediaPlayer->error() != QMediaPlayer::NoError) {
-    //             qWarning() << "MediaPlayer Error:" << m_mediaPlayer->errorString();
-    //         }
-    //     } else {
-    //         qWarning() << "MediaPlayer source is invalid:" << OVERRIDE_SOUND_RESOURCE;
-    //     }
-    // }
+    // Uruchomienie dźwięku jest teraz obsługiwane wewnątrz FloatingEnergySphereWidget
 }
 
 void SystemOverrideManager::handleFloatingWidgetClosed()

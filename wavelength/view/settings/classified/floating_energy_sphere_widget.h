@@ -24,7 +24,7 @@ class FloatingEnergySphereWidget : public QOpenGLWidget, protected QOpenGLFuncti
     Q_OBJECT
 
 public:
-    explicit FloatingEnergySphereWidget(QWidget *parent = nullptr);
+    explicit FloatingEnergySphereWidget(bool isFirstTime, QWidget *parent = nullptr);
     ~FloatingEnergySphereWidget() override;
 
     void setClosable(bool closable);
@@ -56,6 +56,8 @@ private:
     void setupShaders();
     void setupAudio(); // <<< Dodano
     float calculateRMSAmplitude(const QAudioBuffer& buffer); // <<< Dodano
+
+    bool m_isFirstTime;
 
     QTimer m_timer;
     float m_timeValue;

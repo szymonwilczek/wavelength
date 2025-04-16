@@ -122,7 +122,7 @@ const char *fragmentShaderSource = R"(
 // --- Koniec Shaders ---
 
 
-FloatingEnergySphereWidget::FloatingEnergySphereWidget(QWidget *parent)
+FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget *parent)
     : QOpenGLWidget(parent),
       QOpenGLFunctions_3_3_Core(),
       m_timeValue(0.0f),
@@ -140,7 +140,8 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(QWidget *parent)
       m_decoder(nullptr), // <<< Inicjalizacja
       m_audioBufferDurationMs(0), // <<< Inicjalizacja
       m_currentAudioAmplitude(0.0f), // <<< Inicjalizacja
-      m_audioReady(false) // <<< Inicjalizacja
+      m_audioReady(false), // <<< Inicjalizacja
+m_isFirstTime(isFirstTime)
 {
 
     m_player = new QMediaPlayer(this);
@@ -231,66 +232,68 @@ void FloatingEnergySphereWidget::initializeGL()
 // <<< Nowa funkcja do konfiguracji audio >>>
 void FloatingEnergySphereWidget::setupAudio()
 {
-    qDebug() << "Setting up audio using QMediaPlayer/QAudioDecoder with local files...";
+    qDebug() << "Setting up audio. Is first time:" << m_isFirstTime;
 
-    // Sprawdź, czy obiekty zostały utworzone w konstruktorze
     if (!m_player || !m_decoder) {
         qCritical() << "Audio objects (player/decoder) are null!";
         return;
     }
 
-    // --- Obsługa błędów ---
     connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &FloatingEnergySphereWidget::handleMediaPlayerError);
     connect(m_decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, &FloatingEnergySphereWidget::handleAudioDecoderError);
-
-    // --- Konfiguracja dekodera ---
     connect(m_decoder, &QAudioDecoder::bufferReady, this, &FloatingEnergySphereWidget::processAudioBuffer);
     connect(m_decoder, &QAudioDecoder::finished, this, &FloatingEnergySphereWidget::audioDecodingFinished);
 
-    // --- Znajdź ścieżkę do katalogu aplikacji ---
     QString appDirPath = QCoreApplication::applicationDirPath();
-    qDebug() << "Application directory:" << appDirPath;
+    QString audioSubDir = "/assets/audio/";
 
-    // --- Skonstruuj pełne ścieżki do plików audio ---
-    // Zakładamy, że pliki są w podkatalogu "assets/audio" względem pliku .exe
-    QString audioSubDir = "/assets/audio/"; // Użyj '/' dla kompatybilności
-    QString wavFilePath = QDir::cleanPath(appDirPath + audioSubDir + "JOI.wav");
-    QString mp3FilePath = QDir::cleanPath(appDirPath + audioSubDir + "JOImp3.mp3");
+    // <<< Wybór nazwy pliku na podstawie flagi >>>
+    QString audioFileName;
+    if (m_isFirstTime) {
+        audioFileName = "JOI.wav"; // Plik dla pierwszego uruchomienia
+        qDebug() << "Playing initial audio file:" << audioFileName;
+    } else {
+        audioFileName = "hello_again.wav"; // Plik dla kolejnych uruchomień
+        qDebug() << "Playing subsequent audio file:" << audioFileName;
+    }
+    // <<< Koniec wyboru nazwy pliku >>>
 
-    QString chosenFilePath;
+    QString chosenFilePath = QDir::cleanPath(appDirPath + audioSubDir + audioFileName);
     QUrl chosenFileUrl;
 
-    // --- Wybór pliku audio (priorytet dla WAV) ---
-    if (QFile::exists(wavFilePath)) {
-        chosenFilePath = wavFilePath;
+    if (QFile::exists(chosenFilePath)) {
         chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
-        qDebug() << "Using WAV audio file:" << chosenFilePath;
-    } else if (QFile::exists(mp3FilePath)) {
-        chosenFilePath = mp3FilePath;
-        chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
-        qDebug() << "WAV not found, using MP3 audio file:" << chosenFilePath;
+        qDebug() << "Using audio file:" << chosenFilePath;
     } else {
-        qCritical() << "Neither WAV nor MP3 audio file found in expected location:" << QDir::cleanPath(appDirPath + audioSubDir);
-        qCritical() << "Checked paths:" << wavFilePath << "and" << mp3FilePath;
-        qCritical() << "Ensure the 'assets/audio' folder with sound files is copied next to the executable.";
-        // Nie twórz obiektów playera/dekodera, jeśli plik nie istnieje
-        // delete m_player; m_player = nullptr; // Już niepotrzebne, są tworzone w konstruktorze
-        // delete m_decoder; m_decoder = nullptr;
-        return;
+        // Spróbuj alternatywnego pliku (np. MP3), jeśli główny nie istnieje
+        // LUB zgłoś krytyczny błąd, jeśli wybrany plik jest wymagany
+        QString fallbackFileName = m_isFirstTime ? "JOImp3.mp3" : ""; // Można dodać fallback dla hello_again
+        if (!fallbackFileName.isEmpty()) {
+             QString fallbackFilePath = QDir::cleanPath(appDirPath + audioSubDir + fallbackFileName);
+             if (QFile::exists(fallbackFilePath)) {
+                 chosenFilePath = fallbackFilePath;
+                 chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
+                 qWarning() << "Primary audio file not found, using fallback:" << chosenFilePath;
+             } else {
+                 qCritical() << "Chosen audio file AND fallback not found:" << chosenFilePath << "and" << fallbackFilePath;
+                 return;
+             }
+        } else {
+             qCritical() << "Chosen audio file not found:" << chosenFilePath;
+             qCritical() << "Ensure the 'assets/audio' folder with '" << audioFileName << "' is copied next to the executable.";
+             return;
+        }
     }
 
-    // --- Uruchomienie dekodera ---
-    m_decoder->setSourceFilename(chosenFilePath); // QAudioDecoder używa QString
+    m_decoder->setSourceFilename(chosenFilePath);
     m_decoder->start();
     qDebug() << "Audio decoder started for:" << chosenFilePath;
 
-    // --- Konfiguracja odtwarzacza ---
-    m_player->setMedia(chosenFileUrl); // QMediaPlayer używa QUrl::fromLocalFile
+    m_player->setMedia(chosenFileUrl);
     m_player->setVolume(75);
     m_player->play();
     qDebug() << "Audio player started for:" << chosenFileUrl.toString();
 
-    // Sprawdź stan od razu po wywołaniu play()
     if (m_player->state() == QMediaPlayer::StoppedState && m_player->error() != QMediaPlayer::NoError) {
          qWarning() << "Player entered StoppedState immediately after play() call. Error:" << m_player->errorString();
     }
