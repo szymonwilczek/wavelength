@@ -13,6 +13,11 @@
 #include <QWheelEvent>
 #include <QPoint>
 #include <vector>
+#include <QtMultimedia/QMediaPlayer> // <<< Dodano
+#include <QtMultimedia/QAudioDecoder> // <<< Dodano
+#include <QtMultimedia/QAudioBuffer> // <<< Dodano
+#include <QMediaContent> // <<< Dodano
+#include <QAudioFormat> // <<< Dodano
 
 class FloatingEnergySphereWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -40,17 +45,23 @@ protected:
 
     private slots:
         void updateAnimation();
+        void processAudioBuffer(); // <<< Dodano
+        void audioDecodingFinished(); // <<< Dodano
+        void handleMediaPlayerError(); // <<< Dodano
+        void handleAudioDecoderError(); // <<< Dodano
+
 
 private:
     void setupSphereGeometry(int rings, int sectors);
     void setupShaders();
+    void setupAudio(); // <<< Dodano
+    float calculateRMSAmplitude(const QAudioBuffer& buffer); // <<< Dodano
 
     QTimer m_timer;
-    float m_timeValue; // Używane w shaderach do animacji
+    float m_timeValue;
 
     QOpenGLShaderProgram *m_program;
-    QOpenGLBuffer m_vbo; // Vertex Buffer Object (tylko pozycje)
-    // Usunięto m_ebo
+    QOpenGLBuffer m_vbo;
     QOpenGLVertexArrayObject m_vao;
 
     QMatrix4x4 m_projectionMatrix;
@@ -64,18 +75,26 @@ private:
     bool m_mousePressed;
     QQuaternion m_rotation;
 
-    // Geometria - tylko wierzchołki
     std::vector<GLfloat> m_vertices;
-    // Usunięto m_indices i m_indexCount
-    int m_vertexCount; // Liczba wierzchołków do narysowania
+    int m_vertexCount;
 
     bool m_closable;
 
-    QVector3D m_angularVelocity; // Prędkość kątowa obrotu
+    QVector3D m_angularVelocity;
     float m_dampingFactor;
 
-    QElapsedTimer m_elapsedTimer;   // Timer do mierzenia czasu
+    QElapsedTimer m_elapsedTimer;
     float m_lastFrameTimeSecs;
+
+    // --- Audio ---
+    QMediaPlayer *m_player; // <<< Dodano
+    QAudioDecoder *m_decoder; // <<< Dodano
+    std::vector<float> m_audioAmplitudes; // <<< Dodano: Przechowuje znormalizowane amplitudy RMS dla każdego bufora
+    QAudioFormat m_audioFormat; // <<< Dodano: Przechowuje format dekodowanego audio
+    qint64 m_audioBufferDurationMs; // <<< Dodano: Czas trwania jednego bufora audio w ms
+    float m_currentAudioAmplitude; // <<< Dodano: Aktualna amplituda do przekazania do shadera
+    float m_targetAudioAmplitude;
+    bool m_audioReady; // <<< Dodano: Flaga wskazująca, czy dane audio są gotowe
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H
