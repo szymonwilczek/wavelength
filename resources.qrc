@@ -19,5 +19,9 @@
         <!-- Resourcy dla warstw zabezpieczeń -->
         <file>assets/security_resources/fingerprint.svg</file>
         <file>assets/security_resources/handprint.svg</file>
+
+        <!-- Audio -->
+        <file>assets/audio/JOI.wav</file>
+        <file>assets/audio/JOImp3.mp3</file>
     </qresource>
 </RCC>
