@@ -19,22 +19,25 @@ const char *vertexShaderSource = R"(
     uniform mat4 model;
     uniform mat4 view;
     uniform mat4 projection;
-    uniform float time; // Globalny czas
+    uniform float time;
     uniform float audioAmplitude;
-    // uniform float animationBlendFactor; // <<< Usunięto
+
+    // --- Uniformy dla uderzeń ---
+    #define MAX_IMPACTS 5
+    uniform vec3 u_impactPoints[MAX_IMPACTS];
+    uniform float u_impactStartTimes[MAX_IMPACTS];
+    // Nie potrzebujemy activeImpactCount, jeśli sprawdzamy startTime > 0
 
     out vec3 vPos;
-    out float vDeformationFactor;
+    out float vDeformationFactor; // Będzie teraz uwzględniać uderzenia
 
     float noise(vec3 p) {
         return fract(sin(dot(p, vec3(12.9898, 78.233, 54.53))) * 43758.5453);
     }
 
-    // <<< Przywrócono 6-parametrową definicję evolvingWave >>>
     float evolvingWave(vec3 pos, float baseFreq, float freqVariation, float amp, float speed, float timeOffset) {
         float freqTimeFactor = 0.23;
         float offsetTimeFactor = 0.16;
-        // Używamy globalnego 'time'
         float currentFreq = baseFreq + sin(time * freqTimeFactor + timeOffset * 2.0) * freqVariation;
         float currentOffset = timeOffset + cos(time * offsetTimeFactor + pos.x * 0.1) * 2.0;
         return sin(pos.y * currentFreq + time * speed + currentOffset) *
@@ -48,40 +51,87 @@ const char *vertexShaderSource = R"(
         vPos = aPos;
         vec3 normal = normalize(aPos);
 
-        // float idleTime = time * animationBlendFactor; // <<< Usunięto
-
+        // --- Deformacje Idle i Audio (bez zmian) ---
         float baseAmplitude = 0.26;
         float baseSpeed = 0.33;
-        // Wywołania używają globalnego 'time' (6 parametrów)
         float deformation1 = evolvingWave(aPos, 2.0, 0.55, baseAmplitude, baseSpeed * 0.8, 0.0);
         float deformation2 = evolvingWave(aPos * 1.5, 3.5, 1.1, baseAmplitude * 0.7, baseSpeed * 1.5, 1.5);
         float thinkingAmplitudeFactor = 0.85;
         float thinkingDeformation = evolvingWave(aPos * 0.5, 1.0, 0.35, baseAmplitude * thinkingAmplitudeFactor, baseSpeed * 0.15, 5.0);
-        // Funkcja noise używa globalnego 'time'
         float noiseDeformation = (noise(aPos * 2.5 + time * 0.04) - 0.5) * baseAmplitude * 0.15;
-
         float totalIdleDeformation = deformation1 + deformation2 + thinkingDeformation + noiseDeformation;
-
         float audioDeformationScale = 1.8;
         float audioEffect = audioAmplitude * audioDeformationScale;
 
-        // Deformacja idle jest zawsze dodawana do deformacji audio
-        float totalDeformation = totalIdleDeformation + audioEffect;
+        // --- Obliczanie deformacji od uderzeń ---
+        float totalImpactDeformation = 0.0;
+        float impactDuration = 2.8; // Czas trwania efektu w sekundach
+        float waveSpeed = 3.5;      // Prędkość rozchodzenia się fali
+        float maxDepth = -0.18;     // Maksymalna głębokość wgniecenia (ujemna)
+        float waveLength = 0.7;     // Długość fali (wpływa na częstotliwość przestrzenną)
+        float PI = 3.14159265;
 
+        for (int i = 0; i < MAX_IMPACTS; ++i) {
+            // Sprawdź, czy uderzenie jest aktywne (czas startu > 0)
+            if (u_impactStartTimes[i] > 0.0) {
+                float timeSinceImpact = time - u_impactStartTimes[i];
+
+                // Sprawdź, czy efekt uderzenia jest jeszcze aktywny czasowo
+                if (timeSinceImpact > 0.0 && timeSinceImpact < impactDuration) {
+                    // Oblicz odległość kątową na powierzchni sfery
+                    vec3 impactPointNorm = normalize(u_impactPoints[i]); // Upewnij się, że jest znormalizowany
+                    float dotProduct = dot(normal, impactPointNorm);
+                    dotProduct = clamp(dotProduct, -1.0, 1.0); // Unikaj błędów numerycznych
+                    float distance = acos(dotProduct); // Odległość kątowa w radianach
+
+                    // Oblicz, jak daleko dotarł front fali
+                    float waveFrontDistance = timeSinceImpact * waveSpeed;
+
+                    // Sprawdź, czy wierzchołek jest w zasięgu fali
+                    if (distance < waveFrontDistance + waveLength * 0.5) { // Trochę zapasu dla gładkości
+                        // Funkcja fali (np. tłumiony cosinus)
+                        // Chcemy, aby fala zaczynała się od wgniecenia i rozchodziła
+                        float phase = (distance - waveFrontDistance) / waveLength * 2.0 * PI;
+                        float ripple = cos(phase);
+
+                        // Obwiednia czasowa (szybkie narastanie, wolniejsze zanikanie)
+                        float timeEnvelope = smoothstep(0.0, 0.2, timeSinceImpact) * smoothstep(impactDuration, impactDuration * 0.6, timeSinceImpact);
+
+                        // Obwiednia odległościowa (efekt słabnie dalej od frontu fali)
+                        // float distanceEnvelope = smoothstep(waveFrontDistance + waveLength * 0.5, waveFrontDistance - waveLength * 0.5, distance);
+                        // Prostsza obwiednia: efekt najsilniejszy przy froncie
+                         float distanceEnvelope = 1.0 - smoothstep(0.0, waveLength * 1.5, abs(distance - waveFrontDistance));
+
+
+                        // Połącz wszystko
+                        float impactDeform = ripple * timeEnvelope * distanceEnvelope * maxDepth;
+
+                        totalImpactDeformation += impactDeform;
+                    }
+                }
+                 // Opcjonalnie: Oznacz jako nieaktywne po czasie trwania (można też w C++)
+                 // if (timeSinceImpact >= impactDuration) {
+                 //     // Jak przekazać informację zwrotną do C++? Trudne. Lepiej obsłużyć w C++.
+                 // }
+            }
+        }
+
+        // --- Połącz wszystkie deformacje ---
+        vec3 displacedPos = aPos + normal * (totalIdleDeformation + audioEffect + totalImpactDeformation);
+
+        // --- Zaktualizuj vDeformationFactor ---
         float maxExpectedDeformation = baseAmplitude * 2.0 + audioDeformationScale;
-        vDeformationFactor = smoothstep(0.0, max(0.1, maxExpectedDeformation), abs(totalDeformation));
-
-        vec3 displacedPos = aPos + normal * totalDeformation;
+        // Uwzględnij maksymalną głębokość uderzenia w oczekiwanej deformacji
+        vDeformationFactor = smoothstep(0.0, max(0.1, maxExpectedDeformation + abs(maxDepth)), abs(totalIdleDeformation + audioEffect + totalImpactDeformation));
 
         gl_Position = projection * view * model * vec4(displacedPos, 1.0);
 
+        // --- Rozmiar punktu (bez zmian) ---
         float basePointSize = 0.9;
         float sizeVariation = 0.5;
         float smoothTimeFactor = 0.3;
-        // Rozmiar punktu używa globalnego 'time'
         float idlePointSizeVariation = sizeVariation * vDeformationFactor * (0.3 * sin(time * smoothTimeFactor + aPos.y * 0.5));
         float audioPointSizeVariation = audioAmplitude * 1.5;
-
         gl_PointSize = basePointSize + idlePointSizeVariation + audioPointSizeVariation;
         gl_PointSize = max(0.6, gl_PointSize);
     }
@@ -143,6 +193,11 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget
       m_audioReady(false), // <<< Inicjalizacja
 m_isFirstTime(isFirstTime)
 {
+    m_impacts.resize(MAX_IMPACTS); // Utwórz miejsce dla maksymalnej liczby uderzeń
+    for(auto& impact : m_impacts) {
+        impact.active = false;
+        impact.startTime = -1.0f; // Oznacz jako nieaktywne
+    }
 
     m_player = new QMediaPlayer(this);
     m_decoder = new QAudioDecoder(this);
@@ -366,7 +421,7 @@ void FloatingEnergySphereWidget::paintGL()
     m_vao.bind();
 
     m_viewMatrix.setToIdentity();
-    m_cameraPosition = QVector3D(0, 0, m_cameraDistance);
+    // Kamera jest już ustawiona w world space, nie musimy jej transformować
     m_viewMatrix.lookAt(m_cameraPosition, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
 
     m_modelMatrix.setToIdentity();
@@ -376,7 +431,33 @@ void FloatingEnergySphereWidget::paintGL()
     m_program->setUniformValue("view", m_viewMatrix);
     m_program->setUniformValue("model", m_modelMatrix);
     m_program->setUniformValue("time", m_timeValue);
-    m_program->setUniformValue("audioAmplitude", m_currentAudioAmplitude); // <<< Przekazanie amplitudy do shadera
+    m_program->setUniformValue("audioAmplitude", m_currentAudioAmplitude);
+
+    // --- Przekaż dane uderzeń do shadera ---
+    QVector3D impactPointsGL[MAX_IMPACTS];
+    float impactStartTimesGL[MAX_IMPACTS];
+    for (int i = 0; i < MAX_IMPACTS; ++i) {
+        if (m_impacts[i].active) {
+            // Sprawdź, czy uderzenie nie jest za stare (opcjonalne czyszczenie tutaj)
+            if (m_timeValue - m_impacts[i].startTime < 3.0f) { // Użyj wartości nieco większej niż impactDuration
+                 impactPointsGL[i] = m_impacts[i].point;
+                 impactStartTimesGL[i] = m_impacts[i].startTime;
+            } else {
+                 // Oznacz jako nieaktywne, jeśli czas minął
+                 m_impacts[i].active = false;
+                 impactPointsGL[i] = QVector3D(0,0,0); // Wyzeruj dane
+                 impactStartTimesGL[i] = -1.0f;
+            }
+        } else {
+            impactPointsGL[i] = QVector3D(0,0,0); // Wyzeruj dane dla nieaktywnych
+            impactStartTimesGL[i] = -1.0f;
+        }
+    }
+    // Użyj setUniformValueArray dla tablic (wymaga Qt 5.6+)
+    // lub ustawiaj pojedynczo w pętli dla starszych wersji
+    m_program->setUniformValueArray("u_impactPoints", impactPointsGL, MAX_IMPACTS);
+    m_program->setUniformValueArray("u_impactStartTimes", impactStartTimesGL, MAX_IMPACTS, 1);
+    // ------------------------------------
 
     glDrawArrays(GL_POINTS, 0, m_vertexCount);
 
@@ -587,6 +668,114 @@ void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event)
         m_mousePressed = true;
         m_lastMousePos = event->pos();
         m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
+
+        qDebug() << "mousePressEvent Start. Time:" << m_timeValue; // <<< DEBUG
+
+        // --- Logika Ray Casting ---
+        QPointF pos = event->localPos();
+        float widgetWidth = width();
+        float widgetHeight = height();
+
+        if (widgetWidth <= 0 || widgetHeight <= 0) {
+             qWarning() << "Invalid widget dimensions:" << widgetWidth << "x" << widgetHeight;
+             event->accept();
+             return;
+        }
+
+        // 1. Normalizuj
+        float ndcX = (pos.x() / widgetWidth) * 2.0f - 1.0f;
+        float ndcY = 1.0f - (pos.y() / widgetHeight) * 2.0f;
+        qDebug() << "NDC Coords:" << ndcX << ndcY; // <<< DEBUG
+
+        // 2. Clip
+        QVector4D clipCoords(ndcX, ndcY, -1.0f, 1.0f);
+
+        // 3. Eye
+        qDebug() << "Projection Matrix:\n" << m_projectionMatrix; // <<< DEBUG
+        bool invertibleProj;
+        QMatrix4x4 invProjection = m_projectionMatrix.inverted(&invertibleProj);
+        if (!invertibleProj) { qDebug() << "Projection matrix not invertible"; event->accept(); return; }
+        QVector4D eyeCoords = invProjection * clipCoords;
+        eyeCoords.setZ(-1.0f);
+        eyeCoords.setW(0.0f);
+        qDebug() << "Eye Coords:" << eyeCoords; // <<< DEBUG
+
+        // 4. World
+        qDebug() << "View Matrix:\n" << m_viewMatrix; // <<< DEBUG
+        bool invertibleView;
+        QMatrix4x4 invView = m_viewMatrix.inverted(&invertibleView);
+         if (!invertibleView) { qDebug() << "View matrix not invertible"; event->accept(); return; }
+        QVector4D worldDir4 = invView * eyeCoords;
+        QVector3D worldRayDir(worldDir4.x(), worldDir4.y(), worldDir4.z());
+        worldRayDir.normalize();
+        QVector3D worldRayOrigin = invView.column(3).toVector3D();
+        qDebug() << "World Ray Origin:" << worldRayOrigin << "Dir:" << worldRayDir; // <<< DEBUG
+
+        // 5. Model
+        qDebug() << "Model Matrix:\n" << m_modelMatrix; // <<< DEBUG
+        bool invertibleModel;
+        QMatrix4x4 invModel = m_modelMatrix.inverted(&invertibleModel);
+        if (!invertibleModel) { qDebug() << "Model matrix not invertible"; event->accept(); return; }
+        QVector3D modelRayOrigin = invModel * worldRayOrigin;
+        QVector3D modelRayDir = (invModel * QVector4D(worldRayDir, 0.0f)).toVector3D();
+        modelRayDir.normalize();
+        qDebug() << "Model Ray Origin:" << modelRayOrigin << "Dir:" << modelRayDir; // <<< DEBUG
+
+        // 6. Przecięcie
+        float a = QVector3D::dotProduct(modelRayDir, modelRayDir);
+        float b = 2.0f * QVector3D::dotProduct(modelRayOrigin, modelRayDir);
+        float c = QVector3D::dotProduct(modelRayOrigin, modelRayOrigin) - 1.0f;
+        float discriminant = b*b - 4*a*c;
+        qDebug() << "Intersection: a=" << a << "b=" << b << "c=" << c << "disc=" << discriminant; // <<< DEBUG
+
+        if (discriminant >= 0) {
+            float t1 = (-b - sqrt(discriminant)) / (2.0f * a);
+            float t = t1;
+            qDebug() << "Intersection t=" << t; // <<< DEBUG
+
+            if (t > 0.001f) {
+                QVector3D modelIntersectionPoint = modelRayOrigin + t * modelRayDir;
+                QVector3D impactPoint = modelIntersectionPoint.normalized();
+                qDebug() << "Calculated Impact Point:" << impactPoint;
+
+                // --- Zapisz uderzenie ---
+                // Poprawione obliczanie indeksu, aby zawsze był nieujemny
+                int index = (m_nextImpactIndex % MAX_IMPACTS + MAX_IMPACTS) % MAX_IMPACTS; // <<< ZMIANA TUTAJ
+
+                qDebug() << "Attempting to write to m_impacts index:" << index << "(from nextImpactIndex:" << m_nextImpactIndex << ")"; // Dodano log m_nextImpactIndex
+
+                // Sprawdź, czy wektor ma oczekiwany rozmiar (sanity check)
+                if (m_impacts.size() != MAX_IMPACTS) {
+                     qCritical() << "CRITICAL: m_impacts size mismatch! Expected:" << MAX_IMPACTS << "Actual:" << m_impacts.size();
+                     event->accept();
+                     return;
+                }
+
+                // Sprawdź, czy indeks jest poprawny (teraz powinien zawsze być)
+                if (index < 0 || index >= MAX_IMPACTS) {
+                    qCritical() << "CRITICAL: Invalid index calculated even after correction:" << index;
+                    event->accept();
+                    return;
+                }
+
+                // Bezpośrednio przed zapisem
+                qDebug() << "Writing impact data...";
+                m_impacts[index].point = impactPoint;
+                m_impacts[index].startTime = m_timeValue;
+                m_impacts[index].active = true;
+                m_nextImpactIndex++; // Inkrementuj dopiero po udanym zapisie
+
+                qDebug() << "Impact registered successfully at index" << index << "New nextImpactIndex:" << m_nextImpactIndex;
+
+            } else {
+                qDebug() << "Intersection is behind or too close to the camera (t =" << t << ")";
+            }
+        } else {
+            qDebug() << "No intersection between ray and sphere.";
+        }
+        // --- Koniec logiki Ray Casting ---
+
+        qDebug() << "mousePressEvent End.";
         event->accept();
     } else {
         event->ignore();
