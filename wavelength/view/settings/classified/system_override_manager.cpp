@@ -283,7 +283,7 @@ void SystemOverrideManager::simulateMouseMovement()
     m_currentMousePos.setY(qBound((qreal)screenGeometry.top(), m_currentMousePos.y(), (qreal)screenGeometry.bottom() - 1));
 
     // Ustaw pozycję kursora
-    SetCursorPos(static_cast<int>(m_currentMousePos.x()), static_cast<int>(m_currentMousePos.y()));
+    // SetCursorPos(static_cast<int>(m_currentMousePos.x()), static_cast<int>(m_currentMousePos.y()));
 #else
     // Not implemented
 #endif
