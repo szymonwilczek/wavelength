@@ -9,6 +9,7 @@
 #include <QUrl> // <<< Dodano
 #include <limits> // <<< Dodano dla std::numeric_limits
 #include <QDir>
+#include <qmath.h>
 
 // --- Zaktualizowane Shaders ---
 // Vertex Shader: Dodano uniform 'audioAmplitude' i uwzględniono go w deformacji
@@ -403,10 +404,39 @@ void FloatingEnergySphereWidget::setupSphereGeometry(int rings, int sectors)
 
 void FloatingEnergySphereWidget::resizeGL(int w, int h)
 {
+    if (h == 0) h = 1; // Zapobieganie dzieleniu przez zero
+
+    // Ustawienie viewportu OpenGL na cały widget
     glViewport(0, 0, w, h);
+
+    // --- Dynamiczne obliczanie FOV dla stałego rozmiaru sfery ---
+    float aspectRatio = static_cast<float>(w) / static_cast<float>(h);
+    float sphereRadius = 1.0f; // Promień sfery w przestrzeni modelu
+    // Współczynnik określający, jaką część mniejszego wymiaru widgetu ma zajmować sfera
+    // Np. 1.1 oznacza, że sfera zajmie ok. 91% mniejszego wymiaru, dając mały margines.
+    // Zwiększ tę wartość, aby sfera była mniejsza (większy margines).
+    // Zmniejsz (bliżej 1.0), aby była większa (mniejszy margines).
+    float paddingFactor = 2.0f;
+
+    // Oblicz tangens połowy wymaganego kąta widzenia, aby zmieścić sferę z marginesem
+    // Musimy zapewnić, że zmieści się zarówno w pionie, jak i w poziomie.
+    // Wybieramy większy z wymaganych kątów (co odpowiada mniejszemu wymiarowi).
+    float requiredTanHalfFovVertical = (sphereRadius * paddingFactor) / m_cameraDistance;
+    float requiredTanHalfFovHorizontal = (sphereRadius * paddingFactor) / m_cameraDistance; // Dla sfery to to samo
+
+    // Oblicz tangens połowy pionowego FOV, który zapewni dopasowanie w obu osiach
+    float tanHalfFovY = qMax(requiredTanHalfFovVertical, requiredTanHalfFovHorizontal / aspectRatio);
+
+    // Oblicz pionowy FOV w radianach, a następnie przekonwertuj na stopnie
+    float fovYRadians = 2.0f * atan(tanHalfFovY);
+    float fovYDegrees = qRadiansToDegrees(fovYRadians);
+
+    // Ustawienie macierzy projekcji perspektywicznej z obliczonym FOV
     m_projectionMatrix.setToIdentity();
-    float aspect = float(w) / float(h ? h : 1);
-    m_projectionMatrix.perspective(40.0f, aspect, 0.1f, 100.0f);
+    m_projectionMatrix.perspective(fovYDegrees, aspectRatio, 0.1f, 100.0f); // Bliska i daleka płaszczyzna odcięcia
+
+    qDebug() << "Resized to" << w << "x" << h << "Aspect:" << aspectRatio << "Calculated FOVy:" << fovYDegrees;
+    // ---------------------------------------------------------
 }
 
 void FloatingEnergySphereWidget::paintGL()
