@@ -35,6 +35,7 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
       m_mediaPlayer(nullptr), // Inicjalizacja dźwięku
       m_audioOutput(nullptr), // Inicjalizacja dźwięku
       m_originalWallpaperPath(""),
+      m_tempBlackWallpaperPath(""),
       m_overrideActive(false),
       m_inputBlocked(false) // Początkowo wejście nie jest zablokowane
 {
@@ -77,6 +78,12 @@ SystemOverrideManager::~SystemOverrideManager()
         m_floatingWidget->close();
         m_floatingWidget = nullptr;
     }
+
+    if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
+        QFile::remove(m_tempBlackWallpaperPath);
+        qDebug() << "Removed temporary black wallpaper on destruction:" << m_tempBlackWallpaperPath;
+    }
+
 #ifdef Q_OS_WIN
     CoUninitialize();
 #endif
@@ -119,10 +126,10 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
     qDebug() << "Initiating System Override Sequence...";
 
     // --- Kolejne kroki ---
-    qDebug() << "Changing wallpaper...";
-    if (!changeWallpaper(OVERRIDE_WALLPAPER_RESOURCE)) {
-        qWarning() << "Failed to change wallpaper.";
-    }
+    // qDebug() << "Changing wallpaper...";
+    // if (!changeWallpaper(OVERRIDE_WALLPAPER_RESOURCE)) {
+    //     qWarning() << "Failed to change wallpaper.";
+    // }
 
     qDebug() << "Minimizing windows...";
     if (!minimizeAllWindows()) {
@@ -152,10 +159,10 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
     // Zamknięcie zainicjuje `restoreSystemState`.
 }
 
-bool SystemOverrideManager::changeWallpaper(const QString& resourcePath)
+bool SystemOverrideManager::changeWallpaper(const QString& /*resourcePath - parametr nieużywany*/)
 {
 #ifdef Q_OS_WIN
-    // Zapisz ścieżkę do obecnej tapety
+    // 1. Zapisz ścieżkę do obecnej tapety
     WCHAR currentPath[MAX_PATH];
     if (SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, currentPath, 0)) {
         m_originalWallpaperPath = QString::fromWCharArray(currentPath);
@@ -165,27 +172,46 @@ bool SystemOverrideManager::changeWallpaper(const QString& resourcePath)
         m_originalWallpaperPath = "";
     }
 
-    // Skopiuj obraz z zasobów do pliku tymczasowego
-    QFile resourceFile(resourcePath);
-    if (!resourceFile.exists()) {
-        qWarning() << "Wallpaper resource not found:" << resourcePath;
-        return false;
-    }
-    QString tempWallpaperPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/wavelength_override_temp.png";
-    if (QFile::exists(tempWallpaperPath)) QFile::remove(tempWallpaperPath);
-    if (!resourceFile.copy(tempWallpaperPath)) {
-        qWarning() << "Could not copy wallpaper resource to temporary file:" << tempWallpaperPath << " Error: " << resourceFile.errorString();
-        return false;
+    // 2. Utwórz ścieżkę do pliku tymczasowego
+    m_tempBlackWallpaperPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/wavelength_black_temp.bmp";
+    qDebug() << "Temporary black wallpaper path:" << m_tempBlackWallpaperPath;
+
+    // Usuń stary plik tymczasowy, jeśli istnieje
+    if (QFile::exists(m_tempBlackWallpaperPath)) {
+        if (!QFile::remove(m_tempBlackWallpaperPath)) {
+             qWarning() << "Could not remove existing temporary wallpaper file:" << m_tempBlackWallpaperPath;
+             // Kontynuuj mimo wszystko, save() powinien nadpisać
+        }
     }
 
-    // Ustaw nową tapetę
-    std::wstring pathW = tempWallpaperPath.toStdWString();
+    // 3. Utwórz czarny obraz o rozmiarze ekranu
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    QImage blackImage(screenGeometry.size(), QImage::Format_RGB32);
+    if (blackImage.isNull()) {
+        qCritical() << "Failed to create QImage for black wallpaper.";
+        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę w razie błędu
+        return false;
+    }
+    blackImage.fill(Qt::black);
+
+    // 4. Zapisz obraz jako plik BMP
+    if (!blackImage.save(m_tempBlackWallpaperPath, "BMP")) {
+        qCritical() << "Failed to save black wallpaper image to:" << m_tempBlackWallpaperPath;
+        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę w razie błędu
+        return false;
+    }
+    qDebug() << "Black wallpaper image saved successfully.";
+
+    // 5. Ustaw nową tapetę
+    std::wstring pathW = m_tempBlackWallpaperPath.toStdWString();
     if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)pathW.c_str(), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
-        qDebug() << "Wallpaper changed successfully to:" << tempWallpaperPath;
+        qDebug() << "Black wallpaper set successfully.";
         return true;
     } else {
-        qWarning() << "SystemParametersInfoW failed to set wallpaper. Error code:" << GetLastError();
-        QFile::remove(tempWallpaperPath);
+        qWarning() << "SystemParametersInfoW failed to set black wallpaper. Error code:" << GetLastError();
+        // Usuń plik tymczasowy w razie błędu ustawiania
+        QFile::remove(m_tempBlackWallpaperPath);
+        m_tempBlackWallpaperPath = "";
         return false;
     }
 #else
@@ -197,25 +223,36 @@ bool SystemOverrideManager::changeWallpaper(const QString& resourcePath)
 bool SystemOverrideManager::restoreWallpaper()
 {
 #ifdef Q_OS_WIN
+    bool success = false;
     if (m_originalWallpaperPath.isEmpty()) {
         qWarning() << "No original wallpaper path saved to restore.";
-        return false;
-    }
-    qDebug() << "Restoring original wallpaper:" << m_originalWallpaperPath;
-    std::wstring pathW = m_originalWallpaperPath.toStdWString();
-    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)pathW.c_str(), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
-        qDebug() << "Original wallpaper restored successfully.";
-        m_originalWallpaperPath = ""; // Wyczyść po przywróceniu
-        QString tempWallpaperPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/wavelength_override_temp.png";
-        if (QFile::exists(tempWallpaperPath)) {
-            if(QFile::remove(tempWallpaperPath)) qDebug() << "Temporary wallpaper file removed:" << tempWallpaperPath;
-            else qWarning() << "Could not remove temporary wallpaper file:" << tempWallpaperPath;
-        }
-        return true;
+        // Mimo to spróbuj usunąć czarną tapetę, jeśli istnieje
     } else {
-        qWarning() << "SystemParametersInfoW failed to restore wallpaper. Error code:" << GetLastError();
-        return false;
+        qDebug() << "Restoring original wallpaper:" << m_originalWallpaperPath;
+        std::wstring pathW = m_originalWallpaperPath.toStdWString();
+        if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)pathW.c_str(), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
+            qDebug() << "Original wallpaper restored successfully.";
+            m_originalWallpaperPath = ""; // Wyczyść po przywróceniu
+            success = true; // Oznacz sukces przywracania
+        } else {
+            qWarning() << "SystemParametersInfoW failed to restore wallpaper. Error code:" << GetLastError();
+            // Nie czyść m_originalWallpaperPath, może się udać później
+            success = false; // Oznacz błąd przywracania
+        }
     }
+
+    // Zawsze próbuj usunąć tymczasowy plik czarnej tapety po próbie przywrócenia
+    if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
+        if(QFile::remove(m_tempBlackWallpaperPath)) {
+            qDebug() << "Temporary black wallpaper file removed:" << m_tempBlackWallpaperPath;
+        } else {
+            qWarning() << "Could not remove temporary black wallpaper file:" << m_tempBlackWallpaperPath;
+            // To nie jest krytyczne, ale warto zalogować
+        }
+        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę niezależnie od sukcesu usunięcia
+    }
+
+    return success; // Zwróć sukces *przywracania* oryginalnej tapety
 #else
     qWarning() << "Wallpaper restoration not implemented for this OS.";
     return false;

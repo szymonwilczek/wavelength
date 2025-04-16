@@ -56,6 +56,7 @@ private:
     QAudioOutput* m_audioOutput; // Wymagane w Qt6
 
     QString m_originalWallpaperPath;
+    QString m_tempBlackWallpaperPath;
     bool m_overrideActive;
     bool m_inputBlocked; // Flaga śledząca stan blokady wejścia
     QPointF m_currentMousePos; // Aktualna pozycja (float dla płynności)
