@@ -18,9 +18,7 @@
 #endif
 
 // --- Stałe ---
-const int MOUSE_SIMULATION_INTERVAL_MS = 16; // Zwiększona częstotliwość dla płynności (~60 FPS)
-const int MOUSE_TARGET_INTERVAL_MS = 1500; // Jak często zmieniać cel myszy (1.5 sekundy)
-const int MOUSE_SIMULATION_DURATION_MS = 15000;
+const int MOUSE_LOCK_INTERVAL_MS = 10;
 const int RESTORE_DELAY_MS = 500;
 const QString OVERRIDE_WALLPAPER_RESOURCE = ":/assets/images/wavelength_override_wallpaper.png";
 const QString OVERRIDE_SOUND_RESOURCE = "qrc:/assets/sounds/override_ambient.wav"; // Ścieżka do pliku dźwiękowego w zasobach
@@ -28,19 +26,19 @@ const QString OVERRIDE_SOUND_RESOURCE = "qrc:/assets/sounds/override_ambient.wav
 
 SystemOverrideManager::SystemOverrideManager(QObject *parent)
     : QObject(parent),
-      m_mouseMoveTimer(new QTimer(this)),
-      m_mouseTargetTimer(new QTimer(this)), // Inicjalizacja timera celu
+      m_mouseLockTimer(new QTimer(this)), // Zmieniona nazwa
+      // m_mouseTargetTimer nie jest już inicjalizowany
       m_trayIcon(nullptr),
       m_floatingWidget(nullptr),
-      m_mediaPlayer(nullptr), // Inicjalizacja dźwięku
-      m_audioOutput(nullptr), // Inicjalizacja dźwięku
+      m_mediaPlayer(nullptr),
+      m_audioOutput(nullptr),
       m_originalWallpaperPath(""),
       m_tempBlackWallpaperPath(""),
       m_overrideActive(false),
-      m_inputBlocked(false) // Początkowo wejście nie jest zablokowane
+      m_inputBlocked(false),
+      m_offScreenLockPos(-10000, -10000) // Domyślna wartość poza ekranem
 {
-    connect(m_mouseMoveTimer, &QTimer::timeout, this, &SystemOverrideManager::simulateMouseMovement);
-    connect(m_mouseTargetTimer, &QTimer::timeout, this, &SystemOverrideManager::updateMouseTarget); // Połączenie timera celu
+    connect(m_mouseLockTimer, &QTimer::timeout, this, &SystemOverrideManager::lockMousePosition);
 
     // Inicjalizacja powiadomień
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
@@ -77,6 +75,10 @@ SystemOverrideManager::~SystemOverrideManager()
     if (m_floatingWidget) {
         m_floatingWidget->close();
         m_floatingWidget = nullptr;
+    }
+
+    if (m_mouseLockTimer->isActive()) {
+        m_mouseLockTimer->stop();
     }
 
     if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
@@ -144,19 +146,11 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
         }
     });
 
-    qDebug() << "Starting mouse simulation...";
-    startMouseSimulation();
+    qDebug() << "Starting mouse lock...";
+    startMouseLock(); // <<< ZMIENIONE WYWOŁANIE
 
     qDebug() << "Showing floating animation widget...";
     showFloatingAnimationWidget(isFirstTime); // Pokazuje widget i uruchamia dźwięk wewnątrz
-
-    // Timer do zatrzymania symulacji myszy
-    QTimer::singleShot(MOUSE_SIMULATION_DURATION_MS, this, &SystemOverrideManager::stopMouseSimulation);
-
-    // WAŻNE: Nie ustawiamy już timera do automatycznego przywracania.
-    // Przywracanie stanu powinno nastąpić TYLKO po zamknięciu widgetu animacji.
-    // Widget animacji nie może być teraz zamknięty przez użytkownika.
-    // Zamknięcie zainicjuje `restoreSystemState`.
 }
 
 bool SystemOverrideManager::changeWallpaper(const QString& /*resourcePath - parametr nieużywany*/)
@@ -259,68 +253,47 @@ bool SystemOverrideManager::restoreWallpaper()
 #endif
 }
 
-void SystemOverrideManager::startMouseSimulation()
+void SystemOverrideManager::startMouseLock()
 {
 #ifdef Q_OS_WIN
-    POINT p;
-    GetCursorPos(&p);
-    m_currentMousePos = QPointF(p.x, p.y); // Zapisz początkową pozycję jako float
-    updateMouseTarget(); // Ustaw pierwszy cel
-    m_mouseTargetTimer->start(MOUSE_TARGET_INTERVAL_MS); // Zacznij zmieniać cel
-    m_mouseMoveTimer->start(MOUSE_SIMULATION_INTERVAL_MS); // Zacznij ruch
-    qDebug() << "Mouse simulation started.";
-#else
-    qWarning() << "Mouse simulation not implemented for this OS.";
-#endif
-}
-
-void SystemOverrideManager::stopMouseSimulation()
-{
-    if (m_mouseMoveTimer->isActive()) {
-        m_mouseMoveTimer->stop();
-        m_mouseTargetTimer->stop(); // Zatrzymaj też zmianę celu
-        qDebug() << "Mouse simulation stopped.";
-    }
-}
-
-void SystemOverrideManager::updateMouseTarget() {
-#ifdef Q_OS_WIN
-    // Ustaw nowy losowy cel na ekranie
-    static std::default_random_engine generator(std::random_device{}());
+    // 1. Oblicz pozycję poza ekranem
     QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    std::uniform_int_distribution<int> distX(screenGeometry.left() + 50, screenGeometry.right() - 50);
-    std::uniform_int_distribution<int> distY(screenGeometry.top() + 50, screenGeometry.bottom() - 50);
+    // Ustaw pozycję znacznie poza prawym dolnym rogiem
+    m_offScreenLockPos.setX(screenGeometry.right() + 500);
+    m_offScreenLockPos.setY(screenGeometry.bottom() + 500);
+    qDebug() << "Calculated off-screen lock position:" << m_offScreenLockPos;
 
-    m_targetMousePos = QPointF(distX(generator), distY(generator));
-    qDebug() << "New mouse target:" << m_targetMousePos;
-#endif
-}
-
-
-void SystemOverrideManager::simulateMouseMovement()
-{
-#ifdef Q_OS_WIN
-    // Płynny ruch w kierunku celu (prosta interpolacja)
-    QPointF direction = m_targetMousePos - m_currentMousePos;
-    float distance = std::sqrt(QPointF::dotProduct(direction, direction));
-
-    // Im bliżej celu, tym wolniej
-    float speedFactor = qBound(0.01f, distance / 200.0f, 0.1f); // Dostosuj dzielnik dla prędkości
-
-    if (distance > 5.0f) { // Jeśli nie jesteśmy bardzo blisko celu
-        m_currentMousePos += direction * speedFactor;
+    // 2. Natychmiast przesuń kursor w to miejsce
+    if (!SetCursorPos(m_offScreenLockPos.x(), m_offScreenLockPos.y())) {
+        qWarning() << "Initial SetCursorPos failed! Error code:" << GetLastError();
     } else {
-        // Jesteśmy blisko, można ustawić nowy cel od razu lub poczekać na timer
-        // updateMouseTarget(); // Opcjonalnie: zmień cel od razu po dotarciu
+        qDebug() << "Cursor moved off-screen initially.";
     }
 
-    // Ogranicz do ekranu (na wszelki wypadek)
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    m_currentMousePos.setX(qBound((qreal)screenGeometry.left(), m_currentMousePos.x(), (qreal)screenGeometry.right() - 1));
-    m_currentMousePos.setY(qBound((qreal)screenGeometry.top(), m_currentMousePos.y(), (qreal)screenGeometry.bottom() - 1));
+    // 3. Uruchom timer, który będzie stale resetował pozycję
+    m_mouseLockTimer->start(MOUSE_LOCK_INTERVAL_MS);
+    qDebug() << "Mouse lock timer started with interval:" << MOUSE_LOCK_INTERVAL_MS << "ms";
+#else
+    qWarning() << "Mouse lock not implemented for this OS.";
+#endif
+}
 
-    // Ustaw pozycję kursora
-    SetCursorPos(static_cast<int>(m_currentMousePos.x()), static_cast<int>(m_currentMousePos.y()));
+// Zmieniona nazwa i implementacja
+void SystemOverrideManager::stopMouseLock()
+{
+    if (m_mouseLockTimer->isActive()) {
+        m_mouseLockTimer->stop();
+        qDebug() << "Mouse lock timer stopped.";
+    }
+}
+
+// Nowa implementacja slotu timera
+void SystemOverrideManager::lockMousePosition()
+{
+#ifdef Q_OS_WIN
+    // Po prostu ustaw kursor w zapamiętanej pozycji poza ekranem
+    // To powinno przeciwdziałać próbom przesunięcia go przez użytkownika lub system
+    SetCursorPos(m_offScreenLockPos.x(), m_offScreenLockPos.y());
 #else
     // Not implemented
 #endif
@@ -466,7 +439,7 @@ void SystemOverrideManager::restoreSystemState()
     }
 
     // --- Kolejne kroki (wykonywane nawet jeśli odblokowanie się nie powiodło) ---
-    stopMouseSimulation();
+    stopMouseLock();
 
     // Zatrzymaj i zamknij widget animacji, jeśli nadal istnieje
     if (m_floatingWidget) {

@@ -32,22 +32,20 @@ public:
     void restoreSystemState(); // Upubliczniamy, aby można było wywołać z zewnątrz
 
     private slots:
-        void simulateMouseMovement();
-    void handleFloatingWidgetClosed(); // Slot do obsługi zamknięcia widgetu animacji
-    void updateMouseTarget(); // Slot do zmiany celu myszy
+    void lockMousePosition();
+    void handleFloatingWidgetClosed();
 
 private:
     bool changeWallpaper(const QString& imagePath);
     bool restoreWallpaper();
-    void startMouseSimulation();
-    void stopMouseSimulation();
+    void startMouseLock();
+    void stopMouseLock();
     bool sendWindowsNotification(const QString& title, const QString& message);
     bool minimizeAllWindows();
     void showFloatingAnimationWidget(bool isFirstTime);
     bool blockUserInput(bool block); // Funkcja do blokowania/odblokowywania wejścia
 
-    QTimer* m_mouseMoveTimer;
-    QTimer* m_mouseTargetTimer; // Timer do zmiany celu myszy
+    QTimer* m_mouseLockTimer;
     QSystemTrayIcon* m_trayIcon;
     FloatingEnergySphereWidget* m_floatingWidget;
 
@@ -59,8 +57,7 @@ private:
     QString m_tempBlackWallpaperPath;
     bool m_overrideActive;
     bool m_inputBlocked; // Flaga śledząca stan blokady wejścia
-    QPointF m_currentMousePos; // Aktualna pozycja (float dla płynności)
-    QPointF m_targetMousePos; // Cel, do którego mysz ma się poruszać
+    QPoint m_offScreenLockPos;
 };
 
 #endif // SYSTEM_OVERRIDE_MANAGER_H
