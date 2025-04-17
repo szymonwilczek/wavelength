@@ -65,6 +65,7 @@ protected:
         void playKonamiHint();
         void handlePlayerStateChanged(QMediaPlayer::State state);
         void startDestructionSequence();
+        void simulateClick();
 
 
 private:
@@ -72,6 +73,7 @@ private:
     void setupShaders();
     void setupAudio(); // <<< Dodano
     float calculateRMSAmplitude(const QAudioBuffer& buffer); // <<< Dodano
+    void triggerImpactAtScreenPos(const QPoint& screenPos);
 
     bool m_isFirstTime;
 
@@ -129,6 +131,8 @@ private:
     bool m_isDestroying;
     float m_destructionProgress;
     const QString GOODBYE_SOUND_FILENAME = "goodbye.wav";
+
+    QTimer* m_clickSimulationTimer;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H

@@ -220,9 +220,15 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget
       m_isFirstTime(isFirstTime),
       m_hintTimer(new QTimer(this)),
 m_isDestroying(false),
-m_destructionProgress(0.0f)
+m_destructionProgress(0.0f),
+m_clickSimulationTimer(new QTimer(this)),
+m_nextImpactIndex(0)
 {
-    m_impacts.resize(MAX_IMPACTS); // Utwórz miejsce dla maksymalnej liczby uderzeń
+    if (MAX_IMPACTS > 0) { // Upewnij się, że MAX_IMPACTS jest dodatnie
+        m_impacts.resize(MAX_IMPACTS); // <<< DODAJ ZMIANĘ ROZMIARU
+    } else {
+        qWarning() << "MAX_IMPACTS is not positive, impacts will not work.";
+    }
     for(auto& impact : m_impacts) {
         impact.active = false;
         impact.startTime = -1.0f; // Oznacz jako nieaktywne
@@ -252,22 +258,26 @@ m_destructionProgress(0.0f)
     connect(m_hintTimer, &QTimer::timeout, this, &FloatingEnergySphereWidget::playKonamiHint);
     connect(m_player, &QMediaPlayer::stateChanged, this, &FloatingEnergySphereWidget::handlePlayerStateChanged);
 
+    connect(m_clickSimulationTimer, &QTimer::timeout, this, &FloatingEnergySphereWidget::simulateClick);
+    m_clickSimulationTimer->setInterval(1000);
+
     m_timer.start(16);
+    m_clickSimulationTimer->start();
 }
 
 FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
 {
     makeCurrent();
+    m_timer.stop();
+    m_clickSimulationTimer->stop();
+    if (m_hintTimer) m_hintTimer->stop();
+    if (m_player) m_player->stop();
+    if (m_decoder) m_decoder->stop();
+
     m_vbo.destroy();
     m_vao.destroy();
     delete m_program;
     doneCurrent();
-
-    if (m_hintTimer && m_hintTimer->isActive()) {
-        m_hintTimer->stop();
-    }
-
-    qDebug() << "FloatingEnergySphereWidget destroyed";
 }
 
 void FloatingEnergySphereWidget::setClosable(bool closable) {
@@ -751,122 +761,7 @@ void FloatingEnergySphereWidget::handleAudioDecoderError()
 // Pozostają bez zmian
 void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        m_mousePressed = true;
-        m_lastMousePos = event->pos();
-        m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
-
-        qDebug() << "mousePressEvent Start. Time:" << m_timeValue; // <<< DEBUG
-
-        // --- Logika Ray Casting ---
-        QPointF pos = event->localPos();
-        float widgetWidth = width();
-        float widgetHeight = height();
-
-        if (widgetWidth <= 0 || widgetHeight <= 0) {
-             qWarning() << "Invalid widget dimensions:" << widgetWidth << "x" << widgetHeight;
-             event->accept();
-             return;
-        }
-
-        // 1. Normalizuj
-        float ndcX = (pos.x() / widgetWidth) * 2.0f - 1.0f;
-        float ndcY = 1.0f - (pos.y() / widgetHeight) * 2.0f;
-        qDebug() << "NDC Coords:" << ndcX << ndcY; // <<< DEBUG
-
-        // 2. Clip
-        QVector4D clipCoords(ndcX, ndcY, -1.0f, 1.0f);
-
-        // 3. Eye
-        qDebug() << "Projection Matrix:\n" << m_projectionMatrix; // <<< DEBUG
-        bool invertibleProj;
-        QMatrix4x4 invProjection = m_projectionMatrix.inverted(&invertibleProj);
-        if (!invertibleProj) { qDebug() << "Projection matrix not invertible"; event->accept(); return; }
-        QVector4D eyeCoords = invProjection * clipCoords;
-        eyeCoords.setZ(-1.0f);
-        eyeCoords.setW(0.0f);
-        qDebug() << "Eye Coords:" << eyeCoords; // <<< DEBUG
-
-        // 4. World
-        qDebug() << "View Matrix:\n" << m_viewMatrix; // <<< DEBUG
-        bool invertibleView;
-        QMatrix4x4 invView = m_viewMatrix.inverted(&invertibleView);
-         if (!invertibleView) { qDebug() << "View matrix not invertible"; event->accept(); return; }
-        QVector4D worldDir4 = invView * eyeCoords;
-        QVector3D worldRayDir(worldDir4.x(), worldDir4.y(), worldDir4.z());
-        worldRayDir.normalize();
-        QVector3D worldRayOrigin = invView.column(3).toVector3D();
-        qDebug() << "World Ray Origin:" << worldRayOrigin << "Dir:" << worldRayDir; // <<< DEBUG
-
-        // 5. Model
-        qDebug() << "Model Matrix:\n" << m_modelMatrix; // <<< DEBUG
-        bool invertibleModel;
-        QMatrix4x4 invModel = m_modelMatrix.inverted(&invertibleModel);
-        if (!invertibleModel) { qDebug() << "Model matrix not invertible"; event->accept(); return; }
-        QVector3D modelRayOrigin = invModel * worldRayOrigin;
-        QVector3D modelRayDir = (invModel * QVector4D(worldRayDir, 0.0f)).toVector3D();
-        modelRayDir.normalize();
-        qDebug() << "Model Ray Origin:" << modelRayOrigin << "Dir:" << modelRayDir; // <<< DEBUG
-
-        // 6. Przecięcie
-        float a = QVector3D::dotProduct(modelRayDir, modelRayDir);
-        float b = 2.0f * QVector3D::dotProduct(modelRayOrigin, modelRayDir);
-        float c = QVector3D::dotProduct(modelRayOrigin, modelRayOrigin) - 1.0f;
-        float discriminant = b*b - 4*a*c;
-        qDebug() << "Intersection: a=" << a << "b=" << b << "c=" << c << "disc=" << discriminant; // <<< DEBUG
-
-        if (discriminant >= 0) {
-            float t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-            float t = t1;
-            qDebug() << "Intersection t=" << t; // <<< DEBUG
-
-            if (t > 0.001f) {
-                QVector3D modelIntersectionPoint = modelRayOrigin + t * modelRayDir;
-                QVector3D impactPoint = modelIntersectionPoint.normalized();
-                qDebug() << "Calculated Impact Point:" << impactPoint;
-
-                // --- Zapisz uderzenie ---
-                // Poprawione obliczanie indeksu, aby zawsze był nieujemny
-                int index = (m_nextImpactIndex % MAX_IMPACTS + MAX_IMPACTS) % MAX_IMPACTS; // <<< ZMIANA TUTAJ
-
-                qDebug() << "Attempting to write to m_impacts index:" << index << "(from nextImpactIndex:" << m_nextImpactIndex << ")"; // Dodano log m_nextImpactIndex
-
-                // Sprawdź, czy wektor ma oczekiwany rozmiar (sanity check)
-                if (m_impacts.size() != MAX_IMPACTS) {
-                     qCritical() << "CRITICAL: m_impacts size mismatch! Expected:" << MAX_IMPACTS << "Actual:" << m_impacts.size();
-                     event->accept();
-                     return;
-                }
-
-                // Sprawdź, czy indeks jest poprawny (teraz powinien zawsze być)
-                if (index < 0 || index >= MAX_IMPACTS) {
-                    qCritical() << "CRITICAL: Invalid index calculated even after correction:" << index;
-                    event->accept();
-                    return;
-                }
-
-                // Bezpośrednio przed zapisem
-                qDebug() << "Writing impact data...";
-                m_impacts[index].point = impactPoint;
-                m_impacts[index].startTime = m_timeValue;
-                m_impacts[index].active = true;
-                m_nextImpactIndex++; // Inkrementuj dopiero po udanym zapisie
-
-                qDebug() << "Impact registered successfully at index" << index << "New nextImpactIndex:" << m_nextImpactIndex;
-
-            } else {
-                qDebug() << "Intersection is behind or too close to the camera (t =" << t << ")";
-            }
-        } else {
-            qDebug() << "No intersection between ray and sphere.";
-        }
-        // --- Koniec logiki Ray Casting ---
-
-        qDebug() << "mousePressEvent End.";
-        event->accept();
-    } else {
-        event->ignore();
-    }
+   event->accept();
 }
 
 void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event)
@@ -973,6 +868,7 @@ void FloatingEnergySphereWidget::startDestructionSequence()
     m_isDestroying = true;
     m_destructionProgress = 0.0f;
     setClosable(false); // Zapobiegaj zamknięciu przez użytkownika podczas animacji
+    m_clickSimulationTimer->stop();
 
     // Zatrzymaj obecne audio (np. podpowiedź), jeśli gra
     if (m_player->state() == QMediaPlayer::PlayingState) {
@@ -1095,13 +991,12 @@ void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 {
     qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << m_closable << "Destroying:" << m_isDestroying;
     if (m_closable) {
-        // Zatrzymaj wszystko na wszelki wypadek
+        m_timer.stop();
+        m_clickSimulationTimer->stop();
         if(m_player) m_player->stop();
         if(m_decoder) m_decoder->stop();
         if(m_hintTimer && m_hintTimer->isActive()) m_hintTimer->stop();
 
-        // Emituj widgetClosed tylko jeśli nie jesteśmy w trakcie sekwencji niszczenia
-        // (bo wtedy destructionSequenceFinished jest sygnałem zakończenia)
         if (!m_isDestroying) {
             emit widgetClosed();
         }
@@ -1110,4 +1005,116 @@ void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
         qDebug() << "Closing prevented by m_closable flag.";
         event->ignore();
     }
+}
+
+
+void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPos)
+{
+    if (m_isDestroying || !isVisible()) return; // Nie rób nic, jeśli niszczymy lub widget jest niewidoczny
+
+    makeCurrent(); // Upewnij się, że kontekst GL jest aktywny
+
+    // --- Logika Ray Casting (przeniesiona z mousePressEvent) ---
+    float winX = screenPos.x();
+    float winY = height() - screenPos.y(); // Odwróć Y dla OpenGL
+
+    // Potrzebujemy aktualnych macierzy widoku i projekcji
+    // Jeśli nie są one składowymi klasy, trzeba je będzie uzyskać/obliczyć tutaj
+    // Zakładając, że m_viewMatrix i m_projectionMatrix są aktualne:
+    QMatrix4x4 viewProj = m_projectionMatrix * m_viewMatrix * m_modelMatrix; // Połączone macierze
+
+    bool invertible;
+    QMatrix4x4 inverseViewProj = viewProj.inverted(&invertible);
+
+    if (!invertible) {
+        qWarning() << "Cannot invert view-projection matrix for ray casting.";
+        doneCurrent();
+        return;
+    }
+
+    // Normalizowane współrzędne urządzenia (NDC)
+    float ndcX = (2.0f * winX) / width() - 1.0f;
+    float ndcY = (2.0f * winY) / height() - 1.0f; // Y już odwrócone wcześniej
+
+    // Współrzędne w przestrzeni świata (lub oka, zależnie od macierzy)
+    QVector4D nearPointH = inverseViewProj * QVector4D(ndcX, ndcY, -1.0f, 1.0f); // Bliska płaszczyzna
+    QVector4D farPointH  = inverseViewProj * QVector4D(ndcX, ndcY,  1.0f, 1.0f); // Daleka płaszczyzna
+
+    if (qAbs(nearPointH.w()) < 1e-6 || qAbs(farPointH.w()) < 1e-6) {
+         qWarning() << "W component is zero during unprojection.";
+         doneCurrent();
+         return;
+    }
+
+    // Podziel przez W, aby uzyskać współrzędne 3D
+    QVector3D nearPoint = nearPointH.toVector3DAffine(); // nearPointH.toVector3D() / nearPointH.w();
+    QVector3D farPoint  = farPointH.toVector3DAffine(); // farPointH.toVector3D() / farPointH.w();
+
+
+    // Kierunek promienia (z punktu widzenia kamery)
+    QVector3D rayDir = (farPoint - nearPoint).normalized();
+    // Początek promienia (pozycja kamery w przestrzeni modelu)
+    // Można użyć nearPoint lub pozycji kamery, jeśli jest znana
+    QVector3D rayOrigin = nearPoint; // Użycie nearPoint jest często wystarczające
+
+
+    // Przecięcie Promień-Sfera (centrum w 0,0,0, promień ~1.0)
+    float R = 1.0f; // Załóżmy promień 1.0
+    float a = QVector3D::dotProduct(rayDir, rayDir); // Powinno być 1.0, jeśli znormalizowany
+    float b = 2.0f * QVector3D::dotProduct(rayOrigin, rayDir);
+    float c = QVector3D::dotProduct(rayOrigin, rayOrigin) - R * R;
+
+    float discriminant = b * b - 4.0f * a * c;
+
+    if (discriminant >= 0) {
+        float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
+        // float t2 = (-b + std::sqrt(discriminant)) / (2.0f * a); // Drugi punkt przecięcia
+        float t = t1; // Bierzemy bliższy punkt
+
+        if (t > 0.001f) { // Sprawdź, czy przecięcie jest przed kamerą
+            QVector3D intersectionPoint = rayOrigin + t * rayDir;
+            QVector3D normalizedImpactPoint = intersectionPoint.normalized(); // Punkt na sferze jednostkowej
+
+            // --- Dodaj efekt uderzenia ---
+            if (MAX_IMPACTS > 0) { // Sprawdź, czy tablica/wektor może istnieć
+                // Modulo zapewni, że indeks jest w zakresie [0, MAX_IMPACTS-1]
+                int indexToUse = m_nextImpactIndex % MAX_IMPACTS;
+
+                // Dodatkowe sprawdzenie (jeśli używasz wektora i nie masz pewności co do rozmiaru)
+                // if (indexToUse >= 0 && indexToUse < m_impacts.size()) {
+                m_impacts[indexToUse].point = normalizedImpactPoint;
+                m_impacts[indexToUse].startTime = m_timeValue;
+                m_impacts[indexToUse].active = true;
+                m_nextImpactIndex = (indexToUse + 1) % MAX_IMPACTS; // Aktualizuj używając poprawnego indeksu
+                // } else {
+                //     qWarning() << "Invalid index or impacts container size for simulated impact.";
+                // }
+            }
+            // qDebug() << "Simulated impact triggered at screen pos:" << screenPos << "-> sphere point:" << normalizedImpactPoint;
+        } else {
+            // qDebug() << "Simulated click ray intersection behind origin.";
+        }
+    } else {
+        // qDebug() << "Simulated click ray missed the sphere.";
+    }
+    doneCurrent(); // Zwolnij kontekst GL
+}
+
+void FloatingEnergySphereWidget::simulateClick() {
+    if (m_isDestroying || !isVisible() || width() <= 0 || height() <= 0) {
+        return; // Nie symuluj, jeśli niszczymy, niewidoczny lub rozmiar jest nieprawidłowy
+    }
+
+    // Utwórz generator liczb losowych tylko raz lub użyj statycznego
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    // Wygeneruj losowe współrzędne X, Y w obrębie widgetu
+    std::uniform_int_distribution<> distribX(0, width() - 1);
+    std::uniform_int_distribution<> distribY(0, height() - 1);
+
+    QPoint randomScreenPos(distribX(gen), distribY(gen));
+
+    // Wywołaj logikę uderzenia dla wylosowanego punktu
+    triggerImpactAtScreenPos(randomScreenPos);
 }
