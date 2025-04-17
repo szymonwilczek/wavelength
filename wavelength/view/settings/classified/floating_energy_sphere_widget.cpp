@@ -22,6 +22,7 @@ const char *vertexShaderSource = R"(
     uniform mat4 projection;
     uniform float time;
     uniform float audioAmplitude;
+    uniform float u_destructionFactor;
 
     // --- Uniformy dla uderzeń ---
     #define MAX_IMPACTS 5
@@ -117,24 +118,41 @@ const char *vertexShaderSource = R"(
             }
         }
 
-        // --- Połącz wszystkie deformacje ---
+       // --- Połącz wszystkie deformacje ---
         vec3 displacedPos = aPos + normal * (totalIdleDeformation + audioEffect + totalImpactDeformation);
 
+        // --- Efekt zniszczenia ---
+        // Skalowanie pozycji w kierunku środka (0,0,0)
+        // Używamy potęgi, aby kolaps przyspieszał pod koniec
+        float collapseFactor = pow(u_destructionFactor, 2.0);
+        vec3 finalPos = displacedPos * (1.0 - collapseFactor); // <<< KURCZENIE SIĘ
+
+        // Dodaj chaotyczne przesunięcie na zewnątrz (opcjonalne, można dostosować siłę)
+        float chaosStrength = u_destructionFactor * 0.5;
+        vec3 chaosOffset = normal * (noise(vPos * 5.0 + time * 2.0) - 0.5) * chaosStrength;
+        finalPos += chaosOffset; // Dodaje trochę "rozpadania się" podczas kurczenia
+
         // --- Zaktualizuj vDeformationFactor ---
-        float maxExpectedDeformation = baseAmplitude * 2.0 + audioDeformationScale;
-        // Uwzględnij maksymalną głębokość uderzenia w oczekiwanej deformacji
-        vDeformationFactor = smoothstep(0.0, max(0.1, maxExpectedDeformation + abs(maxDepth)), abs(totalIdleDeformation + audioEffect + totalImpactDeformation));
+        if (u_destructionFactor == 0.0) {
+             float maxExpectedDeformation = baseAmplitude * 2.0 + audioDeformationScale;
+             vDeformationFactor = smoothstep(0.0, max(0.1, maxExpectedDeformation + abs(maxDepth)), abs(totalIdleDeformation + audioEffect + totalImpactDeformation));
+        } else {
+             vDeformationFactor = u_destructionFactor; // Użyj postępu niszczenia dla koloru/blasku
+        }
 
-        gl_Position = projection * view * model * vec4(displacedPos, 1.0);
+        gl_Position = projection * view * model * vec4(finalPos, 1.0); // Użyj finalPos
 
-        // --- Rozmiar punktu (bez zmian) ---
+        // --- Rozmiar punktu ---
         float basePointSize = 0.9;
         float sizeVariation = 0.5;
         float smoothTimeFactor = 0.3;
         float idlePointSizeVariation = sizeVariation * vDeformationFactor * (0.3 * sin(time * smoothTimeFactor + aPos.y * 0.5));
         float audioPointSizeVariation = audioAmplitude * 1.5;
         gl_PointSize = basePointSize + idlePointSizeVariation + audioPointSizeVariation;
-        gl_PointSize = max(0.6, gl_PointSize);
+
+        // Skaluj rozmiar punktu w dół podczas niszczenia
+        gl_PointSize *= (1.0 - u_destructionFactor); // <<< ZMNIEJSZANIE PUNKTÓW
+        gl_PointSize = max(0.1, gl_PointSize); // Zapobiegaj natychmiastowemu zniknięciu punktów
     }
 )";
 
@@ -144,14 +162,16 @@ const char *fragmentShaderSource = R"(
     out vec4 FragColor;
 
     in vec3 vPos;
-    in float vDeformationFactor;
+    in float vDeformationFactor; // Teraz zawiera postęp niszczenia
     uniform float time;
+    uniform float u_destructionFactor; // Można też przekazać bezpośrednio
 
     void main()
     {
         vec3 colorBlue = vec3(0.1, 0.3, 1.0);
         vec3 colorViolet = vec3(0.7, 0.2, 0.9);
         vec3 colorPink = vec3(1.0, 0.4, 0.8);
+        vec3 colorRed = vec3(1.0, 0.1, 0.1); // Kolor dla zniszczenia
 
         float factor = (normalize(vPos).y + 1.0) / 2.0;
 
@@ -162,10 +182,15 @@ const char *fragmentShaderSource = R"(
             baseColor = mix(colorViolet, colorPink, (factor - 0.5) * 2.0);
         }
 
+        // Zmień kolor na czerwony podczas niszczenia
+        baseColor = mix(baseColor, colorRed, u_destructionFactor);
+
         float glow = 0.4 + 0.8 * vDeformationFactor + 0.3 * abs(sin(vPos.x * 2.0 + time * 1.5));
         vec3 finalColor = baseColor * (glow + 0.2);
 
         float baseAlpha = 0.75;
+        // Opcjonalnie: Zmniejszaj alpha podczas niszczenia (może powodować problemy z przezroczystością tła)
+        // float finalAlpha = baseAlpha * (1.0 - u_destructionFactor);
         float finalAlpha = baseAlpha;
         FragColor = vec4(finalColor, finalAlpha);
     }
@@ -193,7 +218,9 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget
       m_currentAudioAmplitude(0.0f), // <<< Inicjalizacja
       m_audioReady(false), // <<< Inicjalizacja
       m_isFirstTime(isFirstTime),
-      m_hintTimer(new QTimer(this))
+      m_hintTimer(new QTimer(this)),
+m_isDestroying(false),
+m_destructionProgress(0.0f)
 {
     m_impacts.resize(MAX_IMPACTS); // Utwórz miejsce dla maksymalnej liczby uderzeń
     for(auto& impact : m_impacts) {
@@ -474,6 +501,7 @@ void FloatingEnergySphereWidget::paintGL()
     m_program->setUniformValue("model", m_modelMatrix);
     m_program->setUniformValue("time", m_timeValue);
     m_program->setUniformValue("audioAmplitude", m_currentAudioAmplitude);
+    m_program->setUniformValue("u_destructionFactor", m_destructionProgress);
 
     // --- Przekaż dane uderzeń do shadera ---
     QVector3D impactPointsGL[MAX_IMPACTS];
@@ -516,6 +544,23 @@ void FloatingEnergySphereWidget::updateAnimation()
 
     m_timeValue += deltaTime;
     if (m_timeValue > 3600.0f) m_timeValue -= 3600.0f;
+
+    if (m_isDestroying) {
+        // Zwiększaj postęp zniszczenia
+        // Dostosuj czas trwania do długości dźwięku "goodbye.wav" lub własnych preferencji
+        float destructionDuration = 8.0f;
+        m_destructionProgress += deltaTime / destructionDuration;
+        m_destructionProgress = qBound(0.0f, m_destructionProgress, 1.0f);
+
+        // Zatrzymaj obrót i reakcję na audio podczas niszczenia
+        m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
+        m_currentAudioAmplitude = 0.0f; // Płynnie wyzeruj amplitudę
+        m_targetAudioAmplitude = 0.0f;
+
+        // Nie aktualizuj normalnej animacji/obrotu
+        update();
+        return; // Zakończ updateAnimation tutaj dla stanu niszczenia
+    }
 
     bool isPlaying = (m_player && m_player->state() == QMediaPlayer::PlayingState);
 
@@ -903,14 +948,15 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
         }
 
         if (match) {
-            qDebug() << "KONAMI CODE ENTERED!";
-            // Wyemituj sygnał i wyczyść sekwencję, aby uniknąć wielokrotnego wywołania
-            emit konamiCodeEntered();
+            qDebug() << "KONAMI CODE ENTERED! Starting destruction sequence.";
+            // Wywołaj nową funkcję zamiast emitować sygnał od razu
+            startDestructionSequence(); // <<< ZMIANA TUTAJ
             m_keySequence.clear();
-            // Opcjonalnie: zatrzymaj timer podpowiedzi, jeśli był aktywny
             if (m_hintTimer->isActive()) {
                 m_hintTimer->stop();
             }
+            // Nie emituj już konamiCodeEntered tutaj
+            // emit konamiCodeEntered();
         }
     }
 
@@ -919,12 +965,68 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
     event->accept(); // Akceptuj zdarzenie, aby nie było przekazywane wyżej
 }
 
+void FloatingEnergySphereWidget::startDestructionSequence()
+{
+    if (m_isDestroying) return; // Już w trakcie niszczenia
+
+    qDebug() << "Starting destruction sequence...";
+    m_isDestroying = true;
+    m_destructionProgress = 0.0f;
+    setClosable(false); // Zapobiegaj zamknięciu przez użytkownika podczas animacji
+
+    // Zatrzymaj obecne audio (np. podpowiedź), jeśli gra
+    if (m_player->state() == QMediaPlayer::PlayingState) {
+        m_player->stop();
+    }
+    if (m_decoder && m_decoder->state() != QAudioDecoder::StoppedState) {
+        m_decoder->stop(); // Zatrzymaj też dekoder, jeśli działał
+    }
+
+    // Znajdź i odtwórz dźwięk "goodbye.wav"
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    QString audioSubDir = "/assets/audio/";
+    QString goodbyeFilePath = QDir::cleanPath(appDirPath + audioSubDir + GOODBYE_SOUND_FILENAME);
+    QUrl goodbyeFileUrl;
+
+    if (QFile::exists(goodbyeFilePath)) {
+        goodbyeFileUrl = QUrl::fromLocalFile(goodbyeFilePath);
+        qDebug() << "Playing destruction audio:" << goodbyeFilePath;
+        m_player->setMedia(goodbyeFileUrl);
+        m_player->setVolume(80); // Ustaw głośność
+        m_player->play();
+    } else {
+        qCritical() << "Destruction audio file not found:" << goodbyeFilePath;
+        // Co zrobić, jeśli plik nie istnieje? Można od razu emitować sygnał zakończenia
+        // lub kontynuować bez dźwięku. Dla bezpieczeństwa emitujmy od razu.
+        emit destructionSequenceFinished();
+        m_closable = true;
+        close();
+    }
+}
+
 // --- Nowy slot do obsługi zmiany stanu odtwarzacza ---
 void FloatingEnergySphereWidget::handlePlayerStateChanged(QMediaPlayer::State state)
 {
     qDebug() << "Player state changed to:" << state;
+
+    // --- Logika dla zakończenia dźwięku zniszczenia ---
+    if (m_isDestroying && state == QMediaPlayer::StoppedState) {
+        // Sprawdź, czy zakończony plik to rzeczywiście dźwięk zniszczenia
+        if (m_player->media().canonicalUrl().fileName() == GOODBYE_SOUND_FILENAME) {
+            qDebug() << "Destruction audio finished.";
+            // Upewnij się, że animacja wizualnie dobiegła końca (opcjonalne opóźnienie lub sprawdzenie progress)
+            // Dla uproszczenia emitujemy od razu
+            emit destructionSequenceFinished();
+            // Pozwól na zamknięcie i zamknij widget
+            m_closable = true;
+            close(); // Wywołaj closeEvent
+            return; // Zakończ obsługę dla tego stanu
+        }
+    }
+    // --- Koniec logiki dla zniszczenia ---
+
     // Sprawdź, czy audio się zakończyło i czy timer podpowiedzi jeszcze nie działa
-    if (state == QMediaPlayer::StoppedState && !m_hintTimer->isActive()) {
+    if (!m_isDestroying && state == QMediaPlayer::StoppedState && !m_hintTimer->isActive()) {
         // Sprawdź, czy pozycja jest bliska końca (unikaj uruchomienia timera przy błędach na starcie)
         if (m_player->position() > 0 && m_player->duration() > 0 &&
             m_player->position() >= m_player->duration() - 100) // Mały margines na końcu
@@ -938,7 +1040,7 @@ void FloatingEnergySphereWidget::handlePlayerStateChanged(QMediaPlayer::State st
         } else if (m_player->error() != QMediaPlayer::NoError) {
              qDebug() << "Player stopped due to error, not starting hint timer.";
         }
-    } else if (state == QMediaPlayer::PlayingState) {
+    } else if (!m_isDestroying && state == QMediaPlayer::PlayingState) {
         // Jeśli odtwarzanie się wznowi (np. hint), zatrzymaj timer
         if (m_hintTimer->isActive()) {
             qDebug() << "Player started playing, stopping hint timer.";
@@ -991,13 +1093,18 @@ void FloatingEnergySphereWidget::playKonamiHint()
 
 void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 {
-    qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << m_closable;
+    qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << m_closable << "Destroying:" << m_isDestroying;
     if (m_closable) {
-        // Zatrzymaj audio i timery przed zamknięciem
+        // Zatrzymaj wszystko na wszelki wypadek
         if(m_player) m_player->stop();
         if(m_decoder) m_decoder->stop();
-        if(m_hintTimer && m_hintTimer->isActive()) m_hintTimer->stop(); // <<< Zatrzymaj timer podpowiedzi
-        emit widgetClosed();
+        if(m_hintTimer && m_hintTimer->isActive()) m_hintTimer->stop();
+
+        // Emituj widgetClosed tylko jeśli nie jesteśmy w trakcie sekwencji niszczenia
+        // (bo wtedy destructionSequenceFinished jest sygnałem zakończenia)
+        if (!m_isDestroying) {
+            emit widgetClosed();
+        }
         QWidget::closeEvent(event);
     } else {
         qDebug() << "Closing prevented by m_closable flag.";

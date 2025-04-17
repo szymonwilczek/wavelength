@@ -126,10 +126,10 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
     qDebug() << "Initiating System Override Sequence...";
 
     // --- Kolejne kroki ---
-    // qDebug() << "Changing wallpaper...";
-    // if (!changeWallpaper(OVERRIDE_WALLPAPER_RESOURCE)) {
-    //     qWarning() << "Failed to change wallpaper.";
-    // }
+    qDebug() << "Changing wallpaper...";
+    if (!changeWallpaper(OVERRIDE_WALLPAPER_RESOURCE)) {
+        qWarning() << "Failed to change wallpaper.";
+    }
 
     qDebug() << "Minimizing windows...";
     if (!minimizeAllWindows()) {
@@ -412,8 +412,11 @@ void SystemOverrideManager::showFloatingAnimationWidget(bool isFirstTime)
     connect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed,
             this, &SystemOverrideManager::handleFloatingWidgetClosed);
 
-    connect(m_floatingWidget, &FloatingEnergySphereWidget::konamiCodeEntered,
-            this, &SystemOverrideManager::restoreSystemState);
+    // Zamiast konamiCodeEntered, połącz nowy sygnał zakończenia sekwencji niszczenia
+    // connect(m_floatingWidget, &FloatingEnergySphereWidget::konamiCodeEntered,
+    //         this, &SystemOverrideManager::restoreSystemState); // <<< STARE POŁĄCZENIE
+    connect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished,
+            this, &SystemOverrideManager::restoreSystemState); // <<< NOWE POŁĄCZENIE
 
     QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
     int x = (screenGeometry.width() - m_floatingWidget->width()) / 2;

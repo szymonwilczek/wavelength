@@ -42,6 +42,7 @@ public:
     signals:
         void widgetClosed();
         void konamiCodeEntered();
+        void destructionSequenceFinished();
 
 protected:
     void initializeGL() override;
@@ -63,6 +64,7 @@ protected:
         void handleAudioDecoderError(); // <<< Dodano
         void playKonamiHint();
         void handlePlayerStateChanged(QMediaPlayer::State state);
+        void startDestructionSequence();
 
 
 private:
@@ -123,6 +125,10 @@ private:
         Qt::Key_B, Qt::Key_A, Qt::Key_Return
     };
     QTimer* m_hintTimer;
+
+    bool m_isDestroying;
+    float m_destructionProgress;
+    const QString GOODBYE_SOUND_FILENAME = "goodbye.wav";
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H
