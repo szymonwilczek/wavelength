@@ -1,26 +1,16 @@
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QGroupBox>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QStackedWidget>
-#include <QScrollArea>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
 #include <QDateTime>
-#include <QPainter>
-#include <QProgressBar>
 
 #include "../ui/button/cyber_button.h"
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
 #include "settings/classified/system_override_manager.h"
-#include "settings/classified/wave_sculptor/wave_sculptor_window.h"
 #include "settings/layers/code/security_code_layer.h"
 #include "settings/layers/fingerprint/fingerprint_layer.h"
 #include "settings/layers/handprint/handprint_layer.h"
@@ -157,7 +147,6 @@ private slots:
     void restoreDefaults();
     void switchToTab(int tabIndex);
     void handleBackButton();
-    void openWaveSculptor();
 
 private:
     void loadSettingsFromRegistry();
@@ -238,7 +227,6 @@ private:
     bool m_debugModeEnabled;
 
     QWidget* m_classifiedFeaturesWidget;
-    WaveSculptorWindow* m_waveSculptorWindow;
 
     QPushButton* m_overrideButton;
 

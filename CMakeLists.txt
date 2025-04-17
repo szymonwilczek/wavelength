@@ -170,10 +170,6 @@ add_executable(
         wavelength/view/settings/layers/typing_test/typing_test_layer.h
         wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
         wavelength/view/settings/layers/snake_game/snake_game_layer.h
-        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.cpp
-        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.h
-        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.cpp
-        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.h
         wavelength/view/settings/classified/floating_energy_sphere_widget.cpp
         wavelength/view/settings/classified/floating_energy_sphere_widget.h
         wavelength/view/settings/classified/system_override_manager.cpp
