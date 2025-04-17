@@ -29,7 +29,6 @@ m_voiceRecognitionLayer(nullptr),
 m_typingTestLayer(nullptr),
 m_snakeGameLayer(nullptr),
 m_classifiedFeaturesWidget(nullptr),
-m_waveSculptorWindow(nullptr),
 m_currentLayerIndex(FingerprintIndex),
 m_debugModeEnabled(true) // <<< Zainicjalizuj flagę na false
 {
@@ -231,7 +230,6 @@ void SettingsView::setupClassifiedTab() {
         "QPushButton:hover { background-color: #0099CC; }"
         "QPushButton:pressed { background-color: #005588; }"
     );
-    connect(waveSculptorButton, &QPushButton::clicked, this, &SettingsView::openWaveSculptor);
     buttonLayout->addWidget(waveSculptorButton);
 
     // Miejsca na przyciski Matrix Vision i System Override (dodamy później)
@@ -392,15 +390,6 @@ void SettingsView::setupClassifiedTab() {
     m_tabContent->addWidget(tab);
 
     resetSecurityLayers();
-}
-
-void SettingsView::openWaveSculptor() {
-    qDebug() << "Opening Wave Sculptor...";
-    // Tworzymy nowe okno za każdym razem lub pokazujemy istniejące
-    // Prostsze podejście: tworzymy nowe za każdym razem
-    // Pamiętaj, że WaveSculptorWindow usuwa się samo po zamknięciu (deleteLater)
-    WaveSculptorWindow* sculptorWindow = new WaveSculptorWindow();
-    sculptorWindow->show();
 }
 
 void SettingsView::setupNextSecurityLayer() {
