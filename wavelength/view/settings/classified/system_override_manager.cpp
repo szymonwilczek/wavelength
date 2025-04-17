@@ -39,7 +39,8 @@ const std::set<DWORD> ALLOWED_KEYS = {
     VK_RIGHT,    // Strzałka w prawo
     0x42,        // Klawisz 'B'
     0x41,        // Klawisz 'A'
-    VK_RETURN    // Klawisz Enter
+    VK_RETURN,    // Klawisz Enter
+    VK_CAPITAL // Klawisz Caps Lock
 };
 
 
