@@ -192,7 +192,8 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget
       m_audioBufferDurationMs(0), // <<< Inicjalizacja
       m_currentAudioAmplitude(0.0f), // <<< Inicjalizacja
       m_audioReady(false), // <<< Inicjalizacja
-m_isFirstTime(isFirstTime)
+      m_isFirstTime(isFirstTime),
+      m_hintTimer(new QTimer(this))
 {
     m_impacts.resize(MAX_IMPACTS); // Utwórz miejsce dla maksymalnej liczby uderzeń
     for(auto& impact : m_impacts) {
@@ -219,6 +220,12 @@ m_isFirstTime(isFirstTime)
     QSurfaceFormat fmt = format();
     fmt.setAlphaBufferSize(8);
     setFormat(fmt);
+
+    connect(&m_timer, &QTimer::timeout, this, &FloatingEnergySphereWidget::updateAnimation);
+    connect(m_hintTimer, &QTimer::timeout, this, &FloatingEnergySphereWidget::playKonamiHint);
+    connect(m_player, &QMediaPlayer::stateChanged, this, &FloatingEnergySphereWidget::handlePlayerStateChanged);
+
+    m_timer.start(16);
 }
 
 FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
@@ -228,6 +235,11 @@ FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
     m_vao.destroy();
     delete m_program;
     doneCurrent();
+
+    if (m_hintTimer && m_hintTimer->isActive()) {
+        m_hintTimer->stop();
+    }
+
     qDebug() << "FloatingEnergySphereWidget destroyed";
 }
 
@@ -866,13 +878,125 @@ void FloatingEnergySphereWidget::wheelEvent(QWheelEvent *event)
     update();
 }
 
+
+void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
+{
+    int key = event->key();
+    qDebug() << "Key pressed:" << QKeySequence(key).toString();
+
+    // Dodaj klawisz do sekwencji
+    m_keySequence.push_back(key);
+
+    // Utrzymaj rozmiar sekwencji równy długości kodu Konami
+    while (m_keySequence.size() > m_konamiCode.size()) {
+        m_keySequence.pop_front();
+    }
+
+    // Sprawdź, czy sekwencja pasuje do kodu Konami
+    if (m_keySequence.size() == m_konamiCode.size()) {
+        bool match = true;
+        for (size_t i = 0; i < m_konamiCode.size(); ++i) {
+            if (m_keySequence[i] != m_konamiCode[i]) {
+                match = false;
+                break;
+            }
+        }
+
+        if (match) {
+            qDebug() << "KONAMI CODE ENTERED!";
+            // Wyemituj sygnał i wyczyść sekwencję, aby uniknąć wielokrotnego wywołania
+            emit konamiCodeEntered();
+            m_keySequence.clear();
+            // Opcjonalnie: zatrzymaj timer podpowiedzi, jeśli był aktywny
+            if (m_hintTimer->isActive()) {
+                m_hintTimer->stop();
+            }
+        }
+    }
+
+    // Przekaż zdarzenie dalej, jeśli nie zostało obsłużone (lub zawsze)
+    // QOpenGLWidget::keyPressEvent(event); // Raczej niepotrzebne
+    event->accept(); // Akceptuj zdarzenie, aby nie było przekazywane wyżej
+}
+
+// --- Nowy slot do obsługi zmiany stanu odtwarzacza ---
+void FloatingEnergySphereWidget::handlePlayerStateChanged(QMediaPlayer::State state)
+{
+    qDebug() << "Player state changed to:" << state;
+    // Sprawdź, czy audio się zakończyło i czy timer podpowiedzi jeszcze nie działa
+    if (state == QMediaPlayer::StoppedState && !m_hintTimer->isActive()) {
+        // Sprawdź, czy pozycja jest bliska końca (unikaj uruchomienia timera przy błędach na starcie)
+        if (m_player->position() > 0 && m_player->duration() > 0 &&
+            m_player->position() >= m_player->duration() - 100) // Mały margines na końcu
+        {
+            qDebug() << "Initial audio finished. Starting 30s hint timer.";
+            m_hintTimer->setSingleShot(true); // Upewnij się, że jest jednorazowy
+            m_hintTimer->start(30000); // 30 sekund
+        } else if (m_player->position() == 0 && m_player->error() == QMediaPlayer::NoError) {
+             // Jeśli stan to Stopped, ale pozycja 0 (np. po ręcznym stop()), nie startuj timera
+             qDebug() << "Player stopped manually or before starting, not starting hint timer.";
+        } else if (m_player->error() != QMediaPlayer::NoError) {
+             qDebug() << "Player stopped due to error, not starting hint timer.";
+        }
+    } else if (state == QMediaPlayer::PlayingState) {
+        // Jeśli odtwarzanie się wznowi (np. hint), zatrzymaj timer
+        if (m_hintTimer->isActive()) {
+            qDebug() << "Player started playing, stopping hint timer.";
+            m_hintTimer->stop();
+        }
+    }
+}
+
+
+// --- Nowy slot do odtwarzania podpowiedzi ---
+void FloatingEnergySphereWidget::playKonamiHint()
+{
+    qDebug() << "Hint timer timed out. Attempting to play Konami hint.";
+
+    // Sprawdź, czy widget jest nadal widoczny/aktywny
+    if (!isVisible()) {
+        qDebug() << "Widget not visible, skipping Konami hint.";
+        return;
+    }
+
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    QString audioSubDir = "/assets/audio/";
+    QString hintFileName = "konami.wav"; // Nazwa pliku podpowiedzi
+    QString hintFilePath = QDir::cleanPath(appDirPath + audioSubDir + hintFileName);
+    QUrl hintFileUrl;
+
+    if (QFile::exists(hintFilePath)) {
+        hintFileUrl = QUrl::fromLocalFile(hintFilePath);
+        qDebug() << "Playing Konami hint audio:" << hintFilePath;
+
+        // Zatrzymaj dekoder, jeśli działał (nie powinien, ale na wszelki wypadek)
+        if (m_decoder && m_decoder->state() != QAudioDecoder::StoppedState) {
+            m_decoder->stop();
+        }
+        // Zatrzymaj odtwarzacz, jeśli grał coś innego
+        if (m_player->state() != QMediaPlayer::StoppedState) {
+            m_player->stop();
+        }
+
+        // Ustaw nowe źródło i odtwórz
+        m_player->setMedia(hintFileUrl);
+        m_player->setVolume(85); // Można ustawić inną głośność dla podpowiedzi
+        m_player->play();
+
+    } else {
+        qCritical() << "Konami hint audio file not found:" << hintFilePath;
+        qCritical() << "Ensure the 'assets/audio' folder with '" << hintFileName << "' is copied next to the executable.";
+    }
+}
+
 void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 {
     qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << m_closable;
     if (m_closable) {
-        // Zatrzymaj audio przed zamknięciem
+        // Zatrzymaj audio i timery przed zamknięciem
         if(m_player) m_player->stop();
         if(m_decoder) m_decoder->stop();
+        if(m_hintTimer && m_hintTimer->isActive()) m_hintTimer->stop(); // <<< Zatrzymaj timer podpowiedzi
         emit widgetClosed();
         QWidget::closeEvent(event);
     } else {

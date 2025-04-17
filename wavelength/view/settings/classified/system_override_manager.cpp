@@ -320,7 +320,7 @@ void SystemOverrideManager::simulateMouseMovement()
     m_currentMousePos.setY(qBound((qreal)screenGeometry.top(), m_currentMousePos.y(), (qreal)screenGeometry.bottom() - 1));
 
     // Ustaw pozycję kursora
-    // SetCursorPos(static_cast<int>(m_currentMousePos.x()), static_cast<int>(m_currentMousePos.y()));
+    SetCursorPos(static_cast<int>(m_currentMousePos.x()), static_cast<int>(m_currentMousePos.y()));
 #else
     // Not implemented
 #endif
@@ -412,14 +412,18 @@ void SystemOverrideManager::showFloatingAnimationWidget(bool isFirstTime)
     connect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed,
             this, &SystemOverrideManager::handleFloatingWidgetClosed);
 
+    connect(m_floatingWidget, &FloatingEnergySphereWidget::konamiCodeEntered,
+            this, &SystemOverrideManager::restoreSystemState);
+
     QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
     int x = (screenGeometry.width() - m_floatingWidget->width()) / 2;
     int y = (screenGeometry.height() - m_floatingWidget->height()) / 2;
     m_floatingWidget->move(x, y);
 
     m_floatingWidget->show();
+    m_floatingWidget->activateWindow();
+    m_floatingWidget->setFocus();
 
-    // Uruchomienie dźwięku jest teraz obsługiwane wewnątrz FloatingEnergySphereWidget
 }
 
 void SystemOverrideManager::handleFloatingWidgetClosed()

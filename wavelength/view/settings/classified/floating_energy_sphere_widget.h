@@ -1,6 +1,7 @@
 #ifndef FLOATING_ENERGY_SPHERE_WIDGET_H
 #define FLOATING_ENERGY_SPHERE_WIDGET_H
 
+#include <deque>
 #include <QElapsedTimer>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
@@ -40,6 +41,7 @@ public:
 
     signals:
         void widgetClosed();
+        void konamiCodeEntered();
 
 protected:
     void initializeGL() override;
@@ -51,6 +53,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
     private slots:
         void updateAnimation();
@@ -58,6 +61,8 @@ protected:
         void audioDecodingFinished(); // <<< Dodano
         void handleMediaPlayerError(); // <<< Dodano
         void handleAudioDecoderError(); // <<< Dodano
+        void playKonamiHint();
+        void handlePlayerStateChanged(QMediaPlayer::State state);
 
 
 private:
@@ -109,6 +114,15 @@ private:
 
     std::vector<ImpactInfo> m_impacts;
     int m_nextImpactIndex;
+
+    // --- Konami Code ---
+    std::deque<int> m_keySequence;
+    const std::vector<int> m_konamiCode = {
+        Qt::Key_Up, Qt::Key_Down, Qt::Key_Up, Qt::Key_Down,
+        Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
+        Qt::Key_B, Qt::Key_A, Qt::Key_Return
+    };
+    QTimer* m_hintTimer;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H
