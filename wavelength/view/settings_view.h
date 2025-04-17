@@ -19,6 +19,8 @@
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
+#include "settings/classified/system_override_manager.h"
+#include "settings/classified/wave_sculptor/wave_sculptor_window.h"
 #include "settings/layers/code/security_code_layer.h"
 #include "settings/layers/fingerprint/fingerprint_layer.h"
 #include "settings/layers/handprint/handprint_layer.h"
@@ -73,6 +75,7 @@ public:
         m_isActive = active;
         update();
     }
+
 
 protected:
     void enterEvent(QEvent *event) override {
@@ -140,6 +143,8 @@ public:
     explicit SettingsView(QWidget *parent = nullptr);
     ~SettingsView() override;
 
+    void setDebugMode(bool enabled);
+
 signals:
     void backToMainView();
     void settingsChanged();
@@ -152,6 +157,7 @@ private slots:
     void restoreDefaults();
     void switchToTab(int tabIndex);
     void handleBackButton();
+    void openWaveSculptor();
 
 private:
     void loadSettingsFromRegistry();
@@ -229,6 +235,14 @@ private:
     };
 
     SecurityLayerIndex m_currentLayerIndex;
+    bool m_debugModeEnabled;
+
+    QWidget* m_classifiedFeaturesWidget;
+    WaveSculptorWindow* m_waveSculptorWindow;
+
+    QPushButton* m_overrideButton;
+
+    SystemOverrideManager* m_systemOverrideManager;
 };
 
 #endif // SETTINGS_VIEW_H

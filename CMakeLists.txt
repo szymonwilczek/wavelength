@@ -9,7 +9,10 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-base_x64-windows")
 
-add_executable(${PROJECT_NAME} main.cpp
+add_executable(
+        ${PROJECT_NAME}
+#        WIN32
+        main.cpp
         resources.qrc
         wavelength/ui/navigation/navbar.h
         wavelength/ui/navigation/navbar.cpp
@@ -167,6 +170,14 @@ add_executable(${PROJECT_NAME} main.cpp
         wavelength/view/settings/layers/typing_test/typing_test_layer.h
         wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
         wavelength/view/settings/layers/snake_game/snake_game_layer.h
+        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.cpp
+        wavelength/view/settings/classified/wave_sculptor/editable_stream_widget.h
+        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.cpp
+        wavelength/view/settings/classified/wave_sculptor/wave_sculptor_window.h
+        wavelength/view/settings/classified/floating_energy_sphere_widget.cpp
+        wavelength/view/settings/classified/floating_energy_sphere_widget.h
+        wavelength/view/settings/classified/system_override_manager.cpp
+        wavelength/view/settings/classified/system_override_manager.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

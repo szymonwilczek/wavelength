@@ -143,6 +143,22 @@ public:
         emit configChanged("max_recent_wavelength");
     }
 
+    bool isSystemOverrideInitiated() const {
+        // Odczytujemy wartość przy każdym zapytaniu, aby mieć pewność aktualności
+        // Domyślnie false, jeśli klucz nie istnieje
+        return m_settings.value("Advanced/SystemOverrideInitiated", false).toBool();
+    }
+
+    void setSystemOverrideInitiated(bool initiated) {
+        // Zapisujemy wartość natychmiast
+        m_settings.setValue("Advanced/SystemOverrideInitiated", initiated);
+        // Nie ma potrzeby emitowania sygnału, chyba że UI na to reaguje
+        // emit configChanged("system_override_initiated");
+        // Zapisz od razu do pliku, aby zmiana była trwała nawet w razie awarii
+        saveSettings();
+        qDebug() << "SystemOverrideInitiated set to:" << initiated << "and saved.";
+    }
+
     // Zachowaj ustawienia
     void saveSettings() {
         m_settings.sync();
@@ -151,8 +167,18 @@ public:
 
     // Przywróć domyślne ustawienia
     void restoreDefaults() {
-        m_settings.clear();
-        emit configChanged("all");
+        bool wasInitiated = isSystemOverrideInitiated();
+
+        m_settings.clear(); // Czyści WSZYSTKIE ustawienia
+
+        // Po wyczyszczeniu, isSystemOverrideInitiated() zwróci domyślne false
+        qDebug() << "Settings cleared. SystemOverrideInitiated was:" << wasInitiated << ", is now:" << isSystemOverrideInitiated();
+
+        // Nie ma potrzeby ręcznego ustawiania na false, bo clear() to załatwia
+        // m_settings.setValue("Advanced/SystemOverrideInitiated", false); // Już niepotrzebne
+
+        emit configChanged("all"); // Sygnalizuj zmianę wszystkich ustawień
+        saveSettings(); // Zapisz pusty stan (lub domyślne, jeśli QSettings je przywraca)
     }
 
     // Metoda do odczytywania dowolnego ustawienia
