@@ -24,6 +24,11 @@ public:
     explicit SystemOverrideManager(QObject *parent = nullptr);
     ~SystemOverrideManager();
 
+#ifdef Q_OS_WIN
+    static bool isRunningAsAdmin();
+    static bool relaunchAsAdmin(const QStringList& arguments = QStringList());
+#endif
+
     signals:
         void overrideFinished(); // Sygnał informujący o zakończeniu sekwencji
 
@@ -32,20 +37,15 @@ public:
     void restoreSystemState(); // Upubliczniamy, aby można było wywołać z zewnątrz
 
     private slots:
-    void lockMousePosition();
     void handleFloatingWidgetClosed();
 
 private:
     bool changeWallpaper(const QString& imagePath);
     bool restoreWallpaper();
-    void startMouseLock();
-    void stopMouseLock();
     bool sendWindowsNotification(const QString& title, const QString& message);
     bool minimizeAllWindows();
     void showFloatingAnimationWidget(bool isFirstTime);
-    bool blockUserInput(bool block); // Funkcja do blokowania/odblokowywania wejścia
 
-    QTimer* m_mouseLockTimer;
     QSystemTrayIcon* m_trayIcon;
     FloatingEnergySphereWidget* m_floatingWidget;
 
@@ -56,8 +56,23 @@ private:
     QString m_originalWallpaperPath;
     QString m_tempBlackWallpaperPath;
     bool m_overrideActive;
-    bool m_inputBlocked; // Flaga śledząca stan blokady wejścia
-    QPoint m_offScreenLockPos;
+
+#ifdef Q_OS_WIN
+
+    static bool relaunchNormally(const QStringList& arguments = QStringList());
+
+    // --- Hooks ---
+    static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+    bool installKeyboardHook();
+    void uninstallKeyboardHook();
+    static HHOOK m_keyboardHook;
+
+    static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
+    bool installMouseHook();
+    void uninstallMouseHook();
+    static HHOOK m_mouseHook;
+    // --------------------------------------------
+#endif
 };
 
 #endif // SYSTEM_OVERRIDE_MANAGER_H

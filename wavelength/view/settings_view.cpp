@@ -274,23 +274,42 @@ void SettingsView::setupClassifiedTab() {
     m_overrideButton->setEnabled(true); // Upewnij się, że jest włączony
     // --- DODAJ TO POŁĄCZENIE ---
     connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
-        m_overrideButton->setEnabled(false); // Wyłącz przycisk po kliknięciu
+        qDebug() << "Override button clicked.";
 
-        // Sprawdź, czy to pierwsze uruchomienie override
-        bool isFirstTime = !m_config->isSystemOverrideInitiated(); // Zakładając, że masz tę metodę w WavelengthConfig
-
-        if (isFirstTime) {
-            qDebug() << "First time System Override initiated. Setting flag.";
-            m_config->setSystemOverrideInitiated(true); // Zakładając, że masz tę metodę
-            m_config->saveSettings(); // Zapisz zmianę flagi od razu
+#ifdef Q_OS_WIN
+        if (SystemOverrideManager::isRunningAsAdmin()) {
+            // Już mamy uprawnienia, kontynuuj normalnie
+            qDebug() << "Already running as admin. Initiating sequence directly.";
+            m_overrideButton->setEnabled(false);
+            m_overrideButton->setText("OVERRIDE IN PROGRESS...");
+            // Wywołaj sekwencję (przekaż odpowiednią wartość dla isFirstTime)
+            QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false)); // Użyj invokeMethod dla bezpieczeństwa wątków, jeśli jest ryzyko
         } else {
-            qDebug() << "System Override initiated previously.";
+            // Nie mamy uprawnień, poproś o nie przez ponowne uruchomienie
+            qDebug() << "Not running as admin. Attempting relaunch with elevation request...";
+            // Dodaj argument, aby nowa instancja wiedziała, co robić
+            QStringList args;
+            args << "--run-override"; // Specjalny argument
+
+            if (SystemOverrideManager::relaunchAsAdmin(args)) {
+                // Próba ponownego uruchomienia zainicjowana (UAC powinno się pojawić)
+                // Zamknij bieżącą instancję aplikacji, aby uniknąć duplikatów
+                qDebug() << "Relaunch initiated. Closing current instance.";
+                QApplication::quit();
+            } else {
+                // Nie udało się nawet poprosić o uprawnienia (np. błąd systemowy)
+                // lub użytkownik anulował UAC (choć to trudne do wykrycia tutaj od razu)
+                QMessageBox::warning(this, "Elevation Failed", "Could not request administrator privileges.\nThe override sequence cannot start.");
+                // Przycisk pozostaje włączony
+            }
         }
-
-        // Przekaż informację o pierwszym uruchomieniu do menedżera
-        m_systemOverrideManager->initiateOverrideSequence(isFirstTime); // Zmodyfikowana metoda menedżera
-
+#else
+        // Obsługa dla innych systemów (np. Linux/macOS używające sudo/pkexec)
+        QMessageBox::information(this, "System Override", "System override sequence initiated (OS specific elevation might be required).");
+        m_overrideButton->setEnabled(false);
         m_overrideButton->setText("OVERRIDE IN PROGRESS...");
+        QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
+#endif
     });
     // ---------------------------
     buttonLayout->addWidget(m_overrideButton);

@@ -72,6 +72,48 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
+    // --- Przetwarzanie argumentów linii poleceń ---
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Wavelength Application");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    // Dodaj opcję dla sekwencji override
+    QCommandLineOption overrideOption("run-override", "Internal flag to start the system override sequence immediately.");
+    parser.addOption(overrideOption);
+
+    parser.process(app);
+    // ---------------------------------------------
+
+    // --- Sprawdź, czy uruchomić sekwencję override ---
+    if (parser.isSet(overrideOption)) {
+        qDebug() << "--run-override flag detected.";
+
+#ifdef Q_OS_WIN
+        // Sprawdź, czy faktycznie mamy uprawnienia administratora
+        if (!SystemOverrideManager::isRunningAsAdmin()) {
+            qCritical() << "Relaunched with --run-override but not running as admin! Aborting.";
+            QMessageBox::critical(nullptr, "Administrator Privileges Required",
+                                  "Failed to start the override sequence because administrator privileges are missing even after relaunch.");
+            return 1; // Zakończ z błędem
+        }
+        qDebug() << "Confirmed running as admin. Initiating override sequence...";
+
+        // Utwórz menedżera override i zainicjuj sekwencję
+        SystemOverrideManager overrideManager; // Utwórz na stosie, bo nie potrzebujemy głównego okna
+        overrideManager.initiateOverrideSequence(false); // false, bo to nie pierwsze uruchomienie
+
+        // Nie tworzymy głównego okna, tylko uruchamiamy pętlę zdarzeń
+        // Menedżer override sam pokaże swoją animację
+        return app.exec(); // Uruchom pętlę zdarzeń dla animacji override
+
+#else
+        // Na innych systemach, po prostu kontynuuj (brak implementacji UAC)
+        qWarning() << "--run-override flag ignored on non-Windows OS.";
+        // Kontynuuj normalne uruchomienie poniżej
+#endif
+    }
+
     FontManager* fontManager = FontManager::getInstance();
     if (!fontManager->initialize()) {
         qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";

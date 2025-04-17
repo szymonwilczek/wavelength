@@ -6,9 +6,11 @@
 #include <QSystemTrayIcon>
 #include <QDir>
 #include <QMessageBox>
+#include <qprocess.h>
 #include <QStandardPaths>
 #include <QSettings>
 #include <random>
+#include <set>
 
 #ifdef Q_OS_WIN
 #include <shellapi.h>
@@ -17,16 +19,32 @@
 #include <shobjidl.h> // Dla IShellDispatch (MinimizeAll)
 #endif
 
+#ifdef Q_OS_WIN
+// --- DEFINICJA STATYCZNEGO POLA ---
+HHOOK SystemOverrideManager::m_keyboardHook = NULL;
+HHOOK SystemOverrideManager::m_mouseHook = NULL;
+// ---------------------------------
+#endif
+
 // --- Stałe ---
 const int MOUSE_LOCK_INTERVAL_MS = 10;
 const int RESTORE_DELAY_MS = 500;
 const QString OVERRIDE_WALLPAPER_RESOURCE = ":/assets/images/wavelength_override_wallpaper.png";
-const QString OVERRIDE_SOUND_RESOURCE = "qrc:/assets/sounds/override_ambient.wav"; // Ścieżka do pliku dźwiękowego w zasobach
+const QString OVERRIDE_SOUND_RESOURCE = "qrc:/assets/sounds/override_ambient.wav";
+
+const std::set<DWORD> ALLOWED_KEYS = {
+    VK_UP,       // Strzałka w górę
+    VK_DOWN,     // Strzałka w dół
+    VK_LEFT,     // Strzałka w lewo
+    VK_RIGHT,    // Strzałka w prawo
+    0x42,        // Klawisz 'B'
+    0x41,        // Klawisz 'A'
+    VK_RETURN    // Klawisz Enter
+};
 
 
 SystemOverrideManager::SystemOverrideManager(QObject *parent)
     : QObject(parent),
-      m_mouseLockTimer(new QTimer(this)), // Zmieniona nazwa
       // m_mouseTargetTimer nie jest już inicjalizowany
       m_trayIcon(nullptr),
       m_floatingWidget(nullptr),
@@ -34,11 +52,15 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
       m_audioOutput(nullptr),
       m_originalWallpaperPath(""),
       m_tempBlackWallpaperPath(""),
-      m_overrideActive(false),
-      m_inputBlocked(false),
-      m_offScreenLockPos(-10000, -10000) // Domyślna wartość poza ekranem
+      m_overrideActive(false)
 {
-    connect(m_mouseLockTimer, &QTimer::timeout, this, &SystemOverrideManager::lockMousePosition);
+
+#ifdef Q_OS_WIN
+    // Upewnij się, że hak jest NULL na starcie
+    m_keyboardHook = NULL;
+    m_mouseHook = NULL;
+#endif
+
 
     // Inicjalizacja powiadomień
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
@@ -65,10 +87,6 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
 
 SystemOverrideManager::~SystemOverrideManager()
 {
-    // Zawsze próbuj odblokować wejście przy zamykaniu
-    if (m_inputBlocked) {
-        blockUserInput(false);
-    }
     if (m_overrideActive) {
         restoreSystemState();
     }
@@ -77,35 +95,15 @@ SystemOverrideManager::~SystemOverrideManager()
         m_floatingWidget = nullptr;
     }
 
-    if (m_mouseLockTimer->isActive()) {
-        m_mouseLockTimer->stop();
-    }
-
     if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
         QFile::remove(m_tempBlackWallpaperPath);
         qDebug() << "Removed temporary black wallpaper on destruction:" << m_tempBlackWallpaperPath;
     }
 
 #ifdef Q_OS_WIN
+    uninstallKeyboardHook();
+    uninstallMouseHook();
     CoUninitialize();
-#endif
-}
-
-bool SystemOverrideManager::blockUserInput(bool block) {
-#ifdef Q_OS_WIN
-    qDebug() << (block ? "Blocking" : "Unblocking") << "user input...";
-    if (BlockInput(block)) {
-        m_inputBlocked = block;
-        qDebug() << "User input" << (block ? "blocked." : "unblocked.");
-        return true;
-    } else {
-        m_inputBlocked = false; // Upewnij się, że flaga jest poprawna w razie błędu
-        qWarning() << "BlockInput failed! Error code:" << GetLastError();
-        return false;
-    }
-#else
-    qWarning() << "Input blocking not implemented for this OS.";
-    return false; // Nie zablokowano
 #endif
 }
 
@@ -116,13 +114,24 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
         return;
     }
 
-    // --- KROK 0: Zablokuj wejście ---
-    if (!blockUserInput(true)) {
-        qWarning() << "Failed to block user input. Aborting override sequence for safety.";
-        // Można wyświetlić komunikat użytkownikowi
-        // QMessageBox::critical(nullptr, "Override Error", "Failed to block user input. System Override aborted.");
-        // return; // Nie kontynuuj, jeśli nie można zablokować wejścia
+#ifdef Q_OS_WIN
+    // --- Zainstaluj Hak Klawiatury ---
+    if (!installKeyboardHook()) {
+        // Co zrobić, jeśli hak się nie zainstaluje?
+        // Można przerwać, wyświetlić ostrzeżenie lub kontynuować bez blokady klawiatury
+        qWarning() << "Keyboard hook installation failed. Input filtering will not work.";
+        // Można rozważyć przerwanie:
+        // m_overrideActive = false;
+        // emit overrideSequenceStartFailed("Failed to install keyboard input filter.");
+        // return;
     }
+
+    if (!installMouseHook()) { // <<< NOWE
+        qWarning() << "Mouse hook installation failed. Mouse input will not be blocked.";
+        // Rozważ przerwanie
+    }
+    // ---------------------------------
+#endif
 
     m_overrideActive = true;
     qDebug() << "Initiating System Override Sequence...";
@@ -145,9 +154,6 @@ void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
             qWarning() << "Failed to send notification.";
         }
     });
-
-    qDebug() << "Starting mouse lock...";
-    startMouseLock(); // <<< ZMIENIONE WYWOŁANIE
 
     qDebug() << "Showing floating animation widget...";
     showFloatingAnimationWidget(isFirstTime); // Pokazuje widget i uruchamia dźwięk wewnątrz
@@ -250,52 +256,6 @@ bool SystemOverrideManager::restoreWallpaper()
 #else
     qWarning() << "Wallpaper restoration not implemented for this OS.";
     return false;
-#endif
-}
-
-void SystemOverrideManager::startMouseLock()
-{
-#ifdef Q_OS_WIN
-    // 1. Oblicz pozycję poza ekranem
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    // Ustaw pozycję znacznie poza prawym dolnym rogiem
-    m_offScreenLockPos.setX(screenGeometry.right() + 500);
-    m_offScreenLockPos.setY(screenGeometry.bottom() + 500);
-    qDebug() << "Calculated off-screen lock position:" << m_offScreenLockPos;
-
-    // 2. Natychmiast przesuń kursor w to miejsce
-    if (!SetCursorPos(m_offScreenLockPos.x(), m_offScreenLockPos.y())) {
-        qWarning() << "Initial SetCursorPos failed! Error code:" << GetLastError();
-    } else {
-        qDebug() << "Cursor moved off-screen initially.";
-    }
-
-    // 3. Uruchom timer, który będzie stale resetował pozycję
-    m_mouseLockTimer->start(MOUSE_LOCK_INTERVAL_MS);
-    qDebug() << "Mouse lock timer started with interval:" << MOUSE_LOCK_INTERVAL_MS << "ms";
-#else
-    qWarning() << "Mouse lock not implemented for this OS.";
-#endif
-}
-
-// Zmieniona nazwa i implementacja
-void SystemOverrideManager::stopMouseLock()
-{
-    if (m_mouseLockTimer->isActive()) {
-        m_mouseLockTimer->stop();
-        qDebug() << "Mouse lock timer stopped.";
-    }
-}
-
-// Nowa implementacja slotu timera
-void SystemOverrideManager::lockMousePosition()
-{
-#ifdef Q_OS_WIN
-    // Po prostu ustaw kursor w zapamiętanej pozycji poza ekranem
-    // To powinno przeciwdziałać próbom przesunięcia go przez użytkownika lub system
-    SetCursorPos(m_offScreenLockPos.x(), m_offScreenLockPos.y());
-#else
-    // Not implemented
 #endif
 }
 
@@ -418,53 +378,289 @@ void SystemOverrideManager::handleFloatingWidgetClosed()
 
 void SystemOverrideManager::restoreSystemState()
 {
-    // Sprawdź, czy override był aktywny LUB czy wejście jest zablokowane
-    if (!m_overrideActive && !m_inputBlocked) {
-        qDebug() << "RestoreSystemState called but override is not active and input is not blocked.";
-        return;
-    }
-
+    if (!m_overrideActive) { /* ... */ return; }
     qDebug() << "Restoring system state...";
 
-    // --- KROK 1: Odblokuj wejście ---
-    // Zrób to jako pierwszy krok, aby użytkownik odzyskał kontrolę
-    if (m_inputBlocked) {
-        if (!blockUserInput(false)) {
-            qWarning() << "CRITICAL: Failed to unblock user input during restoration!";
-            // W tej sytuacji użytkownik może potrzebować restartu!
-            QMessageBox::critical(nullptr, "Input Error", "Failed to restore keyboard and mouse input! You may need to restart your computer.");
-        }
-    } else {
-         qDebug() << "Input was not blocked, skipping unblock.";
-    }
-
-    // --- Kolejne kroki (wykonywane nawet jeśli odblokowanie się nie powiodło) ---
-    stopMouseLock();
+#ifdef Q_OS_WIN
+    // --- Odinstaluj Haki ---
+    uninstallKeyboardHook();
+    uninstallMouseHook();
+    // -----------------------
+#endif
 
     // Zatrzymaj i zamknij widget animacji, jeśli nadal istnieje
     if (m_floatingWidget) {
         qDebug() << "Closing existing floating widget during restore.";
+        // Rozłącz sygnały, aby uniknąć ponownego wywołania restoreSystemState
         disconnect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::handleFloatingWidgetClosed);
-        m_floatingWidget->setClosable(true); // Pozwól na normalne zamknięcie teraz
+        disconnect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::restoreSystemState);
+        m_floatingWidget->setClosable(true);
         m_floatingWidget->close();
         m_floatingWidget = nullptr;
     }
 
-    // Zatrzymaj dźwięk (na wszelki wypadek)
-    // if (m_mediaPlayer && m_mediaPlayer->playbackState() == QMediaPlayer::PlayingState) {
-    //     m_mediaPlayer->stop();
-    // }
-
+    // Przywróć tapetę
     if (!restoreWallpaper()) {
         qWarning() << "Failed to restore original wallpaper.";
     }
 
-    // Oznacz jako nieaktywny i wyemituj sygnał (tylko jeśli był aktywny)
+    // Oznacz jako nieaktywny i wyemituj sygnał (jeśli był aktywny)
     if(m_overrideActive) {
         m_overrideActive = false;
         qDebug() << "System state restoration complete. Override deactivated.";
-        emit overrideFinished();
+        emit overrideFinished(); // Emituj sygnał *przed* próbą relaunchu
     } else {
         qDebug() << "System state restoration complete (input unblocked only).";
     }
+
+    // --- NOWE: Relaunch normalnej instancji i zamknij bieżącą (podwyższoną) ---
+    qDebug() << "Attempting to relaunch the application normally...";
+#ifdef Q_OS_WIN
+    if (relaunchNormally()) { // Wywołaj nową funkcję pomocniczą
+        qDebug() << "Normal relaunch initiated. Quitting elevated instance shortly.";
+        // Użyj QTimer::singleShot, aby dać nowemu procesowi chwilę na start
+        QTimer::singleShot(500, [](){ QApplication::quit(); });
+    } else {
+        qWarning() << "Failed to relaunch the application normally. Elevated instance will exit anyway.";
+        QTimer::singleShot(500, [](){ QApplication::quit(); }); // Zamknij mimo wszystko
+    }
+#else
+    // Na innych systemach po prostu zamknij
+    qWarning() << "Normal relaunch not implemented for this OS. Quitting elevated instance.";
+    QTimer::singleShot(100, [](){ QApplication::quit(); });
+#endif
+    // -----------------------------------------------------------------------
 }
+
+#ifdef Q_OS_WIN
+// --- Implementacja funkcji pomocniczych ---
+
+bool SystemOverrideManager::isRunningAsAdmin()
+{
+    BOOL isAdmin = FALSE;
+    HANDLE hToken = NULL;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+        TOKEN_ELEVATION elevation;
+        DWORD cbSize = sizeof(TOKEN_ELEVATION);
+        if (GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &cbSize)) {
+            isAdmin = elevation.TokenIsElevated;
+        }
+    }
+    if (hToken) {
+        CloseHandle(hToken);
+    }
+    return isAdmin;
+
+    // Alternatywna, prostsza metoda (wymaga linkowania z Shell32.lib)
+    // return IsUserAnAdmin(); // Zwraca TRUE jeśli użytkownik jest adminem, ale niekoniecznie proces jest podwyższony
+}
+
+bool SystemOverrideManager::relaunchAsAdmin(const QStringList& arguments)
+{
+    QStringList args = arguments;
+    QString appPath = QApplication::applicationFilePath();
+
+    SHELLEXECUTEINFOW sei = { sizeof(sei) };
+    sei.lpVerb = L"runas"; // Kluczowe: żądanie podwyższenia uprawnień
+    sei.lpFile = reinterpret_cast<LPCWSTR>(appPath.utf16());
+    // Konwertuj argumenty na pojedynczy string rozdzielony spacjami
+    QString argsString = args.join(' ');
+    sei.lpParameters = argsString.isEmpty() ? nullptr : reinterpret_cast<LPCWSTR>(argsString.utf16());
+    sei.hwnd = NULL;
+    sei.nShow = SW_SHOWNORMAL;
+    sei.fMask = SEE_MASK_DEFAULT; // Można dodać SEE_MASK_NOCLOSEPROCESS jeśli potrzebujesz uchwytu
+
+    qDebug() << "Attempting to relaunch" << appPath << "with args:" << argsString << "as admin...";
+
+    if (ShellExecuteExW(&sei)) {
+        qDebug() << "Relaunch successful (UAC prompt should appear).";
+        return true;
+    } else {
+        DWORD error = GetLastError();
+        qWarning() << "ShellExecuteExW failed with error code:" << error;
+        // ERROR_CANCELLED (1223) oznacza, że użytkownik anulował UAC
+        if (error == ERROR_CANCELLED) {
+             qDebug() << "User cancelled the UAC prompt.";
+        } else {
+             qWarning() << "Failed to request elevation.";
+        }
+        return false;
+    }
+}
+
+
+LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode == HC_ACTION)
+    {
+        // Sprawdź tylko zdarzenia wciśnięcia klawisza
+        if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
+        {
+            KBDLLHOOKSTRUCT *pkhs = (KBDLLHOOKSTRUCT *)lParam;
+            DWORD vkCode = pkhs->vkCode;
+
+            // Sprawdź, czy klawisz jest na liście dozwolonych
+            if (ALLOWED_KEYS.find(vkCode) == ALLOWED_KEYS.end())
+            {
+                // Klawisz NIE jest dozwolony - zablokuj go
+                // qDebug() << "Blocking key:" << vkCode; // Opcjonalny debug
+                return 1; // Zwrócenie wartości > 0 blokuje dalsze przetwarzanie
+            }
+            // Jeśli klawisz jest dozwolony, przejdź dalej
+            // qDebug() << "Allowing key:" << vkCode; // Opcjonalny debug
+        }
+    }
+
+    // Przekaż zdarzenie do następnego haka w łańcuchu
+    // Ważne: Przekazuj m_keyboardHook, a nie twórz nowego uchwytu!
+    return CallNextHookEx(m_keyboardHook, nCode, wParam, lParam);
+}
+
+bool SystemOverrideManager::installKeyboardHook()
+{
+    if (m_keyboardHook != NULL) {
+        qWarning() << "Keyboard hook already installed.";
+        return true; // Już zainstalowany
+    }
+
+    // Pobierz uchwyt do bieżącego modułu (DLL lub EXE)
+    //HINSTANCE hInstance = GetModuleHandle(NULL); // Można użyć NULL dla bieżącego procesu
+    // LUB jeśli SystemOverrideManager jest w DLL:
+    HINSTANCE hInstance = GetModuleHandleW(L"wavelength.dll"); // Zastąp poprawną nazwą DLL jeśli dotyczy
+    if (!hInstance) {
+         // Jeśli powyższe zawiedzie, spróbuj z NULL
+         hInstance = GetModuleHandle(NULL);
+         if (!hInstance) {
+            qCritical() << "Failed to get module handle for keyboard hook. Error:" << GetLastError();
+            return false;
+         }
+    }
+
+
+    qDebug() << "Attempting to install low-level keyboard hook...";
+    m_keyboardHook = SetWindowsHookEx(
+        WH_KEYBOARD_LL,             // Typ haka: nisko-poziomowy klawiatury
+        LowLevelKeyboardProc,       // Wskaźnik do procedury haka
+        hInstance,                  // Uchwyt do modułu zawierającego procedurę haka
+        0                           // ID wątku (0 dla globalnego haka)
+    );
+
+    if (m_keyboardHook == NULL) {
+        qCritical() << "Failed to install keyboard hook! Error code:" << GetLastError()
+                   << ". Konami code might not work, and input won't be fully blocked.";
+        return false;
+    }
+
+    qDebug() << "Low-level keyboard hook installed successfully. Handle:" << m_keyboardHook;
+    return true;
+}
+
+void SystemOverrideManager::uninstallKeyboardHook()
+{
+    if (m_keyboardHook != NULL) {
+        qDebug() << "Uninstalling low-level keyboard hook. Handle:" << m_keyboardHook;
+        if (UnhookWindowsHookEx(m_keyboardHook)) {
+            qDebug() << "Keyboard hook uninstalled successfully.";
+        } else {
+            qWarning() << "Failed to uninstall keyboard hook! Error code:" << GetLastError();
+        }
+        m_keyboardHook = NULL; // Zawsze resetuj uchwyt
+    }
+}
+
+LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode == HC_ACTION)
+    {
+        // Blokuj wszystkie zdarzenia myszy (kliknięcia, ruch, kółko)
+        // Można by ewentualnie przepuszczać WM_MOUSEMOVE, jeśli chcemy tylko blokować kliknięcia,
+        // ale pełna blokada jest bezpieczniejsza dla utrzymania fokusu.
+        switch (wParam)
+        {
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONUP:
+            case WM_LBUTTONDBLCLK:
+            case WM_RBUTTONDOWN:
+            case WM_RBUTTONUP:
+            case WM_RBUTTONDBLCLK:
+            case WM_MBUTTONDOWN:
+            case WM_MBUTTONUP:
+            case WM_MBUTTONDBLCLK:
+            case WM_XBUTTONDOWN:
+            case WM_XBUTTONUP:
+            case WM_XBUTTONDBLCLK:
+            case WM_MOUSEMOVE:
+            case WM_MOUSEWHEEL:
+            case WM_MOUSEHWHEEL:
+                // qDebug() << "Blocking mouse event:" << wParam; // Opcjonalny debug
+                return 1; // Zablokuj zdarzenie
+            default:
+                break; // Inne zdarzenia (np. systemowe) przepuszczamy
+        }
+    }
+
+    // Przekaż zdarzenie do następnego haka w łańcuchu
+    return CallNextHookEx(m_mouseHook, nCode, wParam, lParam);
+}
+
+bool SystemOverrideManager::installMouseHook()
+{
+    if (m_mouseHook != NULL) {
+        qWarning() << "Mouse hook already installed.";
+        return true;
+    }
+
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    if (!hInstance) {
+        qCritical() << "Failed to get module handle for mouse hook. Error:" << GetLastError();
+        return false;
+    }
+
+    qDebug() << "Attempting to install low-level mouse hook...";
+    m_mouseHook = SetWindowsHookEx(
+        WH_MOUSE_LL,            // Typ haka: nisko-poziomowy myszy
+        LowLevelMouseProc,      // Wskaźnik do procedury haka
+        hInstance,              // Uchwyt do modułu
+        0                       // ID wątku (0 dla globalnego)
+    );
+
+    if (m_mouseHook == NULL) {
+        qCritical() << "Failed to install mouse hook! Error code:" << GetLastError();
+        return false;
+    }
+
+    qDebug() << "Low-level mouse hook installed successfully. Handle:" << m_mouseHook;
+    return true;
+}
+
+void SystemOverrideManager::uninstallMouseHook()
+{
+    if (m_mouseHook != NULL) {
+        qDebug() << "Uninstalling low-level mouse hook. Handle:" << m_mouseHook;
+        if (UnhookWindowsHookEx(m_mouseHook)) {
+            qDebug() << "Mouse hook uninstalled successfully.";
+        } else {
+            qWarning() << "Failed to uninstall mouse hook! Error code:" << GetLastError();
+        }
+        m_mouseHook = NULL;
+    }
+}
+
+bool SystemOverrideManager::relaunchNormally(const QStringList& arguments)
+{
+    QString appPath = QApplication::applicationFilePath();
+    QStringList args = arguments; // Przekaż argumenty, jeśli są potrzebne
+
+    qDebug() << "Relaunching normally:" << appPath << "with args:" << args.join(' ');
+
+    // Użyj QProcess::startDetached - jest prostsze i powinno wystarczyć
+    if (QProcess::startDetached(appPath, args)) {
+        qDebug() << "QProcess::startDetached successful for normal relaunch.";
+        return true;
+    } else {
+        qWarning() << "QProcess::startDetached failed for normal relaunch.";
+        // Można dodać fallback na ShellExecuteEx z 'open', ale startDetached jest preferowane
+        return false;
+    }
+}
+#endif
