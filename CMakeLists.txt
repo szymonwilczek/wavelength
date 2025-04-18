@@ -174,6 +174,8 @@ add_executable(
         wavelength/view/settings/classified/floating_energy_sphere_widget.h
         wavelength/view/settings/classified/system_override_manager.cpp
         wavelength/view/settings/classified/system_override_manager.h
+        wavelength/ui/button/tab_button.cpp
+        wavelength/ui/button/tab_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

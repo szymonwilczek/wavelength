@@ -90,7 +90,7 @@ void SettingsView::setupUi() {
     tabLayout->addStretch(1);
 
     // Tworzenie przycisków zakładek
-    QStringList tabNames = {"User", "Server", "Appearance", "Network", "Advanced", "CLASSIFIED"};
+    QStringList tabNames = {"Wavelength", "Appearance", "Performance", "Advanced", "CLASSIFIED"};
 
     for (int i = 0; i < tabNames.size(); i++) {
         TabButton *btn = new TabButton(tabNames[i], m_tabBar);
@@ -133,7 +133,6 @@ void SettingsView::setupUi() {
     );
 
     // Tworzenie zawartości dla każdej zakładki
-    setupUserTab();
     setupServerTab();
     setupAppearanceTab();
     setupNetworkTab();
@@ -440,31 +439,6 @@ void SettingsView::setupNextSecurityLayer() {
     }
 }
 
-void SettingsView::setupUserTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure your user profile settings", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_userNameEdit = new CyberLineEdit(tab);
-    m_userNameEdit->setPlaceholderText("Enter your username");
-    formLayout->addRow("Username:", m_userNameEdit);
-
-    // Można dodać więcej pól dotyczących użytkownika (np. awatar, preferencje)
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
 
 void SettingsView::setupServerTab() {
     QWidget *tab = new QWidget(m_tabContent);
@@ -669,8 +643,6 @@ void SettingsView::showEvent(QShowEvent *event) {
 
 
 void SettingsView::loadSettingsFromRegistry() {
-    // User
-    m_userNameEdit->setText(m_config->getUserName());
 
     // Server
     m_serverAddressEdit->setText(m_config->getRelayServerAddress());
@@ -700,8 +672,6 @@ void SettingsView::loadSettingsFromRegistry() {
 }
 
 void SettingsView::saveSettings() {
-    // User
-    m_config->setUserName(m_userNameEdit->text());
 
     // Server
     m_config->setRelayServerAddress(m_serverAddressEdit->text());
