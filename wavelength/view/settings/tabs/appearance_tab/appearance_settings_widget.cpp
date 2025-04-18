@@ -129,7 +129,7 @@ void AppearanceSettingsWidget::loadSettings() {
     updateColorPreview(m_messageColorPreview, m_selectedMessageColor);
     updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
 
-    updateRecentColorsUI(); // Zaktualizuj UI ostatnich kolorów
+    updateRecentColorsUI();
 }
 
 void AppearanceSettingsWidget::saveSettings() {
@@ -141,10 +141,11 @@ void AppearanceSettingsWidget::saveSettings() {
 }
 
 void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const QColor& color) {
-    if (previewWidget) {
-        QPalette pal = previewWidget->palette();
-        pal.setColor(QPalette::Window, color);
-        previewWidget->setPalette(pal);
+    if (previewWidget && color.isValid()) {
+        previewWidget->setStyleSheet(QString("background-color: %1; border: 1px solid #555;")
+                                         .arg(color.name(QColor::HexRgb)));
+    } else if (previewWidget) {
+        previewWidget->setStyleSheet("background-color: transparent; border: 1px solid #555;");
     }
 }
 
@@ -198,10 +199,19 @@ void AppearanceSettingsWidget::updateRecentColorsUI() {
     QLayoutItem* item;
     while ((item = m_recentColorsLayout->takeAt(0)) != nullptr) {
         if (item->widget()) {
-             item->widget()->deleteLater(); // Bezpieczniejsze usuwanie widgetów
+             item->widget()->deleteLater();
         }
+        // Usuń również element layoutu, jeśli nie jest to stretch
+        if (!item->spacerItem()) {
+             delete item;
+        }
+    }
+     // Usuń ewentualny stary stretch na końcu
+    if (m_recentColorsLayout->count() > 0 && m_recentColorsLayout->itemAt(m_recentColorsLayout->count() - 1)->spacerItem()) {
+        item = m_recentColorsLayout->takeAt(m_recentColorsLayout->count() - 1);
         delete item;
     }
+
 
     QStringList recentHexColors = m_config->getRecentColors();
 
@@ -210,13 +220,24 @@ void AppearanceSettingsWidget::updateRecentColorsUI() {
         if (color.isValid()) {
             QPushButton* colorButton = new QPushButton(m_recentColorsLayout->parentWidget());
             colorButton->setFixedSize(28, 28);
-            colorButton->setFlat(true);
-            colorButton->setAutoFillBackground(true);
-            QPalette pal = colorButton->palette();
-            pal.setColor(QPalette::Button, color);
-            colorButton->setPalette(pal);
-            colorButton->setStyleSheet(QString("QPushButton { border: 1px solid #777; border-radius: 3px; } QPushButton:hover { border: 1px solid #ccc; }"));
+            // Usuwamy setFlat i setAutoFillBackground
+            // colorButton->setFlat(true);
+            // colorButton->setAutoFillBackground(true);
             colorButton->setToolTip(hexColor);
+
+            // Ustaw kolor tła i styl za pomocą setStyleSheet
+            colorButton->setStyleSheet(QString(
+                "QPushButton {"
+                "  background-color: %1;" // Ustaw kolor tła
+                "  border: 1px solid #777;"
+                "  border-radius: 3px;"
+                "}"
+                "QPushButton:hover {"
+                "  border: 1px solid #ccc;" // Można dodać efekt hover, np. jaśniejszą ramkę
+                "}"
+            ).arg(color.name(QColor::HexRgb))); // Użyj formatu #RRGGBB
+
+            // Usunięto setPalette
 
             connect(colorButton, &QPushButton::clicked, this, [this, color]() {
                 this->selectRecentColor(color);
@@ -225,11 +246,6 @@ void AppearanceSettingsWidget::updateRecentColorsUI() {
             m_recentColorsLayout->addWidget(colorButton);
             m_recentColorButtons.append(colorButton);
         }
-    }
-     // Usuń ewentualny stary stretch
-    if (m_recentColorsLayout->count() > recentHexColors.size()) {
-        item = m_recentColorsLayout->takeAt(m_recentColorsLayout->count() - 1);
-        delete item;
     }
     m_recentColorsLayout->addStretch(); // Dodaj rozciągliwość na końcu
 }
