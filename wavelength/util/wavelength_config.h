@@ -1,6 +1,7 @@
 #ifndef WAVELENGTH_CONFIG_H
 #define WAVELENGTH_CONFIG_H
 
+#include <QColor>
 #include <QObject>
 #include <QString>
 #include <QSettings>
@@ -11,6 +12,8 @@
 
 class WavelengthConfig : public QObject {
     Q_OBJECT
+
+    static constexpr int MAX_RECENT_COLORS = 5;
 
 public:
     static WavelengthConfig* getInstance() {
@@ -150,11 +153,7 @@ public:
     }
 
     void setSystemOverrideInitiated(bool initiated) {
-        // Zapisujemy wartość natychmiast
         m_settings.setValue("Advanced/SystemOverrideInitiated", initiated);
-        // Nie ma potrzeby emitowania sygnału, chyba że UI na to reaguje
-        // emit configChanged("system_override_initiated");
-        // Zapisz od razu do pliku, aby zmiana była trwała nawet w razie awarii
         saveSettings();
         qDebug() << "SystemOverrideInitiated set to:" << initiated << "and saved.";
     }
@@ -165,40 +164,122 @@ public:
         qDebug() << "Settings saved to:" << m_settings.fileName();
     }
 
-    // Przywróć domyślne ustawienia
     void restoreDefaults() {
         bool wasInitiated = isSystemOverrideInitiated();
 
+        // Zapisz listę ostatnich kolorów przed wyczyszczeniem
+        QStringList recentColorsBeforeClear = getRecentColors();
+
         m_settings.clear(); // Czyści WSZYSTKIE ustawienia
 
-        // Po wyczyszczeniu, isSystemOverrideInitiated() zwróci domyślne false
         qDebug() << "Settings cleared. SystemOverrideInitiated was:" << wasInitiated << ", is now:" << isSystemOverrideInitiated();
 
-        // Nie ma potrzeby ręcznego ustawiania na false, bo clear() to załatwia
-        // m_settings.setValue("Advanced/SystemOverrideInitiated", false); // Już niepotrzebne
+        // setBackgroundColor(QColor("#101820")); // Przykładowe domyślne
+        // setBlobColor(QColor("#00ccff"));
+        // setMessageColor(QColor("#E0E0E0"));
+        // setStreamColor(QColor("#00aa88"));
+        // m_settings.setValue("appearance/recent_colors", QStringList()); // Wyczyść listę ostatnich
+
+        // Opcjonalnie: Przywróć listę ostatnich kolorów, jeśli chcesz ją zachować po resecie
+        // m_settings.setValue("appearance/recent_colors", recentColorsBeforeClear);
+
 
         emit configChanged("all"); // Sygnalizuj zmianę wszystkich ustawień
-        saveSettings(); // Zapisz pusty stan (lub domyślne, jeśli QSettings je przywraca)
+        emit recentColorsChanged(); // Sygnalizuj zmianę listy ostatnich kolorów
+        saveSettings(); // Zapisz pusty stan (lub domyślne)
     }
 
-    // Metoda do odczytywania dowolnego ustawienia
     QVariant getSetting(const QString& key, const QVariant& defaultValue = QVariant()) const {
         return m_settings.value(key, defaultValue);
     }
 
-    // Metoda do zapisywania dowolnego ustawienia
     void setSetting(const QString& key, const QVariant& value) {
         m_settings.setValue(key, value);
         emit configChanged(key);
     }
 
+
+     QColor getBackgroundColor() const {
+        return m_settings.value("appearance/background_color", QColor("#101820")).value<QColor>();
+    }
+
+    void setBackgroundColor(const QColor& color) {
+        m_settings.setValue("appearance/background_color", color);
+        addRecentColor(color); // Dodaj do ostatnich kolorów
+        emit configChanged("background_color");
+    }
+
+    // Kolor "bloba" (cokolwiek to jest w UI)
+    QColor getBlobColor() const {
+        return m_settings.value("appearance/blob_color", QColor("#00ccff")).value<QColor>();
+    }
+
+    void setBlobColor(const QColor& color) {
+        m_settings.setValue("appearance/blob_color", color);
+        addRecentColor(color);
+        emit configChanged("blob_color");
+    }
+
+    // Kolor tekstu wiadomości
+    QColor getMessageColor() const {
+        return m_settings.value("appearance/message_color", QColor("#E0E0E0")).value<QColor>();
+    }
+
+    void setMessageColor(const QColor& color) {
+        m_settings.setValue("appearance/message_color", color);
+        addRecentColor(color);
+        emit configChanged("message_color");
+    }
+
+    // Kolor "strumienia" (cokolwiek to jest w UI)
+    QColor getStreamColor() const {
+        return m_settings.value("appearance/stream_color", QColor("#00aa88")).value<QColor>();
+    }
+
+    void setStreamColor(const QColor& color) {
+        m_settings.setValue("appearance/stream_color", color);
+        addRecentColor(color);
+        emit configChanged("stream_color");
+    }
+
+    // --- OSTATNIO UŻYWANE KOLORY ---
+
+    QStringList getRecentColors() const {
+        return m_settings.value("appearance/recent_colors").toStringList();
+    }
+
+    void addRecentColor(const QColor& color) {
+        if (!color.isValid()) return;
+
+        QStringList recent = getRecentColors();
+        QString hexColor = color.name(QColor::HexRgb); // Zapisz jako #RRGGBB
+
+        // Usuń istniejący wpis, jeśli jest taki sam
+        recent.removeAll(hexColor);
+
+        // Dodaj nowy kolor na początek
+        recent.prepend(hexColor);
+
+        // Ogranicz listę do MAX_RECENT_COLORS
+        while (recent.size() > MAX_RECENT_COLORS) {
+            recent.removeLast();
+        }
+
+        m_settings.setValue("appearance/recent_colors", recent);
+        emit recentColorsChanged(); // Sygnał o zmianie listy ostatnich kolorów
+    }
+
 signals:
     void configChanged(const QString& key);
+    void recentColorsChanged();
 
 private:
-    WavelengthConfig(QObject* parent = nullptr) : QObject(parent), 
+    WavelengthConfig(QObject* parent = nullptr) : QObject(parent),
         m_settings("Wavelength", "WavelengthApp") {
         qDebug() << "Config initialized. Settings file:" << m_settings.fileName();
+        // Rejestracja typu QColor dla QSettings
+        qRegisterMetaType<QColor>("QColor");
+        qRegisterMetaTypeStreamOperators<QColor>("QColor");
     }
     
     ~WavelengthConfig() {

@@ -21,6 +21,8 @@
 #include "settings/layers/typing_test/typing_test_layer.h"
 #include "settings/layers/voice_recognition/voice_recognition_layer.h"
 
+class AppearanceSettingsWidget;
+
 class SettingsView : public QWidget {
     Q_OBJECT
 
@@ -47,7 +49,6 @@ private:
     void loadSettingsFromRegistry();
     void setupUi();
     void setupServerTab();
-    void setupAppearanceTab();
     void setupNetworkTab();
     void setupAdvancedTab();
     void setupClassifiedTab();
@@ -68,8 +69,7 @@ private:
     QSpinBox *m_serverPortEdit;
 
     // Kontrolki do edycji ustawień - Appearance
-    QComboBox *m_themeComboBox;
-    QSpinBox *m_animationDurationEdit;
+    AppearanceSettingsWidget* m_appearanceTabWidget;
 
     // Kontrolki do edycji ustawień - Network
     QSpinBox *m_connectionTimeoutEdit;
