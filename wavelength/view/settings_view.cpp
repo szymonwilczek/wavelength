@@ -1,18 +1,13 @@
 #include "settings_view.h"
 
-#include <QPainter>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
-#include <QGridLayout>
-#include <QScrollArea>
 #include <QElapsedTimer>
 #include <QMessageBox>
 #include <QApplication>
 #include <QGraphicsOpacityEffect>
 #include <QMouseEvent>
 #include <QRandomGenerator>
-#include <QStyle>
 
 #include "settings/classified/system_override_manager.h"
 
