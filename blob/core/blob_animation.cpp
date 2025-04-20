@@ -437,9 +437,13 @@ void BlobAnimation::applyIdleEffect() {
 }
 
 void BlobAnimation::setBackgroundColor(const QColor &color) {
-    m_params.backgroundColor = color;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setBackgroundColor called with:" << color.name();
+    if (m_params.backgroundColor != color) {
+        m_params.backgroundColor = color;
+        // Czy updateGridBuffer używa tego koloru? Czy trzeba wywołać coś jeszcze?
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update(); // Wymuś przemalowanie
+    }
 }
 
 void BlobAnimation::setGridColor(const QColor &color) {
@@ -739,4 +743,14 @@ void BlobAnimation::resumeAllEventTracking() {
     // Wymuś odświeżenie animacji
     switchToState(BlobConfig::IDLE);
     update();
+}
+
+void BlobAnimation::setBlobColor(const QColor &color) {
+    qDebug() << "BlobAnimation::setBlobColor called with:" << color.name();
+    // Załóżmy, że kolor bloba to 'borderColor' w parametrach
+    if (m_params.borderColor != color) {
+        m_params.borderColor = color;
+        // Nie ma potrzeby aktualizować bufora siatki, tylko przemalować
+        update(); // Wymuś przemalowanie (wywoła paintGL)
+    }
 }

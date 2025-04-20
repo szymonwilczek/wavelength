@@ -44,12 +44,6 @@ public:
 
     ~BlobAnimation() override;
 
-    void setBackgroundColor(const QColor &color);
-
-    void setGridColor(const QColor &color);
-
-    void setGridSpacing(int spacing);
-
     QPointF getBlobCenter() const {
         if (m_controlPoints.empty()) {
             return QPointF(width() / 2.0, height() / 2.0);
@@ -100,6 +94,14 @@ public:
             pauseAllEventTracking();
         }
     }
+
+    void setBackgroundColor(const QColor &color);
+
+    void setBlobColor(const QColor &color);
+
+    void setGridColor(const QColor &color);
+
+    void setGridSpacing(int spacing);
 
     signals:
     void visualizationReset();

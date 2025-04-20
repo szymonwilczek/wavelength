@@ -143,38 +143,74 @@ void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const 
 }
 
 void AppearanceSettingsWidget::chooseBackgroundColor() {
-    QColor color = QColorDialog::getColor(m_selectedBgColor, this, "Select Background Color", QColorDialog::ShowAlphaChannel);
+    // Zapisz bieżący kolor, aby można było go przywrócić, jeśli użytkownik anuluje
+    QColor originalColor = m_selectedBgColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Background Color", QColorDialog::ShowAlphaChannel);
+
     if (color.isValid()) {
-        m_selectedBgColor = color;
-        updateColorPreview(m_bgColorPreview, m_selectedBgColor);
-        m_config->addRecentColor(color); // Dodaj do ostatnich od razu
+        m_selectedBgColor = color; // Zaktualizuj kolor przechowywany lokalnie (na potrzeby przycisku Save)
+        updateColorPreview(m_bgColorPreview, m_selectedBgColor); // Zaktualizuj lokalny podgląd
+
+        // --- Natychmiast zastosuj zmianę w konfiguracji ---
+        // To spowoduje emisję sygnału configChanged("background_color")
+        qDebug() << "Immediately setting background color in config to:" << color.name();
+        m_config->setBackgroundColor(color);
+        // -------------------------------------------------
+
+        // m_config->addRecentColor(color); // Niepotrzebne, bo setBackgroundColor już to robi
+    } else {
+        // Użytkownik anulował - przywróć poprzedni kolor w podglądzie (opcjonalnie)
+        // updateColorPreview(m_bgColorPreview, originalColor);
+        // m_selectedBgColor = originalColor; // Przywróć też zmienną lokalną
     }
 }
 
+
 void AppearanceSettingsWidget::chooseBlobColor() {
-    QColor color = QColorDialog::getColor(m_selectedBlobColor, this, "Select Blob Color");
+    QColor originalColor = m_selectedBlobColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Blob Color"); // Usunięto ShowAlphaChannel, jeśli niepotrzebne dla bloba
+
     if (color.isValid()) {
-        m_selectedBlobColor = color;
-        updateColorPreview(m_blobColorPreview, m_selectedBlobColor);
-        m_config->addRecentColor(color);
+        m_selectedBlobColor = color; // Zaktualizuj kolor lokalny
+        updateColorPreview(m_blobColorPreview, m_selectedBlobColor); // Zaktualizuj podgląd
+
+        // --- Natychmiast zastosuj zmianę w konfiguracji ---
+        qDebug() << "Immediately setting blob color in config to:" << color.name();
+        m_config->setBlobColor(color); // To wyemituje configChanged("blob_color")
+        // -------------------------------------------------
+
+        // m_config->addRecentColor(color); // Niepotrzebne, setBlobColor to robi
     }
+    // Opcjonalnie: przywróć kolor, jeśli anulowano
+    // else {
+    //     updateColorPreview(m_blobColorPreview, originalColor);
+    //     m_selectedBlobColor = originalColor;
+    // }
 }
 
 void AppearanceSettingsWidget::chooseMessageColor() {
-    QColor color = QColorDialog::getColor(m_selectedMessageColor, this, "Select Message Color");
+    QColor originalColor = m_selectedMessageColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Message Color");
     if (color.isValid()) {
         m_selectedMessageColor = color;
         updateColorPreview(m_messageColorPreview, m_selectedMessageColor);
-        m_config->addRecentColor(color);
+        // --- Natychmiast zastosuj zmianę (jeśli chcesz) ---
+        qDebug() << "Immediately setting message color in config to:" << color.name();
+        m_config->setMessageColor(color); // Zakładając, że chcesz natychmiastowej zmiany
+        // -------------------------------------------------
     }
 }
 
 void AppearanceSettingsWidget::chooseStreamColor() {
-    QColor color = QColorDialog::getColor(m_selectedStreamColor, this, "Select Stream Color");
+    QColor originalColor = m_selectedStreamColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Stream Color");
     if (color.isValid()) {
         m_selectedStreamColor = color;
         updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
-        m_config->addRecentColor(color);
+        // --- Natychmiast zastosuj zmianę (jeśli chcesz) ---
+        qDebug() << "Immediately setting stream color in config to:" << color.name();
+        m_config->setStreamColor(color); // Zakładając, że chcesz natychmiastowej zmiany
+        // -------------------------------------------------
     }
 }
 

@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     animationLayout->setSpacing(0);
 
     auto *animation = new BlobAnimation(animationWidget);
-    animation->setBackgroundColor(QColor(35, 35, 35));
+    animation->setBackgroundColor(config->getBackgroundColor());
     animation->setGridColor(QColor(60, 60, 60));
     animation->setGridSpacing(20);
     animationLayout->addWidget(animation);
@@ -241,6 +241,29 @@ int main(int argc, char *argv[]) {
     };
 
     toggleEventListening(true);
+
+
+    QObject::connect(config, &WavelengthConfig::configChanged,
+                     [animation, config](const QString& key) {
+        if (key == "background_color" || key == "all") {
+            QColor newColor = config->getBackgroundColor();
+            qDebug() << "Config changed: background_color to" << newColor.name();
+            // Wywołaj slot w BlobAnimation w wątku głównym
+            QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection,
+                                      Q_ARG(QColor, newColor));
+        } else if (key == "blob_color" || key == "all") {
+            QColor newColor = config->getBlobColor();
+            qDebug() << "Config changed: blob_color to" << newColor.name();
+            QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection,
+                                      Q_ARG(QColor, newColor));
+        }
+        // Możesz dodać obsługę innych kluczy (np. grid_color) w przyszłości
+        // else if (key == "grid_color" || key == "all") {
+        //     QColor newGridColor = config->getGridColor();
+        //     QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection,
+        //                               Q_ARG(QColor, newGridColor));
+        // }
+    });
 
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
     [stackedWidget, animationWidget, animation](int index) {
