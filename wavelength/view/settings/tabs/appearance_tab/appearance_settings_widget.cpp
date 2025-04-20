@@ -8,106 +8,97 @@
 #include <QColorDialog>
 #include <QDebug>
 
+#include "components/clickable_color_preview.h"
+
 AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::getInstance()), // Pobierz instancję config
+      m_config(WavelengthConfig::getInstance()),
       m_bgColorPreview(nullptr),
       m_blobColorPreview(nullptr),
       m_messageColorPreview(nullptr),
       m_streamColorPreview(nullptr),
       m_recentColorsLayout(nullptr)
 {
+    qDebug() << "AppearanceSettingsWidget constructor start";
     setupUi();
-    loadSettings(); // Załaduj ustawienia przy tworzeniu widgetu
-
-    // Połącz sygnał zmiany ostatnich kolorów z config z aktualizacją UI w tym widgecie
+    loadSettings();
     connect(m_config, &WavelengthConfig::recentColorsChanged, this, &AppearanceSettingsWidget::updateRecentColorsUI);
+    qDebug() << "AppearanceSettingsWidget constructor end";
+
+    // --- DODAJ TEST GEOMETRII PO SETUP ---
+    if (m_bgColorPreview) {
+        qDebug() << "m_bgColorPreview geometry after setupUi:" << m_bgColorPreview->geometry();
+        qDebug() << "m_bgColorPreview isVisible:" << m_bgColorPreview->isVisible();
+    } else {
+        qDebug() << "m_bgColorPreview is NULL after setupUi!";
+    }
+    // -------------------------------------
 }
 
 void AppearanceSettingsWidget::setupUi() {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this); // Główny layout pionowy
+    qDebug() << "AppearanceSettingsWidget setupUi start";
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(20);
 
-    QLabel *infoLabel = new QLabel("Configure application appearance colors", this);
+    QLabel *infoLabel = new QLabel("Configure application appearance colors (click preview to change)", this);
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     mainLayout->addWidget(infoLabel);
 
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setHorizontalSpacing(15);
     gridLayout->setVerticalSpacing(10);
-    gridLayout->setColumnStretch(2, 1); // Rozciągnij trzecią kolumnę
+    gridLayout->setColumnStretch(1, 0); // Podgląd ma stały rozmiar
+    gridLayout->setColumnStretch(2, 1); // Pusta kolumna się rozciąga
+
+    QString labelStyle = "color: #c0c0c0; background-color: transparent; font-family: Consolas; font-size: 10pt;";
 
     // Wiersz dla koloru tła
     QLabel* bgLabel = new QLabel("Background Color:", this);
-    m_bgColorPreview = new QWidget(this);
-    m_bgColorPreview->setFixedSize(24, 24);
-    m_bgColorPreview->setAutoFillBackground(true);
-    m_bgColorPreview->setStyleSheet("border: 1px solid #555;");
-    QPushButton* bgButton = new QPushButton("Choose...", this);
-    connect(bgButton, &QPushButton::clicked, this, &AppearanceSettingsWidget::chooseBackgroundColor);
+    bgLabel->setStyleSheet(labelStyle);
+    m_bgColorPreview = new ClickableColorPreview(this);
+    qDebug() << "Created m_bgColorPreview:" << m_bgColorPreview; // Czy wskaźnik jest poprawny?
+    connect(qobject_cast<ClickableColorPreview*>(m_bgColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBackgroundColor);
     gridLayout->addWidget(bgLabel, 0, 0, Qt::AlignRight);
     gridLayout->addWidget(m_bgColorPreview, 0, 1);
-    gridLayout->addWidget(bgButton, 0, 2);
+    qDebug() << "Added m_bgColorPreview to gridLayout at (0, 1)";
 
     // Wiersz dla koloru bloba
     QLabel* blobLabel = new QLabel("Blob Color:", this);
-    m_blobColorPreview = new QWidget(this);
-    m_blobColorPreview->setFixedSize(24, 24);
-    m_blobColorPreview->setAutoFillBackground(true);
-    m_blobColorPreview->setStyleSheet("border: 1px solid #555;");
-    QPushButton* blobButton = new QPushButton("Choose...", this);
-    connect(blobButton, &QPushButton::clicked, this, &AppearanceSettingsWidget::chooseBlobColor);
+    blobLabel->setStyleSheet(labelStyle);
+    m_blobColorPreview = new ClickableColorPreview(this);
+    qDebug() << "Created m_blobColorPreview:" << m_blobColorPreview;
+    connect(qobject_cast<ClickableColorPreview*>(m_blobColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBlobColor);
     gridLayout->addWidget(blobLabel, 1, 0, Qt::AlignRight);
     gridLayout->addWidget(m_blobColorPreview, 1, 1);
-    gridLayout->addWidget(blobButton, 1, 2);
+    qDebug() << "Added m_blobColorPreview to gridLayout at (1, 1)";
 
     // Wiersz dla koloru wiadomości
     QLabel* msgLabel = new QLabel("Message Color:", this);
-    m_messageColorPreview = new QWidget(this);
-    m_messageColorPreview->setFixedSize(24, 24);
-    m_messageColorPreview->setAutoFillBackground(true);
-    m_messageColorPreview->setStyleSheet("border: 1px solid #555;");
-    QPushButton* msgButton = new QPushButton("Choose...", this);
-    connect(msgButton, &QPushButton::clicked, this, &AppearanceSettingsWidget::chooseMessageColor);
+    msgLabel->setStyleSheet(labelStyle);
+    m_messageColorPreview = new ClickableColorPreview(this);
+    qDebug() << "Created m_messageColorPreview:" << m_messageColorPreview;
+    connect(qobject_cast<ClickableColorPreview*>(m_messageColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseMessageColor);
     gridLayout->addWidget(msgLabel, 2, 0, Qt::AlignRight);
     gridLayout->addWidget(m_messageColorPreview, 2, 1);
-    gridLayout->addWidget(msgButton, 2, 2);
+    qDebug() << "Added m_messageColorPreview to gridLayout at (2, 1)";
 
     // Wiersz dla koloru strumienia
     QLabel* streamLabel = new QLabel("Stream Color:", this);
-    m_streamColorPreview = new QWidget(this);
-    m_streamColorPreview->setFixedSize(24, 24);
-    m_streamColorPreview->setAutoFillBackground(true);
-    m_streamColorPreview->setStyleSheet("border: 1px solid #555;");
-    QPushButton* streamButton = new QPushButton("Choose...", this);
-    connect(streamButton, &QPushButton::clicked, this, &AppearanceSettingsWidget::chooseStreamColor);
+    streamLabel->setStyleSheet(labelStyle);
+    m_streamColorPreview = new ClickableColorPreview(this);
+    qDebug() << "Created m_streamColorPreview:" << m_streamColorPreview;
+    connect(qobject_cast<ClickableColorPreview*>(m_streamColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseStreamColor);
     gridLayout->addWidget(streamLabel, 3, 0, Qt::AlignRight);
     gridLayout->addWidget(m_streamColorPreview, 3, 1);
-    gridLayout->addWidget(streamButton, 3, 2);
-
-    // Zastosuj style do QLabel i QPushButton w gridLayout
-    QString labelStyle = "color: #c0c0c0; background-color: transparent; font-family: Consolas; font-size: 10pt;";
-    QString buttonStyle = "QPushButton { background-color: #005577; border: 1px solid #0077AA; padding: 5px 10px; border-radius: 3px; color: #E0E0E0; font-family: Consolas; }"
-                          "QPushButton:hover { background-color: #0077AA; }"
-                          "QPushButton:pressed { background-color: #003355; }";
-
-    bgLabel->setStyleSheet(labelStyle);
-    blobLabel->setStyleSheet(labelStyle);
-    msgLabel->setStyleSheet(labelStyle);
-    streamLabel->setStyleSheet(labelStyle);
-    bgButton->setStyleSheet(buttonStyle);
-    blobButton->setStyleSheet(buttonStyle);
-    msgButton->setStyleSheet(buttonStyle);
-    streamButton->setStyleSheet(buttonStyle);
+    qDebug() << "Added m_streamColorPreview to gridLayout at (3, 1)";
 
     mainLayout->addLayout(gridLayout);
 
-    // Sekcja ostatnich kolorów
+    // Sekcja ostatnich kolorów (bez zmian w logice dodawania)
     QLabel *recentLabel = new QLabel("Recently Used Colors:", this);
     recentLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt; margin-top: 15px;");
     mainLayout->addWidget(recentLabel);
-
     QWidget* recentColorsContainer = new QWidget(this);
     m_recentColorsLayout = new QHBoxLayout(recentColorsContainer);
     m_recentColorsLayout->setContentsMargins(0, 5, 0, 0);
@@ -115,7 +106,8 @@ void AppearanceSettingsWidget::setupUi() {
     m_recentColorsLayout->setAlignment(Qt::AlignLeft);
     mainLayout->addWidget(recentColorsContainer);
 
-    mainLayout->addStretch(); // Dodaj rozciągliwość na dole
+    mainLayout->addStretch();
+    qDebug() << "AppearanceSettingsWidget setupUi end";
 }
 
 void AppearanceSettingsWidget::loadSettings() {
@@ -141,11 +133,12 @@ void AppearanceSettingsWidget::saveSettings() {
 }
 
 void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const QColor& color) {
-    if (previewWidget && color.isValid()) {
-        previewWidget->setStyleSheet(QString("background-color: %1; border: 1px solid #555;")
-                                         .arg(color.name(QColor::HexRgb)));
-    } else if (previewWidget) {
-        previewWidget->setStyleSheet("background-color: transparent; border: 1px solid #555;");
+    ClickableColorPreview* preview = qobject_cast<ClickableColorPreview*>(previewWidget);
+    if (preview) {
+        qDebug() << "Calling setColor on" << preview << "with color" << color.name();
+        preview->setColor(color);
+    } else {
+        qWarning() << "Failed to cast QWidget* to ClickableColorPreview* in updateColorPreview.";
     }
 }
 

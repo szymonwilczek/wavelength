@@ -178,6 +178,8 @@ add_executable(
         wavelength/ui/button/tab_button.h
         wavelength/view/settings/tabs/appearance_tab/appearance_settings_widget.cpp
         wavelength/view/settings/tabs/appearance_tab/appearance_settings_widget.h
+        wavelength/view/settings/tabs/appearance_tab/components/clickable_color_preview.cpp
+        wavelength/view/settings/tabs/appearance_tab/components/clickable_color_preview.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
