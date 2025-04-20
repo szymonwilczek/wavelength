@@ -11,6 +11,7 @@
 
 #include "settings/classified/system_override_manager.h"
 #include "settings/tabs/appearance_tab/appearance_settings_widget.h"
+#include "settings/tabs/wavelength_tab/wavelength_settings_widget.h"
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
@@ -129,8 +130,9 @@ void SettingsView::setupUi() {
     );
 
     // Tworzenie zawartości dla każdej zakładki
-    setupServerTab();
-    m_appearanceTabWidget = new AppearanceSettingsWidget(m_tabContent); // Index 1
+    m_wavelengthTabWidget = new WavelengthSettingsWidget(m_tabContent);
+    m_tabContent->addWidget(m_wavelengthTabWidget);
+    m_appearanceTabWidget = new AppearanceSettingsWidget(m_tabContent);
     m_tabContent->addWidget(m_appearanceTabWidget);
     setupNetworkTab();
     setupAdvancedTab();
@@ -436,39 +438,6 @@ void SettingsView::setupNextSecurityLayer() {
     }
 }
 
-
-void SettingsView::setupServerTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure server connection settings", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_serverAddressEdit = new CyberLineEdit(tab);
-    m_serverAddressEdit->setPlaceholderText("Enter server address");
-    formLayout->addRow("Server Address:", m_serverAddressEdit);
-
-    m_serverPortEdit = new QSpinBox(tab);
-    m_serverPortEdit->setRange(1, 65535);
-    m_serverPortEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-        "QSpinBox::up-button, QSpinBox::down-button { background-color: rgba(0, 150, 220, 100); }"
-    );
-    formLayout->addRow("Server Port:", m_serverPortEdit);
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
 void SettingsView::setupNetworkTab() {
     QWidget *tab = new QWidget(m_tabContent);
     QVBoxLayout *layout = new QVBoxLayout(tab);
@@ -601,13 +570,16 @@ void SettingsView::showEvent(QShowEvent *event) {
 
 
 void SettingsView::loadSettingsFromRegistry() {
-    // Server
-    m_serverAddressEdit->setText(m_config->getRelayServerAddress());
-    m_serverPortEdit->setValue(m_config->getRelayServerPort());
+
+    // --- Wavelength ---
+    if (m_wavelengthTabWidget) {
+        m_wavelengthTabWidget->loadSettings();
+    }
+    // ------------------
 
     // --- Appearance ---
     if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->loadSettings(); // Deleguj ładowanie
+        m_appearanceTabWidget->loadSettings();
     }
     // ------------------
 
@@ -627,33 +599,35 @@ void SettingsView::loadSettingsFromRegistry() {
 }
 
 void SettingsView::saveSettings() {
-    // Server
-    m_config->setRelayServerAddress(m_serverAddressEdit->text());
-    m_config->setRelayServerPort(m_serverPortEdit->value());
-
-    // --- Appearance ---
-    if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->saveSettings(); // Deleguj zapisywanie
+    // --- Wavelength ---
+    if (m_wavelengthTabWidget) {
+        m_wavelengthTabWidget->saveSettings(); // <<< Deleguj zapisywanie
     }
     // ------------------
 
-    // Network
+    // --- Appearance ---
+    if (m_appearanceTabWidget) {
+        m_appearanceTabWidget->saveSettings(); // Deleguj zapisywanie (bez zmian)
+    }
+    // ------------------
+
+    // Network (bez zmian)
     m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
     m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
     m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
 
-    // Advanced
+    // Advanced (bez zmian)
     m_config->setDebugMode(m_debugModeCheckBox->isChecked());
     m_config->setMaxChatHistorySize(m_chatHistorySizeEdit->value());
     m_config->setMaxProcessedMessageIds(m_processedMessageIdsEdit->value());
     m_config->setMaxSentMessageCacheSize(m_sentMessageCacheSizeEdit->value());
     m_config->setMaxRecentWavelength(m_maxRecentWavelengthEdit->value());
 
-    // Zapisanie wszystkich ustawień do pliku/rejestru
+    // Zapisanie wszystkich ustawień do pliku/rejestru (bez zmian)
     m_config->saveSettings();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
-    emit settingsChanged();
+    emit settingsChanged(); // Emituj sygnał po zapisaniu
 }
 
 void SettingsView::restoreDefaults() {

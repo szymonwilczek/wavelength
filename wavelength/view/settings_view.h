@@ -1,7 +1,6 @@
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
-#include <QComboBox>
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QDateTime>
@@ -22,6 +21,7 @@
 #include "settings/layers/voice_recognition/voice_recognition_layer.h"
 
 class AppearanceSettingsWidget;
+class WavelengthSettingsWidget;
 
 class SettingsView : public QWidget {
     Q_OBJECT
@@ -48,7 +48,6 @@ private slots:
 private:
     void loadSettingsFromRegistry();
     void setupUi();
-    void setupServerTab();
     void setupNetworkTab();
     void setupAdvancedTab();
     void setupClassifiedTab();
@@ -64,11 +63,7 @@ private:
     QWidget *m_tabBar;
     QList<TabButton*> m_tabButtons;
 
-    // Kontrolki do edycji ustawień - Server
-    CyberLineEdit *m_serverAddressEdit;
-    QSpinBox *m_serverPortEdit;
-
-    // Kontrolki do edycji ustawień - Appearance
+    WavelengthSettingsWidget* m_wavelengthTabWidget;
     AppearanceSettingsWidget* m_appearanceTabWidget;
 
     // Kontrolki do edycji ustawień - Network
