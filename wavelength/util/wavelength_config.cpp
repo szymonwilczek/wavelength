@@ -69,15 +69,22 @@ void WavelengthConfig::loadDefaults() {
     m_titleTextColor = DefaultConfig::TITLE_TEXT_COLOR;
     m_titleBorderColor = DefaultConfig::TITLE_BORDER_COLOR;
     m_titleGlowColor = DefaultConfig::TITLE_GLOW_COLOR;
+    m_preferredStartFrequency = 130.0;
 }
 
 void WavelengthConfig::loadSettings() {
-    m_settings.beginGroup("Network");
+    m_settings.beginGroup("Wavelength");
     m_relayServerAddress = m_settings.value("relayServerAddress", m_relayServerAddress).toString();
     m_relayServerPort = m_settings.value("relayServerPort", m_relayServerPort).toInt();
+    m_preferredStartFrequency = m_settings.value("preferredStartFrequency", m_preferredStartFrequency).toDouble(); // Ładowanie nowej wartości
+    m_maxChatHistorySize = m_settings.value("maxChatHistorySize", m_maxChatHistorySize).toInt();
+    m_maxProcessedMessageIds = m_settings.value("maxProcessedMessageIds", m_maxProcessedMessageIds).toInt();
+    m_maxSentMessageCacheSize = m_settings.value("maxSentMessageCacheSize", m_maxSentMessageCacheSize).toInt();
+    m_maxRecentWavelength = m_settings.value("maxRecentWavelength", m_maxRecentWavelength).toInt();
     m_connectionTimeout = m_settings.value("connectionTimeout", m_connectionTimeout).toInt();
     m_keepAliveInterval = m_settings.value("keepAliveInterval", m_keepAliveInterval).toInt();
     m_maxReconnectAttempts = m_settings.value("maxReconnectAttempts", m_maxReconnectAttempts).toInt();
+    m_debugMode = m_settings.value("debugMode", m_debugMode).toBool();
     m_settings.endGroup();
 
     m_settings.beginGroup("Application");
@@ -103,12 +110,18 @@ void WavelengthConfig::loadSettings() {
 }
 
 void WavelengthConfig::saveSettings() {
-    m_settings.beginGroup("Network");
+    m_settings.beginGroup("Wavelength");
     m_settings.setValue("relayServerAddress", m_relayServerAddress);
     m_settings.setValue("relayServerPort", m_relayServerPort);
+    m_settings.setValue("preferredStartFrequency", m_preferredStartFrequency);
+    m_settings.setValue("maxChatHistorySize", m_maxChatHistorySize);
+    m_settings.setValue("maxProcessedMessageIds", m_maxProcessedMessageIds);
+    m_settings.setValue("maxSentMessageCacheSize", m_maxSentMessageCacheSize);
+    m_settings.setValue("maxRecentWavelength", m_maxRecentWavelength);
     m_settings.setValue("connectionTimeout", m_connectionTimeout);
     m_settings.setValue("keepAliveInterval", m_keepAliveInterval);
     m_settings.setValue("maxReconnectAttempts", m_maxReconnectAttempts);
+    m_settings.setValue("debugMode", m_debugMode);
     m_settings.endGroup();
 
     m_settings.beginGroup("Application");
@@ -303,4 +316,18 @@ QVariant WavelengthConfig::getSetting(const QString& key) const {
     // Jeśli klucz nie pasuje do żadnego znanego ustawienia
     qWarning() << "WavelengthConfig::getSetting - Unknown key:" << key;
     return QVariant(); // Zwróć nieprawidłowy QVariant
+}
+
+double WavelengthConfig::getPreferredStartFrequency() const {
+    return m_preferredStartFrequency;
+}
+
+void WavelengthConfig::setPreferredStartFrequency(double frequency) {
+    // Ensure frequency is within reasonable bounds if necessary, e.g., >= 130.0
+    frequency = qMax(130.0, frequency);
+    if (m_preferredStartFrequency != frequency) {
+        m_preferredStartFrequency = frequency;
+        emit configChanged("preferredStartFrequency");
+        qDebug() << "Config: Preferred start frequency set to" << m_preferredStartFrequency;
+    }
 }

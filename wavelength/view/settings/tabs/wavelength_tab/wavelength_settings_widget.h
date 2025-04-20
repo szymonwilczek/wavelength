@@ -1,6 +1,7 @@
 #ifndef WAVELENGTH_SETTINGS_WIDGET_H
 #define WAVELENGTH_SETTINGS_WIDGET_H
 
+#include <QDoubleSpinBox>
 #include <QWidget>
 
 class WavelengthConfig;
@@ -22,10 +23,12 @@ public:
 
 private:
     void setupUi();
+    void updateFrequencySuffix(double value);
 
     WavelengthConfig *m_config;
 
     // Kontrolki UI dla tej zakładki
+    QDoubleSpinBox *m_preferredFrequencyEdit;
     CyberLineEdit *m_serverAddressEdit;
     QSpinBox *m_serverPortEdit;
 };

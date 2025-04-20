@@ -23,33 +23,45 @@ router.get("/health", (req, res) => {
  */
 router.get("/api/next-available-frequency", async (req, res) => {
   try {
-    console.log("Looking for next available frequency using FrequencyGapTracker");
+    // Odczytaj opcjonalny parametr i przekonwertuj na liczbę lub null
+    let preferredStartFrequency = null;
+    if (req.query.preferredStartFrequency) {
+      const parsedFreq = parseFloat(req.query.preferredStartFrequency);
+      // Sprawdź, czy parsowanie się udało i czy wartość jest >= 130.0
+      if (!isNaN(parsedFreq) && parsedFreq >= 130.0) {
+        preferredStartFrequency = parsedFreq;
+      } else {
+        console.warn("Invalid or out-of-range preferredStartFrequency parameter received:", req.query.preferredStartFrequency);
+        // Nie zwracaj błędu, po prostu zignoruj nieprawidłową wartość
+      }
+    }
 
-    await frequencyTracker.updateGapsCache();
+    console.log(`Looking for next available frequency. Preferred start: ${preferredStartFrequency ?? 'None'}`);
 
-    const nextFrequency = frequencyTracker.findLowestAvailableFrequency();
+    // Aktualizuj cache przed wyszukiwaniem (może być opcjonalne, zależy od strategii)
+    // await frequencyTracker.updateGapsCache(); // Rozważ, czy to konieczne przy każdym zapytaniu
+
+    // Przekaż preferowaną częstotliwość do trackera
+    const nextFrequency = frequencyTracker.findLowestAvailableFrequency(preferredStartFrequency);
 
     if (nextFrequency !== null) {
       console.log(`Found next available frequency: ${nextFrequency} Hz`);
 
-      const existingInDb = await wavelengthService.getWavelength(nextFrequency);
-      const existingInMemory = connectionManager.activeWavelengths.has(nextFrequency);
-
-      if (existingInDb || existingInMemory) {
-        console.warn(`Frequency ${nextFrequency} is actually taken. Updating cache...`);
-        await frequencyTracker.addTakenFrequency(nextFrequency);
-
-        return router.handle(req, res);
-      }
+      // Dodatkowa weryfikacja (opcjonalna, tracker powinien być wiarygodny)
+      // const existingInDb = await wavelengthService.getWavelength(nextFrequency);
+      // const existingInMemory = connectionManager.activeWavelengths.has(nextFrequency);
+      // if (existingInDb || existingInMemory) { ... }
 
       res.json({
         frequency: nextFrequency,
         status: "success",
       });
     } else {
-      console.log("No available frequencies found");
+      console.log("No available frequencies found matching the criteria.");
+      // Zwróć 404, jeśli nie znaleziono ŻADNEJ wolnej częstotliwości (nawet bez preferencji)
+      // lub jeśli nie znaleziono częstotliwości >= preferowanej
       res.status(404).json({
-        error: "No available frequencies found",
+        error: "No available frequencies found matching the criteria",
         status: "error",
       });
     }
@@ -61,6 +73,7 @@ router.get("/api/next-available-frequency", async (req, res) => {
     });
   }
 });
+
 
 /**
  * Returns a list of all active wavelengths

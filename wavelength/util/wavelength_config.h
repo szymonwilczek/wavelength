@@ -41,6 +41,9 @@ public:
     bool isDebugMode() const;
     void setDebugMode(bool enabled);
 
+    double getPreferredStartFrequency() const;
+    void setPreferredStartFrequency(double frequency);
+
     // --- Kolory wyglądu ---
     QColor getBackgroundColor() const;
     void setBackgroundColor(const QColor& color);
@@ -114,6 +117,8 @@ private:
     QColor m_titleTextColor;
     QColor m_titleBorderColor;
     QColor m_titleGlowColor;
+
+    double m_preferredStartFrequency;
 };
 
 #endif // WAVELENGTH_CONFIG_H
