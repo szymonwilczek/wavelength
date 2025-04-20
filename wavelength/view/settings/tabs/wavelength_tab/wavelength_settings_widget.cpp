@@ -53,7 +53,7 @@ void WavelengthSettingsWidget::setupUi() {
     // Połącz sygnał zmiany wartości ze slotem aktualizującym sufiks
     connect(m_preferredFrequencyEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &WavelengthSettingsWidget::updateFrequencySuffix);
     // Wywołaj raz, aby ustawić początkowy sufiks
-    updateFrequencySuffix(m_config->getPreferredStartFrequency()); // Użyj wartości z configu
+    // updateFrequencySuffix(m_config->getPreferredStartFrequency()); // Użyj wartości z configu
     formLayout->addRow(preferredFreqLabel, m_preferredFrequencyEdit);
 
 
@@ -127,7 +127,7 @@ void WavelengthSettingsWidget::loadSettings() {
         qWarning() << "WavelengthSettingsWidget::loadSettings - UI elements not initialized.";
         return;
     }
-    m_preferredFrequencyEdit->setValue(m_config->getPreferredStartFrequency());
+    m_preferredFrequencyEdit->setValue(m_config->getPreferredStartFrequency().toDouble());
     m_serverAddressEdit->setText(m_config->getRelayServerAddress());
     m_serverPortEdit->setValue(m_config->getRelayServerPort());
     // Upewnij się, że sufiks jest poprawny po załadowaniu
@@ -140,7 +140,7 @@ void WavelengthSettingsWidget::saveSettings() {
         qWarning() << "WavelengthSettingsWidget::saveSettings - UI elements not initialized.";
         return;
     }
-    m_config->setPreferredStartFrequency(m_preferredFrequencyEdit->value());
+    m_config->setPreferredStartFrequency(m_preferredFrequencyEdit->text());
     m_config->setRelayServerAddress(m_serverAddressEdit->text());
     m_config->setRelayServerPort(m_serverPortEdit->value());
     qDebug() << "WavelengthSettingsWidget settings prepared for saving.";

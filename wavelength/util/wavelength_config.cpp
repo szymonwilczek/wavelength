@@ -318,13 +318,13 @@ QVariant WavelengthConfig::getSetting(const QString& key) const {
     return QVariant(); // Zwróć nieprawidłowy QVariant
 }
 
-double WavelengthConfig::getPreferredStartFrequency() const {
+QString WavelengthConfig::getPreferredStartFrequency() const {
     return m_preferredStartFrequency;
 }
 
-void WavelengthConfig::setPreferredStartFrequency(double frequency) {
+void WavelengthConfig::setPreferredStartFrequency(QString frequency) {
     // Ensure frequency is within reasonable bounds if necessary, e.g., >= 130.0
-    frequency = qMax(130.0, frequency);
+    //TODO: tymczasowa konwersja na zmiennoprzecinkowe żeby sprawdzić zakresy
     if (m_preferredStartFrequency != frequency) {
         m_preferredStartFrequency = frequency;
         emit configChanged("preferredStartFrequency");

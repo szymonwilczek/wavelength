@@ -48,7 +48,7 @@ private:
 
 class MessageFormatter {
 public:
-    static QString formatMessage(const QJsonObject& msgObj, double frequency) {
+    static QString formatMessage(const QJsonObject& msgObj, QString frequency) {
         // Pobierz treść wiadomości
         QString content;
         if (msgObj.contains("content")) {

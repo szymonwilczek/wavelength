@@ -234,12 +234,12 @@ int main(int argc, char *argv[]) {
     window.resize(1024, 768);
 
     const auto instanceManager = new AppInstanceManager(&window, animation, &window);
-    instanceManager->start();
-
-    QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
-    window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    window.setEnabled(false);
-});
+//     instanceManager->start();
+//
+//     QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
+//     window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+//     window.setEnabled(false);
+// });
 
 
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const double frequency) {
+    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString frequency) {
         animation->hide();
         navbar->setChatMode(true);
         chatView->setWavelength(frequency, "");
@@ -340,13 +340,13 @@ int main(int argc, char *argv[]) {
                      chatView, &WavelengthChatView::onWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
-                     [switchToChatView](double frequency) {
+                     [switchToChatView](QString frequency) {
                          qDebug() << "Wavelength created signal received";
                          switchToChatView(frequency);
                      });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
-                     [switchToChatView](double frequency) {
+                     [switchToChatView](QString frequency) {
                          qDebug() << "Wavelength joined signal received";
                          switchToChatView(frequency);
                      });
@@ -417,7 +417,7 @@ int main(int argc, char *argv[]) {
 
         WavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            double frequency = dialog.getFrequency();
+            QString frequency = dialog.getFrequency();
             bool isPasswordProtected = dialog.isPasswordProtected();
             QString password = dialog.getPassword();
 
@@ -439,7 +439,7 @@ int main(int argc, char *argv[]) {
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            double frequency = dialog.getFrequency();
+            QString frequency = dialog.getFrequency();
             QString password = dialog.getPassword();
 
             if (coordinator->joinWavelength(frequency, password)) {

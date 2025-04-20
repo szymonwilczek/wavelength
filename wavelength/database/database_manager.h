@@ -17,62 +17,6 @@ public:
         return &instance;
     }
 
-    bool isFrequencyAvailable(double frequency) {
-        try {
-            double normalizedFrequency = WavelengthUtilities::normalizeFrequency(frequency);
-
-            pqxx::work txn{*m_connection};
-            pqxx::result result = txn.exec_params(
-                "SELECT COUNT(*) FROM active_wavelengths WHERE CAST(frequency AS NUMERIC(12,1)) = CAST($1 AS NUMERIC(12,1))",
-                normalizedFrequency
-            );
-            txn.commit();
-
-            int count = result[0][0].as<int>();
-            qDebug() << "Frequency" << normalizedFrequency << "availability check: "
-                     << (count == 0 ? "available" : "taken");
-            return count == 0;
-        }
-        catch (const std::exception& e) {
-            qDebug() << "PostgreSQL error when checking frequency availability:" << e.what();
-            return false;
-        }
-    }
-
-    bool getWavelengthDetails(double frequency, QString& name, bool& isPasswordProtected) {
-        try {
-            // Normalizacja częstotliwości
-            double normalizedFrequency = WavelengthUtilities::normalizeFrequency(frequency);
-
-            qDebug() << "Executing SQL query for frequency:" << normalizedFrequency;
-
-            // Używamy CAST do zapewnienia zgodności typów
-            pqxx::work txn{*m_connection};
-            pqxx::result result = txn.exec_params(
-                "SELECT name, is_password_protected FROM active_wavelengths WHERE CAST(frequency AS NUMERIC(12,1)) = CAST($1 AS NUMERIC(12,1))",
-                normalizedFrequency
-            );
-            txn.commit();
-
-            if (result.empty()) {
-                qDebug() << "Wavelength" << normalizedFrequency << "not found in database";
-                return false;
-            }
-
-            name = QString::fromStdString(result[0]["name"].as<std::string>());
-            isPasswordProtected = result[0]["is_password_protected"].as<bool>();
-
-            qDebug() << "Found wavelength in database:" << normalizedFrequency
-                     << "Name:" << name << "Protected:" << isPasswordProtected;
-
-            return true;
-        }
-        catch (const std::exception& e) {
-            qDebug() << "PostgreSQL error when getting wavelength details:" << e.what();
-            return false;
-        }
-    }
-
     bool isConnected() const {
         return m_isConnected;
     }

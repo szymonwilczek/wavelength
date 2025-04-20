@@ -24,7 +24,7 @@ public:
         return &instance;
     }
 
-    bool createWavelength(double frequency, bool isPasswordProtected,
+    bool createWavelength(QString frequency, bool isPasswordProtected,
                   const QString& password) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
 
@@ -40,11 +40,11 @@ public:
             return false;
         }
 
-        // Check if the frequency is available in the database
-        if (!DatabaseManager::getInstance()->isFrequencyAvailable(frequency)) {
-            qDebug() << "Frequency" << frequency << "is not available";
-            return false;
-        }
+        // // Check if the frequency is available in the database
+        // if (!DatabaseManager::getInstance()->isFrequencyAvailable(frequency)) {
+        //     qDebug() << "Frequency" << frequency << "is not available";
+        //     return false;
+        // }
 
         // Mark this frequency as pending registration
         registry->addPendingRegistration(frequency);
@@ -125,12 +125,12 @@ public:
 
             if (registry->hasWavelength(frequency)) {
                 qDebug() << "Removing wavelength" << frequency << "due to socket disconnect";
-                double activeFreq = registry->getActiveWavelength();
+                QString activeFreq = registry->getActiveWavelength();
                 
                 registry->removeWavelength(frequency);
 
                 if (activeFreq == frequency) {
-                    registry->setActiveWavelength(-1);
+                    registry->setActiveWavelength("-1");
                 }
                 
                 emit wavelengthClosed(frequency);
@@ -189,8 +189,8 @@ public:
     }
 
 signals:
-    void wavelengthCreated(double frequency);
-    void wavelengthClosed(double frequency);
+    void wavelengthCreated(QString frequency);
+    void wavelengthClosed(QString frequency);
     void connectionError(const QString& errorMessage);
 
 private:

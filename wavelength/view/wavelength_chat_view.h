@@ -259,7 +259,7 @@ public:
         }
     }
 
-    void setWavelength(double frequency, const QString &name = QString()) {
+    void setWavelength(QString frequency, const QString &name = QString()) {
         currentFrequency = frequency;
 
         resetStatusIndicator();
@@ -287,7 +287,7 @@ public:
         inputField->clear();
     }
 
-    void onMessageReceived(double frequency, const QString &message) {
+    void onMessageReceived(QString frequency, const QString &message) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -300,7 +300,7 @@ public:
         });
     }
 
-    void onMessageSent(double frequency, const QString &message) {
+    void onMessageSent(QString frequency, const QString &message) {
         if (frequency != currentFrequency) {
             return;
         }
@@ -308,7 +308,7 @@ public:
         messageArea->addMessage(message, "sent", StreamMessage::MessageType::Transmitted);
     }
 
-    void onWavelengthClosed(double frequency) {
+    void onWavelengthClosed(QString frequency) {
         if (frequency != currentFrequency || m_isAborting) {
             return;
         }
@@ -436,7 +436,7 @@ private slots:
     }
 
     void abortWavelength() {
-        if (currentFrequency == -1) {
+        if (currentFrequency == "-1") {
             return;
         }
 
@@ -517,7 +517,7 @@ private:
     QPushButton *attachButton;
     QPushButton *sendButton;
     QPushButton *abortButton;
-    double currentFrequency = -1.0;
+    QString currentFrequency = "-1.0";
     double m_scanlineOpacity;
     bool m_isAborting = false;
 

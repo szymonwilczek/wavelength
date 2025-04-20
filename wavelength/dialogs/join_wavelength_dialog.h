@@ -426,15 +426,15 @@ public:
         }
     }
 
-    double getFrequency() const {
-        double value = frequencyEdit->text().toDouble();
+    QString getFrequency() const {
+        QString value = frequencyEdit->text();
 
-        // Przelicz wartość na Hz w zależności od wybranej jednostki
-        if (frequencyUnitCombo->currentText() == "kHz") {
-            value *= 1000.0;
-        } else if (frequencyUnitCombo->currentText() == "MHz") {
-            value *= 1000000.0;
-        }
+        // // Przelicz wartość na Hz w zależności od wybranej jednostki
+        // if (frequencyUnitCombo->currentText() == "kHz") {
+        //     value *= 1000.0;
+        // } else if (frequencyUnitCombo->currentText() == "MHz") {
+        //     value *= 1000000.0;
+        // }
 
         return value;
     }
@@ -476,15 +476,15 @@ private slots:
         isJoining = true;
         statusLabel->hide();
 
-        double frequency = getFrequency();
+        QString frequency = getFrequency();
         QString password = passwordEdit->text();
 
-        if (frequency < 130 || frequency > 180000000.0) {
-            statusLabel->setText("FREQUENCY MUST BE BETWEEN 130Hz AND 180MHz");
-            statusLabel->show();
-            isJoining = false;
-            return;
-        }
+        // if (frequency < 130 || frequency > 180000000.0) {
+        //     statusLabel->setText("FREQUENCY MUST BE BETWEEN 130Hz AND 180MHz");
+        //     statusLabel->show();
+        //     isJoining = false;
+        //     return;
+        // }
 
         // Animacja scanline podczas łączenia
         QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
@@ -524,7 +524,7 @@ private slots:
         isJoining = false;
     }
 
-    void onAuthFailed(int frequency) {
+    void onAuthFailed(QString frequency) {
         statusLabel->setText("AUTHENTICATION FAILED: INCORRECT PASSWORD");
         statusLabel->show();
 

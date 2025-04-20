@@ -1,13 +1,17 @@
+// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\utils\helpers.js
 /**
- * Normalizes the frequency value to a number with one decimal place.
- * @param {number|string} frequency - Frequency to be normalized, can be a number or a string.
- * @returns {number} - Normalized frequency value rounded to one decimal place.
- * @throws {TypeError} - Throws an error if the frequency is not a number or string.
+ * Normalizes the frequency value to a string with one decimal place.
+ * @param {number|string} frequency - Frequency to be normalized.
+ * @returns {string} - Normalized frequency string (e.g., "130.0").
+ * @throws {TypeError} - Throws an error if the frequency cannot be parsed to a valid positive number.
  */
 function normalizeFrequency(frequency) {
-  const numFreq =
-    typeof frequency === "string" ? parseFloat(frequency) : frequency;
-  return parseFloat(numFreq.toFixed(1));
+  const numFreq = typeof frequency === 'string' ? parseFloat(frequency.trim()) : frequency;
+  if (isNaN(numFreq) || numFreq <= 0) { // Also ensure positivity here
+    throw new TypeError(`Invalid frequency value provided: ${frequency}`);
+  }
+  // Ensure one decimal place, return as string
+  return numFreq.toFixed(1);
 }
 
 /**
@@ -29,15 +33,17 @@ function generateMessageId(prefix = "msg") {
 }
 
 /**
- * Checks that the frequency is correct
- * @param {number|string} frequency - Frequency to be checked, can be a number or a string.
+ * Checks if the input can be normalized to a valid frequency string.
+ * @param {number|string} frequency - Frequency to be checked.
  * @returns {boolean} - True if the frequency is valid, false otherwise.
- * @throws {TypeError} - Throws an error if the frequency is not a number or string.
  */
 function isValidFrequency(frequency) {
-  const numFreq =
-    typeof frequency === "string" ? parseFloat(frequency) : frequency;
-  return !isNaN(numFreq) && numFreq > 0;
+  try {
+    normalizeFrequency(frequency); // Try to normalize
+    return true;
+  } catch (e) {
+    return false; // Normalization failed
+  }
 }
 
 module.exports = {

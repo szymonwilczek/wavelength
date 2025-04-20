@@ -182,7 +182,7 @@ public:
     connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-        frequencyWatcher = new QFutureWatcher<double>(this);
+        frequencyWatcher = new QFutureWatcher<QString>(this);
         connect(frequencyWatcher, &QFutureWatcher<double>::finished, this, &WavelengthDialog::onFrequencyFound);
 
         // Ustawiamy text w etykiecie częstotliwości na domyślną wartość
@@ -448,7 +448,7 @@ public:
     }
 }
 
-    double getFrequency() const {
+    QString getFrequency() const {
         return m_frequency;
     }
 
@@ -496,7 +496,7 @@ private slots:
         timeoutTimer->start();
 
         // Uruchom asynchroniczne wyszukiwanie
-        QFuture<double> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
+        QFuture<QString> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
         frequencyWatcher->setFuture(future);
     }
 
@@ -548,7 +548,7 @@ private slots:
         m_frequencyFound = true;
 
         // Przygotuj tekst częstotliwości
-        QString frequencyText = formatFrequencyText(m_frequency);
+        QString frequencyText = m_frequency;
 
         // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
         QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
@@ -632,12 +632,12 @@ private slots:
     }
 
 private:
-    static double findLowestAvailableFrequency() {
+    static QString findLowestAvailableFrequency() {
     qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
     // Pobierz preferowaną częstotliwość startową z konfiguracji
     WavelengthConfig* config = WavelengthConfig::getInstance();
-    double preferredFreq = config->getPreferredStartFrequency();
+    QString preferredFreq = config->getPreferredStartFrequency();
     qDebug() << "LOG: Używam preferowanej częstotliwości startowej:" << preferredFreq << "Hz";
 
     QNetworkAccessManager manager;
@@ -647,7 +647,7 @@ private:
     // Utwórz URL i dodaj preferowaną częstotliwość jako parametr zapytania
     QUrl url("http://localhost:3000/api/next-available-frequency");
     QUrlQuery query;
-    query.addQueryItem("preferredStartFrequency", QString::number(preferredFreq, 'f', 1)); // Przekaż jako string z 1 miejscem po przecinku
+    query.addQueryItem("preferredStartFrequency", preferredFreq);
     url.setQuery(query);
 
     qDebug() << "LOG: Wysyłanie żądania do:" << url.toString();
@@ -662,7 +662,7 @@ private:
     // Uruchom pętlę zdarzeń aż do zakończenia żądania
     loop.exec();
 
-    double resultFrequency = 130.0; // Domyślna wartość w razie błędu
+    QString resultFrequency = "130.0"; // Domyślna wartość w razie błędu
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray responseData = reply->readAll();
@@ -769,9 +769,9 @@ private:
     QLabel *statusLabel;
     CyberButton *generateButton;
     CyberButton *cancelButton;
-    QFutureWatcher<double> *frequencyWatcher;
+    QFutureWatcher<QString> *frequencyWatcher;
     QTimer *m_refreshTimer;
-    double m_frequency = 130.0; // Domyślna wartość
+    QString m_frequency = "130.0"; // Domyślna wartość
     bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
     const int m_shadowSize; // Rozmiar cienia
     double m_scanlineOpacity; // Przezroczystość linii skanowania

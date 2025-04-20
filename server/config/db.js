@@ -1,10 +1,11 @@
+// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\config\db.js
 const { Pool } = require("pg");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://u_f67b73d1_c584_40b2_a189_3cf401949c75:NUlV9202u7L7J8i9sVIk6hC8erKY2O5v5v72s0v3nJ1hyy6QsnA2@pg.rapidapp.io:5433/db_f67b73d1_c584_40b2_a189_3cf401949c75?ssl=true&sslmode=no-verify&application_name=rapidapp_nodejs";
+    process.env.DATABASE_URL ||
+    "postgresql://u_f67b73d1_c584_40b2_a189_3cf401949c75:NUlV9202u7L7J8i9sVIk6hC8erKY2O5v5v72s0v3nJ1hyy6QsnA2@pg.rapidapp.io:5433/db_f67b73d1_c584_40b2_a189_3cf401949c75?ssl=true&sslmode=no-verify&application_name=rapidapp_nodejs";
 
 const pool = new Pool({
   connectionString,
@@ -42,16 +43,26 @@ async function query(text, params) {
  */
 async function initDb() {
   try {
+    // Drop existing table if necessary during development/testing
+    // await query(`DROP TABLE IF EXISTS active_wavelengths;`);
+
     await query(`
       CREATE TABLE IF NOT EXISTS active_wavelengths (
-        frequency DECIMAL(10, 1) PRIMARY KEY,
+        id SERIAL PRIMARY KEY, -- Keep serial ID
+        frequency TEXT UNIQUE NOT NULL, -- Changed to TEXT UNIQUE
         name VARCHAR(255) NOT NULL,
         is_password_protected BOOLEAN NOT NULL DEFAULT false,
         host_socket_id VARCHAR(50) NOT NULL,
+        password_hash VARCHAR(64), -- Added password hash column
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       )
     `);
-    console.log("Database initialized successfully");
+    // Ensure index exists on the TEXT column
+    await query(`
+      CREATE INDEX IF NOT EXISTS idx_active_wavelengths_frequency
+        ON active_wavelengths(frequency);
+    `);
+    console.log("Database initialized successfully (frequency as TEXT)");
   } catch (error) {
     console.error("Error initializing database:", error);
     throw error;
