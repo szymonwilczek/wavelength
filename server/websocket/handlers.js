@@ -250,109 +250,118 @@ function handleSendMessage(ws, data) {
  * @param {Object} data - File data
  */
 function handleSendFile(ws, data) {
-    const frequency = ws.frequency; // Should be normalized string "XXX.X"
-    const messageId = data.messageId || generateMessageId("file");
-    const attachmentType = data.attachmentType; // e.g., 'image', 'audio', 'video', 'file'
-    const attachmentMimeType = data.attachmentMimeType; // e.g., 'image/png'
-    const attachmentName = data.attachmentName; // e.g., 'photo.png'
-    const attachmentData = data.attachmentData; // Base64 encoded string
-    const senderId = ws.sessionId; // Use sender's session ID
-    const timestamp = data.timestamp || Date.now(); // Use provided or current time
+  const frequency = ws.frequency;
+  const messageId = data.messageId || generateMessageId("file");
+  const attachmentType = data.attachmentType;
+  const attachmentMimeType = data.attachmentMimeType;
+  const attachmentName = data.attachmentName;
+  const attachmentData = data.attachmentData;
+  const senderId = data.senderId || ws.sessionId;
+  const timestamp = data.timestamp || Date.now();
 
-    if (!frequency) {
-        console.error(`Handler: send_file attempt from client ${senderId || 'unknown'} not connected to a frequency.`);
-        ws.send(JSON.stringify({ type: "error", error: "Cannot send file: Not connected to a frequency" }));
-        return;
-    }
-    if (!attachmentData || !attachmentName || !attachmentType || !attachmentMimeType) {
-        console.error(`Handler: send_file missing required fields on ${frequency} from ${senderId}.`);
-        ws.send(JSON.stringify({ type: "error", error: "Missing required attachment data fields (type, mimeType, name, data)." }));
-        return;
-    }
-
-    const wavelength = connectionManager.activeWavelengths.get(frequency); // Use string key
-
-    if (!wavelength) {
-        console.error(`Handler: Wavelength ${frequency} not found for send_file from ${senderId}.`);
-        ws.send(JSON.stringify({ type: "error", error: "Wavelength does not exist or host is offline" }));
-        return;
-    }
-
-    // Approximate size check based on base64 length (adjust limit as needed)
-    const maxSizeMb = 20;
-    const maxBase64Length = maxSizeMb * 1024 * 1024 * 4 / 3; // Base64 is ~4/3 larger
-    if (attachmentData.length > maxBase64Length) {
-        console.warn(`Handler: File size exceeds limit (${maxSizeMb}MB) for ${attachmentName} on ${frequency} from ${senderId}.`);
-        ws.send(JSON.stringify({ type: "error", error: `File size exceeds the maximum limit (~${maxSizeMb}MB)` }));
-        return;
-    }
-
-    // Check for duplicate messageId
-    if (connectionManager.isMessageProcessed(frequency, messageId)) {
-        console.log(`Handler: Ignoring duplicate file message ${messageId} on ${frequency}`);
-        return; // Silently ignore
-    }
-    connectionManager.markMessageProcessed(frequency, messageId);
-
-    const isHost = ws.isHost;
-    const sender = isHost ? "Host" : (senderId ? senderId.substring(0, 8) : "Client");
-
-    console.log(`Handler: File received on ${frequency} from ${sender} (ID: ${messageId}): ${attachmentName} (${attachmentType})`);
-
-    // Send confirmation back to sender (optional)
-    // Consider sending only metadata back, not the full data again
+  if (!frequency) {
     ws.send(
-        JSON.stringify({
-            type: "message", // Still type message, indicates successful receipt/processing start
-            hasAttachment: true,
-            attachmentType: attachmentType,
-            attachmentMimeType: attachmentMimeType,
-            attachmentName: attachmentName,
-            // attachmentData: attachmentData, // Avoid sending data back unless necessary
-            frequency: frequency, // Send string freq "XXX.X"
-            messageId: messageId,
-            timestamp: new Date(timestamp).toISOString(),
-            isSelf: true, // Flag for sender's client
-            senderId: senderId,
-        })
+      JSON.stringify({
+        type: "error",
+        error: "You are not connected to any wavelength",
+      })
     );
+    return;
+  }
 
-    // Prepare broadcast message for others
-    const broadcastMessage = {
-        type: "message", // Clients expect 'message' type for chat display
-        hasAttachment: true,
-        attachmentType: attachmentType,
-        attachmentMimeType: attachmentMimeType,
-        attachmentName: attachmentName,
-        attachmentData: attachmentData, // Include base64 data for others
-        frequency: frequency, // Send string freq "XXX.X"
-        messageId: messageId,
-        timestamp: new Date(timestamp).toISOString(),
-        sender: sender, // "Host" or client ID prefix
-        senderId: senderId, // Full session ID of sender
-    };
-    const broadcastStr = JSON.stringify(broadcastMessage);
+  const wavelength = connectionManager.activeWavelengths.get(frequency);
 
-    // Send to other clients
-    wavelength.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            try {
-                client.send(broadcastStr);
-            } catch (e) {
-                console.error(`Handler: Error sending file message to client ${client.sessionId || 'unknown'}:`, e);
-                // Consider removing client if send fails repeatedly?
-            }
-        }
-    });
+  if (!wavelength) {
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        error: "Wavelength not found",
+      })
+    );
+    return;
+  }
 
-    // Send to host if sender is a client
-    if (!isHost && wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
-        try {
-            wavelength.host.send(broadcastStr);
-        } catch (e) {
-            console.error("Handler: Error sending file message to host:", e);
-        }
+  if (attachmentData && attachmentData.length > 15 * 1024 * 1024) {
+    // ~10MB hard-stuck limit after base64 decoding (~15MB before decoding)
+    // TODO: consider using streams for larger files or extend this limit
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        error: "File size exceeds the maximum limit (10MB)",
+      })
+    );
+    return;
+  }
+
+  if (connectionManager.isMessageProcessed(frequency, messageId)) {
+    return;
+  }
+
+  connectionManager.markMessageProcessed(frequency, messageId);
+
+  const isHost = ws.isHost;
+  const sender = isHost
+    ? "Host"
+    : (ws.sessionId && ws.sessionId.substring(0, 8)) || "Client";
+
+  console.log(
+    `File received in wavelength ${frequency} from ${sender}: ${attachmentName} (${attachmentType}, ID: ${messageId})`
+  );
+
+  ws.send(
+    JSON.stringify({
+      type: "message",
+      hasAttachment: true,
+      attachmentType: attachmentType,
+      attachmentMimeType: attachmentMimeType,
+      attachmentName: attachmentName,
+      attachmentData: attachmentData,
+      frequency: frequency,
+      messageId: messageId,
+      timestamp: new Date(timestamp).toISOString(),
+      isSelf: true,
+      senderId: senderId,
+    })
+  );
+
+  const broadcastMessage = {
+    type: "message",
+    hasAttachment: true,
+    attachmentType: attachmentType,
+    attachmentMimeType: attachmentMimeType,
+    attachmentName: attachmentName,
+    attachmentData: attachmentData,
+    frequency: frequency,
+    messageId: messageId,
+    timestamp: new Date(timestamp).toISOString(),
+    sender: sender,
+    senderId: senderId,
+  };
+
+  const broadcastStr = JSON.stringify(broadcastMessage);
+
+  wavelength.clients.forEach((client) => {
+    if (client !== ws && client.readyState === WebSocket.OPEN) {
+      try {
+        client.send(broadcastStr);
+      } catch (e) {
+        console.error("Error sending message to client:", e);
+      }
     }
+  });
+
+  if (
+    !isHost &&
+    wavelength.host &&
+    wavelength.host !== ws &&
+    wavelength.host.readyState === WebSocket.OPEN
+  ) {
+    try {
+      wavelength.host.send(broadcastStr);
+    } catch (e) {
+      console.error("Error sending message to host:", e);
+    }
+  }
 }
 
 

@@ -142,12 +142,10 @@ QSize sizeHint() const override {
             int totalWidth = qMax(contentSize.width(), baseSize.width());
 
             QSize result(totalWidth, totalHeight);
-            qDebug() << "AttachmentPlaceholder::sizeHint - dla zawartości:" << result;
             return result;
         }
     }
 
-    qDebug() << "AttachmentPlaceholder::sizeHint - bazowy:" << baseSize;
     return baseSize;
 }
 
@@ -175,14 +173,7 @@ QSize sizeHint() const override {
         }
     }
 
-    void setError(const QString& errorMsg) {
-         m_loadButton->setEnabled(true);
-         m_loadButton->setText("PONÓW DEKODOWANIE");
-         m_loadButton->setVisible(true); // Pokaż przycisk przy błędzie
-         m_progressLabel->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + errorMsg + "</span>");
-         m_progressLabel->setVisible(true);
-         m_isLoaded = false;
-     }
+
 
     signals:
     void attachmentLoaded();
@@ -240,7 +231,6 @@ private slots:
                 }
             });
         } else {
-            // Stare zachowanie dla pełnych danych (dla kompatybilności)
             AttachmentQueueManager::getInstance()->addTask([this]() {
                 try {
                     QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
@@ -252,8 +242,6 @@ private slots:
                         return;
                     }
 
-                    // Dalsze przetwarzanie jak wcześniej
-                    // ...
                 } catch (const std::exception& e) {
                     QMetaObject::invokeMethod(this, "setError",
                         Qt::QueuedConnection,
@@ -265,6 +253,16 @@ private slots:
 
 
 public slots:
+
+    void setError(const QString& errorMsg) {
+    m_loadButton->setEnabled(true);
+    m_loadButton->setText("PONÓW DEKODOWANIE");
+    m_loadButton->setVisible(true); // Pokaż przycisk przy błędzie
+    m_progressLabel->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + errorMsg + "</span>");
+    m_progressLabel->setVisible(true);
+    m_isLoaded = false;
+}
+
     void showImage(const QByteArray& data) {
         InlineImageViewer* imageViewer = new InlineImageViewer(data, m_contentContainer);
         setContent(imageViewer);
