@@ -669,8 +669,8 @@ private:
         QJsonDocument doc = QJsonDocument::fromJson(responseData);
         QJsonObject obj = doc.object();
 
-        if (obj.contains("frequency") && obj["frequency"].isDouble()) {
-            resultFrequency = obj["frequency"].toDouble();
+        if (obj.contains("frequency") && obj["frequency"].isString()) {
+            resultFrequency = obj["frequency"].toString();
             qDebug() << "LOG: Serwer zwrócił dostępną częstotliwość:" << resultFrequency << "Hz";
         } else {
              qDebug() << "LOG: Błąd parsowania odpowiedzi JSON lub brak klucza 'frequency'. Odpowiedź:" << responseData;
