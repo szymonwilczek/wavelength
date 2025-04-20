@@ -37,38 +37,38 @@ public:
     }
     
     // Zdarzenia związane z wavelength
-    void wavelengthCreated(double frequency) {
+    void wavelengthCreated(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("wavelength_created", data);
     }
     
-    void wavelengthJoined(double frequency) {
+    void wavelengthJoined(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("wavelength_joined", data);
     }
     
-    void wavelengthLeft(double frequency) {
+    void wavelengthLeft(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("wavelength_left", data);
     }
     
-    void wavelengthClosed(double frequency) {
+    void wavelengthClosed(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("wavelength_closed", data);
     }
     
-    void messageReceived(double frequency, const QString& message) {
+    void messageReceived(QString frequency, const QString& message) {
         QVariantMap data;
         data["frequency"] = frequency;
         data["message"] = message;
         publishEvent("message_received", data);
     }
     
-    void messageSent(double frequency, const QString& message) {
+    void messageSent(QString frequency, const QString& message) {
         QVariantMap data;
         data["frequency"] = frequency;
         data["message"] = message;
@@ -81,13 +81,13 @@ public:
         publishEvent("connection_error", data);
     }
     
-    void authenticationFailed(double frequency) {
+    void authenticationFailed(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("authentication_failed", data);
     }
     
-    void userKicked(double frequency, const QString& reason) {
+    void userKicked(QString frequency, const QString& reason) {
         QVariantMap data;
         data["frequency"] = frequency;
         data["reason"] = reason;
@@ -103,14 +103,14 @@ public:
     }
     
     // Generyczne zdarzenia systemowe
-    void systemMessage(double frequency, const QString& message) {
+    void systemMessage(QString frequency, const QString& message) {
         QVariantMap data;
         data["frequency"] = frequency;
         data["message"] = message;
         publishEvent("system_message", data);
     }
     
-    void activeWavelengthChanged(double frequency) {
+    void activeWavelengthChanged(QString frequency) {
         QVariantMap data;
         data["frequency"] = frequency;
         publishEvent("active_wavelength_changed", data);

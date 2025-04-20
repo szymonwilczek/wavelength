@@ -21,7 +21,7 @@ void BlobRenderer::renderBlob(QPainter &painter,
 
     drawBorder(painter, blobPath, params.borderColor, params.borderWidth);
 
-    // drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor, animationState);  // Przekazujemy stan animacji
+    drawFilling(painter, blobPath, blobCenter, params.blobRadius, params.borderColor, animationState);  // Przekazujemy stan animacji
 }
 
 void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
@@ -94,7 +94,7 @@ void BlobRenderer::drawBackground(QPainter &painter,
 
 
         // Rysowanie głównej siatki
-        QColor mainGridColor = QColor(0, 195, 255, 40);
+        const QColor& mainGridColor = gridColor;
         bufferPainter.setPen(QPen(mainGridColor, 1, Qt::SolidLine));
 
         // Główne linie siatki
@@ -107,7 +107,7 @@ void BlobRenderer::drawBackground(QPainter &painter,
         }
 
         // Dodajemy podsiatkę o mniejszej intensywności
-        QColor subgridColor = QColor(0,130, 200, 35);
+        QColor subgridColor = QColor(gridColor.redF(), gridColor.greenF(), gridColor.blueF(), 0.35);
         subgridColor.setAlphaF(0.3);
         bufferPainter.setPen(QPen(subgridColor, 0.5, Qt::DotLine));
 

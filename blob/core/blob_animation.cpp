@@ -3,18 +3,29 @@
 #include <QApplication>
 #include <QDebug>
 
+#include "../../wavelength/util/wavelength_config.h"
+
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QOpenGLWidget(parent),
       m_transitionManager(this),
       m_eventHandler(this) {
+
+    WavelengthConfig *config = WavelengthConfig::getInstance();
+
+    // --- Zainicjuj parametry bloba z konfiguracji ---
+    m_params.backgroundColor = config->getBackgroundColor();
+    m_params.borderColor = config->getBlobColor(); // Zakładamy, że borderColor to główny kolor bloba
+    m_params.gridColor = config->getGridColor();
+    m_params.gridSpacing = config->getGridSpacing();
+
     m_params.blobRadius = 250.0f;
     m_params.numPoints = 32;
-    m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
-    m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
-    m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
+    // m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
+    // m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
+    // m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
     m_params.glowRadius = 10; // Większy promień poświaty
     m_params.borderWidth = 3; // Grubość obramowania
-    m_params.gridSpacing = 20; // Odstęp siatki
+    // m_params.gridSpacing = 20; // Odstęp siatki
 
     m_idleParams.waveAmplitude = 2.0; // Nieco większa amplituda
     m_idleParams.waveFrequency = 2.0;
@@ -437,21 +448,33 @@ void BlobAnimation::applyIdleEffect() {
 }
 
 void BlobAnimation::setBackgroundColor(const QColor &color) {
-    m_params.backgroundColor = color;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setBackgroundColor called with:" << color.name();
+    if (m_params.backgroundColor != color) {
+        m_params.backgroundColor = color;
+        // Czy updateGridBuffer używa tego koloru? Czy trzeba wywołać coś jeszcze?
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update(); // Wymuś przemalowanie
+    }
 }
 
 void BlobAnimation::setGridColor(const QColor &color) {
-    m_params.gridColor = color;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setGridColor called with:" << color.name(QColor::HexArgb);
+    if (m_params.gridColor != color) {
+        m_params.gridColor = color;
+        // Aktualizuj bufor siatki
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update();
+    }
 }
 
 void BlobAnimation::setGridSpacing(int spacing) {
-    m_params.gridSpacing = spacing;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setGridSpacing called with:" << spacing;
+    if (m_params.gridSpacing != spacing && spacing > 0) {
+        m_params.gridSpacing = spacing;
+        // Aktualizuj bufor siatki
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update();
+    }
 }
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
@@ -739,4 +762,14 @@ void BlobAnimation::resumeAllEventTracking() {
     // Wymuś odświeżenie animacji
     switchToState(BlobConfig::IDLE);
     update();
+}
+
+void BlobAnimation::setBlobColor(const QColor &color) {
+    qDebug() << "BlobAnimation::setBlobColor called with:" << color.name();
+    // Załóżmy, że kolor bloba to 'borderColor' w parametrach
+    if (m_params.borderColor != color) {
+        m_params.borderColor = color;
+        // Nie ma potrzeby aktualizować bufora siatki, tylko przemalować
+        update(); // Wymuś przemalowanie (wywoła paintGL)
+    }
 }

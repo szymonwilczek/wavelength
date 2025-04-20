@@ -25,11 +25,11 @@ public:
         return &instance;
     }
 
-    bool areFrequenciesEqual(double freq1, double freq2, double epsilon = 0.0001) {
-        return std::abs(freq1 - freq2) < epsilon;
+    bool areFrequenciesEqual(QString freq1, QString freq2) {
+        return freq1 == freq2;
     }
 
-    void processIncomingMessage(const QString& message, double frequency) {
+    void processIncomingMessage(const QString& message, QString frequency) {
         qDebug() << "Processing message for wavelength" << frequency << ":" << message.left(50) + "...";
         bool ok = false;
         QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
@@ -41,7 +41,7 @@ public:
 
         QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
         QString messageId = MessageHandler::getInstance()->getMessageId(msgObj);
-        double msgFrequency = MessageHandler::getInstance()->getMessageFrequency(msgObj);
+        QString msgFrequency = MessageHandler::getInstance()->getMessageFrequency(msgObj);
 
         qDebug() << "Message type:" << msgType << "ID:" << messageId << "Freq:" << msgFrequency;
 
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    void setSocketMessageHandlers(QWebSocket* socket, double frequency) {
+    void setSocketMessageHandlers(QWebSocket* socket, QString frequency) {
         if (!socket) return;
 
         connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
@@ -84,7 +84,7 @@ public:
     }
 
 private:
-    void processMessageContent(const QJsonObject& msgObj, double frequency, const QString& messageId) {
+    void processMessageContent(const QJsonObject& msgObj, QString frequency, const QString& messageId) {
         // Sprawdź czy wiadomość już przetwarzana
         if (MessageHandler::getInstance()->isMessageProcessed(messageId)) {
             qDebug() << "Message already processed, skipping:" << messageId;
@@ -118,11 +118,11 @@ private:
     }
 
     // Dodaj tę metodę, jeśli jeszcze nie istnieje
-    Q_INVOKABLE void emitMessageReceived(double frequency, const QString& formattedMessage) {
+    Q_INVOKABLE void emitMessageReceived(QString frequency, const QString& formattedMessage) {
         emit messageReceived(frequency, formattedMessage);
     }
 
-    void processSystemCommand(const QJsonObject& msgObj, double frequency) {
+    void processSystemCommand(const QJsonObject& msgObj, QString frequency) {
         QString command = msgObj["command"].toString();
 
         if (command == "ping") {
@@ -142,50 +142,50 @@ private:
                 // Usuń wavelength z rejestru
                 WavelengthRegistry* registry = WavelengthRegistry::getInstance();
                 if (registry->hasWavelength(frequency)) {
-                    int activeFreq = registry->getActiveWavelength();
+                    QString activeFreq = registry->getActiveWavelength();
                     registry->removeWavelength(frequency);
                     if (activeFreq == frequency) {
-                        registry->setActiveWavelength(-1);
+                        registry->setActiveWavelength("-1");
                     }
                 }
             }
         }
     }
 
-    void processUserJoined(const QJsonObject& msgObj, double frequency) {
+    void processUserJoined(const QJsonObject& msgObj, QString frequency) {
         QString userId = msgObj["userId"].toString();
         QString formattedMsg = MessageFormatter::formatSystemMessage(
             QString("User %1 joined the wavelength").arg(userId.left(5)));
         emit systemMessage(frequency, formattedMsg);
     }
 
-    void processUserLeft(const QJsonObject& msgObj, double frequency) {
+    void processUserLeft(const QJsonObject& msgObj, QString frequency) {
         QString userId = msgObj["userId"].toString();
         QString formattedMsg = MessageFormatter::formatSystemMessage(
             QString("User %1 left the wavelength").arg(userId.left(5)));
         emit systemMessage(frequency, formattedMsg);
     }
 
-    void processWavelengthClosed(const QJsonObject& msgObj, double frequency) {
+    void processWavelengthClosed(const QJsonObject& msgObj, QString frequency) {
         qDebug() << "Wavelength" << frequency << "was closed";
 
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
         if (registry->hasWavelength(frequency)) {
-            int activeFreq = registry->getActiveWavelength();
+            QString activeFreq = registry->getActiveWavelength();
             registry->markWavelengthClosing(frequency, true);
             registry->removeWavelength(frequency);
             if (activeFreq == frequency) {
-                registry->setActiveWavelength(-1);
+                registry->setActiveWavelength("-1");
             }
             emit wavelengthClosed(frequency);
         }
     }
 
 signals:
-    void messageReceived(double frequency, const QString& formattedMessage);
-    void systemMessage(double frequency, const QString& formattedMessage);
-    void wavelengthClosed(double frequency);
-    void userKicked(double frequency, const QString& reason);
+    void messageReceived(QString frequency, const QString& formattedMessage);
+    void systemMessage(QString frequency, const QString& formattedMessage);
+    void wavelengthClosed(QString frequency);
+    void userKicked(QString frequency, const QString& reason);
 
 private:
     WavelengthMessageProcessor(QObject* parent = nullptr) : QObject(parent) {}

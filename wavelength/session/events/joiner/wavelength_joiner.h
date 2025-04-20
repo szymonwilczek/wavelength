@@ -25,7 +25,7 @@ public:
         return &instance;
     }
 
-    JoinResult joinWavelength(double frequency, const QString& password = QString()) {
+    JoinResult joinWavelength(QString frequency, const QString& password = QString()) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     DatabaseManager* dbManager = DatabaseManager::getInstance();
 
@@ -49,12 +49,12 @@ public:
     // Get wavelength details from database
     QString name;
     bool isPasswordProtected;
-    if (!dbManager->getWavelengthDetails(frequency, name, isPasswordProtected)) {
-        registry->removePendingRegistration(frequency);
-        qDebug() << "Failed to get wavelength details from database";
-        emit connectionError("Częstotliwość nie istnieje lub nie jest dostępna");
-        return {false, "WAVELENGTH UNAVAILABLE"};
-    }
+    // if (!dbManager->getWavelengthDetails(frequency, name, isPasswordProtected)) {
+    //     registry->removePendingRegistration(frequency);
+    //     qDebug() << "Failed to get wavelength details from database";
+    //     emit connectionError("Częstotliwość nie istnieje lub nie jest dostępna");
+    //     return {false, "WAVELENGTH UNAVAILABLE"};
+    // }
 
         if (isPasswordProtected && password.isEmpty()) {
             registry->removePendingRegistration(frequency);
@@ -148,7 +148,7 @@ public:
         }
 
         if (registry->hasWavelength(frequency)) {
-            double activeFreq = registry->getActiveWavelength();
+            QString activeFreq = registry->getActiveWavelength();
 
             registry->removeWavelength(frequency);
 
@@ -214,12 +214,12 @@ public:
 }
 
 signals:
-    void wavelengthJoined(double frequency);
-    void wavelengthClosed(double frequency);
-    void authenticationFailed(double frequency);
+    void wavelengthJoined(QString frequency);
+    void wavelengthClosed(QString frequency);
+    void authenticationFailed(QString frequency);
     void connectionError(const QString& errorMessage);
-    void messageReceived(double frequency, const QString& formattedMessage);
-    void wavelengthLeft(double frequency);
+    void messageReceived(QString frequency, const QString& formattedMessage);
+    void wavelengthLeft(QString frequency);
 
 private:
     WavelengthJoiner(QObject* parent = nullptr) : QObject(parent) {}

@@ -1,20 +1,17 @@
 #include "settings_view.h"
 
-#include <QPainter>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
-#include <QGridLayout>
-#include <QScrollArea>
 #include <QElapsedTimer>
 #include <QMessageBox>
 #include <QApplication>
 #include <QGraphicsOpacityEffect>
 #include <QMouseEvent>
 #include <QRandomGenerator>
-#include <QStyle>
 
 #include "settings/classified/system_override_manager.h"
+#include "settings/tabs/appearance_tab/appearance_settings_widget.h"
+#include "settings/tabs/wavelength_tab/wavelength_settings_widget.h"
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
@@ -90,7 +87,7 @@ void SettingsView::setupUi() {
     tabLayout->addStretch(1);
 
     // Tworzenie przycisków zakładek
-    QStringList tabNames = {"User", "Server", "Appearance", "Network", "Advanced", "CLASSIFIED"};
+    QStringList tabNames = {"Wavelength", "Appearance", "Performance", "Advanced", "CLASSIFIED"};
 
     for (int i = 0; i < tabNames.size(); i++) {
         TabButton *btn = new TabButton(tabNames[i], m_tabBar);
@@ -133,9 +130,10 @@ void SettingsView::setupUi() {
     );
 
     // Tworzenie zawartości dla każdej zakładki
-    setupUserTab();
-    setupServerTab();
-    setupAppearanceTab();
+    m_wavelengthTabWidget = new WavelengthSettingsWidget(m_tabContent);
+    m_tabContent->addWidget(m_wavelengthTabWidget);
+    m_appearanceTabWidget = new AppearanceSettingsWidget(m_tabContent);
+    m_tabContent->addWidget(m_appearanceTabWidget);
     setupNetworkTab();
     setupAdvancedTab();
     setupClassifiedTab();
@@ -440,103 +438,6 @@ void SettingsView::setupNextSecurityLayer() {
     }
 }
 
-void SettingsView::setupUserTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure your user profile settings", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_userNameEdit = new CyberLineEdit(tab);
-    m_userNameEdit->setPlaceholderText("Enter your username");
-    formLayout->addRow("Username:", m_userNameEdit);
-
-    // Można dodać więcej pól dotyczących użytkownika (np. awatar, preferencje)
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
-void SettingsView::setupServerTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure server connection settings", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_serverAddressEdit = new CyberLineEdit(tab);
-    m_serverAddressEdit->setPlaceholderText("Enter server address");
-    formLayout->addRow("Server Address:", m_serverAddressEdit);
-
-    m_serverPortEdit = new QSpinBox(tab);
-    m_serverPortEdit->setRange(1, 65535);
-    m_serverPortEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-        "QSpinBox::up-button, QSpinBox::down-button { background-color: rgba(0, 150, 220, 100); }"
-    );
-    formLayout->addRow("Server Port:", m_serverPortEdit);
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
-void SettingsView::setupAppearanceTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure application appearance", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_themeComboBox = new QComboBox(tab);
-    m_themeComboBox->addItem("Light");
-    m_themeComboBox->addItem("Dark");
-    m_themeComboBox->addItem("Cyberpunk");
-    m_themeComboBox->setStyleSheet(
-        "QComboBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-        "QComboBox QAbstractItemView { color: #00eeff; background-color: rgba(10, 25, 40, 220); selection-background-color: rgba(0, 150, 220, 150); }"
-    );
-    formLayout->addRow("Theme:", m_themeComboBox);
-
-    m_animationDurationEdit = new QSpinBox(tab);
-    m_animationDurationEdit->setRange(100, 2000);
-    m_animationDurationEdit->setSingleStep(50);
-    m_animationDurationEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-        "QSpinBox::up-button, QSpinBox::down-button { background-color: rgba(0, 150, 220, 100); }"
-    );
-    formLayout->addRow("Animation Duration (ms):", m_animationDurationEdit);
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
 void SettingsView::setupNetworkTab() {
     QWidget *tab = new QWidget(m_tabContent);
     QVBoxLayout *layout = new QVBoxLayout(tab);
@@ -669,22 +570,18 @@ void SettingsView::showEvent(QShowEvent *event) {
 
 
 void SettingsView::loadSettingsFromRegistry() {
-    // User
-    m_userNameEdit->setText(m_config->getUserName());
 
-    // Server
-    m_serverAddressEdit->setText(m_config->getRelayServerAddress());
-    m_serverPortEdit->setValue(m_config->getRelayServerPort());
-
-    // Appearance
-    QString theme = m_config->getApplicationTheme();
-    if (theme == "light") {
-        m_themeComboBox->setCurrentIndex(0);
-    } else if (theme == "dark") {
-        m_themeComboBox->setCurrentIndex(1);
-    } else if (theme == "cyberpunk") {
-        m_themeComboBox->setCurrentIndex(2);
+    // --- Wavelength ---
+    if (m_wavelengthTabWidget) {
+        m_wavelengthTabWidget->loadSettings();
     }
+    // ------------------
+
+    // --- Appearance ---
+    if (m_appearanceTabWidget) {
+        m_appearanceTabWidget->loadSettings();
+    }
+    // ------------------
 
     // Network
     m_connectionTimeoutEdit->setValue(m_config->getConnectionTimeout());
@@ -697,79 +594,67 @@ void SettingsView::loadSettingsFromRegistry() {
     m_processedMessageIdsEdit->setValue(m_config->getMaxProcessedMessageIds());
     m_sentMessageCacheSizeEdit->setValue(m_config->getMaxSentMessageCacheSize());
     m_maxRecentWavelengthEdit->setValue(m_config->getMaxRecentWavelength());
+
+    resetSecurityLayers();
 }
 
 void SettingsView::saveSettings() {
-    // User
-    m_config->setUserName(m_userNameEdit->text());
-
-    // Server
-    m_config->setRelayServerAddress(m_serverAddressEdit->text());
-    m_config->setRelayServerPort(m_serverPortEdit->value());
-
-    // Appearance
-    QString theme;
-    switch (m_themeComboBox->currentIndex()) {
-        case 0: theme = "light"; break;
-        case 1: theme = "dark"; break;
-        case 2: theme = "cyberpunk"; break;
-        default: theme = "dark";
+    // --- Wavelength ---
+    if (m_wavelengthTabWidget) {
+        m_wavelengthTabWidget->saveSettings(); // <<< Deleguj zapisywanie
     }
-    m_config->setApplicationTheme(theme);
+    // ------------------
 
-    // Network
+    // --- Appearance ---
+    if (m_appearanceTabWidget) {
+        m_appearanceTabWidget->saveSettings(); // Deleguj zapisywanie (bez zmian)
+    }
+    // ------------------
+
+    // Network (bez zmian)
     m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
     m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
     m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
 
-    // Advanced
+    // Advanced (bez zmian)
     m_config->setDebugMode(m_debugModeCheckBox->isChecked());
     m_config->setMaxChatHistorySize(m_chatHistorySizeEdit->value());
     m_config->setMaxProcessedMessageIds(m_processedMessageIdsEdit->value());
     m_config->setMaxSentMessageCacheSize(m_sentMessageCacheSizeEdit->value());
     m_config->setMaxRecentWavelength(m_maxRecentWavelengthEdit->value());
 
-    // Zapisanie ustawień
+    // Zapisanie wszystkich ustawień do pliku/rejestru (bez zmian)
     m_config->saveSettings();
 
-    QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved to registry.");
-
-    emit settingsChanged(); // Informujemy o zmianie ustawień
+    QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
+    emit settingsChanged(); // Emituj sygnał po zapisaniu
 }
 
 void SettingsView::restoreDefaults() {
     if (QMessageBox::question(this, "Restore Defaults",
-                             "Are you sure you want to restore all settings to default values?",
+                             "Are you sure you want to restore all settings to default values?\nThis includes appearance colors.",
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         m_config->restoreDefaults();
-        loadSettingsFromRegistry();
-        if (m_tabContent->currentIndex() == 5) {
-            resetSecurityLayers();
-        }
+        loadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie Appearance
+        QMessageBox::information(this, "Defaults Restored", "Settings have been restored to their default values.");
                              }
 }
 
 void SettingsView::switchToTab(int tabIndex) {
-    // Sprawdź, czy próbujemy przełączyć się do tej samej zakładki
-    if (tabIndex == m_tabContent->currentIndex()) {
-        return; // Nie rób nic, jeśli to ta sama zakładka
-    }
+    if (tabIndex < 0 || tabIndex >= m_tabButtons.size()) return;
 
-    // Ustaw aktywny przycisk zakładki
-    for (int i = 0; i < m_tabButtons.size(); i++) {
+    for (int i = 0; i < m_tabButtons.size(); ++i) {
         m_tabButtons[i]->setActive(i == tabIndex);
-        m_tabButtons[i]->setChecked(i == tabIndex);
+        m_tabButtons[i]->setChecked(i == tabIndex); // Upewnij się, że stan checked jest spójny
     }
-
-    // Przełącz zawartość zakładki
     m_tabContent->setCurrentIndex(tabIndex);
 
-    // Usunięto blok resetujący warstwy przy każdym przejściu do CLASSIFIED
-    // Resetowanie odbywa się teraz tylko przy wejściu do widoku (showEvent)
-    // lub przez przycisk BACK (handleBackButton) lub przy restoreDefaults.
-    // Jeśli zakładka CLASSIFIED nie została jeszcze zainicjowana (np. pierwszy raz),
-    // resetSecurityLayers() w setupClassifiedTab() ustawi ją poprawnie.
-    // Jeśli użytkownik przeszedł warstwy, stan zostanie zachowany do opuszczenia widoku.
+    // Resetuj stan zakładki CLASSIFIED, jeśli na nią przechodzimy
+    // Upewnij się, że indeks jest poprawny (np. 4, jeśli to piąta zakładka)
+    constexpr int ClassifiedTabIndex = 4; // Zdefiniuj jako stałą lub użyj enum
+    if (tabIndex == ClassifiedTabIndex) {
+        resetSecurityLayers();
+    }
 }
 
 void SettingsView::handleBackButton() {

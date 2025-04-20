@@ -29,7 +29,7 @@ public:
 
     bool sendMessage(const QString& message) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        double freq = registry->getActiveWavelength();
+        QString freq = registry->getActiveWavelength();
 
         if (freq == -1) {
             qDebug() << "Cannot send message - no active wavelength";
@@ -187,7 +187,7 @@ public:
 
             // Pobieramy dane potrzebne do wysłania
             WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-            double frequency = registry->getActiveWavelength();
+            QString frequency = registry->getActiveWavelength();
             QString senderId = AuthenticationManager::getInstance()->generateClientId();
             QString messageId = MessageHandler::getInstance()->generateMessageId();
 
@@ -226,7 +226,7 @@ public:
 }
 
 // Dodaj nową wersję metody sendFileToServer, która zwraca bool
-Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
+Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, QString frequency, const QString& progressMsgId) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     QWebSocket* socket = nullptr;
 
@@ -278,7 +278,7 @@ Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, double frequency, 
     }
 
     // Dodajemy slot do wysyłania wiadomości przez socket
-    void handleSendJsonViaSocket(const QString& jsonMessage, double frequency, const QString& progressMsgId) {
+    void handleSendJsonViaSocket(const QString& jsonMessage, QString frequency, const QString& progressMsgId) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
         QWebSocket* socket = nullptr;
 
@@ -307,10 +307,10 @@ Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, double frequency, 
     }
 
 signals:
-    void messageSent(double frequency, const QString& formattedMessage);
+    void messageSent(QString frequency, const QString& formattedMessage);
     void progressMessageUpdated(const QString& messageId, const QString& message);
     void removeProgressMessage(const QString& messageId);
-    void sendJsonViaSocket(const QString& jsonMessage, double frequency, const QString& progressMsgId);
+    void sendJsonViaSocket(const QString& jsonMessage, QString frequency, const QString& progressMsgId);
 
 private:
     WavelengthMessageService(QObject* parent = nullptr) : QObject(parent) {

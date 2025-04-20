@@ -85,8 +85,8 @@ public:
         return messageObj["content"].toString();
     }
 
-    double getMessageFrequency(const QJsonObject& messageObj) {
-        return messageObj["frequency"].toDouble();
+    QString getMessageFrequency(const QJsonObject& messageObj) {
+        return messageObj["frequency"].toString();
     }
 
     QString getMessageSenderId(const QJsonObject& messageObj) {
@@ -97,16 +97,10 @@ public:
         return messageObj["messageId"].toString();
     }
 
-    double normalizeFrequency(double frequency, int precision = 1) {
-        // Zaokrąglenie do określonej liczby miejsc po przecinku
-        double multiplier = std::pow(10.0, precision);
-        return std::round(frequency * multiplier) / multiplier;
-    }
-
-    QJsonObject createAuthRequest(double frequency, const QString& password, const QString& clientId) {
+    QJsonObject createAuthRequest(const QString& frequency, const QString& password, const QString& clientId) {
         QJsonObject authObj;
         authObj["type"] = "auth";
-        authObj["frequency"] = normalizeFrequency(frequency);
+        authObj["frequency"] = frequency;
         authObj["password"] = password;
         authObj["clientId"] = clientId;
         return authObj;
@@ -114,18 +108,18 @@ public:
 
 
 
-    QJsonObject createRegisterRequest(double frequency, bool isPasswordProtected,
+    QJsonObject createRegisterRequest(const QString &frequency, bool isPasswordProtected,
                                       const QString& password, const QString& hostId) {
         QJsonObject regObj;
         regObj["type"] = "register_wavelength";
-        regObj["frequency"] = normalizeFrequency(frequency);
+        regObj["frequency"] = frequency;
         regObj["isPasswordProtected"] = isPasswordProtected;
         regObj["password"] = password;
         regObj["hostId"] = hostId;
         return regObj;
     }
 
-    QJsonObject createLeaveRequest(double frequency, bool isHost) {
+    QJsonObject createLeaveRequest(QString frequency, bool isHost) {
         QJsonObject leaveObj;
         leaveObj["type"] = isHost ? "close_wavelength" : "leave_wavelength";
         leaveObj["frequency"] = frequency;

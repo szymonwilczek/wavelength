@@ -44,7 +44,7 @@ public:
     // ---- Metody fasadowe dla głównych operacji na wavelength ----
 
     // Tworzenie nowego wavelength
-    bool createWavelength(double frequency,
+    bool createWavelength(QString frequency,
                          bool isPasswordProtected, const QString& password) {
         qDebug() << "Coordinator: Creating wavelength" << frequency;
         bool success = WavelengthCreator::getInstance()->createWavelength(
@@ -58,7 +58,7 @@ public:
     }
 
     // Dołączanie do istniejącego wavelength
-    bool joinWavelength(double frequency, const QString& password = QString()) {
+    bool joinWavelength(QString frequency, const QString& password = QString()) {
         qDebug() << "Coordinator: Joining wavelength" << frequency;
         auto result = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
 
@@ -72,7 +72,7 @@ public:
     // Opuszczanie wavelength
     void leaveWavelength() {
         qDebug() << "Coordinator: Leaving active wavelength";
-        double frequency = WavelengthStateManager::getInstance()->getActiveWavelength();
+        QString frequency = WavelengthStateManager::getInstance()->getActiveWavelength();
 
         if (frequency != -1) {
             WavelengthStateManager::getInstance()->unregisterJoinedWavelength(frequency);
@@ -82,7 +82,7 @@ public:
     }
 
     // Zamykanie wavelength (tylko dla hosta)
-    void closeWavelength(double frequency) {
+    void closeWavelength(QString frequency) {
         qDebug() << "Coordinator: Closing wavelength" << frequency;
         WavelengthStateManager::getInstance()->unregisterJoinedWavelength(frequency);
         WavelengthLeaver::getInstance()->closeWavelength(frequency);
@@ -97,16 +97,16 @@ public:
     // ---- Metody zarządzania stanem ----
 
     // Pobieranie informacji o wavelength
-    WavelengthInfo getWavelengthInfo(double frequency, bool* isHost = nullptr) {
+    WavelengthInfo getWavelengthInfo(QString frequency, bool* isHost = nullptr) {
         return WavelengthStateManager::getInstance()->getWavelengthInfo(frequency, isHost);
     }
 
     // Aktywny wavelength
-    double getActiveWavelength() {
+    QString getActiveWavelength() {
         return WavelengthStateManager::getInstance()->getActiveWavelength();
     }
 
-    void setActiveWavelength(double frequency) {
+    void setActiveWavelength(QString frequency) {
         WavelengthStateManager::getInstance()->setActiveWavelength(frequency);
     }
 
@@ -116,7 +116,7 @@ public:
     }
 
     // Lista dołączonych wavelength
-    QList<double> getJoinedWavelengths() {
+    QList<QString> getJoinedWavelengths() {
         return WavelengthStateManager::getInstance()->getJoinedWavelengths();
     }
 
@@ -126,23 +126,23 @@ public:
     }
 
     // Sprawdzanie czy wavelength jest chroniony hasłem
-    bool isWavelengthPasswordProtected(double frequency) {
+    bool isWavelengthPasswordProtected(QString frequency) {
         return WavelengthStateManager::getInstance()->isWavelengthPasswordProtected(frequency);
     }
 
     // Sprawdzanie czy jesteśmy hostem dla danego wavelength
-    bool isWavelengthHost(double frequency) {
+    bool isWavelengthHost(QString frequency) {
         return WavelengthStateManager::getInstance()->isWavelengthHost(frequency);
     }
 
 
     // Sprawdzanie czy dołączyliśmy do wavelength
-    bool isWavelengthJoined(double frequency) {
+    bool isWavelengthJoined(QString frequency) {
         return WavelengthStateManager::getInstance()->isWavelengthJoined(frequency);
     }
 
     // Sprawdzanie czy wavelength jest podłączony
-    bool isWavelengthConnected(double frequency) {
+    bool isWavelengthConnected(QString frequency) {
         return WavelengthStateManager::getInstance()->isWavelengthConnected(frequency);
     }
 
@@ -164,50 +164,50 @@ public:
 
 signals:
     // Przekazywane sygnały dla WavelengthManager
-    void wavelengthCreated(double frequency);
-    void wavelengthJoined(double frequency);
-    void wavelengthLeft(double frequency);
-    void wavelengthClosed(double frequency);
-    void messageReceived(double frequency, const QString& message);
-    void messageSent(double frequency, const QString& message);
+    void wavelengthCreated(QString frequency);
+    void wavelengthJoined(QString frequency);
+    void wavelengthLeft(QString frequency);
+    void wavelengthClosed(QString frequency);
+    void messageReceived(QString frequency, const QString& message);
+    void messageSent(QString frequency, const QString& message);
     void connectionError(const QString& errorMessage);
-    void authenticationFailed(double frequency);
-    void userKicked(double frequency, const QString& reason);
-    void activeWavelengthChanged(double frequency);
+    void authenticationFailed(QString frequency);
+    void userKicked(QString frequency, const QString& reason);
+    void activeWavelengthChanged(QString frequency);
 
 private slots:
     // Obsługa zdarzeń z różnych komponentów - tutaj naprawiamy propagację sygnałów
-    void onWavelengthCreated(double frequency) {
+    void onWavelengthCreated(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
         emit wavelengthCreated(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->wavelengthCreated(frequency);
     }
 
-    void onWavelengthJoined(double frequency) {
+    void onWavelengthJoined(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthJoined signal for frequency" << frequency;
         emit wavelengthJoined(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->wavelengthJoined(frequency);
     }
 
-    void onWavelengthLeft(double frequency) {
+    void onWavelengthLeft(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthLeft signal for frequency" << frequency;
         emit wavelengthLeft(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->wavelengthLeft(frequency);
     }
 
-    void onWavelengthClosed(double frequency) {
+    void onWavelengthClosed(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthClosed signal for frequency" << frequency;
         emit wavelengthClosed(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->wavelengthClosed(frequency);
     }
 
-    void onMessageReceived(double frequency, const QString& message) {
+    void onMessageReceived(QString frequency, const QString& message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageReceived signal";
         emit messageReceived(frequency, message);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->messageReceived(frequency, message);
     }
 
-    void onMessageSent(double frequency, const QString& message) {
+    void onMessageSent(QString frequency, const QString& message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageSent signal";
         emit messageSent(frequency, message);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->messageSent(frequency, message);
@@ -219,13 +219,13 @@ private slots:
         WavelengthEventBroker::getInstance()->connectionError(errorMessage);
     }
 
-    void onAuthenticationFailed(double frequency) {
+    void onAuthenticationFailed(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating authenticationFailed signal for frequency" << frequency;
         emit authenticationFailed(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->authenticationFailed(frequency);
     }
 
-    void onActiveWavelengthChanged(double frequency) {
+    void onActiveWavelengthChanged(QString frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" << frequency;
         emit activeWavelengthChanged(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
         WavelengthEventBroker::getInstance()->activeWavelengthChanged(frequency);

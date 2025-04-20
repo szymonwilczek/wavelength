@@ -36,6 +36,26 @@ void centerLabel(QLabel *label, BlobAnimation *animation) {
     }
 }
 
+void updateTitleLabelStyle(QLabel* label, const QColor& textColor, const QColor& borderColor) {
+    if (!label) return;
+    // Ostrożnie zrekonstruuj styl, zachowując inne właściwości
+    QString style = QString(
+        "QLabel {"
+        "   font-family: 'Blender Pro Heavy';" // Zachowaj czcionkę
+        "   letter-spacing: 8px;"             // Zachowaj odstępy
+        "   color: %1;"                       // NOWY kolor tekstu
+        "   background-color: transparent;"   // Zachowaj tło
+        "   border: 2px solid %2;"            // NOWY kolor ramki
+        "   border-radius: 8px;"              // Zachowaj promień
+        "   padding: 10px 20px;"              // Zachowaj padding
+        "   text-transform: uppercase;"       // Zachowaj transformację
+        "}"
+    ).arg(textColor.name(QColor::HexRgb))
+     .arg(borderColor.name(QColor::HexRgb));
+    label->setStyleSheet(style);
+    qDebug() << "Updated titleLabel style:" << style;
+}
+
 class ResizeEventFilter : public QObject {
 public:
     ResizeEventFilter(QLabel *label, BlobAnimation *animation)
@@ -65,12 +85,10 @@ int main(int argc, char *argv[]) {
 
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
-
-    WavelengthConfig *config = WavelengthConfig::getInstance();
-
-    // Ustawienie nazwy aplikacji i organizacji dla QSettings
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
+
+    WavelengthConfig *config = WavelengthConfig::getInstance();
 
     // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;
@@ -154,9 +172,6 @@ int main(int argc, char *argv[]) {
     animationLayout->setSpacing(0);
 
     auto *animation = new BlobAnimation(animationWidget);
-    animation->setBackgroundColor(QColor(35, 35, 35));
-    animation->setGridColor(QColor(60, 60, 60));
-    animation->setGridSpacing(20);
     animationLayout->addWidget(animation);
 
     QSurfaceFormat format;
@@ -199,6 +214,8 @@ int main(int argc, char *argv[]) {
         "}"
     );
 
+    updateTitleLabelStyle(titleLabel, config->getTitleTextColor(), config->getTitleBorderColor());
+
     // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
     QGraphicsDropShadowEffect *glowEffect = new QGraphicsDropShadowEffect(titleLabel);
     glowEffect->setBlurRadius(15);
@@ -217,12 +234,12 @@ int main(int argc, char *argv[]) {
     window.resize(1024, 768);
 
     const auto instanceManager = new AppInstanceManager(&window, animation, &window);
-    instanceManager->start();
-
-    QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
-    window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    window.setEnabled(false);
-});
+//     instanceManager->start();
+//
+//     QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
+//     window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+//     window.setEnabled(false);
+// });
 
 
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
@@ -242,6 +259,55 @@ int main(int argc, char *argv[]) {
 
     toggleEventListening(true);
 
+
+    QObject::connect(config, &WavelengthConfig::configChanged,
+                     [animation, config, titleLabel, glowEffect](const QString& key) { // <<< Dodaj titleLabel, glowEffect
+        qDebug() << "Lambda for configChanged executed with key:" << key;
+        if (key == "background_color" || key == "all") {
+            QColor newColor = config->getBackgroundColor();
+            qDebug() << "Config changed: background_color to" << newColor.name();
+            QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
+        }
+        else if (key == "blob_color" || key == "all") {
+            QColor newColor = config->getBlobColor();
+            qDebug() << "Config changed: blob_color to" << newColor.name();
+            QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
+        }
+        // --- NOWE: Obsługa siatki ---
+        else if (key == "grid_color" || key == "all") {
+            QColor newColor = config->getGridColor();
+            qDebug() << "Config changed: grid_color to" << newColor.name(QColor::HexArgb);
+            QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
+        }
+        else if (key == "grid_spacing" || key == "all") {
+            int newSpacing = config->getGridSpacing();
+            qDebug() << "Config changed: grid_spacing to" << newSpacing;
+            QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection, Q_ARG(int, newSpacing));
+        }
+        // --- NOWE: Obsługa tytułu ---
+        else if (key == "title_text_color" || key == "title_border_color" || key == "all") {
+             // Aktualizuj styl, jeśli zmienił się kolor tekstu lub ramki
+             QColor textColor = config->getTitleTextColor();
+             QColor borderColor = config->getTitleBorderColor();
+             qDebug() << "Config changed: Updating title style (Text:" << textColor.name() << ", Border:" << borderColor.name() << ")";
+             // Wywołaj w głównym wątku dla bezpieczeństwa UI
+             QMetaObject::invokeMethod(qApp, [titleLabel, textColor, borderColor](){ // Użyj qApp lub innego QObject z głównego wątku
+                 updateTitleLabelStyle(titleLabel, textColor, borderColor);
+             }, Qt::QueuedConnection);
+        }
+        else if (key == "title_glow_color" || key == "all") {
+            QColor newColor = config->getTitleGlowColor();
+            qDebug() << "Config changed: title_glow_color to" << newColor.name();
+            if (glowEffect) {
+                // Wywołaj w głównym wątku dla bezpieczeństwa UI
+                QMetaObject::invokeMethod(qApp, [glowEffect, newColor](){
+                    glowEffect->setColor(newColor);
+                }, Qt::QueuedConnection);
+            }
+        }
+        // ---------------------------
+    });
+
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
     [stackedWidget, animationWidget, animation](int index) {
         static int lastIndex = -1;
@@ -257,7 +323,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const double frequency) {
+    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString frequency) {
         animation->hide();
         navbar->setChatMode(true);
         chatView->setWavelength(frequency, "");
@@ -274,13 +340,13 @@ int main(int argc, char *argv[]) {
                      chatView, &WavelengthChatView::onWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
-                     [switchToChatView](double frequency) {
+                     [switchToChatView](QString frequency) {
                          qDebug() << "Wavelength created signal received";
                          switchToChatView(frequency);
                      });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
-                     [switchToChatView](double frequency) {
+                     [switchToChatView](QString frequency) {
                          qDebug() << "Wavelength joined signal received";
                          switchToChatView(frequency);
                      });
@@ -351,7 +417,7 @@ int main(int argc, char *argv[]) {
 
         WavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            double frequency = dialog.getFrequency();
+            QString frequency = dialog.getFrequency();
             bool isPasswordProtected = dialog.isPasswordProtected();
             QString password = dialog.getPassword();
 
@@ -373,7 +439,7 @@ int main(int argc, char *argv[]) {
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            double frequency = dialog.getFrequency();
+            QString frequency = dialog.getFrequency();
             QString password = dialog.getPassword();
 
             if (coordinator->joinWavelength(frequency, password)) {

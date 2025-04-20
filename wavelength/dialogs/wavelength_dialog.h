@@ -182,7 +182,7 @@ public:
     connect(generateButton, &QPushButton::clicked, this, &WavelengthDialog::tryGenerate);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-        frequencyWatcher = new QFutureWatcher<double>(this);
+        frequencyWatcher = new QFutureWatcher<QString>(this);
         connect(frequencyWatcher, &QFutureWatcher<double>::finished, this, &WavelengthDialog::onFrequencyFound);
 
         // Ustawiamy text w etykiecie częstotliwości na domyślną wartość
@@ -448,7 +448,7 @@ public:
     }
 }
 
-    double getFrequency() const {
+    QString getFrequency() const {
         return m_frequency;
     }
 
@@ -496,7 +496,7 @@ private slots:
         timeoutTimer->start();
 
         // Uruchom asynchroniczne wyszukiwanie
-        QFuture<double> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
+        QFuture<QString> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
         frequencyWatcher->setFuture(future);
     }
 
@@ -548,7 +548,7 @@ private slots:
         m_frequencyFound = true;
 
         // Przygotuj tekst częstotliwości
-        QString frequencyText = formatFrequencyText(m_frequency);
+        QString frequencyText = m_frequency;
 
         // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
         QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
@@ -632,48 +632,60 @@ private slots:
     }
 
 private:
-    static double findLowestAvailableFrequency() {
-        qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
+    static QString findLowestAvailableFrequency() {
+    qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
-        // Zapytaj serwer o następną dostępną częstotliwość
-        QNetworkAccessManager manager;
-        QEventLoop loop;
-        QNetworkReply *reply;
+    // Pobierz preferowaną częstotliwość startową z konfiguracji
+    WavelengthConfig* config = WavelengthConfig::getInstance();
+    QString preferredFreq = config->getPreferredStartFrequency();
+    qDebug() << "LOG: Używam preferowanej częstotliwości startowej:" << preferredFreq << "Hz";
 
-        // Utwórz żądanie GET do serwera
-        QUrl url("http://localhost:3000/api/next-available-frequency");
-        QNetworkRequest request(url);
+    QNetworkAccessManager manager;
+    QEventLoop loop;
+    QNetworkReply *reply;
 
-        // Wykonaj żądanie synchronicznie (w kontekście asynchronicznego QtConcurrent::run)
-        reply = manager.get(request);
+    // Utwórz URL i dodaj preferowaną częstotliwość jako parametr zapytania
+    QUrl url("http://localhost:3000/api/next-available-frequency");
+    QUrlQuery query;
+    query.addQueryItem("preferredStartFrequency", preferredFreq);
+    url.setQuery(query);
 
-        // Połącz sygnał zakończenia z pętlą zdarzeń
-        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    qDebug() << "LOG: Wysyłanie żądania do:" << url.toString();
+    QNetworkRequest request(url);
 
-        // Uruchom pętlę zdarzeń aż do zakończenia żądania
-        loop.exec();
+    // Wykonaj żądanie synchronicznie (w kontekście asynchronicznego QtConcurrent::run)
+    reply = manager.get(request);
 
-        if (reply->error() == QNetworkReply::NoError) {
-            // Parsuj odpowiedź jako JSON
-            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-            QJsonObject obj = doc.object();
+    // Połącz sygnał zakończenia z pętlą zdarzeń
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 
-            if (obj.contains("frequency")) {
-                double frequency = obj["frequency"].toDouble();
-                qDebug() << "LOG: Serwer zwrócił dostępną częstotliwość:" << frequency << "Hz";
-                reply->deleteLater();
-                return frequency;
-            }
+    // Uruchom pętlę zdarzeń aż do zakończenia żądania
+    loop.exec();
+
+    QString resultFrequency = "130.0"; // Domyślna wartość w razie błędu
+
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray responseData = reply->readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(responseData);
+        QJsonObject obj = doc.object();
+
+        if (obj.contains("frequency") && obj["frequency"].isString()) {
+            resultFrequency = obj["frequency"].toString();
+            qDebug() << "LOG: Serwer zwrócił dostępną częstotliwość:" << resultFrequency << "Hz";
         } else {
-            qDebug() << "LOG: Błąd podczas komunikacji z serwerem:" << reply->errorString();
+             qDebug() << "LOG: Błąd parsowania odpowiedzi JSON lub brak klucza 'frequency'. Odpowiedź:" << responseData;
+             // Użyj domyślnej wartości 130.0
         }
-
-        reply->deleteLater();
-
-        // W przypadku błędu zwróć domyślną wartość
-        qDebug() << "LOG: Używam domyślnej częstotliwości 130 Hz";
-        return 130.0;
+    } else {
+        qDebug() << "LOG: Błąd podczas komunikacji z serwerem:" << reply->errorString();
+        // Użyj domyślnej wartości 130.0
     }
+
+    reply->deleteLater();
+
+    qDebug() << "LOG: Zakończono szukanie, zwracam częstotliwość:" << resultFrequency << "Hz";
+    return resultFrequency;
+}
 
     void initRenderBuffers() {
     if (!m_buffersInitialized || height() != m_previousHeight) {
@@ -757,9 +769,9 @@ private:
     QLabel *statusLabel;
     CyberButton *generateButton;
     CyberButton *cancelButton;
-    QFutureWatcher<double> *frequencyWatcher;
+    QFutureWatcher<QString> *frequencyWatcher;
     QTimer *m_refreshTimer;
-    double m_frequency = 130.0; // Domyślna wartość
+    QString m_frequency = "130.0"; // Domyślna wartość
     bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
     const int m_shadowSize; // Rozmiar cienia
     double m_scanlineOpacity; // Przezroczystość linii skanowania

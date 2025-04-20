@@ -2,8 +2,6 @@
 #define BLOBCONFIG_H
 
 #include <QColor>
-#include <QPointF>
-#include <QVector>
 
 namespace BlobConfig {
     enum AnimationState {
@@ -13,14 +11,14 @@ namespace BlobConfig {
     };
 
     struct BlobParameters {
-        double blobRadius = 250.0f;
-        int numPoints = 24;
-        QColor borderColor = QColor(70, 130, 180);
-        int glowRadius = 10;
-        int borderWidth = 6;
-        QColor backgroundColor;
-        QColor gridColor;
-        int gridSpacing = 25;
+        double blobRadius = 250.0f; // Pozostaw promień, jeśli nie jest konfigurowalny
+        int numPoints = 24;         // Pozostaw liczbę punktów, jeśli nie jest konfigurowalna
+        QColor borderColor;         // <<< Usunięto domyślny kolor
+        int glowRadius = 10;        // Pozostaw, jeśli nie jest konfigurowalne
+        int borderWidth = 6;        // Pozostaw, jeśli nie jest konfigurowalne
+        QColor backgroundColor;     // <<< Usunięto domyślny kolor
+        QColor gridColor;           // <<< Usunięto domyślny kolor
+        int gridSpacing;            // <<< Usunięto domyślny odstęp
         int screenWidth = 0;
         int screenHeight = 0;
     };
