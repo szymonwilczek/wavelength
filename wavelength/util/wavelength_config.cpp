@@ -39,8 +39,8 @@ WavelengthConfig* WavelengthConfig::getInstance() {
 
 WavelengthConfig::WavelengthConfig(QObject *parent)
     : QObject(parent),
-      m_settings(QSettings::IniFormat, QSettings::UserScope,
-                 QCoreApplication::organizationName(), QCoreApplication::applicationName())
+    m_settings(QSettings::UserScope,
+     QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
     qDebug() << "Config file path:" << m_settings.fileName();
     loadDefaults(); // Najpierw ustaw domyślne

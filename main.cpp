@@ -85,12 +85,10 @@ int main(int argc, char *argv[]) {
 
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
-
-    WavelengthConfig *config = WavelengthConfig::getInstance();
-
-    // Ustawienie nazwy aplikacji i organizacji dla QSettings
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
+
+    WavelengthConfig *config = WavelengthConfig::getInstance();
 
     // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;
@@ -174,11 +172,6 @@ int main(int argc, char *argv[]) {
     animationLayout->setSpacing(0);
 
     auto *animation = new BlobAnimation(animationWidget);
-    animation->setBackgroundColor(config->getBackgroundColor());
-    animation->setBlobColor(config->getBlobColor());
-    animation->setGridColor(config->getGridColor());
-    animation->setGridSpacing(config->getGridSpacing());
-    animation->setGridSpacing(20);
     animationLayout->addWidget(animation);
 
     QSurfaceFormat format;
@@ -220,6 +213,8 @@ int main(int argc, char *argv[]) {
         "   text-transform: uppercase;"
         "}"
     );
+
+    updateTitleLabelStyle(titleLabel, config->getTitleTextColor(), config->getTitleBorderColor());
 
     // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
     QGraphicsDropShadowEffect *glowEffect = new QGraphicsDropShadowEffect(titleLabel);

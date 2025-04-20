@@ -3,18 +3,29 @@
 #include <QApplication>
 #include <QDebug>
 
+#include "../../wavelength/util/wavelength_config.h"
+
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QOpenGLWidget(parent),
       m_transitionManager(this),
       m_eventHandler(this) {
+
+    WavelengthConfig *config = WavelengthConfig::getInstance();
+
+    // --- Zainicjuj parametry bloba z konfiguracji ---
+    m_params.backgroundColor = config->getBackgroundColor();
+    m_params.borderColor = config->getBlobColor(); // Zakładamy, że borderColor to główny kolor bloba
+    m_params.gridColor = config->getGridColor();
+    m_params.gridSpacing = config->getGridSpacing();
+
     m_params.blobRadius = 250.0f;
     m_params.numPoints = 32;
-    m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
-    m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
-    m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
+    // m_params.borderColor = QColor(0, 200, 255); // Neonowy niebieski
+    // m_params.backgroundColor = QColor(0, 15, 30); // Ciemny odcień granatowego
+    // m_params.gridColor = QColor(0, 100, 150, 60); // Neonowa siatka
     m_params.glowRadius = 10; // Większy promień poświaty
     m_params.borderWidth = 3; // Grubość obramowania
-    m_params.gridSpacing = 20; // Odstęp siatki
+    // m_params.gridSpacing = 20; // Odstęp siatki
 
     m_idleParams.waveAmplitude = 2.0; // Nieco większa amplituda
     m_idleParams.waveFrequency = 2.0;
