@@ -36,6 +36,26 @@ void centerLabel(QLabel *label, BlobAnimation *animation) {
     }
 }
 
+void updateTitleLabelStyle(QLabel* label, const QColor& textColor, const QColor& borderColor) {
+    if (!label) return;
+    // Ostrożnie zrekonstruuj styl, zachowując inne właściwości
+    QString style = QString(
+        "QLabel {"
+        "   font-family: 'Blender Pro Heavy';" // Zachowaj czcionkę
+        "   letter-spacing: 8px;"             // Zachowaj odstępy
+        "   color: %1;"                       // NOWY kolor tekstu
+        "   background-color: transparent;"   // Zachowaj tło
+        "   border: 2px solid %2;"            // NOWY kolor ramki
+        "   border-radius: 8px;"              // Zachowaj promień
+        "   padding: 10px 20px;"              // Zachowaj padding
+        "   text-transform: uppercase;"       // Zachowaj transformację
+        "}"
+    ).arg(textColor.name(QColor::HexRgb))
+     .arg(borderColor.name(QColor::HexRgb));
+    label->setStyleSheet(style);
+    qDebug() << "Updated titleLabel style:" << style;
+}
+
 class ResizeEventFilter : public QObject {
 public:
     ResizeEventFilter(QLabel *label, BlobAnimation *animation)
@@ -155,7 +175,9 @@ int main(int argc, char *argv[]) {
 
     auto *animation = new BlobAnimation(animationWidget);
     animation->setBackgroundColor(config->getBackgroundColor());
-    animation->setGridColor(QColor(60, 60, 60));
+    animation->setBlobColor(config->getBlobColor());
+    animation->setGridColor(config->getGridColor());
+    animation->setGridSpacing(config->getGridSpacing());
     animation->setGridSpacing(20);
     animationLayout->addWidget(animation);
 
@@ -244,25 +266,51 @@ int main(int argc, char *argv[]) {
 
 
     QObject::connect(config, &WavelengthConfig::configChanged,
-                     [animation, config](const QString& key) {
+                     [animation, config, titleLabel, glowEffect](const QString& key) { // <<< Dodaj titleLabel, glowEffect
+        qDebug() << "Lambda for configChanged executed with key:" << key;
         if (key == "background_color" || key == "all") {
             QColor newColor = config->getBackgroundColor();
             qDebug() << "Config changed: background_color to" << newColor.name();
-            // Wywołaj slot w BlobAnimation w wątku głównym
-            QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection,
-                                      Q_ARG(QColor, newColor));
-        } else if (key == "blob_color" || key == "all") {
+            QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
+        }
+        else if (key == "blob_color" || key == "all") {
             QColor newColor = config->getBlobColor();
             qDebug() << "Config changed: blob_color to" << newColor.name();
-            QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection,
-                                      Q_ARG(QColor, newColor));
+            QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
         }
-        // Możesz dodać obsługę innych kluczy (np. grid_color) w przyszłości
-        // else if (key == "grid_color" || key == "all") {
-        //     QColor newGridColor = config->getGridColor();
-        //     QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection,
-        //                               Q_ARG(QColor, newGridColor));
-        // }
+        // --- NOWE: Obsługa siatki ---
+        else if (key == "grid_color" || key == "all") {
+            QColor newColor = config->getGridColor();
+            qDebug() << "Config changed: grid_color to" << newColor.name(QColor::HexArgb);
+            QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
+        }
+        else if (key == "grid_spacing" || key == "all") {
+            int newSpacing = config->getGridSpacing();
+            qDebug() << "Config changed: grid_spacing to" << newSpacing;
+            QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection, Q_ARG(int, newSpacing));
+        }
+        // --- NOWE: Obsługa tytułu ---
+        else if (key == "title_text_color" || key == "title_border_color" || key == "all") {
+             // Aktualizuj styl, jeśli zmienił się kolor tekstu lub ramki
+             QColor textColor = config->getTitleTextColor();
+             QColor borderColor = config->getTitleBorderColor();
+             qDebug() << "Config changed: Updating title style (Text:" << textColor.name() << ", Border:" << borderColor.name() << ")";
+             // Wywołaj w głównym wątku dla bezpieczeństwa UI
+             QMetaObject::invokeMethod(qApp, [titleLabel, textColor, borderColor](){ // Użyj qApp lub innego QObject z głównego wątku
+                 updateTitleLabelStyle(titleLabel, textColor, borderColor);
+             }, Qt::QueuedConnection);
+        }
+        else if (key == "title_glow_color" || key == "all") {
+            QColor newColor = config->getTitleGlowColor();
+            qDebug() << "Config changed: title_glow_color to" << newColor.name();
+            if (glowEffect) {
+                // Wywołaj w głównym wątku dla bezpieczeństwa UI
+                QMetaObject::invokeMethod(qApp, [glowEffect, newColor](){
+                    glowEffect->setColor(newColor);
+                }, Qt::QueuedConnection);
+            }
+        }
+        // ---------------------------
     });
 
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,

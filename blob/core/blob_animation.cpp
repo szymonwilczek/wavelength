@@ -447,15 +447,23 @@ void BlobAnimation::setBackgroundColor(const QColor &color) {
 }
 
 void BlobAnimation::setGridColor(const QColor &color) {
-    m_params.gridColor = color;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setGridColor called with:" << color.name(QColor::HexArgb);
+    if (m_params.gridColor != color) {
+        m_params.gridColor = color;
+        // Aktualizuj bufor siatki
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update();
+    }
 }
 
 void BlobAnimation::setGridSpacing(int spacing) {
-    m_params.gridSpacing = spacing;
-    m_renderer.resetGridBuffer();
-    update();
+    qDebug() << "BlobAnimation::setGridSpacing called with:" << spacing;
+    if (m_params.gridSpacing != spacing && spacing > 0) {
+        m_params.gridSpacing = spacing;
+        // Aktualizuj bufor siatki
+        m_renderer.updateGridBuffer(m_params.backgroundColor, m_params.gridColor, m_params.gridSpacing, width(), height());
+        update();
+    }
 }
 
 bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {

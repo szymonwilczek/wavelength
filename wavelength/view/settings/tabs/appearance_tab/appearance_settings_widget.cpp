@@ -7,16 +7,17 @@
 #include <QGridLayout>
 #include <QColorDialog>
 #include <QDebug>
+#include <QSpinBox>
 
 #include "components/clickable_color_preview.h"
 
 AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
     : QWidget(parent),
       m_config(WavelengthConfig::getInstance()),
-      m_bgColorPreview(nullptr),
-      m_blobColorPreview(nullptr),
-      m_messageColorPreview(nullptr),
-      m_streamColorPreview(nullptr),
+      // Inicjalizacja wskaźników
+      m_bgColorPreview(nullptr), m_blobColorPreview(nullptr), m_streamColorPreview(nullptr),
+      m_gridColorPreview(nullptr), m_gridSpacingSpinBox(nullptr), // NOWE
+      m_titleTextColorPreview(nullptr), m_titleBorderColorPreview(nullptr), m_titleGlowColorPreview(nullptr), // NOWE
       m_recentColorsLayout(nullptr)
 {
     qDebug() << "AppearanceSettingsWidget constructor start";
@@ -24,15 +25,6 @@ AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
     loadSettings();
     connect(m_config, &WavelengthConfig::recentColorsChanged, this, &AppearanceSettingsWidget::updateRecentColorsUI);
     qDebug() << "AppearanceSettingsWidget constructor end";
-
-    // --- DODAJ TEST GEOMETRII PO SETUP ---
-    if (m_bgColorPreview) {
-        qDebug() << "m_bgColorPreview geometry after setupUi:" << m_bgColorPreview->geometry();
-        qDebug() << "m_bgColorPreview isVisible:" << m_bgColorPreview->isVisible();
-    } else {
-        qDebug() << "m_bgColorPreview is NULL after setupUi!";
-    }
-    // -------------------------------------
 }
 
 void AppearanceSettingsWidget::setupUi() {
@@ -48,62 +40,76 @@ void AppearanceSettingsWidget::setupUi() {
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setHorizontalSpacing(15);
     gridLayout->setVerticalSpacing(10);
-    gridLayout->setColumnStretch(1, 0); // Podgląd ma stały rozmiar
+    gridLayout->setColumnStretch(1, 0); // Podgląd/Input ma stały rozmiar
     gridLayout->setColumnStretch(2, 1); // Pusta kolumna się rozciąga
 
     QString labelStyle = "color: #c0c0c0; background-color: transparent; font-family: Consolas; font-size: 10pt;";
+    QString spinBoxStyle = "QSpinBox { background-color: #1A2A3A; color: #E0E0E0; border: 1px solid #005577; border-radius: 3px; padding: 3px; font-family: Consolas; }"
+                           "QSpinBox::up-button, QSpinBox::down-button { width: 16px; background-color: #005577; border: 1px solid #0077AA; }"
+                           "QSpinBox::up-arrow, QSpinBox::down-arrow { color: #E0E0E0; }"; // Prosty styl dla SpinBox
 
-    // Wiersz dla koloru tła
-    QLabel* bgLabel = new QLabel("Background Color:", this);
-    bgLabel->setStyleSheet(labelStyle);
+    int row = 0;
+
+    // --- Istniejące kolory ---
+    // Background Color
+    QLabel* bgLabel = new QLabel("Background Color:", this); bgLabel->setStyleSheet(labelStyle);
     m_bgColorPreview = new ClickableColorPreview(this);
-    qDebug() << "Created m_bgColorPreview:" << m_bgColorPreview; // Czy wskaźnik jest poprawny?
     connect(qobject_cast<ClickableColorPreview*>(m_bgColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBackgroundColor);
-    gridLayout->addWidget(bgLabel, 0, 0, Qt::AlignRight);
-    gridLayout->addWidget(m_bgColorPreview, 0, 1);
-    qDebug() << "Added m_bgColorPreview to gridLayout at (0, 1)";
-
-    // Wiersz dla koloru bloba
-    QLabel* blobLabel = new QLabel("Blob Color:", this);
-    blobLabel->setStyleSheet(labelStyle);
+    gridLayout->addWidget(bgLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_bgColorPreview, row, 1); row++;
+    // Blob Color
+    QLabel* blobLabel = new QLabel("Blob Color:", this); blobLabel->setStyleSheet(labelStyle);
     m_blobColorPreview = new ClickableColorPreview(this);
-    qDebug() << "Created m_blobColorPreview:" << m_blobColorPreview;
     connect(qobject_cast<ClickableColorPreview*>(m_blobColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBlobColor);
-    gridLayout->addWidget(blobLabel, 1, 0, Qt::AlignRight);
-    gridLayout->addWidget(m_blobColorPreview, 1, 1);
-    qDebug() << "Added m_blobColorPreview to gridLayout at (1, 1)";
-
-    // Wiersz dla koloru wiadomości
-    QLabel* msgLabel = new QLabel("Message Color:", this);
-    msgLabel->setStyleSheet(labelStyle);
-    m_messageColorPreview = new ClickableColorPreview(this);
-    qDebug() << "Created m_messageColorPreview:" << m_messageColorPreview;
-    connect(qobject_cast<ClickableColorPreview*>(m_messageColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseMessageColor);
-    gridLayout->addWidget(msgLabel, 2, 0, Qt::AlignRight);
-    gridLayout->addWidget(m_messageColorPreview, 2, 1);
-    qDebug() << "Added m_messageColorPreview to gridLayout at (2, 1)";
-
-    // Wiersz dla koloru strumienia
-    QLabel* streamLabel = new QLabel("Stream Color:", this);
-    streamLabel->setStyleSheet(labelStyle);
+    gridLayout->addWidget(blobLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_blobColorPreview, row, 1); row++;
+    // Stream Color
+    QLabel* streamLabel = new QLabel("Stream Color:", this); streamLabel->setStyleSheet(labelStyle);
     m_streamColorPreview = new ClickableColorPreview(this);
-    qDebug() << "Created m_streamColorPreview:" << m_streamColorPreview;
     connect(qobject_cast<ClickableColorPreview*>(m_streamColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseStreamColor);
-    gridLayout->addWidget(streamLabel, 3, 0, Qt::AlignRight);
-    gridLayout->addWidget(m_streamColorPreview, 3, 1);
-    qDebug() << "Added m_streamColorPreview to gridLayout at (3, 1)";
+    gridLayout->addWidget(streamLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_streamColorPreview, row, 1); row++;
+
+    // --- NOWE: Ustawienia siatki ---
+    // Grid Color
+    QLabel* gridColorLabel = new QLabel("Grid Color:", this); gridColorLabel->setStyleSheet(labelStyle);
+    m_gridColorPreview = new ClickableColorPreview(this);
+    connect(qobject_cast<ClickableColorPreview*>(m_gridColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseGridColor);
+    gridLayout->addWidget(gridColorLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_gridColorPreview, row, 1); row++;
+    // Grid Spacing
+    QLabel* gridSpacingLabel = new QLabel("Grid Spacing:", this); gridSpacingLabel->setStyleSheet(labelStyle);
+    m_gridSpacingSpinBox = new QSpinBox(this);
+    m_gridSpacingSpinBox->setRange(5, 200); // Ustaw sensowny zakres
+    m_gridSpacingSpinBox->setSuffix(" px");
+    m_gridSpacingSpinBox->setStyleSheet(spinBoxStyle);
+    connect(m_gridSpacingSpinBox, qOverload<int>(&QSpinBox::valueChanged), this, &AppearanceSettingsWidget::gridSpacingChanged);
+    gridLayout->addWidget(gridSpacingLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_gridSpacingSpinBox, row, 1); row++;
+    // -----------------------------
+
+    // --- NOWE: Ustawienia tytułu ---
+    // Title Text Color
+    QLabel* titleTextLabel = new QLabel("Title Text Color:", this); titleTextLabel->setStyleSheet(labelStyle);
+    m_titleTextColorPreview = new ClickableColorPreview(this);
+    connect(qobject_cast<ClickableColorPreview*>(m_titleTextColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleTextColor);
+    gridLayout->addWidget(titleTextLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleTextColorPreview, row, 1); row++;
+    // Title Border Color
+    QLabel* titleBorderLabel = new QLabel("Title Border Color:", this); titleBorderLabel->setStyleSheet(labelStyle);
+    m_titleBorderColorPreview = new ClickableColorPreview(this);
+    connect(qobject_cast<ClickableColorPreview*>(m_titleBorderColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleBorderColor);
+    gridLayout->addWidget(titleBorderLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleBorderColorPreview, row, 1); row++;
+    // Title Glow Color
+    QLabel* titleGlowLabel = new QLabel("Title Glow Color:", this); titleGlowLabel->setStyleSheet(labelStyle);
+    m_titleGlowColorPreview = new ClickableColorPreview(this);
+    connect(qobject_cast<ClickableColorPreview*>(m_titleGlowColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleGlowColor);
+    gridLayout->addWidget(titleGlowLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleGlowColorPreview, row, 1); row++;
+    // -----------------------------
 
     mainLayout->addLayout(gridLayout);
 
-    // Sekcja ostatnich kolorów (bez zmian w logice dodawania)
+    // Sekcja ostatnich kolorów (bez zmian)
     QLabel *recentLabel = new QLabel("Recently Used Colors:", this);
     recentLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt; margin-top: 15px;");
     mainLayout->addWidget(recentLabel);
     QWidget* recentColorsContainer = new QWidget(this);
     m_recentColorsLayout = new QHBoxLayout(recentColorsContainer);
-    m_recentColorsLayout->setContentsMargins(0, 5, 0, 0);
-    m_recentColorsLayout->setSpacing(8);
-    m_recentColorsLayout->setAlignment(Qt::AlignLeft);
+    m_recentColorsLayout->setContentsMargins(0, 5, 0, 0); m_recentColorsLayout->setSpacing(8); m_recentColorsLayout->setAlignment(Qt::AlignLeft);
     mainLayout->addWidget(recentColorsContainer);
 
     mainLayout->addStretch();
@@ -111,31 +117,50 @@ void AppearanceSettingsWidget::setupUi() {
 }
 
 void AppearanceSettingsWidget::loadSettings() {
+    // Istniejące
     m_selectedBgColor = m_config->getBackgroundColor();
     m_selectedBlobColor = m_config->getBlobColor();
-    m_selectedMessageColor = m_config->getMessageColor();
     m_selectedStreamColor = m_config->getStreamColor();
-
     updateColorPreview(m_bgColorPreview, m_selectedBgColor);
     updateColorPreview(m_blobColorPreview, m_selectedBlobColor);
-    updateColorPreview(m_messageColorPreview, m_selectedMessageColor);
     updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
+
+    // NOWE
+    m_selectedGridColor = m_config->getGridColor();
+    m_selectedGridSpacing = m_config->getGridSpacing();
+    m_selectedTitleTextColor = m_config->getTitleTextColor();
+    m_selectedTitleBorderColor = m_config->getTitleBorderColor();
+    m_selectedTitleGlowColor = m_config->getTitleGlowColor();
+
+    updateColorPreview(m_gridColorPreview, m_selectedGridColor);
+    m_gridSpacingSpinBox->setValue(m_selectedGridSpacing);
+    updateColorPreview(m_titleTextColorPreview, m_selectedTitleTextColor);
+    updateColorPreview(m_titleBorderColorPreview, m_selectedTitleBorderColor);
+    updateColorPreview(m_titleGlowColorPreview, m_selectedTitleGlowColor);
+    // ---
 
     updateRecentColorsUI();
 }
 
 void AppearanceSettingsWidget::saveSettings() {
+    // Wywołaj settery w config - chociaż zmiany są natychmiastowe,
+    // to zapewnia spójność, jeśli użytkownik zmienił coś w innych zakładkach
     m_config->setBackgroundColor(m_selectedBgColor);
     m_config->setBlobColor(m_selectedBlobColor);
-    m_config->setMessageColor(m_selectedMessageColor);
     m_config->setStreamColor(m_selectedStreamColor);
-    // Nie trzeba tu wywoływać saveSettings() z config, zrobi to główny przycisk Save w SettingsView
+    // NOWE
+    m_config->setGridColor(m_selectedGridColor);
+    m_config->setGridSpacing(m_selectedGridSpacing);
+    m_config->setTitleTextColor(m_selectedTitleTextColor);
+    m_config->setTitleBorderColor(m_selectedTitleBorderColor);
+    m_config->setTitleGlowColor(m_selectedTitleGlowColor);
+    // ---
+    // Nie trzeba wywoływać m_config->saveSettings() tutaj, zrobi to główny przycisk Save
 }
 
 void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const QColor& color) {
     ClickableColorPreview* preview = qobject_cast<ClickableColorPreview*>(previewWidget);
     if (preview) {
-        qDebug() << "Calling setColor on" << preview << "with color" << color.name();
         preview->setColor(color);
     } else {
         qWarning() << "Failed to cast QWidget* to ClickableColorPreview* in updateColorPreview.";
@@ -188,18 +213,6 @@ void AppearanceSettingsWidget::chooseBlobColor() {
     // }
 }
 
-void AppearanceSettingsWidget::chooseMessageColor() {
-    QColor originalColor = m_selectedMessageColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Message Color");
-    if (color.isValid()) {
-        m_selectedMessageColor = color;
-        updateColorPreview(m_messageColorPreview, m_selectedMessageColor);
-        // --- Natychmiast zastosuj zmianę (jeśli chcesz) ---
-        qDebug() << "Immediately setting message color in config to:" << color.name();
-        m_config->setMessageColor(color); // Zakładając, że chcesz natychmiastowej zmiany
-        // -------------------------------------------------
-    }
-}
 
 void AppearanceSettingsWidget::chooseStreamColor() {
     QColor originalColor = m_selectedStreamColor;
@@ -214,9 +227,65 @@ void AppearanceSettingsWidget::chooseStreamColor() {
     }
 }
 
+void AppearanceSettingsWidget::chooseGridColor() {
+    QColor originalColor = m_selectedGridColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Grid Color", QColorDialog::ShowAlphaChannel); // Pozwól na alfę dla siatki
+    if (color.isValid()) {
+        m_selectedGridColor = color;
+        updateColorPreview(m_gridColorPreview, m_selectedGridColor);
+        qDebug() << "Immediately setting grid color in config to:" << color.name(QColor::HexArgb);
+        m_config->setGridColor(color);
+    }
+}
+
+void AppearanceSettingsWidget::gridSpacingChanged(int value) {
+    if (m_selectedGridSpacing != value) {
+        m_selectedGridSpacing = value;
+        qDebug() << "Immediately setting grid spacing in config to:" << value;
+        m_config->setGridSpacing(value);
+        // Nie ma podglądu do aktualizacji, SpinBox sam się aktualizuje
+    }
+}
+
+void AppearanceSettingsWidget::chooseTitleTextColor() {
+    QColor originalColor = m_selectedTitleTextColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Text Color");
+    if (color.isValid()) {
+        m_selectedTitleTextColor = color;
+        updateColorPreview(m_titleTextColorPreview, m_selectedTitleTextColor);
+        qDebug() << "Immediately setting title text color in config to:" << color.name();
+        m_config->setTitleTextColor(color);
+    }
+}
+
+void AppearanceSettingsWidget::chooseTitleBorderColor() {
+    QColor originalColor = m_selectedTitleBorderColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Border Color");
+    if (color.isValid()) {
+        m_selectedTitleBorderColor = color;
+        updateColorPreview(m_titleBorderColorPreview, m_selectedTitleBorderColor);
+        qDebug() << "Immediately setting title border color in config to:" << color.name();
+        m_config->setTitleBorderColor(color);
+    }
+}
+
+void AppearanceSettingsWidget::chooseTitleGlowColor() {
+    QColor originalColor = m_selectedTitleGlowColor;
+    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Glow Color");
+    if (color.isValid()) {
+        m_selectedTitleGlowColor = color;
+        updateColorPreview(m_titleGlowColorPreview, m_selectedTitleGlowColor);
+        qDebug() << "Immediately setting title glow color in config to:" << color.name();
+        m_config->setTitleGlowColor(color);
+    }
+}
+// --------------------
+
 void AppearanceSettingsWidget::selectRecentColor(const QColor& color) {
     qDebug() << "Recent color selected:" << color.name();
-    m_config->addRecentColor(color); // Dodaj ponownie, aby odświeżyć kolejność
+    // Tutaj można by dodać logikę, który podgląd ma być zaktualizowany
+    // na podstawie jakiegoś stanu, ale na razie samo dodanie do listy wystarczy.
+    m_config->addRecentColor(color);
 }
 
 void AppearanceSettingsWidget::updateRecentColorsUI() {

@@ -1,6 +1,7 @@
 #ifndef WAVELENGTH_CONFIG_H
 #define WAVELENGTH_CONFIG_H
 
+
 #include <QColor>
 #include <QObject>
 #include <QString>
@@ -12,284 +13,107 @@
 
 class WavelengthConfig : public QObject {
     Q_OBJECT
-
     static constexpr int MAX_RECENT_COLORS = 5;
-
 public:
-    static WavelengthConfig* getInstance() {
-        static WavelengthConfig instance;
-        return &instance;
-    }
+    static WavelengthConfig* getInstance();
+    ~WavelengthConfig() override = default;
 
-    // Adres serwera relay
-    QString getRelayServerAddress() const {
-        return m_settings.value("server/relay_address", "localhost").toString();
-    }
+    // --- Istniejące metody ---
+    QString getRelayServerAddress() const;
+    void setRelayServerAddress(const QString& address);
+    int getRelayServerPort() const;
+    void setRelayServerPort(int port);
+    QString getRelayServerUrl() const;
+    int getMaxChatHistorySize() const;
+    void setMaxChatHistorySize(int size);
+    int getMaxProcessedMessageIds() const;
+    void setMaxProcessedMessageIds(int size);
+    int getMaxSentMessageCacheSize() const;
+    void setMaxSentMessageCacheSize(int size);
+    int getMaxRecentWavelength() const;
+    void setMaxRecentWavelength(int size);
+    int getConnectionTimeout() const;
+    void setConnectionTimeout(int timeout);
+    int getKeepAliveInterval() const;
+    void setKeepAliveInterval(int interval);
+    int getMaxReconnectAttempts() const;
+    void setMaxReconnectAttempts(int attempts);
+    bool isDebugMode() const;
+    void setDebugMode(bool enabled);
 
-    void setRelayServerAddress(const QString& address) {
-        m_settings.setValue("server/relay_address", address);
-        emit configChanged("relay_server_address");
-    }
+    // --- Kolory wyglądu ---
+    QColor getBackgroundColor() const;
+    void setBackgroundColor(const QColor& color);
+    QColor getBlobColor() const;
+    void setBlobColor(const QColor& color);
+    QColor getMessageColor() const;
+    void setMessageColor(const QColor& color);
+    QColor getStreamColor() const;
+    void setStreamColor(const QColor& color);
 
-    // Port serwera relay
-    int getRelayServerPort() const {
-        return m_settings.value("server/relay_port", 3000).toInt();
-    }
+    // --- NOWE: Ustawienia siatki ---
+    QColor getGridColor() const;
+    void setGridColor(const QColor& color);
+    int getGridSpacing() const;
+    void setGridSpacing(int spacing);
+    // -----------------------------
 
-    void setRelayServerPort(int port) {
-        m_settings.setValue("server/relay_port", port);
-        emit configChanged("relay_server_port");
-    }
+    // --- NOWE: Ustawienia etykiety tytułowej ---
+    QColor getTitleTextColor() const;
+    void setTitleTextColor(const QColor& color);
+    QColor getTitleBorderColor() const;
+    void setTitleBorderColor(const QColor& color);
+    QColor getTitleGlowColor() const;
+    void setTitleGlowColor(const QColor& color);
+    // -----------------------------------------
 
-    // Pełny URL serwera relay
-    QString getRelayServerUrl() const {
-        return QString("ws://%1:%2").arg(getRelayServerAddress()).arg(getRelayServerPort());
-    }
+    // --- Ostatnie kolory ---
+    QStringList getRecentColors() const;
+    void addRecentColor(const QColor& color);
+    // -----------------------
 
-    // Maksymalna liczba wiadomości przechowywanych w historii
-    int getMaxChatHistorySize() const {
-        return m_settings.value("chat/max_history_size", 200).toInt();
-    }
+    void saveSettings(); // Zapisuje wszystkie bieżące wartości
+    void restoreDefaults(); // Przywraca wartości domyślne
 
-    void setMaxChatHistorySize(int size) {
-        m_settings.setValue("chat/max_history_size", size);
-        emit configChanged("max_chat_history_size");
-    }
-
-    // Maksymalna liczba przetworzonych ID wiadomości w pamięci podręcznej
-    int getMaxProcessedMessageIds() const {
-        return m_settings.value("messages/max_processed_ids", 200).toInt();
-    }
-
-    void setMaxProcessedMessageIds(int size) {
-        m_settings.setValue("messages/max_processed_ids", size);
-        emit configChanged("max_processed_message_ids");
-    }
-
-    // Maksymalny rozmiar pamięci podręcznej wysłanych wiadomości
-    int getMaxSentMessageCacheSize() const {
-        return m_settings.value("messages/max_sent_cache_size", 100).toInt();
-    }
-
-    void setMaxSentMessageCacheSize(int size) {
-        m_settings.setValue("messages/max_sent_cache_size", size);
-        emit configChanged("max_sent_message_cache_size");
-    }
-
-    // Timeout połączenia (w milisekundach)
-    int getConnectionTimeout() const {
-        return m_settings.value("connection/timeout_ms", 5000).toInt();
-    }
-
-    void setConnectionTimeout(int timeoutMs) {
-        m_settings.setValue("connection/timeout_ms", timeoutMs);
-        emit configChanged("connection_timeout");
-    }
-
-    // Interwał keep-alive (w milisekundach)
-    int getKeepAliveInterval() const {
-        return m_settings.value("connection/keep_alive_ms", 30000).toInt();
-    }
-
-    void setKeepAliveInterval(int intervalMs) {
-        m_settings.setValue("connection/keep_alive_ms", intervalMs);
-        emit configChanged("keep_alive_interval");
-    }
-
-    // Maksymalna liczba prób ponownego połączenia
-    int getMaxReconnectAttempts() const {
-        return m_settings.value("connection/max_reconnect_attempts", 3).toInt();
-    }
-
-    void setMaxReconnectAttempts(int attempts) {
-        m_settings.setValue("connection/max_reconnect_attempts", attempts);
-        emit configChanged("max_reconnect_attempts");
-    }
-
-    // Ustawienie trybu debugowania
-    bool isDebugMode() const {
-        return m_settings.value("app/debug_mode", false).toBool();
-    }
-
-    void setDebugMode(bool enabled) {
-        m_settings.setValue("app/debug_mode", enabled);
-        emit configChanged("debug_mode");
-    }
-
-    // Nazwa użytkownika
-    QString getUserName() const {
-        return m_settings.value("user/name", "Anonymous").toString();
-    }
-
-    void setUserName(const QString& name) {
-        m_settings.setValue("user/name", name);
-        emit configChanged("user_name");
-    }
-
-    // Motyw aplikacji
-    QString getApplicationTheme() const {
-        return m_settings.value("app/theme", "light").toString();
-    }
-
-    void setApplicationTheme(const QString& theme) {
-        m_settings.setValue("app/theme", theme);
-        emit configChanged("application_theme");
-    }
-
-    // Maksymalna liczba przechowywanych dołączonych wavelength w historii
-    int getMaxRecentWavelength() const {
-        return m_settings.value("wavelength/max_recent", 10).toInt();
-    }
-
-    void setMaxRecentWavelength(int count) {
-        m_settings.setValue("wavelength/max_recent", count);
-        emit configChanged("max_recent_wavelength");
-    }
-
-    bool isSystemOverrideInitiated() const {
-        // Odczytujemy wartość przy każdym zapytaniu, aby mieć pewność aktualności
-        // Domyślnie false, jeśli klucz nie istnieje
-        return m_settings.value("Advanced/SystemOverrideInitiated", false).toBool();
-    }
-
-    void setSystemOverrideInitiated(bool initiated) {
-        m_settings.setValue("Advanced/SystemOverrideInitiated", initiated);
-        saveSettings();
-        qDebug() << "SystemOverrideInitiated set to:" << initiated << "and saved.";
-    }
-
-    // Zachowaj ustawienia
-    void saveSettings() {
-        m_settings.sync();
-        qDebug() << "Settings saved to:" << m_settings.fileName();
-    }
-
-    void restoreDefaults() {
-        bool wasInitiated = isSystemOverrideInitiated();
-
-        // Zapisz listę ostatnich kolorów przed wyczyszczeniem
-        QStringList recentColorsBeforeClear = getRecentColors();
-
-        m_settings.clear(); // Czyści WSZYSTKIE ustawienia
-
-        qDebug() << "Settings cleared. SystemOverrideInitiated was:" << wasInitiated << ", is now:" << isSystemOverrideInitiated();
-
-        // setBackgroundColor(QColor("#101820")); // Przykładowe domyślne
-        // setBlobColor(QColor("#00ccff"));
-        // setMessageColor(QColor("#E0E0E0"));
-        // setStreamColor(QColor("#00aa88"));
-        // m_settings.setValue("appearance/recent_colors", QStringList()); // Wyczyść listę ostatnich
-
-        // Opcjonalnie: Przywróć listę ostatnich kolorów, jeśli chcesz ją zachować po resecie
-        // m_settings.setValue("appearance/recent_colors", recentColorsBeforeClear);
-
-
-        emit configChanged("all"); // Sygnalizuj zmianę wszystkich ustawień
-        emit recentColorsChanged(); // Sygnalizuj zmianę listy ostatnich kolorów
-        saveSettings(); // Zapisz pusty stan (lub domyślne)
-    }
-
-    QVariant getSetting(const QString& key, const QVariant& defaultValue = QVariant()) const {
-        return m_settings.value(key, defaultValue);
-    }
-
-    void setSetting(const QString& key, const QVariant& value) {
-        m_settings.setValue(key, value);
-        emit configChanged(key);
-    }
-
-
-     QColor getBackgroundColor() const {
-        return m_settings.value("appearance/background_color", QColor("#101820")).value<QColor>();
-    }
-
-    void setBackgroundColor(const QColor& color) {
-        m_settings.setValue("appearance/background_color", color);
-        addRecentColor(color); // Dodaj do ostatnich kolorów
-        emit configChanged("background_color");
-    }
-
-    // Kolor "bloba" (cokolwiek to jest w UI)
-    QColor getBlobColor() const {
-        return m_settings.value("appearance/blob_color", QColor("#00ccff")).value<QColor>();
-    }
-
-    void setBlobColor(const QColor& color) {
-        m_settings.setValue("appearance/blob_color", color);
-        addRecentColor(color);
-        emit configChanged("blob_color");
-    }
-
-    // Kolor tekstu wiadomości
-    QColor getMessageColor() const {
-        return m_settings.value("appearance/message_color", QColor("#E0E0E0")).value<QColor>();
-    }
-
-    void setMessageColor(const QColor& color) {
-        m_settings.setValue("appearance/message_color", color);
-        addRecentColor(color);
-        emit configChanged("message_color");
-    }
-
-    // Kolor "strumienia" (cokolwiek to jest w UI)
-    QColor getStreamColor() const {
-        return m_settings.value("appearance/stream_color", QColor("#00aa88")).value<QColor>();
-    }
-
-    void setStreamColor(const QColor& color) {
-        m_settings.setValue("appearance/stream_color", color);
-        addRecentColor(color);
-        emit configChanged("stream_color");
-    }
-
-    // --- OSTATNIO UŻYWANE KOLORY ---
-
-    QStringList getRecentColors() const {
-        return m_settings.value("appearance/recent_colors").toStringList();
-    }
-
-    void addRecentColor(const QColor& color) {
-        if (!color.isValid()) return;
-
-        QStringList recent = getRecentColors();
-        QString hexColor = color.name(QColor::HexRgb); // Zapisz jako #RRGGBB
-
-        // Usuń istniejący wpis, jeśli jest taki sam
-        recent.removeAll(hexColor);
-
-        // Dodaj nowy kolor na początek
-        recent.prepend(hexColor);
-
-        // Ogranicz listę do MAX_RECENT_COLORS
-        while (recent.size() > MAX_RECENT_COLORS) {
-            recent.removeLast();
-        }
-
-        m_settings.setValue("appearance/recent_colors", recent);
-        emit recentColorsChanged(); // Sygnał o zmianie listy ostatnich kolorów
-    }
+    QVariant getSetting(const QString& key) const;
 
 signals:
     void configChanged(const QString& key);
     void recentColorsChanged();
 
 private:
-    WavelengthConfig(QObject* parent = nullptr) : QObject(parent),
-        m_settings("Wavelength", "WavelengthApp") {
-        qDebug() << "Config initialized. Settings file:" << m_settings.fileName();
-        // Rejestracja typu QColor dla QSettings
-        qRegisterMetaType<QColor>("QColor");
-        qRegisterMetaTypeStreamOperators<QColor>("QColor");
-    }
-    
-    ~WavelengthConfig() {
-        saveSettings();
-    }
-
+    explicit WavelengthConfig(QObject *parent = nullptr);
     WavelengthConfig(const WavelengthConfig&) = delete;
     WavelengthConfig& operator=(const WavelengthConfig&) = delete;
 
+    void loadDefaults();
+    void loadSettings(); // Ładuje z QSettings
+
+    static WavelengthConfig* m_instance;
     QSettings m_settings;
+
+    // Zmienne przechowujące wartości
+    QString m_relayServerAddress;
+    int m_relayServerPort;
+    int m_maxChatHistorySize;
+    int m_maxProcessedMessageIds;
+    int m_maxSentMessageCacheSize;
+    int m_maxRecentWavelength;
+    int m_connectionTimeout;
+    int m_keepAliveInterval;
+    int m_maxReconnectAttempts;
+    bool m_debugMode;
+    QColor m_backgroundColor;
+    QColor m_blobColor;
+    QColor m_streamColor;
+    QStringList m_recentColors;
+
+    // NOWE zmienne
+    QColor m_gridColor;
+    int m_gridSpacing;
+    QColor m_titleTextColor;
+    QColor m_titleBorderColor;
+    QColor m_titleGlowColor;
 };
 
 #endif // WAVELENGTH_CONFIG_H
