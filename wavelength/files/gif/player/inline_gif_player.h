@@ -42,20 +42,29 @@ public:
         m_decoder = std::make_shared<GifDecoder>(gifData, this);
 
         // Połącz sygnały
+        connect(m_decoder.get(), &GifDecoder::firstFrameReady, this, &InlineGifPlayer::displayThumbnail, Qt::QueuedConnection);
         connect(m_decoder.get(), &GifDecoder::frameReady, this, &InlineGifPlayer::updateFrame, Qt::QueuedConnection);
-        connect(m_decoder.get(), &GifDecoder::error, this, &InlineGifPlayer::handleError);
-        connect(m_decoder.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::handleGifInfo);
-        m_decoder->resume();
+        connect(m_decoder.get(), &GifDecoder::error, this, &InlineGifPlayer::handleError, Qt::QueuedConnection); // Dodano QueuedConnection dla bezpieczeństwa
+        connect(m_decoder.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::handleGifInfo, Qt::QueuedConnection);
 
-        // Inicjalizuj odtwarzacz w osobnym wątku
-        QTimer::singleShot(100, this, [this]() {
-            if (m_decoder) m_decoder->start();
+        // Inicjalizuj dekoder (wyekstrahuje pierwszą klatkę)
+        // Wywołanie w osobnym wątku lub przez QTimer, aby nie blokować UI
+        QTimer::singleShot(0, this, [this]() {
+            if (m_decoder) {
+                if (!m_decoder->initialize()) {
+                     qDebug() << "InlineGifPlayer: Decoder initialization failed.";
+                     // Można tu obsłużyć błąd inicjalizacji
+                } else {
+                     qDebug() << "InlineGifPlayer: Decoder initialized successfully.";
+                }
+            }
         });
 
         // Obsługa zamykania aplikacji
         connect(qApp, &QApplication::aboutToQuit, this, &InlineGifPlayer::releaseResources); // Uproszczono lambdę
 
-        // Usunięto instalację filtra zdarzeń i kursor
+        setMouseTracking(true);
+        m_gifLabel->setMouseTracking(true);
     }
 
     // Usunięto getActivePlayer i logikę s_activePlayer
@@ -67,12 +76,16 @@ public:
     void releaseResources() {
         if (m_decoder) {
             m_decoder->stop();
-            m_decoder->wait(500);
-            m_decoder->releaseResources();
-            m_decoder.reset(); // Zwalniamy wskaźnik
+            if (m_decoder->isRunning()) { // Czekaj tylko jeśli wątek działał
+                m_decoder->wait(500);
+            }
+            // releaseResources w dekoderze jest wywoływane w jego destruktorze,
+            // ale można też wywołać jawnie, jeśli jest potrzeba
+            // m_decoder->releaseResources();
+            m_decoder.reset();
+            m_isPlaying = false;
+            qDebug() << "InlineGifPlayer: Resources released.";
         }
-        // Usunięto logikę s_activePlayer
-        // Usunięto m_isActive
     }
 
     // Zwraca oryginalny rozmiar GIF-a jako wskazówkę
@@ -83,36 +96,65 @@ public:
         return QFrame::sizeHint(); // Zwróć domyślny, jeśli rozmiar nie jest znany
     }
 
-    // Usunięto activate
-    // Usunięto deactivate
-    // Usunięto eventFilter
-    // Usunięto enterEvent
-
-private slots:
-    // Usunięto togglePlayback
-
-    void updateFrame(const QImage& frame) {
-        if (frame.isNull()) return;
-
-        // Jeśli to pierwsza klatka, zapisz ją jako miniaturkę (może być przydatne)
-        if (m_thumbnailFrame.isNull()) {
-            m_thumbnailFrame = frame.copy();
-        }
-
-        // Ustaw pixmapę na QLabel - skalowanie załatwi setScaledContents(true)
-        m_gifLabel->setPixmap(QPixmap::fromImage(frame));
-
-        // Nie ustawiamy już setFixedSize
-        // setFixedSize(frame.width(), frame.height()); // Usunięto
-        // m_gifLabel->setFixedSize(frame.size()); // Usunięto
-
-        // Jeśli to pierwsza klatka, zaktualizuj geometrię
-        if (m_gifLabel->size() != frame.size()) {
-             updateGeometry(); // Informujemy layout o potencjalnej zmianie rozmiaru
+    void startPlayback() {
+        qDebug() << "InlineGifPlayer: startPlayback called.";
+        if (m_decoder && !m_isPlaying) {
+            m_isPlaying = true;
+            m_decoder->resume();
         }
     }
 
-    // Usunięto displayScaledImage
+    // Metoda do jawnego zatrzymania/pauzowania odtwarzania (np. dla dialogu)
+    void stopPlayback() {
+        qDebug() << "InlineGifPlayer: stopPlayback called.";
+        if (m_decoder && m_isPlaying) {
+            m_isPlaying = false;
+            m_decoder->pause();
+        }
+    }
+
+protected:
+    // Przechwytywanie zdarzeń najechania i opuszczenia myszy
+    void enterEvent(QEvent *event) override {
+        qDebug() << "InlineGifPlayer: Mouse entered.";
+        startPlayback(); // Rozpocznij odtwarzanie przy najechaniu
+        QFrame::enterEvent(event);
+    }
+
+    void leaveEvent(QEvent *event) override {
+        qDebug() << "InlineGifPlayer: Mouse left.";
+        stopPlayback(); // Zatrzymaj odtwarzanie przy opuszczeniu
+        QFrame::leaveEvent(event);
+    }
+
+private slots:
+    void displayThumbnail(const QImage& frame) {
+        if (!frame.isNull()) {
+            qDebug() << "InlineGifPlayer: Displaying thumbnail.";
+            m_thumbnailPixmap = QPixmap::fromImage(frame); // Zapisz miniaturkę
+            m_gifLabel->setPixmap(m_thumbnailPixmap.scaled(
+                m_gifLabel->size(), // Skaluj do aktualnego rozmiaru labelki
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            ));
+            // Nie aktualizuj geometrii tutaj, poczekaj na gifInfo
+        } else {
+            qDebug() << "InlineGifPlayer: Received null thumbnail.";
+            m_gifLabel->setText("⚠️ Błąd ładowania miniatury");
+        }
+    }
+
+    void updateFrame(const QImage& frame) {
+        // Ta metoda jest teraz wywoływana tylko gdy dekoder aktywnie dekoduje (m_isPlaying == true)
+        if (frame.isNull() || !m_isPlaying) return; // Dodano sprawdzenie m_isPlaying
+
+        // Ustaw pixmapę - setScaledContents zajmie się resztą
+        m_gifLabel->setPixmap(QPixmap::fromImage(frame));
+
+        // Nie ma potrzeby aktualizować geometrii dla każdej klatki,
+        // chyba że rozmiar GIFa się zmienia dynamicznie (rzadkie)
+    }
+
 
     void updatePosition(double position) {
         m_currentPosition = position;
@@ -138,7 +180,13 @@ private slots:
         updateGeometry();
         emit gifLoaded(); // Sygnalizujemy załadowanie informacji o GIFie
 
-        // Usunięto pobieranie pierwszej klatki jako miniaturki tutaj
+        if (!m_thumbnailPixmap.isNull() && !m_isPlaying) {
+            m_gifLabel->setPixmap(m_thumbnailPixmap.scaled(
+                m_gifLabel->size(),
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            ));
+        }
     }
 
     void handlePlaybackFinished() {
@@ -161,6 +209,8 @@ private:
     double m_currentPosition = 0;
     // Usunięto m_isActive
     QImage m_thumbnailFrame;
+    bool m_isPlaying; // Flaga śledząca, czy aktywnie odtwarzamy
+    QPixmap m_thumbnailPixmap;
 
     // Usunięto s_activePlayer
 };

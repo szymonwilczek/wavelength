@@ -304,69 +304,28 @@ public:
             m_formatContext->nb_streams  // Liczba strumieni (powinno być tylko 1 dla GIF)
         );
 
+        extractAndEmitFirstFrameInternal(); // Wywołaj wewnętrzną metodę ekstrakcji
+
         m_initialized = true;
+        m_paused = true; // Zacznij w stanie spauzowanym
+        m_stopped = false; // Upewnij się, że nie jest zatrzymany
         return true;
-    }
-
-    void extractFirstFrame() {
-        if (!m_formatContext || m_gifStream < 0)
-            return;
-
-        // Tymczasowo zapisz stan
-        bool wasPaused = m_paused;
-
-        // Ustaw na początek strumienia
-        av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
-        avcodec_flush_buffers(m_codecContext);
-
-        // Odczytaj pakiet i dekoduj ramkę
-        AVPacket packet;
-        while (av_read_frame(m_formatContext, &packet) >= 0) {
-            if (packet.stream_index == m_gifStream) {
-                avcodec_send_packet(m_codecContext, &packet);
-                if (avcodec_receive_frame(m_codecContext, m_frame) == 0) {
-                    // Konwertuj ramkę do RGB
-                    sws_scale(
-                        m_swsContext,
-                        (const uint8_t* const*)m_frame->data, m_frame->linesize, 0, m_codecContext->height,
-                        m_frameRGB->data, m_frameRGB->linesize
-                    );
-
-                    // Utwórz QImage z obsługą przezroczystości (Format_RGBA8888)
-                    QImage frame(
-                        m_frameRGB->data[0],
-                        m_codecContext->width,
-                        m_codecContext->height,
-                        m_frameRGB->linesize[0],
-                        QImage::Format_RGBA8888
-                    );
-
-                    emit frameReady(frame);
-                    av_packet_unref(&packet);
-                    break;
-                }
-            }
-            av_packet_unref(&packet);
-        }
-
-        // Przywróć stan pauzy
-        m_paused = wasPaused;
     }
 
     void stop() {
         QMutexLocker locker(&m_mutex);
         m_stopped = true;
+        m_paused = false; // Aby pętla mogła sprawdzić m_stopped
         locker.unlock();
-        m_waitCondition.wakeOne();
+        m_waitCondition.wakeAll(); // Obudź, aby zakończyć
     }
 
     void pause() {
         QMutexLocker locker(&m_mutex);
-        m_paused = !m_paused;
-        locker.unlock();
-
-        if (!m_paused)
-            m_waitCondition.wakeOne();
+        if (!m_stopped) { // Nie pauzuj, jeśli jest zatrzymany
+            m_paused = true;
+            qDebug() << "GifDecoder::pause() - Pausing playback.";
+        }
     }
 
     bool isPaused() const {
@@ -429,15 +388,28 @@ public:
 
     void resume() {
         QMutexLocker locker(&m_mutex);
+        if (m_stopped) return; // Nie wznawiaj, jeśli zatrzymany
+
         if (m_paused) {
             m_paused = false;
             qDebug() << "GifDecoder::resume() - Resuming playback.";
-            m_waitCondition.wakeAll(); // Obudź wątek czekający w run()
+            if (!isRunning()) { // Jeśli wątek nie działa, uruchom go
+                qDebug() << "GifDecoder::resume() - Thread not running, starting...";
+                locker.unlock(); // Odblokuj przed startem wątku
+                start(); // Uruchom pętlę run()
+                locker.relock(); // Zablokuj ponownie
+            } else {
+                qDebug() << "GifDecoder::resume() - Waking up paused thread.";
+                m_waitCondition.wakeAll(); // Obudź wątek czekający w run()
+            }
+        } else {
+            qDebug() << "GifDecoder::resume() - Already running.";
         }
     }
 
 signals:
     void frameReady(const QImage& frame);
+    void firstFrameReady(const QImage& frame);
     void error(const QString& message);
     void gifInfo(int width, int height, double duration, double frameRate, int numStreams);
     void playbackFinished();
@@ -453,44 +425,46 @@ protected:
         qDebug() << "GifDecoder::run() - Initialization successful.";
 
         AVPacket packet;
-        // Usunięto frameFinished, sprawdzamy wynik bezpośrednio
         int frameCounter = 0; // Licznik wyemitowanych klatek
-
         m_frameTimer.start();
-        bool isFirstFrame = true;
+        bool isFirstFrameAfterResume = true;
 
-        while (!m_stopped) {
+        while (true) {
             { // Ograniczenie zakresu lockera
                 QMutexLocker locker(&m_mutex);
-                if (m_paused && !m_seeking) { // Nie czekaj jeśli szukamy
+                if (m_stopped) {
+                    qDebug() << "GifDecoder::run() - Stopped flag set, exiting loop.";
+                    break; // Wyjdź z pętli, jeśli zatrzymano
+                }
+                if (m_paused) {
                     qDebug() << "GifDecoder::run() - Paused, waiting...";
                     m_waitCondition.wait(&m_mutex);
                     qDebug() << "GifDecoder::run() - Woken up.";
-                    if (m_stopped) break; // Sprawdź po obudzeniu
-                    if (!m_paused) { // Jeśli wznowiono
-                        m_frameTimer.restart();
-                        isFirstFrame = true;
+                    // Po obudzeniu pętla sprawdzi m_stopped i m_paused ponownie
+                    if (!m_paused && !m_stopped) { // Jeśli wznowiono
+                        m_frameTimer.restart(); // Zresetuj timer klatki
+                        isFirstFrameAfterResume = true; // Traktuj następną klatkę jako pierwszą po wznowieniu
                     }
-                    continue; // Wróć na początek pętli, aby ponownie sprawdzić warunki
+                    continue; // Wróć na początek pętli
                 }
-
+                // Jeśli nie jest zatrzymany i nie jest spauzowany, kontynuuj dekodowanie
                 if (m_seeking) {
                     qDebug() << "GifDecoder::run() - Seeking to position:" << m_seekPosition;
                     if (m_formatContext && m_gifStream >= 0) {
                         // Użyj AVSEEK_FLAG_ANY dla GIFów, może być bardziej niezawodne
                         int seek_ret = av_seek_frame(m_formatContext, m_gifStream, m_seekPosition, AVSEEK_FLAG_BACKWARD); // lub AVSEEK_FLAG_ANY
                         if (seek_ret < 0) {
-                             qDebug() << "GifDecoder::run() - Seek failed:" << seek_ret;
+                            qDebug() << "GifDecoder::run() - Seek failed:" << seek_ret;
                         } else {
-                             qDebug() << "GifDecoder::run() - Seek successful.";
-                             if (m_codecContext) {
-                                 avcodec_flush_buffers(m_codecContext); // Wyczyszczenie buforów po szukaniu
-                                 qDebug() << "GifDecoder::run() - Codec buffers flushed.";
-                             }
+                            qDebug() << "GifDecoder::run() - Seek successful.";
+                            if (m_codecContext) {
+                                avcodec_flush_buffers(m_codecContext); // Wyczyszczenie buforów po szukaniu
+                                qDebug() << "GifDecoder::run() - Codec buffers flushed.";
+                            }
                         }
                         m_seeking = false;
                         m_frameTimer.restart();
-                        isFirstFrame = true;
+                        isFirstFrameAfterResume = true;
 
                         // Aktualizacja pozycji po przeszukiwaniu
                         m_currentPosition = m_seekPosition * av_q2d(m_formatContext->streams[m_gifStream]->time_base);
@@ -498,39 +472,36 @@ protected:
                         emit positionChanged(m_currentPosition);
                         locker.relock(); // Zablokuj ponownie (chociaż nie jest to ściśle konieczne przed continue)
                     } else {
-                         m_seeking = false; // Nie można szukać, zresetuj flagę
+                        m_seeking = false; // Nie można szukać, zresetuj flagę
                     }
                     continue; // Wróć na początek pętli po seek
                 }
             } // Koniec zakresu lockera
 
-            // --- Czytanie pakietu ---
-            // qDebug() << "GifDecoder::run() - Reading frame..."; // Może być zbyt gadatliwe
             int readResult = av_read_frame(m_formatContext, &packet);
-            // qDebug() << "GifDecoder::run() - av_read_frame result:" << readResult;
 
             if (readResult < 0) {
                 if (readResult == AVERROR_EOF) {
-                    qDebug() << "GifDecoder::run() - End of stream reached (AVERROR_EOF). Looping...";
-                    // Zapętlanie - przewiń na początek
-                    QMutexLocker locker(&m_mutex); // Potrzebny lock do modyfikacji stanu
+                    // Koniec strumienia - zapętlanie
+                    QMutexLocker locker(&m_mutex);
+                    if (m_stopped) break; // Sprawdź ponownie przed seek
+                    qDebug() << "GifDecoder::run() - End of stream, looping...";
                     int seek_ret = av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
                     if (seek_ret < 0) {
-                         qDebug() << "GifDecoder::run() - Loop seek failed:" << seek_ret;
-                         m_stopped = true; // Zatrzymaj, jeśli przewinięcie się nie powiodło
+                        qDebug() << "GifDecoder::run() - Loop seek failed:" << seek_ret;
+                        m_stopped = true; // Zatrzymaj, jeśli przewinięcie się nie powiodło
+                        break;
                     } else {
-                         if (m_codecContext) {
-                             avcodec_flush_buffers(m_codecContext);
-                         }
-                         m_currentPosition = 0;
-                         locker.unlock(); // Odblokuj przed emisją sygnału
-                         emit positionChanged(0);
-                         locker.relock(); // Zablokuj ponownie
-                         qDebug() << "GifDecoder::run() - Seeked to beginning for loop.";
+                        if (m_codecContext) avcodec_flush_buffers(m_codecContext);
+                        m_currentPosition = 0;
+                        m_frameTimer.restart(); // Reset timera przy zapętleniu
+                        isFirstFrameAfterResume = true;
+                        locker.unlock();
+                        emit positionChanged(0);
+                        locker.relock();
                     }
-                    locker.unlock(); // Odblokuj przed continue
-                    av_packet_unref(&packet); // Upewnij się, że pakiet jest zwolniony
-                    continue; // Kontynuuj pętlę od początku
+                    av_packet_unref(&packet);
+                    continue;
                 } else {
                     // Inny błąd odczytu
                     char errbuf[AV_ERROR_MAX_STRING_SIZE] = {0};
@@ -543,10 +514,7 @@ protected:
 
             // --- Przetwarzanie pakietu ---
             if (packet.stream_index == m_gifStream) {
-                // qDebug() << "GifDecoder::run() - Packet belongs to GIF stream. Sending to decoder...";
                 int sendResult = avcodec_send_packet(m_codecContext, &packet);
-                // qDebug() << "GifDecoder::run() - avcodec_send_packet result:" << sendResult;
-
                 if (sendResult < 0) {
                     char errbuf[AV_ERROR_MAX_STRING_SIZE] = {0};
                     av_make_error_string(errbuf, AV_ERROR_MAX_STRING_SIZE, sendResult);
@@ -597,16 +565,17 @@ protected:
 
                             // Opóźnienie
                             qint64 delayTime = static_cast<qint64>(m_frameDelay); // Użyj m_frameDelay
-                            if (!isFirstFrame) {
+                            if (!isFirstFrameAfterResume) { // Użyj nowej flagi
                                 qint64 elapsed = m_frameTimer.elapsed();
                                 delayTime = qMax((qint64)0, delayTime - elapsed);
                             }
-                            // qDebug() << "GifDecoder::run() - Calculated delay:" << delayTime;
                             if (delayTime > 0) {
-                                QThread::msleep(delayTime);
+                                // Użyj usleep lub innego mechanizmu czekania, który można przerwać
+                                // QThread::msleep jest prosty, ale może nie być idealny do szybkiego wznawiania
+                                msleep(delayTime); // Użyj msleep z QThread
                             }
                             m_frameTimer.restart();
-                            isFirstFrame = false;
+                            isFirstFrameAfterResume = false; // Zresetuj flagę
 
                         } else if (receiveResult == AVERROR(EAGAIN) || receiveResult == AVERROR_EOF) {
                             // EAGAIN: Potrzeba więcej danych (następny pakiet)
@@ -673,6 +642,67 @@ private:
         }
 
         return decoder->m_readPosition;
+    }
+
+    void extractAndEmitFirstFrameInternal() {
+        if (!m_formatContext || m_gifStream < 0 || !m_codecContext || !m_swsContext || !m_frame || !m_frameRGB) {
+            qWarning() << "GifDecoder: Cannot extract first frame, context not ready.";
+            return;
+        }
+
+        // Przewiń na początek (może nie być konieczne, jeśli initialize jest pierwsze)
+        av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
+        avcodec_flush_buffers(m_codecContext);
+        m_readPosition = 0; // Resetuj pozycję odczytu dla AVIOContext
+
+        AVPacket packet;
+        av_init_packet(&packet); // Zainicjuj pakiet
+        packet.data = nullptr;
+        packet.size = 0;
+
+        bool frame_decoded = false;
+        while (av_read_frame(m_formatContext, &packet) >= 0 && !frame_decoded) {
+            if (packet.stream_index == m_gifStream) {
+                if (avcodec_send_packet(m_codecContext, &packet) >= 0) {
+                    if (avcodec_receive_frame(m_codecContext, m_frame) == 0) {
+                        // Konwertuj ramkę do RGBA
+                        sws_scale(
+                            m_swsContext,
+                            (const uint8_t* const*)m_frame->data, m_frame->linesize, 0, m_codecContext->height,
+                            m_frameRGB->data, m_frameRGB->linesize
+                        );
+
+                        // Utwórz QImage
+                        QImage firstFrame(
+                            m_frameRGB->data[0],
+                            m_codecContext->width,
+                            m_codecContext->height,
+                            m_frameRGB->linesize[0],
+                            QImage::Format_RGBA8888
+                        );
+
+                        qDebug() << "GifDecoder: First frame extracted successfully.";
+                        emit firstFrameReady(firstFrame.copy()); // Emituj kopię
+                        frame_decoded = true;
+                    }
+                    // Ignoruj błędy EAGAIN/EOF przy odbieraniu pierwszej klatki
+                }
+                 // Ignoruj błędy wysyłania przy pierwszej klatce (np. potrzeba więcej danych)
+            }
+            av_packet_unref(&packet); // Zwolnij pakiet wewnątrz pętli
+        }
+         av_packet_unref(&packet); // Upewnij się, że jest zwolniony po pętli
+
+        // Przewiń z powrotem na początek, aby run() zaczął od początku
+        av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
+        avcodec_flush_buffers(m_codecContext);
+        m_readPosition = 0; // Resetuj pozycję odczytu ponownie
+
+        if (!frame_decoded) {
+            qWarning() << "GifDecoder: Failed to extract the first frame.";
+            // Można wyemitować pusty obraz lub sygnał błędu
+            emit firstFrameReady(QImage());
+        }
     }
 
     QByteArray m_gifData;

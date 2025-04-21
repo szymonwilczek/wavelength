@@ -302,7 +302,7 @@ public slots:
     scrollArea->setStyleSheet("QScrollArea { background-color: #001018; border: none; }");
 
     QWidget* contentWidget = nullptr;
-    // QSize originalContentSize; // Nie jest już potrzebna w tym zakresie
+    InlineGifPlayer* fullGif = nullptr;
 
     // Lambda do wywołania po uzyskaniu rozmiaru (przeniesiona logika z sizeReadyCallback)
     auto adjustAndShowWithSizeCheck = [this, fullSizeDialog, scrollArea](QWidget* contentWgt, QSize size) {
@@ -316,14 +316,27 @@ public slots:
     };
 
     if (isGif) {
-        InlineGifPlayer* fullGif = new InlineGifPlayer(data, scrollArea);
+        fullGif = new InlineGifPlayer(data, scrollArea); // Przypisz do wskaźnika
         contentWidget = fullGif;
-        connect(fullGif, &InlineGifPlayer::gifLoaded, this, [=]() {
-            // Użyj QTimer, aby upewnić się, że sizeHint jest zaktualizowany
-            QTimer::singleShot(0, this, [=]() {
-                // Wywołaj lambdę pomocniczą bezpośrednio
+        // Połącz gifLoaded, aby uzyskać rozmiar i pokazać dialog
+        connect(fullGif, &InlineGifPlayer::gifLoaded, this, [=]() mutable { // mutable, aby móc modyfikować fullGif
+            QTimer::singleShot(0, this, [=]() mutable {
                 adjustAndShowWithSizeCheck(fullGif, fullGif->sizeHint());
+                // Rozpocznij odtwarzanie *po* pokazaniu dialogu
+                if (fullGif) { // Sprawdź czy wskaźnik jest nadal ważny
+                     fullGif->startPlayback();
+                }
             });
+        });
+        // Połącz finished dialogu, aby zatrzymać odtwarzanie
+        connect(fullSizeDialog, &QDialog::finished, this, [fullGif]() mutable {
+             if (fullGif) {
+                 // Nie trzeba jawnie stopPlayback(), bo WA_DeleteOnClose wywoła destruktor
+                 // fullGif->stopPlayback();
+                 // Destruktor InlineGifPlayer wywoła releaseResources(), które zatrzyma dekoder.
+                 qDebug() << "Full size GIF dialog finished.";
+                 // Można by tu ustawić fullGif = nullptr, ale WA_DeleteOnClose i tak go usunie.
+             }
         });
     } else {
         InlineImageViewer* fullImage = new InlineImageViewer(data, scrollArea);
