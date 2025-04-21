@@ -732,14 +732,9 @@ protected:
         QDateTime currentTime = QDateTime::currentDateTime();
         QString timeStr = currentTime.toString("HH:mm:ss");
 
-        // Losowy identyfikator lokalizacji w stylu cyberpunk
-        QString locId = QString("SEC-%1-Z%2")
-            .arg(QRandomGenerator::global()->bounded(1000, 9999))
-            .arg(QRandomGenerator::global()->bounded(10, 99));
 
         // Wskaźnik priorytetów i wiarygodności (składa się z cyfr i liter)
         int trustLevel = 60 + QRandomGenerator::global()->bounded(40); // 60-99%
-        QString trustIndicator = QString("[%1%]").arg(trustLevel);
 
         // Dodanie znaczników w prawym górnym rogu
         painter.setFont(QFont("Consolas", 8));
@@ -749,11 +744,6 @@ protected:
         painter.drawText(QRect(width() - 150, 8, 120, 12),
                         Qt::AlignRight | Qt::AlignVCenter,
                         QString("TS: %1").arg(timeStr));
-
-        // Lokalizacja
-        painter.drawText(QRect(width() - 150, 20, 120, 12),
-                        Qt::AlignRight | Qt::AlignVCenter,
-                        QString("LOC: %1").arg(locId));
 
         // Wskaźnik priorytetu
         QColor priorityColor;
@@ -785,19 +775,6 @@ protected:
         painter.setFont(QFont("Consolas", 8, QFont::Bold));
         painter.drawText(priorityRect, Qt::AlignCenter, priorityText);
 
-        // Rysujemy wskaźnik wiarygodności
-        QRect trustRect(8, height() - 22, 90, 16);
-        painter.setFont(QFont("Consolas", 7));
-        painter.setPen(QPen(textColor, 1));
-
-        // Kolor zależny od poziomu wiarygodności
-        QColor trustColor = (trustLevel >= 90) ? QColor(0, 255, 0) :
-                          (trustLevel >= 75) ? QColor(255, 255, 0) :
-                          QColor(255, 100, 0);
-
-        painter.setPen(trustColor);
-        painter.drawText(trustRect, Qt::AlignLeft | Qt::AlignVCenter,
-                      QString("TRUST: %1").arg(trustIndicator));
     }
 
     void resizeEvent(QResizeEvent* event) override {

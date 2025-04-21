@@ -87,6 +87,14 @@ public:
     void setContent(QWidget* content) {
          qDebug() << "AttachmentPlaceholder::setContent - ustawianie zawartości";
 
+         QLayoutItem* item;
+         while ((item = m_contentLayout->takeAt(0)) != nullptr) {
+             if (QWidget* widget = item->widget()) {
+                 widget->deleteLater();
+             }
+             delete item;
+         }
+
          // Sprawdzamy rozmiar nowej zawartości
          if (content->sizeHint().isValid()) {
              qDebug() << "Rozmiar zawartości (sizeHint):" << content->sizeHint();
@@ -96,25 +104,45 @@ public:
          m_contentLayout->addWidget(content);
          m_contentContainer->setVisible(true);
          m_loadButton->setVisible(false);
+         m_progressLabel->setVisible(false);
          m_isLoaded = true;
 
          // Usuwamy wszystkie ograniczenia rozmiaru
          content->setMinimumSize(0, 0);
          content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+         m_contentContainer->setMinimumSize(0, 0);
+         m_contentContainer->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+         setMinimumSize(0, 0);
+         setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
          // Ustawiamy politykę rozmiaru - preferowana, nie ekspansywna
          content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
          m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+         // Placeholder powinien się dopasować do zawartości
+         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-         // Aktywujemy layout
+         // Aktywujemy layout i aktualizujemy geometrię
          m_contentLayout->activate();
-         updateGeometry();
+         layout()->activate(); // Aktywuj główny layout placeholdera
+         updateGeometry(); // Zaktualizuj geometrię placeholdera
 
-         // Dajemy trochę czasu na ustalenie rozmiaru widgetu
-         QTimer::singleShot(100, this, [this, content]() {
-             // Wymuszamy update całej hierarchii widgetów
+         // Dajemy trochę czasu na ustalenie rozmiaru i informujemy rodzica
+         QTimer::singleShot(50, this, [this, content]() {
+             // Wymuszamy update layoutu w CyberAttachmentViewer, jeśli to on jest zawartością
              if (CyberAttachmentViewer* viewer = qobject_cast<CyberAttachmentViewer*>(content)) {
-                 viewer->updateContentLayout();
+                 viewer->updateContentLayout(); // Ta funkcja powinna zadbać o aktualizację w dół
+             } else {
+                 // Jeśli zawartością nie jest viewer, nadal aktualizuj geometrię
+                 content->updateGeometry();
+             }
+             updateGeometry(); // Ponownie zaktualizuj placeholder
+
+             // Powiadom rodzica o zmianie rozmiaru
+             if (parentWidget()) {
+                 parentWidget()->updateGeometry();
+                 if(parentWidget()->layout()) parentWidget()->layout()->activate();
+                 QEvent event(QEvent::LayoutRequest);
+                 QApplication::sendEvent(parentWidget(), &event);
              }
 
              // Emitujemy sygnał po ustawieniu zawartości z opóźnieniem
@@ -504,7 +532,7 @@ void showCyberImage(const QByteArray& data) {
     viewer->setContent(scalingAttachment);
     setContent(viewer);
     setLoading(false);
-    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
+    // QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberGif(const QByteArray& data) {
@@ -539,7 +567,7 @@ void showCyberGif(const QByteArray& data) {
     viewer->setContent(scalingAttachment);
     setContent(viewer);
     setLoading(false);
-    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
+    // QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberAudio(const QByteArray& data) {

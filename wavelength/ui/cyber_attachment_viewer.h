@@ -15,6 +15,8 @@
 #include <QDebug>
 #include <QEvent>
 
+#include "chat/effects/mask_overlay.h"
+
 class CyberAttachmentViewer : public QWidget {
     Q_OBJECT
     Q_PROPERTY(int decryptionCounter READ decryptionCounter WRITE setDecryptionCounter)
@@ -53,6 +55,9 @@ public:
         // m_contentLayout->setAlignment(Qt::AlignCenter); // Usunięto alignment, pozwalamy zawartości wypełnić
         m_layout->addWidget(m_contentContainer, 1);
 
+        m_maskOverlay = new MaskOverlay(m_contentContainer);
+        m_maskOverlay->setVisible(false);
+
 
     // Timer dla animacji
     m_animTimer = new QTimer(this);
@@ -73,6 +78,9 @@ public:
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred); // Zmieniono na Preferred
         m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+
+        connect(this, &CyberAttachmentViewer::decryptionCounterChanged, m_maskOverlay, &MaskOverlay::setRevealProgress);
+
     qDebug() << "CyberAttachmentViewer: utworzono z rozmiarem początkowym" << size();
 
     QTimer::singleShot(500, this, &CyberAttachmentViewer::onActionButtonClicked);
@@ -86,8 +94,11 @@ public:
 
     int decryptionCounter() const { return m_decryptionCounter; }
     void setDecryptionCounter(int counter) {
-        m_decryptionCounter = counter;
-        updateDecryptionStatus();
+        if (m_decryptionCounter != counter) {
+            m_decryptionCounter = counter;
+            updateDecryptionStatus();
+            emit decryptionCounterChanged(m_decryptionCounter); // Emituj sygnał
+        }
     }
 
     void updateContentLayout() {
@@ -118,41 +129,45 @@ public:
     void setContent(QWidget* content) {
         qDebug() << "CyberAttachmentViewer::setContent - ustawianie zawartości";
 
-        // Usunięcie poprzedniej zawartości
         if (m_contentWidget) {
             m_contentLayout->removeWidget(m_contentWidget);
-            m_contentWidget->deleteLater(); // Bezpieczne usunięcie
+            m_contentWidget->deleteLater();
             m_contentWidget = nullptr;
         }
 
-        // Dodanie nowej zawartości
-        m_contentWidget = content; // Przypisz nowy widget
+        m_contentWidget = content;
         m_contentLayout->addWidget(m_contentWidget);
 
         content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-        // Usuń ograniczenia rozmiaru na zawartości
         content->setMinimumSize(0, 0);
         content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
-        // Ukrywamy zawartość początkowo
+        // *** ZMIANA: Zawartość jest początkowo UKRYTA ***
         content->setVisible(false);
+        // *** ZMIANA: Maska jest pokazywana zamiast zawartości ***
+        m_maskOverlay->setVisible(true);
+        m_maskOverlay->raise(); // Upewnij się, że maska jest na wierzchu
+        m_maskOverlay->startScanning(); // Rozpocznij animację skanowania na masce
 
-        // Aktualizujemy status
         m_statusLabel->setText("WYKRYTO ZASZYFROWANE DANE");
         m_isDecrypted = false;
+        m_isScanning = false; // Resetuj stan skanowania
+        setDecryptionCounter(0); // Resetuj licznik
 
-        // Aktywujemy layout i odświeżamy wymiary
         m_contentLayout->activate();
-        updateGeometry();
+        updateGeometry(); // Ważne, aby dostosować rozmiar kontenera
 
-        // Informujemy rodzica o zmianie rozmiaru
-        QTimer::singleShot(0, this, [this]() {
+        // *** ZMIANA: Wymuś aktualizację rozmiaru maski po krótkim opóźnieniu ***
+        QTimer::singleShot(10, this, [this]() {
+            if (m_contentWidget && m_maskOverlay) {
+                 // Ustaw rozmiar maski na rozmiar kontenera zawartości
+                 m_maskOverlay->setGeometry(m_contentContainer->rect());
+                 m_maskOverlay->raise(); // Ponownie na wszelki wypadek
+            }
+            // Poinformuj rodzica o potencjalnej zmianie rozmiaru
             if (parentWidget()) {
                 parentWidget()->updateGeometry();
-                parentWidget()->layout()->activate();
-
-                // Emituj sygnał o zmianie rozmiaru dla całej hierarchii widgetów
+                if (parentWidget()->layout()) parentWidget()->layout()->activate();
                 QEvent event(QEvent::LayoutRequest);
                 QApplication::sendEvent(parentWidget(), &event);
             }
@@ -191,6 +206,16 @@ public:
     }
 
 protected:
+
+    void resizeEvent(QResizeEvent* event) override {
+        QWidget::resizeEvent(event);
+        // Dopasuj rozmiar i pozycję maski do kontenera zawartości
+        if (m_contentContainer && m_maskOverlay) {
+            m_maskOverlay->setGeometry(m_contentContainer->rect());
+            m_maskOverlay->raise(); // Upewnij się, że jest na wierzchu
+        }
+    }
+
     void paintEvent(QPaintEvent* event) override {
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
@@ -259,13 +284,6 @@ protected:
         painter.setPen(borderColor);
         painter.setFont(QFont("Consolas", 7));
 
-        // Lewy górny - ID
-        painter.drawText(5, 15, QString("ID:%1").arg(QRandomGenerator::global()->bounded(1000, 9999)));
-
-        // Prawy górny - timestamp
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        painter.drawText(width() - 70, 15, QString("TS:%1").arg(timestamp));
-
         // Lewy dolny - poziom zabezpieczeń
         int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
         painter.drawText(5, height() - 5, QString("SEC:LVL%1").arg(secLevel));
@@ -274,92 +292,86 @@ protected:
         QString status = m_isDecrypted ? "UNLOCKED" : "LOCKED";
         painter.drawText(width() - 80, height() - 5, status);
 
-        // W trybie skanowania dodajemy więcej linii skanujących
-        if (m_isScanning && !m_isDecrypted) {
-            painter.setPen(QPen(QColor(0, 255, 255, 80), 1, Qt::SolidLine));
-
-            int scanLines = 8;
-            for (int i = 0; i < scanLines; i++) {
-                qreal phase = static_cast<qreal>(QDateTime::currentMSecsSinceEpoch() % 2000) / 2000.0;
-                qreal pos = (phase + static_cast<qreal>(i) / scanLines) - floor(phase + static_cast<qreal>(i) / scanLines);
-                int y = static_cast<int>(pos * height());
-
-                painter.drawLine(0, y, width(), y);
-            }
-        }
+        // // W trybie skanowania dodajemy więcej linii skanujących
+        // if (m_isScanning && !m_isDecrypted) {
+        //     painter.setPen(QPen(QColor(0, 255, 255, 80), 1, Qt::SolidLine));
+        //
+        //     int scanLines = 8;
+        //     for (int i = 0; i < scanLines; i++) {
+        //         qreal phase = static_cast<qreal>(QDateTime::currentMSecsSinceEpoch() % 2000) / 2000.0;
+        //         qreal pos = (phase + static_cast<qreal>(i) / scanLines) - floor(phase + static_cast<qreal>(i) / scanLines);
+        //         int y = static_cast<int>(pos * height());
+        //
+        //         painter.drawLine(0, y, width(), y);
+        //     }
+        // }
     }
 
 private slots:
     void onActionButtonClicked() {
+        // Logika pozostaje podobna, ale operuje na stanie i masce
         if (!m_isDecrypted) {
             if (!m_isScanning) {
-                startScanningAnimation();
-            } else {
-                startDecryptionAnimation();
+                startScanningAnimation(); // Rozpoczyna tylko wizualne skanowanie na masce
             }
+            // Nie ma już potrzeby ręcznego klikania, aby rozpocząć deszyfrację,
+            // startDecryptionAnimation jest wywoływane automatycznie po skanowaniu.
         } else {
             closeViewer();
         }
     }
 
     void startScanningAnimation() {
+        if (!m_contentWidget) return; // Nie rób nic, jeśli nie ma zawartości
+
         m_isScanning = true;
+        m_isDecrypted = false;
+        setDecryptionCounter(0); // Resetuj postęp
         m_statusLabel->setText("SKANOWANIE ZABEZPIECZEŃ...");
 
-        // Pokazujemy zawartość (będzie skanowana)
-        m_contentWidget->setVisible(true);
+        // *** ZMIANA: Nie pokazujemy m_contentWidget ***
+        // m_contentWidget->setVisible(true); // USUNIĘTE
 
-        // Tworzymy efekt skanowania
-        QTimer* scanTimer = new QTimer(this);
+        // *** ZMIANA: Upewnij się, że maska jest widoczna i animowana ***
+        m_maskOverlay->setGeometry(m_contentContainer->rect()); // Upewnij się co do rozmiaru
+        m_maskOverlay->raise();
+        m_maskOverlay->startScanning(); // Rozpocznij/kontynuuj animację skanowania
 
-        // Używamy zmiennej członkowskiej zamiast zmiennej lokalnej
-        m_scanProgress = 0;
-
-        connect(scanTimer, &QTimer::timeout, this, [this, scanTimer]() {
-            m_scanProgress += 5;
-            if (m_scanProgress >= 100) {
-                scanTimer->stop();
-                scanTimer->deleteLater();
-
-                // Po zakończeniu skanowania
-                m_statusLabel->setText("SKANOWANIE ZAKOŃCZONE. PRZYGOTOWANIE DESZYFRACJI...");
-
-                // Automatycznie rozpocznij dekodowanie po krótkim opóźnieniu
-                QTimer::singleShot(800, this, &CyberAttachmentViewer::startDecryptionAnimation);
+        // Używamy timera do symulacji czasu skanowania przed deszyfracją
+        QTimer::singleShot(2000, this, [this]() { // Czas trwania "skanowania"
+            if (m_isScanning) { // Sprawdź, czy nadal jesteśmy w trybie skanowania
+                 m_statusLabel->setText("SKANOWANIE ZAKOŃCZONE. PRZYGOTOWANIE DESZYFRACJI...");
+                 // Automatycznie rozpocznij dekodowanie po krótkim opóźnieniu
+                 QTimer::singleShot(800, this, &CyberAttachmentViewer::startDecryptionAnimation);
             }
-
-            // Aktualizuj UI podczas skanowania
-            update();
         });
 
-        scanTimer->start(50);
+        update(); // Przerenderuj ramki itp.
     }
 
     void startDecryptionAnimation() {
-        // Zatrzymujemy timer migania
-        if (m_blinkTimer) {
-            m_blinkTimer->stop();
-            m_blinkTimer->deleteLater();
-            m_blinkTimer = nullptr;
-        }
+        if (!m_contentWidget) return; // Nie rób nic, jeśli nie ma zawartości
+        if (m_isDecrypted) return;   // Nie zaczynaj, jeśli już zakończono
 
+        m_isScanning = false; // Skanowanie zakończone, zaczyna się deszyfracja
         m_statusLabel->setText("ROZPOCZĘTO DEKODOWANIE... 0%");
 
-        // Animacja dekodowania
+        // *** ZMIANA: Maska nadal jest widoczna, ale zacznie się odsłaniać ***
+        m_maskOverlay->setVisible(true);
+        m_maskOverlay->raise();
+        // Animacja licznika (która przez sygnał/slot aktualizuje maskę)
         QPropertyAnimation* decryptAnim = new QPropertyAnimation(this, "decryptionCounter");
-        decryptAnim->setDuration(4000);  // 4 sekundy
+        decryptAnim->setDuration(6000);
         decryptAnim->setStartValue(0);
         decryptAnim->setEndValue(100);
         decryptAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-        connect(decryptAnim, &QPropertyAnimation::finished, this, [this]() {
-            finishDecryption();
-        });
+        connect(decryptAnim, &QPropertyAnimation::finished, this, &CyberAttachmentViewer::finishDecryption);
 
         decryptAnim->start(QPropertyAnimation::DeleteWhenStopped);
 
-        // Uruchamiamy timer animacji
-        m_animTimer->start(50);
+        // Timer animacji (np. dla glitchy w tekście) nie jest już potrzebny do maski
+        // m_animTimer->start(50); // Można zostawić dla innych efektów jeśli są
     }
 
     void updateAnimation() {
@@ -385,20 +397,25 @@ private slots:
     }
 
     void updateDecryptionStatus() {
+        // Aktualizuje tylko etykietę tekstową
         m_statusLabel->setText(QString("DEKODOWANIE... %1%").arg(m_decryptionCounter));
+        // Nie trzeba już ręcznie aktualizować maski, robi to sygnał decryptionCounterChanged
     }
 
     void finishDecryption() {
-        m_animTimer->stop();
+        // m_animTimer->stop(); // Zatrzymaj, jeśli był używany
         m_isDecrypted = true;
         m_isScanning = false;
 
-        // Aktualizujemy UI
         m_statusLabel->setText("DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY");
 
-        // Upewniamy się, że zawartość jest widoczna (bez efektu migotania)
-        m_contentWidget->setVisible(true);
-        update();
+        // *** ZMIANA: Ukryj maskę i pokaż zawartość ***
+        m_maskOverlay->stopScanning(); // Zatrzymuje timer i ukrywa maskę
+        if (m_contentWidget) {
+            m_contentWidget->setVisible(true); // Pokaż finalną zawartość
+        }
+
+        update(); // Przerenderuj stan końcowy (np. status UNLOCKED)
     }
 
     void closeViewer() {
@@ -407,6 +424,7 @@ private slots:
     }
 
 signals:
+    void decryptionCounterChanged(int value);
     void viewingFinished();
 
 private:
@@ -422,6 +440,7 @@ private:
     QTimer* m_animTimer;
     QTimer* m_blinkTimer = nullptr;
     int m_scanProgress = 0;
+    MaskOverlay* m_maskOverlay;
 };
 
 #endif // CYBER_ATTACHMENT_VIEWER_H
