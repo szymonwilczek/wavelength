@@ -120,20 +120,60 @@ void AppInstanceManager::clientDisconnected() {
     if (!socket) return;
 
     if (m_isCreator) {
-        if (const QString clientId = m_clientIds.value(socket, QString(-1)); clientId != -1) {
-            QMutexLocker locker(&m_instancesMutex);
-            for (int i = 0; i < m_connectedInstances.size(); i++) {
-                if (m_connectedInstances[i].instanceId == clientId) {
-                    m_connectedInstances.removeAt(i);
-                    break;
-                }
+        if (const QString clientId = m_clientIds.value(socket, QString()); !clientId.isNull()) {
+            qDebug() << "[INSTANCE MANAGER] Client disconnected:" << clientId;
+            {
+                QMutexLocker locker(&m_instancesMutex);
+                m_connectedInstances.erase(
+                    std::remove_if(m_connectedInstances.begin(), m_connectedInstances.end(),
+                                   [&](const InstanceInfo& info){ return info.instanceId == clientId; }),
+                    m_connectedInstances.end()
+                );
             }
+
             m_clientIds.remove(socket);
             emit instanceDisconnected(clientId);
+
+            QMetaObject::invokeMethod(m_window, [this]() {
+                if (m_window && !m_window->isEnabled()) {
+                    qDebug() << "[INSTANCE MANAGER] Re-enabling main window after client disconnect.";
+                    m_window->setEnabled(true);
+                }
+                if (m_window && !m_window->isActiveWindow()) {
+                     qDebug() << "[INSTANCE MANAGER] Activating main window after client disconnect.";
+                    m_window->activateWindow();
+                    m_window->raise();
+                }
+                 if (m_window && m_window->testAttribute(Qt::WA_TransparentForMouseEvents)) {
+                    qDebug() << "[INSTANCE MANAGER] Disabling WA_TransparentForMouseEvents on main window.";
+                    m_window->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+                 }
+
+            }, Qt::QueuedConnection);
+
+        } else {
+             qDebug() << "[INSTANCE MANAGER] Client disconnected, but ID not found for socket.";
         }
     } else {
+        qDebug() << "[INSTANCE MANAGER] Disconnected from server.";
         if (!isAnotherInstanceRunning()) {
+            qDebug() << "[INSTANCE MANAGER] Server not running, becoming creator.";
             m_isCreator = true;
+            if (m_attractionThread && m_threadRunning) {
+                m_threadRunning = false;
+                if (m_attractionThread->joinable()) {
+                    m_attractionThread->join();
+                }
+                m_attractionThread.reset();
+            }
+            if(m_socket) {
+                m_socket->deleteLater();
+                m_socket = nullptr;
+            }
+            {
+                QMutexLocker locker(&m_instancesMutex);
+                m_connectedInstances.clear();
+            }
             setupServer();
         }
     }

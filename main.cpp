@@ -235,12 +235,12 @@ int main(int argc, char *argv[]) {
     window.resize(1024, 768);
 
     const auto instanceManager = new AppInstanceManager(&window, animation, &window);
-//     instanceManager->start();
-//
-//     QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
-//     window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
-//     window.setEnabled(false);
-// });
+    instanceManager->start();
+
+    QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
+    window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    window.setEnabled(false);
+});
 
 
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
