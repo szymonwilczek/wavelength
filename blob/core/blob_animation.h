@@ -144,6 +144,7 @@ private:
     void applyIdleEffect();
 
     void resetBlobToCenter() {
+        std::lock_guard<std::mutex> lock(m_pointsMutex);
         // Zapamiętaj aktualny promień bloba
         double originalRadius = m_params.blobRadius;
 
