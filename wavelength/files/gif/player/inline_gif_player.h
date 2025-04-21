@@ -45,8 +45,7 @@ public:
         connect(m_decoder.get(), &GifDecoder::frameReady, this, &InlineGifPlayer::updateFrame, Qt::QueuedConnection);
         connect(m_decoder.get(), &GifDecoder::error, this, &InlineGifPlayer::handleError);
         connect(m_decoder.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::handleGifInfo);
-        connect(m_decoder.get(), &GifDecoder::playbackFinished, this, &InlineGifPlayer::handlePlaybackFinished);
-        connect(m_decoder.get(), &GifDecoder::positionChanged, this, &InlineGifPlayer::updatePosition);
+        m_decoder->resume();
 
         // Inicjalizuj odtwarzacz w osobnym wątku
         QTimer::singleShot(100, this, [this]() {
