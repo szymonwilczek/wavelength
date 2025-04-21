@@ -323,11 +323,21 @@ QString WavelengthConfig::getPreferredStartFrequency() const {
 }
 
 void WavelengthConfig::setPreferredStartFrequency(QString frequency) {
-    // Ensure frequency is within reasonable bounds if necessary, e.g., >= 130.0
-    //TODO: tymczasowa konwersja na zmiennoprzecinkowe żeby sprawdzić zakresy
-    if (m_preferredStartFrequency != frequency) {
-        m_preferredStartFrequency = frequency;
+    bool ok;
+    double freqValue = frequency.toDouble(&ok);
+
+    if (ok && freqValue >= 130.0) {
+        QString normalizedFrequency = QString::number(freqValue, 'f', 1);
+        if (m_preferredStartFrequency != normalizedFrequency) {
+            m_preferredStartFrequency = normalizedFrequency;
+            emit configChanged("preferredStartFrequency");
+            qDebug() << "Config: Preferred start frequency set to" << m_preferredStartFrequency;
+        }
+    } else {
+        qWarning() << "Config: Invalid preferred start frequency provided:" << frequency << ". Keeping previous value:" << m_preferredStartFrequency;
+        if (m_preferredStartFrequency.toDouble(&ok) < 130.0 || !ok) {
+        m_preferredStartFrequency = QString::number(130.0, 'f', 1);
         emit configChanged("preferredStartFrequency");
-        qDebug() << "Config: Preferred start frequency set to" << m_preferredStartFrequency;
+        }
     }
 }

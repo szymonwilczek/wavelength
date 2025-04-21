@@ -1,15 +1,18 @@
 #ifndef WAVELENGTH_SETTINGS_WIDGET_H
 #define WAVELENGTH_SETTINGS_WIDGET_H
 
-#include <QDoubleSpinBox>
+// Usunięto: #include <QDoubleSpinBox>
 #include <QWidget>
 
 class WavelengthConfig;
-class CyberLineEdit;
+class CyberLineEdit; // Zmienimy na standardowy QLineEdit dla uproszczenia walidacji
+class QLineEdit;     // Dodano
+class QComboBox;     // Dodano
 class QSpinBox;
 class QLabel;
 class QVBoxLayout;
 class QFormLayout;
+class QHBoxLayout;   // Dodano
 
 class WavelengthSettingsWidget : public QWidget {
     Q_OBJECT
@@ -23,14 +26,17 @@ public:
 
 private:
     void setupUi();
-    void updateFrequencySuffix(double value);
+    // Usunięto: void updateFrequencySuffix(double value);
+    bool validateFrequencyInput(double& valueHz); // Nowa funkcja pomocnicza do walidacji
 
     WavelengthConfig *m_config;
 
     // Kontrolki UI dla tej zakładki
-    QDoubleSpinBox *m_preferredFrequencyEdit;
-    CyberLineEdit *m_serverAddressEdit;
-    QSpinBox *m_serverPortEdit;
+    // Usunięto: QDoubleSpinBox *m_preferredFrequencyEdit;
+    QLineEdit *m_frequencyValueEdit;     // Zamiast QDoubleSpinBox
+    QComboBox *m_frequencyUnitCombo;     // Do wyboru jednostki
+    CyberLineEdit *m_serverAddressEdit;  // Pozostaje bez zmian
+    QSpinBox *m_serverPortEdit;          // Pozostaje bez zmian
 };
 
 #endif // WAVELENGTH_SETTINGS_WIDGET_H
