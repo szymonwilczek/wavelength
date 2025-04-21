@@ -16,16 +16,16 @@ namespace DefaultConfig {
     const int KEEP_ALIVE_INTERVAL = 30000; // ms
     const int MAX_RECONNECT_ATTEMPTS = 5;
     const bool DEBUG_MODE = false;
-    const QColor BACKGROUND_COLOR = QColor("#101820"); // Ciemny niebiesko-szary
-    const QColor BLOB_COLOR = QColor("#4682B4"); // Steel Blue
-    const QColor MESSAGE_COLOR = QColor("#E0E0E0"); // Jasnoszary
-    const QColor STREAM_COLOR = QColor("#00FF00"); // Zielony (placeholder)
+    const QColor BACKGROUND_COLOR = QColor(0x101820); // Ciemny niebiesko-szary
+    const QColor BLOB_COLOR = QColor(0x4682B4); // Steel Blue
+    const QColor MESSAGE_COLOR = QColor(0xE0E0E0); // Jasnoszary
+    const QColor STREAM_COLOR = QColor(0x00FF00); // Zielony (placeholder)
     // NOWE domyślne
     const QColor GRID_COLOR = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
     const int GRID_SPACING = 35;
-    const QColor TITLE_TEXT_COLOR = QColor("#FFFFFF"); // Biały
-    const QColor TITLE_BORDER_COLOR = QColor("#E0B0FF"); // Lawendowy fiolet
-    const QColor TITLE_GLOW_COLOR = QColor("#E0B0FF"); // Lawendowy fiolet
+    const QColor TITLE_TEXT_COLOR = QColor(0xFFFFFF); // Biały
+    const QColor TITLE_BORDER_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
+    const QColor TITLE_GLOW_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
 }
 
 WavelengthConfig* WavelengthConfig::m_instance = nullptr;
@@ -69,22 +69,12 @@ void WavelengthConfig::loadDefaults() {
     m_titleTextColor = DefaultConfig::TITLE_TEXT_COLOR;
     m_titleBorderColor = DefaultConfig::TITLE_BORDER_COLOR;
     m_titleGlowColor = DefaultConfig::TITLE_GLOW_COLOR;
-    m_preferredStartFrequency = 130.0;
+    m_preferredStartFrequency = "130.0";
 }
 
 void WavelengthConfig::loadSettings() {
     m_settings.beginGroup("Wavelength");
-    m_relayServerAddress = m_settings.value("relayServerAddress", m_relayServerAddress).toString();
-    m_relayServerPort = m_settings.value("relayServerPort", m_relayServerPort).toInt();
-    m_preferredStartFrequency = m_settings.value("preferredStartFrequency", m_preferredStartFrequency).toDouble(); // Ładowanie nowej wartości
-    m_maxChatHistorySize = m_settings.value("maxChatHistorySize", m_maxChatHistorySize).toInt();
-    m_maxProcessedMessageIds = m_settings.value("maxProcessedMessageIds", m_maxProcessedMessageIds).toInt();
-    m_maxSentMessageCacheSize = m_settings.value("maxSentMessageCacheSize", m_maxSentMessageCacheSize).toInt();
-    m_maxRecentWavelength = m_settings.value("maxRecentWavelength", m_maxRecentWavelength).toInt();
-    m_connectionTimeout = m_settings.value("connectionTimeout", m_connectionTimeout).toInt();
-    m_keepAliveInterval = m_settings.value("keepAliveInterval", m_keepAliveInterval).toInt();
-    m_maxReconnectAttempts = m_settings.value("maxReconnectAttempts", m_maxReconnectAttempts).toInt();
-    m_debugMode = m_settings.value("debugMode", m_debugMode).toBool();
+    m_preferredStartFrequency = m_settings.value("preferredStartFrequency", m_preferredStartFrequency).toDouble();
     m_settings.endGroup();
 
     m_settings.beginGroup("Application");
@@ -100,28 +90,25 @@ void WavelengthConfig::loadSettings() {
     m_blobColor = m_settings.value("blobColor", m_blobColor).value<QColor>();
     m_streamColor = m_settings.value("streamColor", m_streamColor).value<QColor>();
     m_recentColors = m_settings.value("recentColors", QStringList()).toStringList();
-    // NOWE ładowanie
     m_gridColor = m_settings.value("gridColor", m_gridColor).value<QColor>();
     m_gridSpacing = m_settings.value("gridSpacing", m_gridSpacing).toInt();
     m_titleTextColor = m_settings.value("titleTextColor", m_titleTextColor).value<QColor>();
     m_titleBorderColor = m_settings.value("titleBorderColor", m_titleBorderColor).value<QColor>();
     m_titleGlowColor = m_settings.value("titleGlowColor", m_titleGlowColor).value<QColor>();
     m_settings.endGroup();
+
+    m_settings.beginGroup("Network");
+    m_relayServerAddress = m_settings.value("relayServerAddress", m_relayServerAddress).toString();
+    m_relayServerPort = m_settings.value("relayServerPort", m_relayServerPort).toInt();
+    m_connectionTimeout = m_settings.value("connectionTimeout", m_connectionTimeout).toInt();
+    m_keepAliveInterval = m_settings.value("keepAliveInterval", m_keepAliveInterval).toInt();
+    m_maxReconnectAttempts = m_settings.value("maxReconnectAttempts", m_maxReconnectAttempts).toInt();
+    m_settings.endGroup();
 }
 
 void WavelengthConfig::saveSettings() {
     m_settings.beginGroup("Wavelength");
-    m_settings.setValue("relayServerAddress", m_relayServerAddress);
-    m_settings.setValue("relayServerPort", m_relayServerPort);
     m_settings.setValue("preferredStartFrequency", m_preferredStartFrequency);
-    m_settings.setValue("maxChatHistorySize", m_maxChatHistorySize);
-    m_settings.setValue("maxProcessedMessageIds", m_maxProcessedMessageIds);
-    m_settings.setValue("maxSentMessageCacheSize", m_maxSentMessageCacheSize);
-    m_settings.setValue("maxRecentWavelength", m_maxRecentWavelength);
-    m_settings.setValue("connectionTimeout", m_connectionTimeout);
-    m_settings.setValue("keepAliveInterval", m_keepAliveInterval);
-    m_settings.setValue("maxReconnectAttempts", m_maxReconnectAttempts);
-    m_settings.setValue("debugMode", m_debugMode);
     m_settings.endGroup();
 
     m_settings.beginGroup("Application");
@@ -137,12 +124,19 @@ void WavelengthConfig::saveSettings() {
     m_settings.setValue("blobColor", m_blobColor);
     m_settings.setValue("streamColor", m_streamColor);
     m_settings.setValue("recentColors", m_recentColors);
-    // NOWY zapis
     m_settings.setValue("gridColor", m_gridColor);
     m_settings.setValue("gridSpacing", m_gridSpacing);
     m_settings.setValue("titleTextColor", m_titleTextColor);
     m_settings.setValue("titleBorderColor", m_titleBorderColor);
     m_settings.setValue("titleGlowColor", m_titleGlowColor);
+    m_settings.endGroup();
+
+    m_settings.beginGroup("Network");
+    m_settings.setValue("relayServerAddress", m_relayServerAddress);
+    m_settings.setValue("relayServerPort", m_relayServerPort);
+    m_settings.setValue("connectionTimeout", m_connectionTimeout);
+    m_settings.setValue("keepAliveInterval", m_keepAliveInterval);
+    m_settings.setValue("maxReconnectAttempts", m_maxReconnectAttempts);
     m_settings.endGroup();
 
     m_settings.sync(); // Wymuś zapis na dysk
@@ -157,23 +151,18 @@ void WavelengthConfig::restoreDefaults() {
     qDebug() << "Restored default settings.";
 }
 
-// --- Implementacje getterów (bez zmian dla istniejących) ---
 QString WavelengthConfig::getRelayServerAddress() const { return m_relayServerAddress; }
 int WavelengthConfig::getRelayServerPort() const { return m_relayServerPort; }
-// ... (inne gettery) ...
 QColor WavelengthConfig::getBackgroundColor() const { return m_backgroundColor; }
 QColor WavelengthConfig::getBlobColor() const { return m_blobColor; }
 QColor WavelengthConfig::getStreamColor() const { return m_streamColor; }
 QStringList WavelengthConfig::getRecentColors() const { return m_recentColors; }
-// --- NOWE gettery ---
 QColor WavelengthConfig::getGridColor() const { return m_gridColor; }
 int WavelengthConfig::getGridSpacing() const { return m_gridSpacing; }
 QColor WavelengthConfig::getTitleTextColor() const { return m_titleTextColor; }
 QColor WavelengthConfig::getTitleBorderColor() const { return m_titleBorderColor; }
 QColor WavelengthConfig::getTitleGlowColor() const { return m_titleGlowColor; }
-// --------------------
 
-// --- Implementacje setterów (zmodyfikowane/nowe) ---
 void WavelengthConfig::setRelayServerAddress(const QString& address) {
     if (m_relayServerAddress != address) {
         m_relayServerAddress = address;
@@ -186,7 +175,6 @@ void WavelengthConfig::setRelayServerPort(int port) {
         emit configChanged("relayServerPort");
     }
 }
-// ... (inne settery) ...
 void WavelengthConfig::setBackgroundColor(const QColor& color) {
     if (m_backgroundColor != color && color.isValid()) {
         m_backgroundColor = color;
@@ -270,7 +258,6 @@ void WavelengthConfig::addRecentColor(const QColor& color) {
     emit recentColorsChanged(); // Sygnalizuj zmianę listy
 }
 
-// ... (reszta metod jak getRelayServerUrl itp.) ...
 QString WavelengthConfig::getRelayServerUrl() const {
     return QString("ws://%1:%2").arg(m_relayServerAddress).arg(m_relayServerPort);
 }
@@ -315,7 +302,7 @@ QVariant WavelengthConfig::getSetting(const QString& key) const {
 
     // Jeśli klucz nie pasuje do żadnego znanego ustawienia
     qWarning() << "WavelengthConfig::getSetting - Unknown key:" << key;
-    return QVariant(); // Zwróć nieprawidłowy QVariant
+    return {}; // Zwróć nieprawidłowy QVariant
 }
 
 QString WavelengthConfig::getPreferredStartFrequency() const {

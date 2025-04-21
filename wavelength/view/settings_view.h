@@ -1,27 +1,30 @@
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
-#include <QSpinBox>
 #include <QStackedWidget>
 #include <QDateTime>
 
 #include "../ui/button/cyber_button.h"
 #include "../ui/button/tab_button.h"
 #include "../ui/checkbox/cyber_checkbox.h"
-#include "../ui/input/cyber_line_edit.h"
 #include "../util/wavelength_config.h"
-#include "settings/classified/system_override_manager.h"
-#include "settings/layers/code/security_code_layer.h"
-#include "settings/layers/fingerprint/fingerprint_layer.h"
-#include "settings/layers/handprint/handprint_layer.h"
-#include "settings/layers/question/security_question_layer.h"
-#include "settings/layers/retina_scan/retina_scan_layer.h"
-#include "settings/layers/snake_game/snake_game_layer.h"
-#include "settings/layers/typing_test/typing_test_layer.h"
-#include "settings/layers/voice_recognition/voice_recognition_layer.h"
 
+class SystemOverrideManager;
+class SnakeGameLayer;
+class TypingTestLayer;
+class VoiceRecognitionLayer;
+class RetinaScanLayer;
+class SecurityQuestionLayer;
+class SecurityCodeLayer;
+class HandprintLayer;
+class FingerprintLayer;
 class AppearanceSettingsWidget;
 class WavelengthSettingsWidget;
+class NetworkSettingsWidget;
+class QSpinBox;
+class QLabel;
+class QTimer;
+class QPushButton;
 
 class SettingsView : public QWidget {
     Q_OBJECT
@@ -48,8 +51,6 @@ private slots:
 private:
     void loadSettingsFromRegistry();
     void setupUi();
-    void setupNetworkTab();
-    void setupAdvancedTab();
     void setupClassifiedTab();
     void setupNextSecurityLayer();
     void resetSecurityLayers();
@@ -65,18 +66,7 @@ private:
 
     WavelengthSettingsWidget* m_wavelengthTabWidget;
     AppearanceSettingsWidget* m_appearanceTabWidget;
-
-    // Kontrolki do edycji ustawień - Network
-    QSpinBox *m_connectionTimeoutEdit;
-    QSpinBox *m_keepAliveIntervalEdit;
-    QSpinBox *m_maxReconnectAttemptsEdit;
-
-    // Kontrolki do edycji ustawień - Advanced
-    CyberCheckBox *m_debugModeCheckBox;
-    QSpinBox *m_chatHistorySizeEdit;
-    QSpinBox *m_processedMessageIdsEdit;
-    QSpinBox *m_sentMessageCacheSizeEdit;
-    QSpinBox *m_maxRecentWavelengthEdit;
+    NetworkSettingsWidget* m_advancedTabWidget;
 
     // Przyciski akcji
     CyberButton *m_saveButton;
@@ -85,6 +75,7 @@ private:
 
     QTimer *m_refreshTimer;
 
+    // Warstwy bezpieczeństwa (bez zmian)
     FingerprintLayer* m_fingerprintLayer;
     HandprintLayer* m_handprintLayer;
     SecurityCodeLayer* m_securityCodeLayer;
@@ -94,7 +85,6 @@ private:
     TypingTestLayer* m_typingTestLayer;
     SnakeGameLayer* m_snakeGameLayer;
     QWidget* m_accessGrantedWidget;
-
     QStackedWidget* m_securityLayersStack;
 
     enum SecurityLayerIndex {
@@ -113,9 +103,7 @@ private:
     bool m_debugModeEnabled;
 
     QWidget* m_classifiedFeaturesWidget;
-
     QPushButton* m_overrideButton;
-
     SystemOverrideManager* m_systemOverrideManager;
 };
 

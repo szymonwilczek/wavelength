@@ -644,11 +644,15 @@ private:
     QEventLoop loop;
     QNetworkReply *reply;
 
-    // Utwórz URL i dodaj preferowaną częstotliwość jako parametr zapytania
-    QUrl url("http://localhost:3000/api/next-available-frequency");
-    QUrlQuery query;
-    query.addQueryItem("preferredStartFrequency", preferredFreq);
-    url.setQuery(query);
+        QString serverAddress = config->getRelayServerAddress();
+        int serverPort = config->getRelayServerPort();
+
+        QString baseUrlString = QString("http://%1:%2/api/next-available-frequency").arg(serverAddress).arg(serverPort);
+        QUrl url(baseUrlString);
+
+        QUrlQuery query;
+        query.addQueryItem("preferredStartFrequency", preferredFreq);
+        url.setQuery(query);
 
     qDebug() << "LOG: Wysyłanie żądania do:" << url.toString();
     QNetworkRequest request(url);
