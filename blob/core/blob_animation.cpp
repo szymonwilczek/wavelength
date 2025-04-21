@@ -223,6 +223,7 @@ BlobAnimation::~BlobAnimation() {
 }
 
 void BlobAnimation::initializeBlob() {
+    std::lock_guard<std::mutex> lock(m_pointsMutex);
     // Wyczyść aktualne punkty
     m_controlPoints.clear();
     m_targetPoints.clear();
@@ -306,26 +307,24 @@ QRectF BlobAnimation::calculateBlobBoundingRect() {
 void BlobAnimation::updateAnimation() {
     m_needsRedraw = false;
 
-    std::lock_guard<std::mutex> lock(m_pointsMutex);
+    { // <<< Dodaj zakres dla blokady
+        std::lock_guard<std::mutex> lock(m_pointsMutex); // <<< DODAJ BLOKADĘ
 
-    processMovementBuffer();
+        // processMovementBuffer może modyfikować wektory przez applyInertiaForce
+        processMovementBuffer();
 
-    // Usuwamy sprawdzanie isInTransitionToIdle
-    // if (m_transitionManager.isInTransitionToIdle()) {
-    //     handleIdleTransition();
-    //     m_needsRedraw = true;
-    // } else
-
-    if (m_currentState == BlobConfig::IDLE) {
-        if (m_currentBlobState) {
-            m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+        // Stany IDLE/MOVING/RESIZING mogą modyfikować wektory w metodzie apply
+        if (m_currentState == BlobConfig::IDLE) {
+            if (m_currentBlobState) {
+                m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+            }
+        } else if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
+            if (m_currentBlobState) {
+                m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
+                m_needsRedraw = true;
+            }
         }
-    } else if (m_currentState == BlobConfig::MOVING || m_currentState == BlobConfig::RESIZING) {
-        if (m_currentBlobState) {
-            m_currentBlobState->apply(m_controlPoints, m_velocity, m_blobCenter, m_params);
-            m_needsRedraw = true;
-        }
-    }
+    } // <<< Blokada zwalniana automatycznie
 
     if (m_needsRedraw) {
         update();
