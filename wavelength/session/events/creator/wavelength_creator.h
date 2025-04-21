@@ -185,7 +185,6 @@ public:
 
             connect(keepAliveTimer, &QTimer::timeout, socket, [socket](){
                 if (socket->isValid()) {
-                    qDebug() << "Sending ping...";
                     socket->ping();
                 }
             });
