@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QDebug> // Dodano dla logowania
 
 #include "../../audio/player/inline_audio_player.h"
 #include "../../video/player/inline_video_player.h"
@@ -22,11 +23,8 @@ public:
     InlineGifPlayer(const QByteArray& gifData, QWidget* parent = nullptr)
         : QFrame(parent), m_gifData(gifData) {
 
-        setFrameStyle(QFrame::StyledPanel);
-        setStyleSheet("background-color: #1a1a1a; border: 1px solid #444;");
-        
-        // Początkowy rozmiar będzie automatycznie dostosowany po otrzymaniu informacji o GIF-ie
-        setMaximumSize(800, 800);
+        // Usunięto setFrameStyle i setStyleSheet
+        // Usunięto setMaximumSize
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -35,43 +33,41 @@ public:
         // Obszar wyświetlania GIF-a
         m_gifLabel = new QLabel(this);
         m_gifLabel->setAlignment(Qt::AlignCenter);
-        m_gifLabel->setStyleSheet("background-color: #1a1a1a; color: #ffffff;");
+        m_gifLabel->setStyleSheet("background-color: transparent; color: #ffffff;"); // Przezroczyste tło
         m_gifLabel->setText("Ładowanie GIF...");
+        m_gifLabel->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
         layout->addWidget(m_gifLabel);
 
         // Dekoder GIF
         m_decoder = std::make_shared<GifDecoder>(gifData, this);
 
         // Połącz sygnały
+        connect(m_decoder.get(), &GifDecoder::firstFrameReady, this, &InlineGifPlayer::displayThumbnail, Qt::QueuedConnection);
         connect(m_decoder.get(), &GifDecoder::frameReady, this, &InlineGifPlayer::updateFrame, Qt::QueuedConnection);
-        connect(m_decoder.get(), &GifDecoder::error, this, &InlineGifPlayer::handleError);
-        connect(m_decoder.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::handleGifInfo);
-        connect(m_decoder.get(), &GifDecoder::playbackFinished, this, &InlineGifPlayer::handlePlaybackFinished);
+        connect(m_decoder.get(), &GifDecoder::error, this, &InlineGifPlayer::handleError, Qt::QueuedConnection); // Dodano QueuedConnection dla bezpieczeństwa
+        connect(m_decoder.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::handleGifInfo, Qt::QueuedConnection);
 
-        // Połączenie dla aktualizacji pozycji (opcjonalne dla GIF-ów)
-        connect(m_decoder.get(), &GifDecoder::positionChanged, this, &InlineGifPlayer::updatePosition);
-
-        // Inicjalizuj odtwarzacz w osobnym wątku
-        QTimer::singleShot(100, this, [this]() {
-            m_decoder->start();
+        // Inicjalizuj dekoder (wyekstrahuje pierwszą klatkę)
+        // Wywołanie w osobnym wątku lub przez QTimer, aby nie blokować UI
+        QTimer::singleShot(0, this, [this]() {
+            if (m_decoder) {
+                if (!m_decoder->initialize()) {
+                     qDebug() << "InlineGifPlayer: Decoder initialization failed.";
+                     // Można tu obsłużyć błąd inicjalizacji
+                } else {
+                     qDebug() << "InlineGifPlayer: Decoder initialized successfully.";
+                }
+            }
         });
 
         // Obsługa zamykania aplikacji
-        connect(qApp, &QApplication::aboutToQuit, this, [this]() {
-            if (s_activePlayer == this) {
-                s_activePlayer = nullptr;
-            }
-            releaseResources();
-        });
-        
-        // Umożliwienie kliknięcia, aby zatrzymać/wznowić GIF
-        m_gifLabel->installEventFilter(this);
-        m_gifLabel->setCursor(Qt::PointingHandCursor);
+        connect(qApp, &QApplication::aboutToQuit, this, &InlineGifPlayer::releaseResources); // Uproszczono lambdę
+
+        setMouseTracking(true);
+        m_gifLabel->setMouseTracking(true);
     }
 
-    static InlineGifPlayer* getActivePlayer() {
-        return s_activePlayer;
-    }
+    // Usunięto getActivePlayer i logikę s_activePlayer
 
     ~InlineGifPlayer() {
         releaseResources();
@@ -80,151 +76,95 @@ public:
     void releaseResources() {
         if (m_decoder) {
             m_decoder->stop();
-            m_decoder->wait(500); // Czekaj max 500ms na zakończenie wątku
-            m_decoder->releaseResources();
-        }
-
-        if (s_activePlayer == this) {
-            s_activePlayer = nullptr;
-        }
-        m_isActive = false;
-    }
-
-    void activate() {
-        // Jeśli już jest aktywny, nic nie rób
-        if (m_isActive) return;
-
-        // Dezaktywuj aktualnie aktywny odtwarzacz GIF
-        if (s_activePlayer && s_activePlayer != this) {
-            s_activePlayer->deactivate();
-        }
-
-        // Dezaktywuj aktywny odtwarzacz audio, jeśli taki istnieje
-        if (InlineAudioPlayer::getActivePlayer() != nullptr) {
-            InlineAudioPlayer::getActivePlayer()->deactivate();
-        }
-
-        // Dezaktywuj aktywny odtwarzacz wideo, jeśli taki istnieje
-        if (InlineVideoPlayer::getActivePlayer() != nullptr) {
-            InlineVideoPlayer::getActivePlayer()->deactivate();
-        }
-
-        // Aktywuj ten odtwarzacz
-        m_isActive = true;
-        s_activePlayer = this;
-
-        // Upewnij się, że dekoder jest w odpowiednim stanie
-        if (!m_decoder->isRunning()) {
-            if (!m_decoder->reinitialize()) {
-                qDebug() << "Nie udało się zainicjalizować dekodera GIF";
-                return;
+            if (m_decoder->isRunning()) { // Czekaj tylko jeśli wątek działał
+                m_decoder->wait(500);
             }
-            m_decoder->start();
-        }
-
-        // Wznów odtwarzanie jeśli było zatrzymane
-        if (m_decoder->isPaused()) {
-            m_decoder->pause(); // Przełącza stan pauzy
+            // releaseResources w dekoderze jest wywoływane w jego destruktorze,
+            // ale można też wywołać jawnie, jeśli jest potrzeba
+            // m_decoder->releaseResources();
+            m_decoder.reset();
+            m_isPlaying = false;
+            qDebug() << "InlineGifPlayer: Resources released.";
         }
     }
 
-    void deactivate() {
-        if (!m_isActive) return;
-
-        // Zatrzymaj odtwarzanie
-        if (m_decoder && !m_decoder->isPaused()) {
-            m_decoder->pause();  // Pauzuj odtwarzanie
+    // Zwraca oryginalny rozmiar GIF-a jako wskazówkę
+    QSize sizeHint() const override {
+        if (m_gifWidth > 0 && m_gifHeight > 0) {
+            return QSize(m_gifWidth, m_gifHeight);
         }
-
-        // Wyświetl pierwszą klatkę jako nieruchomy obraz
-        if (!m_thumbnailFrame.isNull()) {
-            displayScaledImage(m_thumbnailFrame);
-        }
-
-        // Usuń status aktywnego, jeśli to ten odtwarzacz
-        if (s_activePlayer == this) {
-            s_activePlayer = nullptr;
-        }
-
-        m_isActive = false;
+        return QFrame::sizeHint(); // Zwróć domyślny, jeśli rozmiar nie jest znany
     }
 
-    // Obsługa kliknięcia w GIF (pauza/wznów)
-    bool eventFilter(QObject *watched, QEvent *event) override {
-        if (watched == m_gifLabel && event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton) {
-                togglePlayback();
-                return true;
-            }
+    void startPlayback() {
+        qDebug() << "InlineGifPlayer: startPlayback called.";
+        if (m_decoder && !m_isPlaying) {
+            m_isPlaying = true;
+            m_decoder->resume();
         }
-        return QFrame::eventFilter(watched, event);
     }
 
-    // Efekt najechania myszą
-    void enterEvent(QEnterEvent *event) {
-        // Aktywuj po najechaniu myszą
-        activate();
+    // Metoda do jawnego zatrzymania/pauzowania odtwarzania (np. dla dialogu)
+    void stopPlayback() {
+        qDebug() << "InlineGifPlayer: stopPlayback called.";
+        if (m_decoder && m_isPlaying) {
+            m_isPlaying = false;
+            m_decoder->pause();
+        }
+    }
+
+protected:
+    // Przechwytywanie zdarzeń najechania i opuszczenia myszy
+    void enterEvent(QEvent *event) override {
+        qDebug() << "InlineGifPlayer: Mouse entered.";
+        startPlayback(); // Rozpocznij odtwarzanie przy najechaniu
         QFrame::enterEvent(event);
     }
 
+    void leaveEvent(QEvent *event) override {
+        qDebug() << "InlineGifPlayer: Mouse left.";
+        stopPlayback(); // Zatrzymaj odtwarzanie przy opuszczeniu
+        QFrame::leaveEvent(event);
+    }
+
 private slots:
-    void togglePlayback() {
-        if (!m_decoder) return;
-
-        // Aktywuj ten odtwarzacz przed odtwarzaniem
-        activate();
-
-        // Przełącz stan pauzy
-        m_decoder->pause();
-
-        // Wizualne wskazanie stanu pauzy można dodać jeśli potrzeba
-        // np. dodając przezroczysty przycisk play na środku podczas pauzy
+    void displayThumbnail(const QImage& frame) {
+        if (!frame.isNull()) {
+            qDebug() << "InlineGifPlayer: Displaying thumbnail.";
+            m_thumbnailPixmap = QPixmap::fromImage(frame); // Zapisz miniaturkę
+            m_gifLabel->setPixmap(m_thumbnailPixmap.scaled(
+                m_gifLabel->size(), // Skaluj do aktualnego rozmiaru labelki
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            ));
+            // Nie aktualizuj geometrii tutaj, poczekaj na gifInfo
+        } else {
+            qDebug() << "InlineGifPlayer: Received null thumbnail.";
+            m_gifLabel->setText("⚠️ Błąd ładowania miniatury");
+        }
     }
 
     void updateFrame(const QImage& frame) {
-        // Jeśli to pierwsza klatka, zapisz ją jako miniaturkę
-        if (m_thumbnailFrame.isNull()) {
-            m_thumbnailFrame = frame.copy();
-        }
+        // Ta metoda jest teraz wywoływana tylko gdy dekoder aktywnie dekoduje (m_isPlaying == true)
+        if (frame.isNull() || !m_isPlaying) return; // Dodano sprawdzenie m_isPlaying
 
-        displayScaledImage(frame);
+        // Ustaw pixmapę - setScaledContents zajmie się resztą
+        m_gifLabel->setPixmap(QPixmap::fromImage(frame));
+
+        // Nie ma potrzeby aktualizować geometrii dla każdej klatki,
+        // chyba że rozmiar GIFa się zmienia dynamicznie (rzadkie)
     }
 
-    void displayScaledImage(const QImage& image) {
-        // Obliczamy rozmiar skalowanej ramki z zachowaniem proporcji
-        // i ograniczeniem do sensownego maksymalnego rozmiaru
-        QSize targetSize = image.size();
-        int maxWidth = std::min(image.width(), 600); // Maksymalna szerokość GIF-a
-        int maxHeight = std::min(image.height(), 600); // Maksymalna wysokość GIF-a
-        
-        targetSize.scale(maxWidth, maxHeight, Qt::KeepAspectRatio);
-
-        // Skalujemy oryginalną klatkę tylko jeśli trzeba
-        QImage scaledImage;
-        if (image.width() > maxWidth || image.height() > maxHeight) {
-            scaledImage = image.scaled(targetSize.width(), targetSize.height(),
-                                     Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        } else {
-            scaledImage = image; // Użyj oryginalnego rozmiaru
-        }
-
-        // Aktualizujemy rozmiar widgetu do rozmiaru GIF-a
-        setFixedSize(scaledImage.width(), scaledImage.height());
-
-        // Wyświetlamy obraz
-        m_gifLabel->setPixmap(QPixmap::fromImage(scaledImage));
-        m_gifLabel->setFixedSize(scaledImage.size());
-    }
 
     void updatePosition(double position) {
-        // Aktualizacja pozycji (opcjonalna dla GIF-ów)
         m_currentPosition = position;
     }
 
     void handleError(const QString& message) {
         qDebug() << "GIF decoder error:" << message;
         m_gifLabel->setText("⚠️ " + message);
+        setMinimumSize(100, 50); // Minimalny rozmiar dla błędu
+        updateGeometry();
     }
 
     void handleGifInfo(int width, int height, double duration, double frameRate, int numStreams) {
@@ -232,36 +172,47 @@ private slots:
         m_gifHeight = height;
         m_gifDuration = duration;
         m_frameRate = frameRate;
-        
-        qDebug() << "GIF info - szerokość:" << width << "wysokość:" << height 
+
+        qDebug() << "GIF info - szerokość:" << width << "wysokość:" << height
                  << "czas trwania:" << duration << "s, FPS:" << frameRate;
 
-        // Pobierz pierwszą klatkę jako miniaturkę
-        QTimer::singleShot(100, this, [this]() {
-            m_decoder->extractFirstFrame();
-        });
+        // Zaktualizuj geometrię po otrzymaniu informacji o rozmiarze
+        updateGeometry();
+        emit gifLoaded(); // Sygnalizujemy załadowanie informacji o GIFie
+
+        if (!m_thumbnailPixmap.isNull() && !m_isPlaying) {
+            m_gifLabel->setPixmap(m_thumbnailPixmap.scaled(
+                m_gifLabel->size(),
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            ));
+        }
     }
 
     void handlePlaybackFinished() {
-        // GIF-y zazwyczaj automatycznie się zapętlają w dekoderze,
-        // więc to zdarzenie może nie być potrzebne
+        // GIF-y zazwyczaj automatycznie się zapętlają w dekoderze
     }
+
+signals:
+    void gifLoaded(); // Nowy sygnał
 
 private:
     QLabel* m_gifLabel;
     std::shared_ptr<GifDecoder> m_decoder;
 
     QByteArray m_gifData;
-    
+
     int m_gifWidth = 0;
     int m_gifHeight = 0;
     double m_gifDuration = 0;
     double m_frameRate = 0;
     double m_currentPosition = 0;
-    bool m_isActive = false;
-    QImage m_thumbnailFrame;                 // Przechowuje miniaturkę dla zatrzymanego odtwarzacza
-    
-    inline static InlineGifPlayer* s_activePlayer = nullptr;
+    // Usunięto m_isActive
+    QImage m_thumbnailFrame;
+    bool m_isPlaying; // Flaga śledząca, czy aktywnie odtwarzamy
+    QPixmap m_thumbnailPixmap;
+
+    // Usunięto s_activePlayer
 };
 
 #endif //INLINE_GIF_PLAYER_H

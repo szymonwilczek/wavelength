@@ -49,9 +49,9 @@ public:
     // Kontener na zawartość
     m_contentContainer = new QWidget(this);
     m_contentLayout = new QVBoxLayout(m_contentContainer);
-    m_contentLayout->setContentsMargins(3, 3, 3, 3);
-    m_contentLayout->setAlignment(Qt::AlignCenter);
-    m_layout->addWidget(m_contentContainer, 1);
+        m_contentLayout->setContentsMargins(0, 0, 0, 0); // Zmieniono marginesy na 0
+        // m_contentLayout->setAlignment(Qt::AlignCenter); // Usunięto alignment, pozwalamy zawartości wypełnić
+        m_layout->addWidget(m_contentContainer, 1);
 
 
     // Timer dla animacji
@@ -70,7 +70,8 @@ public:
     setMinimumSize(0, 0);
 
     // Ustawiamy dobrą politykę rozmiaru
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred); // Zmieniono na Preferred
+        m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     qDebug() << "CyberAttachmentViewer: utworzono z rozmiarem początkowym" << size();
 
@@ -118,29 +119,21 @@ public:
         qDebug() << "CyberAttachmentViewer::setContent - ustawianie zawartości";
 
         // Usunięcie poprzedniej zawartości
-        QLayoutItem* item;
-        while ((item = m_contentLayout->takeAt(0)) != nullptr) {
-            if (item->widget()) delete item->widget();
-            delete item;
+        if (m_contentWidget) {
+            m_contentLayout->removeWidget(m_contentWidget);
+            m_contentWidget->deleteLater(); // Bezpieczne usunięcie
+            m_contentWidget = nullptr;
         }
 
         // Dodanie nowej zawartości
-        m_contentLayout->addWidget(content);
-        m_contentWidget = content;
+        m_contentWidget = content; // Przypisz nowy widget
+        m_contentLayout->addWidget(m_contentWidget);
 
-        m_contentLayout->setAlignment(content, Qt::AlignCenter);
+        content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
         // Usuń ograniczenia rozmiaru na zawartości
         content->setMinimumSize(0, 0);
         content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-
-        if (content->sizeHint().isValid()) {
-            qDebug() << "Rozmiar docelowej zawartości (sizeHint):" << content->sizeHint();
-        }
-
-        // Użyj Preferred zamiast Expanding dla lepszego dopasowania
-        content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
         // Ukrywamy zawartość początkowo
         content->setVisible(false);
@@ -164,37 +157,38 @@ public:
                 QApplication::sendEvent(parentWidget(), &event);
             }
         });
-
-        updateContentLayout();
     }
 
-QSize sizeHint() const override {
-    if (m_contentWidget) {
-        // Pobieramy preferowany rozmiar zawartości
-        QSize contentSize = m_contentWidget->sizeHint();
-        if (contentSize.isValid() && contentSize.width() > 0 && contentSize.height() > 0) {
-            // Dodajemy przestrzeń na ramki, przyciski i etykiety
-            int totalHeight = contentSize.height() +
-                            m_layout->contentsMargins().top() +
-                            m_layout->contentsMargins().bottom() +
-                            m_statusLabel->sizeHint().height() +
-                            m_layout->spacing() * 2;
+    QSize sizeHint() const override {
+        QSize hint;
+        int extraHeight = m_statusLabel->sizeHint().height() + m_layout->spacing();
+        int extraWidth = m_layout->contentsMargins().left() + m_layout->contentsMargins().right();
+        extraHeight += m_layout->contentsMargins().top() + m_layout->contentsMargins().bottom();
 
-            int totalWidth = contentSize.width() +
-                           m_layout->contentsMargins().left() +
-                           m_layout->contentsMargins().right();
-
-            QSize result(totalWidth, totalHeight);
-            qDebug() << "CyberAttachmentViewer::sizeHint zwraca:" << result;
-            return result;
+        if (m_contentWidget) {
+            // Pobieramy sizeHint zawartości (czyli AutoScalingAttachment)
+            QSize contentHint = m_contentWidget->sizeHint();
+            if (contentHint.isValid()) {
+                hint.setWidth(contentHint.width() + extraWidth);
+                hint.setHeight(contentHint.height() + extraHeight);
+                return hint;
+            } else {
+                // Jeśli contentHint jest nieprawidłowy, spróbujmy rozmiar widgetu
+                QSize contentSize = m_contentWidget->size();
+                if (contentSize.isValid() && contentSize.width() > 0) {
+                    hint.setWidth(contentSize.width() + extraWidth);
+                    hint.setHeight(contentSize.height() + extraHeight);
+                    return hint;
+                }
+            }
         }
-    }
 
-    // Podstawowy rozmiar, jeśli nie mamy zawartości
-    QSize defaultSize(400, 250);
-    qDebug() << "CyberAttachmentViewer::sizeHint zwraca domyślny:" << defaultSize;
-    return defaultSize;
-}
+        // Podstawowy rozmiar, jeśli nie mamy zawartości lub jej rozmiar jest nieznany
+        QSize defaultSize(200, 100); // Zmniejszony domyślny rozmiar
+        hint.setWidth(defaultSize.width() + extraWidth);
+        hint.setHeight(defaultSize.height() + extraHeight);
+        return hint;
+    }
 
 protected:
     void paintEvent(QPaintEvent* event) override {

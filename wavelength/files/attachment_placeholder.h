@@ -7,9 +7,12 @@
 #include <qfuture.h>
 #include <QLabel>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <qtconcurrentrun.h>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QWindow>
 
 #include "attachment_queue_manager.h"
 #include "auto_scaling_attachment.h"
@@ -281,6 +284,189 @@ public slots:
         setLoading(false);
     }
 
+    // Funkcja pomocnicza do tworzenia i pokazywania dialogu
+    void showFullSizeDialog(const QByteArray& data, bool isGif) {
+    QWidget* parentWindow = window();
+    QDialog* fullSizeDialog = new QDialog(parentWindow, Qt::Window | Qt::FramelessWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    fullSizeDialog->setWindowTitle(isGif ? "Podgląd animacji" : "Podgląd załącznika");
+    fullSizeDialog->setModal(false);
+    fullSizeDialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    QVBoxLayout* layout = new QVBoxLayout(fullSizeDialog);
+    layout->setContentsMargins(5, 5, 5, 5);
+
+    QScrollArea* scrollArea = new QScrollArea(fullSizeDialog);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setStyleSheet("QScrollArea { background-color: #001018; border: none; }");
+
+    QWidget* contentWidget = nullptr;
+    InlineGifPlayer* fullGif = nullptr;
+
+    // Lambda do wywołania po uzyskaniu rozmiaru (przeniesiona logika z sizeReadyCallback)
+    auto adjustAndShowWithSizeCheck = [this, fullSizeDialog, scrollArea](QWidget* contentWgt, QSize size) {
+        if (size.isValid()) {
+            qDebug() << "Dialog: Content size ready:" << size;
+            adjustAndShowDialog(fullSizeDialog, scrollArea, contentWgt, size);
+        } else {
+            qDebug() << "Dialog: Content size invalid after load.";
+            adjustAndShowDialog(fullSizeDialog, scrollArea, contentWgt, QSize(400, 300)); // Fallback
+        }
+    };
+
+    if (isGif) {
+        fullGif = new InlineGifPlayer(data, scrollArea); // Przypisz do wskaźnika
+        contentWidget = fullGif;
+        // Połącz gifLoaded, aby uzyskać rozmiar i pokazać dialog
+        connect(fullGif, &InlineGifPlayer::gifLoaded, this, [=]() mutable { // mutable, aby móc modyfikować fullGif
+            QTimer::singleShot(0, this, [=]() mutable {
+                adjustAndShowWithSizeCheck(fullGif, fullGif->sizeHint());
+                // Rozpocznij odtwarzanie *po* pokazaniu dialogu
+                if (fullGif) { // Sprawdź czy wskaźnik jest nadal ważny
+                     fullGif->startPlayback();
+                }
+            });
+        });
+        // Połącz finished dialogu, aby zatrzymać odtwarzanie
+        connect(fullSizeDialog, &QDialog::finished, this, [fullGif]() mutable {
+             if (fullGif) {
+                 // Nie trzeba jawnie stopPlayback(), bo WA_DeleteOnClose wywoła destruktor
+                 // fullGif->stopPlayback();
+                 // Destruktor InlineGifPlayer wywoła releaseResources(), które zatrzyma dekoder.
+                 qDebug() << "Full size GIF dialog finished.";
+                 // Można by tu ustawić fullGif = nullptr, ale WA_DeleteOnClose i tak go usunie.
+             }
+        });
+    } else {
+        InlineImageViewer* fullImage = new InlineImageViewer(data, scrollArea);
+        contentWidget = fullImage;
+        connect(fullImage, &InlineImageViewer::imageLoaded, this, [=]() {
+            QTimer::singleShot(0, this, [=]() {
+                // Wywołaj lambdę pomocniczą bezpośrednio
+                adjustAndShowWithSizeCheck(fullImage, fullImage->sizeHint());
+            });
+        });
+        // Fallback z imageInfoReady
+        connect(fullImage, &InlineImageViewer::imageInfoReady, this, [=](int w, int h, bool) {
+            // Sprawdź, czy dialog nie został już pokazany (np. przez imageLoaded)
+            // Proste sprawdzenie widoczności może wystarczyć
+            if (!fullSizeDialog->isVisible()) {
+                 QTimer::singleShot(0, this, [=]() {
+                     // Pobierz sizeHint ponownie, na wypadek gdyby imageLoaded zadziałało w międzyczasie
+                     QSize currentHint = fullImage->sizeHint();
+                     if (currentHint.isValid()) {
+                          adjustAndShowWithSizeCheck(fullImage, currentHint);
+                     } else {
+                          adjustAndShowWithSizeCheck(fullImage, QSize(w, h)); // Użyj rozmiaru z info jako fallback
+                     }
+                 });
+            }
+        });
+    }
+
+    scrollArea->setWidget(contentWidget);
+    layout->addWidget(scrollArea, 1);
+
+    QPushButton* closeButton = new QPushButton("Zamknij", fullSizeDialog);
+        closeButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: #002b3d;"
+            "  color: #00ffff;"
+            "  border: 1px solid #00aaff;"
+            "  border-radius: 2px;"
+            "  padding: 6px;"
+            "  font-family: 'Consolas', monospace;"
+            "  font-weight: bold;"
+            "}"
+            "QPushButton:hover {"
+            "  background-color: #003e59;"
+            "}"
+            "QPushButton:pressed {"
+            "  background-color: #005580;"
+            "}"
+        );
+        layout->addWidget(closeButton, 0, Qt::AlignHCenter);
+        connect(closeButton, &QPushButton::clicked, fullSizeDialog, &QDialog::accept);
+
+        // Styl okna
+        fullSizeDialog->setStyleSheet(
+            "QDialog {"
+            "  background-color: #001822;"
+            "  border: 2px solid #00aaff;"
+            "}"
+        );
+    }
+
+    // Funkcja pomocnicza do dostosowania rozmiaru i pokazania dialogu
+    void adjustAndShowDialog(QDialog* dialog, QScrollArea* scrollArea, QWidget* contentWidget, QSize originalContentSize) {
+    if (!dialog || !contentWidget || !originalContentSize.isValid()) {
+        qDebug() << "adjustAndShowDialog: Invalid arguments or size.";
+        if(dialog) dialog->deleteLater();
+        return;
+    }
+
+    // 1. Pobierz geometrię ekranu (bez zmian)
+    QScreen* screen = nullptr;
+    if (window() && window()->windowHandle()) {
+        screen = window()->windowHandle()->screen();
+    }
+    if (!screen) {
+        screen = QApplication::primaryScreen();
+    }
+    QRect availableGeometry = screen ? screen->availableGeometry() : QRect(0, 0, 1024, 768);
+    qDebug() << "Dialog: Using Screen geometry:" << availableGeometry;
+
+    // 2. Marginesy okna dialogowego (bez zmian)
+    const int margin = 50;
+
+    // 3. Ustaw ROZMIAR ZAWARTOŚCI na ORYGINALNY
+    qDebug() << "Dialog: Setting content widget fixed size to ORIGINAL:" << originalContentSize;
+    contentWidget->setFixedSize(originalContentSize); // Kluczowa zmiana!
+
+    // 4. Oblicz preferowany rozmiar okna dialogu na podstawie ORYGINALNEGO rozmiaru zawartości
+    QPushButton* closeButton = dialog->findChild<QPushButton*>();
+    int buttonHeight = closeButton ? closeButton->sizeHint().height() : 30; // Użyj sizeHint przycisku
+    int verticalMargins = dialog->layout()->contentsMargins().top() + dialog->layout()->contentsMargins().bottom() + dialog->layout()->spacing() + buttonHeight;
+    int horizontalMargins = dialog->layout()->contentsMargins().left() + dialog->layout()->contentsMargins().right();
+
+    QSize preferredDialogSize = originalContentSize;
+    preferredDialogSize.rwidth() += horizontalMargins;
+    preferredDialogSize.rheight() += verticalMargins;
+
+    // Dodaj miejsce na paski przewijania, jeśli będą potrzebne (porównaj oryginalny rozmiar z dostępnym miejscem *wewnątrz* okna)
+    QSize maxContentAreaSize(
+        availableGeometry.width() - margin * 2 - horizontalMargins - scrollArea->verticalScrollBar()->sizeHint().width(),
+        availableGeometry.height() - margin * 2 - verticalMargins - scrollArea->horizontalScrollBar()->sizeHint().height() // Dodano odjęcie paska poziomego
+    );
+
+    if (originalContentSize.width() > maxContentAreaSize.width()) {
+        preferredDialogSize.rheight() += scrollArea->horizontalScrollBar()->sizeHint().height();
+    }
+    if (originalContentSize.height() > maxContentAreaSize.height()) {
+        preferredDialogSize.rwidth() += scrollArea->verticalScrollBar()->sizeHint().width();
+    }
+     qDebug() << "Dialog: Preferred dialog size (based on original content):" << preferredDialogSize;
+
+
+    // 5. OGRANICZ rozmiar okna dialogu do dostępnej geometrii ekranu (z marginesami)
+    QSize finalDialogSize = preferredDialogSize;
+    finalDialogSize.setWidth(qMin(finalDialogSize.width(), availableGeometry.width() - margin * 2));
+    finalDialogSize.setHeight(qMin(finalDialogSize.height(), availableGeometry.height() - margin * 2));
+    qDebug() << "Dialog: Final dialog size (limited to screen):" << finalDialogSize;
+
+    dialog->resize(finalDialogSize);
+
+    // 6. Wyśrodkuj dialog na ekranie (bez zmian)
+    int x = availableGeometry.left() + (availableGeometry.width() - finalDialogSize.width()) / 2;
+    int y = availableGeometry.top() + (availableGeometry.height() - finalDialogSize.height()) / 2;
+    dialog->move(x, y);
+    qDebug() << "Dialog: Moving to:" << QPoint(x,y);
+
+    // 7. Pokaż dialog (bez zmian)
+    dialog->show();
+}
+
 void showCyberImage(const QByteArray& data) {
     CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
 
@@ -293,66 +479,32 @@ void showCyberImage(const QByteArray& data) {
     // Opakowujemy w AutoScalingAttachment
     AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(imageViewer, viewer);
 
-    // Ustawiamy maksymalny dozwolony rozmiar (np. 80% szerokości wiadomości, 60% wysokości ekranu)
-    QScreen* screen = QApplication::primaryScreen();
-    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    QSize maxSize(400, 300);
+
+    if (parentWidget() && parentWidget()->parentWidget()) { // Zakładając hierarchię StreamMessage -> Placeholder -> Viewer -> ScalingAttachment
+        QWidget* streamMessage = parentWidget()->parentWidget();
+        maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50)); // Odejmij marginesy
+        maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
+    } else {
+        QScreen* screen = QApplication::primaryScreen();
+        if(screen) {
+            maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
+            maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
+        }
+    }
+    qDebug() << "showCyberImage - Ustawiam maxSize dla miniatury:" << maxSize;
     scalingAttachment->setMaxAllowedSize(maxSize);
 
     // Podłączamy obsługę kliknięcia
-    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [data, this]() {
-        // Utworzenie osobnego widgetu dla pełnowymiarowego obrazu
-        QDialog* fullSizeViewer = new QDialog(nullptr, Qt::Window | Qt::FramelessWindowHint);
-        fullSizeViewer->setWindowTitle("Podgląd załącznika");
-        fullSizeViewer->setModal(true);
-
-        QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
-
-        // Dodajemy pełnowymiarowy obraz
-        InlineImageViewer* fullImage = new InlineImageViewer(data, fullSizeViewer);
-        layout->addWidget(fullImage, 0, Qt::AlignCenter);
-
-        // Dodaj przycisk zamknięcia
-        QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
-        closeButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: #002b3d;"
-            "  color: #00ffff;"
-            "  border: 1px solid #00aaff;"
-            "  border-radius: 2px;"
-            "  padding: 6px;"
-            "  font-family: 'Consolas', monospace;"
-            "  font-weight: bold;"
-            "}"
-        );
-        layout->addWidget(closeButton, 0, Qt::AlignHCenter);
-
-        connect(closeButton, &QPushButton::clicked, fullSizeViewer, &QDialog::accept);
-
-        // Ustaw styl okna w stylu cyberpunkowym
-        fullSizeViewer->setStyleSheet(
-            "QDialog {"
-            "  background-color: #001822;"
-            "  border: 2px solid #00aaff;"
-            "}"
-        );
-
-        fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
-        fullSizeViewer->show();
-    });
+    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [this, data]() {
+            showFullSizeDialog(data, false); // false oznacza, że to nie GIF
+        });
 
     // Ustawiamy zawartość viewera
     viewer->setContent(scalingAttachment);
-
-    // Podłączamy sygnał zakończenia
-    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        m_loadButton->setText("PONÓW DEKODOWANIE");
-        m_loadButton->setVisible(true);
-        m_contentContainer->setVisible(false);
-        emit attachmentLoaded();
-    });
-
     setContent(viewer);
     setLoading(false);
+    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberGif(const QByteArray& data) {
@@ -364,65 +516,30 @@ void showCyberGif(const QByteArray& data) {
     // Opakowujemy w AutoScalingAttachment
     AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(gifPlayer, viewer);
 
-    // Ustawiamy maksymalny dozwolony rozmiar
-    QScreen* screen = QApplication::primaryScreen();
-    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    QSize maxSize(400, 300);
+    if (parentWidget() && parentWidget()->parentWidget()) {
+        QWidget* streamMessage = parentWidget()->parentWidget();
+        maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50));
+        maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
+    } else {
+        QScreen* screen = QApplication::primaryScreen();
+        if(screen) {
+            maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
+            maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
+        }
+    }
+
     scalingAttachment->setMaxAllowedSize(maxSize);
 
     // Podłączamy obsługę kliknięcia
-    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [data, this]() {
-        // Utworzenie osobnego widgetu dla pełnowymiarowego gifa
-        QDialog* fullSizeViewer = new QDialog(nullptr, Qt::Window | Qt::FramelessWindowHint);
-        fullSizeViewer->setWindowTitle("Podgląd animacji");
-        fullSizeViewer->setModal(true);
-
-        QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
-
-        // Dodajemy pełnowymiarowy gif
-        InlineGifPlayer* fullGif = new InlineGifPlayer(data, fullSizeViewer);
-        layout->addWidget(fullGif, 0, Qt::AlignCenter);
-
-        // Dodaj przycisk zamknięcia
-        QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
-        closeButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: #002b3d;"
-            "  color: #00ffff;"
-            "  border: 1px solid #00aaff;"
-            "  border-radius: 2px;"
-            "  padding: 6px;"
-            "  font-family: 'Consolas', monospace;"
-            "  font-weight: bold;"
-            "}"
-        );
-        layout->addWidget(closeButton, 0, Qt::AlignHCenter);
-
-        connect(closeButton, &QPushButton::clicked, fullSizeViewer, &QDialog::accept);
-
-        // Ustaw styl okna w stylu cyberpunkowym
-        fullSizeViewer->setStyleSheet(
-            "QDialog {"
-            "  background-color: #001822;"
-            "  border: 2px solid #00aaff;"
-            "}"
-        );
-
-        fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
-        fullSizeViewer->show();
-    });
+    connect(scalingAttachment, &AutoScalingAttachment::clicked, this, [this, data]() {
+            showFullSizeDialog(data, true); // true oznacza, że to GIF
+        });
 
     viewer->setContent(scalingAttachment);
-
-    // Podłączamy sygnał zakończenia
-    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        m_loadButton->setText("PONÓW DEKODOWANIE");
-        m_loadButton->setVisible(true);
-        m_contentContainer->setVisible(false);
-        emit attachmentLoaded();
-    });
-
     setContent(viewer);
     setLoading(false);
+    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberAudio(const QByteArray& data) {
