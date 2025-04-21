@@ -12,6 +12,23 @@ void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF>& controlPoints,
                                        QPointF& blobCenter,
                                        const BlobConfig::BlobParameters& params,
                                        const BlobConfig::PhysicsParameters& physicsParams) {
+
+    // --- DODANE ZABEZPIECZENIE ---
+    // Sprawdź, czy wszystkie wektory mają oczekiwany i spójny rozmiar
+    const size_t expectedSize = static_cast<size_t>(params.numPoints);
+    if (controlPoints.size() != expectedSize ||
+        targetPoints.size() != expectedSize ||
+        velocity.size() != expectedSize) {
+        qCritical() << "BlobPhysics::updatePhysicsOptimized - Niespójne rozmiary wektorów! Oczekiwano:" << expectedSize
+                    << "controlPoints:" << controlPoints.size()
+                    << "targetPoints:" << targetPoints.size()
+                    << "velocity:" << velocity.size();
+        // Możesz tutaj rzucić wyjątek, zwrócić błąd, lub użyć assert
+        assert(false && "Niespójne rozmiary wektorów w updatePhysicsOptimized!");
+        return; // Zakończ funkcję, aby uniknąć crasha
+        }
+    // --- KONIEC ZABEZPIECZENIA ---
+
     const size_t numPoints = controlPoints.size();
 
     // Używamy struktur danych zoptymalizowanych pod kątem wydajności pamięci podręcznej
@@ -134,7 +151,39 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
                                       const BlobConfig::BlobParameters& params,
                                       const BlobConfig::PhysicsParameters& physicsParams) {
 
-    const size_t numPoints = controlPoints.size();
+    // --- DODANE ZABEZPIECZENIE ---
+    const size_t expectedSize = static_cast<size_t>(params.numPoints);
+    if (controlPoints.size() != expectedSize ||
+        targetPoints.size() != expectedSize ||
+        velocity.size() != expectedSize) {
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów!";
+        assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel!");
+        return;
+        }
+    // Odczytaj rozmiary *przed* uruchomieniem wątków
+    const size_t initialControlPointsSize = controlPoints.size();
+    const size_t initialTargetPointsSize = targetPoints.size();
+    const size_t initialVelocitySize = velocity.size();
+
+    if (initialControlPointsSize != expectedSize ||
+        initialTargetPointsSize != expectedSize ||
+        initialVelocitySize != expectedSize) {
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów PRZED uruchomieniem wątków! Oczekiwano:" << expectedSize
+                    << "controlPoints:" << initialControlPointsSize
+                    << "targetPoints:" << initialTargetPointsSize
+                    << "velocity:" << initialVelocitySize;
+        assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel PRZED uruchomieniem wątków!");
+        return;
+        }
+    // --- KONIEC ZABEZPIECZENIA ---
+
+    const size_t numPoints = initialControlPointsSize;
+
+    if (numPoints < 24) { // Lub inna wartość progowa używana później
+        // Jeśli jest zbyt małe, od razu przejdź do wersji sekwencyjnej
+        updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams, nullptr);
+        return;
+    }
 
     // Użyj SIMD-friendly struktury danych gdy liczba punktów jest duża
     if (numPoints > 64) {
@@ -145,10 +194,6 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
     const int batchSize = 16; // Zwiększony rozmiar partii dla lepszej wydajności cache
 
-    if (numPoints < 24 || numThreads <= 1) {
-        updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams, nullptr);
-        return;
-    }
 
     // Prekalkujemy stałe wartości dla wszystkich wątków
     const double radiusThreshold = params.blobRadius * 1.1;
@@ -161,20 +206,43 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     const double maxSpeedSquared = maxSpeed * maxSpeed;
 
     // Użyj statycznego bufora dla poprzednich prędkości, aby uniknąć realokacji
+    if (velocity.size() != numPoints) {
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Rozmiar 'velocity' (" << velocity.size() << ") zmienił się przed kopiowaniem! Oczekiwano:" << numPoints;
+        assert(false && "Rozmiar 'velocity' zmienił się przed kopiowaniem!");
+        return;
+    }
+    // --- Koniec sprawdzenia ---
+
     static std::vector<QPointF> previousVelocity;
     if (previousVelocity.size() != numPoints) {
         previousVelocity.resize(numPoints);
     }
+    // --- Dodatkowe sprawdzenie po resize i przed copy ---
+    if (velocity.size() != previousVelocity.size()) {
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary 'velocity' (" << velocity.size()
+                    << ") i 'previousVelocity' (" << previousVelocity.size() << ") przed std::copy!";
+        assert(false && "Niespójne rozmiary velocity i previousVelocity przed std::copy!");
+        return;
+    }
+    // --- Koniec sprawdzenia ---
     std::copy(velocity.begin(), velocity.end(), previousVelocity.begin());
 
-    std::atomic<bool> isInMotion(false);
 
+    std::atomic<bool> isInMotion(false);
     QVector<QFuture<void>> futures;
     futures.reserve(numThreads);
 
     for (int t = 0; t < numThreads; ++t) {
         const size_t startIdx = t * (numPoints / numThreads);
         const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * (numPoints / numThreads);
+
+        // --- Sprawdzenie poprawności zakresu wątku ---
+        if (startIdx >= numPoints || endIdx > numPoints || startIdx > endIdx) {
+            qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres dla wątku" << t << "! startIdx:" << startIdx << "endIdx:" << endIdx << "numPoints:" << numPoints;
+            assert(false && "Nieprawidłowy zakres dla wątku!");
+            continue; // Pomiń ten wątek
+        }
+        // --- Koniec sprawdzenia ---
 
         futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx, radiusThresholdSquared,
                                         dampingFactor, velocityBlend, prevVelocityBlend,
@@ -186,8 +254,47 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
             for (size_t batchStart = startIdx; batchStart < endIdx; batchStart += batchSize) {
                 const size_t batchEnd = qMin(batchStart + batchSize, endIdx);
 
+                if (batchStart >= numPoints || batchEnd > numPoints || batchStart > batchEnd) {
+                    qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres partii! batchStart:" << batchStart << "batchEnd:" << batchEnd << "numPoints:" << numPoints << "Wątek:" << QThread::currentThreadId();
+                    assert(false && "Nieprawidłowy zakres partii!");
+                    continue; // Pomiń tę partię
+                 }
+
                 for (size_t i = batchStart; i < batchEnd; ++i) {
+
+                    size_t currentControlPointsSize = controlPoints.size(); // Odczytaj AKTUALNY rozmiar
+                    if (i >= currentControlPointsSize) {
+                        qCritical() << "BlobPhysics::updatePhysicsParallel - WYKRYTO DOSTĘP POZA ZAKRES controlPoints! Index 'i':" << i
+                                    << "Aktualny rozmiar:" << currentControlPointsSize
+                                    << "Oczekiwany rozmiar (numPoints):" << numPoints
+                                    << "Zakres wątku:" << startIdx << "-" << endIdx
+                                    << "Zakres partii:" << batchStart << "-" << batchEnd
+                                    << "Wątek ID:" << QThread::currentThreadId();
+                         assert(false && "Dostęp poza zakres controlPoints w pętli równoległej!");
+                        return; // Zakończ to zadanie, aby uniknąć crasha
+                    }
+
                     QPointF& currentPoint = controlPoints[i];
+
+                    size_t currentTargetPointsSize = targetPoints.size();
+                    if (i >= currentTargetPointsSize) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres targetPoints! Index 'i':" << i << "Aktualny rozmiar:" << currentTargetPointsSize << "Wątek ID:" << QThread::currentThreadId();
+                         assert(false && "Dostęp poza zakres targetPoints!");
+                         return;
+                    }
+                    size_t currentVelocitySize = velocity.size();
+                     if (i >= currentVelocitySize) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres velocity! Index 'i':" << i << "Aktualny rozmiar:" << currentVelocitySize << "Wątek ID:" << QThread::currentThreadId();
+                         assert(false && "Dostęp poza zakres velocity!");
+                         return;
+                    }
+                    size_t currentPreviousVelocitySize = previousVelocity.size();
+                     if (i >= currentPreviousVelocitySize) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres previousVelocity! Index 'i':" << i << "Aktualny rozmiar:" << currentPreviousVelocitySize << "Wątek ID:" << QThread::currentThreadId();
+                         assert(false && "Dostęp poza zakres previousVelocity!");
+                         return;
+                    }
+
                     QPointF& currentTarget = targetPoints[i];
                     QPointF& currentVelocity = velocity[i];
                     const QPointF& prevVelocity = previousVelocity[i];
@@ -258,6 +365,17 @@ void BlobPhysics::updatePhysics(std::vector<QPointF>& controlPoints,
                               const BlobConfig::BlobParameters& params,
                               const BlobConfig::PhysicsParameters& physicsParams,
                               QWidget* parent) {
+
+    // --- DODANE ZABEZPIECZENIE ---
+    const size_t expectedSize = static_cast<size_t>(params.numPoints);
+    if (controlPoints.size() != expectedSize ||
+        targetPoints.size() != expectedSize ||
+        velocity.size() != expectedSize) {
+        qCritical() << "BlobPhysics::updatePhysics - Niespójne rozmiary wektorów!";
+        assert(false && "Niespójne rozmiary wektorów w updatePhysics!");
+        return;
+        }
+    // --- KONIEC ZABEZPIECZENIA ---
 
     static std::vector<QPointF> previousVelocity;
     if (previousVelocity.size() != velocity.size()) {
