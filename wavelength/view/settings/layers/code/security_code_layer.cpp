@@ -82,14 +82,12 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     // Inicjalizacja bazy kodów bezpieczeństwa
     m_securityCodes = {
         // Cyberpunk & technologiczne kody
-        SecurityCode("2077", "Night City's most notorious year (Cyberpunk game)"),
+        SecurityCode("2077", "Night City's most notorious year"),
         SecurityCode("1337", "Elite hacker language code"),
-        SecurityCode("C0DE", "Base representation of what you're entering", false),
+        SecurityCode("CODE", "Base representation of what you're entering", false),
         SecurityCode("HACK", "What hackers do best", false),
-        SecurityCode("N3T0", "Abbreviation for the digital realm (leet)", false),
         SecurityCode("GHOS", "In the machine (famous cyberpunk concept)", false),
         SecurityCode("D3CK", "Cyberdeck connection interface (leet)", false),
-        SecurityCode("5YNT", "Artificial humanoid in cyberpunk lore (abbreviated)", false),
 
         // Matematyczne i naukowe kody
         SecurityCode("3141", "First digits of π (pi)"),
@@ -97,7 +95,7 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
         SecurityCode("2718", "Euler's number (e) first digits"),
         SecurityCode("1729", "Hardy-Ramanujan number (taxicab)"),
         SecurityCode("6174", "Kaprekar's constant"),
-        SecurityCode("2048", "Binary: 2^11, popular game"),
+        SecurityCode("2048", "2^11, popular game"),
 
         // Daty związane z technologią, cyberpunkiem i sci-fi
         SecurityCode("1984", "Orwell's dystopian surveillance society"),
@@ -108,15 +106,12 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
         SecurityCode("1989", "World Wide Web invented"),
 
         // Kulturowe i kryptograficzne
-        SecurityCode("B00K", "Digital knowledge container", false),
+        SecurityCode("BOOK", "Digital knowledge container", false),
         SecurityCode("EV1L", "C0RP - Cyberpunk antagonist trope", false),
-        SecurityCode("L0CK", "Security metaphor", false),
+        SecurityCode("LOCK", "Security metaphor", false),
 
         // Easter eggi
         SecurityCode("RICK", "Never gonna give you up...", false),
-        SecurityCode("1138", "George Lucas' first film THX reference"),
-        SecurityCode("0451", "Immersive sim reference (System Shock, Deus Ex)"),
-        SecurityCode("1701", "Famous sci-fi starship registry"),
         SecurityCode("8080", "Classic Intel processor"),
         SecurityCode("6502", "CPU used in Apple II and Commodore 64"),
     };
