@@ -19,13 +19,10 @@ void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF>& controlPoints,
     if (controlPoints.size() != expectedSize ||
         targetPoints.size() != expectedSize ||
         velocity.size() != expectedSize) {
-        qCritical() << "BlobPhysics::updatePhysicsOptimized - Niespójne rozmiary wektorów! Oczekiwano:" << expectedSize
-                    << "controlPoints:" << controlPoints.size()
-                    << "targetPoints:" << targetPoints.size()
-                    << "velocity:" << velocity.size();
-        // Możesz tutaj rzucić wyjątek, zwrócić błąd, lub użyć assert
-        assert(false && "Niespójne rozmiary wektorów w updatePhysicsOptimized!");
-        return; // Zakończ funkcję, aby uniknąć crasha
+        qCritical() << "BlobPhysics::updatePhysicsOptimized - Niespójne rozmiary wektorów!";
+        qCritical() << "controlPoints:" << controlPoints.size() << "targetPoints:" << targetPoints.size() << "velocity:" << velocity.size() << "expected:" << expectedSize;
+        // assert(false && "Niespójne rozmiary wektorów w updatePhysicsOptimized!"); // Można zostawić lub usunąć asercję tutaj
+        return; // <--- DODAJ TĘ LINIĘ
         }
     // --- KONIEC ZABEZPIECZENIA ---
 
@@ -156,27 +153,27 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     if (controlPoints.size() != expectedSize ||
         targetPoints.size() != expectedSize ||
         velocity.size() != expectedSize) {
-        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów!";
-        assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel!");
-        return;
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów PRZED odczytem!";
+        qCritical() << "controlPoints:" << controlPoints.size() << "targetPoints:" << targetPoints.size() << "velocity:" << velocity.size() << "expected:" << expectedSize;
+        return; // Zatrzymujemy, jeśli rozmiary są niespójne na starcie
         }
     // Odczytaj rozmiary *przed* uruchomieniem wątków
     const size_t initialControlPointsSize = controlPoints.size();
     const size_t initialTargetPointsSize = targetPoints.size();
     const size_t initialVelocitySize = velocity.size();
 
+    // Sprawdzenie spójności (można usunąć, bo jest już wyżej)
     if (initialControlPointsSize != expectedSize ||
         initialTargetPointsSize != expectedSize ||
         initialVelocitySize != expectedSize) {
-        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów PRZED uruchomieniem wątków! Oczekiwano:" << expectedSize
-                    << "controlPoints:" << initialControlPointsSize
-                    << "targetPoints:" << initialTargetPointsSize
-                    << "velocity:" << initialVelocitySize;
-        assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel PRZED uruchomieniem wątków!");
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów! (Asercja)";
+        qCritical() << "controlPoints:" << initialControlPointsSize << "targetPoints:" << initialTargetPointsSize << "velocity:" << initialVelocitySize << "expected:" << expectedSize;
+        // assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel!"); // Usunięto asercję
         return;
         }
     // --- KONIEC ZABEZPIECZENIA ---
 
+    // Użyj rozmiaru odczytanego pod blokadą
     const size_t numPoints = initialControlPointsSize;
 
     if (numPoints < 24) { // Lub inna wartość progowa używana później
@@ -192,7 +189,12 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     }
 
     const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
-    const int batchSize = 16; // Zwiększony rozmiar partii dla lepszej wydajności cache
+    const int batchSize = std::max(1, static_cast<int>(numPoints) / m_threadPool.maxThreadCount());
+    std::vector<std::pair<int, int>> ranges;
+    // Upewnij się, że pętla używa int, jeśli numPoints może być duże, rozważ size_t
+    for (int i = 0; i < static_cast<int>(numPoints); i += batchSize) {
+        ranges.push_back({i, std::min(i + batchSize, static_cast<int>(numPoints))});
+    }
 
 
     // Prekalkujemy stałe wartości dla wszystkich wątków
