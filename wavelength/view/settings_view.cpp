@@ -1,3 +1,4 @@
+// filepath: c:\Users\szymo\Documents\GitHub\wavelength\wavelength\view\settings_view.cpp
 #include "settings_view.h"
 
 #include <QHBoxLayout>
@@ -8,10 +9,28 @@
 #include <QGraphicsOpacityEffect>
 #include <QMouseEvent>
 #include <QRandomGenerator>
+#include <QTimer> // Dodano dla QTimer
+#include <QLabel> // Dodano dla QLabel
+#include <QPushButton> // Dodano dla QPushButton
+#include <QSpinBox> // Dodano dla QSpinBox
 
 #include "settings/classified/system_override_manager.h"
 #include "settings/tabs/appearance_tab/appearance_settings_widget.h"
 #include "settings/tabs/wavelength_tab/wavelength_settings_widget.h"
+#include "settings/tabs/network_tab/network_settings_widget.h" // <<< Dodano include
+
+// Warstwy bezpieczeństwa
+#include "settings/layers/fingerprint/fingerprint_layer.h"
+#include "settings/layers/handprint/handprint_layer.h"
+#include "settings/layers/code/security_code_layer.h"
+#include "settings/layers/question/security_question_layer.h"
+#include "settings/layers/retina_scan/retina_scan_layer.h"
+#include "settings/layers/voice_recognition/voice_recognition_layer.h"
+#include "settings/layers/typing_test/typing_test_layer.h"
+#include "settings/layers/snake_game/snake_game_layer.h"
+
+// UI
+#include "../ui/checkbox/cyber_checkbox.h" // Potrzebne dla m_debugModeCheckBox
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
@@ -27,7 +46,22 @@ m_typingTestLayer(nullptr),
 m_snakeGameLayer(nullptr),
 m_classifiedFeaturesWidget(nullptr),
 m_currentLayerIndex(FingerprintIndex),
-m_debugModeEnabled(true) // <<< Zainicjalizuj flagę na false
+m_debugModeEnabled(false), // Zmieniono inicjalizację na false zgodnie z komentarzem w kodzie
+m_wavelengthTabWidget(nullptr), // Dodano inicjalizację wskaźników
+m_appearanceTabWidget(nullptr),
+m_advancedTabWidget(nullptr), // <<< Dodano inicjalizację
+m_saveButton(nullptr),
+m_defaultsButton(nullptr),
+m_backButton(nullptr),
+m_refreshTimer(nullptr),
+m_accessGrantedWidget(nullptr), // Nadal inicjalizowany, chociaż może nie być używany
+m_overrideButton(nullptr),
+m_systemOverrideManager(nullptr),
+m_titleLabel(nullptr),
+m_sessionLabel(nullptr),
+m_timeLabel(nullptr),
+m_tabBar(nullptr),
+m_tabContent(nullptr)
 {
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("SettingsView { background-color: #101820; }");
@@ -39,7 +73,7 @@ m_debugModeEnabled(true) // <<< Zainicjalizuj flagę na false
     m_refreshTimer->setInterval(1000);
     connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
         QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        m_timeLabel->setText(QString("TS: %1").arg(timestamp));
+        if(m_timeLabel) m_timeLabel->setText(QString("TS: %1").arg(timestamp));
     });
     m_refreshTimer->start();
 
@@ -65,10 +99,12 @@ void SettingsView::setDebugMode(bool enabled) {
 }
 
 SettingsView::~SettingsView() {
+    // Nie trzeba usuwać widgetów-dzieci, Qt zrobi to samo
+    // Wystarczy zatrzymać i usunąć timer
     if (m_refreshTimer) {
         m_refreshTimer->stop();
-        delete m_refreshTimer;
-        m_refreshTimer = nullptr;
+        // delete m_refreshTimer; // Qt zarządza pamięcią dzieci, nie usuwaj ręcznie
+        // m_refreshTimer = nullptr;
     }
 }
 
@@ -87,7 +123,8 @@ void SettingsView::setupUi() {
     tabLayout->addStretch(1);
 
     // Tworzenie przycisków zakładek
-    QStringList tabNames = {"Wavelength", "Appearance", "Performance", "Advanced", "CLASSIFIED"};
+    // Zmieniono "Performance" na "Network"
+    QStringList tabNames = {"Wavelength", "Appearance", "Network","CLASSIFIED"};
 
     for (int i = 0; i < tabNames.size(); i++) {
         TabButton *btn = new TabButton(tabNames[i], m_tabBar);
@@ -96,7 +133,7 @@ void SettingsView::setupUi() {
         if (tabNames[i] == "CLASSIFIED") {
             btn->setStyleSheet(
                 "TabButton {"
-                "  color: #ff3333;"  // czerwony kolor
+                "  color: #ff3333;"
                 "  background-color: transparent;"
                 "  border: none;"
                 "  font-family: 'Consolas';"
@@ -131,47 +168,50 @@ void SettingsView::setupUi() {
 
     // Tworzenie zawartości dla każdej zakładki
     m_wavelengthTabWidget = new WavelengthSettingsWidget(m_tabContent);
-    m_tabContent->addWidget(m_wavelengthTabWidget);
+    m_tabContent->addWidget(m_wavelengthTabWidget); // Index 0
+
     m_appearanceTabWidget = new AppearanceSettingsWidget(m_tabContent);
-    m_tabContent->addWidget(m_appearanceTabWidget);
-    setupNetworkTab();
-    setupAdvancedTab();
-    setupClassifiedTab();
+    m_tabContent->addWidget(m_appearanceTabWidget); // Index 1
+
+    // Usunięto wywołanie setupNetworkTab();
+    // Dodano tworzenie AdvancedSettingsWidget (zakładka Network)
+    m_advancedTabWidget = new NetworkSettingsWidget(m_tabContent); // <<< Utworzenie nowej zakładki
+    m_tabContent->addWidget(m_advancedTabWidget); // Index 2
+
+    setupClassifiedTab(); // Tworzy zakładkę "CLASSIFIED" - Index 3
 
     mainLayout->addWidget(m_tabContent, 1);
 
-    // Panel przycisków
+    // Panel przycisków (bez zmian)
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(15);
-
     m_backButton = new CyberButton("BACK", this, false);
     m_backButton->setFixedHeight(40);
-
     m_defaultsButton = new CyberButton("RESTORE DEFAULTS", this, false);
     m_defaultsButton->setFixedHeight(40);
-
     m_saveButton = new CyberButton("SAVE SETTINGS", this, true);
     m_saveButton->setFixedHeight(40);
-
     buttonLayout->addWidget(m_backButton, 1);
     buttonLayout->addStretch(1);
     buttonLayout->addWidget(m_defaultsButton, 1);
     buttonLayout->addWidget(m_saveButton, 2);
-
     mainLayout->addLayout(buttonLayout);
 
-    // Połączenia
+    // Połączenia (bez zmian)
     connect(m_backButton, &CyberButton::clicked, this, &SettingsView::handleBackButton);
     connect(m_saveButton, &CyberButton::clicked, this, &SettingsView::saveSettings);
     connect(m_defaultsButton, &CyberButton::clicked, this, &SettingsView::restoreDefaults);
 
     // Domyślnie aktywna pierwsza zakładka
-    m_tabButtons[0]->setActive(true);
-    m_tabButtons[0]->setChecked(true);
+    if (!m_tabButtons.isEmpty()) {
+        m_tabButtons[0]->setActive(true);
+        m_tabButtons[0]->setChecked(true);
+    }
     m_tabContent->setCurrentIndex(0);
 }
 
 void SettingsView::setupClassifiedTab() {
+    // Implementacja bez zmian...
     QWidget *tab = new QWidget(m_tabContent);
     QVBoxLayout *layout = new QVBoxLayout(tab);
     layout->setContentsMargins(20, 20, 20, 20);
@@ -185,11 +225,9 @@ void SettingsView::setupClassifiedTab() {
     warningLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(warningLabel);
 
-    // Kontener na wszystkie poziomy zabezpieczeń i nowe funkcje
     m_securityLayersStack = new QStackedWidget(tab);
     layout->addWidget(m_securityLayersStack, 1);
 
-    // Tworzenie warstw zabezpieczeń (bez zmian)
     m_fingerprintLayer = new FingerprintLayer(m_securityLayersStack);
     m_handprintLayer = new HandprintLayer(m_securityLayersStack);
     m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
@@ -199,7 +237,6 @@ void SettingsView::setupClassifiedTab() {
     m_typingTestLayer = new TypingTestLayer(m_securityLayersStack);
     m_snakeGameLayer = new SnakeGameLayer(m_securityLayersStack);
 
-    // --- NOWY WIDGET Z FUNKCJAMI ZAMIAST ACCESS GRANTED ---
     m_classifiedFeaturesWidget = new QWidget(m_securityLayersStack);
     QVBoxLayout *featuresLayout = new QVBoxLayout(m_classifiedFeaturesWidget);
     featuresLayout->setAlignment(Qt::AlignCenter);
@@ -215,12 +252,10 @@ void SettingsView::setupClassifiedTab() {
     featuresDesc->setAlignment(Qt::AlignCenter);
     featuresLayout->addWidget(featuresDesc);
 
-    // Kontener na przyciski funkcji
     QWidget* buttonContainer = new QWidget(m_classifiedFeaturesWidget);
-    QHBoxLayout* buttonLayout = new QHBoxLayout(buttonContainer);
-    buttonLayout->setSpacing(15);
+    QHBoxLayout* buttonLayoutClassified = new QHBoxLayout(buttonContainer); // Zmieniono nazwę zmiennej
+    buttonLayoutClassified->setSpacing(15);
 
-    // Przycisk Wave Sculptor
     QPushButton* waveSculptorButton = new QPushButton("Wave Sculptor", buttonContainer);
     waveSculptorButton->setMinimumHeight(40);
     waveSculptorButton->setStyleSheet(
@@ -228,20 +263,18 @@ void SettingsView::setupClassifiedTab() {
         "QPushButton:hover { background-color: #0099CC; }"
         "QPushButton:pressed { background-color: #005588; }"
     );
-    buttonLayout->addWidget(waveSculptorButton);
+    buttonLayoutClassified->addWidget(waveSculptorButton);
 
-    // Miejsca na przyciski Matrix Vision i System Override (dodamy później)
     QPushButton* matrixVisionButton = new QPushButton("Matrix Vision (TBD)", buttonContainer);
     matrixVisionButton->setMinimumHeight(40);
     matrixVisionButton->setStyleSheet("QPushButton { background-color: #444; border: 1px solid #666; padding: 10px; border-radius: 5px; color: #999; }");
-    matrixVisionButton->setEnabled(false); // Na razie wyłączony
-    buttonLayout->addWidget(matrixVisionButton);
+    matrixVisionButton->setEnabled(false);
+    buttonLayoutClassified->addWidget(matrixVisionButton);
 
-    // Przycisk SYSTEM OVERRIDE - Poprawiona inicjalizacja
-    m_overrideButton = new QPushButton("CAUTION: SYSTEM OVERRIDE", buttonContainer); // Poprawiony tekst
-    m_overrideButton->setMinimumHeight(50); // Wyższy przycisk
+    m_overrideButton = new QPushButton("CAUTION: SYSTEM OVERRIDE", buttonContainer);
+    m_overrideButton->setMinimumHeight(50);
     m_overrideButton->setMinimumWidth(250);
-    m_overrideButton->setStyleSheet( // Zastosuj od razu właściwy styl
+    m_overrideButton->setStyleSheet(
         "QPushButton {"
         "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #AA0000, stop:1 #660000);"
         "  border: 2px solid #FF3333;"
@@ -261,61 +294,44 @@ void SettingsView::setupClassifiedTab() {
         "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #880000, stop:1 #440000);"
         "  border-color: #DD0000;"
         "}"
-        "QPushButton:disabled {" // Dodaj styl dla stanu wyłączonego
+        "QPushButton:disabled {"
         "  background-color: #555;"
         "  border-color: #777;"
         "  color: #999;"
         "}"
     );
-    m_overrideButton->setEnabled(true); // Upewnij się, że jest włączony
-    // --- DODAJ TO POŁĄCZENIE ---
+    m_overrideButton->setEnabled(true);
     connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
         qDebug() << "Override button clicked.";
-
 #ifdef Q_OS_WIN
         if (SystemOverrideManager::isRunningAsAdmin()) {
-            // Już mamy uprawnienia, kontynuuj normalnie
             qDebug() << "Already running as admin. Initiating sequence directly.";
             m_overrideButton->setEnabled(false);
             m_overrideButton->setText("OVERRIDE IN PROGRESS...");
-            // Wywołaj sekwencję (przekaż odpowiednią wartość dla isFirstTime)
-            QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false)); // Użyj invokeMethod dla bezpieczeństwa wątków, jeśli jest ryzyko
+            QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
         } else {
-            // Nie mamy uprawnień, poproś o nie przez ponowne uruchomienie
             qDebug() << "Not running as admin. Attempting relaunch with elevation request...";
-            // Dodaj argument, aby nowa instancja wiedziała, co robić
             QStringList args;
-            args << "--run-override"; // Specjalny argument
-
+            args << "--run-override";
             if (SystemOverrideManager::relaunchAsAdmin(args)) {
-                // Próba ponownego uruchomienia zainicjowana (UAC powinno się pojawić)
-                // Zamknij bieżącą instancję aplikacji, aby uniknąć duplikatów
                 qDebug() << "Relaunch initiated. Closing current instance.";
                 QApplication::quit();
             } else {
-                // Nie udało się nawet poprosić o uprawnienia (np. błąd systemowy)
-                // lub użytkownik anulował UAC (choć to trudne do wykrycia tutaj od razu)
                 QMessageBox::warning(this, "Elevation Failed", "Could not request administrator privileges.\nThe override sequence cannot start.");
-                // Przycisk pozostaje włączony
             }
         }
 #else
-        // Obsługa dla innych systemów (np. Linux/macOS używające sudo/pkexec)
         QMessageBox::information(this, "System Override", "System override sequence initiated (OS specific elevation might be required).");
         m_overrideButton->setEnabled(false);
         m_overrideButton->setText("OVERRIDE IN PROGRESS...");
         QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
 #endif
     });
-    // ---------------------------
-    buttonLayout->addWidget(m_overrideButton);
-
+    buttonLayoutClassified->addWidget(m_overrideButton);
 
     featuresLayout->addWidget(buttonContainer, 0, Qt::AlignCenter);
     featuresLayout->addStretch();
-    // --- KONIEC NOWEGO WIDGETU ---
 
-    // Dodajemy wszystkie widgety do stosu
     m_securityLayersStack->addWidget(m_fingerprintLayer);
     m_securityLayersStack->addWidget(m_handprintLayer);
     m_securityLayersStack->addWidget(m_securityCodeLayer);
@@ -326,226 +342,108 @@ void SettingsView::setupClassifiedTab() {
     m_securityLayersStack->addWidget(m_snakeGameLayer);
     m_securityLayersStack->addWidget(m_classifiedFeaturesWidget);
 
-    // Połączenia warstw
+    // Połączenia warstw (bez zmian)
     connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = HandprintIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_handprintLayer->initialize();
     });
-
     connect(m_handprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SecurityCodeIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_securityCodeLayer->initialize();
     });
-
     connect(m_securityCodeLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SecurityQuestionIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_securityQuestionLayer->initialize();
     });
-
     connect(m_securityQuestionLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = RetinaScanIndex; // Zmiana na RetinaScanIndex
+        m_currentLayerIndex = RetinaScanIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_retinaScanLayer->initialize(); // Inicjalizacja nowej warstwy
+        m_retinaScanLayer->initialize();
     });
-
     connect(m_retinaScanLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = VoiceRecognitionIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_voiceRecognitionLayer->initialize();
     });
-
     connect(m_voiceRecognitionLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = TypingTestIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_typingTestLayer->initialize();
     });
-
     connect(m_typingTestLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SnakeGameIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
         m_snakeGameLayer->initialize();
     });
-
     connect(m_snakeGameLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        // Zamiast AccessGrantedIndex, użyjemy indeksu nowego widgetu
         int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
         if (featuresIndex != -1) {
-             m_currentLayerIndex = static_cast<SecurityLayerIndex>(featuresIndex); // Rzutowanie może być ryzykowne, jeśli indeksy się zmienią
+             // Rzutowanie jest ok, jeśli AccessGrantedIndex jest ostatnim elementem enum PRZED dodaniem widgetu
+             // Lepiej użyć bezpośrednio featuresIndex
+             m_currentLayerIndex = static_cast<SecurityLayerIndex>(featuresIndex); // Lub jakaś wartość specjalna
              m_securityLayersStack->setCurrentIndex(featuresIndex);
-             // Nie ma potrzeby initialize() dla tego widgetu
              qDebug() << "All security layers passed. Showing classified features.";
         } else {
              qWarning() << "Could not find ClassifiedFeaturesWidget in the stack!";
-             // Awaryjnie, przejdź do ostatniego widgetu
              m_securityLayersStack->setCurrentIndex(m_securityLayersStack->count() - 1);
         }
     });
 
     layout->addStretch();
-    m_tabContent->addWidget(tab);
+    m_tabContent->addWidget(tab); // Dodaj zakładkę do stosu
 
-    resetSecurityLayers();
+    resetSecurityLayers(); // Zresetuj na końcu
 }
 
 void SettingsView::setupNextSecurityLayer() {
+    // Implementacja bez zmian...
     // Sprawdź, czy obecny indeks jest prawidłowy i czy nie jest to ostatnia warstwa przed dostępem
-    if (m_currentLayerIndex < AccessGrantedIndex) {
-        m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    // Użyjemy indeksu widgetu funkcji zamiast AccessGrantedIndex
+    int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+    if (featuresIndex == -1) {
+        qWarning() << "Cannot setup next layer: ClassifiedFeaturesWidget not found.";
+        return; // Błąd krytyczny
+    }
+
+    if (static_cast<int>(m_currentLayerIndex) < featuresIndex) {
+         m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
     } else {
-        // Jeśli już jesteśmy na AccessGrantedIndex lub dalej, nie rób nic
+        // Jeśli już jesteśmy na ClassifiedFeaturesWidget lub dalej (co nie powinno się zdarzyć), nie rób nic
         return;
     }
 
-
     // Przygotowanie następnego zabezpieczenia
-    switch (m_currentLayerIndex) {
-        case HandprintIndex:
-            m_securityLayersStack->setCurrentIndex(HandprintIndex);
-        m_handprintLayer->initialize();
-        break;
-        case SecurityCodeIndex:
-            m_securityLayersStack->setCurrentIndex(SecurityCodeIndex);
-        m_securityCodeLayer->initialize();
-        break;
-        case SecurityQuestionIndex:
-            m_securityLayersStack->setCurrentIndex(SecurityQuestionIndex);
-        m_securityQuestionLayer->initialize();
-        break;
-        case RetinaScanIndex:
-            m_securityLayersStack->setCurrentIndex(RetinaScanIndex);
-        m_retinaScanLayer->initialize();
-        break;
-        case VoiceRecognitionIndex:
-            m_securityLayersStack->setCurrentIndex(VoiceRecognitionIndex);
-        m_voiceRecognitionLayer->initialize();
-        break;
-        case TypingTestIndex:
-            m_securityLayersStack->setCurrentIndex(TypingTestIndex);
-        m_typingTestLayer->initialize();
-        break;
-        case SnakeGameIndex:
-            m_securityLayersStack->setCurrentIndex(SnakeGameIndex);
-        m_snakeGameLayer->initialize();
-        break;
-        case AccessGrantedIndex:
-            m_securityLayersStack->setCurrentIndex(AccessGrantedIndex);
-        // Tutaj nie ma initialize(), bo to ekran końcowy
-        break;
-        // Nie powinno być default, bo wszystkie przypadki są obsłużone
+    // Używamy indeksów enum, które odpowiadają indeksom widgetów dodanych wcześniej
+    if (m_currentLayerIndex < featuresIndex) {
+         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+         // Wywołaj initialize dla odpowiedniej warstwy
+         QWidget* currentWidget = m_securityLayersStack->widget(m_currentLayerIndex);
+         SecurityLayer* currentLayer = qobject_cast<SecurityLayer*>(currentWidget);
+         if (currentLayer) {
+             currentLayer->initialize();
+         } else {
+             qWarning() << "Widget at index" << m_currentLayerIndex << "is not a SecurityLayer!";
+         }
+    } else if (m_currentLayerIndex == featuresIndex) {
+         // Osiągnięto widget funkcji, nie ma initialize()
+         m_securityLayersStack->setCurrentIndex(featuresIndex);
     }
 }
 
-void SettingsView::setupNetworkTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Configure network connection parameters", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_connectionTimeoutEdit = new QSpinBox(tab);
-    m_connectionTimeoutEdit->setRange(1000, 60000);
-    m_connectionTimeoutEdit->setSingleStep(500);
-    m_connectionTimeoutEdit->setSuffix(" ms");
-    m_connectionTimeoutEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Connection Timeout:", m_connectionTimeoutEdit);
-
-    m_keepAliveIntervalEdit = new QSpinBox(tab);
-    m_keepAliveIntervalEdit->setRange(1000, 60000);
-    m_keepAliveIntervalEdit->setSingleStep(500);
-    m_keepAliveIntervalEdit->setSuffix(" ms");
-    m_keepAliveIntervalEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Keep Alive Interval:", m_keepAliveIntervalEdit);
-
-    m_maxReconnectAttemptsEdit = new QSpinBox(tab);
-    m_maxReconnectAttemptsEdit->setRange(0, 20);
-    m_maxReconnectAttemptsEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Max Reconnect Attempts:", m_maxReconnectAttemptsEdit);
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
-void SettingsView::setupAdvancedTab() {
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    QLabel *infoLabel = new QLabel("Advanced application settings - modify with caution", tab);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
-
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-
-    m_debugModeCheckBox = new CyberCheckBox("Enable detailed logging and debugging features", tab);
-    formLayout->addRow("Debug Mode:", m_debugModeCheckBox);
-
-    m_chatHistorySizeEdit = new QSpinBox(tab);
-    m_chatHistorySizeEdit->setRange(50, 1000);
-    m_chatHistorySizeEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Chat History Size:", m_chatHistorySizeEdit);
-
-    m_processedMessageIdsEdit = new QSpinBox(tab);
-    m_processedMessageIdsEdit->setRange(50, 1000);
-    m_processedMessageIdsEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Max Processed Message IDs:", m_processedMessageIdsEdit);
-
-    m_sentMessageCacheSizeEdit = new QSpinBox(tab);
-    m_sentMessageCacheSizeEdit->setRange(10, 500);
-    m_sentMessageCacheSizeEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Sent Message Cache Size:", m_sentMessageCacheSizeEdit);
-
-    m_maxRecentWavelengthEdit = new QSpinBox(tab);
-    m_maxRecentWavelengthEdit->setRange(1, 30);
-    m_maxRecentWavelengthEdit->setStyleSheet(
-        "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; }"
-    );
-    formLayout->addRow("Max Recent Wavelength:", m_maxRecentWavelengthEdit);
-
-    layout->addLayout(formLayout);
-    layout->addStretch();
-
-    m_tabContent->addWidget(tab);
-}
-
 void SettingsView::createHeaderPanel() {
+    // Implementacja bez zmian...
     QHBoxLayout *headerLayout = new QHBoxLayout();
     headerLayout->setSpacing(10);
 
-    // Tytuł
     m_titleLabel = new QLabel("SYSTEM SETTINGS", this);
     m_titleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     headerLayout->addWidget(m_titleLabel);
 
     headerLayout->addStretch();
 
-    // Panel informacyjny z ID sesji i czasem
     QString sessionId = QString("%1-%2")
         .arg(QRandomGenerator::global()->bounded(1000, 9999))
         .arg(QRandomGenerator::global()->bounded(10000, 99999));
@@ -559,71 +457,58 @@ void SettingsView::createHeaderPanel() {
     m_timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
     headerLayout->addWidget(m_timeLabel);
 
-    dynamic_cast<QVBoxLayout*>(layout())->addLayout(headerLayout);
+    // Dodaj headerLayout do głównego layoutu (zakładając, że główny layout to QVBoxLayout)
+    QVBoxLayout* mainVLayout = qobject_cast<QVBoxLayout*>(layout());
+    if (mainVLayout) {
+        mainVLayout->insertLayout(0, headerLayout); // Wstaw na górze
+    } else {
+        qWarning() << "Could not cast main layout to QVBoxLayout in createHeaderPanel";
+        // Awaryjnie dodaj na końcu
+        layout()->addItem(headerLayout);
+    }
 }
 
 void SettingsView::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     loadSettingsFromRegistry();
-    resetSecurityLayers();
+    resetSecurityLayers(); // Resetuj warstwy przy każdym pokazaniu widoku
 }
 
 
 void SettingsView::loadSettingsFromRegistry() {
-
     // --- Wavelength ---
     if (m_wavelengthTabWidget) {
         m_wavelengthTabWidget->loadSettings();
     }
-    // ------------------
-
     // --- Appearance ---
     if (m_appearanceTabWidget) {
         m_appearanceTabWidget->loadSettings();
     }
-    // ------------------
-
-    // Network
-    m_connectionTimeoutEdit->setValue(m_config->getConnectionTimeout());
-    m_keepAliveIntervalEdit->setValue(m_config->getKeepAliveInterval());
-    m_maxReconnectAttemptsEdit->setValue(m_config->getMaxReconnectAttempts());
-
-    // Advanced
-    m_debugModeCheckBox->setChecked(m_config->isDebugMode());
-    m_chatHistorySizeEdit->setValue(m_config->getMaxChatHistorySize());
-    m_processedMessageIdsEdit->setValue(m_config->getMaxProcessedMessageIds());
-    m_sentMessageCacheSizeEdit->setValue(m_config->getMaxSentMessageCacheSize());
-    m_maxRecentWavelengthEdit->setValue(m_config->getMaxRecentWavelength());
-
-    resetSecurityLayers();
+    // --- Network (teraz w AdvancedSettingsWidget) ---
+    if (m_advancedTabWidget) { // <<< Dodano ładowanie nowej zakładki
+        m_advancedTabWidget->loadSettings();
+    }
 }
 
 void SettingsView::saveSettings() {
     // --- Wavelength ---
     if (m_wavelengthTabWidget) {
-        m_wavelengthTabWidget->saveSettings(); // <<< Deleguj zapisywanie
+        m_wavelengthTabWidget->saveSettings();
     }
-    // ------------------
-
     // --- Appearance ---
     if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->saveSettings(); // Deleguj zapisywanie (bez zmian)
+        m_appearanceTabWidget->saveSettings();
     }
-    // ------------------
+    // --- Network (teraz w AdvancedSettingsWidget) ---
+    if (m_advancedTabWidget) { // <<< Dodano zapisywanie nowej zakładki
+        m_advancedTabWidget->saveSettings();
+    }
+    // Usunięto bezpośrednie zapisywanie:
+    // m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
+    // m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
+    // m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
 
-    // Network (bez zmian)
-    m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
-    m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
-    m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
-
-    // Advanced (bez zmian)
-    m_config->setDebugMode(m_debugModeCheckBox->isChecked());
-    m_config->setMaxChatHistorySize(m_chatHistorySizeEdit->value());
-    m_config->setMaxProcessedMessageIds(m_processedMessageIdsEdit->value());
-    m_config->setMaxSentMessageCacheSize(m_sentMessageCacheSizeEdit->value());
-    m_config->setMaxRecentWavelength(m_maxRecentWavelengthEdit->value());
-
-    // Zapisanie wszystkich ustawień do pliku/rejestru (bez zmian)
+    // Zapisanie wszystkich ustawień do pliku/rejestru
     m_config->saveSettings();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
@@ -632,11 +517,12 @@ void SettingsView::saveSettings() {
 
 void SettingsView::restoreDefaults() {
     if (QMessageBox::question(this, "Restore Defaults",
-                             "Are you sure you want to restore all settings to default values?\nThis includes appearance colors.",
+                             "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings.", // Zaktualizowano komunikat
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         m_config->restoreDefaults();
-        loadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie Appearance
+        loadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie
         QMessageBox::information(this, "Defaults Restored", "Settings have been restored to their default values.");
+        emit settingsChanged(); // Emituj sygnał również po przywróceniu domyślnych
                              }
 }
 
@@ -645,13 +531,11 @@ void SettingsView::switchToTab(int tabIndex) {
 
     for (int i = 0; i < m_tabButtons.size(); ++i) {
         m_tabButtons[i]->setActive(i == tabIndex);
-        m_tabButtons[i]->setChecked(i == tabIndex); // Upewnij się, że stan checked jest spójny
+        m_tabButtons[i]->setChecked(i == tabIndex);
     }
     m_tabContent->setCurrentIndex(tabIndex);
 
-    // Resetuj stan zakładki CLASSIFIED, jeśli na nią przechodzimy
-    // Upewnij się, że indeks jest poprawny (np. 4, jeśli to piąta zakładka)
-    constexpr int ClassifiedTabIndex = 4; // Zdefiniuj jako stałą lub użyj enum
+    constexpr int ClassifiedTabIndex = 3;
     if (tabIndex == ClassifiedTabIndex) {
         resetSecurityLayers();
     }
@@ -664,7 +548,7 @@ void SettingsView::handleBackButton() {
 
 
 void SettingsView::resetSecurityLayers() {
-    // Sprawdź, czy widgety warstw i stos zostały utworzone
+    // Implementacja bez zmian...
     if (!m_securityLayersStack || !m_fingerprintLayer || !m_handprintLayer ||
         !m_securityCodeLayer || !m_securityQuestionLayer || !m_retinaScanLayer ||
         !m_voiceRecognitionLayer || !m_typingTestLayer || !m_snakeGameLayer ||
@@ -675,7 +559,6 @@ void SettingsView::resetSecurityLayers() {
 
     qDebug() << "Resetting security layers... Debug mode:" << m_debugModeEnabled;
 
-    // Zresetuj stan każdej warstwy (zawsze warto to zrobić)
     m_fingerprintLayer->reset();
     m_handprintLayer->reset();
     m_securityCodeLayer->reset();
@@ -691,23 +574,17 @@ void SettingsView::resetSecurityLayers() {
     }
 
     if (m_debugModeEnabled) {
-        // --- TRYB DEBUGOWANIA ---
-        // Znajdź indeks ostatniego widgetu (funkcji)
         int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
         if (featuresIndex != -1) {
             m_securityLayersStack->setCurrentIndex(featuresIndex);
             qDebug() << "Debug mode: Bypassed security layers, showing classified features.";
-            // Nie ma potrzeby wywoływania initialize() dla tego widgetu
         } else {
             qWarning() << "Debug mode error: Could not find ClassifiedFeaturesWidget index!";
-            // Awaryjnie, ustaw pierwszy widget
             m_securityLayersStack->setCurrentIndex(FingerprintIndex);
             m_currentLayerIndex = FingerprintIndex;
             m_fingerprintLayer->initialize();
         }
     } else {
-        // --- TRYB NORMALNY ---
-        // Ustaw pierwszą warstwę jako aktywną i zainicjuj ją
         m_currentLayerIndex = FingerprintIndex;
         m_securityLayersStack->setCurrentIndex(FingerprintIndex);
         m_fingerprintLayer->initialize();
@@ -715,4 +592,3 @@ void SettingsView::resetSecurityLayers() {
     }
     qDebug() << "Security layers reset complete. Current index:" << m_securityLayersStack->currentIndex();
 }
-
