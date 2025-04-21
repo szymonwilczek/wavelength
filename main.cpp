@@ -357,20 +357,16 @@ int main(int argc, char *argv[]) {
         qDebug() << "Wavelength aborted, switching back to animation view";
 
         navbar->setChatMode(false);
-
-        // Ukrywamy bloba na czas przejścia
         animation->hide();
-
-        // Resetuj kolory
         animation->resetLifeColor();
-
-        // Przejście do widoku animacji
         stackedWidget->slideToWidget(animationWidget);
 
-        // Przywrócenie stanu animacji po zakończeniu przejścia
         QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
             animation->show();
             animation->resetVisualization();
+            // --- DODANO ---
+            titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
+            // -------------
             centerLabel(titleLabel, animation);
             textEffect->startAnimation();
         });
@@ -398,14 +394,15 @@ int main(int argc, char *argv[]) {
     qDebug() << "Back from settings, switching to animation view";
 
     animation->hide();
-
     animation->resetLifeColor();
-
     stackedWidget->slideToWidget(animationWidget);
 
     QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
         animation->show();
         animation->resetVisualization();
+        // --- DODANO ---
+        titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
+        // -------------
         centerLabel(titleLabel, animation);
         textEffect->startAnimation();
     });
@@ -472,13 +469,11 @@ int main(int argc, char *argv[]) {
     window.show();
 
     QTimer::singleShot(500, [titleLabel, animation, textEffect]() {
-        // Upewnij się, że etykieta jest widoczna
         titleLabel->setText("WAVELENGTH");
-        titleLabel->adjustSize();
+        titleLabel->adjustSize(); // Upewnij się, że rozmiar jest obliczony po ustawieniu tekstu
         centerLabel(titleLabel, animation);
         titleLabel->show();
 
-        // Rozpocznij animację z większym opóźnieniem
         QTimer::singleShot(300, [textEffect]() {
             textEffect->startAnimation();
         });
