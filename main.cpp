@@ -23,6 +23,7 @@
 #include "wavelength/view/main_window/cyberpunk_text_effect.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
 #include "wavelength/view/settings_view.h"
+#include "wavelength/view/settings/tabs/classified_tab/components/system_override_manager.h"
 
 void centerLabel(QLabel *label, BlobAnimation *animation) {
     if (label && animation) {

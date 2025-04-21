@@ -152,28 +152,28 @@ add_executable(
         wavelength/view/settings_view.h
         wavelength/ui/widgets/gl_transition_widget.cpp
         wavelength/ui/widgets/gl_transition_widget.h
-        wavelength/view/settings/layers/security_layer.cpp
-        wavelength/view/settings/layers/security_layer.h
-        wavelength/view/settings/layers/fingerprint/fingerprint_layer.cpp
-        wavelength/view/settings/layers/fingerprint/fingerprint_layer.h
-        wavelength/view/settings/layers/handprint/handprint_layer.cpp
-        wavelength/view/settings/layers/handprint/handprint_layer.h
-        wavelength/view/settings/layers/code/security_code_layer.cpp
-        wavelength/view/settings/layers/code/security_code_layer.h
-        wavelength/view/settings/layers/question/security_question_layer.cpp
-        wavelength/view/settings/layers/question/security_question_layer.h
-        wavelength/view/settings/layers/retina_scan/retina_scan_layer.cpp
-        wavelength/view/settings/layers/retina_scan/retina_scan_layer.h
-        wavelength/view/settings/layers/voice_recognition/voice_recognition_layer.cpp
-        wavelength/view/settings/layers/voice_recognition/voice_recognition_layer.h
-        wavelength/view/settings/layers/typing_test/typing_test_layer.cpp
-        wavelength/view/settings/layers/typing_test/typing_test_layer.h
-        wavelength/view/settings/layers/snake_game/snake_game_layer.cpp
-        wavelength/view/settings/layers/snake_game/snake_game_layer.h
-        wavelength/view/settings/classified/floating_energy_sphere_widget.cpp
-        wavelength/view/settings/classified/floating_energy_sphere_widget.h
-        wavelength/view/settings/classified/system_override_manager.cpp
-        wavelength/view/settings/classified/system_override_manager.h
+        wavelength/view/settings/tabs/classified_tab/layers/security_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/security_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/fingerprint/fingerprint_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/fingerprint/fingerprint_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/handprint/handprint_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/handprint/handprint_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/code/security_code_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/code/security_code_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/question/security_question_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/question/security_question_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/retina_scan/retina_scan_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/retina_scan/retina_scan_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/voice_recognition/voice_recognition_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/voice_recognition/voice_recognition_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/typing_test/typing_test_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/typing_test/typing_test_layer.h
+        wavelength/view/settings/tabs/classified_tab/layers/snake_game/snake_game_layer.cpp
+        wavelength/view/settings/tabs/classified_tab/layers/snake_game/snake_game_layer.h
+        wavelength/view/settings/tabs/classified_tab/components/floating_energy_sphere_widget.cpp
+        wavelength/view/settings/tabs/classified_tab/components/floating_energy_sphere_widget.h
+        wavelength/view/settings/tabs/classified_tab/components/system_override_manager.cpp
+        wavelength/view/settings/tabs/classified_tab/components/system_override_manager.h
         wavelength/ui/button/tab_button.cpp
         wavelength/ui/button/tab_button.h
         wavelength/view/settings/tabs/appearance_tab/appearance_settings_widget.cpp

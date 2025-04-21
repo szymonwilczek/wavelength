@@ -14,20 +14,20 @@
 #include <QPushButton> // Dodano dla QPushButton
 #include <QSpinBox> // Dodano dla QSpinBox
 
-#include "settings/classified/system_override_manager.h"
+#include "settings/tabs/classified_tab/components/system_override_manager.h"
 #include "settings/tabs/appearance_tab/appearance_settings_widget.h"
 #include "settings/tabs/wavelength_tab/wavelength_settings_widget.h"
 #include "settings/tabs/network_tab/network_settings_widget.h" // <<< Dodano include
 
 // Warstwy bezpieczeństwa
-#include "settings/layers/fingerprint/fingerprint_layer.h"
-#include "settings/layers/handprint/handprint_layer.h"
-#include "settings/layers/code/security_code_layer.h"
-#include "settings/layers/question/security_question_layer.h"
-#include "settings/layers/retina_scan/retina_scan_layer.h"
-#include "settings/layers/voice_recognition/voice_recognition_layer.h"
-#include "settings/layers/typing_test/typing_test_layer.h"
-#include "settings/layers/snake_game/snake_game_layer.h"
+#include "settings/tabs/classified_tab/layers/fingerprint/fingerprint_layer.h"
+#include "settings/tabs/classified_tab/layers/handprint/handprint_layer.h"
+#include "settings/tabs/classified_tab/layers/code/security_code_layer.h"
+#include "settings/tabs/classified_tab/layers/question/security_question_layer.h"
+#include "settings/tabs/classified_tab/layers/retina_scan/retina_scan_layer.h"
+#include "settings/tabs/classified_tab/layers/voice_recognition/voice_recognition_layer.h"
+#include "settings/tabs/classified_tab/layers/typing_test/typing_test_layer.h"
+#include "settings/tabs/classified_tab/layers/snake_game/snake_game_layer.h"
 
 // UI
 #include "../ui/checkbox/cyber_checkbox.h" // Potrzebne dla m_debugModeCheckBox

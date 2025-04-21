@@ -1,34 +1,30 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\wavelength\view\settings_view.h
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
-// Usunięto: #include <QSpinBox> // Nie jest już bezpośrednio potrzebny
 #include <QStackedWidget>
 #include <QDateTime>
 
 #include "../ui/button/cyber_button.h"
 #include "../ui/button/tab_button.h"
 #include "../ui/checkbox/cyber_checkbox.h"
-// Usunięto: #include "../ui/input/cyber_line_edit.h" // Nie jest już bezpośrednio potrzebny
 #include "../util/wavelength_config.h"
-#include "settings/classified/system_override_manager.h"
-#include "settings/layers/code/security_code_layer.h"
-#include "settings/layers/fingerprint/fingerprint_layer.h"
-#include "settings/layers/handprint/handprint_layer.h"
-#include "settings/layers/question/security_question_layer.h"
-#include "settings/layers/retina_scan/retina_scan_layer.h"
-#include "settings/layers/snake_game/snake_game_layer.h"
-#include "settings/layers/typing_test/typing_test_layer.h"
-#include "settings/layers/voice_recognition/voice_recognition_layer.h"
 
-// Forward declarations
+class SystemOverrideManager;
+class SnakeGameLayer;
+class TypingTestLayer;
+class VoiceRecognitionLayer;
+class RetinaScanLayer;
+class SecurityQuestionLayer;
+class SecurityCodeLayer;
+class HandprintLayer;
+class FingerprintLayer;
 class AppearanceSettingsWidget;
 class WavelengthSettingsWidget;
-class NetworkSettingsWidget; // <<< Dodano forward declaration
-class QSpinBox; // Nadal potrzebne dla zakładek Advanced i innych
-class QLabel; // Nadal potrzebne
-class QTimer; // Nadal potrzebne
-class QPushButton; // Nadal potrzebne
+class NetworkSettingsWidget;
+class QSpinBox;
+class QLabel;
+class QTimer;
+class QPushButton;
 
 class SettingsView : public QWidget {
     Q_OBJECT
