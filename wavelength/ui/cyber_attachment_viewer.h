@@ -259,13 +259,6 @@ protected:
         painter.setPen(borderColor);
         painter.setFont(QFont("Consolas", 7));
 
-        // Lewy górny - ID
-        painter.drawText(5, 15, QString("ID:%1").arg(QRandomGenerator::global()->bounded(1000, 9999)));
-
-        // Prawy górny - timestamp
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        painter.drawText(width() - 70, 15, QString("TS:%1").arg(timestamp));
-
         // Lewy dolny - poziom zabezpieczeń
         int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
         painter.drawText(5, height() - 5, QString("SEC:LVL%1").arg(secLevel));

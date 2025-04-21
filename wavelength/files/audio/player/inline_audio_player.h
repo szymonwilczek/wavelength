@@ -688,12 +688,6 @@ protected:
         painter.setPen(borderColor.lighter(120));
         painter.setFont(QFont("Consolas", 7));
 
-        // Lewy górny - ID sesji
-        painter.drawText(6, 12, QString("ID:%1").arg(QRandomGenerator::global()->bounded(1000, 9999)));
-
-        // Prawy górny - timestamp
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        painter.drawText(width() - 70, 12, QString("TS:%1").arg(timestamp));
 
         // Linie skanowania (scanlines) - efekt monitora CRT
         if (m_scanlineOpacity > 0.01) {
