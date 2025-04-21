@@ -296,19 +296,14 @@ private:
     }
 
     void loadConfig() {
-        // Inicjalizacja konfiguracji
         WavelengthConfig* config = WavelengthConfig::getInstance();
         
-        // Możemy tu ustawić domyślne wartości, jeśli plik konfiguracyjny nie istnieje
         if (!QFile::exists(config->getSetting("configFilePath").toString())) {
             qDebug() << "Setting default configuration";
             
-            // Przykładowe wartości domyślne
             config->setRelayServerAddress("localhost");
             config->setRelayServerPort(3000);
-            config->setMaxChatHistorySize(200);
-            config->setDebugMode(false);
-            
+
             // Zapisz konfigurację
             config->saveSettings();
         }

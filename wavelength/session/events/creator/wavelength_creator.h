@@ -8,12 +8,14 @@
 #include <QJsonObject>
 #include <QUrl>
 #include <QDebug>
+#include <QTimer>
 
 #include "../../../database/database_manager.h"
 #include "../../../registry/wavelength_registry.h"
 #include "../../../auth/authentication_manager.h"
 #include "../../../messages/handler/message_handler.h"
 #include "../../../messages/wavelength_message_processor.h"
+#include "../../../util/wavelength_config.h"
 
 class WavelengthCreator : public QObject {
     Q_OBJECT
@@ -27,6 +29,7 @@ public:
     bool createWavelength(QString frequency, bool isPasswordProtected,
                   const QString& password) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+        WavelengthConfig* config = WavelengthConfig::getInstance();
 
         // Check if the wavelength already exists locally
         if (registry->hasWavelength(frequency)) {
@@ -54,6 +57,7 @@ public:
 
         // Zmienna do śledzenia czy callback connected został już wywołany
         bool* connectedCallbackExecuted = new bool(false);
+        QTimer* keepAliveTimer = new QTimer(this);
 
         qDebug() << "Creating WebSocket connection for wavelength" << frequency;
 
@@ -61,7 +65,7 @@ public:
         QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
         // Definiujemy obsługę wiadomości - wspólna dla wszystkich callbacków
-        auto messageHandler = [this, frequency, hostId, isPasswordProtected, password, socket](const QString& message) {
+        auto messageHandler = [this, frequency, hostId, isPasswordProtected, password, socket, keepAliveTimer](const QString& message) { // Przekaż timer
             qDebug() << "WebSocket received message for wavelength" << frequency << ":" << message;
             bool ok = false;
             QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
@@ -88,18 +92,20 @@ public:
                     info.password = password;
                     info.hostId = hostId;
                     info.isHost = true;
-                    info.socket = socket;
+                    info.socket = socket; // Przechowaj wskaźnik na socket w info
 
                     registry->addWavelength(frequency, info);
                     registry->setActiveWavelength(frequency);
 
-                    // Dodaj to:
+                    // Połącz przetwarzanie wiadomości przychodzących
                     QObject::connect(socket, &QWebSocket::textMessageReceived,
                                    [frequency](const QString& message) {
                         qDebug() << "Processing incoming message for host wavelength" << frequency;
-                        // Przekazanie wiadomości do procesora
                         WavelengthMessageProcessor::getInstance()->processIncomingMessage(message, frequency);
                     });
+
+                    // Uruchom timer keep-alive po pomyślnej rejestracji
+                    keepAliveTimer->start(WavelengthConfig::getInstance()->getKeepAliveInterval());
 
                     emit wavelengthCreated(frequency);
                 } else {
@@ -107,14 +113,17 @@ public:
                     qDebug() << "Failed to register wavelength:" << errorMsg;
                     emit connectionError(errorMsg);
 
+                    keepAliveTimer->stop(); // Zatrzymaj timer w razie błędu
                     socket->close();
-                    socket->deleteLater();
+                    // socket->deleteLater(); // Usunięcie w disconnectHandler
                 }
             }
+            // Można dodać obsługę PONG, jeśli serwer je wysyła
+            // connect(socket, &QWebSocket::pong, this, [](quint64 elapsedTime, const QByteArray &payload){ ... });
         };
 
         // Definiujemy obsługę rozłączenia
-        auto disconnectHandler = [this, frequency, socket, connectedCallbackExecuted]() {
+        auto disconnectHandler = [this, frequency, socket, keepAliveTimer, connectedCallbackExecuted]() {
             qDebug() << "WebSocket disconnected for wavelength" << frequency;
             WavelengthRegistry* registry = WavelengthRegistry::getInstance();
 
@@ -125,6 +134,7 @@ public:
 
             if (registry->hasWavelength(frequency)) {
                 qDebug() << "Removing wavelength" << frequency << "due to socket disconnect";
+                keepAliveTimer->stop();
                 QString activeFreq = registry->getActiveWavelength();
                 
                 registry->removeWavelength(frequency);
@@ -137,6 +147,7 @@ public:
             }
             
             socket->deleteLater();
+            keepAliveTimer->deleteLater();
             delete connectedCallbackExecuted;
         };
 
@@ -163,27 +174,36 @@ public:
 
         // Definiujemy obsługę połączenia
         connect(socket, &QWebSocket::connected, this, [this, socket, frequency, isPasswordProtected,
-                                                       password, hostId, connectedCallbackExecuted]() {
+                                                       password, hostId, keepAliveTimer, connectedCallbackExecuted]() { // Przekaż timer
             if (*connectedCallbackExecuted) {
                 qDebug() << "Connected callback already executed, ignoring";
                 return;
             }
-            
+
             *connectedCallbackExecuted = true;
             qDebug() << "WebSocket connected for wavelength" << frequency;
-            
+
+            connect(keepAliveTimer, &QTimer::timeout, socket, [socket](){
+                if (socket->isValid()) {
+                    qDebug() << "Sending ping...";
+                    socket->ping();
+                }
+            });
+
             MessageHandler* msgHandler = MessageHandler::getInstance();
             QJsonObject regRequest = msgHandler->createRegisterRequest(frequency, isPasswordProtected, password, hostId);
-            
+
             QJsonDocument doc(regRequest);
             socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
             qDebug() << "Sent register request for wavelength" << frequency;
         });
 
         // Łączymy z serwerem
-        QString url = QString("ws://localhost:3000");
-        qDebug() << "Opening WebSocket connection to URL:" << url;
-        socket->open(QUrl(url));
+        QString address = config->getRelayServerAddress();
+        int port = config->getRelayServerPort();
+        QUrl url(QString("ws://%1:%2").arg(address).arg(port));
+        qDebug() << "Opening WebSocket connection to URL:" << url.toString();
+        socket->open(url);
 
         return true;
     }
