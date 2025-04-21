@@ -7,6 +7,7 @@
 #include <qfuture.h>
 #include <QLabel>
 #include <QPushButton>
+#include <QScrollArea>
 #include <qtconcurrentrun.h>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -293,9 +294,20 @@ void showCyberImage(const QByteArray& data) {
     // Opakowujemy w AutoScalingAttachment
     AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(imageViewer, viewer);
 
-    // Ustawiamy maksymalny dozwolony rozmiar (np. 80% szerokości wiadomości, 60% wysokości ekranu)
-    QScreen* screen = QApplication::primaryScreen();
-    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    QSize maxSize(400, 300);
+
+    if (parentWidget() && parentWidget()->parentWidget()) { // Zakładając hierarchię StreamMessage -> Placeholder -> Viewer -> ScalingAttachment
+        QWidget* streamMessage = parentWidget()->parentWidget();
+        maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50)); // Odejmij marginesy
+        maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
+    } else {
+        QScreen* screen = QApplication::primaryScreen();
+        if(screen) {
+            maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
+            maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
+        }
+    }
+    qDebug() << "showCyberImage - Ustawiam maxSize dla miniatury:" << maxSize;
     scalingAttachment->setMaxAllowedSize(maxSize);
 
     // Podłączamy obsługę kliknięcia
@@ -306,10 +318,19 @@ void showCyberImage(const QByteArray& data) {
         fullSizeViewer->setModal(true);
 
         QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
+        layout->setContentsMargins(5, 5, 5, 5);
 
         // Dodajemy pełnowymiarowy obraz
-        InlineImageViewer* fullImage = new InlineImageViewer(data, fullSizeViewer);
-        layout->addWidget(fullImage, 0, Qt::AlignCenter);
+        QScrollArea* scrollArea = new QScrollArea(fullSizeViewer);
+        scrollArea->setWidgetResizable(true); // Pozwala widgetowi wewnątrz się rozszerzać
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scrollArea->setStyleSheet("QScrollArea { background-color: #001018; border: none; }"); // Styl pasujący
+
+        InlineImageViewer* fullImage = new InlineImageViewer(data, scrollArea); // Rodzicem jest scrollArea
+        scrollArea->setWidget(fullImage); // Ustawiamy obraz jako widget w scrollArea
+
+        layout->addWidget(scrollArea, 1); // ScrollArea zajmuje większość miejsca
 
         // Dodaj przycisk zamknięcia
         QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
@@ -335,6 +356,28 @@ void showCyberImage(const QByteArray& data) {
             "  border: 2px solid #00aaff;"
             "}"
         );
+
+        // Pobierz geometrię ekranu
+        QScreen* screen = QApplication::primaryScreen();
+        QRect screenGeometry = screen->availableGeometry();
+
+        // Ustaw maksymalny rozmiar dialogu (np. 90% ekranu)
+        QSize maxDialogSize = screenGeometry.size() * 0.9;
+        scrollArea->setMaximumSize(maxDialogSize); // Ogranicz rozmiar scroll area
+
+        // Oblicz preferowany rozmiar dialogu na podstawie zawartości i przycisku
+        fullSizeViewer->adjustSize(); // Dopasuj rozmiar do zawartości
+        QSize dialogSize = fullSizeViewer->size();
+
+        // Ogranicz rozmiar dialogu, jeśli przekracza maksimum
+        if (dialogSize.width() > maxDialogSize.width()) dialogSize.setWidth(maxDialogSize.width());
+        if (dialogSize.height() > maxDialogSize.height()) dialogSize.setHeight(maxDialogSize.height());
+        fullSizeViewer->resize(dialogSize); // Ustaw ograniczony rozmiar
+
+        // Wyśrodkuj dialog na ekranie
+        int x = screenGeometry.left() + (screenGeometry.width() - dialogSize.width()) / 2;
+        int y = screenGeometry.top() + (screenGeometry.height() - dialogSize.height()) / 2;
+        fullSizeViewer->move(x, y);
 
         fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
         fullSizeViewer->show();
@@ -353,6 +396,7 @@ void showCyberImage(const QByteArray& data) {
 
     setContent(viewer);
     setLoading(false);
+    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberGif(const QByteArray& data) {
@@ -364,9 +408,19 @@ void showCyberGif(const QByteArray& data) {
     // Opakowujemy w AutoScalingAttachment
     AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(gifPlayer, viewer);
 
-    // Ustawiamy maksymalny dozwolony rozmiar
-    QScreen* screen = QApplication::primaryScreen();
-    QSize maxSize(screen->availableGeometry().width() * 0.6, screen->availableGeometry().height() * 0.35);
+    QSize maxSize(400, 300);
+    if (parentWidget() && parentWidget()->parentWidget()) {
+        QWidget* streamMessage = parentWidget()->parentWidget();
+        maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50));
+        maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
+    } else {
+        QScreen* screen = QApplication::primaryScreen();
+        if(screen) {
+            maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
+            maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
+        }
+    }
+
     scalingAttachment->setMaxAllowedSize(maxSize);
 
     // Podłączamy obsługę kliknięcia
@@ -377,10 +431,19 @@ void showCyberGif(const QByteArray& data) {
         fullSizeViewer->setModal(true);
 
         QVBoxLayout* layout = new QVBoxLayout(fullSizeViewer);
+        layout->setContentsMargins(5, 5, 5, 5);
 
         // Dodajemy pełnowymiarowy gif
-        InlineGifPlayer* fullGif = new InlineGifPlayer(data, fullSizeViewer);
-        layout->addWidget(fullGif, 0, Qt::AlignCenter);
+        QScrollArea* scrollArea = new QScrollArea(fullSizeViewer);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        scrollArea->setStyleSheet("QScrollArea { background-color: #001018; border: none; }");
+
+        InlineGifPlayer* fullGif = new InlineGifPlayer(data, scrollArea);
+        scrollArea->setWidget(fullGif);
+
+        layout->addWidget(scrollArea, 1);
 
         // Dodaj przycisk zamknięcia
         QPushButton* closeButton = new QPushButton("Zamknij", fullSizeViewer);
@@ -407,8 +470,27 @@ void showCyberGif(const QByteArray& data) {
             "}"
         );
 
-        fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
-        fullSizeViewer->show();
+        QScreen* screen = QApplication::primaryScreen();
+         QRect screenGeometry = screen->availableGeometry();
+
+         // Ustaw maksymalny rozmiar dialogu
+         QSize maxDialogSize = screenGeometry.size() * 0.9;
+         scrollArea->setMaximumSize(maxDialogSize);
+
+         // Oblicz preferowany rozmiar dialogu i ogranicz go
+         fullSizeViewer->adjustSize();
+         QSize dialogSize = fullSizeViewer->size();
+         if (dialogSize.width() > maxDialogSize.width()) dialogSize.setWidth(maxDialogSize.width());
+         if (dialogSize.height() > maxDialogSize.height()) dialogSize.setHeight(maxDialogSize.height());
+         fullSizeViewer->resize(dialogSize);
+
+         // Wyśrodkuj dialog
+         int x = screenGeometry.left() + (screenGeometry.width() - dialogSize.width()) / 2;
+         int y = screenGeometry.top() + (screenGeometry.height() - dialogSize.height()) / 2;
+         fullSizeViewer->move(x, y);
+
+         fullSizeViewer->setAttribute(Qt::WA_DeleteOnClose);
+         fullSizeViewer->show();
     });
 
     viewer->setContent(scalingAttachment);
@@ -423,6 +505,7 @@ void showCyberGif(const QByteArray& data) {
 
     setContent(viewer);
     setLoading(false);
+    QTimer::singleShot(50, this, [this](){ updateGeometry(); });
 }
 
 void showCyberAudio(const QByteArray& data) {

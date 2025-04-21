@@ -16,6 +16,9 @@
 #include <QTimer>
 #include <QEvent>
 
+#include "gif/player/inline_gif_player.h"
+#include "image/displayer/image_viewer.h"
+
 class AutoScalingAttachment : public QWidget {
     Q_OBJECT
 
@@ -33,7 +36,7 @@ public:
         contentLayout->setContentsMargins(0, 0, 0, 0);
         contentLayout->setSpacing(0);
         contentLayout->addWidget(m_content);
-        m_content->setParent(m_contentContainer);
+        // m_content->setParent(m_contentContainer);
 
         layout->addWidget(m_contentContainer, 0, Qt::AlignCenter);
 
@@ -57,18 +60,31 @@ public:
         // Włącz obsługę zdarzeń myszy
         setMouseTracking(true);
         m_contentContainer->setMouseTracking(true);
-        m_content->setMouseTracking(true);
-        m_content->installEventFilter(this);
+        // m_content->setMouseTracking(true);
+        // m_content->installEventFilter(this);
         m_contentContainer->installEventFilter(this);
 
         // Ustaw odpowiednią politykę rozmiaru
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+        m_contentContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        m_content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
         // Ustaw kursor wskazujący dla skalowanych załączników
         setCursor(Qt::PointingHandCursor);
 
-        // Sprawdź i dostosuj rozmiar po krótkim opóźnieniu
-        QTimer::singleShot(100, this, &AutoScalingAttachment::checkAndScaleContent);
+        InlineImageViewer* imgView = qobject_cast<InlineImageViewer*>(m_content);
+        InlineGifPlayer* gifPlay = qobject_cast<InlineGifPlayer*>(m_content);
+        if (imgView) {
+            connect(imgView, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::checkAndScaleContent);
+            // W przypadku błędu też spróbujmy ustawić rozmiar
+            connect(imgView, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::checkAndScaleContent);
+        } else if (gifPlay) {
+            connect(gifPlay, &InlineGifPlayer::gifLoaded, this, &AutoScalingAttachment::checkAndScaleContent);
+        } else {
+            // Dla innych typów zawartości, spróbuj od razu
+            QTimer::singleShot(50, this, &AutoScalingAttachment::checkAndScaleContent);
+        }
     }
 
     void setMaxAllowedSize(const QSize& maxSize) {
@@ -78,11 +94,13 @@ public:
 
     QSize contentOriginalSize() const {
         if (m_content) {
-            if (m_content->sizeHint().isValid()) {
-                return m_content->sizeHint();
+            // Używamy sizeHint jako preferowanego oryginalnego rozmiaru
+            QSize hint = m_content->sizeHint();
+            if (hint.isValid()) {
+                return hint;
             }
         }
-        return size();
+        return QSize(); // Zwróć nieprawidłowy rozmiar, jeśli nie można określić
     }
 
     bool isScaled() const {
@@ -94,17 +112,23 @@ public:
     }
 
     QSize sizeHint() const override {
-        if (m_content && m_isScaled && m_scaledSize.isValid()) {
-            // Dodajemy przestrzeń na etykietę informacyjną
-            int extraHeight = m_infoLabel->isVisible() ? m_infoLabel->height() + 4 : 0;
-            return QSize(m_scaledSize.width(), m_scaledSize.height() + extraHeight);
-        } else if (m_content) {
-            QSize contentSize = m_content->sizeHint();
-            if (contentSize.isValid()) {
-                return contentSize;
-            }
+        QSize currentContentSize = m_contentContainer->size(); // Bierzemy aktualny rozmiar kontenera
+        if (!currentContentSize.isValid() || currentContentSize.width() <= 0 || currentContentSize.height() <= 0) {
+            // Jeśli kontener nie ma rozmiaru, spróbujmy sizeHint zawartości
+            currentContentSize = m_content ? m_content->sizeHint() : QSize();
         }
-        return QWidget::sizeHint();
+
+        if (currentContentSize.isValid() && currentContentSize.width() > 0 && currentContentSize.height() > 0) {
+            int extraHeight = m_infoLabel->isVisible() ? m_infoLabel->sizeHint().height() + layout()->spacing() : 0;
+            QSize hint(currentContentSize.width(), currentContentSize.height() + extraHeight);
+            qDebug() << "AutoScalingAttachment::sizeHint (valid content):" << hint;
+            return hint;
+        }
+
+        // Zwróć domyślny minimalny rozmiar, jeśli nic innego nie działa
+        QSize defaultHint = QWidget::sizeHint().isValid() ? QWidget::sizeHint() : QSize(100,50);
+        qDebug() << "AutoScalingAttachment::sizeHint (default):" << defaultHint;
+        return defaultHint;
     }
 
 signals:
@@ -112,115 +136,112 @@ signals:
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override {
-        if ((watched == m_content || watched == m_contentContainer) && 
-            event->type() == QEvent::MouseButtonRelease) {
-            if (m_isScaled) {
-                emit clicked();
-                return true;
+        // Zmieniamy watched na m_contentContainer
+        if (watched == m_contentContainer && event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent* me = static_cast<QMouseEvent*>(event);
+            if (me->button() == Qt::LeftButton) {
+                qDebug() << "AutoScalingAttachment: Kliknięto kontener!";
+                emit clicked(); // Emituj zawsze po kliknięciu
+                return true; // Zawsze przechwytuj kliknięcie na kontenerze
             }
         }
         return QWidget::eventFilter(watched, event);
     }
 
-    void mousePressEvent(QMouseEvent* event) override {
-        if (m_isScaled && event->button() == Qt::LeftButton) {
-            event->accept();
-        } else {
-            QWidget::mousePressEvent(event);
-        }
-    }
-
-    void mouseReleaseEvent(QMouseEvent* event) override {
-        if (m_isScaled && event->button() == Qt::LeftButton) {
-            emit clicked();
-            event->accept();
-        } else {
-            QWidget::mouseReleaseEvent(event);
-        }
-    }
-
     void enterEvent(QEvent* event) override {
+        // Pokazuj etykietę informacyjną tylko jeśli obrazek jest faktycznie przeskalowany
         if (m_isScaled) {
-            // Pokazuj etykietę informacyjną podczas najechania
             m_infoLabel->show();
-            updateGeometry();
+            // updateGeometry(); // Niekoniecznie potrzebne, chyba że etykieta zmienia rozmiar znacząco
         }
         QWidget::enterEvent(event);
     }
 
     void leaveEvent(QEvent* event) override {
-        if (m_isScaled) {
-            // Ukryj etykietę po zjechaniu kursorem
-            m_infoLabel->hide();
-            updateGeometry();
-        }
+        // Zawsze ukrywaj etykietę po zjechaniu
+        m_infoLabel->hide();
+        // updateGeometry(); // Niekoniecznie potrzebne
         QWidget::leaveEvent(event);
     }
 
 private slots:
     void checkAndScaleContent() {
-        if (!m_content) return;
-
-        // Pobierz oryginalny rozmiar zawartości
-        QSize originalSize = m_content->sizeHint();
-        if (!originalSize.isValid() || originalSize.width() <= 0 || originalSize.height() <= 0) {
+        if (!m_content) {
+            qDebug() << "AutoScalingAttachment::checkAndScaleContent - Brak zawartości.";
             return;
         }
 
-        // Pobierz maksymalny dostępny rozmiar
-        QSize maxSize;
-        if (m_maxAllowedSize.isValid()) {
-            maxSize = m_maxAllowedSize;
-        } else {
-            // Jeśli nie ustawiono explicite, użyj dostępnego miejsca na ekranie
-            // Pobieramy informacje o ekranie
-            QScreen* screen = QApplication::primaryScreen();
-            if (parentWidget() && parentWidget()->window()) {
-                screen = parentWidget()->window()->screen();
-            }
-            
-            QRect screenRect = screen->availableGeometry();
-            
-            // Ograniczamy do 80% dostępnego obszaru
-            maxSize = QSize(screenRect.width() * 0.8, screenRect.height() * 0.8);
+        // Pobierz oryginalny rozmiar zawartości z sizeHint
+        QSize originalSize = m_content->sizeHint();
+        if (!originalSize.isValid() || originalSize.width() <= 0 || originalSize.height() <= 0) {
+            qDebug() << "AutoScalingAttachment::checkAndScaleContent - Nieprawidłowy sizeHint zawartości:" << originalSize;
+            // Spróbuj wymusić aktualizację sizeHint
+             m_content->updateGeometry();
+             originalSize = m_content->sizeHint();
+             if (!originalSize.isValid() || originalSize.width() <= 0 || originalSize.height() <= 0) {
+                 qDebug() << "AutoScalingAttachment::checkAndScaleContent - Nadal nieprawidłowy sizeHint.";
+                 // Można spróbować poczekać chwilę i spróbować ponownie
+                 // QTimer::singleShot(100, this, &AutoScalingAttachment::checkAndScaleContent);
+                 return;
+             }
         }
+         qDebug() << "AutoScalingAttachment::checkAndScaleContent - Oryginalny sizeHint zawartości:" << originalSize;
+
+
+        // Pobierz maksymalny dostępny rozmiar
+        QSize maxSize = m_maxAllowedSize;
+        if (!maxSize.isValid()) {
+            // Domyślny maksymalny rozmiar, jeśli nie ustawiono
+            maxSize = QSize(400, 300); // Przykładowy domyślny limit
+            qDebug() << "AutoScalingAttachment::checkAndScaleContent - Używam domyślnego maxSize:" << maxSize;
+        } else {
+             qDebug() << "AutoScalingAttachment::checkAndScaleContent - Używam ustawionego maxSize:" << maxSize;
+        }
+
 
         // Sprawdź czy zawartość jest zbyt duża
         bool needsScaling = originalSize.width() > maxSize.width() ||
                            originalSize.height() > maxSize.height();
 
+        QSize targetSize;
         if (needsScaling) {
             // Oblicz skalę zachowującą proporcje
-            double scaleX = static_cast<double>(maxSize.width()) / originalSize.width();
-            double scaleY = static_cast<double>(maxSize.height()) / originalSize.height();
-            double scale = qMin(scaleX, scaleY);
+            qreal scaleX = static_cast<qreal>(maxSize.width()) / originalSize.width();
+            qreal scaleY = static_cast<qreal>(maxSize.height()) / originalSize.height();
+            qreal scale = qMin(scaleX, scaleY);
 
             // Oblicz nowy rozmiar
-            m_scaledSize = QSize(originalSize.width() * scale, originalSize.height() * scale);
+            targetSize = QSize(qMax(1, static_cast<int>(originalSize.width() * scale)),
+                               qMax(1, static_cast<int>(originalSize.height() * scale)));
 
-            // Ustaw stały rozmiar dla kontenera
-            m_contentContainer->setFixedSize(m_scaledSize);
-            
-            qDebug() << "AutoScalingAttachment: Przeskalowano załącznik z" << originalSize 
-                     << "do" << m_scaledSize;
-
-            // Ustaw flagę skalowania
+            qDebug() << "AutoScalingAttachment: Skalowanie wymagane. Z" << originalSize << "do" << targetSize;
             m_isScaled = true;
-            
-            // Pokaż informację o możliwości kliknięcia
-            m_infoLabel->setText("Kliknij, aby powiększyć");
-            m_infoLabel->setCursor(Qt::PointingHandCursor);
+            m_infoLabel->setText("Kliknij, aby powiększyć"); // Pokaż info tylko przy skalowaniu
         } else {
-            // Nie ma potrzeby skalowania
-            m_contentContainer->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+            // Nie ma potrzeby skalowania, użyj oryginalnego rozmiaru
+            targetSize = originalSize;
+            qDebug() << "AutoScalingAttachment: Skalowanie niewymagane. Rozmiar:" << targetSize;
             m_isScaled = false;
-            m_infoLabel->hide();
+            m_infoLabel->hide(); // Ukryj info, jeśli nie skalujemy
         }
 
-        // Aktualizuj układ
-        updateGeometry();
+        // Ustaw stały rozmiar dla kontenera zawartości
+        m_contentContainer->setFixedSize(targetSize);
+
+        // Upewnij się, że zawartość wewnątrz kontenera też ma odpowiedni rozmiar
+        // (QLabel ze scaledContents=true powinien się dostosować)
+        // m_content->setFixedSize(targetSize); // Raczej niepotrzebne
+
+        // Aktualizuj układ i geometrię tego widgetu
+        m_scaledSize = targetSize; // Zapiszmy obliczony rozmiar na później (np. dla sizeHint)
+        updateGeometry(); // Ważne, aby poinformować layout nadrzędny o zmianie preferencji rozmiaru
+
+        // Wymuś aktualizację layoutu rodzica
         if (parentWidget()) {
-            parentWidget()->updateGeometry();
+            QTimer::singleShot(0, parentWidget(), [parent = parentWidget()]() {
+                 if (parent->layout()) parent->layout()->activate();
+                 parent->updateGeometry();
+            });
         }
     }
 
@@ -229,7 +250,7 @@ private:
     QWidget* m_contentContainer;
     QLabel* m_infoLabel;
     bool m_isScaled;
-    QSize m_scaledSize;
+    QSize m_scaledSize; // Przechowuje obliczony rozmiar po skalowaniu
     QSize m_maxAllowedSize;
 };
 
