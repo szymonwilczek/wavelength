@@ -364,11 +364,12 @@ int main(int argc, char *argv[]) {
         QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
             animation->show();
             animation->resetVisualization();
-            // --- DODANO ---
             titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
-            // -------------
-            centerLabel(titleLabel, animation);
-            textEffect->startAnimation();
+            // Dodaj minimalne opóźnienie przed centrowaniem
+            QTimer::singleShot(0, [titleLabel, animation]() {
+                centerLabel(titleLabel, animation);
+            });
+            textEffect->startAnimation(); // Rozpocznij animację tekstu od razu
         });
     });
 
@@ -400,11 +401,12 @@ int main(int argc, char *argv[]) {
     QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
         animation->show();
         animation->resetVisualization();
-        // --- DODANO ---
         titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
-        // -------------
-        centerLabel(titleLabel, animation);
-        textEffect->startAnimation();
+        // Dodaj minimalne opóźnienie przed centrowaniem
+        QTimer::singleShot(0, [titleLabel, animation]() {
+            centerLabel(titleLabel, animation);
+        });
+        textEffect->startAnimation(); // Rozpocznij animację tekstu od razu
     });
 });
 
@@ -470,8 +472,11 @@ int main(int argc, char *argv[]) {
 
     QTimer::singleShot(500, [titleLabel, animation, textEffect]() {
         titleLabel->setText("WAVELENGTH");
-        titleLabel->adjustSize(); // Upewnij się, że rozmiar jest obliczony po ustawieniu tekstu
-        centerLabel(titleLabel, animation);
+        titleLabel->adjustSize();
+        // Dodaj minimalne opóźnienie przed centrowaniem
+        QTimer::singleShot(0, [titleLabel, animation]() {
+            centerLabel(titleLabel, animation);
+        });
         titleLabel->show();
 
         QTimer::singleShot(300, [textEffect]() {
