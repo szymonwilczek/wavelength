@@ -102,7 +102,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
                 }
 
                 m_lastSize = newSize;
-                update();
+                // update();
             });
 
     connect(&m_eventHandler, &BlobEventHandler::stateResetTimerRequested, this, [this]() {
@@ -386,6 +386,7 @@ bool BlobAnimation::event(QEvent *event) {
 }
 
 void BlobAnimation::switchToState(BlobConfig::AnimationState newState) {
+    // std::lock_guard<std::mutex> lock(m_pointsMutex);
     if (!m_eventsEnabled) {
         return;
     }
