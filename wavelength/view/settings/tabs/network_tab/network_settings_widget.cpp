@@ -131,5 +131,4 @@ void NetworkSettingsWidget::saveSettings() {
     m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
     m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
     qDebug() << "AdvancedSettingsWidget settings prepared for saving.";
-    // Nie wywołujemy m_config->saveSettings() tutaj, zrobi to główny widok
 }
