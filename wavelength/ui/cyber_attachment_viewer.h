@@ -135,10 +135,6 @@ public:
         content->setMinimumSize(0, 0);
         content->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
-        if (content->sizeHint().isValid()) {
-            qDebug() << "Rozmiar docelowej zawartości (sizeHint):" << content->sizeHint();
-        }
-
         // Ukrywamy zawartość początkowo
         content->setVisible(false);
 
@@ -175,7 +171,6 @@ public:
             if (contentHint.isValid()) {
                 hint.setWidth(contentHint.width() + extraWidth);
                 hint.setHeight(contentHint.height() + extraHeight);
-                qDebug() << "CyberAttachmentViewer::sizeHint (z contentHint):" << hint << "ContentHint:" << contentHint;
                 return hint;
             } else {
                 // Jeśli contentHint jest nieprawidłowy, spróbujmy rozmiar widgetu
@@ -183,7 +178,6 @@ public:
                 if (contentSize.isValid() && contentSize.width() > 0) {
                     hint.setWidth(contentSize.width() + extraWidth);
                     hint.setHeight(contentSize.height() + extraHeight);
-                    qDebug() << "CyberAttachmentViewer::sizeHint (z contentSize):" << hint << "ContentSize:" << contentSize;
                     return hint;
                 }
             }
@@ -193,7 +187,6 @@ public:
         QSize defaultSize(200, 100); // Zmniejszony domyślny rozmiar
         hint.setWidth(defaultSize.width() + extraWidth);
         hint.setHeight(defaultSize.height() + extraHeight);
-        qDebug() << "CyberAttachmentViewer::sizeHint (domyślny):" << hint;
         return hint;
     }
 
