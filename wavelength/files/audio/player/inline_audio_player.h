@@ -91,37 +91,6 @@ protected:
             painter.setOpacity(1.0);
         }
 
-        // // Wizualizacja dźwięku - małe słupki pulsujące
-        // int barCount = 6;
-        // int maxBarHeight = 8;
-        // int barWidth = 2;
-        // int barSpacing = 4;
-        // int startX = handlePos - ((barCount * (barWidth + barSpacing)) / 2);
-        // int barY = trackRect.top() - maxBarHeight - 2;
-        //
-        // if (value() > minimum() + (maximum() - minimum()) * 0.05) {
-        //     painter.setPen(Qt::NoPen);
-        //
-        //     for (int i = 0; i < barCount; i++) {
-        //         // Generuj wysokość słupka na podstawie pozycji i czasu
-        //         double phase = (QDateTime::currentMSecsSinceEpoch() % 1000) / 1000.0;
-        //         double offset = (double)i / barCount;
-        //         double barHeight = maxBarHeight * (0.3 + 0.7 * qAbs(sin((phase + offset) * M_PI * 3)));
-        //
-        //         // Neonowy kolor z przejściem
-        //         QColor barColor;
-        //         if (i < barCount / 2) {
-        //             barColor = progressColor.lighter(100 + i * 20);
-        //         } else {
-        //             barColor = progressColor.lighter(100 + (barCount - i) * 20);
-        //         }
-        //
-        //         painter.setBrush(barColor);
-        //         painter.drawRect(startX + i * (barWidth + barSpacing), barY + (maxBarHeight - barHeight),
-        //                         barWidth, barHeight);
-        //     }
-        // }
-
         // Rysowanie uchwytu z efektem świecenia
         QRect handleRect(handlePos, (height() - handleHeight) / 2, handleWidth, handleHeight);
 
