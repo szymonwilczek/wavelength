@@ -13,12 +13,17 @@
 #include <QPainterPath>
 #include <QDateTime>
 #include <QRandomGenerator>
-#include <QGraphicsDropShadowEffect>
 #include <QGraphicsOpacityEffect>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
-#include <QPointer>
 #include <QStyle>
+#include <QOperatingSystemVersion>
+
+#ifdef Q_OS_WINDOWS
+#include <windows.h>
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+#endif
 
 #include "../decoder/video_decoder.h"
 
@@ -307,7 +312,7 @@ public:
         : QDialog(parent), m_videoData(videoData), m_mimeType(mimeType),
           m_scanlineOpacity(0.15), m_gridOpacity(0.1)
     {
-        setWindowTitle("C:\\> WAVELENGTH_VISUAL_DECODER");
+        setWindowTitle("SYS> WAVELENGTH_VISUAL_STREAM_DECODER");
         setMinimumSize(800, 560); // Nieco większy rozmiar dla cyberpunkowego interfejsu
         setModal(false);
 
@@ -319,6 +324,18 @@ public:
             "  font-family: 'Consolas';"    // Czcionka technologiczna
             "}"
         );
+
+#ifdef Q_OS_WINDOWS
+        // Ustaw ciemny pasek tytułu dla Windows 10/11
+        if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
+            HWND hwnd = (HWND)this->winId(); // Pobierz uchwyt okna dialogowego
+            if (hwnd) {
+                // Użyj atrybutu 20 dla Windows 10 1809+ / Windows 11
+                BOOL darkMode = TRUE;
+                ::DwmSetWindowAttribute(hwnd, 20, &darkMode, sizeof(darkMode));
+            }
+        }
+#endif
 
         // Główny layout
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -542,75 +559,6 @@ protected:
 
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
-
-        // Ramki w stylu AR
-        QColor borderColor(0, 200, 255);
-        painter.setPen(QPen(borderColor, 1));
-
-        // Technologiczna ramka
-        QPainterPath frame;
-        int clipSize = 20;
-
-        // Górna krawędź
-        frame.moveTo(clipSize, 0);
-        frame.lineTo(width() - clipSize, 0);
-
-        // Prawy górny róg
-        frame.lineTo(width(), clipSize);
-
-        // Prawa krawędź
-        frame.lineTo(width(), height() - clipSize);
-
-        // Prawy dolny róg
-        frame.lineTo(width() - clipSize, height());
-
-        // Dolna krawędź
-        frame.lineTo(clipSize, height());
-
-        // Lewy dolny róg
-        frame.lineTo(0, height() - clipSize);
-
-        // Lewa krawędź
-        frame.lineTo(0, clipSize);
-
-        // Lewy górny róg
-        frame.lineTo(clipSize, 0);
-
-        painter.drawPath(frame);
-
-        // Znaczniki AR w rogach
-        painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-        int markerSize = 12;
-
-        // Lewy górny
-        painter.drawLine(clipSize, 10, clipSize + markerSize, 10);
-        painter.drawLine(clipSize, 10, clipSize, 10 + markerSize);
-
-        // Prawy górny
-        painter.drawLine(width() - clipSize - markerSize, 10, width() - clipSize, 10);
-        painter.drawLine(width() - clipSize, 10, width() - clipSize, 10 + markerSize);
-
-        // Prawy dolny
-        painter.drawLine(width() - clipSize - markerSize, height() - 10, width() - clipSize, height() - 10);
-        painter.drawLine(width() - clipSize, height() - 10, width() - clipSize, height() - 10 - markerSize);
-
-        // Lewy dolny
-        painter.drawLine(clipSize, height() - 10, clipSize + markerSize, height() - 10);
-        painter.drawLine(clipSize, height() - 10, clipSize, height() - 10 - markerSize);
-
-        // Dane techniczne w rogach
-        painter.setPen(borderColor);
-        painter.setFont(QFont("Consolas", 7));
-
-        // Linie skanowania (scanlines) - efekt monitora CRT
-        if (m_scanlineOpacity > 0.01) {
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
-
-            for (int y = 0; y < height(); y += 4) {
-                painter.drawRect(0, y, width(), 1);
-            }
-        }
 
         // Siatka hologramu w tle
         if (m_gridOpacity > 0.01) {
