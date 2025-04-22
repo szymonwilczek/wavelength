@@ -285,25 +285,11 @@ protected:
 
         // Lewy dolny - poziom zabezpieczeń
         int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
-        painter.drawText(10, height() - 10, QString("SEC:LVL%1").arg(secLevel));
+        painter.drawText(20, height() - 10, QString("SEC:LVL%1").arg(secLevel));
 
         // Prawy dolny - status
         QString status = m_isDecrypted ? "UNLOCKED" : "LOCKED";
-        painter.drawText(width() - 85, height() - 10, status);
-
-        // // W trybie skanowania dodajemy więcej linii skanujących
-        // if (m_isScanning && !m_isDecrypted) {
-        //     painter.setPen(QPen(QColor(0, 255, 255, 80), 1, Qt::SolidLine));
-        //
-        //     int scanLines = 8;
-        //     for (int i = 0; i < scanLines; i++) {
-        //         qreal phase = static_cast<qreal>(QDateTime::currentMSecsSinceEpoch() % 2000) / 2000.0;
-        //         qreal pos = (phase + static_cast<qreal>(i) / scanLines) - floor(phase + static_cast<qreal>(i) / scanLines);
-        //         int y = static_cast<int>(pos * height());
-        //
-        //         painter.drawLine(0, y, width(), y);
-        //     }
-        // }
+        painter.drawText(width() - 60, height() - 10, status);
     }
 
 private slots:
