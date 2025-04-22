@@ -258,7 +258,6 @@ protected:
         // Dodatkowe linie technologiczne
         painter.setPen(QPen(borderColor, 1, Qt::DotLine));
         painter.drawLine(2, 30, width() - 2, 30);
-        painter.drawLine(2, height() - 30, width() - 2, height() - 30);
 
         // Znaczniki AR w rogach
         painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
