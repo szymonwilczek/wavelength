@@ -91,37 +91,6 @@ protected:
             painter.setOpacity(1.0);
         }
 
-        // Wizualizacja dźwięku - małe słupki pulsujące
-        int barCount = 6;
-        int maxBarHeight = 8;
-        int barWidth = 2;
-        int barSpacing = 4;
-        int startX = handlePos - ((barCount * (barWidth + barSpacing)) / 2);
-        int barY = trackRect.top() - maxBarHeight - 2;
-
-        if (value() > minimum() + (maximum() - minimum()) * 0.05) {
-            painter.setPen(Qt::NoPen);
-
-            for (int i = 0; i < barCount; i++) {
-                // Generuj wysokość słupka na podstawie pozycji i czasu
-                double phase = (QDateTime::currentMSecsSinceEpoch() % 1000) / 1000.0;
-                double offset = (double)i / barCount;
-                double barHeight = maxBarHeight * (0.3 + 0.7 * qAbs(sin((phase + offset) * M_PI * 3)));
-
-                // Neonowy kolor z przejściem
-                QColor barColor;
-                if (i < barCount / 2) {
-                    barColor = progressColor.lighter(100 + i * 20);
-                } else {
-                    barColor = progressColor.lighter(100 + (barCount - i) * 20);
-                }
-
-                painter.setBrush(barColor);
-                painter.drawRect(startX + i * (barWidth + barSpacing), barY + (maxBarHeight - barHeight),
-                                barWidth, barHeight);
-            }
-        }
-
         // Rysowanie uchwytu z efektem świecenia
         QRect handleRect(handlePos, (height() - handleHeight) / 2, handleWidth, handleHeight);
 
@@ -460,7 +429,7 @@ public:
             m_playbackFinished = true;
             m_playButton->setText("↻");
             m_statusLabel->setText("ZAKOŃCZONO ODTWARZANIE");
-            m_spectrumIntensity = 0.1; // Zmniejszenie intensywności spektrum
+            decreaseSpectrumIntensity();
             update();
         });
 
@@ -476,12 +445,6 @@ public:
         m_uiTimer->setInterval(50);
         connect(m_uiTimer, &QTimer::timeout, this, &InlineAudioPlayer::updateUI);
         m_uiTimer->start();
-
-        // Timer dla losowych "zakłóceń" cyfrowych
-        m_glitchTimer = new QTimer(this);
-        m_glitchTimer->setInterval(QRandomGenerator::global()->bounded(3000, 7000));
-        connect(m_glitchTimer, &QTimer::timeout, this, &InlineAudioPlayer::triggerGlitch);
-        m_glitchTimer->start();
 
         // Inicjalizuj odtwarzacz w osobnym wątku
         QTimer::singleShot(100, this, [this]() {
@@ -518,9 +481,6 @@ public:
         // Zatrzymujemy timery
         if (m_uiTimer) {
             m_uiTimer->stop();
-        }
-        if (m_glitchTimer) {
-            m_glitchTimer->stop();
         }
         if (m_spectrumTimer) {
             m_spectrumTimer->stop();
@@ -664,40 +624,9 @@ protected:
 
         painter.drawPath(frame);
 
-        // Znaczniki AR w rogach
-        painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-        int markerSize = 8;
-
-        // Lewy górny
-        painter.drawLine(clipSize, 5, clipSize + markerSize, 5);
-        painter.drawLine(clipSize, 5, clipSize, 5 + markerSize);
-
-        // Prawy górny
-        painter.drawLine(width() - clipSize - markerSize, 5, width() - clipSize, 5);
-        painter.drawLine(width() - clipSize, 5, width() - clipSize, 5 + markerSize);
-
-        // Prawy dolny
-        painter.drawLine(width() - clipSize - markerSize, height() - 5, width() - clipSize, height() - 5);
-        painter.drawLine(width() - clipSize, height() - 5, width() - clipSize, height() - 5 - markerSize);
-
-        // Lewy dolny
-        painter.drawLine(clipSize, height() - 5, clipSize + markerSize, height() - 5);
-        painter.drawLine(clipSize, height() - 5, clipSize, height() - 5 - markerSize);
-
         // Dane techniczne w rogach
         painter.setPen(borderColor.lighter(120));
         painter.setFont(QFont("Consolas", 7));
-
-
-        // Linie skanowania (scanlines) - efekt monitora CRT
-        if (m_scanlineOpacity > 0.01) {
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
-
-            for (int y = 0; y < height(); y += 3) {
-                painter.drawRect(0, y, width(), 1);
-            }
-        }
     }
 
     bool eventFilter(QObject* watched, QEvent* event) override {
@@ -886,34 +815,6 @@ private slots:
         }
     }
 
-    void triggerGlitch() {
-        // Wywołujemy losowe zakłócenia w obrazie
-        double intensity = 0.3 + QRandomGenerator::global()->bounded(40) / 100.0;
-
-        // Animacja zakłóceń
-        QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
-        scanAnim->setDuration(400);
-        scanAnim->setStartValue(m_scanlineOpacity);
-        scanAnim->setKeyValueAt(0.4, intensity);
-        scanAnim->setEndValue(0.15);
-        scanAnim->start(QPropertyAnimation::DeleteWhenStopped);
-
-        // Losowe wyświetlenie informacji technicznych
-        if (QRandomGenerator::global()->bounded(10) < 3 && m_decoder && !m_decoder->isPaused()) {
-            m_statusLabel->setText(QString("DATA STREAM: %1 kbps").arg(QRandomGenerator::global()->bounded(128, 320)));
-
-            // Przywróć normalny status po chwili
-            QTimer::singleShot(1200, this, [this]() {
-                if (m_decoder && !m_decoder->isPaused() && !m_playbackFinished) {
-                    m_statusLabel->setText("ODTWARZANIE");
-                }
-            });
-        }
-
-        // Ustawiamy kolejny interwał
-        m_glitchTimer->setInterval(QRandomGenerator::global()->bounded(3000, 8000));
-    }
-
     void increaseSpectrumIntensity() {
         QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
         spectrumAnim->setDuration(600);
@@ -943,12 +844,12 @@ private:
         // Rysujemy siatkę
         painter.setPen(QPen(QColor(50, 30, 90, 100), 1, Qt::DotLine));
 
-        int stepX = target->width() / 16;
+        int stepX = target->width() / 8;
         for (int x = stepX; x < target->width(); x += stepX) {
             painter.drawLine(x, 0, x, target->height());
         }
 
-        int stepY = target->height() / 4;
+        int stepY = target->height() / 3;
         for (int y = stepY; y < target->height(); y += stepY) {
             painter.drawLine(0, y, target->width(), y);
         }
@@ -981,21 +882,6 @@ private:
                 }
             }
         }
-
-        // Dodajemy neonowy efekt obramowania
-        QPen glowPen(QColor(160, 100, 255, 120), 1);
-        painter.setPen(glowPen);
-        painter.drawRect(target->rect().adjusted(0, 0, -1, -1));
-
-        // Opcjonalnie: wyświetlenie linii środkowej
-        painter.setPen(QPen(QColor(200, 150, 255, 80), 1, Qt::DashLine));
-        painter.drawLine(0, target->height()/2, target->width(), target->height()/2);
-
-        // Dodajemy oznaczenia techniczne
-        painter.setPen(QColor(160, 100, 255));
-        painter.setFont(QFont("Consolas", 6));
-        painter.drawText(5, 10, "FFT:64");
-        painter.drawText(target->width() - 55, 10, QString("GAIN:%1").arg(qRound(m_spectrumIntensity * 100)));
     }
 
     // Pola klasy InlineAudioPlayer
@@ -1010,7 +896,6 @@ private:
 
     std::shared_ptr<AudioDecoder> m_decoder;
     QTimer* m_uiTimer;
-    QTimer* m_glitchTimer;
     QTimer* m_spectrumTimer;
 
     QByteArray m_audioData;

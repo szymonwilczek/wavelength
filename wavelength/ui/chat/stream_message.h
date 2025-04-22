@@ -5,6 +5,8 @@
 #include <QGraphicsEffect>
 #include <QScrollArea>
 #include <QSequentialAnimationGroup>
+#include <QSvgRenderer>
+#include <QBitmap>
 #include <qtimeline.h>
 #include <utility>
 
@@ -13,6 +15,8 @@
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
+
+
 
 class StreamMessage : public QWidget {
     Q_OBJECT
@@ -28,6 +32,35 @@ public:
         System
     };
 
+    QIcon createColoredSvgIcon(const QString& svgPath, const QColor& color, const QSize& size) {
+        QSvgRenderer renderer;
+        if (!renderer.load(svgPath)) {
+            qWarning() << "Nie można załadować SVG:" << svgPath;
+            return QIcon(); // Zwróć pustą ikonę w razie błędu
+        }
+
+        // Utwórz pixmapę o żądanym rozmiarze z przezroczystym tłem
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+
+        // Narysuj SVG na pixmapie
+        QPainter painter(&pixmap);
+        renderer.render(&painter);
+        painter.end(); // Zakończ malowanie na oryginalnej pixmapie
+
+        // Utwórz maskę z kanału alfa oryginalnej pixmapy
+        QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
+
+        // Utwórz nową pixmapę wypełnioną docelowym kolorem
+        QPixmap coloredPixmap(size);
+        coloredPixmap.fill(color);
+
+        // Zastosuj maskę do kolorowej pixmapy
+        coloredPixmap.setMask(mask);
+
+        return QIcon(coloredPixmap);
+    }
+
     StreamMessage(QString  content, QString  sender, MessageType type, QWidget* parent = nullptr)
 : QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
   m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
@@ -39,7 +72,7 @@ public:
 
     // Podstawowy layout
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->setContentsMargins(25, 40, 25, 15);
+    m_mainLayout->setContentsMargins(45, 35, 45, 30);
     m_mainLayout->setSpacing(10);
 
     // Wyczyść treść z tagów HTML
@@ -123,35 +156,51 @@ public:
 
         // Inicjalizacja przycisków nawigacyjnych
         m_nextButton = new QPushButton(">", this);
-        m_nextButton->setFixedSize(40, 40);
+        m_nextButton->setFixedSize(25, 25);
         m_nextButton->setStyleSheet(
             "QPushButton {"
             "  background-color: rgba(0, 200, 255, 0.3);"
             "  color: #00ffff;"
             "  border: 1px solid #00ccff;"
-            "  border-radius: 20px;"
+            "  border-radius: 3px;"   // <<< ZMIANA: Lekkie ścięcie
             "  font-weight: bold;"
-            "  font-size: 16px;"
+            "  font-size: 12pt;"      // <<< ZMIANA: Lekko zmniejszona czcionka
+            "  padding: 0px 0px 1px 0px;" // <<< ZMIANA: Minimalny padding dla lepszego wyśrodkowania '>'
             "}"
             "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
             "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
         m_nextButton->hide();
 
         m_prevButton = new QPushButton("<", this);
-        m_prevButton->setFixedSize(40, 40);
+        m_prevButton->setFixedSize(25, 25);
+        // Skopiuje styl z m_nextButton, w tym nowy border-radius i padding
         m_prevButton->setStyleSheet(m_nextButton->styleSheet());
         m_prevButton->hide();
 
-        m_markReadButton = new QPushButton("✓", this);
-        m_markReadButton->setFixedSize(40, 40);
+
+        m_markReadButton = new QPushButton(this); // Pusty przycisk
+        m_markReadButton->setFixedSize(25, 25);
+
+        // Ustaw docelowy kolor i rozmiar ikony
+        QColor iconColor = QColor("#00ffcc"); // Kolor obramówki
+        QSize iconSize(20, 20); // Rozmiar ikony wewnątrz przycisku
+
+        // Utwórz pokolorowaną ikonę za pomocą funkcji pomocniczej
+        QIcon checkIcon = createColoredSvgIcon(":/assets/icons/checkmark.svg", iconColor, iconSize);
+
+        if (!checkIcon.isNull()) {
+            m_markReadButton->setIcon(checkIcon);
+            // Nie ustawiamy już setIconSize, bo ikona ma już właściwy rozmiar z funkcji pomocniczej
+        } else {
+            qWarning() << "Nie można utworzyć pokolorowanej ikony checkmark.svg!";
+            m_markReadButton->setText("✓"); // Fallback do tekstu
+        }
+
         m_markReadButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: rgba(0, 255, 150, 0.3);"
-            "  color: #00ffaa;"
-            "  border: 1px solid #00ffcc;"
-            "  border-radius: 20px;"
-            "  font-weight: bold;"
-            "  font-size: 16px;"
+            "  background-color: rgba(0, 255, 150, 0.3);" // Tło przycisku może pozostać
+            "  border: 1px solid #00ffcc;" // Obramówka w tym samym kolorze co ikona
+            "  border-radius: 3px;"
             "}"
             "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
             "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
@@ -359,7 +408,7 @@ void adjustSizeToContent() {
                 int newWidth = qMin(
                     qMax(viewerSize.width() +
                          m_mainLayout->contentsMargins().left() +
-                         m_mainLayout->contentsMargins().right() + 50, 500),
+                         m_mainLayout->contentsMargins().right() + 100, 500),
                     maxWidth);
 
                 int newHeight = qMin(
@@ -381,8 +430,8 @@ void adjustSizeToContent() {
                 if (!scalers.isEmpty()) {
                     // Ustawiamy maksymalny dozwolony rozmiar dla auto-skalowanej zawartości
                     QSize contentMaxSize(
-                        maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() - 60,
-                        maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 150
+                        maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() + 20,
+                        maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 100
                     );
 
                     scalers.first()->setMaxAllowedSize(contentMaxSize);
@@ -405,7 +454,7 @@ void adjustSizeToContent() {
 }
 
     QSize sizeHint() const override {
-        QSize baseSize(500, 180);
+        QSize baseSize(550, 180);
 
         if (m_scrollArea) {
             return QSize(550, 300); // Docelowy rozmiar dla długich wiadomości
@@ -725,7 +774,7 @@ protected:
         // Tekst nagłówka (nadawca)
         painter.setPen(QPen(textColor, 1));
         painter.setFont(QFont("Consolas", 10, QFont::Bold));
-        painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
+        painter.drawText(QRect(clipSize + 5, 7, width() - 2*clipSize - 10, 22),
                         Qt::AlignLeft | Qt::AlignVCenter, m_sender);
 
         // Znacznik czasu i lokalizacji w stylu AR
@@ -733,15 +782,12 @@ protected:
         QString timeStr = currentTime.toString("HH:mm:ss");
 
 
-        // Wskaźnik priorytetów i wiarygodności (składa się z cyfr i liter)
-        int trustLevel = 60 + QRandomGenerator::global()->bounded(40); // 60-99%
-
         // Dodanie znaczników w prawym górnym rogu
         painter.setFont(QFont("Consolas", 8));
         painter.setPen(QPen(textColor.lighter(120), 1));
 
         // Timestamp
-        painter.drawText(QRect(width() - 150, 8, 120, 12),
+        painter.drawText(QRect(width() - 150, 12, 120, 12),
                         Qt::AlignRight | Qt::AlignVCenter,
                         QString("TS: %1").arg(timeStr));
 

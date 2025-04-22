@@ -30,196 +30,6 @@
 
 #include "stream_message.h"
 
-// Nowy komponent sidebar do wyświetlania listy wiadomości po prawej stronie
-class MessageSidebar : public QWidget {
-    Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setFixedWidth)
-
-public:
-    explicit MessageSidebar(QWidget* parent = nullptr) : QWidget(parent), m_expanded(false) {
-        setFixedWidth(0); // Początkowo zwinięty
-        setMinimumHeight(200);
-
-        // Główny układ pionowy
-        QVBoxLayout* mainLayout = new QVBoxLayout(this);
-        mainLayout->setContentsMargins(0, 0, 0, 0);
-        mainLayout->setSpacing(1);
-
-        // Przycisk rozwijania/zwijania
-        m_toggleButton = new QPushButton(">", this);
-        m_toggleButton->setFixedSize(30, 60);
-        m_toggleButton->setStyleSheet(
-            "QPushButton {"
-            "  background-color: rgba(0, 80, 120, 0.7);"
-            "  color: #00ccff;"
-            "  border: 1px solid #00aaff;"
-            "  border-top-left-radius: 15px;"
-            "  border-bottom-left-radius: 15px;"
-            "  border-right: none;"
-            "  font-weight: bold;"
-            "}"
-            "QPushButton:hover { background-color: rgba(0, 100, 150, 0.8); }");
-
-        // Obszar przewijania dla wiadomości
-        m_scrollArea = new QScrollArea(this);
-        m_scrollArea->setWidgetResizable(true);
-        m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_scrollArea->setStyleSheet(
-            "QScrollArea { background-color: transparent; border: none; }"
-            "QScrollBar:vertical { background: rgba(20, 30, 40, 0.5); width: 10px; }"
-            "QScrollBar::handle:vertical { background: rgba(0, 150, 200, 0.5); border-radius: 4px; min-height: 20px; }"
-            "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }");
-
-        // Kontener na wiadomości
-        m_messageContainer = new QWidget();
-        m_messageContainer->setStyleSheet("background-color: transparent;");
-        m_messageLayout = new QVBoxLayout(m_messageContainer);
-        m_messageLayout->setAlignment(Qt::AlignTop);
-        m_messageLayout->setContentsMargins(2, 5, 2, 5);
-        m_messageLayout->setSpacing(5);
-
-        m_scrollArea->setWidget(m_messageContainer);
-        mainLayout->addWidget(m_scrollArea);
-
-        // Umieszczamy przycisk na lewo od panelu
-        m_toggleButton->move(-m_toggleButton->width(), height()/2 - m_toggleButton->height()/2);
-        m_toggleButton->raise();
-
-        // Podłączamy sygnał przycisku
-        connect(m_toggleButton, &QPushButton::clicked, this, &MessageSidebar::toggleExpanded);
-
-        // Włączamy płynne przewijanie dotykiem
-        QScroller::grabGesture(m_scrollArea->viewport(), QScroller::TouchGesture);
-    }
-
-    void addMessageItem(const QString& sender, const QString& preview, StreamMessage::MessageType type, int index) {
-        // Tworzymy element reprezentujący wiadomość
-        QWidget* item = new QWidget(m_messageContainer);
-        item->setProperty("index", index);
-
-        QVBoxLayout* itemLayout = new QVBoxLayout(item);
-        itemLayout->setContentsMargins(8, 8, 8, 8);
-        itemLayout->setSpacing(3);
-
-        // Etykieta nadawcy
-        QLabel* senderLabel = new QLabel(sender, item);
-        senderLabel->setStyleSheet(
-            "color: #ffffff; font-weight: bold; font-size: 9pt; "
-            "font-family: 'Consolas', monospace;");
-
-        // Podgląd treści
-        QLabel* previewLabel = new QLabel(preview.left(20) + (preview.length() > 20 ? "..." : ""), item);
-        previewLabel->setStyleSheet("color: #cccccc; font-size: 8pt;");
-
-        itemLayout->addWidget(senderLabel);
-        itemLayout->addWidget(previewLabel);
-
-        // Stylizacja elementu zależnie od typu wiadomości
-        QString borderColor;
-        switch (type) {
-            case StreamMessage::Transmitted:
-                borderColor = "#00ccff";
-                break;
-            case StreamMessage::Received:
-                borderColor = "#cc55ff";
-                break;
-            case StreamMessage::System:
-                borderColor = "#ffcc33";
-                break;
-        }
-
-        item->setStyleSheet(QString(
-            "QWidget {"
-            "  background-color: rgba(10, 15, 20, 180);"
-            "  border-left: 3px solid %1;"
-            "  border-radius: 2px;"
-            "}"
-            "QWidget:hover {"
-            "  background-color: rgba(20, 30, 40, 220);"
-            "}").arg(borderColor));
-
-        item->setCursor(Qt::PointingHandCursor);
-
-        // Instalujemy filtr zdarzeń do obsługi kliknięć
-        item->installEventFilter(this);
-
-        // Dodajemy element do layoutu
-        m_messageLayout->addWidget(item);
-
-        // Przewijamy do najnowszego elementu
-        QTimer::singleShot(100, this, [this]() {
-            m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
-        });
-    }
-
-    void clearItems() {
-        // Usuń wszystkie elementy
-        QLayoutItem* item;
-        while ((item = m_messageLayout->takeAt(0)) != nullptr) {
-            if (item->widget()) {
-                delete item->widget();
-            }
-            delete item;
-        }
-    }
-
-public slots:
-    void toggleExpanded() {
-        m_expanded = !m_expanded;
-
-        // Animacja rozwijania/zwijania
-        QPropertyAnimation* anim = new QPropertyAnimation(this, "width");
-        anim->setDuration(300);
-        anim->setStartValue(width());
-        anim->setEndValue(m_expanded ? 200 : 0);
-        anim->setEasingCurve(QEasingCurve::OutCubic);
-
-        // Zmiana tekstu przycisku
-        m_toggleButton->setText(m_expanded ? "<" : ">");
-
-        // Po zakończeniu animacji aktualizujemy pozycję przycisku
-        connect(anim, &QPropertyAnimation::finished, this, [this]() {
-            updateToggleButtonPosition();
-        });
-
-        anim->start(QAbstractAnimation::DeleteWhenStopped);
-    }
-
-    void resizeEvent(QResizeEvent* event) override {
-        QWidget::resizeEvent(event);
-        updateToggleButtonPosition();
-    }
-
-signals:
-    void messageSelected(int index);
-
-protected:
-    bool eventFilter(QObject* watched, QEvent* event) override {
-        if (event->type() == QEvent::MouseButtonRelease) {
-            QWidget* widget = qobject_cast<QWidget*>(watched);
-            if (widget && widget->property("index").isValid()) {
-                int index = widget->property("index").toInt();
-                emit messageSelected(index);
-                return true;
-            }
-        }
-        return QWidget::eventFilter(watched, event);
-    }
-
-private:
-    void updateToggleButtonPosition() {
-        // Ustawiamy przycisk po lewej stronie sidebara
-        m_toggleButton->move(-m_toggleButton->width(), height()/2 - m_toggleButton->height()/2);
-        m_toggleButton->raise();
-    }
-
-    bool m_expanded;
-    QPushButton* m_toggleButton;
-    QScrollArea* m_scrollArea;
-    QWidget* m_messageContainer;
-    QVBoxLayout* m_messageLayout;
-};
-
 // Główny widget strumienia komunikacji - poprawiona wersja z OpenGL
 class CommunicationStream : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
@@ -276,11 +86,6 @@ public:
         m_streamNameLabel->adjustSize();
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
-        // Sidebar z wiadomościami
-        m_sidebar = new MessageSidebar(this);
-        m_sidebar->move(width(), 0);
-        connect(m_sidebar, &MessageSidebar::messageSelected, this, &CommunicationStream::showMessageAtIndex);
-
         // Format dla OpenGL
         QSurfaceFormat format;
         format.setDepthBufferSize(24);
@@ -317,9 +122,6 @@ public:
 
         // Dodajemy wiadomość do kolejki
         m_messages.append(message);
-
-        // Dodajemy element w sidebarze
-        m_sidebar->addMessageItem(sender, content, type, m_messages.size() - 1);
 
         // Podłączamy sygnały do nawigacji między wiadomościami
         connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
@@ -384,9 +186,6 @@ public:
         // Dodajemy wiadomość do kolejki
         m_messages.append(message);
 
-        // Dodajemy element w sidebarze
-        m_sidebar->addMessageItem(sender, content, type, m_messages.size() - 1);
-
         // Podłączamy sygnały do nawigacji między wiadomościami
         connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
         connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
@@ -409,7 +208,6 @@ public:
         }
 
         m_messages.clear();
-        m_sidebar->clearItems();
         m_currentMessageIndex = -1;
         returnToIdleAnimation();
     }
@@ -554,10 +352,6 @@ const char* fragmentShaderSource = R"(
         // Aktualizujemy pozycję etykiety nazwy strumienia
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
-        // Aktualizujemy pozycję sidebara
-        m_sidebar->setFixedHeight(height());
-        m_sidebar->move(width() - m_sidebar->width(), 0);
-
         // Aktualizujemy pozycję aktualnie wyświetlanej wiadomości
         updateMessagePosition();
     }
@@ -591,7 +385,6 @@ const char* fragmentShaderSource = R"(
         // Globalna obsługa klawiszy
         if (event->key() == Qt::Key_Tab) {
             // Przełączamy widoczność sidebara
-            m_sidebar->toggleExpanded();
             event->accept();
         } else if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
             // Przekazujemy obsługę klawiszy do aktywnej wiadomości
@@ -791,17 +584,6 @@ private slots:
             if (index >= 0) {
                 m_messages.removeAt(index);
 
-                // Aktualizujemy indeksy w sidebarze
-                m_sidebar->clearItems();
-                for (int i = 0; i < m_messages.size(); ++i) {
-                    m_sidebar->addMessageItem(
-                        m_messages[i]->sender(),
-                        m_messages[i]->content(),
-                        m_messages[i]->type(),
-                        i
-                    );
-                }
-
                 // Aktualizujemy bieżący indeks
                 if (m_currentMessageIndex >= index && m_currentMessageIndex > 0) {
                     m_currentMessageIndex--;
@@ -856,7 +638,6 @@ private:
     int m_currentMessageIndex;
 
     QLabel* m_streamNameLabel;
-    MessageSidebar* m_sidebar;
     bool m_initialized;
     qreal m_timeOffset;
 
