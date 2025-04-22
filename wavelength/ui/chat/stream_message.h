@@ -39,7 +39,7 @@ public:
 
     // Podstawowy layout
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->setContentsMargins(25, 40, 25, 15);
+    m_mainLayout->setContentsMargins(45, 35, 45, 30);
     m_mainLayout->setSpacing(10);
 
     // Wyczyść treść z tagów HTML
@@ -123,13 +123,13 @@ public:
 
         // Inicjalizacja przycisków nawigacyjnych
         m_nextButton = new QPushButton(">", this);
-        m_nextButton->setFixedSize(40, 40);
+        m_nextButton->setFixedSize(25, 25);
         m_nextButton->setStyleSheet(
             "QPushButton {"
             "  background-color: rgba(0, 200, 255, 0.3);"
             "  color: #00ffff;"
             "  border: 1px solid #00ccff;"
-            "  border-radius: 20px;"
+            "  border-radius: 12px;"
             "  font-weight: bold;"
             "  font-size: 16px;"
             "}"
@@ -138,10 +138,12 @@ public:
         m_nextButton->hide();
 
         m_prevButton = new QPushButton("<", this);
-        m_prevButton->setFixedSize(40, 40);
+        m_prevButton->setFixedSize(25, 25);
         m_prevButton->setStyleSheet(m_nextButton->styleSheet());
         m_prevButton->hide();
 
+
+        // TODO: better checkmark icon
         m_markReadButton = new QPushButton("✓", this);
         m_markReadButton->setFixedSize(40, 40);
         m_markReadButton->setStyleSheet(
@@ -151,7 +153,8 @@ public:
             "  border: 1px solid #00ffcc;"
             "  border-radius: 20px;"
             "  font-weight: bold;"
-            "  font-size: 16px;"
+            "  font-size: 13px;"
+            "  padding: 5px;"
             "}"
             "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
             "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
@@ -359,7 +362,7 @@ void adjustSizeToContent() {
                 int newWidth = qMin(
                     qMax(viewerSize.width() +
                          m_mainLayout->contentsMargins().left() +
-                         m_mainLayout->contentsMargins().right() + 50, 500),
+                         m_mainLayout->contentsMargins().right() + 100, 500),
                     maxWidth);
 
                 int newHeight = qMin(
@@ -381,8 +384,8 @@ void adjustSizeToContent() {
                 if (!scalers.isEmpty()) {
                     // Ustawiamy maksymalny dozwolony rozmiar dla auto-skalowanej zawartości
                     QSize contentMaxSize(
-                        maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() - 60,
-                        maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 150
+                        maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() + 20,
+                        maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 100
                     );
 
                     scalers.first()->setMaxAllowedSize(contentMaxSize);
@@ -405,7 +408,7 @@ void adjustSizeToContent() {
 }
 
     QSize sizeHint() const override {
-        QSize baseSize(500, 180);
+        QSize baseSize(550, 180);
 
         if (m_scrollArea) {
             return QSize(550, 300); // Docelowy rozmiar dla długich wiadomości
@@ -725,7 +728,7 @@ protected:
         // Tekst nagłówka (nadawca)
         painter.setPen(QPen(textColor, 1));
         painter.setFont(QFont("Consolas", 10, QFont::Bold));
-        painter.drawText(QRect(clipSize + 5, 5, width() - 2*clipSize - 10, 22),
+        painter.drawText(QRect(clipSize + 5, 7, width() - 2*clipSize - 10, 22),
                         Qt::AlignLeft | Qt::AlignVCenter, m_sender);
 
         // Znacznik czasu i lokalizacji w stylu AR
@@ -733,15 +736,12 @@ protected:
         QString timeStr = currentTime.toString("HH:mm:ss");
 
 
-        // Wskaźnik priorytetów i wiarygodności (składa się z cyfr i liter)
-        int trustLevel = 60 + QRandomGenerator::global()->bounded(40); // 60-99%
-
         // Dodanie znaczników w prawym górnym rogu
         painter.setFont(QFont("Consolas", 8));
         painter.setPen(QPen(textColor.lighter(120), 1));
 
         // Timestamp
-        painter.drawText(QRect(width() - 150, 8, 120, 12),
+        painter.drawText(QRect(width() - 150, 12, 120, 12),
                         Qt::AlignRight | Qt::AlignVCenter,
                         QString("TS: %1").arg(timeStr));
 

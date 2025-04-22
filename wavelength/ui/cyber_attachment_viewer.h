@@ -286,11 +286,11 @@ protected:
 
         // Lewy dolny - poziom zabezpieczeń
         int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
-        painter.drawText(5, height() - 5, QString("SEC:LVL%1").arg(secLevel));
+        painter.drawText(10, height() - 10, QString("SEC:LVL%1").arg(secLevel));
 
         // Prawy dolny - status
         QString status = m_isDecrypted ? "UNLOCKED" : "LOCKED";
-        painter.drawText(width() - 80, height() - 5, status);
+        painter.drawText(width() - 85, height() - 10, status);
 
         // // W trybie skanowania dodajemy więcej linii skanujących
         // if (m_isScanning && !m_isDecrypted) {
