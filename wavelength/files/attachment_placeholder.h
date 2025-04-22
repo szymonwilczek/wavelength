@@ -4,6 +4,7 @@
 
 #ifndef ATTACHMENT_PLACEHOLDER_H
 #define ATTACHMENT_PLACEHOLDER_H
+#include <qfileinfo.h>
 #include <qfuture.h>
 #include <QLabel>
 #include <QPushButton>
@@ -40,9 +41,28 @@ public:
         else if (type == "gif") icon = "🎞️";
         else icon = "📎";
 
-        m_infoLabel = new QLabel(QString("<span style='color:#00ccff;'>%1</span> <span style='color:#aaaaaa; font-size:9pt;'>%2</span>").arg(icon, filename), this);
-        m_infoLabel->setTextFormat(Qt::RichText);
-        layout->addWidget(m_infoLabel);
+         QFileInfo fileInfo(filename);
+         QString baseName = fileInfo.baseName(); // Nazwa pliku bez ostatniego rozszerzenia
+         QString suffix = fileInfo.completeSuffix(); // Całe rozszerzenie (np. tar.gz)
+
+         const int maxBaseNameLength = 25;
+         QString displayedName;
+
+         if (baseName.length() > maxBaseNameLength) {
+             displayedName = baseName.left(maxBaseNameLength) + "[...]";
+         } else {
+             displayedName = baseName;
+         }
+
+         // Dodaj rozszerzenie, jeśli istnieje
+         if (!suffix.isEmpty()) {
+             displayedName += "." + suffix;
+         }
+
+         // Użycie skróconej nazwy w etykiecie
+         m_infoLabel = new QLabel(QString("<span style='color:#00ccff;'>%1</span> <span style='color:#aaaaaa; font-size:9pt;'>%2</span>").arg(icon, displayedName), this); // <<< UŻYTO displayedName
+         m_infoLabel->setTextFormat(Qt::RichText);
+         layout->addWidget(m_infoLabel);
 
         // Przycisk do ładowania załącznika - teraz ukryty domyślnie
         m_loadButton = new QPushButton("PONÓW DEKODOWANIE", this);
