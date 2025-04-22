@@ -3,6 +3,9 @@
         <!-- Ikony aplikacji -->
         <file>assets/icons/wavelength_logo_upscaled.png</file>
 
+        <!-- Ikony SVG -->
+        <file>assets/icons/checkmark.svg</file>
+
         <!-- Czcionki -->
         <file>assets/fonts/BlenderPro/BlenderPro-Bold.ttf</file>
         <file>assets/fonts/BlenderPro/BlenderPro-Medium.ttf</file>

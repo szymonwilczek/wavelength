@@ -5,6 +5,8 @@
 #include <QGraphicsEffect>
 #include <QScrollArea>
 #include <QSequentialAnimationGroup>
+#include <QSvgRenderer>
+#include <QBitmap>
 #include <qtimeline.h>
 #include <utility>
 
@@ -13,6 +15,8 @@
 #include "../../files/attachment_placeholder.h"
 #include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
+
+
 
 class StreamMessage : public QWidget {
     Q_OBJECT
@@ -27,6 +31,35 @@ public:
         Transmitted,
         System
     };
+
+    QIcon createColoredSvgIcon(const QString& svgPath, const QColor& color, const QSize& size) {
+        QSvgRenderer renderer;
+        if (!renderer.load(svgPath)) {
+            qWarning() << "Nie można załadować SVG:" << svgPath;
+            return QIcon(); // Zwróć pustą ikonę w razie błędu
+        }
+
+        // Utwórz pixmapę o żądanym rozmiarze z przezroczystym tłem
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+
+        // Narysuj SVG na pixmapie
+        QPainter painter(&pixmap);
+        renderer.render(&painter);
+        painter.end(); // Zakończ malowanie na oryginalnej pixmapie
+
+        // Utwórz maskę z kanału alfa oryginalnej pixmapy
+        QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
+
+        // Utwórz nową pixmapę wypełnioną docelowym kolorem
+        QPixmap coloredPixmap(size);
+        coloredPixmap.fill(color);
+
+        // Zastosuj maskę do kolorowej pixmapy
+        coloredPixmap.setMask(mask);
+
+        return QIcon(coloredPixmap);
+    }
 
     StreamMessage(QString  content, QString  sender, MessageType type, QWidget* parent = nullptr)
 : QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
@@ -129,9 +162,10 @@ public:
             "  background-color: rgba(0, 200, 255, 0.3);"
             "  color: #00ffff;"
             "  border: 1px solid #00ccff;"
-            "  border-radius: 12px;"
+            "  border-radius: 3px;"   // <<< ZMIANA: Lekkie ścięcie
             "  font-weight: bold;"
-            "  font-size: 16px;"
+            "  font-size: 12pt;"      // <<< ZMIANA: Lekko zmniejszona czcionka
+            "  padding: 0px 0px 1px 0px;" // <<< ZMIANA: Minimalny padding dla lepszego wyśrodkowania '>'
             "}"
             "QPushButton:hover { background-color: rgba(0, 200, 255, 0.5); }"
             "QPushButton:pressed { background-color: rgba(0, 200, 255, 0.7); }");
@@ -139,22 +173,34 @@ public:
 
         m_prevButton = new QPushButton("<", this);
         m_prevButton->setFixedSize(25, 25);
+        // Skopiuje styl z m_nextButton, w tym nowy border-radius i padding
         m_prevButton->setStyleSheet(m_nextButton->styleSheet());
         m_prevButton->hide();
 
 
-        // TODO: better checkmark icon
-        m_markReadButton = new QPushButton("✓", this);
-        m_markReadButton->setFixedSize(40, 40);
+        m_markReadButton = new QPushButton(this); // Pusty przycisk
+        m_markReadButton->setFixedSize(25, 25);
+
+        // Ustaw docelowy kolor i rozmiar ikony
+        QColor iconColor = QColor("#00ffcc"); // Kolor obramówki
+        QSize iconSize(20, 20); // Rozmiar ikony wewnątrz przycisku
+
+        // Utwórz pokolorowaną ikonę za pomocą funkcji pomocniczej
+        QIcon checkIcon = createColoredSvgIcon(":/assets/icons/checkmark.svg", iconColor, iconSize);
+
+        if (!checkIcon.isNull()) {
+            m_markReadButton->setIcon(checkIcon);
+            // Nie ustawiamy już setIconSize, bo ikona ma już właściwy rozmiar z funkcji pomocniczej
+        } else {
+            qWarning() << "Nie można utworzyć pokolorowanej ikony checkmark.svg!";
+            m_markReadButton->setText("✓"); // Fallback do tekstu
+        }
+
         m_markReadButton->setStyleSheet(
             "QPushButton {"
-            "  background-color: rgba(0, 255, 150, 0.3);"
-            "  color: #00ffaa;"
-            "  border: 1px solid #00ffcc;"
-            "  border-radius: 20px;"
-            "  font-weight: bold;"
-            "  font-size: 13px;"
-            "  padding: 5px;"
+            "  background-color: rgba(0, 255, 150, 0.3);" // Tło przycisku może pozostać
+            "  border: 1px solid #00ffcc;" // Obramówka w tym samym kolorze co ikona
+            "  border-radius: 3px;"
             "}"
             "QPushButton:hover { background-color: rgba(0, 255, 150, 0.5); }"
             "QPushButton:pressed { background-color: rgba(0, 255, 150, 0.7); }");
