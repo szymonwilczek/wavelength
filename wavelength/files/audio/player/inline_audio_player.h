@@ -477,12 +477,6 @@ public:
         connect(m_uiTimer, &QTimer::timeout, this, &InlineAudioPlayer::updateUI);
         m_uiTimer->start();
 
-        // Timer dla losowych "zakłóceń" cyfrowych
-        m_glitchTimer = new QTimer(this);
-        m_glitchTimer->setInterval(QRandomGenerator::global()->bounded(3000, 7000));
-        connect(m_glitchTimer, &QTimer::timeout, this, &InlineAudioPlayer::triggerGlitch);
-        m_glitchTimer->start();
-
         // Inicjalizuj odtwarzacz w osobnym wątku
         QTimer::singleShot(100, this, [this]() {
             m_decoder->start(QThread::HighPriority);
@@ -518,9 +512,6 @@ public:
         // Zatrzymujemy timery
         if (m_uiTimer) {
             m_uiTimer->stop();
-        }
-        if (m_glitchTimer) {
-            m_glitchTimer->stop();
         }
         if (m_spectrumTimer) {
             m_spectrumTimer->stop();
@@ -689,15 +680,15 @@ protected:
         painter.setFont(QFont("Consolas", 7));
 
 
-        // Linie skanowania (scanlines) - efekt monitora CRT
-        if (m_scanlineOpacity > 0.01) {
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
-
-            for (int y = 0; y < height(); y += 3) {
-                painter.drawRect(0, y, width(), 1);
-            }
-        }
+        // // Linie skanowania (scanlines) - efekt monitora CRT
+        // if (m_scanlineOpacity > 0.01) {
+        //     painter.setPen(Qt::NoPen);
+        //     painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
+        //
+        //     for (int y = 0; y < height(); y += 3) {
+        //         painter.drawRect(0, y, width(), 1);
+        //     }
+        // }
     }
 
     bool eventFilter(QObject* watched, QEvent* event) override {
@@ -886,34 +877,6 @@ private slots:
         }
     }
 
-    void triggerGlitch() {
-        // Wywołujemy losowe zakłócenia w obrazie
-        double intensity = 0.3 + QRandomGenerator::global()->bounded(40) / 100.0;
-
-        // Animacja zakłóceń
-        QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
-        scanAnim->setDuration(400);
-        scanAnim->setStartValue(m_scanlineOpacity);
-        scanAnim->setKeyValueAt(0.4, intensity);
-        scanAnim->setEndValue(0.15);
-        scanAnim->start(QPropertyAnimation::DeleteWhenStopped);
-
-        // Losowe wyświetlenie informacji technicznych
-        if (QRandomGenerator::global()->bounded(10) < 3 && m_decoder && !m_decoder->isPaused()) {
-            m_statusLabel->setText(QString("DATA STREAM: %1 kbps").arg(QRandomGenerator::global()->bounded(128, 320)));
-
-            // Przywróć normalny status po chwili
-            QTimer::singleShot(1200, this, [this]() {
-                if (m_decoder && !m_decoder->isPaused() && !m_playbackFinished) {
-                    m_statusLabel->setText("ODTWARZANIE");
-                }
-            });
-        }
-
-        // Ustawiamy kolejny interwał
-        m_glitchTimer->setInterval(QRandomGenerator::global()->bounded(3000, 8000));
-    }
-
     void increaseSpectrumIntensity() {
         QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
         spectrumAnim->setDuration(600);
@@ -986,16 +949,6 @@ private:
         QPen glowPen(QColor(160, 100, 255, 120), 1);
         painter.setPen(glowPen);
         painter.drawRect(target->rect().adjusted(0, 0, -1, -1));
-
-        // Opcjonalnie: wyświetlenie linii środkowej
-        painter.setPen(QPen(QColor(200, 150, 255, 80), 1, Qt::DashLine));
-        painter.drawLine(0, target->height()/2, target->width(), target->height()/2);
-
-        // Dodajemy oznaczenia techniczne
-        painter.setPen(QColor(160, 100, 255));
-        painter.setFont(QFont("Consolas", 6));
-        painter.drawText(5, 10, "FFT:64");
-        painter.drawText(target->width() - 55, 10, QString("GAIN:%1").arg(qRound(m_spectrumIntensity * 100)));
     }
 
     // Pola klasy InlineAudioPlayer
@@ -1010,7 +963,6 @@ private:
 
     std::shared_ptr<AudioDecoder> m_decoder;
     QTimer* m_uiTimer;
-    QTimer* m_glitchTimer;
     QTimer* m_spectrumTimer;
 
     QByteArray m_audioData;
