@@ -91,36 +91,36 @@ protected:
             painter.setOpacity(1.0);
         }
 
-        // Wizualizacja dźwięku - małe słupki pulsujące
-        int barCount = 6;
-        int maxBarHeight = 8;
-        int barWidth = 2;
-        int barSpacing = 4;
-        int startX = handlePos - ((barCount * (barWidth + barSpacing)) / 2);
-        int barY = trackRect.top() - maxBarHeight - 2;
-
-        if (value() > minimum() + (maximum() - minimum()) * 0.05) {
-            painter.setPen(Qt::NoPen);
-
-            for (int i = 0; i < barCount; i++) {
-                // Generuj wysokość słupka na podstawie pozycji i czasu
-                double phase = (QDateTime::currentMSecsSinceEpoch() % 1000) / 1000.0;
-                double offset = (double)i / barCount;
-                double barHeight = maxBarHeight * (0.3 + 0.7 * qAbs(sin((phase + offset) * M_PI * 3)));
-
-                // Neonowy kolor z przejściem
-                QColor barColor;
-                if (i < barCount / 2) {
-                    barColor = progressColor.lighter(100 + i * 20);
-                } else {
-                    barColor = progressColor.lighter(100 + (barCount - i) * 20);
-                }
-
-                painter.setBrush(barColor);
-                painter.drawRect(startX + i * (barWidth + barSpacing), barY + (maxBarHeight - barHeight),
-                                barWidth, barHeight);
-            }
-        }
+        // // Wizualizacja dźwięku - małe słupki pulsujące
+        // int barCount = 6;
+        // int maxBarHeight = 8;
+        // int barWidth = 2;
+        // int barSpacing = 4;
+        // int startX = handlePos - ((barCount * (barWidth + barSpacing)) / 2);
+        // int barY = trackRect.top() - maxBarHeight - 2;
+        //
+        // if (value() > minimum() + (maximum() - minimum()) * 0.05) {
+        //     painter.setPen(Qt::NoPen);
+        //
+        //     for (int i = 0; i < barCount; i++) {
+        //         // Generuj wysokość słupka na podstawie pozycji i czasu
+        //         double phase = (QDateTime::currentMSecsSinceEpoch() % 1000) / 1000.0;
+        //         double offset = (double)i / barCount;
+        //         double barHeight = maxBarHeight * (0.3 + 0.7 * qAbs(sin((phase + offset) * M_PI * 3)));
+        //
+        //         // Neonowy kolor z przejściem
+        //         QColor barColor;
+        //         if (i < barCount / 2) {
+        //             barColor = progressColor.lighter(100 + i * 20);
+        //         } else {
+        //             barColor = progressColor.lighter(100 + (barCount - i) * 20);
+        //         }
+        //
+        //         painter.setBrush(barColor);
+        //         painter.drawRect(startX + i * (barWidth + barSpacing), barY + (maxBarHeight - barHeight),
+        //                         barWidth, barHeight);
+        //     }
+        // }
 
         // Rysowanie uchwytu z efektem świecenia
         QRect handleRect(handlePos, (height() - handleHeight) / 2, handleWidth, handleHeight);
@@ -460,7 +460,7 @@ public:
             m_playbackFinished = true;
             m_playButton->setText("↻");
             m_statusLabel->setText("ZAKOŃCZONO ODTWARZANIE");
-            m_spectrumIntensity = 0.1; // Zmniejszenie intensywności spektrum
+            decreaseSpectrumIntensity();
             update();
         });
 
@@ -655,40 +655,9 @@ protected:
 
         painter.drawPath(frame);
 
-        // Znaczniki AR w rogach
-        painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-        int markerSize = 8;
-
-        // Lewy górny
-        painter.drawLine(clipSize, 5, clipSize + markerSize, 5);
-        painter.drawLine(clipSize, 5, clipSize, 5 + markerSize);
-
-        // Prawy górny
-        painter.drawLine(width() - clipSize - markerSize, 5, width() - clipSize, 5);
-        painter.drawLine(width() - clipSize, 5, width() - clipSize, 5 + markerSize);
-
-        // Prawy dolny
-        painter.drawLine(width() - clipSize - markerSize, height() - 5, width() - clipSize, height() - 5);
-        painter.drawLine(width() - clipSize, height() - 5, width() - clipSize, height() - 5 - markerSize);
-
-        // Lewy dolny
-        painter.drawLine(clipSize, height() - 5, clipSize + markerSize, height() - 5);
-        painter.drawLine(clipSize, height() - 5, clipSize, height() - 5 - markerSize);
-
         // Dane techniczne w rogach
         painter.setPen(borderColor.lighter(120));
         painter.setFont(QFont("Consolas", 7));
-
-
-        // // Linie skanowania (scanlines) - efekt monitora CRT
-        // if (m_scanlineOpacity > 0.01) {
-        //     painter.setPen(Qt::NoPen);
-        //     painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
-        //
-        //     for (int y = 0; y < height(); y += 3) {
-        //         painter.drawRect(0, y, width(), 1);
-        //     }
-        // }
     }
 
     bool eventFilter(QObject* watched, QEvent* event) override {
