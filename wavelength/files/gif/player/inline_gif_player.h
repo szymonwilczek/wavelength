@@ -12,7 +12,6 @@
 #include <QDebug> // Dodano dla logowania
 
 #include "../../audio/player/inline_audio_player.h"
-#include "../../video/player/inline_video_player.h"
 #include "../decoder/gif_decoder.h"
 
 // Klasa odtwarzacza GIF zintegrowanego z czatem
