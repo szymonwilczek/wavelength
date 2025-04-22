@@ -256,6 +256,7 @@ public:
         av_opt_set_int(m_swrContext, "out_sample_rate", 44100, 0);
         av_opt_set_sample_fmt(m_swrContext, "in_sample_fmt", m_audioCodecContext->sample_fmt, 0);
         av_opt_set_sample_fmt(m_swrContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+        av_opt_set_int(m_swrContext, "resampler_quality", 7, 0);
 
         if (swr_init(m_swrContext) < 0) {
             emit error("Nie można zainicjalizować kontekstu resamplingu audio");
