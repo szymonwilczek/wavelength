@@ -906,12 +906,12 @@ private:
         // Rysujemy siatkę
         painter.setPen(QPen(QColor(50, 30, 90, 100), 1, Qt::DotLine));
 
-        int stepX = target->width() / 16;
+        int stepX = target->width() / 8;
         for (int x = stepX; x < target->width(); x += stepX) {
             painter.drawLine(x, 0, x, target->height());
         }
 
-        int stepY = target->height() / 4;
+        int stepY = target->height() / 3;
         for (int y = stepY; y < target->height(); y += stepY) {
             painter.drawLine(0, y, target->width(), y);
         }
@@ -944,11 +944,6 @@ private:
                 }
             }
         }
-
-        // Dodajemy neonowy efekt obramowania
-        QPen glowPen(QColor(160, 100, 255, 120), 1);
-        painter.setPen(glowPen);
-        painter.drawRect(target->rect().adjusted(0, 0, -1, -1));
     }
 
     // Pola klasy InlineAudioPlayer
