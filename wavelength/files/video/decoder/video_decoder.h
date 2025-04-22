@@ -36,10 +36,12 @@ class VideoDecoder : public QThread {
 
 public:
     VideoDecoder(const QByteArray& videoData, QObject* parent = nullptr)
-        : QThread(parent), m_videoData(videoData), m_stopped(false), m_paused(false), m_seeking(false),
-          m_seekPosition(-1), m_formatContext(nullptr), m_codecContext(nullptr), m_swsContext(nullptr),
+        : QThread(parent), m_videoData(videoData), m_formatContext(nullptr),
+          m_codecContext(nullptr),
+          m_swsContext(nullptr),
           m_frame(nullptr), m_videoStream(-1), m_frameRate(0.0), m_duration(0.0),
-          m_currentPosition(0.0), m_firstFrame(true), m_lastFramePts(AV_NOPTS_VALUE),
+          m_currentPosition(0.0), m_stopped(false), m_paused(true), m_seeking(false),
+          m_seekPosition(-1), m_firstFrame(true), m_lastFramePts(AV_NOPTS_VALUE),
           m_audioDecoder(nullptr), m_audioStreamIndex(-1), m_currentAudioPosition(0.0),
           m_audioInitialized(false), m_audioFinished(false), m_videoFinished(false)
     {
@@ -358,10 +360,8 @@ protected:
             } else {
                 m_audioDecoder->start();
                 m_audioInitialized = true;
-                if (m_paused) { // Ensure audio starts paused if video is paused
-                    if (!m_audioDecoder->isPaused()) {
-                        m_audioDecoder->pause();
-                    }
+                if (!m_audioDecoder->isPaused()) {
+                    m_audioDecoder->pause();
                 }
             }
         }
