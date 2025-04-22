@@ -880,7 +880,7 @@ private slots:
         m_videoLabel->setText("⚠️ " + message);
     }
 
-    void handleVideoInfo(int width, int height, double duration, double fps = 0) {
+    void handleVideoInfo(int width, int height, double fps, double duration) {
         m_playbackStarted = true;
         m_videoWidth = width;
         m_videoHeight = height;
