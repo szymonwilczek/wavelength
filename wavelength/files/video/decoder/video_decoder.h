@@ -116,7 +116,7 @@ public:
         m_swsContext = sws_getContext(
             m_codecContext->width, m_codecContext->height, m_codecContext->pix_fmt,
             m_codecContext->width, m_codecContext->height, AV_PIX_FMT_RGB24,
-            SWS_BILINEAR, nullptr, nullptr, nullptr
+            SWS_LANCZOS, nullptr, nullptr, nullptr
         );
         if (!m_swsContext) {
             emit error("Nie można utworzyć kontekstu konwersji wideo (sws_getContext)");
@@ -209,7 +209,7 @@ public:
         SwsContext* tempSwsCtx = sws_getContext(
             tempCodecCtx->width, tempCodecCtx->height, tempCodecCtx->pix_fmt,
             tempCodecCtx->width, tempCodecCtx->height, AV_PIX_FMT_RGB24,
-            SWS_BILINEAR, nullptr, nullptr, nullptr
+            SWS_LANCZOS, nullptr, nullptr, nullptr
         );
         if (!tempSwsCtx) { /* cleanup */ return; }
 

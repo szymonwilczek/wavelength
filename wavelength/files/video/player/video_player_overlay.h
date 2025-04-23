@@ -313,7 +313,7 @@ public:
           m_scanlineOpacity(0.15), m_gridOpacity(0.1)
     {
         setWindowTitle("SYS> WAVELENGTH_VISUAL_STREAM_DECODER");
-        setMinimumSize(1024, 768); // Nieco większy rozmiar dla cyberpunkowego interfejsu
+        setMinimumSize(900, 630);
         setModal(false);
 
         // Styl całego okna
@@ -387,7 +387,7 @@ public:
         // Label na wideo
         m_videoLabel = new QLabel(this);
         m_videoLabel->setAlignment(Qt::AlignCenter);
-        m_videoLabel->setMinimumSize(720, 405);
+        m_videoLabel->setMinimumSize(828, 466);
         m_videoLabel->setText("BUFFER LOADING...");
         m_videoLabel->setStyleSheet(
             "color: #00ffff;"
