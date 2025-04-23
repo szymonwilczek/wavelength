@@ -313,7 +313,7 @@ public:
           m_scanlineOpacity(0.15), m_gridOpacity(0.1)
     {
         setWindowTitle("SYS> WAVELENGTH_VISUAL_STREAM_DECODER");
-        setMinimumSize(800, 560); // Nieco większy rozmiar dla cyberpunkowego interfejsu
+        setMinimumSize(900, 630);
         setModal(false);
 
         // Styl całego okna
@@ -387,7 +387,7 @@ public:
         // Label na wideo
         m_videoLabel = new QLabel(this);
         m_videoLabel->setAlignment(Qt::AlignCenter);
-        m_videoLabel->setMinimumSize(720, 405);
+        m_videoLabel->setMinimumSize(828, 466);
         m_videoLabel->setText("BUFFER LOADING...");
         m_videoLabel->setStyleSheet(
             "color: #00ffff;"
@@ -611,8 +611,8 @@ private slots:
             connect(m_decoder.get(), &VideoDecoder::positionChanged, this, &VideoPlayerOverlay::updateSliderPosition, Qt::DirectConnection);
 
             m_decoder->start(QThread::HighPriority);
-            m_playButton->setText("❚❚");
-            m_statusLabel->setText("DEKODOWANIE STRUMIENIA...");
+            m_playButton->setText("▶");
+            m_statusLabel->setText("READY");
         }
     }
 
@@ -623,25 +623,24 @@ private slots:
         }
 
         if (m_playbackFinished) {
-            m_decoder->reset();
-            m_playbackFinished = false;
-            m_playButton->setText("❚❚");
-            m_statusLabel->setText("ODTWARZANIE WZNOWIONE");
-            if (!m_decoder->isPaused()) {
-                m_decoder->pause();
+                m_decoder->reset(); // Reset przewija do 0 i pauzuje
+                m_playbackFinished = false;
+                m_playButton->setText("▶"); // Gotowy do startu
+                m_statusLabel->setText("GOTOWY / PAUZA");
+                // Nie wznawiamy automatycznie po resecie.
+                return; // Czekaj na kliknięcie, aby odtworzyć ponownie.
             }
+
             m_decoder->pause(); // Zmienia stan pauzy
-        } else {
-            if (m_decoder->isPaused()) {
-                m_decoder->pause(); // Wznów odtwarzanie
-                m_playButton->setText("❚❚");
-                m_statusLabel->setText("ODTWARZANIE");
-            } else {
-                m_decoder->pause(); // Wstrzymaj odtwarzanie
-                m_playButton->setText("▶");
-                m_statusLabel->setText("PAUZA");
-            }
+
+        if (m_decoder->isPaused()) {
+            m_playButton->setText("▶");
+            m_statusLabel->setText("PAUZA");
+        } else { // Jeśli teraz odtwarza
+            m_playButton->setText("❚❚");
+            m_statusLabel->setText("ODTWARZANIE");
         }
+
 
         // Animacja efektów przy zmianie stanu
         QPropertyAnimation* gridAnim = new QPropertyAnimation(this, "gridOpacity");
@@ -880,7 +879,7 @@ private slots:
         m_videoLabel->setText("⚠️ " + message);
     }
 
-    void handleVideoInfo(int width, int height, double duration, double fps = 0) {
+    void handleVideoInfo(int width, int height, double fps, double duration) {
         m_playbackStarted = true;
         m_videoWidth = width;
         m_videoHeight = height;
@@ -909,7 +908,7 @@ private slots:
         }
 
         // Aktualizujemy status
-        m_statusLabel->setText("DEKODOWANIE ZAKOŃCZONE");
+        m_statusLabel->setText("READY");
 
         // Włączamy HUD po potwierdzeniu informacji o wideo
         m_showHUD = true;

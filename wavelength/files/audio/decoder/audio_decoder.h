@@ -256,6 +256,7 @@ public:
         av_opt_set_int(m_swrContext, "out_sample_rate", 44100, 0);
         av_opt_set_sample_fmt(m_swrContext, "in_sample_fmt", m_audioCodecContext->sample_fmt, 0);
         av_opt_set_sample_fmt(m_swrContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+        av_opt_set_int(m_swrContext, "resampler_quality", 7, 0);
 
         if (swr_init(m_swrContext) < 0) {
             emit error("Nie można zainicjalizować kontekstu resamplingu audio");
@@ -276,6 +277,8 @@ public:
         // Inicjalizacja wyjścia audio
         m_audioOutput = new QAudioOutput(m_audioFormat, nullptr);
         m_audioOutput->setVolume(1.0);
+        int suggestedBufferSize = 44100 * 2 * 2 / 2;
+        m_audioOutput->setBufferSize(qMax(suggestedBufferSize, m_audioOutput->bufferSize()));
         m_audioDevice = m_audioOutput->start();
 
         if (!m_audioDevice || !m_audioDevice->isOpen()) {
@@ -385,12 +388,12 @@ protected:
         int positionUpdateInterval = 250; // ms
 
         // Limiter tempa odtwarzania
-        QElapsedTimer playbackTimer;
-        playbackTimer.start();
+        // QElapsedTimer playbackTimer;
+        // playbackTimer.start();
 
         // Ile próbek zostało przetworzone
-        int64_t samplesProcessed = 0;
-        int64_t lastReportedSamples = 0;
+        // int64_t samplesProcessed = 0;
+        // int64_t lastReportedSamples = 0;
 
         while (!m_stopped) {
             QMutexLocker locker(&m_mutex);
@@ -402,7 +405,7 @@ protected:
                 // Po wznowieniu resetujemy timery
                 if (!m_paused) {
                     positionTimer.restart();
-                    playbackTimer.restart();
+                    // playbackTimer.restart();
                 }
 
                 continue;
@@ -416,15 +419,15 @@ protected:
                     }
                     m_seeking = false;
                     positionTimer.restart();
-                    playbackTimer.restart();
+                    // playbackTimer.restart();
 
                     // Aktualizacja pozycji po przeszukiwaniu
                     m_currentPosition = m_seekPosition * av_q2d(m_formatContext->streams[m_audioStream]->time_base);
                     emit positionChanged(m_currentPosition);
 
                     lastEmittedPosition = m_currentPosition;
-                    samplesProcessed = 0;
-                    lastReportedSamples = 0;
+                    // samplesProcessed = 0;
+                    // lastReportedSamples = 0;
 
                     // Reset bufora audio
                     if (m_audioOutput) {
@@ -469,24 +472,39 @@ protected:
                     }
 
                     // Dodaj liczbę próbek do licznika
-                    samplesProcessed += m_audioFrame->nb_samples;
-
-                    // Obliczamy ile czasu powinno minąć dla tej liczby próbek
-                    double expectedTime = (samplesProcessed - lastReportedSamples) * 1000.0 / 44100.0;
-
-                    // Jeśli przetwarzamy zbyt szybko, zaczekaj
-                    if (playbackTimer.elapsed() < expectedTime) {
-                        QThread::msleep(static_cast<unsigned long>(expectedTime - playbackTimer.elapsed()));
-                    }
+                    // samplesProcessed += m_audioFrame->nb_samples;
+                    //
+                    // // Obliczamy ile czasu powinno minąć dla tej liczby próbek
+                    // double expectedTime = (samplesProcessed - lastReportedSamples) * 1000.0 / 44100.0;
+                    //
+                    // // Jeśli przetwarzamy zbyt szybko, zaczekaj
+                    // if (playbackTimer.elapsed() < expectedTime) {
+                    //     QThread::msleep(static_cast<unsigned long>(expectedTime - playbackTimer.elapsed()));
+                    // }
 
                     // Dekodujemy i wysyłamy ramkę audio
                     decodeAudioFrame(m_audioFrame);
 
                     // Aktualizujemy licznik i timer
-                    if (samplesProcessed - lastReportedSamples > 44100) {  // co około 1 sekundę
-                        lastReportedSamples = samplesProcessed;
-                        playbackTimer.restart();
-                    }
+                    // if (samplesProcessed - lastReportedSamples > 44100) {  // co około 1 sekundę
+                    //     lastReportedSamples = samplesProcessed;
+                    //     playbackTimer.restart();
+                    // }
+
+                    {
+                        QMutexLocker locker(&m_mutex);
+                        if (m_audioOutput && m_audioDevice && m_audioDevice->isOpen()) {
+                            // Poczekaj, jeśli mniej niż np. 1/4 bufora jest wolna
+                            int threshold = m_audioOutput->bufferSize() / 4;
+                            while (m_audioOutput->bytesFree() < threshold && !m_paused && !m_stopped && !m_seeking) {
+                                locker.unlock(); // Zwolnij mutex na czas czekania
+                                QThread::msleep(10); // Krótka pauza, aby nie obciążać CPU
+                                locker.relock();   // Zablokuj ponownie przed sprawdzeniem warunku
+                                // Sprawdź ponownie stan urządzenia na wypadek zmian
+                                if (!m_audioDevice || !m_audioDevice->isOpen()) break;
+                            }
+                        }
+                    } // Mutex zwolniony
                 }
             }
 
@@ -495,32 +513,51 @@ protected:
     }
 
     void decodeAudioFrame(AVFrame* audioFrame) {
-        QMutexLocker locker(&m_mutex);
-        if (!m_audioDevice || !m_audioDevice->isOpen())
-            return;
+        // <<< ZMIANA: Przeniesiono deklaracje na zewnątrz bloku mutexa >>>
+        QByteArray bufferToWrite;
+        bool shouldWrite = false;
 
-        // Oblicz rozmiar bufora wyjściowego (2 kanały stereo, 16-bit)
-        int outSamples = audioFrame->nb_samples;
-        int outBufferSize = outSamples * 2 * 2;  // samples * channels * bytes_per_sample
-        uint8_t* outBuffer = (uint8_t*)av_malloc(outBufferSize);
-        if (!outBuffer) return;
+        { // <<< Początek bloku dla mutexa >>>
+            QMutexLocker locker(&m_mutex);
+            if (!m_audioDevice || !m_audioDevice->isOpen() || m_paused) {
+                // Jeśli nie powinniśmy pisać, wyjdź (mutex zostanie zwolniony)
+                return;
+            }
 
-        int convertedSamples = swr_convert(
-            m_swrContext,
-            &outBuffer, outSamples,
-            (const uint8_t**)audioFrame->extended_data, audioFrame->nb_samples
-        );
+            // Oblicz rozmiar bufora wyjściowego
+            int outSamples = audioFrame->nb_samples;
+            int outBufferSize = outSamples * 2 * 2;
+            uint8_t* outBuffer = (uint8_t*)av_malloc(outBufferSize);
+            if (!outBuffer) return; // Wyjdź, jeśli alokacja się nie powiedzie
 
-        if (convertedSamples > 0) {
-            int actualSize = convertedSamples * 2 * 2;
-            QByteArray buffer((char*)outBuffer, actualSize);
+            int convertedSamples = swr_convert(
+                m_swrContext,
+                &outBuffer, outSamples,
+                (const uint8_t**)audioFrame->extended_data, audioFrame->nb_samples
+            );
 
-            if (m_audioDevice && m_audioDevice->isOpen() && !m_paused) {
-                m_audioDevice->write(buffer);
+            if (convertedSamples > 0) {
+                int actualSize = convertedSamples * 2 * 2;
+                // <<< ZMIANA: Skopiuj dane do lokalnej QByteArray ZANIM zwolnisz mutex >>>
+                bufferToWrite = QByteArray((char*)outBuffer, actualSize);
+                shouldWrite = true; // Ustaw flagę, że mamy coś do zapisania
+            }
+
+            av_freep(&outBuffer);
+        } // <<< Koniec bloku dla mutexa - mutex jest zwalniany >>>
+
+        // <<< ZMIANA: Zapisuj dane POZA blokiem mutexa >>>
+        if (shouldWrite && m_audioDevice && m_audioDevice->isOpen()) {
+            // Dodatkowe sprawdzenie, czy nie jesteśmy w pauzie, która mogła zostać ustawiona
+            // między zwolnieniem mutexa a tym miejscem (choć mało prawdopodobne)
+            QMutexLocker pauseCheckLocker(&m_mutex);
+            bool currentlyPaused = m_paused;
+            pauseCheckLocker.unlock();
+
+            if (!currentlyPaused) {
+                m_audioDevice->write(bufferToWrite);
             }
         }
-
-        av_freep(&outBuffer);
     }
 
 private:

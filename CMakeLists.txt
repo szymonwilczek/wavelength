@@ -76,8 +76,6 @@ add_executable(
         blob/core/blob_event_handler.h
         wavelength/files/video/decoder/video_decoder.cpp
         wavelength/files/video/decoder/video_decoder.h
-        wavelength/files/video/player/inline_video_player.cpp
-        wavelength/files/video/player/inline_video_player.h
         wavelength/files/audio/decoder/audio_decoder.cpp
         wavelength/files/audio/decoder/audio_decoder.h
         wavelength/files/audio/player/inline_audio_player.cpp
