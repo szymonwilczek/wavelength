@@ -19,7 +19,7 @@ class CyberTextDisplay : public QWidget {
 public:
     CyberTextDisplay(const QString& text, QWidget* parent = nullptr)
         : QWidget(parent), m_fullText(text), m_revealedChars(0), 
-          m_glitchIntensity(0.0), m_isFullyRevealed(false)
+          m_glitchIntensity(0.0), m_isFullyRevealed(false), m_hasBeenFullyRevealedOnce(false)
     {
         setMinimumWidth(400);
         setMinimumHeight(60);
@@ -57,7 +57,14 @@ public:
     }
     
     void startReveal() {
-        // Resetuj stan przed rozpoczęciem
+        if (m_hasBeenFullyRevealedOnce) {
+            // Jeśli animacja już się odbyła, pokaż cały tekst od razu
+            setRevealedChars(m_plainText.length()); // Użyj istniejącej metody, aby ustawić znaki i zaktualizować
+            m_textTimer->stop(); // Upewnij się, że timer jest zatrzymany
+            return; // Nie uruchamiaj timera ponownie
+        }
+
+        // Resetuj stan przed rozpoczęciem (tylko jeśli animacja nie była jeszcze wykonana)
         m_revealedChars = 0;
         m_isFullyRevealed = false;
         m_textTimer->stop(); // Zatrzymaj, jeśli już działa
@@ -68,6 +75,7 @@ public:
     void setText(const QString& newText) {
         m_fullText = newText;
         m_plainText = removeHtml(m_fullText);
+        m_hasBeenFullyRevealedOnce = false; // Resetuj flagę dla nowej treści
         recalculateHeight(); // Przelicz wysokość dla nowego tekstu
         startReveal();       // Rozpocznij animację od nowa
     }
@@ -76,9 +84,12 @@ public:
     void setRevealedChars(int chars) {
         m_revealedChars = qMin(chars, m_plainText.length());
         update();
-        
+
         if (m_revealedChars >= m_plainText.length() && !m_isFullyRevealed) {
             m_isFullyRevealed = true;
+            if (!m_hasBeenFullyRevealedOnce) { // Ustaw flagę tylko przy pierwszym razie
+                m_hasBeenFullyRevealedOnce = true;
+            }
             emit fullTextRevealed();
         }
     }
@@ -314,6 +325,7 @@ private:
     QFont m_font;            // Czcionka tekstu
     QTimer* m_textTimer;     // Timer animacji tekstu
     QTimer* m_glitchTimer;   // Timer dla efektów glitch
+    bool m_hasBeenFullyRevealedOnce;
 };
 
 #endif // CYBER_TEXT_DISPLAY_H
