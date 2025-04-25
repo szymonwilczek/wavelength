@@ -207,8 +207,8 @@ public:
         WavelengthMessageService *messageService = WavelengthMessageService::getInstance();
         connect(messageService, &WavelengthMessageService::progressMessageUpdated,
                 this, &WavelengthChatView::updateProgressMessage);
-        connect(messageService, &WavelengthMessageService::removeProgressMessage,
-                this, &WavelengthChatView::removeProgressMessage);
+        // connect(messageService, &WavelengthMessageService::removeProgressMessage,
+        //         this, &WavelengthChatView::removeProgressMessage);
 
         // Timer dla efektów wizualnych
         QTimer *glitchTimer = new QTimer(this);
@@ -288,24 +288,16 @@ public:
     }
 
     void onMessageReceived(QString frequency, const QString &message) {
-        if (frequency != currentFrequency) {
-            return;
-        }
-
-        // W przypadku bardzo dużych wiadomości, zapobiegaj zawieszeniom UI
+        if (frequency != currentFrequency) return;
         QTimer::singleShot(0, this, [this, message]() {
-            messageArea->addMessage(message, "received", StreamMessage::MessageType::Received);
-            // Mały efekt wizualny przy otrzymaniu wiadomości
+            messageArea->addMessage(message, QString(), StreamMessage::MessageType::Received);
             triggerActivityEffect();
         });
     }
 
     void onMessageSent(QString frequency, const QString &message) {
-        if (frequency != currentFrequency) {
-            return;
-        }
-
-        messageArea->addMessage(message, "sent", StreamMessage::MessageType::Transmitted);
+        if (frequency != currentFrequency) return;
+        messageArea->addMessage(message, QString(), StreamMessage::MessageType::Transmitted);
     }
 
     void onWavelengthClosed(QString frequency) {
@@ -415,13 +407,13 @@ protected:
 
 private slots:
     void updateProgressMessage(const QString &messageId, const QString &message) {
-        messageArea->addMessage(message, messageId, StreamMessage::MessageType::Transmitted);
+        messageArea->addMessage(message, messageId, StreamMessage::MessageType::System);
     }
 
-    void removeProgressMessage(const QString &messageId) {
-        messageArea->addMessage("<span style=\"color:#ff5555);\">File transfer completed.</span>",
-                                messageId, StreamMessage::MessageType::Transmitted);
-    }
+    // void removeProgressMessage(const QString &messageId) {
+    //     messageArea->addMessage("<span style=\"color:#ff5555);\">File transfer completed.</span>",
+    //                             messageId, StreamMessage::MessageType::Transmitted);
+    // }
 
     void sendMessage() {
         QString message = inputField->text().trimmed();

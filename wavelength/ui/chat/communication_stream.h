@@ -108,31 +108,31 @@ public:
     }
 
     StreamMessage* addMessageWithAttachment(const QString& content, const QString& sender, StreamMessage::MessageType type, const QString& messageId = QString()) {
-        // Najpierw rozpoczynamy animację odbioru
         startReceivingAnimation();
 
-        // Tworzymy nową wiadomość, ale nie wyświetlamy jej od razu
-        StreamMessage* message = new StreamMessage(content, sender, type, this);
+        // Tworzymy nową wiadomość, przekazując messageId
+        StreamMessage* message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
         message->hide();
 
-        // Dodajemy obsługę załącznika
-        // Najpierw wypisujemy info o zawartości dla debugowania
-        qDebug() << "Dodawanie załącznika dla wiadomości: " << content.left(30) << "...";
-        message->addAttachment(content); // Ten punkt może być problemem
+        qDebug() << "Dodawanie załącznika dla wiadomości ID:" << messageId << " Content:" << content.left(30) << "...";
+        message->addAttachment(content);
 
-        // Dodajemy wiadomość do kolejki
         m_messages.append(message);
 
-        // Podłączamy sygnały do nawigacji między wiadomościami
-        connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
-        connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
-        connect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage);
+        // Podłączamy sygnały
+        connectSignalsForMessage(message); // Używamy metody pomocniczej
 
         // Jeśli nie ma wyświetlanej wiadomości, pokaż tę po zakończeniu animacji odbioru
         if (m_currentMessageIndex == -1) {
             QTimer::singleShot(1200, this, [this]() {
-                showMessageAtIndex(m_messages.size() - 1);
+                // Sprawdź, czy lista nie jest pusta przed pokazaniem
+                if (!m_messages.isEmpty()) {
+                    showMessageAtIndex(m_messages.size() - 1);
+                }
             });
+        } else {
+            // Aktualizuj przyciski nawigacyjne istniejącej wiadomości
+            updateNavigationButtonsForCurrentMessage();
         }
 
         return message;
@@ -175,41 +175,48 @@ public:
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
     }
 
-    StreamMessage *addMessage(const QString &content, const QString &sender, StreamMessage::MessageType type) {
-        // Najpierw rozpoczynamy animację odbioru
+    StreamMessage* addMessage(const QString &content, const QString &sender, StreamMessage::MessageType type, const QString& messageId = QString()) {
         startReceivingAnimation();
 
-        // Tworzymy nową wiadomość, ale nie wyświetlamy jej od razu
-        StreamMessage* message = new StreamMessage(content, sender, type, this);
+        // Tworzymy nową wiadomość, przekazując messageId
+        StreamMessage* message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
         message->hide();
 
-        // Dodajemy wiadomość do kolejki
         m_messages.append(message);
 
-        // Podłączamy sygnały do nawigacji między wiadomościami
-        connect(message, &StreamMessage::messageRead, this, &CommunicationStream::onMessageRead);
-        connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
-        connect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage);
+        // Podłączamy sygnały
+        connectSignalsForMessage(message); // Używamy metody pomocniczej
 
-        // Jeśli nie ma wyświetlanej wiadomości lub używamy nowego podejścia z zakładkami,
-        // pokazujemy tę wiadomość po zakończeniu animacji odbioru
+        // Jeśli nie ma wyświetlanej wiadomości, pokaż tę po zakończeniu animacji odbioru
         if (m_currentMessageIndex == -1) {
             QTimer::singleShot(1200, this, [this]() {
-                showMessageAtIndex(m_messages.size() - 1);
+                 if (!m_messages.isEmpty()) {
+                    showMessageAtIndex(m_messages.size() - 1);
+                 }
             });
+        } else {
+            // Aktualizuj przyciski nawigacyjne istniejącej wiadomości
+            updateNavigationButtonsForCurrentMessage();
         }
         return message;
     }
 
     void clearMessages() {
-        // Ukrywamy i usuwamy wszystkie wiadomości
-        for (auto message : m_messages) {
-            message->deleteLater();
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
+            // Natychmiast ukryj bieżącą wiadomość, aby uniknąć artefaktów
+            m_messages[m_currentMessageIndex]->hide();
+        }
+
+        // Rozłącz sygnały i usuń wszystkie widgety
+        for (StreamMessage* msg : qAsConst(m_messages)) {
+            disconnectSignalsForMessage(msg); // Rozłącz sygnały nawigacyjne
+            msg->deleteLater();
         }
 
         m_messages.clear();
         m_currentMessageIndex = -1;
-        returnToIdleAnimation();
+        returnToIdleAnimation(); // Wróć do stanu bezczynności
+        update();
     }
 
 protected:
@@ -382,19 +389,27 @@ const char* fragmentShaderSource = R"(
     }
 
     void keyPressEvent(QKeyEvent* event) override {
-        // Globalna obsługa klawiszy
         if (event->key() == Qt::Key_Tab) {
-            // Przełączamy widoczność sidebara
             event->accept();
         } else if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
-            // Przekazujemy obsługę klawiszy do aktywnej wiadomości
-            QKeyEvent* newEvent = new QKeyEvent(event->type(), event->key(), event->modifiers(),
-                                               event->text(), event->isAutoRepeat(), event->count());
-            QCoreApplication::postEvent(m_messages[m_currentMessageIndex], newEvent);
-            event->accept();
-        } else {
-            QOpenGLWidget::keyPressEvent(event);
+            StreamMessage* currentMsg = m_messages[m_currentMessageIndex];
+
+            if (event->key() == Qt::Key_Right && currentMsg->nextButton()->isVisible()) {
+                showNextMessage();
+                event->accept();
+                return;
+            } else if (event->key() == Qt::Key_Left && currentMsg->prevButton()->isVisible()) {
+                showPreviousMessage();
+                event->accept();
+                return;
+            } else if (event->key() == Qt::Key_Space || event->key() == Qt::Key_Return) {
+                // Wywołaj onMessageRead, które zdecyduje co zrobić
+                onMessageRead();
+                event->accept();
+                return;
+            }
         }
+        QOpenGLWidget::keyPressEvent(event);
     }
 
 private slots:
@@ -531,37 +546,49 @@ private slots:
 
     void showMessageAtIndex(int index) {
         optimizeForMessageTransition();
-        if (index < 0 || index >= m_messages.size()) return;
+        if (index < 0 || index >= m_messages.size()) {
+            if (m_messages.isEmpty()) {
+                m_currentMessageIndex = -1;
+                returnToIdleAnimation(); // Ustawia stan Idle
+                return;
+            } else {
+                index = qBound(0, index, m_messages.size() - 1);
+            }
+        }
 
-        // Ukrywamy aktualnie wyświetlaną wiadomość
-        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
+        // Ukrywamy poprzednią wiadomość (jeśli była inna)
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size() && m_currentMessageIndex != index) {
+            // Użyj fadeOut, który wyemituje 'hidden' po zakończeniu
+            // handleMessageHidden zignoruje go dla zwykłych wiadomości
             m_messages[m_currentMessageIndex]->fadeOut();
         }
 
         m_currentMessageIndex = index;
-
-        // Wyświetlamy wybraną wiadomość
         StreamMessage* message = m_messages[m_currentMessageIndex];
+
+        // Ustawiamy stan i pokazujemy nową wiadomość
+        m_state = Displaying; // Zawsze ustawiamy stan Displaying, gdy pokazujemy wiadomość
+        message->raise();
         message->show();
         updateMessagePosition();
-        message->fadeIn();
+        message->fadeIn(); // Rozpocznij animację pojawiania się
 
-        // Aktualizujemy przyciski nawigacyjne
-        bool hasNext = index < m_messages.size() - 1;
-        bool hasPrev = index > 0;
-        message->showNavigationButtons(hasPrev, hasNext);
+        updateNavigationButtonsForCurrentMessage();
+        update(); // Odśwież tło OpenGL
     }
 
     void showNextMessage() {
-        optimizeForMessageTransition();
-        if (m_currentMessageIndex >= m_messages.size() - 1) return;
-        showMessageAtIndex(m_currentMessageIndex + 1);
+        if (m_currentMessageIndex < m_messages.size() - 1) {
+            optimizeForMessageTransition();
+            showMessageAtIndex(m_currentMessageIndex + 1);
+        }
     }
 
     void showPreviousMessage() {
-        optimizeForMessageTransition();
-        if (m_currentMessageIndex <= 0) return;
-        showMessageAtIndex(m_currentMessageIndex - 1);
+        if (m_currentMessageIndex > 0) {
+            optimizeForMessageTransition();
+            showMessageAtIndex(m_currentMessageIndex - 1);
+        }
     }
 
     void onMessageRead() {
@@ -569,32 +596,93 @@ private slots:
 
         StreamMessage* message = m_messages[m_currentMessageIndex];
 
-        // Przejdź do następnej wiadomości, jeśli istnieje
-        if (m_currentMessageIndex < m_messages.size() - 1) {
-            showNextMessage();
+        // Sprawdzamy, czy to wiadomość progresu (ma niepuste ID)
+        if (!message->messageId().isEmpty()) {
+            // To jest wiadomość progresu - uruchamiamy animację zamknięcia i usuwamy
+            qDebug() << "onMessageRead: Zamykanie wiadomości progresu ID:" << message->messageId();
+            disconnect(message, &StreamMessage::hidden, this, &CommunicationStream::handleMessageHidden);
+            connect(message, &StreamMessage::hidden, this, &CommunicationStream::handleMessageHidden, Qt::UniqueConnection);
+            message->markAsRead(); // Rozpoczyna animację zamknięcia
         } else {
-            // Jeśli to była ostatnia wiadomość, wróć do stanu bezczynności
-            m_currentMessageIndex = -1;
-            QTimer::singleShot(1500, this, &CommunicationStream::returnToIdleAnimation);
+            // To jest zwykła wiadomość - NIE usuwamy jej i NIE robimy nic wizualnie.
+            // Użytkownik musi użyć strzałek, aby przejść dalej.
+            qDebug() << "onMessageRead: Zwykła wiadomość - akcja 'read' zignorowana (użyj strzałek do nawigacji).";
+            // Można dodać delikatny feedback, np. krótki błysk wiadomości
+            // message->triggerAcknowledgedFeedback(); // Przykładowa metoda w StreamMessage
         }
+    }
 
-        // Usuń przeczytaną wiadomość z naszej listy
-        connect(message, &StreamMessage::hidden, this, [this, message]() {
-            int index = m_messages.indexOf(message);
-            if (index >= 0) {
+    void handleMessageHidden() {
+        StreamMessage* hiddenMsg = qobject_cast<StreamMessage*>(sender());
+        if (!hiddenMsg) return;
+
+        // Sprawdzamy, czy to wiadomość progresu (ma niepuste ID)
+        if (!hiddenMsg->messageId().isEmpty()) {
+            qDebug() << "handleMessageHidden: Usuwanie wiadomości progresu ID:" << hiddenMsg->messageId();
+            int index = m_messages.indexOf(hiddenMsg);
+            if (index != -1) {
                 m_messages.removeAt(index);
 
-                // Aktualizujemy bieżący indeks
-                if (m_currentMessageIndex >= index && m_currentMessageIndex > 0) {
-                    m_currentMessageIndex--;
+                // Aktualizuj indeks bieżącej wiadomości
+                if (m_messages.isEmpty()) {
+                    m_currentMessageIndex = -1;
+                    returnToIdleAnimation(); // Ustawia stan Idle
+                } else {
+                    if (index <= m_currentMessageIndex) {
+                        m_currentMessageIndex = qMax(0, m_currentMessageIndex - 1);
+                    }
+                     m_currentMessageIndex = qBound(0, m_currentMessageIndex, m_messages.size() - 1);
+                    // Pokaż wiadomość na nowym (lub starym, jeśli usunięto późniejszą) indeksie
+                    showMessageAtIndex(m_currentMessageIndex);
                 }
+            } else {
+                 qWarning() << "handleMessageHidden: Wiadomość progresu nie znaleziona w liście!";
             }
-
-            message->deleteLater();
-        });
+            // Ostateczne usunięcie obiektu widgetu TYLKO dla wiadomości progresu
+            hiddenMsg->deleteLater();
+        } else {
+            // To jest zwykła wiadomość, która została ukryta (np. przez fadeOut podczas nawigacji).
+            // NIE usuwamy jej z listy ani nie wywołujemy deleteLater.
+            qDebug() << "handleMessageHidden: Zwykła wiadomość ukryta (np. przez nawigację) - nie usuwamy.";
+            // Upewnijmy się, że stan wizualny jest poprawny, jeśli nadal są wiadomości
+             if (!m_messages.isEmpty() && m_state != Displaying) {
+                 // Jeśli wiadomość została ukryta, ale nadal jesteśmy w stanie wyświetlania
+                 // i nie przeszliśmy do Idle, upewnijmy się, że stan jest Displaying
+                 m_state = Displaying;
+                 update(); // Odśwież tło OpenGL
+             } else if (m_messages.isEmpty() && m_state != Idle) {
+                 // Jeśli ostatnia wiadomość została ukryta (choć nie powinna być usuwana tutaj)
+                 // i przeszliśmy do pustej listy, wróć do Idle
+                 returnToIdleAnimation();
+             }
+        }
     }
 
 private:
+
+    void connectSignalsForMessage(StreamMessage* message) {
+        connect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage, Qt::UniqueConnection);
+        connect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage, Qt::UniqueConnection);
+        // Podłączamy też przycisk "read" do onMessageRead
+        connect(message->m_markReadButton, &QPushButton::clicked, this, &CommunicationStream::onMessageRead, Qt::UniqueConnection);
+    }
+
+    // disconnectSignalsForMessage: Rozłącza tylko sygnały nawigacyjne
+    void disconnectSignalsForMessage(StreamMessage* message) {
+        disconnect(message->nextButton(), &QPushButton::clicked, this, &CommunicationStream::showNextMessage);
+        disconnect(message->prevButton(), &QPushButton::clicked, this, &CommunicationStream::showPreviousMessage);
+        disconnect(message->m_markReadButton, &QPushButton::clicked, this, &CommunicationStream::onMessageRead);
+    }
+
+    // Metoda pomocnicza do aktualizacji przycisków nawigacyjnych
+    void updateNavigationButtonsForCurrentMessage() {
+        if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
+            bool hasNext = m_currentMessageIndex < m_messages.size() - 1;
+            bool hasPrev = m_currentMessageIndex > 0;
+            m_messages[m_currentMessageIndex]->showNavigationButtons(hasPrev, hasNext);
+        }
+    }
+
     void optimizeForMessageTransition() {
         // Czasowo zmniejszamy priorytet odświeżania animacji tła podczas przechodzenia między wiadomościami
         static QElapsedTimer transitionTimer;

@@ -226,7 +226,7 @@ public:
 }
 
 // Dodaj nową wersję metody sendFileToServer, która zwraca bool
-Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, QString frequency, const QString& progressMsgId) {
+bool sendFileToServer(const QString& jsonMessage, QString frequency, const QString& progressMsgId) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     QWebSocket* socket = nullptr;
 
@@ -274,6 +274,8 @@ Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, QString frequency,
     public slots:
     void updateProgressMessage(const QString& progressMsgId, const QString& message) {
         if (progressMsgId.isEmpty()) return;
+        // Ten sygnał jest podłączony do WavelengthChatView::updateProgressMessage,
+        // który wywoła addMessage, a ten z kolei StreamMessage::updateContent
         emit progressMessageUpdated(progressMsgId, message);
     }
 
@@ -296,14 +298,14 @@ Q_INVOKABLE bool sendFileToServer(const QString& jsonMessage, QString frequency,
         // Wysyłamy dane
         socket->sendTextMessage(jsonMessage);
 
-        // Potwierdzamy wysłanie
+        // Potwierdzamy wysłanie - TO JEST OSTATNIA AKTUALIZACJA WIADOMOŚCI
         emit progressMessageUpdated(progressMsgId,
             "<span style=\"color:#66cc66;\">File sent successfully!</span>");
 
-        // Po 5 sekundach usuwamy komunikat
-        QTimer::singleShot(5000, this, [this, progressMsgId]() {
-            emit removeProgressMessage(progressMsgId);
-        });
+        // USUWAMY TIMER - wiadomość ma pozostać z ostatnim statusem
+        // QTimer::singleShot(5000, this, [this, progressMsgId]() {
+        //     emit removeProgressMessage(progressMsgId);
+        // });
     }
 
 signals:

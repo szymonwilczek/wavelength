@@ -57,7 +57,19 @@ public:
     }
     
     void startReveal() {
+        // Resetuj stan przed rozpoczęciem
+        m_revealedChars = 0;
+        m_isFullyRevealed = false;
+        m_textTimer->stop(); // Zatrzymaj, jeśli już działa
         m_textTimer->start(30); // szybkie pisanie
+        update(); // Wymuś odświeżenie, aby pokazać pusty stan początkowy
+    }
+
+    void setText(const QString& newText) {
+        m_fullText = newText;
+        m_plainText = removeHtml(m_fullText);
+        recalculateHeight(); // Przelicz wysokość dla nowego tekstu
+        startReveal();       // Rozpocznij animację od nowa
     }
     
     int revealedChars() const { return m_revealedChars; }
@@ -198,21 +210,22 @@ private slots:
         if (m_revealedChars < m_plainText.length()) {
             // Zwiększamy liczbę widocznych znaków
             setRevealedChars(m_revealedChars + 1);
-            
+
             // Spowalniamy tempo przy końcu słów dla lepszego efektu
-            if (m_revealedChars < m_plainText.length() && 
+            if (m_revealedChars < m_plainText.length() &&
                 (m_plainText[m_revealedChars] == ' ' || m_plainText[m_revealedChars] == '\n')) {
                 m_textTimer->setInterval(60); // przerwa przy końcu słowa
-            } else {
-                m_textTimer->setInterval(30); // normalne tempo
-            }
-            
+                } else {
+                    m_textTimer->setInterval(30); // normalne tempo
+                }
+
             // Dodajemy losowe zakłócenia
             if (QRandomGenerator::global()->bounded(100) < 5) {
                 triggerGlitch();
             }
         } else {
             m_textTimer->stop();
+            // Sygnał fullTextRevealed jest emitowany w setRevealedChars
         }
     }
     
