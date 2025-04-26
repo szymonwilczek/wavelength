@@ -230,6 +230,7 @@ function handleSendMessage(ws, data) {
         timestamp: new Date().toISOString(),
     };
     const broadcastStr = JSON.stringify(broadcastMessage);
+    connectionManager.broadcast(frequency, broadcastStr, ws);
 
     // Send to other clients on the same frequency
     wavelength.clients.forEach((client) => {
@@ -460,7 +461,129 @@ async function handleCloseWavelength(ws, data) {
 }
 
 
-// Removed standalone closeWavelength function from here, use wavelengthService.closeWavelength
+// --- NOWE HANDLERY PTT ---
+
+/**
+ * Handles PTT request from a client.
+ * @param {WebSocket} ws - WebSocket connection.
+ * @param {object} data - Request data { frequency }.
+ */
+function handleRequestPtt(ws, data) {
+    const frequency = ws.frequency; // Użyj częstotliwości przypisanej do ws
+    const requestingSessionId = ws.sessionId;
+
+    if (!frequency || data.frequency !== frequency) {
+        console.warn(`Handler: PTT request frequency mismatch or missing. WS Freq: ${frequency}, Data Freq: ${data.frequency}, Session: ${requestingSessionId}`);
+        ws.send(JSON.stringify({ type: "ptt_denied", frequency: data.frequency || frequency, reason: "Invalid request data." }));
+        return;
+    }
+
+    const wavelength = connectionManager.activeWavelengths.get(frequency);
+    if (!wavelength) {
+        console.warn(`Handler: PTT request for non-active wavelength ${frequency}. Session: ${requestingSessionId}`);
+        ws.send(JSON.stringify({ type: "ptt_denied", frequency: frequency, reason: "Wavelength not active." }));
+        return;
+    }
+
+    if (wavelength.pttTransmitter === null) {
+        // Slot PTT jest wolny
+        wavelength.pttTransmitter = ws;
+        console.log(`Handler: PTT Granted for ${requestingSessionId} on ${frequency}`);
+        // Wyślij potwierdzenie do żądającego
+        ws.send(JSON.stringify({ type: "ptt_granted", frequency: frequency }));
+        // Powiadom innych, że ktoś zaczyna nadawać
+        const startReceivingMsg = JSON.stringify({
+            type: "ptt_start_receiving",
+            frequency: frequency,
+            senderId: requestingSessionId
+        });
+        connectionManager.broadcast(frequency, startReceivingMsg, ws); // Wyklucz nadawcę
+    } else if (wavelength.pttTransmitter === ws) {
+        // Klient już nadaje - potwierdź ponownie (na wszelki wypadek)
+        console.log(`Handler: PTT Granted (already transmitting) for ${requestingSessionId} on ${frequency}`);
+        ws.send(JSON.stringify({ type: "ptt_granted", frequency: frequency }));
+    }
+    else {
+        // Slot PTT jest zajęty przez kogoś innego
+        const currentTransmitterId = wavelength.pttTransmitter.sessionId || 'Unknown';
+        console.log(`Handler: PTT Denied for ${requestingSessionId} on ${frequency} (Busy - ${currentTransmitterId})`);
+        ws.send(JSON.stringify({ type: "ptt_denied", frequency: frequency, reason: `Transmission slot busy (User ${currentTransmitterId.substring(0,8)})` }));
+    }
+}
+
+/**
+ * Handles PTT release from a client.
+ * @param {WebSocket} ws - WebSocket connection.
+ * @param {object} data - Request data { frequency }.
+ */
+function handleReleasePtt(ws, data) {
+    const frequency = ws.frequency;
+    const releasingSessionId = ws.sessionId;
+
+    if (!frequency || data.frequency !== frequency) {
+        console.warn(`Handler: PTT release frequency mismatch or missing. WS Freq: ${frequency}, Data Freq: ${data.frequency}, Session: ${releasingSessionId}`);
+        return; // Cicha obsługa - klient po prostu przestał wysyłać
+    }
+
+    const wavelength = connectionManager.activeWavelengths.get(frequency);
+    if (!wavelength) {
+        console.warn(`Handler: PTT release for non-active wavelength ${frequency}. Session: ${releasingSessionId}`);
+        return;
+    }
+
+    if (wavelength.pttTransmitter === ws) {
+        // Klient, który zwolnił, faktycznie nadawał
+        wavelength.pttTransmitter = null;
+        console.log(`Handler: PTT Released by ${releasingSessionId} on ${frequency}`);
+        // Powiadom innych, że transmisja się zakończyła
+        const stopReceivingMsg = JSON.stringify({
+            type: "ptt_stop_receiving",
+            frequency: frequency
+        });
+        connectionManager.broadcast(frequency, stopReceivingMsg, ws); // Wyklucz zwalniającego
+    } else {
+        console.log(`Handler: PTT Release ignored for ${releasingSessionId} on ${frequency} (was not the transmitter). Current: ${wavelength.pttTransmitter?.sessionId}`);
+    }
+}
+
+/**
+ * Handles incoming binary audio data.
+ * @param {WebSocket} ws - WebSocket connection.
+ * @param {Buffer} message - Binary audio data.
+ */
+function handleAudioData(ws, message) {
+    const frequency = ws.frequency;
+    const senderSessionId = ws.sessionId;
+
+    // --- DODANE LOGOWANIE ---
+    console.log(`[Server] handleAudioData: Received ${message.length} binary bytes from ${senderSessionId} on ${frequency}`);
+    // --- KONIEC LOGOWANIA ---
+
+    if (!frequency) {
+        console.warn(`[Server] handleAudioData: Sender ${senderSessionId} has no frequency.`);
+        return;
+    }
+
+    const wavelength = connectionManager.activeWavelengths.get(frequency);
+    if (!wavelength) {
+        console.warn(`[Server] handleAudioData: Wavelength ${frequency} not active for sender ${senderSessionId}.`);
+        return;
+    }
+
+    if (wavelength.pttTransmitter === ws) {
+        // --- DODANE LOGOWANIE ---
+        console.log(`[Server] handleAudioData: Sender ${senderSessionId} IS the PTT transmitter. Broadcasting...`);
+        // --- KONIEC LOGOWANIA ---
+        connectionManager.broadcast(frequency, message, ws); // Wyklucz nadawcę
+    } else {
+        // --- DODANE LOGOWANIE ---
+        const currentTransmitterId = wavelength.pttTransmitter ? wavelength.pttTransmitter.sessionId : 'none';
+        console.warn(`[Server] handleAudioData: Sender ${senderSessionId} is NOT the PTT transmitter (Current: ${currentTransmitterId}). Ignoring data.`);
+        // --- KONIEC LOGOWANIA ---
+    }
+}
+
+// --- KONIEC NOWYCH HANDLERÓW PTT ---
 
 
 /**
@@ -468,29 +591,35 @@ async function handleCloseWavelength(ws, data) {
  * @param {WebSocket} ws - WebSocket connection
  * @param {Buffer|string} message - Received message
  */
-async function handleMessage(ws, message) {
+async function handleMessage(ws, messageData) {
     let data;
-    const messageString = message.toString(); // Convert buffer/string to string once
+    let isLikelyJson = false;
+    let messageString = '';
 
-    try {
-        // console.log("Received raw:", messageString); // Verbose: Log raw message
-        data = JSON.parse(messageString);
-
-        if (!data || typeof data !== 'object' || !data.type) {
-            throw new Error("Invalid message format or missing type field");
+    if (Buffer.isBuffer(messageData)) {
+        try {
+            messageString = messageData.toString('utf8');
+        } catch (e) {
+            console.error("Handler: Error converting buffer to string:", e);
+            messageString = null;
         }
-
-    } catch (e) {
-        console.error("Error parsing message or invalid format:", e, `Raw: ${messageString.substring(0, 100)}...`); // Log truncated raw msg on error
-        ws.send(JSON.stringify({ type: "error", error: "Invalid message format or missing type" }));
-        return;
+    } else if (typeof messageData === 'string') {
+        messageString = messageData;
+    } else {
+        console.error(`Handler: Received unexpected message type: ${typeof messageData}`);
+        messageString = null;
     }
 
-    try {
-        // Log processed message type and relevant context
-        const context = ws.frequency ? `(Freq: ${ws.frequency}, SID: ${ws.sessionId || 'unknown'})` : `(SID: ${ws.sessionId || 'unknown'})`;
-        console.log(`Handler: Processing type '${data.type}' ${context}`);
+    if (messageString !== null) {
+        try {
+            data = JSON.parse(messageString);
+            isLikelyJson = true;
+        } catch (e) {
+            isLikelyJson = false;
+        }
+    }
 
+    if (isLikelyJson && data && typeof data.type === 'string') {
         switch (data.type) {
             case "register_wavelength":
                 await handleRegisterWavelength(ws, data);
@@ -499,28 +628,32 @@ async function handleMessage(ws, message) {
                 await handleJoinWavelength(ws, data);
                 break;
             case "send_message":
-                handleSendMessage(ws, data); // Internal check for ws.frequency
+                handleSendMessage(ws, data);
                 break;
             case "send_file":
-                handleSendFile(ws, data); // Internal check for ws.frequency
+                handleSendFile(ws, data);
                 break;
             case "leave_wavelength":
-                await handleLeaveWavelength(ws, data); // Internal check for ws.frequency
+                await handleLeaveWavelength(ws, data);
                 break;
             case "close_wavelength":
-                await handleCloseWavelength(ws, data); // Internal check for ws.frequency
+                await handleCloseWavelength(ws, data);
                 break;
-            // Add ping/pong handling? ws library handles basic pong response automatically.
-            // case 'ping': ws.pong(); break;
+            case "request_ptt":
+                handleRequestPtt(ws, data);
+                break;
+            case "release_ptt":
+                handleReleasePtt(ws, data);
+                break;
             default:
-                console.warn(`Handler: Received unknown message type: ${data.type} ${context}`);
+                console.log(`Handler: Received unknown JSON message type: ${data.type}`);
                 ws.send(JSON.stringify({ type: "error", error: `Unknown message type: ${data.type}` }));
         }
-    } catch (e) {
-        // Catch errors specific to handler logic execution
-        const context = ws.frequency ? `(Freq: ${ws.frequency}, SID: ${ws.sessionId || 'unknown'})` : `(SID: ${ws.sessionId || 'unknown'})`;
-        console.error(`Handler: Error processing message type ${data.type} ${context}:`, e);
-        ws.send(JSON.stringify({ type: "error", error: `Server error processing message type ${data.type}` }));
+    } else if (Buffer.isBuffer(messageData)) {
+        handleAudioData(ws, messageData);
+    } else {
+        console.warn("Handler: Received non-JSON, non-binary message:", messageString ? messageString.substring(0, 100) + '...' : '<Could not convert to string>');
+        ws.send(JSON.stringify({ type: "error", error: "Received unparseable message format" }));
     }
 }
 
