@@ -469,22 +469,20 @@ private slots:
     void onPttButtonReleased() {
         if (m_pttState == Transmitting) {
             qDebug() << "PTT Button Released - Stopping Transmission for" << currentFrequency;
-            stopAudioInput(); // Zatrzymaj przechwytywanie
-            // Wyślij informację o zwolnieniu PTT
+            stopAudioInput();
             WavelengthMessageService::getInstance()->sendPttRelease(currentFrequency);
+            // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
+            messageArea->clearTransmittingUser();
+            // --- ZRESETUJ AMPLITUDĘ ---
+            messageArea->setAudioAmplitude(0.0);
         } else if (m_pttState == Requesting) {
-             qDebug() << "PTT Button Released - Cancelling Request for" << currentFrequency;
-             // TODO: Opcjonalnie wysłać anulowanie żądania, jeśli serwer to obsługuje
-             // Na razie po prostu wracamy do Idle
+            qDebug() << "PTT Button Released - Cancelling Request for" << currentFrequency;
+            // Wskaźnik nie był ustawiony, amplituda też nie
         }
         m_pttState = Idle;
         updatePttButtonState();
-        // Resetuj styl przycisku
         pttButton->setStyleSheet("");
-        // Resetuj amplitudę wizualizacji
-        if (messageArea) {
-             messageArea->setGlitchIntensity(0.0);
-        }
+        // Usunięto reset glitchIntensity, bo teraz sterujemy amplitudą
     }
 
     void onPttGranted(QString frequency) {
@@ -492,12 +490,14 @@ private slots:
             qDebug() << "PTT Granted for" << frequency;
             m_pttState = Transmitting;
             updatePttButtonState();
-            startAudioInput(); // Rozpocznij przechwytywanie i wysyłanie
-            pttButton->setStyleSheet("background-color: red; color: white;"); // Przykładowy styl
+            startAudioInput();
+            pttButton->setStyleSheet("background-color: red; color: white;");
+            // --- USTAW WSKAŹNIK NADAJĄCEGO (LOKALNIE) ---
+            messageArea->setTransmittingUser("You");
+            // --- KONIEC USTAWIANIA WSKAŹNIKA ---
         } else if (m_pttState == Requesting) {
-             // Dostaliśmy zgodę na inną częstotliwość lub już nie requestujemy - ignorujemy?
-             qDebug() << "Received PTT grant for wrong frequency or state:" << frequency << m_pttState;
-             onPttButtonReleased(); // Na wszelki wypadek wróć do idle
+            qDebug() << "Received PTT grant for wrong frequency or state:" << frequency << m_pttState;
+            onPttButtonReleased();
         }
     }
 
@@ -515,12 +515,16 @@ private slots:
         }
     }
 
-     void onPttStartReceiving(QString frequency, QString senderId) {
+    void onPttStartReceiving(QString frequency, QString senderId) {
         if (frequency == currentFrequency && m_pttState == Idle) {
             qDebug() << "Starting to receive PTT audio from" << senderId << "on" << frequency;
             m_pttState = Receiving;
             updatePttButtonState();
             startAudioOutput();
+            // --- USTAW WSKAŹNIK NADAJĄCEGO (ZDALNIE) ---
+            m_currentTransmitterId = senderId; // Zapisz ID na wszelki wypadek
+            messageArea->setTransmittingUser(senderId);
+            // --- KONIEC USTAWIANIA WSKAŹNIKA ---
             if (m_audioOutput) {
                 qDebug() << "Audio Output State after start request:" << m_audioOutput->state() << "Error:" << m_audioOutput->error();
             }
@@ -530,14 +534,15 @@ private slots:
     void onPttStopReceiving(QString frequency) {
         if (frequency == currentFrequency && m_pttState == Receiving) {
             qDebug() << "Stopping PTT audio reception on" << frequency;
-            stopAudioOutput(); // Zatrzymaj odtwarzanie
+            stopAudioOutput();
             m_pttState = Idle;
             updatePttButtonState();
-            // Resetuj amplitudę wizualizacji
-            if (messageArea) {
-                 messageArea->setGlitchIntensity(0.0);
-            }
-
+            // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
+            m_currentTransmitterId = "";
+            messageArea->clearTransmittingUser();
+            // --- ZRESETUJ AMPLITUDĘ ---
+            messageArea->setAudioAmplitude(0.0);
+            // Usunięto reset glitchIntensity
         }
     }
 
@@ -568,7 +573,7 @@ private slots:
                 // Oblicz amplitudę dla wizualizacji (jeśli dane zostały zapisane)
                 if (bytesWritten > 0) {
                     qreal amplitude = calculateAmplitude(audioData.left(bytesWritten)); // Użyj tylko zapisanych danych
-                    updateRemoteAudioAmplitude(frequency, amplitude);
+                    // updateRemoteAudioAmplitude(frequency, amplitude);
                 }
 
             } else {
@@ -604,7 +609,8 @@ private slots:
 
             // 3. Zaktualizuj wizualizację lokalnie
             if (messageArea) {
-                messageArea->setGlitchIntensity(amplitude * 1.5); // Mnożnik dla lepszego efektu
+                // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
+                messageArea->setAudioAmplitude(amplitude); // Nowa metoda
             }
         } else {
             qDebug() << "[HOST] onReadyReadInput: Buffer was empty.";
@@ -613,10 +619,12 @@ private slots:
 
     // Slot do aktualizacji wizualizacji na podstawie amplitudy od zdalnego użytkownika
     void updateRemoteAudioAmplitude(QString frequency, qreal amplitude) {
-         if (frequency == currentFrequency && m_pttState == Receiving && messageArea) {
-             // Użyj amplitudy do sterowania glitchIntensity
-             messageArea->setGlitchIntensity(amplitude * 1.5); // Mnożnik dla lepszego efektu
-         }
+        if (frequency == currentFrequency && m_pttState == Receiving && messageArea) {
+            // --- ZMIANA: Ustawiaj amplitudę zamiast glitch ---
+            // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
+            messageArea->setAudioAmplitude(amplitude); // Nowa metoda
+            // --- KONIEC ZMIANY ---
+        }
     }
     // --- KONIEC NOWYCH SLOTÓW PTT ---
 
@@ -727,6 +735,7 @@ private:
     double m_scanlineOpacity;
     bool m_isAborting = false;
     QPushButton *pttButton; // <-- Nowy przycisk
+    QString m_currentTransmitterId;
 
     // --- NOWE POLA AUDIO ---
     PttState m_pttState;
