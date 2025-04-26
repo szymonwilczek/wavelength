@@ -610,7 +610,7 @@ private slots:
             // 3. Zaktualizuj wizualizację lokalnie
             if (messageArea) {
                 // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
-                messageArea->setAudioAmplitude(amplitude); // Nowa metoda
+                messageArea->setAudioAmplitude(amplitude * 1.5); // Nowa metoda
             }
         } else {
             qDebug() << "[HOST] onReadyReadInput: Buffer was empty.";
@@ -622,7 +622,7 @@ private slots:
         if (frequency == currentFrequency && m_pttState == Receiving && messageArea) {
             // --- ZMIANA: Ustawiaj amplitudę zamiast glitch ---
             // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
-            messageArea->setAudioAmplitude(amplitude); // Nowa metoda
+            messageArea->setAudioAmplitude(amplitude * 1.5); // Nowa metoda
             // --- KONIEC ZMIANY ---
         }
     }

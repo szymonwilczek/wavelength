@@ -48,7 +48,7 @@ public:
 
     explicit CommunicationStream(QWidget* parent = nullptr)
         : QOpenGLWidget(parent),
-          m_baseWaveAmplitude(0.01), // Bazowa amplituda w stanie Idle
+          m_baseWaveAmplitude(0.05), // Bazowa amplituda w stanie Idle
           m_amplitudeScale(0.25),    // Mnożnik dla amplitudy audio (dostosuj wg potrzeb)
           m_waveAmplitude(m_baseWaveAmplitude),
           m_targetWaveAmplitude(m_baseWaveAmplitude), // Docelowa amplituda
@@ -548,7 +548,7 @@ private slots:
         ampAnim->setStartValue(m_waveAmplitude);
         // Zamiast dużej amplitudy, ustawiamy tylko nieznacznie podniesioną bazę
         // Główna animacja amplitudy będzie pochodzić z setAudioAmplitude
-        ampAnim->setEndValue(m_baseWaveAmplitude * 2.0); // Np. podwójna bazowa
+        ampAnim->setEndValue(0.15); // Np. podwójna bazowa
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -587,6 +587,7 @@ private slots:
 
         // Zmieniamy stan na wyświetlanie po zakończeniu animacji
         connect(group, &QParallelAnimationGroup::finished, this, [this]() {
+            m_targetWaveAmplitude = 0.15;
             m_state = Displaying;
         });
     }
@@ -602,7 +603,7 @@ private slots:
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1500);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(m_baseWaveAmplitude); // Powrót do bazowej
+        ampAnim->setEndValue(0.01); // Powrót do bazowej
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -691,6 +692,7 @@ private slots:
 
         // Ustawiamy stan
         m_state = Displaying;
+        // m_targetWaveAmplitude = m_baseWaveAmplitude * 6;
 
         // --- ZMIANA KOLEJNOŚCI I METOD ---
         // 1. Upewnij się, że widget ma szansę obliczyć swój rozmiar
