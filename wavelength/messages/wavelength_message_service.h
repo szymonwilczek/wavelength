@@ -27,6 +27,49 @@ public:
         return &instance;
     }
 
+    // --- NOWE METODY PTT ---
+    bool sendPttRequest(const QString& frequency) {
+        QWebSocket* socket = getSocketForFrequency(frequency);
+        if (!socket) return false;
+
+        QJsonObject requestObj;
+        requestObj["type"] = "request_ptt";
+        requestObj["frequency"] = frequency;
+        // Można dodać ID sesji klienta, jeśli serwer tego wymaga
+        // requestObj["senderId"] = AuthenticationManager::getInstance()->getClientId();
+
+        QJsonDocument doc(requestObj);
+        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+        qDebug() << "Sending PTT Request:" << jsonMessage;
+        socket->sendTextMessage(jsonMessage);
+        return true;
+    }
+
+    bool sendPttRelease(const QString& frequency) {
+        QWebSocket* socket = getSocketForFrequency(frequency);
+        if (!socket) return false;
+
+        QJsonObject releaseObj;
+        releaseObj["type"] = "release_ptt";
+        releaseObj["frequency"] = frequency;
+
+        QJsonDocument doc(releaseObj);
+        QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+        qDebug() << "Sending PTT Release:" << jsonMessage;
+        socket->sendTextMessage(jsonMessage);
+        return true;
+    }
+
+    bool sendAudioData(const QString& frequency, const QByteArray& audioData) {
+        QWebSocket* socket = getSocketForFrequency(frequency);
+        if (!socket) return false;
+
+        // Wysyłamy surowe dane binarne
+        qint64 bytesSent = socket->sendBinaryMessage(audioData);
+        // qDebug() << "Sent" << bytesSent << "bytes of audio data for freq" << frequency;
+        return bytesSent == audioData.size();
+    }
+
     bool sendMessage(const QString& message) {
         WavelengthRegistry* registry = WavelengthRegistry::getInstance();
         QString freq = registry->getActiveWavelength();
@@ -313,6 +356,12 @@ signals:
     void progressMessageUpdated(const QString& messageId, const QString& message);
     void removeProgressMessage(const QString& messageId);
     void sendJsonViaSocket(const QString& jsonMessage, QString frequency, const QString& progressMsgId);
+    void pttGranted(QString frequency);
+    void pttDenied(QString frequency, QString reason);
+    void pttStartReceiving(QString frequency, QString senderId);
+    void pttStopReceiving(QString frequency);
+    void audioDataReceived(QString frequency, const QByteArray& audioData);
+    void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private:
     WavelengthMessageService(QObject* parent = nullptr) : QObject(parent) {
@@ -329,6 +378,20 @@ private:
 
     QMap<QString, QString> m_sentMessages;
     QString m_clientId;
+
+    QWebSocket* getSocketForFrequency(const QString& frequency) {
+        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+        if (!registry->hasWavelength(frequency)) {
+            qWarning() << "No wavelength info found for frequency" << frequency << "in getSocketForFrequency";
+            return nullptr;
+        }
+        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+        if (!info.socket || !info.socket->isValid()) {
+            qWarning() << "Invalid socket for frequency" << frequency << "in getSocketForFrequency";
+            return nullptr;
+        }
+        return info.socket;
+    }
 };
 
 #endif // WAVELENGTH_MESSAGE_SERVICE_H

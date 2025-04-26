@@ -174,6 +174,12 @@ signals:
     void authenticationFailed(QString frequency);
     void userKicked(QString frequency, const QString& reason);
     void activeWavelengthChanged(QString frequency);
+    void pttGranted(QString frequency);
+    void pttDenied(QString frequency, QString reason);
+    void pttStartReceiving(QString frequency, QString senderId);
+    void pttStopReceiving(QString frequency);
+    void audioDataReceived(QString frequency, const QByteArray& audioData);
+    void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private slots:
     // Obsługa zdarzeń z różnych komponentów - tutaj naprawiamy propagację sygnałów
@@ -235,6 +241,15 @@ private slots:
         qDebug() << "Configuration changed:" << key;
     }
 
+    // --- NOWE SLOTY PTT (odbierające z WavelengthMessageService) ---
+    void onPttGranted(QString frequency) { emit pttGranted(frequency); }
+    void onPttDenied(QString frequency, QString reason) { emit pttDenied(frequency, reason); }
+    void onPttStartReceiving(QString frequency, QString senderId) { emit pttStartReceiving(frequency, senderId); }
+    void onPttStopReceiving(QString frequency) { emit pttStopReceiving(frequency); }
+    void onAudioDataReceived(QString frequency, const QByteArray& audioData) { emit audioDataReceived(frequency, audioData); }
+    void onRemoteAudioAmplitudeUpdate(QString frequency, qreal amplitude) { emit remoteAudioAmplitudeUpdate(frequency, amplitude); }
+    // --- KONIEC NOWYCH SLOTÓW PTT ---
+
 private:
     WavelengthSessionCoordinator(QObject* parent = nullptr) : QObject(parent) {
         // Konstruktor prywatny dla singletona
@@ -277,6 +292,12 @@ private:
         // WavelengthMessageService
         connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::messageSent,
                 this, &WavelengthSessionCoordinator::onMessageSent, Qt::DirectConnection);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::pttGranted, this, &WavelengthSessionCoordinator::onPttGranted);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::pttDenied, this, &WavelengthSessionCoordinator::onPttDenied);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::pttStartReceiving, this, &WavelengthSessionCoordinator::onPttStartReceiving);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::pttStopReceiving, this, &WavelengthSessionCoordinator::onPttStopReceiving);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::audioDataReceived, this, &WavelengthSessionCoordinator::onAudioDataReceived);
+        connect(WavelengthMessageService::getInstance(), &WavelengthMessageService::remoteAudioAmplitudeUpdate, this, &WavelengthSessionCoordinator::onRemoteAudioAmplitudeUpdate);
 
         // WavelengthMessageProcessor
         connect(WavelengthMessageProcessor::getInstance(), &WavelengthMessageProcessor::messageReceived,

@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include <qtconcurrentrun.h>
 
+#include "wavelength_message_service.h"
 #include "../files/attachment_queue_manager.h"
 #include "../registry/wavelength_registry.h"
 #include "../messages/handler/message_handler.h"
@@ -69,18 +70,85 @@ public:
             processUserLeft(msgObj, frequency);
         } else if (msgType == "wavelength_closed") {
             processWavelengthClosed(msgObj, frequency);
-        } else {
-            qDebug() << "Unknown message type:" << msgType;
+        } else if (msgType == "ptt_granted") {
+            emit pttGranted(frequency); // Emituj sygnał do serwisu/koordynatora
+        } else if (msgType == "ptt_denied") {
+            QString reason = msgObj.value("reason").toString("Transmission slot is busy.");
+            emit pttDenied(frequency, reason); // Emituj sygnał
+        } else if (msgType == "ptt_start_receiving") {
+            QString senderId = msgObj.value("senderId").toString("Unknown");
+            emit pttStartReceiving(frequency, senderId); // Emituj sygnał
+        } else if (msgType == "ptt_stop_receiving") {
+            emit pttStopReceiving(frequency); // Emituj sygnał
+        } else if (msgType == "audio_amplitude") { // Opcjonalne - jeśli serwer wysyła amplitudę
+            qreal amplitude = msgObj.value("amplitude").toDouble(0.0);
+            emit remoteAudioAmplitudeUpdate(frequency, amplitude);
+        }
+        // --- KONIEC NOWYCH TYPÓW WIADOMOŚCI PTT ---
+        else {
+            qDebug() << "Unknown message type received:" << msgType;
         }
     }
 
-    void setSocketMessageHandlers(QWebSocket* socket, QString frequency) {
-        if (!socket) return;
+    void processIncomingBinaryMessage(const QByteArray& message, QString frequency) {
+        qDebug() << "[CLIENT] processIncomingBinaryMessage: Received" << message.size() << "bytes for wavelength" << frequency;
+        emit audioDataReceived(frequency, message);
+    }
 
-        connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
-            qDebug() << "Message processor received message for freq" << frequency << ":" << message.left(50) + "...";
+    void setSocketMessageHandlers(QWebSocket* socket, QString frequency) {
+        if (!socket) {
+             qWarning() << "[CLIENT] setSocketMessageHandlers: Socket is null for frequency" << frequency;
+             return;
+        }
+
+        // Rozłącz stare połączenia, aby uniknąć duplikatów
+        disconnect(socket, &QWebSocket::textMessageReceived, this, nullptr);
+        disconnect(socket, &QWebSocket::binaryMessageReceived, this, nullptr);
+        qDebug() << "[CLIENT] Disconnected previous handlers for freq" << frequency;
+
+
+        // Połącz dla wiadomości tekstowych
+        bool connectedText = connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
             processIncomingMessage(message, frequency);
         });
+        if (!connectedText) {
+             qWarning() << "[CLIENT] FAILED to connect textMessageReceived for freq" << frequency;
+        } else {
+             qDebug() << "[CLIENT] Successfully connected textMessageReceived for freq" << frequency;
+        }
+
+
+        // --- DODANE LOGOWANIE PRZED CONNECT DLA BINARY ---
+        qDebug() << "[CLIENT] Attempting to connect binaryMessageReceived for freq" << frequency
+                 << "Socket valid:" << socket->isValid()
+                 << "State:" << socket->state();
+        // --- KONIEC LOGOWANIA ---
+
+        // Połącz dla wiadomości binarnych
+        bool connectedBinary = connect(socket, &QWebSocket::binaryMessageReceived, this, [this, frequency](const QByteArray& message) {
+             // Ten log powinien się pojawić, jeśli sygnał zostanie odebrany
+             qDebug() << "[CLIENT] binaryMessageReceived signal triggered for freq" << frequency << "Size:" << message.size();
+             processIncomingBinaryMessage(message, frequency);
+        });
+
+        // --- DODANE LOGOWANIE PO CONNECT DLA BINARY ---
+        if (!connectedBinary) {
+            qWarning() << "[CLIENT] FAILED to connect binaryMessageReceived for freq" << frequency;
+        } else {
+            qDebug() << "[CLIENT] Successfully connected binaryMessageReceived for freq" << frequency;
+        }
+        // --- KONIEC LOGOWANIA ---
+
+        // Dodajmy też logowanie błędów samego socketa na wszelki wypadek
+        // Rozłączamy najpierw, aby uniknąć wielokrotnego podłączania tego samego slotu
+        disconnect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, nullptr);
+        connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+                this, [socket, frequency](QAbstractSocket::SocketError error) {
+            qWarning() << "[CLIENT] WebSocket Error Occurred on freq" << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
+        });
+
+
+        qDebug() << "Message handlers set for socket on frequency" << frequency; // Istniejący log
     }
 
 private:
@@ -186,9 +254,25 @@ signals:
     void systemMessage(QString frequency, const QString& formattedMessage);
     void wavelengthClosed(QString frequency);
     void userKicked(QString frequency, const QString& reason);
+    void pttGranted(QString frequency);
+    void pttDenied(QString frequency, QString reason);
+    void pttStartReceiving(QString frequency, QString senderId);
+    void pttStopReceiving(QString frequency);
+    void audioDataReceived(QString frequency, const QByteArray& audioData);
+    void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private:
-    WavelengthMessageProcessor(QObject* parent = nullptr) : QObject(parent) {}
+    WavelengthMessageProcessor(QObject* parent = nullptr) : QObject(parent) {
+        WavelengthMessageService* service = WavelengthMessageService::getInstance();
+        // Połączenia sygnałów z WavelengthMessageService (powinny być OK)
+        connect(this, &WavelengthMessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
+        connect(this, &WavelengthMessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
+        connect(this, &WavelengthMessageProcessor::pttStartReceiving, service, &WavelengthMessageService::pttStartReceiving);
+        connect(this, &WavelengthMessageProcessor::pttStopReceiving, service, &WavelengthMessageService::pttStopReceiving);
+        connect(this, &WavelengthMessageProcessor::audioDataReceived, service, &WavelengthMessageService::audioDataReceived); // To połączenie jest kluczowe
+        connect(this, &WavelengthMessageProcessor::remoteAudioAmplitudeUpdate, service, &WavelengthMessageService::remoteAudioAmplitudeUpdate);
+
+    }
     ~WavelengthMessageProcessor() {}
 
     WavelengthMessageProcessor(const WavelengthMessageProcessor&) = delete;
