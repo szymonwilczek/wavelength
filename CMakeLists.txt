@@ -184,6 +184,8 @@ add_executable(
         wavelength/view/settings/tabs/network_tab/network_settings_widget.h
         wavelength/ui/chat/effects/mask_overlay.cpp
         wavelength/ui/chat/effects/mask_overlay.h
+        wavelength/ui/chat/user_info_label.cpp
+        wavelength/ui/chat/user_info_label.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

@@ -29,6 +29,12 @@
 #include <QVBoxLayout>
 
 #include "stream_message.h"
+#include "user_info_label.h"
+
+struct UserVisuals {
+    // QPainterPath shape; // Już niepotrzebne
+    QColor color;
+};
 
 // Główny widget strumienia komunikacji - poprawiona wersja z OpenGL
 class CommunicationStream : public QOpenGLWidget, protected QOpenGLFunctions {
@@ -91,21 +97,21 @@ public:
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
         // --- NOWY WSKAŹNIK NADAJĄCEGO ---
-        m_transmittingUserLabel = new QLabel(this);
+        m_transmittingUserLabel = new UserInfoLabel(this);
         m_transmittingUserLabel->setStyleSheet(
-            "QLabel {"
-            "  color: #ffaa00;" // Pomarańczowy/żółty dla wyróżnienia
-            "  background-color: rgba(40, 20, 0, 180);"
-            "  border: 1px solid #cc8800;"
+            "UserInfoLabel {"
+            "  color: #dddddd;"
+            "  background-color: rgba(0, 0, 0, 180);"
+            "  border: 1px solid #555555;"
             "  border-radius: 0px;"
-            "  padding: 2px 6px;"
+            "  padding: 2px 4px;"
             "  font-family: 'Consolas', sans-serif;"
             "  font-weight: bold;"
             "  font-size: 10px;"
             "}"
         );
-        m_transmittingUserLabel->setAlignment(Qt::AlignCenter);
-        m_transmittingUserLabel->hide(); // Domyślnie ukryty
+        m_transmittingUserLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        m_transmittingUserLabel->hide();
         // Pozycja zostanie ustawiona w resizeGL
         // --- KONIEC NOWEGO WSKAŹNIKA --
 
@@ -248,15 +254,23 @@ public:
     public slots:
     void setTransmittingUser(const QString& userId) {
         QString displayText = userId;
-        // Można skrócić ID, jeśli jest zbyt długie
+        // Skracanie ID (bez zmian)
         if (userId.length() > 15 && userId.startsWith("client_")) {
-            displayText = "CLIENT " + userId.split('_').last(); // Pokaż tylko ostatnią część ID
+            displayText = "CLIENT " + userId.split('_').last();
         } else if (userId.length() > 15 && userId.startsWith("ws_")) {
             displayText = "HOST " + userId.split('_').last();
+        } else if (userId == "You") {
+            displayText = "YOU";
         }
-        m_transmittingUserLabel->setText(QString("NADAJE: %1").arg(displayText));
+
+        // --- GENERUJ KOLOR I USTAW LABEL ---
+        UserVisuals visuals = generateUserVisuals(userId);
+        // m_transmittingUserLabel->setShape(visuals.shape); // USUNIĘTO
+        m_transmittingUserLabel->setShapeColor(visuals.color); // Ustaw tylko kolor
+        m_transmittingUserLabel->setText(displayText);
+        // --- KONIEC USTAWIANIA ---
+
         m_transmittingUserLabel->adjustSize();
-        // Pozycja zostanie zaktualizowana w resizeGL, ale możemy ją ustawić od razu
         m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
         m_transmittingUserLabel->show();
     }
@@ -264,15 +278,12 @@ public:
     // Slot do czyszczenia wskaźnika nadającego
     void clearTransmittingUser() {
         m_transmittingUserLabel->hide();
-        m_transmittingUserLabel->clear();
+        m_transmittingUserLabel->setText(""); // Wyczyść tekst na wszelki wypadek
     }
 
+    // Slot setAudioAmplitude (bez zmian)
     void setAudioAmplitude(qreal amplitude) {
-        // Ustawiamy docelową amplitudę, która będzie płynnie osiągana w updateAnimation
-        // Używamy skali, aby dostosować wizualny efekt
         m_targetWaveAmplitude = m_baseWaveAmplitude + qBound(0.0, amplitude, 1.0) * m_amplitudeScale;
-        // Można dodać minimalny próg, aby ignorować bardzo ciche dźwięki
-        // if (amplitude < 0.02) m_targetWaveAmplitude = m_baseWaveAmplitude;
     }
 
 protected:
@@ -411,15 +422,13 @@ const char* fragmentShaderSource = R"(
 
     void resizeGL(int w, int h) override {
         glViewport(0, 0, w, h);
-
-        // Aktualizujemy pozycję etykiety nazwy strumienia
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
-        // --- AKTUALIZACJA POZYCJI WSKAŹNIKA NADAJĄCEGO ---
+        // --- AKTUALIZACJA POZYCJI UserInfoLabel ---
+        // adjustSize() powinien być wywołany w setTransmittingUser
         m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
         // --- KONIEC AKTUALIZACJI ---
 
-        // Aktualizujemy pozycję aktualnie wyświetlanej wiadomości
         updateMessagePosition();
     }
 
@@ -869,6 +878,20 @@ private slots:
 
 private:
 
+    UserVisuals generateUserVisuals(const QString& userId) {
+        UserVisuals visuals;
+        quint32 hash = qHash(userId);
+
+        // Wygeneruj kolor na podstawie hasha (w przestrzeni HSL dla lepszych kolorów)
+        int hue = hash % 360; // Odcień 0-359
+        // Utrzymuj wysokie nasycenie i jasność dla neonowego efektu
+        int saturation = 230 + ((hash >> 8) % 26); // Nasycenie 230-255 (bardzo nasycone)
+        int lightness = 140 + ((hash >> 16) % 31); // Jasność 140-170 (jasne, ale nie białe)
+
+        visuals.color = QColor::fromHsl(hue, saturation, lightness);
+        return visuals;
+    }
+
     void connectSignalsForMessage(StreamMessage* message) {
         if (!message) return;
         // Używamy UniqueConnection, aby uniknąć duplikatów połączeń
@@ -935,7 +958,7 @@ private:
     const qreal m_amplitudeScale;    // Skala dla amplitudy audio
     qreal m_waveAmplitude;           // Aktualna amplituda (animowana)
     qreal m_targetWaveAmplitude;
-    QLabel* m_transmittingUserLabel;
+    UserInfoLabel* m_transmittingUserLabel;
     qreal m_waveFrequency;
     qreal m_waveSpeed;
     qreal m_glitchIntensity;
