@@ -8,11 +8,21 @@
 #include <QDateTime>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QMap> // Dodajemy QMap do śledzenia wiadomości progresu
 
-#include "../ui/chat/communication_stream.h"
+#include "../ui/chat/communication_stream.h" // Zawiera StreamMessage
 
 class WavelengthStreamDisplay : public QWidget {
     Q_OBJECT
+
+    // Struktura przechowująca dane wiadomości w kolejce
+    struct MessageData {
+        QString content;
+        QString sender;
+        QString id; // ID jest kluczowe dla aktualizacji
+        StreamMessage::MessageType type;
+        bool hasAttachment = false;
+    };
 
 public:
     WavelengthStreamDisplay(QWidget* parent = nullptr) : QWidget(parent) {
@@ -28,6 +38,9 @@ public:
         // Kolejka wiadomości oczekujących na wyświetlenie
         m_messageQueue = QQueue<MessageData>();
 
+        // Mapa do śledzenia *wyświetlonych* wiadomości progresu po ich ID
+        m_displayedProgressMessages = QMap<QString, StreamMessage*>();
+
         // Timer dla opóźnionego wyświetlania wiadomości
         m_messageTimer = new QTimer(this);
         m_messageTimer->setSingleShot(true);
@@ -42,185 +55,166 @@ public:
             m_communicationStream->setStreamName(QString("%1 (%2 Hz)").arg(name).arg(frequency));
         }
 
-        // Czyścimy wszystkie wiadomości
-        m_communicationStream->clearMessages();
-        m_messageQueue.clear();
+        // Czyścimy wszystko
+        clear();
     }
 
+    // Główna metoda publiczna do dodawania/aktualizowania wiadomości
     void addMessage(const QString& message, const QString& messageId, StreamMessage::MessageType type) {
-        // Dodajemy wiadomość do kolejki
+        // --- NOWA LOGIKA AKTUALIZACJI ---
+        // Sprawdzamy, czy to wiadomość progresu (ma ID) i czy już jest wyświetlona
+        if (!messageId.isEmpty() && m_displayedProgressMessages.contains(messageId)) {
+            StreamMessage* existingMessage = m_displayedProgressMessages.value(messageId);
+            if (existingMessage) {
+                qDebug() << "Aktualizowanie istniejącej wiadomości progresu ID:" << messageId;
+                existingMessage->updateContent(message);
+                return; // Zaktualizowano, nie dodajemy do kolejki
+            } else {
+                // Wskaźnik jest null lub nieprawidłowy, usuwamy z mapy
+                qWarning() << "Usuwanie nieprawidłowego wskaźnika z mapy dla ID:" << messageId;
+                m_displayedProgressMessages.remove(messageId);
+            }
+        }
+        // --- KONIEC LOGIKI AKTUALIZACJI ---
+
+        // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do kolejki
+        qDebug() << "Dodawanie nowej wiadomości do kolejki, ID:" << messageId;
         MessageData data;
-        data.content = message;
-        data.id = messageId;
+        data.content = message; // Przekazujemy oryginalny HTML
+        data.id = messageId;    // Zachowujemy ID
         data.type = type;
 
-        // NOWY KOD: Sprawdzamy, czy wiadomość zawiera załączniki
+        // Sprawdzamy, czy wiadomość zawiera załączniki (na podstawie HTML)
         data.hasAttachment = message.contains("image-placeholder") ||
                               message.contains("video-placeholder") ||
                               message.contains("audio-placeholder") ||
                               message.contains("gif-placeholder");
 
-        qDebug() << "Wiadomość zawiera załącznik: " << data.hasAttachment;
-
-        // Wyodrębniamy dane nadawcy
-        if (message.contains("<span style=")) {
-            QRegularExpression re("<span[^>]*>([^<]+)</span>");
-            QRegularExpressionMatch match = re.match(message);
-            if (match.hasMatch()) {
-                data.sender = match.captured(1);
-                // Usuwamy dwukropek jeśli istnieje
-                if (data.sender.endsWith(":"))
-                    data.sender = data.sender.left(data.sender.length() - 1);
-            } else {
-                data.sender = (type == StreamMessage::Transmitted) ? "You" : "Unknown";
-            }
-        } else {
-            data.sender = (type == StreamMessage::Transmitted) ? "You" :
-                         (type == StreamMessage::System) ? "SYSTEM" : "Unknown";
+        // Wyodrębniamy dane nadawcy (prostsza logika dla wiadomości systemowych/progresu)
+        if (type == StreamMessage::Transmitted && messageId.isEmpty()) { // Zwykła wiadomość wysłana
+             data.sender = "You";
+        } else if (type == StreamMessage::Received) { // Zwykła wiadomość odebrana
+             // Logika wyciągania nadawcy z HTML (jeśli potrzebna dla odebranych)
+             QRegularExpression re("<span[^>]*>([^<]+):</span>"); // Szukamy "Nadawca:"
+             QRegularExpressionMatch match = re.match(message);
+             if (match.hasMatch()) {
+                 data.sender = match.captured(1);
+             } else {
+                 data.sender = "Unknown";
+             }
+        } else { // Wiadomość systemowa lub progresu
+             data.sender = "SYSTEM"; // Lub pusty, jeśli nie chcemy pokazywać nadawcy
         }
 
-        // Czyścimy treść wiadomości z tagów HTML tylko gdy nie ma załącznika
-        if (!data.hasAttachment) {
-            QString cleanContent = message;
-            cleanContent.remove(QRegularExpression("<[^>]*>"));
-            data.content = cleanContent;
-        }
 
+        // Dodajemy do kolejki
         m_messageQueue.enqueue(data);
 
-        // Jeśli to pierwsza wiadomość w kolejce, rozpoczynamy przetwarzanie
+        // Jeśli to pierwsza wiadomość w kolejce i timer nie działa, startujemy
         if (m_messageQueue.size() == 1 && !m_messageTimer->isActive()) {
-            // Krótkie opóźnienie przed wyświetleniem pierwszej wiadomości
-            m_messageTimer->start(300);
+            m_messageTimer->start(100); // Krótsze opóźnienie dla szybszej reakcji
         }
     }
 
+
     void clear() {
-        // Czyścimy wszystkie wiadomości
+        // CommunicationStream::clearMessages zajmie się usunięciem widgetów
         m_communicationStream->clearMessages();
         m_messageQueue.clear();
+        m_displayedProgressMessages.clear(); // Czyścimy mapę wskaźników
         m_messageTimer->stop();
     }
 
-public slots:
-    void onMessageReceived(double frequency, const QString& message) {
-        // Określamy typ wiadomości
-        StreamMessage::MessageType type;
-        if (message.contains("[You]:") || message.contains("color:#60ff8a;")) {
-            type = StreamMessage::Transmitted;
-        } else if (message.contains("color:#ffcc00;")) {
-            type = StreamMessage::System;
-        } else {
-            type = StreamMessage::Received;
-        }
-
-        // Wyciągamy treść i nadawcę z HTML
-        QString sender = "Unknown";
-        QString content = message;
-
-        // Typowe dane nadawcy znajdują się w spanie na początku wiadomości
-        int senderStart = message.indexOf("<span style=\"color:");
-        int senderEnd = message.indexOf("</span>");
-
-        if (senderStart >= 0 && senderEnd > senderStart) {
-            // Wyciągamy dane nadawcy
-            QString senderHtml = message.mid(senderStart, senderEnd - senderStart + 7);
-            sender = senderHtml;
-            sender.remove(QRegExp("<[^>]*>"));
-
-            // Usuwamy końcowy dwukropek i dodatkowe spacje
-            if (sender.endsWith(":")) {
-                sender = sender.left(sender.length() - 1).trimmed();
-            }
-
-            // Wyciągamy treść wiadomości
-            content = message.mid(senderEnd + 7).trimmed();
-        }
-
-        // Generujemy identyfikator wiadomości
-        QString id = QString::number(QRandomGenerator::global()->generate64());
-
-        // Dodajemy wiadomość do wyświetlenia
-        addMessage(message, sender, type, id);
-    }
+// Usunięty slot onMessageReceived - logika powinna być wyżej (np. w WavelengthChatView)
+// public slots:
+//    void onMessageReceived(double frequency, const QString& message) { ... }
 
 private slots:
     void processNextQueuedMessage() {
         if (m_messageQueue.isEmpty()) {
             return;
         }
-
-        // Pobieramy pierwszą wiadomość z kolejki
         MessageData data = m_messageQueue.dequeue();
+        StreamMessage* displayedMessage = nullptr;
 
-        // Wyświetlamy wiadomość w strumieniu
-        StreamMessage* message = nullptr;
-
-        // Sprawdź czy hasAttachment jest faktycznie ustawione na true
-        // dla wiadomości z załącznikami
-        qDebug() << "Przetwarzanie wiadomości: " << data.content.left(30)
-                 << "... hasAttachment=" << data.hasAttachment;
-
-        // Tworzymy wiadomość i sprawdzamy, czy zawiera załącznik
-        if (data.hasAttachment) {
-            // Tworzymy wiadomość z załącznikiem
-            message = m_communicationStream->addMessageWithAttachment(
-                data.content, data.sender, data.type, data.id);
-        } else {
-            // Zwykła wiadomość
-            message = m_communicationStream->addMessage(
-                data.content, data.sender, data.type);
+        // Bezpiecznik - nie powinien być potrzebny, jeśli onStreamMessageDestroyed działa
+        if (!data.id.isEmpty() && m_displayedProgressMessages.contains(data.id)) {
+             qWarning() << "Próba dodania wiadomości z ID, które już istnieje w mapie:" << data.id;
+             displayedMessage = m_displayedProgressMessages.value(data.id);
+             if(displayedMessage) {
+                 displayedMessage->updateContent(data.content); // Aktualizuj na wszelki wypadek
+             } else {
+                 m_displayedProgressMessages.remove(data.id); // Usuń zły wpis
+                 displayedMessage = nullptr; // Wymuś utworzenie poniżej
+             }
         }
 
-        // Jeśli mamy więcej wiadomości w kolejce, ustawiamy timer na następną
+        // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do strumienia wizualnego
+        if (!displayedMessage) {
+            qDebug() << "Przetwarzanie wiadomości z kolejki: " << data.content.left(30)
+                     << "... ID=" << data.id << " hasAttachment=" << data.hasAttachment;
+
+            // Wywołaj CommunicationStream, aby dodał wiadomość wizualnie, przekazując ID
+            if (data.hasAttachment) {
+                displayedMessage = m_communicationStream->addMessageWithAttachment(
+                    data.content, data.sender, data.type, data.id); // Przekaż ID
+            } else {
+                displayedMessage = m_communicationStream->addMessage(
+                    data.content, data.sender, data.type, data.id); // Przekaż ID
+            }
+        }
+
+        // Jeśli wiadomość została pomyślnie utworzona/wyświetlona przez CommunicationStream
+        if (displayedMessage) {
+            // Jeśli to wiadomość progresu (ma ID), dodaj do mapy i podłącz sygnał destroyed
+            if (!data.id.isEmpty()) {
+                // Sprawdźmy jeszcze raz, czy ID nie zostało dodane w międzyczasie
+                if (!m_displayedProgressMessages.contains(data.id)) {
+                    qDebug() << "Dodano wiadomość progresu do mapy, ID:" << data.id;
+                    m_displayedProgressMessages.insert(data.id, displayedMessage);
+                    // Podłącz sygnał zniszczenia do slotu czyszczącego mapę
+                    connect(displayedMessage, &QObject::destroyed, this, &WavelengthStreamDisplay::onStreamMessageDestroyed);
+                } else {
+                     qWarning() << "Wiadomość progresu z ID" << data.id << "już istnieje w mapie podczas dodawania!";
+                }
+            }
+            // Dla zwykłych wiadomości (puste ID) nic nie robimy z mapą ani sygnałem
+        } else {
+             qWarning() << "CommunicationStream nie utworzył/zwrócił widgetu wiadomości dla ID:" << data.id;
+        }
+
+        // Uruchom timer dla następnej wiadomości w kolejce
         if (!m_messageQueue.isEmpty()) {
-            // Losowe opóźnienie między wiadomościami dla bardziej naturalnego efektu
-            int delay = 800 + QRandomGenerator::global()->bounded(1200);
+            int delay = 300 + QRandomGenerator::global()->bounded(500);
             m_messageTimer->start(delay);
         }
     }
 
+    void onStreamMessageDestroyed(QObject* obj) {
+        // Iterujemy po mapie, aby znaleźć wpis pasujący do zniszczonego obiektu
+        // To jest bezpieczniejsze niż poleganie na ID, jeśli jakimś cudem ID nie zostało ustawione
+        auto it = m_displayedProgressMessages.begin();
+        while (it != m_displayedProgressMessages.end()) {
+            if (it.value() == obj) {
+                qDebug() << "Usuwanie wiadomości progresu z mapy po zniszczeniu, ID:" << it.key();
+                it = m_displayedProgressMessages.erase(it); // Usuń wpis i przejdź do następnego
+                return; // Znaleziono i usunięto, kończymy
+            } else {
+                ++it;
+            }
+        }
+        qWarning() << "Otrzymano sygnał destroyed dla obiektu, którego nie ma w mapie wiadomości progresu.";
+    }
+
 private:
-    // Struktura przechowująca dane wiadomości w kolejce
-    struct MessageData {
-        QString content;
-        QString sender;
-        QString id;
-        StreamMessage::MessageType type;
-        bool hasAttachment = false;
-    };
-    
     CommunicationStream* m_communicationStream;
     QQueue<MessageData> m_messageQueue;
     QTimer* m_messageTimer;
+    // Mapa przechowująca wskaźniki do *aktualnie wyświetlonych* wiadomości progresu
+    QMap<QString, StreamMessage*> m_displayedProgressMessages;
 
-    void addMessage(const QString& rawHtml, const QString& sender, StreamMessage::MessageType type, const QString& messageId) {
-        // Sprawdzamy, czy wiadomość zawiera załączniki - dokładniejsze sprawdzenie
-        bool hasAttachment = rawHtml.contains("image-placeholder") ||
-                             rawHtml.contains("video-placeholder") ||
-                             rawHtml.contains("audio-placeholder") ||
-                             rawHtml.contains("gif-placeholder");
-
-        qDebug() << "Dodawanie wiadomości do kolejki: " << rawHtml.left(30)
-                 << "... zawiera załącznik: " << hasAttachment;
-
-        // Dodaj wiadomość do kolejki
-        MessageData data;
-        data.content = rawHtml;
-        data.sender = sender;
-        data.type = type;
-        data.id = messageId;
-        data.hasAttachment = hasAttachment;
-
-        m_messageQueue.enqueue(data);
-
-        // Jeśli to pierwsza wiadomość w kolejce, rozpoczynamy przetwarzanie
-        if (m_messageQueue.size() == 1 && !m_messageTimer->isActive()) {
-            // Krótkie opóźnienie przed wyświetleniem pierwszej wiadomości
-            m_messageTimer->start(300);
-        }
-    }
-
+    // Usunięta prywatna metoda addMessage, logika przeniesiona do publicznej
+    // void addMessage(const QString& rawHtml, const QString& sender, StreamMessage::MessageType type, const QString& messageId) { ... }
 };
 
 #endif // WAVELENGTH_STREAM_DISPLAY_H

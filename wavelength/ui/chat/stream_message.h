@@ -31,6 +31,8 @@ public:
         Transmitted,
         System
     };
+    QPushButton* m_markReadButton;
+
 
     QIcon createColoredSvgIcon(const QString& svgPath, const QColor& color, const QSize& size) {
         QSvgRenderer renderer;
@@ -61,10 +63,11 @@ public:
         return QIcon(coloredPixmap);
     }
 
-    StreamMessage(QString  content, QString  sender, MessageType type, QWidget* parent = nullptr)
-: QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
-  m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
-{
+    StreamMessage(QString  content, QString  sender, MessageType type, QString messageId = QString(), QWidget* parent = nullptr)
+        : QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
+          m_messageId(std::move(messageId)), // Store the message ID
+          m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0)
+    {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMinimumWidth(400);
     setMaximumWidth(600);
@@ -222,6 +225,25 @@ public:
         }
     }
 
+    void updateContent(const QString& newContent) {
+        m_content = newContent;
+        cleanupContent(); // Wyczyść nowy content z HTML
+
+        if (m_textDisplay) {
+            // Wywołaj setText w CyberTextDisplay, co zrestartuje animację
+            m_textDisplay->setText(m_cleanContent);
+        } else if (m_longTextDisplay) {
+            // Podobnie dla długiego tekstu (zakładając, że ma analogiczną metodę setText)
+            QMetaObject::invokeMethod(m_longTextDisplay, "setText", Q_ARG(QString, m_cleanContent));
+        } else if (m_contentLabel) {
+            // Dla zwykłego QLabel po prostu ustaw tekst
+            m_contentLabel->setText(m_cleanContent);
+        }
+        // Nie ma potrzeby aktualizować załącznika, bo wiadomości progresu go nie mają
+        adjustSizeToContent(); // Dostosuj rozmiar, jeśli treść się zmieniła
+        update(); // Wymuś odświeżenie wyglądu
+    }
+
     // Właściwości do animacji
     qreal opacity() const { return m_opacity; }
     void setOpacity(qreal opacity) {
@@ -257,6 +279,7 @@ public:
     QString sender() const { return m_sender; }
     QString content() const { return m_content; }
     MessageType type() const { return m_type; }
+    QString messageId() const {return m_messageId; }
 
 void addAttachment(const QString& html) {
     // Sprawdzamy, jakiego typu załącznik zawiera wiadomość
@@ -659,6 +682,7 @@ public slots:
 }
 
 protected:
+
     void paintEvent(QPaintEvent* event) override {
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
@@ -1121,6 +1145,7 @@ private:
         }
     }
 
+    QString m_messageId;
     QString m_content;
     QString m_cleanContent;
     QString m_sender;
@@ -1133,7 +1158,6 @@ private:
     QVBoxLayout* m_mainLayout;
     QPushButton* m_nextButton;
     QPushButton* m_prevButton;
-    QPushButton* m_markReadButton;
     QTimer* m_animationTimer;
     DisintegrationEffect* m_disintegrationEffect = nullptr;
     QWidget* m_attachmentWidget = nullptr;
