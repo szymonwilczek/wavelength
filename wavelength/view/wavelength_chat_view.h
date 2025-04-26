@@ -1,6 +1,7 @@
 #ifndef WAVELENGTH_CHAT_VIEW_H
 #define WAVELENGTH_CHAT_VIEW_H
 
+#include <QAudioInput>
 #include <qfileinfo.h>
 #include <QWidget>
 #include <QHBoxLayout>
@@ -83,6 +84,13 @@ protected:
 class WavelengthChatView : public QWidget {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
+
+    enum PttState {
+        Idle,
+        Requesting,
+        Transmitting,
+        Receiving
+    };
 
 public:
     explicit WavelengthChatView(QWidget *parent = nullptr)
@@ -180,6 +188,15 @@ public:
         sendButton->setFixedHeight(36);
         inputLayout->addWidget(sendButton);
 
+        // --- NOWY PRZYCISK PTT ---
+        pttButton = new CyberChatButton("MÓW", this);
+        pttButton->setToolTip("Naciśnij i przytrzymaj, aby mówić");
+        pttButton->setCheckable(false); // Działa na press/release
+        connect(pttButton, &QPushButton::pressed, this, &WavelengthChatView::onPttButtonPressed);
+        connect(pttButton, &QPushButton::released, this, &WavelengthChatView::onPttButtonReleased);
+        inputLayout->addWidget(pttButton);
+        // --- KONIEC NOWEGO PRZYCISKU PTT ---
+
         mainLayout->addLayout(inputLayout);
 
         // Przycisk przerwania połączenia
@@ -198,6 +215,8 @@ public:
         );
         mainLayout->addWidget(abortButton);
 
+        initializeAudio();
+
         // Połączenia sygnałów
         connect(inputField, &QLineEdit::returnPressed, this, &WavelengthChatView::sendMessage);
         connect(sendButton, &QPushButton::clicked, this, &WavelengthChatView::sendMessage);
@@ -210,12 +229,28 @@ public:
         // connect(messageService, &WavelengthMessageService::removeProgressMessage,
         //         this, &WavelengthChatView::removeProgressMessage);
 
+        WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+        connect(coordinator, &WavelengthSessionCoordinator::pttGranted, this, &WavelengthChatView::onPttGranted);
+        connect(coordinator, &WavelengthSessionCoordinator::pttDenied, this, &WavelengthChatView::onPttDenied);
+        connect(coordinator, &WavelengthSessionCoordinator::pttStartReceiving, this, &WavelengthChatView::onPttStartReceiving);
+        connect(coordinator, &WavelengthSessionCoordinator::pttStopReceiving, this, &WavelengthChatView::onPttStopReceiving);
+        connect(coordinator, &WavelengthSessionCoordinator::audioDataReceived, this, &WavelengthChatView::onAudioDataReceived);
+
         // Timer dla efektów wizualnych
         QTimer *glitchTimer = new QTimer(this);
         connect(glitchTimer, &QTimer::timeout, this, &WavelengthChatView::triggerVisualEffect);
         glitchTimer->start(5000 + QRandomGenerator::global()->bounded(5000));
 
         setVisible(false);
+    }
+
+    ~WavelengthChatView() {
+        // Zatrzymaj i zwolnij zasoby audio
+        stopAudioInput();
+        stopAudioOutput();
+        delete m_audioInput;
+        delete m_audioOutput;
+        // m_inputDevice i m_outputDevice są zarządzane przez QAudioInput/Output
     }
 
     double scanlineOpacity() const { return m_scanlineOpacity; }
@@ -285,6 +320,16 @@ public:
         setVisible(true);
         inputField->setFocus();
         inputField->clear();
+        pttButton->setEnabled(true); // Włącz przycisk PTT
+        abortButton->setEnabled(true);
+        resetStatusIndicator();
+        m_isAborting = false;
+        // Zatrzymaj PTT jeśli było aktywne
+        if (m_pttState == Transmitting) {
+            onPttButtonReleased();
+        }
+        m_pttState = Idle;
+        updatePttButtonState();
     }
 
     void onMessageReceived(QString frequency, const QString &message) {
@@ -406,6 +451,175 @@ protected:
     }
 
 private slots:
+
+    void onPttButtonPressed() {
+        if (currentFrequency == "-1.0" || m_pttState != Idle) {
+            return; // Nie rób nic jeśli nie ma aktywnej częstotliwości lub już coś robimy
+        }
+        qDebug() << "PTT Button Pressed - Requesting PTT for" << currentFrequency;
+        m_pttState = Requesting;
+        updatePttButtonState();
+        // Wyślij żądanie PTT przez koordynatora/serwis
+        WavelengthMessageService::getInstance()->sendPttRequest(currentFrequency);
+        // Można dodać wizualny feedback (np. zmiana koloru przycisku)
+        pttButton->setStyleSheet("background-color: yellow; color: black;"); // Przykładowy styl
+    }
+
+    void onPttButtonReleased() {
+        if (m_pttState == Transmitting) {
+            qDebug() << "PTT Button Released - Stopping Transmission for" << currentFrequency;
+            stopAudioInput();
+            WavelengthMessageService::getInstance()->sendPttRelease(currentFrequency);
+            // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
+            messageArea->clearTransmittingUser();
+            // --- ZRESETUJ AMPLITUDĘ ---
+            messageArea->setAudioAmplitude(0.0);
+        } else if (m_pttState == Requesting) {
+            qDebug() << "PTT Button Released - Cancelling Request for" << currentFrequency;
+            // Wskaźnik nie był ustawiony, amplituda też nie
+        }
+        m_pttState = Idle;
+        updatePttButtonState();
+        pttButton->setStyleSheet("");
+        // Usunięto reset glitchIntensity, bo teraz sterujemy amplitudą
+    }
+
+    void onPttGranted(QString frequency) {
+        if (frequency == currentFrequency && m_pttState == Requesting) {
+            qDebug() << "PTT Granted for" << frequency;
+            m_pttState = Transmitting;
+            updatePttButtonState();
+            startAudioInput();
+            pttButton->setStyleSheet("background-color: red; color: white;");
+            // --- USTAW WSKAŹNIK NADAJĄCEGO (LOKALNIE) ---
+            messageArea->setTransmittingUser("You");
+            // --- KONIEC USTAWIANIA WSKAŹNIKA ---
+        } else if (m_pttState == Requesting) {
+            qDebug() << "Received PTT grant for wrong frequency or state:" << frequency << m_pttState;
+            onPttButtonReleased();
+        }
+    }
+
+    void onPttDenied(QString frequency, QString reason) {
+        if (frequency == currentFrequency && m_pttState == Requesting) {
+            qDebug() << "PTT Denied for" << frequency << ":" << reason;
+            // Wyświetl powód odmowy (opcjonalnie)
+            // QMessageBox::warning(this, "PTT Denied", reason);
+            messageArea->addMessage(QString("<span style='color:#ffcc00;'>[SYSTEM] Nie można nadawać: %1</span>").arg(reason),
+                                    "", StreamMessage::System);
+
+            m_pttState = Idle;
+            updatePttButtonState();
+            pttButton->setStyleSheet(""); // Resetuj styl
+        }
+    }
+
+    void onPttStartReceiving(QString frequency, QString senderId) {
+        if (frequency == currentFrequency && m_pttState == Idle) {
+            qDebug() << "Starting to receive PTT audio from" << senderId << "on" << frequency;
+            m_pttState = Receiving;
+            updatePttButtonState();
+            startAudioOutput();
+            // --- USTAW WSKAŹNIK NADAJĄCEGO (ZDALNIE) ---
+            m_currentTransmitterId = senderId; // Zapisz ID na wszelki wypadek
+            messageArea->setTransmittingUser(senderId);
+            // --- KONIEC USTAWIANIA WSKAŹNIKA ---
+            if (m_audioOutput) {
+                qDebug() << "Audio Output State after start request:" << m_audioOutput->state() << "Error:" << m_audioOutput->error();
+            }
+        }
+    }
+
+    void onPttStopReceiving(QString frequency) {
+        if (frequency == currentFrequency && m_pttState == Receiving) {
+            qDebug() << "Stopping PTT audio reception on" << frequency;
+            stopAudioOutput();
+            m_pttState = Idle;
+            updatePttButtonState();
+            // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
+            m_currentTransmitterId = "";
+            messageArea->clearTransmittingUser();
+            // --- ZRESETUJ AMPLITUDĘ ---
+            messageArea->setAudioAmplitude(0.0);
+            // Usunięto reset glitchIntensity
+        }
+    }
+
+    // Slot do obsługi przychodzących danych audio (binarnych)
+    void onAudioDataReceived(QString frequency, const QByteArray& audioData) {
+        if (frequency == currentFrequency && m_pttState == Receiving) {
+            if (m_audioOutput) {
+                qDebug() << "[CLIENT] onAudioDataReceived: Current Audio Output State before write:" << m_audioOutput->state();
+            } else {
+                qWarning() << "[CLIENT] onAudioDataReceived: m_audioOutput is null!";
+                return;
+            }
+
+            if (m_outputDevice) {
+                qint64 bytesWritten = m_outputDevice->write(audioData);
+
+                if (bytesWritten < 0) {
+                    qWarning() << "Audio Output Error writing data:" << m_audioOutput->error();
+                } else if (bytesWritten != audioData.size()) {
+                    qWarning() << "Audio Output: Wrote fewer bytes than received:" << bytesWritten << "/" << audioData.size();
+                }
+
+                if (bytesWritten > 0) {
+                    // --- OBLICZ AMPLITUDĘ I ZAKTUALIZUJ WIZUALIZACJĘ ODBIORCY ---
+                    // Używamy danych, które faktycznie zostały zapisane (lub całego bufora, jeśli zapis się powiódł)
+                    qreal amplitude = calculateAmplitude(audioData.left(bytesWritten));
+                    if (messageArea) {
+                        messageArea->setAudioAmplitude(amplitude); // Bezpośrednia aktualizacja wizualizacji
+                    }
+                    // --- KONIEC AKTUALIZACJI WIZUALIZACJI ODBIORCY ---
+
+                    // Komentarz: Poniższa linia jest teraz prawdopodobnie zbędna,
+                    // chyba że sygnał z koordynatora ma inne zastosowanie.
+                    // updateRemoteAudioAmplitude(frequency, amplitude);
+                }
+            } else {
+                qWarning() << "Audio Output: Received audio data but m_outputDevice is null!";
+            }
+        }
+    }
+
+    // Slot do obsługi danych z mikrofonu
+    void onReadyReadInput() {
+        // --- DODANE LOGOWANIE ---
+        qDebug() << "[HOST] onReadyReadInput triggered!";
+        // --- KONIEC DODANIA ---
+
+        if (!m_inputDevice || m_pttState != Transmitting) {
+            qDebug() << "[HOST] onReadyReadInput: Guard failed (device null or state not Transmitting)";
+            return;
+        }
+
+        QByteArray buffer = m_inputDevice->readAll();
+        qDebug() << "[HOST] onReadyReadInput: Read" << buffer.size() << "bytes from input device."; // Loguj rozmiar bufora
+
+        if (!buffer.isEmpty()) {
+            // 1. Wyślij dane binarne przez WebSocket
+            bool sent = WavelengthMessageService::getInstance()->sendAudioData(currentFrequency, buffer);
+            // --- DODANE LOGOWANIE ---
+            qDebug() << "[HOST] onReadyReadInput: Attempted to send audio data. Success:" << sent;
+            // --- KONIEC DODANIA ---
+
+
+            // 2. Oblicz amplitudę
+            qreal amplitude = calculateAmplitude(buffer);
+
+            // 3. Zaktualizuj wizualizację lokalnie
+            if (messageArea) {
+                // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
+                messageArea->setAudioAmplitude(amplitude * 1.5); // Nowa metoda
+            }
+        } else {
+            qDebug() << "[HOST] onReadyReadInput: Buffer was empty.";
+        }
+    }
+
+    // --- KONIEC NOWYCH SLOTÓW PTT ---
+
     void updateProgressMessage(const QString &messageId, const QString &message) {
         messageArea->addMessage(message, messageId, StreamMessage::MessageType::System);
     }
@@ -512,6 +726,198 @@ private:
     QString currentFrequency = "-1.0";
     double m_scanlineOpacity;
     bool m_isAborting = false;
+    QPushButton *pttButton; // <-- Nowy przycisk
+    QString m_currentTransmitterId;
+
+    // --- NOWE POLA AUDIO ---
+    PttState m_pttState;
+    QAudioInput *m_audioInput;
+    QAudioOutput *m_audioOutput;
+    QIODevice *m_inputDevice;
+    QIODevice *m_outputDevice;
+    QAudioFormat m_audioFormat;
+    // --- KONIEC NOWYCH PÓL AUDIO ---
+
+    // --- NOWE METODY PRYWATNE ---
+    void initializeAudio() {
+        m_audioFormat.setSampleRate(16000);       // Przykładowa częstotliwość próbkowania
+        m_audioFormat.setChannelCount(1);         // Mono
+        m_audioFormat.setSampleSize(16);          // 16 bitów na próbkę
+        m_audioFormat.setCodec("audio/pcm");
+        m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
+        m_audioFormat.setSampleType(QAudioFormat::SignedInt);
+
+        QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
+        if (!inputInfo.isFormatSupported(m_audioFormat)) {
+            qWarning() << "Domyślny format wejściowy nie jest obsługiwany, próbuję znaleźć najbliższy.";
+            m_audioFormat = inputInfo.nearestFormat(m_audioFormat);
+        }
+
+        QAudioDeviceInfo outputInfo = QAudioDeviceInfo::defaultOutputDevice();
+        if (!outputInfo.isFormatSupported(m_audioFormat)) {
+            qWarning() << "Domyślny format wyjściowy nie jest obsługiwany, próbuję znaleźć najbliższy.";
+            m_audioFormat = outputInfo.nearestFormat(m_audioFormat);
+        }
+
+        // Tworzymy obiekty, ale nie startujemy ich jeszcze
+        m_audioInput = new QAudioInput(inputInfo, m_audioFormat, this);
+        m_audioOutput = new QAudioOutput(outputInfo, m_audioFormat, this);
+
+        // Ustawienie bufora dla płynniejszego odtwarzania/nagrywania
+         m_audioInput->setBufferSize(4096); // Rozmiar bufora wejściowego
+         m_audioOutput->setBufferSize(8192); // Większy bufor wyjściowy dla kompensacji opóźnień sieciowych
+
+         qDebug() << "Audio initialized with format:" << m_audioFormat;
+    }
+
+    void startAudioInput() {
+        if (!m_audioInput) {
+            qWarning() << "[HOST] Audio Input: Cannot start, m_audioInput is null!";
+            return;
+        }
+        if (m_pttState != Transmitting) {
+            qDebug() << "[HOST] Audio Input: Not starting, state is not Transmitting.";
+            return;
+        }
+        if (m_audioInput->state() != QAudio::StoppedState) {
+            qDebug() << "[HOST] Audio Input: Already running or stopping. State:" << m_audioInput->state();
+            return;
+        }
+
+        qDebug() << "[HOST] Audio Input: Attempting to start...";
+        m_inputDevice = m_audioInput->start(); // Rozpocznij przechwytywanie
+        if (m_inputDevice) {
+            connect(m_inputDevice, &QIODevice::readyRead, this, &WavelengthChatView::onReadyReadInput);
+            // --- DODANE LOGOWANIE ---
+            qDebug() << "[HOST] Audio Input: Started successfully. State:" << m_audioInput->state() << "Error:" << m_audioInput->error();
+            // --- KONIEC DODANIA ---
+        } else {
+            qWarning() << "[HOST] Audio Input: Failed to start! State:" << m_audioInput->state() << "Error:" << m_audioInput->error();
+            onPttButtonReleased();
+        }
+    }
+
+    void stopAudioInput() {
+        if (m_audioInput && m_audioInput->state() != QAudio::StoppedState) {
+            m_audioInput->stop();
+            if (m_inputDevice) {
+                disconnect(m_inputDevice, &QIODevice::readyRead, this, &WavelengthChatView::onReadyReadInput);
+                m_inputDevice = nullptr; // QAudioInput zarządza jego usunięciem
+            }
+             qDebug() << "Audio input stopped.";
+        }
+         // Resetuj wizualizację po zatrzymaniu nadawania
+        if (messageArea && m_pttState != Receiving) { // Nie resetuj jeśli zaraz zaczniemy odbierać
+            messageArea->setGlitchIntensity(0.0);
+        }
+    }
+
+    void startAudioOutput() {
+        if (!m_audioOutput) {
+            qWarning() << "Audio Output: Cannot start, m_audioOutput is null!";
+            return;
+        }
+        if (m_pttState != Receiving) {
+            qDebug() << "Audio Output: Not starting, state is not Receiving.";
+            return;
+        }
+        if (m_audioOutput->state() != QAudio::StoppedState && m_audioOutput->state() != QAudio::IdleState) {
+            qDebug() << "Audio Output: Already running or in an intermediate state:" << m_audioOutput->state();
+            // Jeśli jest już aktywny, upewnij się, że m_outputDevice jest ustawiony
+            if (!m_outputDevice && m_audioOutput->state() == QAudio::ActiveState) {
+                // To nie powinno się zdarzyć, ale na wszelki wypadek
+                // m_outputDevice = m_audioOutput->start(); // Ponowne startowanie może być problematyczne
+                qWarning() << "Audio Output: Active state but m_outputDevice is null. Potential issue.";
+            }
+            return;
+        }
+
+        qDebug() << "Audio Output: Attempting to start...";
+        m_outputDevice = m_audioOutput->start(); // Rozpocznij odtwarzanie (przygotuj urządzenie)
+        if(m_outputDevice) {
+            qDebug() << "Audio Output: Started successfully. State:" << m_audioOutput->state();
+        } else {
+            qWarning() << "Audio Output: Failed to start! State:" << m_audioOutput->state() << "Error:" << m_audioOutput->error();
+            // Obsłuż błąd - np. wróć do stanu Idle
+            // Symulujemy zatrzymanie, aby zresetować stan
+            onPttStopReceiving(currentFrequency);
+        }
+    }
+
+    void stopAudioOutput() {
+        if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) {
+            qDebug() << "Audio Output: Stopping... Current state:" << m_audioOutput->state();
+            m_audioOutput->stop();
+            m_outputDevice = nullptr; // QAudioOutput zarządza jego usunięciem
+            qDebug() << "Audio Output: Stopped. State:" << m_audioOutput->state();
+        } else if (m_audioOutput) {
+            qDebug() << "Audio Output: Already stopped. State:" << m_audioOutput->state();
+        }
+        // Resetuj wizualizację po zatrzymaniu odbierania
+        if (messageArea) {
+            messageArea->setGlitchIntensity(0.0);
+        }
+    }
+
+    // Obliczanie amplitudy RMS z danych PCM 16-bit
+    qreal calculateAmplitude(const QByteArray& buffer) {
+        if (buffer.isEmpty() || m_audioFormat.sampleSize() != 16 || m_audioFormat.sampleType() != QAudioFormat::SignedInt) {
+            return 0.0;
+        }
+
+        const qint16* data = reinterpret_cast<const qint16*>(buffer.constData());
+        int sampleCount = buffer.size() / (m_audioFormat.sampleSize() / 8);
+        if (sampleCount == 0) return 0.0;
+
+        double sumOfSquares = 0.0;
+        for (int i = 0; i < sampleCount; ++i) {
+            // Normalizuj próbkę do zakresu [-1.0, 1.0]
+            double normalizedSample = static_cast<double>(data[i]) / 32767.0;
+            sumOfSquares += normalizedSample * normalizedSample;
+        }
+
+        double meanSquare = sumOfSquares / sampleCount;
+        double rms = std::sqrt(meanSquare);
+
+        // Zwróć wartość RMS (zwykle między 0.0 a ~0.7, rzadko 1.0)
+        // Można przeskalować, jeśli potrzebny jest większy zakres dla glitchIntensity
+        return static_cast<qreal>(rms);
+    }
+
+    // Aktualizacja stanu przycisku PTT i innych kontrolek
+    void updatePttButtonState() {
+        switch (m_pttState) {
+            case Idle:
+                pttButton->setEnabled(true);
+                pttButton->setText("MÓW");
+                inputField->setEnabled(true); // Włącz inne kontrolki
+                sendButton->setEnabled(true);
+                attachButton->setEnabled(true);
+                break;
+            case Requesting:
+                pttButton->setEnabled(true); // Nadal można go zwolnić
+                pttButton->setText("..."); // Wskaźnik oczekiwania
+                inputField->setEnabled(false); // Wyłącz inne kontrolki
+                sendButton->setEnabled(false);
+                attachButton->setEnabled(false);
+                break;
+            case Transmitting:
+                pttButton->setEnabled(true); // Nadal można go zwolnić
+                pttButton->setText("NADAJĘ");
+                inputField->setEnabled(false);
+                sendButton->setEnabled(false);
+                attachButton->setEnabled(false);
+                break;
+            case Receiving:
+                pttButton->setEnabled(false); // Nie można nacisnąć podczas odbierania
+                pttButton->setText("ODBIÓR");
+                inputField->setEnabled(false);
+                sendButton->setEnabled(false);
+                attachButton->setEnabled(false);
+                break;
+        }
+    }
+    // --- KONIEC NOWYCH METOD PRYWATNYCH ---
 
     void resetStatusIndicator() {
         m_statusIndicator->setText("AKTYWNE POŁĄCZENIE");

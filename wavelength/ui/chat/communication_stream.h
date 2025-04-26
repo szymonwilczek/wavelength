@@ -29,6 +29,12 @@
 #include <QVBoxLayout>
 
 #include "stream_message.h"
+#include "user_info_label.h"
+
+struct UserVisuals {
+    // QPainterPath shape; // Już niepotrzebne
+    QColor color;
+};
 
 // Główny widget strumienia komunikacji - poprawiona wersja z OpenGL
 class CommunicationStream : public QOpenGLWidget, protected QOpenGLFunctions {
@@ -48,8 +54,12 @@ public:
 
     explicit CommunicationStream(QWidget* parent = nullptr)
         : QOpenGLWidget(parent),
-          m_waveAmplitude(0.01), m_waveFrequency(2.0), m_waveSpeed(1.0),
-          m_glitchIntensity(0.0), m_waveThickness(0.008), // Grubsza linia
+          m_baseWaveAmplitude(0.05), // Bazowa amplituda w stanie Idle
+          m_amplitudeScale(0.25),    // Mnożnik dla amplitudy audio (dostosuj wg potrzeb)
+          m_waveAmplitude(m_baseWaveAmplitude),
+          m_targetWaveAmplitude(m_baseWaveAmplitude), // Docelowa amplituda
+          m_waveFrequency(2.0), m_waveSpeed(1.0),
+          m_glitchIntensity(0.0), m_waveThickness(0.008),
           m_state(Idle), m_currentMessageIndex(-1),
           m_initialized(false), m_timeOffset(0.0), m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
           m_shaderProgram(nullptr)
@@ -85,6 +95,25 @@ public:
         m_streamNameLabel->setAlignment(Qt::AlignCenter);
         m_streamNameLabel->adjustSize();
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
+
+        // --- NOWY WSKAŹNIK NADAJĄCEGO ---
+        m_transmittingUserLabel = new UserInfoLabel(this);
+        m_transmittingUserLabel->setStyleSheet(
+            "UserInfoLabel {"
+            "  color: #dddddd;"
+            "  background-color: rgba(0, 0, 0, 180);"
+            "  border: 1px solid #555555;"
+            "  border-radius: 0px;"
+            "  padding: 2px 4px;"
+            "  font-family: 'Consolas', sans-serif;"
+            "  font-weight: bold;"
+            "  font-size: 10px;"
+            "}"
+        );
+        m_transmittingUserLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        m_transmittingUserLabel->hide();
+        // Pozycja zostanie ustawiona w resizeGL
+        // --- KONIEC NOWEGO WSKAŹNIKA --
 
         // Format dla OpenGL
         QSurfaceFormat format;
@@ -220,6 +249,41 @@ public:
         m_currentMessageIndex = -1; // Zresetuj indeks
         returnToIdleAnimation(); // Przywróć animację tła do stanu bezczynności
         update(); // Odśwież widok
+    }
+
+    public slots:
+    void setTransmittingUser(const QString& userId) {
+        QString displayText = userId;
+        // Skracanie ID (bez zmian)
+        if (userId.length() > 15 && userId.startsWith("client_")) {
+            displayText = "CLIENT " + userId.split('_').last();
+        } else if (userId.length() > 15 && userId.startsWith("ws_")) {
+            displayText = "HOST " + userId.split('_').last();
+        } else if (userId == "You") {
+            displayText = "YOU";
+        }
+
+        // --- GENERUJ KOLOR I USTAW LABEL ---
+        UserVisuals visuals = generateUserVisuals(userId);
+        // m_transmittingUserLabel->setShape(visuals.shape); // USUNIĘTO
+        m_transmittingUserLabel->setShapeColor(visuals.color); // Ustaw tylko kolor
+        m_transmittingUserLabel->setText(displayText);
+        // --- KONIEC USTAWIANIA ---
+
+        m_transmittingUserLabel->adjustSize();
+        m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
+        m_transmittingUserLabel->show();
+    }
+
+    // Slot do czyszczenia wskaźnika nadającego
+    void clearTransmittingUser() {
+        m_transmittingUserLabel->hide();
+        m_transmittingUserLabel->setText(""); // Wyczyść tekst na wszelki wypadek
+    }
+
+    // Slot setAudioAmplitude (bez zmian)
+    void setAudioAmplitude(qreal amplitude) {
+        m_targetWaveAmplitude = m_baseWaveAmplitude + qBound(0.0, amplitude, 1.0) * m_amplitudeScale;
     }
 
 protected:
@@ -358,11 +422,13 @@ const char* fragmentShaderSource = R"(
 
     void resizeGL(int w, int h) override {
         glViewport(0, 0, w, h);
-
-        // Aktualizujemy pozycję etykiety nazwy strumienia
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
-        // Aktualizujemy pozycję aktualnie wyświetlanej wiadomości
+        // --- AKTUALIZACJA POZYCJI UserInfoLabel ---
+        // adjustSize() powinien być wywołany w setTransmittingUser
+        m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
+        // --- KONIEC AKTUALIZACJI ---
+
         updateMessagePosition();
     }
 
@@ -449,16 +515,23 @@ private slots:
         // Aktualizujemy czas animacji
         m_timeOffset += 0.02 * m_waveSpeed;
 
-        // Stopniowo zmniejszamy intensywność zakłóceń
+        // --- PŁYNNA ZMIANA AMPLITUDY ---
+        // Interpolujemy aktualną amplitudę w kierunku docelowej
+        // Współczynnik 0.1 oznacza, że w każdej klatce zbliżamy się o 10% do celu
+        // Można dostosować (np. 0.2 dla szybszej reakcji, 0.05 dla wolniejszej)
+        m_waveAmplitude = m_waveAmplitude * 0.9 + m_targetWaveAmplitude * 0.1;
+        // --- KONIEC PŁYNNEJ ZMIANY ---
+
+        // Stopniowo zmniejszamy intensywność zakłóceń (jeśli są używane niezależnie)
         if (m_glitchIntensity > 0.0) {
             m_glitchIntensity = qMax(0.0, m_glitchIntensity - 0.005);
         }
 
-        // Wymuszamy aktualizację tylko warstwy OpenGL, nie całego interfejsu
-        // Będzie to odświeżać tylko część z animacją fali, bez wpływu na wiadomości
+        // Wymuszamy aktualizację warstwy OpenGL
         QRegion updateRegion(0, 0, width(), height());
         update(updateRegion);
     }
+
 
     void triggerRandomGlitch() {
         // Wywołujemy losowe zakłócenia tylko w trybie bezczynności
@@ -482,7 +555,9 @@ private slots:
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1000);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.15);  // Większa amplituda
+        // Zamiast dużej amplitudy, ustawiamy tylko nieznacznie podniesioną bazę
+        // Główna animacja amplitudy będzie pochodzić z setAudioAmplitude
+        ampAnim->setEndValue(0.15); // Np. podwójna bazowa
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -521,6 +596,7 @@ private slots:
 
         // Zmieniamy stan na wyświetlanie po zakończeniu animacji
         connect(group, &QParallelAnimationGroup::finished, this, [this]() {
+            m_targetWaveAmplitude = 0.15;
             m_state = Displaying;
         });
     }
@@ -529,11 +605,14 @@ private slots:
         // Zmieniamy stan
         m_state = Idle;
 
+        m_targetWaveAmplitude = m_baseWaveAmplitude;
+        // --- KONIEC RESETU ---
+
         // Animujemy powrót do stanu bezczynności
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1500);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.01);
+        ampAnim->setEndValue(0.01); // Powrót do bazowej
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -622,6 +701,7 @@ private slots:
 
         // Ustawiamy stan
         m_state = Displaying;
+        // m_targetWaveAmplitude = m_baseWaveAmplitude * 6;
 
         // --- ZMIANA KOLEJNOŚCI I METOD ---
         // 1. Upewnij się, że widget ma szansę obliczyć swój rozmiar
@@ -798,6 +878,20 @@ private slots:
 
 private:
 
+    UserVisuals generateUserVisuals(const QString& userId) {
+        UserVisuals visuals;
+        quint32 hash = qHash(userId);
+
+        // Wygeneruj kolor na podstawie hasha (w przestrzeni HSL dla lepszych kolorów)
+        int hue = hash % 360; // Odcień 0-359
+        // Utrzymuj wysokie nasycenie i jasność dla neonowego efektu
+        int saturation = 230 + ((hash >> 8) % 26); // Nasycenie 230-255 (bardzo nasycone)
+        int lightness = 140 + ((hash >> 16) % 31); // Jasność 140-170 (jasne, ale nie białe)
+
+        visuals.color = QColor::fromHsl(hue, saturation, lightness);
+        return visuals;
+    }
+
     void connectSignalsForMessage(StreamMessage* message) {
         if (!message) return;
         // Używamy UniqueConnection, aby uniknąć duplikatów połączeń
@@ -860,7 +954,11 @@ private:
 
 
     // Parametry animacji fali
-    qreal m_waveAmplitude;
+    const qreal m_baseWaveAmplitude; // Bazowa amplituda
+    const qreal m_amplitudeScale;    // Skala dla amplitudy audio
+    qreal m_waveAmplitude;           // Aktualna amplituda (animowana)
+    qreal m_targetWaveAmplitude;
+    UserInfoLabel* m_transmittingUserLabel;
     qreal m_waveFrequency;
     qreal m_waveSpeed;
     qreal m_glitchIntensity;

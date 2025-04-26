@@ -125,9 +125,23 @@ public:
         m_messageTimer->stop();
     }
 
-// Usunięty slot onMessageReceived - logika powinna być wyżej (np. w WavelengthChatView)
-// public slots:
-//    void onMessageReceived(double frequency, const QString& message) { ... }
+public slots:
+    void setGlitchIntensity(qreal intensity) {
+        m_communicationStream->setGlitchIntensity(intensity);
+    }
+
+    // --- NOWE SLOTY PRZEKAZUJĄCE ---
+    void setTransmittingUser(const QString& userId) {
+        m_communicationStream->setTransmittingUser(userId);
+    }
+
+    void clearTransmittingUser() {
+        m_communicationStream->clearTransmittingUser();
+    }
+
+    void setAudioAmplitude(qreal amplitude) {
+        m_communicationStream->setAudioAmplitude(amplitude);
+    }
 
 private slots:
     void processNextQueuedMessage() {
