@@ -130,6 +130,19 @@ public slots:
         m_communicationStream->setGlitchIntensity(intensity);
     }
 
+    // --- NOWE SLOTY PRZEKAZUJĄCE ---
+    void setTransmittingUser(const QString& userId) {
+        m_communicationStream->setTransmittingUser(userId);
+    }
+
+    void clearTransmittingUser() {
+        m_communicationStream->clearTransmittingUser();
+    }
+
+    void setAudioAmplitude(qreal amplitude) {
+        m_communicationStream->setAudioAmplitude(amplitude);
+    }
+
 private slots:
     void processNextQueuedMessage() {
         if (m_messageQueue.isEmpty()) {

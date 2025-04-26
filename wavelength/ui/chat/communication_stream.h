@@ -48,8 +48,12 @@ public:
 
     explicit CommunicationStream(QWidget* parent = nullptr)
         : QOpenGLWidget(parent),
-          m_waveAmplitude(0.01), m_waveFrequency(2.0), m_waveSpeed(1.0),
-          m_glitchIntensity(0.0), m_waveThickness(0.008), // Grubsza linia
+          m_baseWaveAmplitude(0.01), // Bazowa amplituda w stanie Idle
+          m_amplitudeScale(0.25),    // Mnożnik dla amplitudy audio (dostosuj wg potrzeb)
+          m_waveAmplitude(m_baseWaveAmplitude),
+          m_targetWaveAmplitude(m_baseWaveAmplitude), // Docelowa amplituda
+          m_waveFrequency(2.0), m_waveSpeed(1.0),
+          m_glitchIntensity(0.0), m_waveThickness(0.008),
           m_state(Idle), m_currentMessageIndex(-1),
           m_initialized(false), m_timeOffset(0.0), m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
           m_shaderProgram(nullptr)
@@ -85,6 +89,25 @@ public:
         m_streamNameLabel->setAlignment(Qt::AlignCenter);
         m_streamNameLabel->adjustSize();
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
+
+        // --- NOWY WSKAŹNIK NADAJĄCEGO ---
+        m_transmittingUserLabel = new QLabel(this);
+        m_transmittingUserLabel->setStyleSheet(
+            "QLabel {"
+            "  color: #ffaa00;" // Pomarańczowy/żółty dla wyróżnienia
+            "  background-color: rgba(40, 20, 0, 180);"
+            "  border: 1px solid #cc8800;"
+            "  border-radius: 0px;"
+            "  padding: 2px 6px;"
+            "  font-family: 'Consolas', sans-serif;"
+            "  font-weight: bold;"
+            "  font-size: 10px;"
+            "}"
+        );
+        m_transmittingUserLabel->setAlignment(Qt::AlignCenter);
+        m_transmittingUserLabel->hide(); // Domyślnie ukryty
+        // Pozycja zostanie ustawiona w resizeGL
+        // --- KONIEC NOWEGO WSKAŹNIKA --
 
         // Format dla OpenGL
         QSurfaceFormat format;
@@ -220,6 +243,36 @@ public:
         m_currentMessageIndex = -1; // Zresetuj indeks
         returnToIdleAnimation(); // Przywróć animację tła do stanu bezczynności
         update(); // Odśwież widok
+    }
+
+    public slots:
+    void setTransmittingUser(const QString& userId) {
+        QString displayText = userId;
+        // Można skrócić ID, jeśli jest zbyt długie
+        if (userId.length() > 15 && userId.startsWith("client_")) {
+            displayText = "CLIENT " + userId.split('_').last(); // Pokaż tylko ostatnią część ID
+        } else if (userId.length() > 15 && userId.startsWith("ws_")) {
+            displayText = "HOST " + userId.split('_').last();
+        }
+        m_transmittingUserLabel->setText(QString("NADAJE: %1").arg(displayText));
+        m_transmittingUserLabel->adjustSize();
+        // Pozycja zostanie zaktualizowana w resizeGL, ale możemy ją ustawić od razu
+        m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
+        m_transmittingUserLabel->show();
+    }
+
+    // Slot do czyszczenia wskaźnika nadającego
+    void clearTransmittingUser() {
+        m_transmittingUserLabel->hide();
+        m_transmittingUserLabel->clear();
+    }
+
+    void setAudioAmplitude(qreal amplitude) {
+        // Ustawiamy docelową amplitudę, która będzie płynnie osiągana w updateAnimation
+        // Używamy skali, aby dostosować wizualny efekt
+        m_targetWaveAmplitude = m_baseWaveAmplitude + qBound(0.0, amplitude, 1.0) * m_amplitudeScale;
+        // Można dodać minimalny próg, aby ignorować bardzo ciche dźwięki
+        // if (amplitude < 0.02) m_targetWaveAmplitude = m_baseWaveAmplitude;
     }
 
 protected:
@@ -362,6 +415,10 @@ const char* fragmentShaderSource = R"(
         // Aktualizujemy pozycję etykiety nazwy strumienia
         m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
+        // --- AKTUALIZACJA POZYCJI WSKAŹNIKA NADAJĄCEGO ---
+        m_transmittingUserLabel->move(width() - m_transmittingUserLabel->width() - 10, 10);
+        // --- KONIEC AKTUALIZACJI ---
+
         // Aktualizujemy pozycję aktualnie wyświetlanej wiadomości
         updateMessagePosition();
     }
@@ -449,16 +506,23 @@ private slots:
         // Aktualizujemy czas animacji
         m_timeOffset += 0.02 * m_waveSpeed;
 
-        // Stopniowo zmniejszamy intensywność zakłóceń
+        // --- PŁYNNA ZMIANA AMPLITUDY ---
+        // Interpolujemy aktualną amplitudę w kierunku docelowej
+        // Współczynnik 0.1 oznacza, że w każdej klatce zbliżamy się o 10% do celu
+        // Można dostosować (np. 0.2 dla szybszej reakcji, 0.05 dla wolniejszej)
+        m_waveAmplitude = m_waveAmplitude * 0.9 + m_targetWaveAmplitude * 0.1;
+        // --- KONIEC PŁYNNEJ ZMIANY ---
+
+        // Stopniowo zmniejszamy intensywność zakłóceń (jeśli są używane niezależnie)
         if (m_glitchIntensity > 0.0) {
             m_glitchIntensity = qMax(0.0, m_glitchIntensity - 0.005);
         }
 
-        // Wymuszamy aktualizację tylko warstwy OpenGL, nie całego interfejsu
-        // Będzie to odświeżać tylko część z animacją fali, bez wpływu na wiadomości
+        // Wymuszamy aktualizację warstwy OpenGL
         QRegion updateRegion(0, 0, width(), height());
         update(updateRegion);
     }
+
 
     void triggerRandomGlitch() {
         // Wywołujemy losowe zakłócenia tylko w trybie bezczynności
@@ -482,7 +546,9 @@ private slots:
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1000);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.15);  // Większa amplituda
+        // Zamiast dużej amplitudy, ustawiamy tylko nieznacznie podniesioną bazę
+        // Główna animacja amplitudy będzie pochodzić z setAudioAmplitude
+        ampAnim->setEndValue(m_baseWaveAmplitude * 2.0); // Np. podwójna bazowa
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -529,11 +595,14 @@ private slots:
         // Zmieniamy stan
         m_state = Idle;
 
+        m_targetWaveAmplitude = m_baseWaveAmplitude;
+        // --- KONIEC RESETU ---
+
         // Animujemy powrót do stanu bezczynności
         QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
         ampAnim->setDuration(1500);
         ampAnim->setStartValue(m_waveAmplitude);
-        ampAnim->setEndValue(0.01);
+        ampAnim->setEndValue(m_baseWaveAmplitude); // Powrót do bazowej
         ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
         QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
@@ -860,7 +929,11 @@ private:
 
 
     // Parametry animacji fali
-    qreal m_waveAmplitude;
+    const qreal m_baseWaveAmplitude; // Bazowa amplituda
+    const qreal m_amplitudeScale;    // Skala dla amplitudy audio
+    qreal m_waveAmplitude;           // Aktualna amplituda (animowana)
+    qreal m_targetWaveAmplitude;
+    QLabel* m_transmittingUserLabel;
     qreal m_waveFrequency;
     qreal m_waveSpeed;
     qreal m_glitchIntensity;
