@@ -235,7 +235,6 @@ public:
         connect(coordinator, &WavelengthSessionCoordinator::pttStartReceiving, this, &WavelengthChatView::onPttStartReceiving);
         connect(coordinator, &WavelengthSessionCoordinator::pttStopReceiving, this, &WavelengthChatView::onPttStopReceiving);
         connect(coordinator, &WavelengthSessionCoordinator::audioDataReceived, this, &WavelengthChatView::onAudioDataReceived);
-        connect(coordinator, &WavelengthSessionCoordinator::remoteAudioAmplitudeUpdate, this, &WavelengthChatView::updateRemoteAudioAmplitude);
 
         // Timer dla efektów wizualnych
         QTimer *glitchTimer = new QTimer(this);
@@ -553,29 +552,31 @@ private slots:
                 qDebug() << "[CLIENT] onAudioDataReceived: Current Audio Output State before write:" << m_audioOutput->state();
             } else {
                 qWarning() << "[CLIENT] onAudioDataReceived: m_audioOutput is null!";
-                return; // Nie próbuj pisać, jeśli nie ma obiektu
+                return;
             }
 
             if (m_outputDevice) {
-                // Odtwórz dane
                 qint64 bytesWritten = m_outputDevice->write(audioData);
-                // qDebug() << "Wrote" << bytesWritten << "bytes to audio output. Buffer free bytes:" << m_audioOutput->bytesFree(); // Logowanie zapisu
 
-                if (bytesWritten < audioData.size()) {
-                    qWarning() << "Audio Output: Wrote fewer bytes than received!" << bytesWritten << "/" << audioData.size();
-                    // Można spróbować poczekać, jeśli bufor jest pełny, ale to skomplikowane
-                    // QThread::msleep(10); // Proste opóźnienie - NIE ZALECANE w głównym wątku
-                }
-                if (bytesWritten == -1) {
-                    qWarning() << "Audio Output: Write error occurred:" << m_audioOutput->error();
+                if (bytesWritten < 0) {
+                    qWarning() << "Audio Output Error writing data:" << m_audioOutput->error();
+                } else if (bytesWritten != audioData.size()) {
+                    qWarning() << "Audio Output: Wrote fewer bytes than received:" << bytesWritten << "/" << audioData.size();
                 }
 
-                // Oblicz amplitudę dla wizualizacji (jeśli dane zostały zapisane)
                 if (bytesWritten > 0) {
-                    qreal amplitude = calculateAmplitude(audioData.left(bytesWritten)); // Użyj tylko zapisanych danych
+                    // --- OBLICZ AMPLITUDĘ I ZAKTUALIZUJ WIZUALIZACJĘ ODBIORCY ---
+                    // Używamy danych, które faktycznie zostały zapisane (lub całego bufora, jeśli zapis się powiódł)
+                    qreal amplitude = calculateAmplitude(audioData.left(bytesWritten));
+                    if (messageArea) {
+                        messageArea->setAudioAmplitude(amplitude); // Bezpośrednia aktualizacja wizualizacji
+                    }
+                    // --- KONIEC AKTUALIZACJI WIZUALIZACJI ODBIORCY ---
+
+                    // Komentarz: Poniższa linia jest teraz prawdopodobnie zbędna,
+                    // chyba że sygnał z koordynatora ma inne zastosowanie.
                     // updateRemoteAudioAmplitude(frequency, amplitude);
                 }
-
             } else {
                 qWarning() << "Audio Output: Received audio data but m_outputDevice is null!";
             }
@@ -617,15 +618,6 @@ private slots:
         }
     }
 
-    // Slot do aktualizacji wizualizacji na podstawie amplitudy od zdalnego użytkownika
-    void updateRemoteAudioAmplitude(QString frequency, qreal amplitude) {
-        if (frequency == currentFrequency && m_pttState == Receiving && messageArea) {
-            // --- ZMIANA: Ustawiaj amplitudę zamiast glitch ---
-            // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
-            messageArea->setAudioAmplitude(amplitude * 1.5); // Nowa metoda
-            // --- KONIEC ZMIANY ---
-        }
-    }
     // --- KONIEC NOWYCH SLOTÓW PTT ---
 
     void updateProgressMessage(const QString &messageId, const QString &message) {
