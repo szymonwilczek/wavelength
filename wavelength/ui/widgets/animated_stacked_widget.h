@@ -5,6 +5,7 @@
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
+#include <QSoundEffect> // Dodaj dołączenie
 
 #include "gl_transition_widget.h"
 
@@ -31,8 +32,8 @@ public:
     AnimationType animationType() const { return m_animationType; }
     bool isAnimating() const { return m_animationRunning; }
 
-    public slots:
-        void slideToIndex(int index);
+public slots:
+    void slideToIndex(int index);
     void slideToWidget(QWidget *widget);
     void slideToNextIndex();  // Nowa metoda dla karuzelowego przewijania
 
@@ -53,6 +54,7 @@ private:
     bool m_animationRunning;
     int m_targetIndex;  // Nowe pole dla przechowywanego indeksu docelowego
     GLTransitionWidget *m_glTransitionWidget = nullptr;
+    QSoundEffect *m_swooshSound; // Dodaj pole dla efektu dźwiękowego
 };
 
 #endif // ANIMATED_STACKED_WIDGET_H
