@@ -137,8 +137,16 @@ public:
                 // Ustawiamy większą wysokość dla długich wiadomości
                 setMinimumHeight(350);
             } else {
-                // Standardowe zachowanie dla krótkich wiadomości
-                m_textDisplay = new CyberTextDisplay(m_cleanContent, this);
+                CyberTextDisplay::TypingSoundType soundType;
+                if (m_sender == "SYSTEM") { // Sprawdzamy wartość m_sender
+                    soundType = CyberTextDisplay::SystemSound;
+                    qDebug() << "System message detected, using SystemSound type.";
+                } else {
+                    soundType = CyberTextDisplay::UserSound;
+                    qDebug() << "User message detected, using UserSound type.";
+                }
+
+                m_textDisplay = new CyberTextDisplay(m_cleanContent, soundType, this);
                 m_mainLayout->addWidget(m_textDisplay);
             }
         } else {

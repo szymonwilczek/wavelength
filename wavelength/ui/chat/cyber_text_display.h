@@ -23,10 +23,17 @@ class CyberTextDisplay : public QWidget {
     Q_PROPERTY(qreal glitchIntensity READ glitchIntensity WRITE setGlitchIntensity)
 
 public:
-    CyberTextDisplay(const QString& text, QWidget* parent = nullptr)
+
+    enum TypingSoundType {
+        SystemSound, // terminal_typing1.wav
+        UserSound    // terminal_typing2.wav
+    };
+    Q_ENUM(TypingSoundType)
+
+    CyberTextDisplay(const QString& text, TypingSoundType soundType = UserSound, QWidget* parent = nullptr)
         : QWidget(parent), m_fullText(text), m_revealedChars(0),
           m_glitchIntensity(0.0), m_isFullyRevealed(false), m_hasBeenFullyRevealedOnce(false),
-          m_mediaPlayer(nullptr), m_audioOutput(nullptr) // Inicjalizacja wskaźników
+          m_mediaPlayer(nullptr), m_audioOutput(nullptr), m_playlist(nullptr), m_soundType(soundType)
     {
         setMinimumWidth(400);
         setMinimumHeight(60);
@@ -63,8 +70,16 @@ public:
         m_mediaPlayer = new QMediaPlayer(this);
         m_playlist = new QMediaPlaylist(this); // Utwórz playlistę
 
-        // Dodaj plik dźwiękowy do playlisty
-        m_playlist->addMedia(QMediaContent(QUrl("qrc:/assets/audio/interface/terminal_typing1.wav")));
+        QUrl soundUrl;
+        if (m_soundType == SystemSound) {
+            qDebug() << "Using system sound for typing effect.";
+            soundUrl = QUrl("qrc:/assets/audio/interface/terminal_typing2.wav");
+        } else {
+            soundUrl = QUrl("qrc:/assets/audio/interface/terminal_typing1.wav");
+        }
+
+        // Dodaj wybrany plik dźwiękowy do playlisty
+        m_playlist->addMedia(QMediaContent(soundUrl));
         m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop); // Ustaw zapętlanie bieżącego elementu
 
         // Przypisz playlistę do odtwarzacza
@@ -410,6 +425,7 @@ private:
     QMediaPlayer* m_mediaPlayer;   // Dodane
     QAudioOutput* m_audioOutput;   // Dodane
     QMediaPlaylist* m_playlist;
+    TypingSoundType m_soundType;
 };
 
 #endif // CYBER_TEXT_DISPLAY_H
