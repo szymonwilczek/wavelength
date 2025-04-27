@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator]() {
+    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Join wavelength button clicked";
         navbar->playClickSound();
 
