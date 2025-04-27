@@ -56,11 +56,8 @@ public:
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-    void initScanlineBuffer();
     double m_digitalizationProgress = 0.0;
     double m_cornerGlowProgress = 0.0;
-    double m_glitchIntensity = 0.0;
-    QList<int> m_glitchLines;
 
 private:
     void animateShow();
