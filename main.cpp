@@ -89,6 +89,24 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
+    QSoundEffect *bootSound = new QSoundEffect(&app);
+    bootSound->setSource(QUrl("qrc:/assets/audio/interface/boot_up.wav"));
+    bootSound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
+
+    if (bootSound->isLoaded()) {
+        bootSound->play();
+    } else {
+        QTimer::singleShot(100, bootSound, [bootSound](){
+            if(bootSound->isLoaded()) {
+                bootSound->play();
+            } else {
+                 qWarning() << "Failed to load boot sound after delay:" << bootSound->source();
+            }
+        });
+        qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << bootSound->source();
+    }
+    // --- Koniec odtwarzania dźwięku startowego ---
+
     WavelengthConfig *config = WavelengthConfig::getInstance();
 
     // --- Przetwarzanie argumentów linii poleceń ---
@@ -410,8 +428,10 @@ int main(int argc, char *argv[]) {
     });
 });
 
-    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
+    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Create wavelength button clicked";
+
+        navbar->playClickSound();
 
         animation->setLifeColor(QColor(0, 200, 0));
 
@@ -432,8 +452,9 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator]() {
+    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Join wavelength button clicked";
+        navbar->playClickSound();
 
         animation->setLifeColor(QColor(0, 0, 200));
 

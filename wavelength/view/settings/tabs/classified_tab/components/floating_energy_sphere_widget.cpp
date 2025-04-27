@@ -350,7 +350,7 @@ void FloatingEnergySphereWidget::setupAudio()
     connect(m_decoder, &QAudioDecoder::finished, this, &FloatingEnergySphereWidget::audioDecodingFinished);
 
     QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
+    QString audioSubDir = "/assets/audio/Joy";
 
     // <<< Wybór nazwy pliku na podstawie flagi >>>
     QString audioFileName;
@@ -880,7 +880,7 @@ void FloatingEnergySphereWidget::startDestructionSequence()
 
     // Znajdź i odtwórz dźwięk "goodbye.wav"
     QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
+    QString audioSubDir = "/assets/audio/Joy";
     QString goodbyeFilePath = QDir::cleanPath(appDirPath + audioSubDir + GOODBYE_SOUND_FILENAME);
     QUrl goodbyeFileUrl;
 
@@ -958,7 +958,7 @@ void FloatingEnergySphereWidget::playKonamiHint()
     }
 
     QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
+    QString audioSubDir = "/assets/audio/Joy";
     QString hintFileName = "konami.wav"; // Nazwa pliku podpowiedzi
     QString hintFilePath = QDir::cleanPath(appDirPath + audioSubDir + hintFileName);
     QUrl hintFileUrl;

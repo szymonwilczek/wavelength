@@ -8,22 +8,29 @@ AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
       m_animationType(Fade),
       m_animationGroup(new QParallelAnimationGroup(this)),
       m_animationRunning(false),
-      m_targetIndex(-1)
+      m_targetIndex(-1),
+      m_swooshSound(new QSoundEffect(this)) // Zainicjuj QSoundEffect
 {
+    // Ustaw źródło dźwięku (zakładając, że jest w zasobach Qt)
+    m_swooshSound->setSource(QUrl::fromLocalFile(":/assets/audio/interface/swoosh1.wav"));
+    // Opcjonalnie ustaw głośność (0.0 do 1.0)
+    m_swooshSound->setVolume(0.5);
+
+
     connect(m_animationGroup, &QParallelAnimationGroup::finished, [this]() {
-    m_animationRunning = false;
+        m_animationRunning = false;
 
-    // Ustaw właściwy widget docelowy
-    if (m_targetIndex >= 0 && m_targetIndex < count()) {
-        setCurrentIndex(m_targetIndex);  // To wyemituje currentChanged
-    }
+        // Ustaw właściwy widget docelowy
+        if (m_targetIndex >= 0 && m_targetIndex < count()) {
+            setCurrentIndex(m_targetIndex);  // To wyemituje currentChanged
+        }
 
-    // Czyszczenie efektów graficznych po animacji
-    cleanupAfterAnimation();
+        // Czyszczenie efektów graficznych po animacji
+        cleanupAfterAnimation();
 
-    // Zresetuj docelowy indeks
-    m_targetIndex = -1;
-});
+        // Zresetuj docelowy indeks
+        m_targetIndex = -1;
+    });
 
     m_glTransitionWidget = new GLTransitionWidget(this);
     m_glTransitionWidget->hide();
@@ -49,6 +56,13 @@ void AnimatedStackedWidget::slideToIndex(int index)
         m_animationGroup->stop();
         cleanupAfterAnimation();
     }
+
+    if (m_swooshSound->isLoaded()) {
+        m_swooshSound->play();
+    } else {
+        qWarning("Nie można odtworzyć dźwięku swoosh - nie załadowano.");
+    }
+
 
     m_animationRunning = true;
     m_targetIndex = index;

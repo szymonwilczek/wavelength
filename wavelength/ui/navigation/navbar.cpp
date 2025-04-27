@@ -113,11 +113,27 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
 
     addWidget(mainContainer);
 
+    // Inicjalizacja QSoundEffect
+    m_clickSound = new QSoundEffect(this);
+    m_clickSound->setSource(QUrl("qrc:/assets/audio/interface/button_click.wav"));
+    m_clickSound->setVolume(0.8); // Ustaw głośność (0.0 - 1.0)
+
+    // Połączenia sygnałów przycisków z emisją sygnałów Navbara (bez zmian)
     connect(createWavelengthButton, &QPushButton::clicked, this, &Navbar::createWavelengthClicked);
     connect(joinWavelengthButton, &QPushButton::clicked, this, &Navbar::joinWavelengthClicked);
     connect(settingsButton, &QPushButton::clicked, this, &Navbar::settingsClicked);
+
+    connect(settingsButton, &QPushButton::clicked, this, &Navbar::playClickSound);
 }
 
 void Navbar::contextMenuEvent(QContextMenuEvent *event) {
     event->ignore();
+}
+
+void Navbar::playClickSound() {
+    if (m_clickSound && m_clickSound->isLoaded()) { // Sprawdź, czy dźwięk jest załadowany
+        m_clickSound->play();
+    } else if (m_clickSound) {
+        qWarning() << "Click sound not loaded:" << m_clickSound->source();
+    }
 }

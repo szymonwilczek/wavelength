@@ -16,6 +16,7 @@
 #include <QDateTime>
 #include <QRandomGenerator>
 #include <QPropertyAnimation>
+#include <QSoundEffect>
 
 #include "../messages/wavelength_stream_display.h"
 #include "../session/wavelength_session_coordinator.h"
@@ -216,6 +217,14 @@ public:
         mainLayout->addWidget(abortButton);
 
         initializeAudio();
+
+        m_pttOnSound = new QSoundEffect(this);
+        m_pttOnSound->setSource(QUrl::fromLocalFile(":/assets/audio/interface/ptt_on.wav"));
+        m_pttOnSound->setVolume(0.8);
+
+        m_pttOffSound = new QSoundEffect(this);
+        m_pttOffSound->setSource(QUrl::fromLocalFile(":/assets/audio/interface/ptt_off.wav"));
+        m_pttOffSound->setVolume(0.8);
 
         // Połączenia sygnałów
         connect(inputField, &QLineEdit::returnPressed, this, &WavelengthChatView::sendMessage);
@@ -453,35 +462,47 @@ protected:
 private slots:
 
     void onPttButtonPressed() {
+        // --- ODTWÓRZ DŹWIĘK NACIŚNIĘCIA ---
+        if (m_pttOnSound->isLoaded()) {
+            m_pttOnSound->play();
+        } else {
+            qWarning() << "PTT On sound not loaded!";
+        }
+        // --- KONIEC ODTWARZANIA ---
+
         if (currentFrequency == "-1.0" || m_pttState != Idle) {
-            return; // Nie rób nic jeśli nie ma aktywnej częstotliwości lub już coś robimy
+            return;
         }
         qDebug() << "PTT Button Pressed - Requesting PTT for" << currentFrequency;
         m_pttState = Requesting;
         updatePttButtonState();
-        // Wyślij żądanie PTT przez koordynatora/serwis
         WavelengthMessageService::getInstance()->sendPttRequest(currentFrequency);
-        // Można dodać wizualny feedback (np. zmiana koloru przycisku)
-        pttButton->setStyleSheet("background-color: yellow; color: black;"); // Przykładowy styl
+        pttButton->setStyleSheet("background-color: yellow; color: black;");
     }
 
     void onPttButtonReleased() {
+        // --- ODTWÓRZ DŹWIĘK ZWOLNIENIA ---
+        // Odtwórz dźwięk niezależnie od tego, czy faktycznie nadawaliśmy
+        if (m_pttOffSound->isLoaded()) {
+            m_pttOffSound->play();
+        } else {
+            qWarning() << "PTT Off sound not loaded!";
+        }
+        // --- KONIEC ODTWARZANIA ---
+
         if (m_pttState == Transmitting) {
             qDebug() << "PTT Button Released - Stopping Transmission for" << currentFrequency;
             stopAudioInput();
             WavelengthMessageService::getInstance()->sendPttRelease(currentFrequency);
-            // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
             messageArea->clearTransmittingUser();
-            // --- ZRESETUJ AMPLITUDĘ ---
             messageArea->setAudioAmplitude(0.0);
         } else if (m_pttState == Requesting) {
             qDebug() << "PTT Button Released - Cancelling Request for" << currentFrequency;
-            // Wskaźnik nie był ustawiony, amplituda też nie
+            // Można dodać wysłanie anulowania żądania, jeśli serwer to obsługuje
         }
         m_pttState = Idle;
         updatePttButtonState();
         pttButton->setStyleSheet("");
-        // Usunięto reset glitchIntensity, bo teraz sterujemy amplitudą
     }
 
     void onPttGranted(QString frequency) {
@@ -736,6 +757,8 @@ private:
     QIODevice *m_inputDevice;
     QIODevice *m_outputDevice;
     QAudioFormat m_audioFormat;
+    QSoundEffect *m_pttOnSound;
+    QSoundEffect *m_pttOffSound;
     // --- KONIEC NOWYCH PÓL AUDIO ---
 
     // --- NOWE METODY PRYWATNE ---

@@ -24,7 +24,20 @@
         <file>assets/security_resources/handprint.svg</file>
 
         <!-- Audio -->
-        <file>assets/audio/JOI.wav</file>
-        <file>assets/audio/JOImp3.mp3</file>
+
+        <!-- Joy -->
+        <file>assets/audio/Joy/JOI.wav</file>
+        <file>assets/audio/Joy/JOImp3.mp3</file>
+
+        <!-- Interface -->
+        <file>assets/audio/interface/bloop.mp3</file>
+        <file>assets/audio/interface/boot_up.wav</file>
+        <file>assets/audio/interface/button_click.wav</file>
+        <file>assets/audio/interface/ptt_off.wav</file>
+        <file>assets/audio/interface/ptt_on.wav</file>
+        <file>assets/audio/interface/swoosh1.wav</file>
+        <file>assets/audio/interface/swoosh2.wav</file>
+        <file>assets/audio/interface/terminal_typing1.wav</file>
+        <file>assets/audio/interface/terminal_typing2.wav</file>
     </qresource>
 </RCC>
