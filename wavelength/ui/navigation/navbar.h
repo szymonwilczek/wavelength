@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QSoundEffect>
 
 #include "../button/cyberpunk_button.h"
 
@@ -18,21 +19,24 @@ public:
     void setChatMode(const bool inChat) {
         createWavelengthButton->setVisible(!inChat);
         joinWavelengthButton->setVisible(!inChat);
+        settingsButton->setVisible(!inChat);
     }
+    void playClickSound();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
     signals:
         void createWavelengthClicked();
-    void joinWavelengthClicked();
-    void settingsClicked();  // Nowy sygnał dla przycisku ustawień
+        void joinWavelengthClicked();
+        void settingsClicked();
 
 private:
     QLabel *logoLabel;
     CyberpunkButton *createWavelengthButton;
     CyberpunkButton *joinWavelengthButton;
-    CyberpunkButton *settingsButton;  // Nowy przycisk ustawień
+    CyberpunkButton *settingsButton;
+    QSoundEffect* m_clickSound;
 };
 
 #endif // NAVBAR_H

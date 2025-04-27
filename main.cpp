@@ -410,8 +410,10 @@ int main(int argc, char *argv[]) {
     });
 });
 
-    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator]() {
+    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Create wavelength button clicked";
+
+        navbar->playClickSound();
 
         animation->setLifeColor(QColor(0, 200, 0));
 
@@ -434,6 +436,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator]() {
         qDebug() << "Join wavelength button clicked";
+        navbar->playClickSound();
 
         animation->setLifeColor(QColor(0, 0, 200));
 
