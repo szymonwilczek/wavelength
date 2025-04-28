@@ -1,6 +1,6 @@
 #include "chat_style.h"
 
-#include "../../../app/cyberpunk_style.h"
+#include "../../../app/style/cyberpunk_style.h"
 
 
 QString ChatStyle::getChatStyleSheet() {

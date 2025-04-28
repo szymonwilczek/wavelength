@@ -29,85 +29,23 @@ public:
         return &instance;
     }
 
-    bool addWavelength(QString frequency, const WavelengthInfo& info) {
-        if (hasWavelength(frequency)) {
-            qDebug() << "Wavelength" << frequency << "already exists";
-            return false;
-        }
-        
-        m_wavelengths[frequency] = info;
-        m_wavelengths[frequency].frequency = frequency;  // Ensure frequency is correct
-        
-        qDebug() << "Added wavelength:" << frequency
-                 << "protected:" << info.isPasswordProtected;
-                 
-        if (m_pendingRegistrations.contains(frequency)) {
-            m_pendingRegistrations.remove(frequency);
-        }
-        
-        emit wavelengthAdded(frequency);
-        return true;
-    }
+    bool addWavelength(QString frequency, const WavelengthInfo& info);
 
-    bool removeWavelength(QString frequency) {
-        if (!hasWavelength(frequency)) {
-            qDebug() << "Cannot remove - wavelength" << frequency << "does not exist";
-            return false;
-        }
-        
-        // If this is the active wavelength, clear it
-        if (m_activeWavelength == frequency) {
-            m_activeWavelength = -1;
-        }
-        
-        m_wavelengths.remove(frequency);
-        qDebug() << "Removed wavelength:" << frequency;
-        
-        emit wavelengthRemoved(frequency);
-        return true;
-    }
+    bool removeWavelength(QString frequency);
 
     bool hasWavelength(QString frequency) const {
         return m_wavelengths.contains(frequency);
     }
 
-    WavelengthInfo getWavelengthInfo(QString frequency) const {
-        if (hasWavelength(frequency)) {
-            return m_wavelengths[frequency];
-        }
-        return WavelengthInfo(); // Return empty info
-    }
+    WavelengthInfo getWavelengthInfo(QString frequency) const;
 
     QList<QString> getAllWavelengths() const {
         return m_wavelengths.keys();
     }
 
-    bool updateWavelength(QString frequency, const WavelengthInfo& info) {
-        if (!hasWavelength(frequency)) {
-            qDebug() << "Cannot update - wavelength" << frequency << "does not exist";
-            return false;
-        }
-        
-        m_wavelengths[frequency] = info;
-        m_wavelengths[frequency].frequency = frequency;  // Ensure frequency is correct
-        
-        qDebug() << "Updated wavelength:" << frequency;
-        emit wavelengthUpdated(frequency);
-        return true;
-    }
+    bool updateWavelength(QString frequency, const WavelengthInfo& info);
 
-    void setActiveWavelength(QString frequency) {
-        if (frequency != -1 && !hasWavelength(frequency)) {
-            qDebug() << "Cannot set active - wavelength" << frequency << "does not exist";
-            return;
-        }
-        
-        QString previousActive = m_activeWavelength;
-        m_activeWavelength = frequency;
-        
-        qDebug() << "Active wavelength changed from" << previousActive << "to" << frequency;
-        emit activeWavelengthChanged(previousActive, frequency);
-    }
+    void setActiveWavelength(QString frequency);
 
     QString getActiveWavelength() const {
         return m_activeWavelength;
@@ -117,75 +55,23 @@ public:
         return m_activeWavelength == frequency;
     }
 
-    bool addPendingRegistration(QString frequency) {
-        if (hasWavelength(frequency) || m_pendingRegistrations.contains(frequency)) {
-            qDebug() << "Cannot add pending registration - wavelength" 
-                     << frequency << "already exists or is pending";
-            return false;
-        }
-        
-        m_pendingRegistrations.insert(frequency);
-        qDebug() << "Added pending registration for wavelength:" << frequency;
-        return true;
-    }
+    bool addPendingRegistration(QString frequency);
 
-    bool removePendingRegistration(QString frequency) {
-        if (m_pendingRegistrations.contains(frequency)) {
-            m_pendingRegistrations.remove(frequency);
-            qDebug() << "Removed pending registration for wavelength:" << frequency;
-            return true;
-        }
-        return false;
-    }
+    bool removePendingRegistration(QString frequency);
 
     bool isPendingRegistration(QString frequency) const {
         return m_pendingRegistrations.contains(frequency);
     }
 
-    QPointer<QWebSocket> getWavelengthSocket(QString frequency) const {
-        if (hasWavelength(frequency)) {
-            return m_wavelengths[frequency].socket;
-        }
-        return nullptr;
-    }
+    QPointer<QWebSocket> getWavelengthSocket(QString frequency) const;
 
-    void setWavelengthSocket(QString frequency, QPointer<QWebSocket> socket) {
-        if (hasWavelength(frequency)) {
-            m_wavelengths[frequency].socket = socket;
-            qDebug() << "Set socket for wavelength:" << frequency;
-        }
-    }
+    void setWavelengthSocket(QString frequency, QPointer<QWebSocket> socket);
 
-    bool markWavelengthClosing(QString frequency, bool closing = true) {
-        if (!hasWavelength(frequency)) {
-            return false;
-        }
-        
-        m_wavelengths[frequency].isClosing = closing;
-        qDebug() << "Marked wavelength" << frequency << "as" 
-                 << (closing ? "closing" : "not closing");
-        return true;
-    }
+    bool markWavelengthClosing(QString frequency, bool closing = true);
 
-    bool isWavelengthClosing(QString frequency) const {
-        if (hasWavelength(frequency)) {
-            return m_wavelengths[frequency].isClosing;
-        }
-        return false;
-    }
+    bool isWavelengthClosing(QString frequency) const;
 
-    void clearAllWavelengths() {
-        QList<QString> frequencies = m_wavelengths.keys();
-        
-        for (QString frequency : frequencies) {
-            removeWavelength(frequency);
-        }
-        
-        m_pendingRegistrations.clear();
-        m_activeWavelength = -1;
-        
-        qDebug() << "Cleared all wavelengths";
-    }
+    void clearAllWavelengths();
 
 signals:
     void wavelengthAdded(QString frequency);

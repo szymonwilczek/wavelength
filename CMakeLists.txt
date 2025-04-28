@@ -123,7 +123,7 @@ add_executable(
         src/ui/chat/effects/cyber_long_text_display.cpp
         src/ui/chat/effects/cyber_long_text_display.h
         src/app/style/cyberpunk_style.cpp
-        src/app/cyberpunk_style.h
+        src/app/style/cyberpunk_style.h
         src/ui/effects/cyberpunk_text_effect.cpp
         src/ui/effects/cyberpunk_text_effect.h
         src/ui/buttons/cyberpunk_button.cpp
@@ -184,6 +184,18 @@ add_executable(
         src/app/managers/shortcut_manager.h
         src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.cpp
         src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.h
+        src/ui/sliders/cyber_audio_slider.cpp
+        src/ui/sliders/cyber_audio_slider.h
+        src/ui/buttons/cyber_audio_button.cpp
+        src/ui/buttons/cyber_audio_button.h
+        src/ui/sliders/cyber_slider.cpp
+        src/ui/sliders/cyber_slider.h
+        src/ui/buttons/cyber_push_button.cpp
+        src/ui/buttons/cyber_push_button.h
+        src/chat/files/attachments/attachment_data_store.cpp
+        src/chat/files/attachments/attachment_data_store.h
+        src/ui/buttons/cyber_chat_button.cpp
+        src/ui/buttons/cyber_chat_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

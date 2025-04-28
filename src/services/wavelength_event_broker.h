@@ -25,96 +25,34 @@ public:
     
     // Podłączanie odbiorników zdarzeń
     template<typename Receiver, typename Func>
-    void subscribeToEvent(const QString& eventType, Receiver* receiver, Func slot) {
-        connect(this, &WavelengthEventBroker::eventPublished,
-                receiver, [eventType, slot](const QString& type, const QVariantMap& data) {
-            if (type == eventType) {
-                (*slot)(data);
-            }
-        });
-        
-        qDebug() << "Subscribed to event:" << eventType;
-    }
-    
+    void subscribeToEvent(const QString& eventType, Receiver* receiver, Func slot);
+
     // Zdarzenia związane z wavelength
-    void wavelengthCreated(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("wavelength_created", data);
-    }
-    
-    void wavelengthJoined(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("wavelength_joined", data);
-    }
-    
-    void wavelengthLeft(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("wavelength_left", data);
-    }
-    
-    void wavelengthClosed(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("wavelength_closed", data);
-    }
-    
-    void messageReceived(QString frequency, const QString& message) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        data["message"] = message;
-        publishEvent("message_received", data);
-    }
-    
-    void messageSent(QString frequency, const QString& message) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        data["message"] = message;
-        publishEvent("message_sent", data);
-    }
-    
-    void connectionError(const QString& errorMessage) {
-        QVariantMap data;
-        data["error"] = errorMessage;
-        publishEvent("connection_error", data);
-    }
-    
-    void authenticationFailed(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("authentication_failed", data);
-    }
-    
-    void userKicked(QString frequency, const QString& reason) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        data["reason"] = reason;
-        publishEvent("user_kicked", data);
-    }
-    
+    void wavelengthCreated(QString frequency);
+
+    void wavelengthJoined(QString frequency);
+
+    void wavelengthLeft(QString frequency);
+
+    void wavelengthClosed(QString frequency);
+
+    void messageReceived(QString frequency, const QString& message);
+
+    void messageSent(QString frequency, const QString& message);
+
+    void connectionError(const QString& errorMessage);
+
+    void authenticationFailed(QString frequency);
+
+    void userKicked(QString frequency, const QString& reason);
+
     // Zdarzenia związane ze stanem UI
-    void uiStateChanged(const QString& component, const QVariant& state) {
-        QVariantMap data;
-        data["component"] = component;
-        data["state"] = state;
-        publishEvent("ui_state_changed", data);
-    }
-    
+    void uiStateChanged(const QString& component, const QVariant& state);
+
     // Generyczne zdarzenia systemowe
-    void systemMessage(QString frequency, const QString& message) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        data["message"] = message;
-        publishEvent("system_message", data);
-    }
-    
-    void activeWavelengthChanged(QString frequency) {
-        QVariantMap data;
-        data["frequency"] = frequency;
-        publishEvent("active_wavelength_changed", data);
-    }
+    void systemMessage(QString frequency, const QString& message);
+
+    void activeWavelengthChanged(QString frequency);
 
 signals:
     void eventPublished(const QString& eventType, const QVariantMap& data);

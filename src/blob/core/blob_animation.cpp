@@ -773,3 +773,127 @@ void BlobAnimation::setBlobColor(const QColor &color) {
         update(); // Wymuś przemalowanie (wywoła paintGL)
     }
 }
+
+std::vector<QPointF> BlobAnimation::generateOrganicShape(const QPointF& center, double baseRadius, int numPoints) {
+    std::vector<QPointF> points;
+    points.reserve(numPoints);
+
+    std::vector randomFactors(numPoints, 1.0);
+
+    // Komponent losowych zakłóceń (wysokiej częstotliwości)
+    for (int i = 0; i < numPoints; ++i) {
+        constexpr double maxDeform = 1.1;
+        constexpr double minDeform = 0.9;
+        // Mniejszy zakres losowości
+        const double baseFactor = minDeform + QRandomGenerator::global()->generateDouble() * (maxDeform - minDeform);
+        randomFactors[i] = baseFactor;
+    }
+
+    // Dodajemy komponenty o niższych częstotliwościach - ale z mniejszą amplitudą
+    const int lobes = 2 + QRandomGenerator::global()->bounded(3); // 2-4 główne płaty
+    const double lobePhase = QRandomGenerator::global()->generateDouble() * M_PI * 2; // Losowe przesunięcie fazy
+
+    for (int i = 0; i < numPoints; ++i) {
+        const double angle = 2.0 * M_PI * i / numPoints;
+        // Mniejsze falowanie dla głównych płatów
+        const double lobeFactor = 0.07 * sin(angle * lobes + lobePhase);
+        // Mniejsze falowanie dla dodatkowych nieregularności
+        const double midFactor = 0.04 * sin(angle * (lobes*2+1) + lobePhase * 1.5);
+
+        // Łączymy wszystkie komponenty
+        randomFactors[i] = randomFactors[i] + lobeFactor + midFactor;
+
+        // Węższy dopuszczalny zakres
+        randomFactors[i] = qBound(0.85, randomFactors[i], 1.15);
+    }
+
+    // Więcej przejść wygładzania dla bardziej płynnego kształtu
+    std::vector<double> smoothedFactors = randomFactors;
+    for (int smoothPass = 0; smoothPass < 3; ++smoothPass) {
+        std::vector<double> tempFactors = smoothedFactors;
+        for (int i = 0; i < numPoints; ++i) {
+            const int prev = i > 0 ? i - 1 : numPoints - 1;
+            const int next = i < numPoints - 1 ? i + 1 : 0;
+            // Większa waga dla centralnego punktu = większa regularność
+            smoothedFactors[i] = (tempFactors[prev] * 0.2 +
+                                  tempFactors[i] * 0.6 +
+                                  tempFactors[next] * 0.2);
+        }
+    }
+
+    // Dodatkowe sprawdzenie maksymalnego promienia
+    const double maxAllowedRadius = baseRadius * 0.98; // Pozostawiamy 2% marginesu dla bezpieczeństwa
+
+    // Generujemy punkty finalne
+    for (int i = 0; i < numPoints; ++i) {
+        const double angle = 2.0 * M_PI * i / numPoints;
+        // Skalowanie promienia aby nigdy nie przekroczyć bazowego promienia
+        double deformedRadius = baseRadius * smoothedFactors[i];
+        if (deformedRadius > maxAllowedRadius) {
+            deformedRadius = maxAllowedRadius;
+        }
+
+        points.push_back(QPointF(
+            center.x() + deformedRadius * cos(angle),
+            center.y() + deformedRadius * sin(angle)
+        ));
+    }
+
+    return points;
+}
+
+void BlobAnimation::resetBlobToCenter() {
+    std::lock_guard lock(m_pointsMutex);
+    // Zapamiętaj aktualny promień bloba
+    const double originalRadius = m_params.blobRadius;
+
+    // Całkowicie zresetuj bloba
+    m_controlPoints.clear();
+    m_targetPoints.clear();
+    m_velocity.clear();
+
+    // Ustaw bloba dokładnie na środku
+    m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
+
+    // Generuj punkty kontrolne w nieregularnym, organicznym kształcie
+    m_controlPoints = generateOrganicShape(m_blobCenter, originalRadius, m_params.numPoints);
+    m_targetPoints = m_controlPoints;
+    m_velocity.resize(m_params.numPoints, QPointF(0, 0));
+
+    // Przełącz na stan IDLE i zresetuj zachowanie
+    if (m_idleState) {
+        m_idleState.get()->resetInitialization();
+    }
+    switchToState(BlobConfig::IDLE);
+}
+
+void BlobAnimation::resetVisualization() {
+    // Całkowicie resetujemy bloba do stanu początkowego
+    // z oryginalnym rozmiarem i pozycją na środku
+    resetBlobToCenter();
+
+    // Wymuś reset i reinicjalizację HUD
+    m_renderer.resetHUD();
+    m_renderer.forceHUDInitialization(m_blobCenter, m_params.blobRadius,
+                                    m_params.borderColor, width(), height());
+
+    // Sygnał informujący o konieczności aktualizacji innych elementów UI
+    emit visualizationReset();
+
+    // Odśwież widok
+    update();
+}
+
+void BlobAnimation::show() {
+    if (!isVisible()) {
+        setVisible(true);
+        resumeAllEventTracking();
+    }
+}
+
+void BlobAnimation::hide() {
+    if (isVisible()) {
+        setVisible(false);
+        pauseAllEventTracking();
+    }
+}
