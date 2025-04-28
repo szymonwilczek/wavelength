@@ -21,11 +21,7 @@ public:
     
     void updatePhases();
 
-    void resetInitialization() {
-        m_isInitializing = true;
-        m_heartbeatCount = 0;
-        m_heartbeatPhase = 0.0;
-    }
+    void resetInitialization();
 
     // Deklaracja nowej metody
     void applyHeartbeatEffect(std::vector<QPointF>& controlPoints,

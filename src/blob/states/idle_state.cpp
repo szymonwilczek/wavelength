@@ -25,10 +25,16 @@ void IdleState::updatePhases() {
     }
 }
 
+void IdleState::resetInitialization() {
+    m_isInitializing = true;
+    m_heartbeatCount = 0;
+    m_heartbeatPhase = 0.0;
+}
+
 void IdleState::apply(std::vector<QPointF>& controlPoints,
-                     std::vector<QPointF>& velocity,
-                     QPointF& blobCenter,
-                     const BlobConfig::BlobParameters& params) {
+                      std::vector<QPointF>& velocity,
+                      QPointF& blobCenter,
+                      const BlobConfig::BlobParameters& params) {
 
     // Sprawdzamy, czy jesteśmy w fazie inicjalizacji
     if (m_isInitializing) {
