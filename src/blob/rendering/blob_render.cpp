@@ -470,3 +470,18 @@ void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
     int textWidth = fm.horizontalAdvance(m_idleBlobId);
     painter.drawText(blobCenter.x() - textWidth / 2, blobCenter.y() + blobRadius + 30, m_idleBlobId);
 }
+
+void BlobRenderer::forceHUDInitialization(const QPointF &blobCenter, double blobRadius, const QColor &hudColor,
+    int width, int height) {
+    initializeIdleState(blobCenter, blobRadius, hudColor, width, height);
+
+    m_staticHudBuffer = QPixmap(width, height);
+    m_staticHudBuffer.fill(Qt::transparent);
+
+    QPainter hudPainter(&m_staticHudBuffer);
+    hudPainter.setRenderHint(QPainter::Antialiasing, true);
+    drawCompleteHUD(hudPainter, blobCenter, blobRadius, hudColor, width, height);
+    hudPainter.end();
+
+    m_idleHudInitialized = true;
+}
