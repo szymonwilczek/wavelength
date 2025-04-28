@@ -6,16 +6,16 @@ BlobPhysics::BlobPhysics() {
     m_threadPool.setMaxThreadCount(QThread::idealThreadCount());
 }
 
-void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF>& controlPoints,
-                                       const std::vector<QPointF>& targetPoints,
-                                       std::vector<QPointF>& velocity,
-                                       const QPointF& blobCenter,
-                                       const BlobConfig::BlobParameters& params,
-                                       const BlobConfig::PhysicsParameters& &physicsParams) -> void {
+void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF> &controlPoints,
+                                         const std::vector<QPointF> &targetPoints,
+                                         std::vector<QPointF> &velocity,
+                                         const QPointF &blobCenter,
+                                         const BlobConfig::BlobParameters &params,
+                                         const BlobConfig::PhysicsParameters &physicsParams) {
 
     // --- DODANE ZABEZPIECZENIE ---
     // Sprawdź, czy wszystkie wektory mają oczekiwany i spójny rozmiar
-    if (const size_t expectedSize = static_cast<size_t>(params.numPoints); controlPoints.size() != expectedSize ||
+    if (const auto expectedSize = static_cast<size_t>(params.numPoints); controlPoints.size() != expectedSize ||
                                                                            targetPoints.size() != expectedSize ||
                                                                            velocity.size() != expectedSize) {
         qCritical() << "BlobPhysics::updatePhysicsOptimized - Niespójne rozmiary wektorów!";
@@ -43,15 +43,15 @@ void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF>& controlPoints,
     }
 
     // Konwertuj dane na zoptymalizowane struktury (SoA - Structure of Arrays)
-    const float centerX = static_cast<float>(blobCenter.x());
-    const float centerY = static_cast<float>(blobCenter.y());
-    const float radiusThreshold = static_cast<float>(params.blobRadius * 1.1f);
+    const auto centerX = static_cast<float>(blobCenter.x());
+    const auto centerY = static_cast<float>(blobCenter.y());
+    const auto radiusThreshold = static_cast<float>(params.blobRadius * 1.1f);
     const float radiusThresholdSquared = radiusThreshold * radiusThreshold;
-    const float dampingFactor = static_cast<float>(physicsParams.damping);
-    const float viscosity = static_cast<float>(physicsParams.viscosity);
-    const float velocityThreshold = static_cast<float>(physicsParams.velocityThreshold);
+    const auto dampingFactor = static_cast<float>(physicsParams.damping);
+    const auto viscosity = static_cast<float>(physicsParams.viscosity);
+    const auto velocityThreshold = static_cast<float>(physicsParams.velocityThreshold);
     const float velocityThresholdSquared = velocityThreshold * velocityThreshold;
-    const float maxSpeed = static_cast<float>(params.blobRadius * physicsParams.maxSpeed);
+    const auto maxSpeed = static_cast<float>(params.blobRadius * physicsParams.maxSpeed);
     const float maxSpeedSquared = maxSpeed * maxSpeed;
 
     // Kopiuj dane do zoptymalizowanych buforów

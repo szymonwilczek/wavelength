@@ -54,8 +54,7 @@ void updateTitleLabelStyle(QLabel* label, const QColor& textColor, const QColor&
         "   padding: 10px 20px;"              // Zachowaj padding
         "   text-transform: uppercase;"       // Zachowaj transformację
         "}"
-    ).arg(textColor.name(QColor::HexRgb))
-     .arg(borderColor.name(QColor::HexRgb));
+    ).arg(textColor.name(QColor::HexRgb), borderColor.name(QColor::HexRgb));
     label->setStyleSheet(style);
     qDebug() << "Updated titleLabel style:" << style;
 }
@@ -134,7 +133,7 @@ int main(int argc, char *argv[]) {
             // Połącz sygnał zakończenia override z wyjściem z aplikacji
             QObject::connect(&overrideManager, &SystemOverrideManager::overrideFinished, &app, &QCoreApplication::quit);
             overrideManager.initiateOverrideSequence(false); // Rozpocznij sekwencję
-            return app.exec(); // Uruchom pętlę zdarzeń TYLKO dla override
+            return QApplication::exec(); // Uruchom pętlę zdarzeń TYLKO dla override
         }
 #else
         qWarning() << "--run-override flag ignored on non-Windows OS.";
