@@ -1,8 +1,6 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #include "attachment_data_store.h"
+
+#include <QUuid>
 
 QString AttachmentDataStore::storeAttachmentData(const QString &base64Data) {
     QMutexLocker locker(&m_mutex);

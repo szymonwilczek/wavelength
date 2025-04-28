@@ -1,20 +1,8 @@
 #ifndef BLOBANIMATION_H
 #define BLOBANIMATION_H
 
-#include <deque>
-#include <QWidget>
-#include <QTimer>
-#include <QTime>
-#include <QPointF>
-#include <QColor>
-#include <QResizeEvent>
-#include <QEvent>
 #include <vector>
 #include <memory>
-#include <QThread>
-#include <QMutex>
-#include <QDebug>
-#include <QPropertyAnimation>
 
 #include "../blob_config.h"
 #include "../physics/blob_physics.h"

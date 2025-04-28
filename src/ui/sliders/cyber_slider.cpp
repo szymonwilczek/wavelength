@@ -1,8 +1,6 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #include "cyber_slider.h"
+
+#include <QStyle>
 
 CyberSlider::CyberSlider(Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), m_glowIntensity(0.5) {
     setStyleSheet("background: transparent; border: none;");

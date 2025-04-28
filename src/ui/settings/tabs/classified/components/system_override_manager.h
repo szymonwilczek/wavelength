@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QTimer>
 #include <QString>
-#include <QPointF> // Do płynniejszego ruchu myszy
 #include <QSystemTrayIcon>
 #include <QMediaPlayer>
 

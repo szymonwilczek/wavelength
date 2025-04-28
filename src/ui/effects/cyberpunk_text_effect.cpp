@@ -1,8 +1,6 @@
-//
-// Created by szymo on 31.03.2025.
-//
-
 #include "cyberpunk_text_effect.h"
+
+#include <QTimer>
 
 CyberpunkTextEffect::CyberpunkTextEffect(QLabel *label, QWidget *parent): QObject(parent), m_label(label), m_originalText(label->text()) {
     // Ukryj etykietę na początku

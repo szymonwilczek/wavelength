@@ -1,5 +1,5 @@
 #include "shortcuts_settings_widget.h"
-#include "../../../../app/wavelength_config.h" // Potrzebne do WavelengthConfig
+#include "../../../../app/wavelength_config.h"
 
 #include <QVBoxLayout>
 #include <QFormLayout>

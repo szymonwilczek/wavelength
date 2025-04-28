@@ -1,5 +1,7 @@
 #include "blob_event_handler.h"
 
+#include <QDateTime>
+
 BlobEventHandler::BlobEventHandler(QWidget* parentWidget)
     : QObject(parentWidget),
       m_parentWidget(parentWidget),

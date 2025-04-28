@@ -3,10 +3,8 @@
 
 
 #include <QColor>
-#include <QObject>
 #include <QString>
 #include <QSettings>
-#include <QDebug>
 #include <QHostAddress>
 #include <QMap>
 #include <QVariant>

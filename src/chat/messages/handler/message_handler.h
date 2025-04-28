@@ -5,11 +5,9 @@
 #include <QString>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
 #include <QUuid>
 #include <QSet>
 #include <QWebSocket>
-#include <QDebug>
 
 class MessageHandler : public QObject {
     Q_OBJECT

@@ -144,7 +144,6 @@ add_executable(
         src/ui/views/settings_view.h
         src/ui/widgets/gl_transition_widget.cpp
         src/ui/widgets/gl_transition_widget.h
-        src/ui/settings/tabs/classified/layers/security_layer.cpp
         src/ui/settings/tabs/classified/layers/security_layer.h
         src/ui/settings/tabs/classified/layers/fingerprint/fingerprint_layer.cpp
         src/ui/settings/tabs/classified/layers/fingerprint/fingerprint_layer.h
@@ -196,6 +195,8 @@ add_executable(
         src/chat/files/attachments/attachment_data_store.h
         src/ui/buttons/cyber_chat_button.cpp
         src/ui/buttons/cyber_chat_button.h
+        src/ui/widgets/overlay_widget.cpp
+        src/ui/widgets/overlay_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

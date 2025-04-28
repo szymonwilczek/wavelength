@@ -1,7 +1,3 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #ifndef CYBER_PUSH_BUTTON_H
 #define CYBER_PUSH_BUTTON_H
 #include <QDateTime>

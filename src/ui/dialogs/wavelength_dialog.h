@@ -1,14 +1,8 @@
 #ifndef WAVELENGTH_DIALOG_H
 #define WAVELENGTH_DIALOG_H
 
-#include <QLineEdit>
 #include <QLabel>
-#include <QHBoxLayout>
-#include <QFormLayout>
 #include <QApplication>
-#include <QFutureWatcher>
-#include <QGraphicsOpacityEffect>
-#include <QNetworkReply>
 
 #include "../../session/wavelength_session_coordinator.h"
 #include "../../ui/dialogs/animated_dialog.h"

@@ -1,7 +1,3 @@
-//
-// Created by szymo on 16.03.2025.
-//
-
 #include "video_decoder.h"
 
 VideoDecoder::VideoDecoder(const QByteArray &videoData, QObject *parent): QThread(parent), m_videoData(videoData), m_paused(true) {

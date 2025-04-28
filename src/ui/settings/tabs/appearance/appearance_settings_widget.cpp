@@ -1,5 +1,5 @@
 #include "appearance_settings_widget.h"
-#include "../../../../app/wavelength_config.h" // Poprawna ścieżka do config
+#include "../../../../app/wavelength_config.h"
 
 #include <QLabel>
 #include <QPushButton>

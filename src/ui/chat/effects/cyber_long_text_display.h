@@ -1,9 +1,7 @@
 #ifndef CYBER_LONG_TEXT_DISPLAY_H
 #define CYBER_LONG_TEXT_DISPLAY_H
 
-#include <QWidget>
 #include <QPainter>
-#include <QLinearGradient>
 #include <QDateTime>
 #include <QFontMetrics>
 #include <QDebug>

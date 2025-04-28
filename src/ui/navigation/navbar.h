@@ -2,13 +2,12 @@
 #define NAVBAR_H
 
 #include <QToolBar>
-#include <QLabel>
 #include <QHBoxLayout>
 #include <QSoundEffect>
-#include <QSpacerItem> // Dodaj dołączenie
+#include <QSpacerItem>
 
 #include "../../ui/buttons/cyberpunk_button.h"
-#include "network_status_widget.h" // Dodaj dołączenie
+#include "network_status_widget.h"
 
 class Navbar : public QToolBar {
     Q_OBJECT

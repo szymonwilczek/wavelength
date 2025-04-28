@@ -1,7 +1,3 @@
-//
-// Created by szymo on 25.03.2025.
-//
-
 #include "auto_scaling_attachment.h"
 
 AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), m_content(content), m_isScaled(false) {

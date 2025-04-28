@@ -1,7 +1,6 @@
 #ifndef BLOBMATH_H
 #define BLOBMATH_H
 
-#include <QPointF>
 #include <QVector2D>
 #include <QtMath>
 #include <vector>

@@ -3,31 +3,11 @@
 
 #include <QDialog>
 #include <QWidget>
-#include <QShowEvent>
 #include <QCloseEvent>
-#include <QPropertyAnimation>
 #include <QRandomGenerator>
 
-// Klasa dla przyciemnienia tła
-class OverlayWidget : public QWidget {
-    Q_OBJECT
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
 
-public:
-    explicit OverlayWidget(QWidget *parent = nullptr);
-    void updateGeometry(const QRect& rect);
-    qreal opacity() const { return m_opacity; }
-    void setOpacity(qreal opacity);
-
-private:
-    qreal m_opacity;
-    QRect m_excludeRect; // Obszar do wykluczenia (nawigacja)
-
-protected:
-    bool eventFilter(QObject *watched, QEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
-    // void resizeEvent(QResizeEvent *event) override;
-};
+class OverlayWidget;
 
 class AnimatedDialog : public QDialog {
     Q_OBJECT

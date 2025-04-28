@@ -1,9 +1,7 @@
 #ifndef BLOB_RENDERER_H
 #define BLOB_RENDERER_H
 
-#include <QPainter>
-#include <QPixmap>
-#include <QRandomGenerator>
+#include <QPainterPath>
 #include <vector>
 
 #include "path_markers_manager.h"
@@ -35,7 +33,6 @@ public:
                     const std::vector<QPointF> &controlPoints,
                     const QPointF &blobCenter,
                     const BlobConfig::BlobParameters &params,
-                    int width, int height,
                     BlobConfig::AnimationState animationState);
 
     void updateGridBuffer(const QColor &backgroundColor,

@@ -1,5 +1,4 @@
 #include "security_code_layer.h"
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QRandomGenerator>
 #include <QGraphicsOpacityEffect>

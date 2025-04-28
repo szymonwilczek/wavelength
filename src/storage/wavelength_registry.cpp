@@ -1,7 +1,3 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_registry.h"
 
 bool WavelengthRegistry::addWavelength(QString frequency, const WavelengthInfo &info) {

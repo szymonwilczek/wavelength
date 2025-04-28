@@ -6,7 +6,6 @@
 #include <QRandomGenerator>
 #include <QDateTime>
 #include <QCache>
-#include <QtMath>
 
 class ElectronicShutdownEffect : public QGraphicsEffect {
     Q_OBJECT

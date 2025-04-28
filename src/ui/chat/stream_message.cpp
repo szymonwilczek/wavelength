@@ -1,12 +1,13 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "stream_message.h"
 
+#include <QParallelAnimationGroup>
+#include <QSequentialAnimationGroup>
+
+#include "../../chat/files/attachments/auto_scaling_attachment.h"
+
 StreamMessage::StreamMessage(QString content, QString sender, MessageType type, QString messageId, QWidget *parent): QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
-    m_messageId(std::move(messageId)), // Store the message ID
-    m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0) {
+                                                                                                                     m_messageId(std::move(messageId)), // Store the message ID
+                                                                                                                     m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0) {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMinimumWidth(400);
     setMaximumWidth(600);

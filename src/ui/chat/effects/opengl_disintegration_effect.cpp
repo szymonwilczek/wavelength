@@ -1,7 +1,3 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "opengl_disintegration_effect.h"
 
 OpenGLDisintegration::OpenGLDisintegration(QWidget *parent): QOpenGLWidget(parent), m_progress(0.0), m_texture(nullptr), m_program(nullptr) {

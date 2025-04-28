@@ -7,7 +7,6 @@
 #include <QVector>
 #include <QPair>
 #include <QKeyEvent>
-#include <QPropertyAnimation>
 
 class SnakeGameLayer : public SecurityLayer {
     Q_OBJECT

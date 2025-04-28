@@ -4,8 +4,6 @@
 #include <QObject>
 #include <QString>
 #include <QCryptographicHash>
-#include <QDateTime>
-#include <QDebug>
 #include <QJsonDocument>
 
 class AuthenticationManager : public QObject {

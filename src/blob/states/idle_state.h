@@ -1,6 +1,8 @@
 #ifndef IDLESTATE_H
 #define IDLESTATE_H
 
+#include <QVector2D>
+
 #include "blob_state.h"
 #include "../blob_config.h"
 

@@ -6,7 +6,6 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QRandomGenerator>
-#include <QLinearGradient>
 
 class MaskOverlay : public QWidget {
     Q_OBJECT

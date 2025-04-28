@@ -1,7 +1,5 @@
 #include "blob_transition_manager.h"
 #include <QDebug>
-#include <cmath>
-#include <algorithm>
 #include <qmath.h>
 
 BlobTransitionManager::BlobTransitionManager(QObject* parent)

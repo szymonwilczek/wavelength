@@ -2,7 +2,6 @@
 #define WAVELENGTH_REGISTRY_H
 
 #include <QObject>
-#include <QMap>
 #include <QString>
 #include <QPointer>
 #include <QWebSocket>

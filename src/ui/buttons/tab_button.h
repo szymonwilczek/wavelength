@@ -1,7 +1,3 @@
-//
-// Created by szymo on 18.04.2025.
-//
-
 #ifndef TAB_BUTTON_H
 #define TAB_BUTTON_H
 #include <QPainter>

@@ -1,6 +1,7 @@
 #include "animated_stacked_widget.h"
 
 #include <QCoreApplication>
+#include <QGraphicsOpacityEffect>
 
 AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
     : QStackedWidget(parent),

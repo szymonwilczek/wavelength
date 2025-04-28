@@ -1,7 +1,3 @@
-//
-// Created by szymo on 18.04.2025.
-//
-
 #include "tab_button.h"
 
 TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), m_underlineOffset(0), m_isActive(false) {

@@ -6,7 +6,6 @@
 #include <QProgressBar>
 #include <QTimer>
 #include <QSvgRenderer>
-#include <QVector>
 
 class FingerprintLayer : public SecurityLayer {
     Q_OBJECT

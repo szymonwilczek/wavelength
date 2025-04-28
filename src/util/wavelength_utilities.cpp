@@ -1,8 +1,7 @@
-//
-// Created by szymo on 21.03.2025.
-//
-
 #include "wavelength_utilities.h"
+
+#include <QString>
+#include <QDebug>
 
 double WavelengthUtilities::normalizeFrequency(double frequency) {
     // Dokładne odwzorowanie algorytmu JavaScript: parseFloat(numFreq.toFixed(1))

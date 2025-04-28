@@ -10,7 +10,6 @@
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QTimer>
-#include <QMouseEvent>
 #include <QWheelEvent>
 #include <QPoint>
 #include <vector>
@@ -19,7 +18,6 @@
 #include <QtMultimedia/QAudioBuffer> // <<< Dodano
 #include <QMediaContent> // <<< Dodano
 #include <QAudioFormat> // <<< Dodano
-#include <QVector>
 
 #define MAX_IMPACTS 5
 

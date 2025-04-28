@@ -11,7 +11,6 @@ void BlobRenderer::renderBlob(QPainter &painter,
                               const std::vector<QPointF> &controlPoints,
                               const QPointF &blobCenter,
                               const BlobConfig::BlobParameters &params,
-                              int width, int height,
                               BlobConfig::AnimationState animationState) {  // Dodany parametr
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -384,7 +383,7 @@ void BlobRenderer::renderScene(QPainter &painter,
         painter.drawPixmap(0, 0, backgroundCache);
 
         // Rysujemy aktywny blob - ZAWSZE będzie animowany
-        renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
+        renderBlob(painter, controlPoints, blobCenter, params, renderState.animationState);
 
         // Używamy przygotowanego wcześniej HUD
         if (m_idleHudInitialized && !m_staticHudBuffer.isNull()) {
@@ -402,7 +401,7 @@ void BlobRenderer::renderScene(QPainter &painter,
                        width, height);
 
         // Renderuj blob
-        renderBlob(painter, controlPoints, blobCenter, params, width, height, renderState.animationState);
+        renderBlob(painter, controlPoints, blobCenter, params, renderState.animationState);
 
         // Po wyjściu ze stanu IDLE możemy zresetować flagi buforów
         if (m_lastAnimationState == BlobConfig::IDLE && renderState.animationState != BlobConfig::IDLE) {

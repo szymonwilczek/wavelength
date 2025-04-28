@@ -1,11 +1,11 @@
-//
-// Created by szymo on 18.03.2025.
-//
-
 #include "video_player_overlay.h"
 
+#include <QOperatingSystemVersion>
+#include <QParallelAnimationGroup>
+#include <QVBoxLayout>
+
 VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QString &mimeType, QWidget *parent): QDialog(parent), m_videoData(videoData), m_mimeType(mimeType),
-    m_scanlineOpacity(0.15), m_gridOpacity(0.1) {
+                                                                                                               m_scanlineOpacity(0.15), m_gridOpacity(0.1) {
     setWindowTitle("SYS> WAVELENGTH_VISUAL_STREAM_DECODER");
     setMinimumSize(900, 630);
     setModal(false);

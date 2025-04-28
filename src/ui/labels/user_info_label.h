@@ -3,10 +3,9 @@
 
 #include <QLabel>
 #include <QPainter>
-// #include <QPainterPath> // Już niepotrzebne
 #include <QColor>
 #include <QStyleOption>
-#include <QtMath> // Dla qMax
+#include <QtMath>
 
 class UserInfoLabel : public QLabel {
     Q_OBJECT

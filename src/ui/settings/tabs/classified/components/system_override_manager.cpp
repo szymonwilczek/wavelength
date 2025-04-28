@@ -1,5 +1,5 @@
 #include "system_override_manager.h"
-#include "floating_energy_sphere_widget.h" // Include dla widgetu
+#include "floating_energy_sphere_widget.h"
 #include <QDebug>
 #include <QApplication>
 #include <QScreen>
@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include <qprocess.h>
 #include <QStandardPaths>
-#include <QSettings>
 #include <random>
 #include <set>
 
@@ -16,7 +15,6 @@
 #include <shellapi.h>
 #include "shldisp.h"
 #include <winuser.h>
-#include <shobjidl.h> // Dla IShellDispatch (MinimizeAll)
 #endif
 
 #ifdef Q_OS_WIN

@@ -9,8 +9,6 @@
 #include <QAudioDeviceInfo>
 #include <QIODevice>
 #include <QByteArray>
-#include <QAudioFormat>
-#include <QBuffer>
 
 class VoiceRecognitionLayer : public SecurityLayer {
     Q_OBJECT

@@ -1,12 +1,10 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "cyber_text_display.h"
 
+#include <QPropertyAnimation>
+
 CyberTextDisplay::CyberTextDisplay(const QString &text, TypingSoundType soundType, QWidget *parent): QWidget(parent), m_fullText(text), m_revealedChars(0),
-    m_glitchIntensity(0.0), m_isFullyRevealed(false), m_hasBeenFullyRevealedOnce(false),
-    m_mediaPlayer(nullptr), m_audioOutput(nullptr), m_playlist(nullptr), m_soundType(soundType) {
+                                                                                                     m_glitchIntensity(0.0), m_isFullyRevealed(false), m_hasBeenFullyRevealedOnce(false),
+                                                                                                     m_mediaPlayer(nullptr), m_audioOutput(nullptr), m_playlist(nullptr), m_soundType(soundType) {
     setMinimumWidth(400);
     setMinimumHeight(60);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

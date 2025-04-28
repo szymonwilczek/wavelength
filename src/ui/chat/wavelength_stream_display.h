@@ -1,16 +1,8 @@
 #ifndef WAVELENGTH_STREAM_DISPLAY_H
 #define WAVELENGTH_STREAM_DISPLAY_H
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QTimer>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QRegularExpression>
-#include <QMap> // Dodajemy QMap do śledzenia wiadomości progresu
 
-#include "../../ui/chat/communication_stream.h" // Zawiera StreamMessage
+#include "../../ui/chat/communication_stream.h"
 
 class WavelengthStreamDisplay : public QWidget {
     Q_OBJECT

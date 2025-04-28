@@ -1,8 +1,6 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_joiner.h"
+
+#include "../../../auth/authentication_manager.h"
 
 JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &password) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();

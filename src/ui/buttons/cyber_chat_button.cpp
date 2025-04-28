@@ -1,7 +1,3 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #include "cyber_chat_button.h"
 
 CyberChatButton::CyberChatButton(const QString &text, QWidget *parent): QPushButton(text, parent) {

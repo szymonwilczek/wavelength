@@ -1,14 +1,8 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #ifndef ATTACHMENT_DATA_STORE_H
 #define ATTACHMENT_DATA_STORE_H
 #include <QMap>
 #include <qmutex.h>
 #include <QString>
-#include <QUuid>
-
 
 class AttachmentDataStore {
 public:

@@ -2,10 +2,8 @@
 #define ANIMATED_STACKED_WIDGET_H
 
 #include <QStackedWidget>
-#include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
-#include <QGraphicsOpacityEffect>
-#include <QSoundEffect> // Dodaj dołączenie
+#include <QSoundEffect>
 
 #include "gl_transition_widget.h"
 

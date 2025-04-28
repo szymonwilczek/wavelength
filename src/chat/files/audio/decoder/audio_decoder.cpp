@@ -1,8 +1,10 @@
-//
-// Created by szymo on 17.03.2025.
-//
-
 #include "audio_decoder.h"
+
+extern "C" {
+    #include <libavutil/opt.h>
+}
+
+
 
 AudioDecoder::AudioDecoder(const QByteArray &audioData, QObject *parent): QThread(parent), m_audioData(audioData), m_stopped(false) {
     // Zainicjuj domyślne wartości

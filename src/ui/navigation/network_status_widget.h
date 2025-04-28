@@ -1,7 +1,6 @@
 #ifndef NETWORK_STATUS_WIDGET_H
 #define NETWORK_STATUS_WIDGET_H
 
-#include <QWidget>
 #include <QLabel>
 #include <QTimer>
 #include <QNetworkAccessManager>

@@ -1,11 +1,14 @@
-//
-// Created by szymo on 17.03.2025.
-//
-
 #include "attachment_placeholder.h"
 
+#include <qfileinfo.h>
+#include <QScrollBar>
+
+#include "attachment_data_store.h"
+#include "auto_scaling_attachment.h"
+#include "../image/displayer/image_viewer.h"
+
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type, QWidget *parent,
-    bool autoLoad): QWidget(parent), m_filename(filename), m_isLoaded(false) {
+                                             bool autoLoad): QWidget(parent), m_filename(filename), m_isLoaded(false) {
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);

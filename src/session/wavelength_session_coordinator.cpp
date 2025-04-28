@@ -1,8 +1,6 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_session_coordinator.h"
+
+#include "events/leaver/wavelength_leaver.h"
 
 void WavelengthSessionCoordinator::initialize() {
     qDebug() << "Initializing WavelengthSessionCoordinator";

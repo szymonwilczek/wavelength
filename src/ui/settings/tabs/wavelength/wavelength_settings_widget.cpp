@@ -1,13 +1,9 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\wavelength\view\settings\tabs\wavelength_tab\wavelength_settings_widget.cpp
 #include "wavelength_settings_widget.h"
 #include "../../../../app/wavelength_config.h"
-// Usunięto: #include "../../../../ui/input/cyber_line_edit.h"
 
 #include <QLabel>
-// Usunięto: #include <QSpinBox>
 #include <QLineEdit>
 #include <QComboBox>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QDebug>
@@ -16,7 +12,6 @@
 #include <QMessageBox>
 #include <QLocale>
 
-// Definicje stałych dla walidacji
 namespace FreqLimits {
     const double MIN_HZ = 130.0;
     const double MAX_VALUE_PER_UNIT = 999.9;
@@ -28,8 +23,6 @@ WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
       m_config(WavelengthConfig::getInstance()),
       m_frequencyValueEdit(nullptr),
       m_frequencyUnitCombo(nullptr)
-      // Usunięto: m_serverAddressEdit(nullptr),
-      // Usunięto: m_serverPortEdit(nullptr)
 {
     qDebug() << "WavelengthSettingsWidget constructor start";
     setupUi();

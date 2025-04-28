@@ -7,12 +7,6 @@
 #endif
 
 #include <QImage>
-#include <QMutex>
-#include <QThread>
-#include <QWaitCondition>
-#include <QIODevice>
-#include <QDebug>
-#include <QElapsedTimer>
 #include <QBuffer>
 
 #include "../../audio/decoder/audio_decoder.h"
@@ -22,8 +16,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
-#include <libavutil/channel_layout.h>
-#include <libavutil/opt.h>
 }
 
 

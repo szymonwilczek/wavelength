@@ -1,15 +1,11 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\wavelength\view\settings\tabs\wavelength_tab\wavelength_settings_widget.h
 #ifndef WAVELENGTH_SETTINGS_WIDGET_H
 #define WAVELENGTH_SETTINGS_WIDGET_H
 
-// Usunięto: #include <QDoubleSpinBox>
 #include <QWidget>
 
 class WavelengthConfig;
-// Usunięto: class CyberLineEdit;
 class QLineEdit;
 class QComboBox;
-// Usunięto: class QSpinBox;
 class QLabel;
 class QVBoxLayout;
 class QFormLayout;

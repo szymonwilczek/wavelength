@@ -1,7 +1,3 @@
-//
-// Created by szymo on 17.03.2025.
-//
-
 #include "gif_decoder.h"
 
 GifDecoder::GifDecoder(const QByteArray &gifData, QObject *parent): QThread(parent), m_gifData(gifData), m_stopped(false) {
