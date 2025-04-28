@@ -7,24 +7,24 @@
 #endif
 
 #include <QMainWindow>
-#include "wavelength/ui/navigation/navbar.h"
-#include "blob/core/blob_animation.h"
+#include "src/ui/navigation/navbar.h"
+#include "src/blob/core/blob_animation.h"
 #include <QLabel>
 #include <QTimer>
 
-#include "font_manager.h"
-#include "blob/core/app_instance_manager.h"
-#include "wavelength/dialogs/join_wavelength_dialog.h"
-#include "wavelength/view/wavelength_chat_view.h"
-#include "wavelength/dialogs/wavelength_dialog.h"
+#include "src/app/managers/font_manager.h"
+#include "src/app/managers/app_instance_manager.h"
+#include "src/ui/dialogs/join_wavelength_dialog.h"
+#include "src/ui/views/wavelength_chat_view.h"
+#include "src/ui/dialogs/wavelength_dialog.h"
 
-#include "wavelength/session/wavelength_session_coordinator.h"
-#include "wavelength/ui/cyberpunk_style.h"
-#include "wavelength/view/main_window/cyberpunk_text_effect.h"
-#include "wavelength/ui/widgets/animated_stacked_widget.h"
-#include "wavelength/util/shortcut_manager.h"
-#include "wavelength/view/settings_view.h"
-#include "wavelength/view/settings/tabs/classified_tab/components/system_override_manager.h"
+#include "src/session/wavelength_session_coordinator.h"
+#include "src/app/cyberpunk_style.h"
+#include "src/ui/effects/cyberpunk_text_effect.h"
+#include "src/ui/widgets/animated_stacked_widget.h"
+#include "src/app/managers/shortcut_manager.h"
+#include "src/ui/views/settings_view.h"
+#include "src/ui/settings/tabs/classified/components/system_override_manager.h"
 
 void centerLabel(QLabel *label, BlobAnimation *animation) {
     if (label && animation) {
@@ -91,22 +91,10 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName("WavelengthApp");
 
     QSoundEffect *bootSound = new QSoundEffect(&app);
-    bootSound->setSource(QUrl("qrc:/assets/audio/interface/boot_up.wav"));
+    bootSound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
     bootSound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
 
-    if (bootSound->isLoaded()) {
-        bootSound->play();
-    } else {
-        QTimer::singleShot(100, bootSound, [bootSound](){
-            if(bootSound->isLoaded()) {
-                bootSound->play();
-            } else {
-                 qWarning() << "Failed to load boot sound after delay:" << bootSound->source();
-            }
-        });
-        qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << bootSound->source();
-    }
-    // --- Koniec odtwarzania dźwięku startowego ---
+
 
     WavelengthConfig *config = WavelengthConfig::getInstance();
 
@@ -151,6 +139,20 @@ int main(int argc, char *argv[]) {
         // Kontynuuj normalne uruchomienie poniżej
 #endif
     }
+
+    if (bootSound->isLoaded()) {
+        bootSound->play();
+    } else {
+        QTimer::singleShot(100, bootSound, [bootSound](){
+            if(bootSound->isLoaded()) {
+                bootSound->play();
+            } else {
+                 qWarning() << "Failed to load boot sound after delay:" << bootSound->source();
+            }
+        });
+        qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << bootSound->source();
+    }
+    // --- Koniec odtwarzania dźwięku startowego ---
 
     FontManager* fontManager = FontManager::getInstance();
     if (!fontManager->initialize()) {

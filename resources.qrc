@@ -1,43 +1,39 @@
 <RCC>
     <qresource prefix="/">
         <!-- Ikony aplikacji -->
-        <file>assets/icons/wavelength_logo_upscaled.png</file>
+        <file>resources/icons/wavelength_logo_upscaled.png</file>
 
         <!-- Ikony SVG -->
-        <file>assets/icons/checkmark.svg</file>
+        <file>resources/icons/checkmark.svg</file>
 
         <!-- Czcionki -->
-        <file>assets/fonts/BlenderPro/BlenderPro-Bold.ttf</file>
-        <file>assets/fonts/BlenderPro/BlenderPro-Medium.ttf</file>
-        <file>assets/fonts/BlenderPro/BlenderPro-Heavy.ttf</file>
+        <file>resources/fonts/BlenderPro/BlenderPro-Bold.ttf</file>
+        <file>resources/fonts/BlenderPro/BlenderPro-Medium.ttf</file>
+        <file>resources/fonts/BlenderPro/BlenderPro-Heavy.ttf</file>
 
-        <file>assets/fonts/Lato/Lato-Regular.ttf</file>
-        <file>assets/fonts/Lato/Lato-Bold.ttf</file>
-        <file>assets/fonts/Lato/Lato-Light.ttf</file>
+        <file>resources/fonts/Lato/Lato-Regular.ttf</file>
+        <file>resources/fonts/Lato/Lato-Bold.ttf</file>
+        <file>resources/fonts/Lato/Lato-Light.ttf</file>
 
-        <file>assets/fonts/Poppins/Poppins-Regular.ttf</file>
-        <file>assets/fonts/Poppins/Poppins-Bold.ttf</file>
-        <file>assets/fonts/Poppins/Poppins-Medium.ttf</file>
+        <file>resources/fonts/Poppins/Poppins-Regular.ttf</file>
+        <file>resources/fonts/Poppins/Poppins-Bold.ttf</file>
+        <file>resources/fonts/Poppins/Poppins-Medium.ttf</file>
 
         <!-- Resourcy dla warstw zabezpieczeń -->
-        <file>assets/security_resources/fingerprint.svg</file>
-        <file>assets/security_resources/handprint.svg</file>
+        <file>resources/security/fingerprint.svg</file>
+        <file>resources/security/handprint.svg</file>
 
         <!-- Audio -->
-
-        <!-- Joy -->
-        <file>assets/audio/Joy/JOI.wav</file>
-        <file>assets/audio/Joy/JOImp3.mp3</file>
-
-        <!-- Interface -->
-        <file>assets/audio/interface/bloop.mp3</file>
-        <file>assets/audio/interface/boot_up.wav</file>
-        <file>assets/audio/interface/button_click.wav</file>
-        <file>assets/audio/interface/ptt_off.wav</file>
-        <file>assets/audio/interface/ptt_on.wav</file>
-        <file>assets/audio/interface/swoosh1.wav</file>
-        <file>assets/audio/interface/swoosh2.wav</file>
-        <file>assets/audio/interface/terminal_typing1.wav</file>
-        <file>assets/audio/interface/terminal_typing2.wav</file>
+        <file>resources/sounds/Joy/JOI.wav</file>
+        <file>resources/sounds/Joy/JOImp3.mp3</file>
+        <file>resources/sounds/interface/bloop.mp3</file>
+        <file>resources/sounds/interface/boot_up.wav</file>
+        <file>resources/sounds/interface/button_click.wav</file>
+        <file>resources/sounds/interface/ptt_off.wav</file>
+        <file>resources/sounds/interface/ptt_on.wav</file>
+        <file>resources/sounds/interface/swoosh1.wav</file>
+        <file>resources/sounds/interface/swoosh2.wav</file>
+        <file>resources/sounds/interface/terminal_typing1.wav</file>
+        <file>resources/sounds/interface/terminal_typing2.wav</file>
     </qresource>
 </RCC>
