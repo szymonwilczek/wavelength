@@ -46,10 +46,11 @@ WavelengthConfig::WavelengthConfig(QObject *parent)
     m_settings(QSettings::UserScope,
      QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
-    qDebug() << "Config file path:" << m_settings.fileName();
+    qDebug() << "[Config] Initializing... Settings file:" << m_settings.fileName();
     loadDefaults(); // Najpierw ustaw domyślne
     loadDefaultShortcuts();
     loadSettings(); // Następnie nadpisz zapisanymi
+    qDebug() << "[Config] Initialization complete. Loaded settings.";
 }
 
 void WavelengthConfig::loadDefaults() {
@@ -307,16 +308,22 @@ bool WavelengthConfig::isDebugMode() const { return m_debugMode; }
 void WavelengthConfig::setDebugMode(bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
 
 QKeySequence WavelengthConfig::getShortcut(const QString& actionId, const QKeySequence& defaultSequence) const {
-    // Użyj domyślnego skrótu z mapy, jeśli nie podano innego
     QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
-    // Odczytaj z ustawień, używając domyślnego jako fallback
-    return m_settings.value(SHORTCUTS_PREFIX + actionId, actualDefault).value<QKeySequence>();
+    QVariant storedValue = m_settings.value(SHORTCUTS_PREFIX + actionId);
+    QKeySequence resultSequence = m_settings.value(SHORTCUTS_PREFIX + actionId, actualDefault).value<QKeySequence>();
+
+    // <<< Dodane logowanie >>>
+    qDebug() << "[Config] getShortcut(" << actionId << "): Default=" << actualDefault.toString()
+             << ", Stored=" << storedValue.toString() // Zobacz, co faktycznie jest w QSettings
+             << ", Returning=" << resultSequence.toString();
+    // <<< Koniec logowania >>>
+
+    return resultSequence;
 }
 
 void WavelengthConfig::setShortcut(const QString& actionId, const QKeySequence& sequence) {
+    qDebug() << "[Config] setShortcut(" << actionId << "): Setting to" << sequence.toString();
     m_settings.setValue(SHORTCUTS_PREFIX + actionId, sequence);
-    // Nie emitujemy tutaj configChanged, bo zmiana skrótu wymaga restartu
-    // lub bardziej złożonego mechanizmu aktualizacji na żywo.
     // Zapis nastąpi przy saveSettings() lub sync().
 }
 

@@ -54,20 +54,23 @@ void ShortcutManager::registerShortcuts(QWidget* parent) {
 
 template<typename Func>
 void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda) {
-    QKeySequence sequence = m_config->getShortcut(actionId);
+    QKeySequence sequence = m_config->getShortcut(actionId); // Pobierz sekwencję (powinna być już załadowana z pliku)
+
+    // <<< Dodane logowanie >>>
+    qDebug() << "[ShortcutMgr] createAndConnectShortcut(" << actionId << "): Using sequence" << sequence.toString();
+    // <<< Koniec logowania >>>
+
     if (sequence.isEmpty()) {
-        qDebug() << "ShortcutManager: No key sequence defined or loaded for action:" << actionId;
+        qDebug() << "[ShortcutMgr] No key sequence defined or loaded for action:" << actionId;
         return;
     }
 
     QShortcut* shortcut = new QShortcut(sequence, parent);
-    // Ustawienie kontekstu, aby skrót działał tylko gdy widget (lub jego dziecko) ma fokus
     shortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(shortcut, &QShortcut::activated, parent, lambda);
 
-    // Dodaj do mapy zarejestrowanych skrótów
     m_registeredShortcuts[parent].append(shortcut);
-    qDebug() << "ShortcutManager: Registered" << sequence.toString() << "for" << actionId << "on" << parent->objectName();
+    qDebug() << "[ShortcutMgr] Registered" << sequence.toString() << "for" << actionId << "on" << parent->objectName();
 }
 
 void ShortcutManager::registerMainWindowShortcuts(QMainWindow* window, Navbar* navbar) {
@@ -112,20 +115,23 @@ void ShortcutManager::registerChatViewShortcuts(WavelengthChatView* chatView) {
 
     createAndConnectShortcut("ChatView.FocusInput", chatView, [chatView]() {
         qDebug() << "Shortcut activated: FocusInput";
-        if (auto* input = chatView->findChild<QLineEdit*>("inputField")) { // Jeśli ma nazwę obiektu
-            input->setFocus();
+        // Znajdź pole po objectName
+        if (auto* input = chatView->findChild<QLineEdit*>("chatInputField")) {
+            input->setFocus(Qt::ShortcutFocusReason); // Użyj odpowiedniego powodu
             input->selectAll(); // Opcjonalnie zaznacz tekst
+            // Spróbuj aktywować okno nadrzędne, aby upewnić się, że ma fokus systemowy
+            if (chatView->window()) {
+                chatView->window()->activateWindow();
+            }
+             qDebug() << "Focus set on chatInputField";
+        } else {
+            qWarning() << "Could not find QLineEdit with objectName 'chatInputField'";
         }
-        // Jeśli nie ma nazwy, potrzebujemy dostępu do wskaźnika inputField
     });
 
     createAndConnectShortcut("ChatView.AttachFile", chatView, [chatView]() {
         qDebug() << "Shortcut activated: AttachFile";
-        if (auto* button = chatView->findChild<QPushButton*>("attachButton")) {
-            button->click();
-        } else {
-            QMetaObject::invokeMethod(chatView, "attachFile", Qt::QueuedConnection);
-        }
+        chatView->attachFile();
     });
 
     createAndConnectShortcut("ChatView.SendMessage", chatView, [chatView]() {
