@@ -44,12 +44,18 @@ void ShortcutsSettingsWidget::setupUi() {
     m_formLayout->setLabelAlignment(Qt::AlignRight);
 
     // Pobierz wszystkie domyślne akcje, aby utworzyć pola edycji
-    QMap<QString, QKeySequence> defaultShortcuts = m_config->getAllShortcuts(); // Użyj getAllShortcuts
+    QMap<QString, QKeySequence> defaultShortcuts = m_config->getDefaultShortcutsMap();
+    m_shortcutEdits.clear();
+
+
 
     for (auto it = defaultShortcuts.constBegin(); it != defaultShortcuts.constEnd(); ++it) {
         QString actionId = it.key();
         QString description = getActionDescription(actionId);
-        if (description.isEmpty()) continue; // Pomiń, jeśli nie ma opisu
+        if (description.isEmpty()) {
+            qWarning() << "No description for shortcut action:" << actionId;
+            continue; // Pomiń, jeśli nie ma opisu
+        }
 
         QLabel *descLabel = new QLabel(description + ":", scrollWidget);
         descLabel->setStyleSheet("color: #ddeeff; background-color: transparent; border: none;");
@@ -67,7 +73,9 @@ void ShortcutsSettingsWidget::setupUi() {
             "   border: 1px solid #00aaff;"
             "}"
         );
-        keyEdit->setKeySequence(it.value()); // Ustaw początkową wartość
+
+        // --- ZMIANA: Pobierz AKTUALNĄ wartość skrótu (domyślną lub z ustawień) ---
+        keyEdit->setKeySequence(m_config->getShortcut(actionId)); // Użyj getShortcut
 
         m_formLayout->addRow(descLabel, keyEdit);
         m_shortcutEdits.insert(actionId, keyEdit); // Zapisz wskaźnik do widgetu edycji
@@ -147,12 +155,12 @@ void ShortcutsSettingsWidget::restoreDefaultShortcuts() {
                              "Are you sure you want to restore all keyboard shortcuts to their default values?\nThis action cannot be undone immediately.",
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-        // Usuń zapisane wartości skrótów z konfiguracji
-        QMap<QString, QKeySequence> currentShortcuts = m_config->getAllShortcuts();
-        for(const QString& actionId : currentShortcuts.keys()) {
-            // Użyj specjalnej metody lub flagi w setShortcut, albo usuń klucz
-             m_config->setShortcut(actionId, QKeySequence()); // Ustawienie pustego spowoduje wczytanie domyślnego przy następnym getShortcut
+        // --- ZMIANA: Ustaw domyślne wartości w mapie konfiguracji ---
+        QMap<QString, QKeySequence> defaultShortcuts = m_config->getDefaultShortcutsMap(); // Potrzebujemy metody zwracającej m_defaultShortcuts
+        for(auto it = defaultShortcuts.constBegin(); it != defaultShortcuts.constEnd(); ++it) {
+            m_config->setShortcut(it.key(), it.value()); // Ustaw domyślny w mapie m_shortcuts
         }
+        // --- KONIEC ZMIANY ---
 
         // Odśwież UI, aby pokazać domyślne wartości
         loadSettings();

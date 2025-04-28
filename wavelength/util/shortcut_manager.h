@@ -22,6 +22,9 @@ public:
     // Rejestruje skróty dla danego widgetu (kontekstu)
     void registerShortcuts(QWidget* parent);
 
+    public slots:
+        void updateRegisteredShortcuts();
+
 private:
     explicit ShortcutManager(QObject *parent = nullptr);
     ~ShortcutManager() override = default;
@@ -31,7 +34,7 @@ private:
     WavelengthConfig* m_config;
 
     // Mapowanie widgetu na listę jego aktywnych skrótów (do ewentualnej aktualizacji)
-    QMap<QWidget*, QList<QShortcut*>> m_registeredShortcuts;
+    QMap<QWidget*, QMap<QString, QShortcut*>> m_registeredShortcuts;
 
     // Funkcje pomocnicze do rejestracji dla konkretnych widoków
     void registerMainWindowShortcuts(QMainWindow* window, Navbar* navbar);

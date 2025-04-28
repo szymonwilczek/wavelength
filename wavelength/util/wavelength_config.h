@@ -79,6 +79,7 @@ public:
     QKeySequence getShortcut(const QString& actionId, const QKeySequence& defaultSequence = QKeySequence()) const;
     void setShortcut(const QString& actionId, const QKeySequence& sequence);
     QMap<QString, QKeySequence> getAllShortcuts() const;
+    QMap<QString, QKeySequence> getDefaultShortcutsMap() const; // <<< NOWA METODA
 
     void saveSettings(); // Zapisuje wszystkie bieżące wartości
     void restoreDefaults(); // Przywraca wartości domyślne
@@ -102,6 +103,7 @@ private:
 
     void loadDefaultShortcuts();
     QMap<QString, QKeySequence> m_defaultShortcuts;
+    QMap<QString, QKeySequence> m_shortcuts;
 
     // Zmienne przechowujące wartości
     QString m_relayServerAddress;

@@ -31,6 +31,7 @@
 
 // UI
 #include "../ui/checkbox/cyber_checkbox.h" // Potrzebne dla m_debugModeCheckBox
+#include "../util/shortcut_manager.h"
 #include "settings/tabs/shortcuts_tab/shortcuts_settings_widget.h"
 
 SettingsView::SettingsView(QWidget *parent)
@@ -514,6 +515,8 @@ void SettingsView::saveSettings() {
 
     // Zapisanie wszystkich ustawień do pliku/rejestru
     m_config->saveSettings();
+
+    ShortcutManager::getInstance()->updateRegisteredShortcuts();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
     emit settingsChanged(); // Emituj sygnał po zapisaniu
