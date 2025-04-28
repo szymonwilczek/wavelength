@@ -52,48 +52,18 @@ public:
         return m_blobCenter;
     }
 
-    void applyExternalForce(const QVector2D& force) {
-        qDebug() << "Stosowanie siły zewnętrznej do bloba:" << force;
-        // TODO
-    }
-
     void setLifeColor(const QColor& color);
     void resetLifeColor();
 
     void pauseAllEventTracking();
     void resumeAllEventTracking();
 
-    void resetVisualization() {
-        // Całkowicie resetujemy bloba do stanu początkowego
-        // z oryginalnym rozmiarem i pozycją na środku
-        resetBlobToCenter();
-
-        // Wymuś reset i reinicjalizację HUD
-        m_renderer.resetHUD();
-        m_renderer.forceHUDInitialization(m_blobCenter, m_params.blobRadius,
-                                        m_params.borderColor, width(), height());
-
-        // Sygnał informujący o konieczności aktualizacji innych elementów UI
-        emit visualizationReset();
-
-        // Odśwież widok
-        update();
-    }
+    void resetVisualization();
 
     public slots:
-    void show() {
-        if (!isVisible()) {
-            setVisible(true);
-            resumeAllEventTracking();
-        }
-    }
+    void show();
 
-    void hide() {
-        if (isVisible()) {
-            setVisible(false);
-            pauseAllEventTracking();
-        }
-    }
+    void hide();
 
     void setBackgroundColor(const QColor &color);
 
@@ -143,101 +113,9 @@ private:
 
     void applyIdleEffect();
 
-    void resetBlobToCenter() {
-        std::lock_guard<std::mutex> lock(m_pointsMutex);
-        // Zapamiętaj aktualny promień bloba
-        double originalRadius = m_params.blobRadius;
+    void resetBlobToCenter();
 
-        // Całkowicie zresetuj bloba
-        m_controlPoints.clear();
-        m_targetPoints.clear();
-        m_velocity.clear();
-
-        // Ustaw bloba dokładnie na środku
-        m_blobCenter = QPointF(width() / 2.0, height() / 2.0);
-
-        // Generuj punkty kontrolne w nieregularnym, organicznym kształcie
-        m_controlPoints = generateOrganicShape(m_blobCenter, originalRadius, m_params.numPoints);
-        m_targetPoints = m_controlPoints;
-        m_velocity.resize(m_params.numPoints, QPointF(0, 0));
-
-        // Przełącz na stan IDLE i zresetuj zachowanie
-        if (m_idleState) {
-            static_cast<IdleState*>(m_idleState.get())->resetInitialization();
-        }
-        switchToState(BlobConfig::IDLE);
-    }
-
-    std::vector<QPointF> generateOrganicShape(const QPointF& center, double baseRadius, int numPoints) {
-    std::vector<QPointF> points;
-    points.reserve(numPoints);
-
-    // Bardziej umiarkowane parametry deformacji - bliżej okręgu
-    double minDeform = 0.9;  // Mniejsze wcięcia (90% oryginalnego promienia)
-    double maxDeform = 1.1;  // Mniejsze wypukłości (110% oryginalnego promienia)
-
-    // Generujemy wieloczęstotliwościowe zakłócenia - z mniejszą amplitudą
-    std::vector<double> randomFactors(numPoints, 1.0);
-
-    // Komponent losowych zakłóceń (wysokiej częstotliwości)
-    for (int i = 0; i < numPoints; ++i) {
-        // Mniejszy zakres losowości
-        double baseFactor = minDeform + QRandomGenerator::global()->generateDouble() * (maxDeform - minDeform);
-        randomFactors[i] = baseFactor;
-    }
-
-    // Dodajemy komponenty o niższych częstotliwościach - ale z mniejszą amplitudą
-    int lobes = 2 + QRandomGenerator::global()->bounded(3); // 2-4 główne płaty
-    double lobePhase = QRandomGenerator::global()->generateDouble() * M_PI * 2; // Losowe przesunięcie fazy
-
-    for (int i = 0; i < numPoints; ++i) {
-        double angle = 2.0 * M_PI * i / numPoints;
-        // Mniejsze falowanie dla głównych płatów
-        double lobeFactor = 0.07 * sin(angle * lobes + lobePhase);
-        // Mniejsze falowanie dla dodatkowych nieregularności
-        double midFactor = 0.04 * sin(angle * (lobes*2+1) + lobePhase * 1.5);
-
-        // Łączymy wszystkie komponenty
-        randomFactors[i] = randomFactors[i] + lobeFactor + midFactor;
-
-        // Węższy dopuszczalny zakres
-        randomFactors[i] = qBound(0.85, randomFactors[i], 1.15);
-    }
-
-    // Więcej przejść wygładzania dla bardziej płynnego kształtu
-    std::vector<double> smoothedFactors = randomFactors;
-    for (int smoothPass = 0; smoothPass < 3; ++smoothPass) {
-        std::vector<double> tempFactors = smoothedFactors;
-        for (int i = 0; i < numPoints; ++i) {
-            int prev = (i > 0) ? i - 1 : numPoints - 1;
-            int next = (i < numPoints - 1) ? i + 1 : 0;
-            // Większa waga dla centralnego punktu = większa regularność
-            smoothedFactors[i] = (tempFactors[prev] * 0.2 +
-                                  tempFactors[i] * 0.6 +
-                                  tempFactors[next] * 0.2);
-        }
-    }
-
-    // Dodatkowe sprawdzenie maksymalnego promienia
-    double maxAllowedRadius = baseRadius * 0.98; // Pozostawiamy 2% marginesu dla bezpieczeństwa
-
-    // Generujemy punkty finalne
-    for (int i = 0; i < numPoints; ++i) {
-        double angle = 2.0 * M_PI * i / numPoints;
-        // Skalowanie promienia aby nigdy nie przekroczyć bazowego promienia
-        double deformedRadius = baseRadius * smoothedFactors[i];
-        if (deformedRadius > maxAllowedRadius) {
-            deformedRadius = maxAllowedRadius;
-        }
-
-        points.push_back(QPointF(
-            center.x() + deformedRadius * cos(angle),
-            center.y() + deformedRadius * sin(angle)
-        ));
-    }
-
-    return points;
-}
+    static std::vector<QPointF> generateOrganicShape(const QPointF& center, double baseRadius, int numPoints);
 
     BlobEventHandler m_eventHandler;
     BlobTransitionManager m_transitionManager;
