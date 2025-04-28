@@ -9,6 +9,7 @@
 #include "../ui/checkbox/cyber_checkbox.h"
 #include "../util/wavelength_config.h"
 
+class ShortcutsSettingsWidget;
 class SystemOverrideManager;
 class SnakeGameLayer;
 class TypingTestLayer;
@@ -67,6 +68,7 @@ private:
     WavelengthSettingsWidget* m_wavelengthTabWidget;
     AppearanceSettingsWidget* m_appearanceTabWidget;
     NetworkSettingsWidget* m_advancedTabWidget;
+    ShortcutsSettingsWidget* m_shortcutsTabWidget;
 
     // Przyciski akcji
     CyberButton *m_saveButton;

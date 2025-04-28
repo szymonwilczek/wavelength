@@ -3,6 +3,10 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QCoreApplication> // Dla nazwy organizacji i aplikacji
+#include <qkeysequence.h>
+
+// Prefiks dla skrótów
+const QString SHORTCUTS_PREFIX = "Shortcuts/";
 
 // Domyślne wartości
 namespace DefaultConfig {
@@ -44,6 +48,7 @@ WavelengthConfig::WavelengthConfig(QObject *parent)
 {
     qDebug() << "Config file path:" << m_settings.fileName();
     loadDefaults(); // Najpierw ustaw domyślne
+    loadDefaultShortcuts();
     loadSettings(); // Następnie nadpisz zapisanymi
 }
 
@@ -70,6 +75,29 @@ void WavelengthConfig::loadDefaults() {
     m_titleBorderColor = DefaultConfig::TITLE_BORDER_COLOR;
     m_titleGlowColor = DefaultConfig::TITLE_GLOW_COLOR;
     m_preferredStartFrequency = "130.0";
+}
+
+void WavelengthConfig::loadDefaultShortcuts() {
+    m_defaultShortcuts.clear();
+    // Okno główne
+    m_defaultShortcuts["MainWindow.CreateWavelength"] = QKeySequence("Ctrl+N");
+    m_defaultShortcuts["MainWindow.JoinWavelength"] = QKeySequence("Ctrl+J");
+    m_defaultShortcuts["MainWindow.OpenSettings"] = QKeySequence("Ctrl+,");
+    // Widok czatu
+    m_defaultShortcuts["ChatView.AbortConnection"] = QKeySequence("Ctrl+Q");
+    m_defaultShortcuts["ChatView.FocusInput"] = QKeySequence("Ctrl+L");
+    m_defaultShortcuts["ChatView.AttachFile"] = QKeySequence("Ctrl+O");
+    m_defaultShortcuts["ChatView.SendMessage"] = QKeySequence("Ctrl+Enter");
+    m_defaultShortcuts["ChatView.TogglePTT"] = QKeySequence("Space"); // Użyjemy spacji
+    // Widok ustawień
+    m_defaultShortcuts["SettingsView.SwitchTab0"] = QKeySequence("Ctrl+1");
+    m_defaultShortcuts["SettingsView.SwitchTab1"] = QKeySequence("Ctrl+2");
+    m_defaultShortcuts["SettingsView.SwitchTab2"] = QKeySequence("Ctrl+3");
+    m_defaultShortcuts["SettingsView.SwitchTab3"] = QKeySequence("Ctrl+4");
+    m_defaultShortcuts["SettingsView.SwitchTab4"] = QKeySequence("Ctrl+5"); // Dla nowej zakładki skrótów
+    m_defaultShortcuts["SettingsView.Save"] = QKeySequence("Ctrl+S");
+    m_defaultShortcuts["SettingsView.Defaults"] = QKeySequence("Ctrl+D");
+    m_defaultShortcuts["SettingsView.Back"] = QKeySequence(Qt::Key_Escape);
 }
 
 void WavelengthConfig::loadSettings() {
@@ -278,6 +306,28 @@ void WavelengthConfig::setMaxReconnectAttempts(int attempts) { if(m_maxReconnect
 bool WavelengthConfig::isDebugMode() const { return m_debugMode; }
 void WavelengthConfig::setDebugMode(bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
 
+QKeySequence WavelengthConfig::getShortcut(const QString& actionId, const QKeySequence& defaultSequence) const {
+    // Użyj domyślnego skrótu z mapy, jeśli nie podano innego
+    QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
+    // Odczytaj z ustawień, używając domyślnego jako fallback
+    return m_settings.value(SHORTCUTS_PREFIX + actionId, actualDefault).value<QKeySequence>();
+}
+
+void WavelengthConfig::setShortcut(const QString& actionId, const QKeySequence& sequence) {
+    m_settings.setValue(SHORTCUTS_PREFIX + actionId, sequence);
+    // Nie emitujemy tutaj configChanged, bo zmiana skrótu wymaga restartu
+    // lub bardziej złożonego mechanizmu aktualizacji na żywo.
+    // Zapis nastąpi przy saveSettings() lub sync().
+}
+
+QMap<QString, QKeySequence> WavelengthConfig::getAllShortcuts() const {
+    QMap<QString, QKeySequence> shortcuts;
+    // Iteruj po domyślnych, aby mieć pewność, że mamy wszystkie akcje
+    for (auto it = m_defaultShortcuts.constBegin(); it != m_defaultShortcuts.constEnd(); ++it) {
+        shortcuts.insert(it.key(), getShortcut(it.key(), it.value()));
+    }
+    return shortcuts;
+}
 
 QVariant WavelengthConfig::getSetting(const QString& key) const {
     if (key == "relayServerAddress") return m_relayServerAddress;

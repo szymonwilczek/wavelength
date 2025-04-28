@@ -186,6 +186,10 @@ add_executable(
         wavelength/ui/chat/effects/mask_overlay.h
         wavelength/ui/chat/user_info_label.cpp
         wavelength/ui/chat/user_info_label.h
+        wavelength/util/shortcut_manager.cpp
+        wavelength/util/shortcut_manager.h
+        wavelength/view/settings/tabs/shortcuts_tab/shortcuts_settings_widget.cpp
+        wavelength/view/settings/tabs/shortcuts_tab/shortcuts_settings_widget.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 

@@ -10,6 +10,7 @@
 #include <QHostAddress>
 #include <QMap>
 #include <QVariant>
+#include <QKeySequence>
 
 class WavelengthConfig : public QObject {
     Q_OBJECT
@@ -75,6 +76,10 @@ public:
     void addRecentColor(const QColor& color);
     // -----------------------
 
+    QKeySequence getShortcut(const QString& actionId, const QKeySequence& defaultSequence = QKeySequence()) const;
+    void setShortcut(const QString& actionId, const QKeySequence& sequence);
+    QMap<QString, QKeySequence> getAllShortcuts() const;
+
     void saveSettings(); // Zapisuje wszystkie bieżące wartości
     void restoreDefaults(); // Przywraca wartości domyślne
 
@@ -94,6 +99,9 @@ private:
 
     static WavelengthConfig* m_instance;
     QSettings m_settings;
+
+    void loadDefaultShortcuts();
+    QMap<QString, QKeySequence> m_defaultShortcuts;
 
     // Zmienne przechowujące wartości
     QString m_relayServerAddress;
