@@ -192,6 +192,8 @@ add_executable(
         src/ui/sliders/cyber_slider.h
         src/ui/buttons/cyber_push_button.cpp
         src/ui/buttons/cyber_push_button.h
+        src/chat/files/attachments/attachment_data_store.cpp
+        src/chat/files/attachments/attachment_data_store.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
