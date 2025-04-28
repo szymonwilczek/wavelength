@@ -188,6 +188,10 @@ add_executable(
         src/ui/sliders/cyber_audio_slider.h
         src/ui/buttons/cyber_audio_button.cpp
         src/ui/buttons/cyber_audio_button.h
+        src/ui/sliders/cyber_slider.cpp
+        src/ui/sliders/cyber_slider.h
+        src/ui/buttons/cyber_push_button.cpp
+        src/ui/buttons/cyber_push_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
