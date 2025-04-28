@@ -11,6 +11,7 @@
 #include "src/blob/core/blob_animation.h"
 #include <QLabel>
 #include <QTimer>
+#include <QStyleFactory>
 
 #include "src/app/managers/font_manager.h"
 #include "src/app/managers/app_instance_manager.h"
