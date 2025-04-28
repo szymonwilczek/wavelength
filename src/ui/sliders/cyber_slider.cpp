@@ -8,6 +8,11 @@ CyberSlider::CyberSlider(Qt::Orientation orientation, QWidget *parent): QSlider(
     setStyleSheet("background: transparent; border: none;");
 }
 
+void CyberSlider::setGlowIntensity(double intensity) {
+    m_glowIntensity = intensity;
+    update();
+}
+
 void CyberSlider::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 

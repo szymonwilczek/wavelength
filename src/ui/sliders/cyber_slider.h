@@ -18,10 +18,7 @@ public:
     CyberSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
 
     double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(double intensity) {
-        m_glowIntensity = intensity;
-        update();
-    }
+    void setGlowIntensity(double intensity);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
