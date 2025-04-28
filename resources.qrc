@@ -28,6 +28,7 @@
         <file>resources/sounds/Joy/JOImp3.mp3</file>
         <file>resources/sounds/interface/bloop.mp3</file>
         <file>resources/sounds/interface/boot_up.wav</file>
+        <file>resources/sounds/interface/shutdown.wav</file>
         <file>resources/sounds/interface/button_click.wav</file>
         <file>resources/sounds/interface/ptt_off.wav</file>
         <file>resources/sounds/interface/ptt_on.wav</file>
