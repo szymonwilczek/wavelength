@@ -22,6 +22,7 @@
 #include "wavelength/ui/cyberpunk_style.h"
 #include "wavelength/view/main_window/cyberpunk_text_effect.h"
 #include "wavelength/ui/widgets/animated_stacked_widget.h"
+#include "wavelength/util/shortcut_manager.h"
 #include "wavelength/view/settings_view.h"
 #include "wavelength/view/settings/tabs/classified_tab/components/system_override_manager.h"
 
@@ -477,6 +478,11 @@ int main(int argc, char *argv[]) {
     if (!instanceManager->isCreator()) {
         window.setWindowTitle("Wavelength - Sub Instance");
     }
+
+    ShortcutManager* shortcutMgr = ShortcutManager::getInstance();
+    shortcutMgr->registerShortcuts(&window);    // Rejestruje skróty dla QMainWindow (Create, Join, Settings)
+    shortcutMgr->registerShortcuts(chatView);   // Rejestruje skróty dla WavelengthChatView
+    shortcutMgr->registerShortcuts(settingsView); // Rejestruje skróty dla SettingsVie
 
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {

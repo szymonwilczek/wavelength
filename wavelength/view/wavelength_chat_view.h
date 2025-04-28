@@ -179,6 +179,7 @@ public:
 
         // Pole wprowadzania wiadomości
         inputField = new QLineEdit(this);
+        inputField->setObjectName("chatInputField");
         inputField->setPlaceholderText("Wpisz wiadomość...");
         inputField->setStyleSheet(ChatStyle::getInputFieldStyle());
         inputLayout->addWidget(inputField, 1);
@@ -269,39 +270,7 @@ public:
         update();
     }
 
-    void attachFile() {
-        QString filePath = QFileDialog::getOpenFileName(this,
-                                                        "Select File to Attach",
-                                                        QString(),
-                                                        "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
 
-        if (filePath.isEmpty()) {
-            return;
-        }
-
-        // Pobieramy nazwę pliku
-        QFileInfo fileInfo(filePath);
-        QString fileName = fileInfo.fileName();
-
-        // Generujemy identyfikator dla komunikatu
-        QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
-
-        // Wyświetlamy początkowy komunikat
-        QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
-                .arg(fileName);
-
-        messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
-
-        // Uruchamiamy asynchroniczny proces przetwarzania pliku
-        WavelengthMessageService *service = WavelengthMessageService::getInstance();
-        bool started = service->sendFileMessage(filePath, progressMsgId);
-
-        if (!started) {
-            messageArea->addMessage(progressMsgId,
-                                    "<span style=\"color:#ff5555;\">Failed to start file processing.</span>",
-                                    StreamMessage::MessageType::Transmitted);
-        }
-    }
 
     void setWavelength(QString frequency, const QString &name = QString()) {
         currentFrequency = frequency;
@@ -384,6 +353,41 @@ public:
         headerLabel->clear();
         inputField->clear();
         setVisible(false);
+    }
+
+    public slots:
+    void attachFile() {
+        QString filePath = QFileDialog::getOpenFileName(this,
+                                                        "Select File to Attach",
+                                                        QString(),
+                                                        "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
+
+        if (filePath.isEmpty()) {
+            return;
+        }
+
+        // Pobieramy nazwę pliku
+        QFileInfo fileInfo(filePath);
+        QString fileName = fileInfo.fileName();
+
+        // Generujemy identyfikator dla komunikatu
+        QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
+
+        // Wyświetlamy początkowy komunikat
+        QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
+                .arg(fileName);
+
+        messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
+
+        // Uruchamiamy asynchroniczny proces przetwarzania pliku
+        WavelengthMessageService *service = WavelengthMessageService::getInstance();
+        bool started = service->sendFileMessage(filePath, progressMsgId);
+
+        if (!started) {
+            messageArea->addMessage(progressMsgId,
+                                    "<span style=\"color:#ff5555;\">Failed to start file processing.</span>",
+                                    StreamMessage::MessageType::Transmitted);
+        }
     }
 
 protected:

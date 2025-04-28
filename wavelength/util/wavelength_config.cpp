@@ -3,6 +3,10 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QCoreApplication> // Dla nazwy organizacji i aplikacji
+#include <qkeysequence.h>
+
+// Prefiks dla skrótów
+const QString SHORTCUTS_PREFIX = "Shortcuts/";
 
 // Domyślne wartości
 namespace DefaultConfig {
@@ -42,9 +46,14 @@ WavelengthConfig::WavelengthConfig(QObject *parent)
     m_settings(QSettings::UserScope,
      QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
-    qDebug() << "Config file path:" << m_settings.fileName();
-    loadDefaults(); // Najpierw ustaw domyślne
-    loadSettings(); // Następnie nadpisz zapisanymi
+    qDebug() << "[Config] Initializing... Settings file:" << m_settings.fileName();
+    // 1. Załaduj definicje domyślnych skrótów
+    loadDefaultShortcuts();
+    // 2. Ustaw domyślne wartości dla wszystkich ustawień (w tym skopiuj domyślne skróty do m_shortcuts)
+    loadDefaults();
+    // 3. Załaduj zapisane ustawienia, nadpisując domyślne (w tym w m_shortcuts)
+    loadSettings();
+    qDebug() << "[Config] Initialization complete.";
 }
 
 void WavelengthConfig::loadDefaults() {
@@ -70,6 +79,30 @@ void WavelengthConfig::loadDefaults() {
     m_titleBorderColor = DefaultConfig::TITLE_BORDER_COLOR;
     m_titleGlowColor = DefaultConfig::TITLE_GLOW_COLOR;
     m_preferredStartFrequency = "130.0";
+    m_shortcuts = m_defaultShortcuts;
+}
+
+void WavelengthConfig::loadDefaultShortcuts() {
+    m_defaultShortcuts.clear();
+    // Okno główne
+    m_defaultShortcuts["MainWindow.CreateWavelength"] = QKeySequence("Ctrl+N");
+    m_defaultShortcuts["MainWindow.JoinWavelength"] = QKeySequence("Ctrl+J");
+    m_defaultShortcuts["MainWindow.OpenSettings"] = QKeySequence("Ctrl+,");
+    // Widok czatu
+    m_defaultShortcuts["ChatView.AbortConnection"] = QKeySequence("Ctrl+Q");
+    m_defaultShortcuts["ChatView.FocusInput"] = QKeySequence("Ctrl+L");
+    m_defaultShortcuts["ChatView.AttachFile"] = QKeySequence("Ctrl+O");
+    m_defaultShortcuts["ChatView.SendMessage"] = QKeySequence("Ctrl+Enter");
+    m_defaultShortcuts["ChatView.TogglePTT"] = QKeySequence("Space"); // Użyjemy spacji
+    // Widok ustawień
+    m_defaultShortcuts["SettingsView.SwitchTab0"] = QKeySequence("Ctrl+1");
+    m_defaultShortcuts["SettingsView.SwitchTab1"] = QKeySequence("Ctrl+2");
+    m_defaultShortcuts["SettingsView.SwitchTab2"] = QKeySequence("Ctrl+3");
+    m_defaultShortcuts["SettingsView.SwitchTab3"] = QKeySequence("Ctrl+4");
+    m_defaultShortcuts["SettingsView.SwitchTab4"] = QKeySequence("Ctrl+5"); // Dla nowej zakładki skrótów
+    m_defaultShortcuts["SettingsView.Save"] = QKeySequence("Ctrl+S");
+    m_defaultShortcuts["SettingsView.Defaults"] = QKeySequence("Ctrl+D");
+    m_defaultShortcuts["SettingsView.Back"] = QKeySequence(Qt::Key_Escape);
 }
 
 void WavelengthConfig::loadSettings() {
@@ -104,6 +137,23 @@ void WavelengthConfig::loadSettings() {
     m_keepAliveInterval = m_settings.value("keepAliveInterval", m_keepAliveInterval).toInt();
     m_maxReconnectAttempts = m_settings.value("maxReconnectAttempts", m_maxReconnectAttempts).toInt();
     m_settings.endGroup();
+
+    m_settings.beginGroup(SHORTCUTS_PREFIX); // Użyj grupy dla skrótów
+    QStringList shortcutKeys = m_settings.childKeys();
+    for (const QString& key : shortcutKeys) {
+        QKeySequence sequence = m_settings.value(key).value<QKeySequence>();
+        if (!sequence.isEmpty()) {
+            QString actionId = key;
+            m_shortcuts[actionId] = sequence;
+            qDebug() << "[Config] Loaded shortcut from settings:" << actionId << "=" << sequence.toString();
+        } else {
+            qDebug() << "[Config] Warning: Empty shortcut found in settings for key:" << key;
+            if (m_defaultShortcuts.contains(key) && !m_shortcuts.contains(key)) {
+                m_shortcuts[key] = m_defaultShortcuts.value(key);
+            }
+        }
+    }
+    m_settings.endGroup(); // Koniec grupy Shortcuts
 }
 
 void WavelengthConfig::saveSettings() {
@@ -139,12 +189,33 @@ void WavelengthConfig::saveSettings() {
     m_settings.setValue("maxReconnectAttempts", m_maxReconnectAttempts);
     m_settings.endGroup();
 
+    // --- NOWE: Zapisywanie skrótów ---
+    m_settings.beginGroup(SHORTCUTS_PREFIX); // Użyj grupy dla skrótów
+    // Wyczyść stare klucze, aby usunąć te, które mogły zostać przywrócone do domyślnych
+    // (alternatywnie, można by zapisywać tylko te, które różnią się od domyślnych)
+    m_settings.remove(""); // Usuwa wszystkie klucze w bieżącej grupie
+
+    for (auto it = m_shortcuts.constBegin(); it != m_shortcuts.constEnd(); ++it) {
+        QString actionId = it.key();
+        QKeySequence sequence = it.value();
+        // Opcjonalnie: Zapisuj tylko jeśli różni się od domyślnego
+        // if (sequence != m_defaultShortcuts.value(actionId)) {
+        m_settings.setValue(actionId, sequence); // Zapisz pod ID akcji
+        qDebug() << "[Config] Saving shortcut to settings:" << actionId << "=" << sequence.toString();
+        // }
+    }
+    m_settings.endGroup(); // Koniec grupy Shortcuts
+    // --- KONIEC NOWE ---
+
     m_settings.sync(); // Wymuś zapis na dysk
     qDebug() << "Settings saved to:" << m_settings.fileName();
 }
 
 void WavelengthConfig::restoreDefaults() {
     loadDefaults();
+    m_settings.beginGroup(SHORTCUTS_PREFIX);
+    m_settings.remove(""); // Usuń wszystkie klucze w grupie skrótów
+    m_settings.endGroup();
     saveSettings(); // Zapisz domyślne wartości
     emit configChanged("all"); // Sygnalizuj zmianę wszystkich ustawień
     emit recentColorsChanged(); // Zaktualizuj też ostatnie kolory (wyczyszczone)
@@ -278,6 +349,31 @@ void WavelengthConfig::setMaxReconnectAttempts(int attempts) { if(m_maxReconnect
 bool WavelengthConfig::isDebugMode() const { return m_debugMode; }
 void WavelengthConfig::setDebugMode(bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
 
+QKeySequence WavelengthConfig::getShortcut(const QString& actionId, const QKeySequence& defaultSequence) const {
+    // Odczytaj z mapy m_shortcuts, używając domyślnego jako fallback
+    QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
+    QKeySequence result = m_shortcuts.value(actionId, actualDefault);
+    qDebug() << "[Config] getShortcut(" << actionId << "): Returning from map:" << result.toString();
+    return result;
+}
+
+void WavelengthConfig::setShortcut(const QString& actionId, const QKeySequence& sequence) {
+    // Zaktualizuj mapę m_shortcuts
+    if (m_shortcuts.value(actionId) != sequence) {
+        qDebug() << "[Config] setShortcut(" << actionId << "): Updating map to" << sequence.toString();
+        m_shortcuts[actionId] = sequence;
+        // Zapis do QSettings nastąpi podczas saveSettings()
+    }
+}
+
+QMap<QString, QKeySequence> WavelengthConfig::getAllShortcuts() const {
+    // Zwróć kopię mapy m_shortcuts
+    return m_shortcuts;
+}
+
+QMap<QString, QKeySequence> WavelengthConfig::getDefaultShortcutsMap() const {
+    return m_defaultShortcuts; // Zwróć kopię mapy domyślnych
+}
 
 QVariant WavelengthConfig::getSetting(const QString& key) const {
     if (key == "relayServerAddress") return m_relayServerAddress;

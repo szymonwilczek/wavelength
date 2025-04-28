@@ -31,6 +31,8 @@
 
 // UI
 #include "../ui/checkbox/cyber_checkbox.h" // Potrzebne dla m_debugModeCheckBox
+#include "../util/shortcut_manager.h"
+#include "settings/tabs/shortcuts_tab/shortcuts_settings_widget.h"
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
@@ -124,7 +126,7 @@ void SettingsView::setupUi() {
 
     // Tworzenie przycisków zakładek
     // Zmieniono "Performance" na "Network"
-    QStringList tabNames = {"Wavelength", "Appearance", "Network","CLASSIFIED"};
+    QStringList tabNames = {"Wavelength", "Appearance", "Network","Shortcuts", "CLASSIFIED"};
 
     for (int i = 0; i < tabNames.size(); i++) {
         TabButton *btn = new TabButton(tabNames[i], m_tabBar);
@@ -178,7 +180,10 @@ void SettingsView::setupUi() {
     m_advancedTabWidget = new NetworkSettingsWidget(m_tabContent); // <<< Utworzenie nowej zakładki
     m_tabContent->addWidget(m_advancedTabWidget); // Index 2
 
-    setupClassifiedTab(); // Tworzy zakładkę "CLASSIFIED" - Index 3
+    m_shortcutsTabWidget = new ShortcutsSettingsWidget(m_tabContent);
+    m_tabContent->addWidget(m_shortcutsTabWidget); // Index 3
+
+    setupClassifiedTab(); // Tworzy zakładkę "CLASSIFIED" - Index 4
 
     mainLayout->addWidget(m_tabContent, 1);
 
@@ -488,6 +493,8 @@ void SettingsView::loadSettingsFromRegistry() {
     if (m_advancedTabWidget) { // <<< Dodano ładowanie nowej zakładki
         m_advancedTabWidget->loadSettings();
     }
+
+    if (m_shortcutsTabWidget) m_shortcutsTabWidget->loadSettings();
 }
 
 void SettingsView::saveSettings() {
@@ -503,13 +510,13 @@ void SettingsView::saveSettings() {
     if (m_advancedTabWidget) { // <<< Dodano zapisywanie nowej zakładki
         m_advancedTabWidget->saveSettings();
     }
-    // Usunięto bezpośrednie zapisywanie:
-    // m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
-    // m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
-    // m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
+
+    if (m_shortcutsTabWidget) m_shortcutsTabWidget->saveSettings();
 
     // Zapisanie wszystkich ustawień do pliku/rejestru
     m_config->saveSettings();
+
+    ShortcutManager::getInstance()->updateRegisteredShortcuts();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
     emit settingsChanged(); // Emituj sygnał po zapisaniu
@@ -535,7 +542,7 @@ void SettingsView::switchToTab(int tabIndex) {
     }
     m_tabContent->setCurrentIndex(tabIndex);
 
-    constexpr int ClassifiedTabIndex = 3;
+    constexpr int ClassifiedTabIndex = 4;
     if (tabIndex == ClassifiedTabIndex) {
         resetSecurityLayers();
     }
