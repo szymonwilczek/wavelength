@@ -1,8 +1,7 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_message_service.h"
+
+#include "../../../auth/authentication_manager.h"
+#include "../../files/attachments/attachment_queue_manager.h"
 
 bool WavelengthMessageService::sendPttRequest(const QString &frequency) {
     QWebSocket* socket = getSocketForFrequency(frequency);

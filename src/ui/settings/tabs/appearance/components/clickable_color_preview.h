@@ -1,9 +1,7 @@
 #ifndef CLICKABLE_COLOR_PREVIEW_H
 #define CLICKABLE_COLOR_PREVIEW_H
 
-#include <QWidget>
 #include <QMouseEvent>
-#include <QColor>
 #include <QString>
 #include <QDebug>
 #include <QStyleOption>

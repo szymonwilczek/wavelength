@@ -1,8 +1,6 @@
-//
-// Created by szymo on 26.03.2025.
-//
-
 #include "electronic_shutdown_effect.h"
+
+#include <qmath.h>
 
 ElectronicShutdownEffect::ElectronicShutdownEffect(QObject *parent): QGraphicsEffect(parent), m_progress(0.0), m_lastProgress(-1.0),
                                                                      m_resultCache(5), // Mała pamięć podręczna (tylko 5 klatek)

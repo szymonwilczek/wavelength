@@ -2,18 +2,9 @@
 #define CYBER_ATTACHMENT_VIEWER_H
 
 #include <QApplication>
-#include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QPushButton>
-#include <QTimer>
-#include <QPropertyAnimation>
-#include <QDateTime>
-#include <QPainter>
-#include <QRandomGenerator>
-#include <QPainterPath>
 #include <QDebug>
-#include <QEvent>
 
 #include "../chat/effects/mask_overlay.h"
 

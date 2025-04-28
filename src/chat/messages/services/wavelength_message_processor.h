@@ -1,21 +1,8 @@
 #ifndef WAVELENGTH_MESSAGE_PROCESSOR_H
 #define WAVELENGTH_MESSAGE_PROCESSOR_H
 
-#include <QObject>
-#include <QWebSocket>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QMap>
-#include <QString>
-#include <QDebug>
-#include <QDateTime>
-#include <qtconcurrentrun.h>
-
 #include "wavelength_message_service.h"
-#include "../../files/attachments/attachment_queue_manager.h"
-#include "../../../storage/wavelength_registry.h"
 #include "../handler/message_handler.h"
-#include "../formatter/message_formatter.h"
 
 class WavelengthMessageProcessor : public QObject {
     Q_OBJECT

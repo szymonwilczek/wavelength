@@ -1,8 +1,7 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_message_processor.h"
+
+#include "../../files/attachments/attachment_data_store.h"
+#include "../formatter/message_formatter.h"
 
 void WavelengthMessageProcessor::processIncomingMessage(const QString &message, QString frequency) {
     qDebug() << "Processing message for wavelength" << frequency << ":" << message.left(50) + "...";

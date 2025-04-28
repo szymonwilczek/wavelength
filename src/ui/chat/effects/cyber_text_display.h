@@ -2,17 +2,12 @@
 #define CYBER_TEXT_DISPLAY_H
 
 #include <QAudioOutput>
-#include <QWidget>
 #include <QLabel>
 #include <QTimer>
 #include <QDateTime>
 #include <QRandomGenerator>
 #include <QPainter>
-#include <QPainterPath>
-#include <QPropertyAnimation>
 #include <QFontDatabase>
-#include <QSoundEffect>
-#include <QDebug>
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 

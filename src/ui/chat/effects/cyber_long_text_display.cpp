@@ -1,7 +1,3 @@
-//
-// Created by szymo on 28.03.2025.
-//
-
 #include "cyber_long_text_display.h"
 
 CyberLongTextDisplay::CyberLongTextDisplay(const QString &text, const QColor &textColor, QWidget *parent): QWidget(parent), m_originalText(text), m_textColor(textColor),

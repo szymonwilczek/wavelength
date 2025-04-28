@@ -2,7 +2,7 @@
 
 #include <QStandardPaths>
 #include <QDir>
-#include <QCoreApplication> // Dla nazwy organizacji i aplikacji
+#include <QCoreApplication>
 #include <qkeysequence.h>
 
 // Prefiks dla skrótów

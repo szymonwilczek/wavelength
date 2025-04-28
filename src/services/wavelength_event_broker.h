@@ -2,11 +2,8 @@
 #define WAVELENGTH_EVENT_BROKER_H
 
 #include <QObject>
-#include <QMap>
 #include <QString>
-#include <QVariant>
 #include <QDebug>
-#include <functional>
 
 class WavelengthEventBroker : public QObject {
     Q_OBJECT

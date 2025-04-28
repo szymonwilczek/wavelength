@@ -1,7 +1,3 @@
-//
-// Created by szymo on 6.04.2025.
-//
-
 #ifndef CYBER_BUTTON_H
 #define CYBER_BUTTON_H
 #include <QPainter>

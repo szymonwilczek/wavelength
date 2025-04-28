@@ -1,8 +1,6 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_creator.h"
+
+#include "../../../auth/authentication_manager.h"
 
 bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProtected, const QString &password) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();

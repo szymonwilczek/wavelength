@@ -1,7 +1,3 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "disintegration_effect.h"
 
 DisintegrationEffect::DisintegrationEffect(QObject *parent): QGraphicsEffect(parent), m_progress(0.0),

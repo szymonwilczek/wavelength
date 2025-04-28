@@ -5,12 +5,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QPointF>
-#include <QSize>
-#include <QEvent>
-#include <QResizeEvent>
 #include <QMoveEvent>
-#include <QDateTime>
-#include <QVector2D>
 #include <QDebug>
 
 class BlobEventHandler : public QObject {

@@ -3,14 +3,10 @@
 
 #include <QObject>
 #include <QString>
-#include <QDebug>
-#include <qfile.h>
 
 #include "events/creator/wavelength_creator.h"
 #include "events/joiner/wavelength_joiner.h"
-#include "events/leaver/wavelength_leaver.h"
 #include "../chat/messages/services/wavelength_message_service.h"
-#include "../chat/messages/services//wavelength_message_processor.h"
 #include "../services/wavelength_state_manager.h"
 #include "../services/wavelength_event_broker.h"
 #include "../../src/app/wavelength_config.h"

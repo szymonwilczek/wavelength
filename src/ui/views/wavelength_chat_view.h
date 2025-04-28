@@ -2,25 +2,11 @@
 #define WAVELENGTH_CHAT_VIEW_H
 
 #include <QAudioInput>
-#include <qfileinfo.h>
-#include <QWidget>
-#include <QHBoxLayout>
 #include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
-#include <QMessageBox>
-#include <QTimer>
-#include <QFileDialog>
-#include <QPainter>
-#include <QPainterPath>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QPropertyAnimation>
 #include <QSoundEffect>
 
 #include "../../ui/chat/wavelength_stream_display.h"
 #include "../../session/wavelength_session_coordinator.h"
-#include "../../ui/chat/style/chat_style.h"
 #include "../buttons/cyber_chat_button.h"
 
 

@@ -2,13 +2,8 @@
 #define WAVELENGTH_STATE_MANAGER_H
 
 #include <QObject>
-#include <QMap>
 #include <QString>
 #include <QList>
-#include <QDebug>
-#include <QDateTime>
-#include <QAbstractSocket>
-#include <QVariant>
 
 #include "../storage/wavelength_registry.h"
 

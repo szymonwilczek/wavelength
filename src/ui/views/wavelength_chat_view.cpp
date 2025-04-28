@@ -1,8 +1,7 @@
-//
-// Created by szymo on 08.03.2025.
-//
-
 #include "wavelength_chat_view.h"
+
+#include "../chat/style/chat_style.h"
+#include <QFileDialog>
 
 WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scanlineOpacity(0.15) {
     setObjectName("chatViewContainer");

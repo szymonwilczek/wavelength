@@ -2,14 +2,12 @@
 #include "../../ui/buttons/cyberpunk_button.h"
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSpacerItem> // Upewnij się, że jest dołączone
-#include <QFont>
+#include <QSpacerItem>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
 #include <QPushButton>
-#include <QFontDatabase>
 #include <QGraphicsDropShadowEffect>
-#include <QSoundEffect> // Dodaj dołączenie
+#include <QSoundEffect>
 
 #include "network_status_widget.h"
 #include "../../app/managers/font_manager.h"

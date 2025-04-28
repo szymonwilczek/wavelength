@@ -1,8 +1,7 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "cyber_attachment_viewer.h"
+
+#include <QPainterPath>
+#include <QPropertyAnimation>
 
 CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), m_decryptionCounter(0),
                                                                m_isScanning(false), m_isDecrypted(false) {

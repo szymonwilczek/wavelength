@@ -1,7 +1,3 @@
-//
-// Created by szymo on 6.04.2025.
-//
-
 #include "cyber_button.h"
 
 CyberButton::CyberButton(const QString &text, QWidget *parent, bool isPrimary): QPushButton(text, parent), m_glowIntensity(0.5), m_isPrimary(isPrimary) {

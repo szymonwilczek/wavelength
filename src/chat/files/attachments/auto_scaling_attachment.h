@@ -1,9 +1,6 @@
 #ifndef AUTO_SCALING_ATTACHMENT_H
 #define AUTO_SCALING_ATTACHMENT_H
 
-#include <QWidget>
-#include <QGraphicsOpacityEffect>
-#include <QDesktopWidget>
 #include <QScreen>
 
 #include "../gif/player/inline_gif_player.h"

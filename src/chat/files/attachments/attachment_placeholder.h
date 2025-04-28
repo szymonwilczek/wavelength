@@ -1,22 +1,13 @@
 #ifndef ATTACHMENT_PLACEHOLDER_H
 #define ATTACHMENT_PLACEHOLDER_H
-#include <qfileinfo.h>
 #include <qfuture.h>
-#include <QLabel>
-#include <QPushButton>
 #include <QScrollArea>
-#include <QScrollBar>
-#include <qtconcurrentrun.h>
-#include <QVBoxLayout>
 #include <QWidget>
 #include <QWindow>
 
 #include "attachment_queue_manager.h"
-#include "auto_scaling_attachment.h"
-#include "../../messages/formatter/message_formatter.h"
 #include "../../../ui/files/cyber_attachment_viewer.h"
 #include "../gif/player/inline_gif_player.h"
-#include "../image/displayer/image_viewer.h"
 #include "../video/player/video_player_overlay.h"
 
 class AttachmentPlaceholder : public QWidget {

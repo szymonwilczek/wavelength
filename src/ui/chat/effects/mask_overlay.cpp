@@ -1,7 +1,3 @@
-//
-// Created by szymo on 21.04.2025.
-//
-
 #include "mask_overlay.h"
 
 MaskOverlay::MaskOverlay(QWidget *parent): QWidget(parent), m_revealPercentage(0), m_scanLineY(0) {

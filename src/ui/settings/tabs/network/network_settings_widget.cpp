@@ -1,6 +1,6 @@
 #include "network_settings_widget.h"
 #include "../../../../app/wavelength_config.h"
-#include "../../../../ui/input/cyber_line_edit.h" // Potrzebne dla CyberLineEdit
+#include "../../../../ui/input/cyber_line_edit.h"
 
 #include <QLabel>
 #include <QSpinBox>

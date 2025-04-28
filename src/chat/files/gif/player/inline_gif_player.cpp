@@ -1,7 +1,3 @@
-//
-// Created by szymo on 17.03.2025.
-//
-
 #include "inline_gif_player.h"
 
 InlineGifPlayer::InlineGifPlayer(const QByteArray &gifData, QWidget *parent): QFrame(parent), m_gifData(gifData) {

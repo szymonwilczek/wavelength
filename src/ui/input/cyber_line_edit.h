@@ -6,8 +6,6 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 
-
-// Cyberpunkowe pole tekstowe
 class CyberLineEdit : public QLineEdit {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)

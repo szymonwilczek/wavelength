@@ -7,32 +7,11 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
-#include <QVector3D>
-#include <QMatrix4x4>
-#include <QTimer>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QPainter>
-#include <QLabel>
-#include <QPushButton>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
-#include <QGraphicsOpacityEffect>
-#include <QGraphicsEffect>
-#include <QSequentialAnimationGroup>
-#include <QKeyEvent>
-#include <QQueue>
-#include <QPainterPath>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QScroller>
-#include <QVBoxLayout>
 
 #include "stream_message.h"
 #include "../labels/user_info_label.h"
 
 struct UserVisuals {
-    // QPainterPath shape; // Już niepotrzebne
     QColor color;
 };
 

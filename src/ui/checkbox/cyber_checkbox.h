@@ -1,13 +1,8 @@
-//
-// Created by szymo on 6.04.2025.
-//
-
 #ifndef CYBER_CHECKBOX_H
 #define CYBER_CHECKBOX_H
 #include <QCheckBox>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPropertyAnimation>
 #include <QStyleOptionButton>
 
 

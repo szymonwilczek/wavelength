@@ -1,7 +1,3 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "wavelength_leaver.h"
 
 void WavelengthLeaver::leaveWavelength() {

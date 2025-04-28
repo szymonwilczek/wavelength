@@ -1,8 +1,6 @@
-//
-// Created by szymo on 24.03.2025.
-//
-
 #include "communication_stream.h"
+
+#include <QParallelAnimationGroup>
 
 CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent),
                                                            m_baseWaveAmplitude(0.05), // Bazowa amplituda w stanie Idle

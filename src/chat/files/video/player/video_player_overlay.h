@@ -2,22 +2,9 @@
 #define VIDEO_PLAYER_OVERLAY_H
 
 #include <QDialog>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QLabel>
-#include <QSlider>
-#include <QToolButton>
-#include <QTimer>
-#include <QPainter>
 #include <QCloseEvent>
-#include <QPainterPath>
-#include <QDateTime>
 #include <QRandomGenerator>
-#include <QGraphicsOpacityEffect>
-#include <QParallelAnimationGroup>
-#include <QPropertyAnimation>
-#include <QStyle>
-#include <QOperatingSystemVersion>
 
 #ifdef Q_OS_WINDOWS
 #include <windows.h>

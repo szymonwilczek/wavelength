@@ -1,22 +1,10 @@
 #ifndef WAVELENGTH_MESSAGE_SERVICE_H
 #define WAVELENGTH_MESSAGE_SERVICE_H
 
-#include <QObject>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QMap>
-#include <QString>
-#include <QDebug>
-#include <QFile>
-#include <qfileinfo.h>
-#include <QThread>
-#include <QFuture>
 #include <QtConcurrent>
 
 #include "../../../storage/wavelength_registry.h"
 #include "../handler/message_handler.h"
-#include "../../../auth/authentication_manager.h"
-#include "../../../chat/files/attachments/attachment_queue_manager.h"
 
 class WavelengthMessageService : public QObject {
     Q_OBJECT

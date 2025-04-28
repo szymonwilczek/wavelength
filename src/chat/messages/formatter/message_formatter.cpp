@@ -1,8 +1,6 @@
-//
-// Created by szymo on 10.03.2025.
-//
-
 #include "message_formatter.h"
+
+#include <QJsonObject>
 
 QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequency) {
     // Pobierz treść wiadomości

@@ -1,13 +1,8 @@
 #ifndef PATH_MARKERS_MANAGER_H
 #define PATH_MARKERS_MANAGER_H
 
-#include <QColor>
-#include <QDateTime>
-#include <QRandomGenerator>
 #include <QPainter>
-#include <QPainterPath>
 #include <vector>
-#include <cmath>
 #include <qmath.h>
 
 class PathMarkersManager {

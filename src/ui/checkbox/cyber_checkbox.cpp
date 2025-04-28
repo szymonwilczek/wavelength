@@ -1,8 +1,6 @@
-//
-// Created by szymo on 6.04.2025.
-//
-
 #include "cyber_checkbox.h"
+
+#include <QPropertyAnimation>
 
 CyberCheckBox::CyberCheckBox(const QString &text, QWidget *parent): QCheckBox(text, parent), m_glowIntensity(0.5) {
     // Dodaj marginesy, aby zapewnić poprawny rozmiar

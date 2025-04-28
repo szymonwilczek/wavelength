@@ -3,7 +3,6 @@
 
 #include <QImage>
 #include <QDebug>
-#include <QBuffer>
 #include <QObject>
 
 class ImageDecoder : public QObject {

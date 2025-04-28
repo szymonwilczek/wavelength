@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QObject>
 #include <QRandomGenerator>
-#include <QTimer>
 
 class CyberpunkTextEffect : public QObject {
 public:

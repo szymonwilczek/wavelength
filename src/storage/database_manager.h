@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QDebug>
-#include <pqxx/pqxx>  // Upewnij się, że masz zainstalowaną libpqxx z obsługą SSL
+#include <pqxx/pqxx>
 
 #include "../util/wavelength_utilities.h"
 

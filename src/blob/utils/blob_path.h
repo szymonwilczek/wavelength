@@ -3,7 +3,6 @@
 
 #include <QPainterPath>
 #include <QPointF>
-#include <QVector>
 #include "blob_math.h"
 
 class BlobPath {

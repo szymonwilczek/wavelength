@@ -1,15 +1,12 @@
 #ifndef INLINE_IMAGE_VIEWER_H
 #define INLINE_IMAGE_VIEWER_H
 
-#include <QFrame>
 #include <QLabel>
-#include <QVBoxLayout>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QTimer>
 #include <memory>
 #include <QApplication>
-#include <QDebug> // Dodano dla logowania
 
 #include "../decoder/image_decoder.h"
 

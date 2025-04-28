@@ -1,15 +1,8 @@
 #ifndef INLINE_GIF_PLAYER_H
 #define INLINE_GIF_PLAYER_H
 
-#include <QFrame>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QTimer>
 #include <memory>
-#include <QApplication>
-#include <QPainter>
 #include <QMouseEvent>
-#include <QDebug> // Dodano dla logowania
 
 #include "../../audio/player/inline_audio_player.h"
 #include "../decoder/gif_decoder.h"

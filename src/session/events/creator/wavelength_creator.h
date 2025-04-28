@@ -1,19 +1,7 @@
 #ifndef WAVELENGTH_CREATOR_H
 #define WAVELENGTH_CREATOR_H
 
-#include <QObject>
-#include <QString>
-#include <QWebSocket>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QUrl>
-#include <QDebug>
-#include <QTimer>
-
 #include "../../../storage/database_manager.h"
-#include "../../../storage/wavelength_registry.h"
-#include "../../../auth/authentication_manager.h"
-#include "../../../chat/messages/handler/message_handler.h"
 #include "../../../chat/messages/services/wavelength_message_processor.h"
 #include "../../../../src/app/wavelength_config.h"
 

@@ -5,14 +5,13 @@
 #include <QColor>
 #include <QStringList>
 
-// Forward declarations
 class WavelengthConfig;
 class QLabel;
 class QPushButton;
 class QHBoxLayout;
 class QGridLayout;
 class QColorDialog;
-class QSpinBox; // Dodaj QSpinBox
+class QSpinBox;
 
 class AppearanceSettingsWidget : public QWidget {
     Q_OBJECT

@@ -1,8 +1,7 @@
-//
-// Created by szymo on 08.03.2025.
-//
-
 #include "join_wavelength_dialog.h"
+
+#include <QFormLayout>
+#include <QVBoxLayout>
 
 JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(parent, AnimatedDialog::DigitalMaterialization),
                                                              m_shadowSize(10), m_scanlineOpacity(0.08) {

@@ -1,11 +1,7 @@
 #include "shortcut_manager.h"
 
-#include <QWidget>
 #include <QShortcut>
 #include <QMainWindow>
-#include <QDebug>
-#include <QPushButton> // Dla click()
-#include <QLineEdit>   // Dla setFocus()
 
 #include "../wavelength_config.h"
 #include "../../ui/buttons/cyberpunk_button.h"

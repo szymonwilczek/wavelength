@@ -1,13 +1,9 @@
-//
-// Created by szymo on 17.03.2025.
-//
 
 #include "image_viewer.h"
 
-InlineImageViewer::InlineImageViewer(const QByteArray &imageData, QWidget *parent): QFrame(parent), m_imageData(imageData) { // Usunięto m_isZoomed
+#include <QVBoxLayout>
 
-    // Usunięto setFrameStyle i setStyleSheet - styl będzie dziedziczony lub ustawiany z zewnątrz
-    // Usunięto setMaximumSize
+InlineImageViewer::InlineImageViewer(const QByteArray &imageData, QWidget *parent): QFrame(parent), m_imageData(imageData) { // Usunięto m_isZoomed
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

@@ -1,4 +1,3 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\wavelength\view\settings_view.cpp
 #include "settings_view.h"
 
 #include <QHBoxLayout>
@@ -7,19 +6,14 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QGraphicsOpacityEffect>
-#include <QMouseEvent>
 #include <QRandomGenerator>
-#include <QTimer> // Dodano dla QTimer
-#include <QLabel> // Dodano dla QLabel
-#include <QPushButton> // Dodano dla QPushButton
-#include <QSpinBox> // Dodano dla QSpinBox
+#include <QPushButton>
 
 #include "../../ui/settings/tabs/classified/components/system_override_manager.h"
 #include "../../ui/settings/tabs/appearance/appearance_settings_widget.h"
 #include "../../ui/settings/tabs/wavelength/wavelength_settings_widget.h"
 #include "../../ui/settings/tabs/network/network_settings_widget.h"
 
-// Warstwy bezpieczeństwa
 #include "../../ui/settings/tabs/classified/layers/fingerprint/fingerprint_layer.h"
 #include "../../ui/settings/tabs/classified/layers/handprint/handprint_layer.h"
 #include "../../ui/settings/tabs/classified/layers/code/security_code_layer.h"
@@ -29,8 +23,7 @@
 #include "../../ui/settings/tabs/classified/layers/typing_test/typing_test_layer.h"
 #include "../../ui/settings/tabs/classified/layers/snake_game/snake_game_layer.h"
 
-// UI
-#include "../../ui/checkbox/cyber_checkbox.h" // Potrzebne dla m_debugModeCheckBox
+#include "../../ui/checkbox/cyber_checkbox.h"
 #include "../../app/managers/shortcut_manager.h"
 #include "../../ui/settings/tabs/shortcuts/shortcuts_settings_widget.h"
 

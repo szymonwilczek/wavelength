@@ -1,7 +1,6 @@
 #include "cyberpunk_button.h"
 #include <QResizeEvent>
 #include <QHBoxLayout>
-#include <QStyle>
 #include <QStyleOption>
 #include <QPainter>
 

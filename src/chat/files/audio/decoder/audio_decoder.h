@@ -13,13 +13,11 @@
 #include <QAudioFormat>
 #include <QIODevice>
 #include <QDebug>
-#include <QElapsedTimer>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
-#include <libavutil/opt.h>
 }
 
 class AudioDecoder : public QThread {

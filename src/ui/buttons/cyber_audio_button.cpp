@@ -1,7 +1,3 @@
-//
-// Created by szymo on 28.04.2025.
-//
-
 #include "cyber_audio_button.h"
 
 CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent), m_glowIntensity(0.5) {

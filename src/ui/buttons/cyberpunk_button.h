@@ -2,7 +2,6 @@
 #define CYBERPUNK_BUTTON_H
 
 #include <QPushButton>
-#include <QLabel>
 #include <QPropertyAnimation>
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>

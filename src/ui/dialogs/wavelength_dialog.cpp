@@ -1,8 +1,9 @@
-//
-// Created by szymo on 08.03.2025.
-//
-
 #include "wavelength_dialog.h"
+
+#include <QFormLayout>
+#include <QGraphicsOpacityEffect>
+#include <QNetworkReply>
+#include <QVBoxLayout>
 
 WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, AnimatedDialog::DigitalMaterialization),
                                                      m_shadowSize(10), m_scanlineOpacity(0.08) {

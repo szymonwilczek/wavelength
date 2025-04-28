@@ -2,9 +2,6 @@
 #define STREAM_MESSAGE_H
 
 #include <QWidget>
-#include <QGraphicsEffect>
-#include <QScrollArea>
-#include <QSequentialAnimationGroup>
 #include <QSvgRenderer>
 #include <QBitmap>
 #include <qtimeline.h>

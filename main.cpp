@@ -10,6 +10,7 @@
 #include "src/ui/navigation/navbar.h"
 #include "src/blob/core/blob_animation.h"
 #include <QLabel>
+#include <QMessageBox>
 #include <QTimer>
 #include <QStyleFactory>
 
