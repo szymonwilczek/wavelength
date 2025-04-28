@@ -20,8 +20,6 @@ public:
     void setOpacity(qreal opacity);
 
 private:
-    QPixmap m_buffer;
-    bool m_bufferDirty;
     qreal m_opacity;
     QRect m_excludeRect; // Obszar do wykluczenia (nawigacja)
 
@@ -56,11 +54,8 @@ public:
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-    void initScanlineBuffer();
     double m_digitalizationProgress = 0.0;
     double m_cornerGlowProgress = 0.0;
-    double m_glitchIntensity = 0.0;
-    QList<int> m_glitchLines;
 
 private:
     void animateShow();

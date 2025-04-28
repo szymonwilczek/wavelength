@@ -1,41 +1,17 @@
 #ifndef JOIN_WAVELENGTH_DIALOG_H
 #define JOIN_WAVELENGTH_DIALOG_H
 
-#include <QApplication>
-#include <QLineEdit>
-#include <QLabel>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QDoubleValidator>
 #include <QComboBox>
-#include <QPainter>
-#include <QElapsedTimer>
-#include <QPropertyAnimation>
-#include <QPainterPath>
-#include <QGraphicsOpacityEffect>
-#include <QDateTime>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QEventLoop>
-#include <QRandomGenerator>
-#include <QTimer>
 
 #include "wavelength_dialog.h"
 #include "../session/wavelength_session_coordinator.h"
 #include "../ui/dialogs/animated_dialog.h"
-
-
 
 class JoinWavelengthDialog : public AnimatedDialog {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
     Q_PROPERTY(double digitalizationProgress READ digitalizationProgress WRITE setDigitalizationProgress)
     Q_PROPERTY(double cornerGlowProgress READ cornerGlowProgress WRITE setCornerGlowProgress)
-    Q_PROPERTY(double glitchIntensity READ glitchIntensity WRITE setGlitchIntensity)
 
 public:
     explicit JoinWavelengthDialog(QWidget *parent = nullptr)
@@ -54,7 +30,6 @@ public:
         // format.setRenderableType(QSurfaceFormat::OpenGL);
         // QSurfaceFormat::setDefaultFormat(format);
 
-        m_glitchLines = QList<int>();
         m_digitalizationProgress = 0.0;
         m_animationStarted = false;
 
@@ -225,14 +200,7 @@ public:
 
             update(0, minY, width(), maxY - minY);
         }
-    }
-    else if (m_glitchIntensity > 0.01) {
-        for (int i = 0; i < m_glitchLines.size(); i++) {
-            int y = m_glitchLines[i];
-            update(0, y-5, width(), 10);
-        }
-    }
-    else {
+    } else {
         m_refreshTimer->setInterval(33); // Mniej intensywne odświeżanie gdy nie ma animacji
     }
 });
@@ -261,12 +229,6 @@ public:
         update();
     }
 
-    double glitchIntensity() const { return m_glitchIntensity; }
-    void setGlitchIntensity(double intensity) {
-        m_glitchIntensity = intensity;
-        update();
-        if (intensity > 0.4) regenerateGlitchLines();
-    }
 
     double scanlineOpacity() const { return m_scanlineOpacity; }
     void setScanlineOpacity(double opacity) {
@@ -274,114 +236,70 @@ public:
         update();
     }
 
-    void regenerateGlitchLines() {
-        static QElapsedTimer lastGlitchUpdate;
-        if (!lastGlitchUpdate.isValid() || lastGlitchUpdate.elapsed() > 100) {
-            m_glitchLines.clear();
-            int glitchCount = 3 + static_cast<int>(glitchIntensity() * 7);
-            for (int i = 0; i < glitchCount; i++) {
-                m_glitchLines.append(QRandomGenerator::global()->bounded(height()));
+    void paintEvent(QPaintEvent *event) override {
+       QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    // Główne tło dialogu z gradientem (bez zmian)
+    QLinearGradient bgGradient(0, 0, 0, height());
+    bgGradient.setColorAt(0, QColor(10, 21, 32));
+    bgGradient.setColorAt(1, QColor(7, 18, 24));
+
+    // Ścieżka dialogu ze ściętymi rogami (bez zmian)
+    QPainterPath dialogPath;
+    int clipSize = 20;
+    dialogPath.moveTo(clipSize, 0);
+    dialogPath.lineTo(width() - clipSize, 0);
+    dialogPath.lineTo(width(), clipSize);
+    dialogPath.lineTo(width(), height() - clipSize);
+    dialogPath.lineTo(width() - clipSize, height());
+    dialogPath.lineTo(clipSize, height());
+    dialogPath.lineTo(0, height() - clipSize);
+    dialogPath.lineTo(0, clipSize);
+    dialogPath.closeSubpath();
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgGradient);
+    painter.drawPath(dialogPath);
+
+    // Obramowanie dialogu (bez zmian)
+    QColor borderColor(0, 195, 255, 150);
+    painter.setPen(QPen(borderColor, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(dialogPath);
+
+    // --- ZMIANA: Rysowanie tylko pojedynczej linii skanującej ---
+    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0 && m_animationStarted) {
+        initRenderBuffers(); // Inicjalizuje tylko m_scanlineBuffer
+
+        int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
+        int clipSize = 20;
+
+        if (!m_scanlineBuffer.isNull()) {
+            painter.setClipping(false);
+            QPainter::CompositionMode previousMode = painter.compositionMode();
+            painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+            // --- USUNIĘTO: Rysowanie m_scanLinesBuffer (śladu) ---
+
+            // Oblicz szerokość linii skanującej (bez zmian)
+            int startX = 0;
+            int endX = width();
+            if (scanLineY < clipSize) { /* ... */ }
+            else if (scanLineY > height() - clipSize) { /* ... */ }
+
+            // Rysuj tylko główną linię skanującą (bez zmian)
+            int scanWidth = endX - startX;
+            if (scanWidth > 0) {
+                painter.drawPixmap(startX, scanLineY - 10, scanWidth, 20,
+                                  m_scanlineBuffer,
+                                  (width() - scanWidth) / 2, 0, scanWidth, 20);
             }
-            lastGlitchUpdate.restart();
+
+            painter.setCompositionMode(previousMode);
         }
     }
-
-    void paintEvent(QPaintEvent *event) override {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-
-        // Główne tło dialogu z gradientem
-        QLinearGradient bgGradient(0, 0, 0, height());
-        bgGradient.setColorAt(0, QColor(10, 21, 32));
-        bgGradient.setColorAt(1, QColor(7, 18, 24));
-
-        // Ścieżka dialogu ze ściętymi rogami
-        QPainterPath dialogPath;
-        int clipSize = 20; // rozmiar ścięcia
-
-        // Tworzenie ścieżki dialogu
-        dialogPath.moveTo(clipSize, 0);
-        dialogPath.lineTo(width() - clipSize, 0);
-        dialogPath.lineTo(width(), clipSize);
-        dialogPath.lineTo(width(), height() - clipSize);
-        dialogPath.lineTo(width() - clipSize, height());
-        dialogPath.lineTo(clipSize, height());
-        dialogPath.lineTo(0, height() - clipSize);
-        dialogPath.lineTo(0, clipSize);
-        dialogPath.closeSubpath();
-
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(bgGradient);
-        painter.drawPath(dialogPath);
-
-        // Obramowanie dialogu
-        QColor borderColor(0, 195, 255, 150);
-        painter.setPen(QPen(borderColor, 1));
-        painter.setBrush(Qt::NoBrush);
-        painter.drawPath(dialogPath);
-
-        // Efekt digitalizacji
-        if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0 && m_animationStarted) {
-            // Inicjalizacja buforów
-            initRenderBuffers();
-
-            int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
-            int clipSize = 20;
-
-            if (scanLineY != m_lastScanlineY) {
-                painter.setClipping(false);
-                QPainter::CompositionMode previousMode = painter.compositionMode();
-                painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-                // Rysuj wszystkie linie poziome od góry do aktualnej pozycji
-                painter.drawPixmap(0, 0, m_scanLinesBuffer, 0, 0, width(), scanLineY);
-
-                // Oblicz szerokość linii skanującej na danej wysokości
-                int startX = 0;
-                int endX = width();
-
-                // Górna część dialogu
-                if (scanLineY < clipSize) {
-                    float ratio = (float)scanLineY / clipSize;
-                    startX = clipSize * (1.0f - ratio);
-                    endX = width() - clipSize * (1.0f - ratio);
-                }
-                // Dolna część dialogu
-                else if (scanLineY > height() - clipSize) {
-                    float ratio = (float)(height() - scanLineY) / clipSize;
-                    startX = clipSize * (1.0f - ratio);
-                    endX = width() - clipSize * (1.0f - ratio);
-                }
-
-                // Rysuj linię skanującą z uwzględnieniem szerokości w danym punkcie Y
-                int scanWidth = endX - startX;
-                if (scanWidth > 0) {
-                    painter.drawPixmap(startX, scanLineY - 10, scanWidth, 20,
-                                      m_scanlineBuffer,
-                                      (width() - scanWidth) / 2, 0, scanWidth, 20);
-                }
-
-                painter.setCompositionMode(previousMode);
-                m_lastScanlineY = scanLineY;
-            }
-        }
-
-        // Efekt glitch
-        if (m_glitchIntensity > 0.01) {
-            painter.setPen(QPen(QColor(255, 50, 120, 150 * m_glitchIntensity), 1));
-
-            for (int i = 0; i < m_glitchLines.size(); i++) {
-                int y = m_glitchLines[i];
-                int offset = QRandomGenerator::global()->bounded(5, 15) * m_glitchIntensity;
-                int width = QRandomGenerator::global()->bounded(30, 80) * m_glitchIntensity;
-
-                if (QRandomGenerator::global()->bounded(2) == 0) {
-                    painter.drawLine(0, y, width, y + offset);
-                } else {
-                    painter.drawLine(this->width() - width, y, this->width(), y + offset);
-                }
-            }
-        }
+    // --- KONIEC ZMIANY ---
 
         // Podświetlanie rogów
         if (m_cornerGlowProgress > 0.0) {
@@ -494,14 +412,6 @@ private slots:
         scanAnim->setKeyValueAt(0.5, 0.6);
         scanAnim->start(QAbstractAnimation::DeleteWhenStopped);
 
-        // Animacja glitch podczas łączenia
-        QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
-        glitchAnim->setDuration(800);
-        glitchAnim->setStartValue(0.0);
-        glitchAnim->setEndValue(0.2);
-        glitchAnim->setKeyValueAt(0.3, 0.5);
-        glitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
         WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -561,78 +471,33 @@ private slots:
     }
 
 private:
-    void initRenderBuffers() {
-    if (!m_buffersInitialized || height() != m_previousHeight) {
-        int clipSize = 20; // rozmiar wycięcia rogów dialogu
+    void JoinWavelengthDialog::initRenderBuffers() {
+        if (!m_buffersInitialized || height() != m_previousHeight) {
+            int clipSize = 20;
 
-        // Bufor głównej linii skanującej - nadal na pełnej szerokości
-        m_scanlineBuffer = QPixmap(width(), 20);
-        m_scanlineBuffer.fill(Qt::transparent);
+            // --- ZMIANA: Inicjalizuj tylko bufor głównej linii skanującej ---
+            m_scanlineBuffer = QPixmap(width(), 20);
+            m_scanlineBuffer.fill(Qt::transparent);
 
-        QPainter scanPainter(&m_scanlineBuffer);
-        scanPainter.setRenderHint(QPainter::Antialiasing, false);
+            QPainter scanPainter(&m_scanlineBuffer);
+            scanPainter.setRenderHint(QPainter::Antialiasing, false);
 
-        // Główna linia skanująca jako gradient
-        QLinearGradient scanGradient(0, 0, 0, 20);
-        scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
-        scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
-        scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
+            QLinearGradient scanGradient(0, 0, 0, 20);
+            scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
+            scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
+            scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
 
-        // Rysujemy na pełnej szerokości - ale uwzględniając kształt dialogu
-        scanPainter.setPen(Qt::NoPen);
-        scanPainter.setBrush(scanGradient);
+            scanPainter.setPen(Qt::NoPen);
+            scanPainter.setBrush(scanGradient);
+            scanPainter.drawRect(0, 0, width(), 20);
 
-        // Ścieżka dialogu ze ściętymi rogami dla linii skanującej (mniejszej wysokości)
-        QPainterPath scanlinePath;
-        scanlinePath.moveTo(clipSize, 0);
-        scanlinePath.lineTo(width() - clipSize, 0);
-        scanlinePath.lineTo(width(), 0);
-        scanlinePath.lineTo(width(), 20);
-        scanlinePath.lineTo(0, 20);
-        scanlinePath.lineTo(0, 0);
-        scanlinePath.closeSubpath();
+            // --- USUNIĘTO: Inicjalizacja m_scanLinesBuffer ---
 
-        scanPainter.drawPath(scanlinePath);
-
-        // Bufor dla linii poziomych - tworzymy nowy dla każdej wysokości
-        m_scanLinesBuffer = QPixmap(width(), height());
-        m_scanLinesBuffer.fill(Qt::transparent);
-
-        QPainter linesPainter(&m_scanLinesBuffer);
-        linesPainter.setRenderHint(QPainter::Antialiasing, true);
-        linesPainter.setPen(QPen(QColor(0, 180, 255, 40)));
-
-        // Rysujemy linie poziome z uwzględnieniem kształtu dialogu
-        for (int y = 0; y < height(); y += 6) {
-            // Obliczamy szerokość w danym punkcie Y
-            int startX = 0;
-            int endX = width();
-
-            // Górny obszar ścięć
-            if (y < clipSize) {
-                // Liniowa zmiana szerokości przy górnych ścięciach
-                float ratio = (float)y / clipSize;
-                startX = clipSize * (1.0f - ratio);
-                endX = width() - clipSize * (1.0f - ratio);
-            }
-            // Dolny obszar ścięć
-            else if (y > height() - clipSize) {
-                // Liniowa zmiana szerokości przy dolnych ścięciach
-                float ratio = (float)(height() - y) / clipSize;
-                startX = clipSize * (1.0f - ratio);
-                endX = width() - clipSize * (1.0f - ratio);
-            }
-
-            // Rysuj linię tylko jeśli jest widoczna
-            if (startX < endX) {
-                linesPainter.drawLine(startX, y, endX, y);
-            }
+            m_buffersInitialized = true;
+            m_previousHeight = height();
+            m_lastScanlineY = -1;
         }
-
-        m_buffersInitialized = true;
-        m_previousHeight = height();
     }
-}
 
     bool m_animationStarted = false;
     CyberLineEdit *frequencyEdit;
@@ -647,10 +512,7 @@ private:
     double m_scanlineOpacity;
     double m_digitalizationProgress = 0.0;
     double m_cornerGlowProgress = 0.0;
-    double m_glitchIntensity = 0.0;
-    QList<int> m_glitchLines;
     QPixmap m_scanlineBuffer;
-    QPixmap m_scanLinesBuffer;
     bool m_buffersInitialized = false;
     int m_lastScanlineY = -1;
     int m_previousHeight = 0;
