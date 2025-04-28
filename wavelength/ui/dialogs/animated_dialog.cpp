@@ -13,7 +13,6 @@
 // Implementacja OverlayWidget z optymalizacjami
 OverlayWidget::OverlayWidget(QWidget *parent)
     : QWidget(parent)
-    , m_bufferDirty(true)
     , m_opacity(0.0)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -58,7 +57,6 @@ bool OverlayWidget::eventFilter(QObject *watched, QEvent *event)
 void OverlayWidget::updateGeometry(const QRect& rect)
 {
     setGeometry(rect);
-    m_bufferDirty = true;
 }
 
 void OverlayWidget::paintEvent(QPaintEvent *event)
@@ -171,87 +169,99 @@ void AnimatedDialog::animateShow()
     QRect geometry = this->geometry();
 
     switch (m_animationType) {
-// Zmodyfikuj przypadek DigitalMaterialization w funkcji animateShow()
-// W animateShow() zmodyfikuj przypadek DigitalMaterialization:
-case DigitalMaterialization: {
-            // Animacja pozycji (wjazd z góry)
-            int startY = geometry.y() - 150; // Start slightly above the final position
-            int endY = geometry.y();
-            this->move(geometry.x(), startY); // Set initial position
+        // ... (inne przypadki animacji bez zmian) ...
 
+        // Zmodyfikuj przypadek DigitalMaterialization w funkcji animateShow()
+        case DigitalMaterialization: {
+            // --- ZMIANA: Połączenie animacji pozycji i przezroczystości ---
+            // Ustaw początkową pozycję i przezroczystość
+            int startY = geometry.y() - 100; // Zmniejszono nieco dystans początkowy dla subtelniejszego efektu
+            int endY = geometry.y();
+            this->move(geometry.x(), startY);
+            this->setWindowOpacity(0.0); // Start fully transparent
+
+            // 1a. Animacja pozycji (wjazd z góry)
             QPropertyAnimation* posAnim = new QPropertyAnimation(this, "pos");
             posAnim->setStartValue(QPoint(geometry.x(), startY));
             posAnim->setEndValue(QPoint(geometry.x(), endY));
-            posAnim->setEasingCurve(QEasingCurve::OutQuad); // Lżejsza krzywa
+            posAnim->setEasingCurve(QEasingCurve::OutCubic); // Nieco płynniejsza krzywa niż OutQuad
             posAnim->setDuration(m_duration); // Czas trwania animacji pozycji
 
-            // Ustawienie pełnej nieprzezroczystości dla systemu kompozycji
-            this->setWindowOpacity(1.0);
+            // 1b. Animacja przezroczystości (płynne pojawienie)
+            QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "windowOpacity");
+            opacityAnim->setStartValue(0.0);
+            opacityAnim->setEndValue(1.0);
+            opacityAnim->setEasingCurve(QEasingCurve::OutCubic); // Ta sama krzywa dla spójności
+            opacityAnim->setDuration(m_duration); // Ten sam czas trwania
 
-            // --- ZMIANA: Użycie QSequentialAnimationGroup ---
-            QSequentialAnimationGroup* sequentialGroup = new QSequentialAnimationGroup(this); // Ustaw rodzica
-            sequentialGroup->addAnimation(posAnim); // 1. Animacja pozycji
+            // Grupa równoległa dla jednoczesnego wjazdu i pojawienia się
+            QParallelAnimationGroup* showParallelGroup = new QParallelAnimationGroup(this);
+            showParallelGroup->addAnimation(posAnim);
+            showParallelGroup->addAnimation(opacityAnim);
+            // --- KONIEC ZMIANY 1 ---
 
-            // Sprawdzamy typ dialogu i dodajemy animację digitalizacji *po* animacji pozycji
+            // --- ZMIANA 2: Użycie QSequentialAnimationGroup z grupą równoległą ---
+            QSequentialAnimationGroup* sequentialGroup = new QSequentialAnimationGroup(this);
+            sequentialGroup->addAnimation(showParallelGroup); // 1. Animacja wjazdu i pojawienia się (równoległa)
+
+            // Sprawdzamy typ dialogu i dodajemy animację digitalizacji *po* animacji wjazdu/pojawienia
             bool isDialogAnimated = false;
-            QPropertyAnimation* digitAnim = nullptr; // Wskaźnik na animację digitalizacji
+            QPropertyAnimation* digitAnim = nullptr;
 
             // Obsługa WavelengthDialog
             if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
                 isDialogAnimated = true;
-                digitalDialog->startRefreshTimer(); // Uruchom timer odświeżania
+                digitalDialog->startRefreshTimer();
 
-                digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress", sequentialGroup); // Ustaw rodzica
+                digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress", sequentialGroup);
                 digitAnim->setStartValue(0.0);
                 digitAnim->setEndValue(1.0);
                 digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-                digitAnim->setDuration(m_duration * 1.5); // Dłuższy czas dla skanowania
+                digitAnim->setDuration(m_duration * 1.5);
 
                 sequentialGroup->addAnimation(digitAnim); // 2. Animacja digitalizacji
 
-                // Połącz koniec całej sekwencji
                 connect(sequentialGroup, &QSequentialAnimationGroup::finished, this, [this, digitalDialog]() {
                     emit showAnimationFinished();
-                    digitalDialog->setRefreshTimerInterval(100); // Wolniejsze odświeżanie po animacji
+                    digitalDialog->setRefreshTimerInterval(100);
                     qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (WavelengthDialog)";
                 });
             }
             // Obsługa JoinWavelengthDialog
             else if (auto joinDialog = qobject_cast<JoinWavelengthDialog*>(this)) {
                 isDialogAnimated = true;
-                joinDialog->startRefreshTimer(); // Uruchom timer odświeżania
+                joinDialog->startRefreshTimer();
 
-                digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress", sequentialGroup); // Ustaw rodzica
+                digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress", sequentialGroup);
                 digitAnim->setStartValue(0.0);
                 digitAnim->setEndValue(1.0);
                 digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-                digitAnim->setDuration(m_duration * 1.5); // Dłuższy czas dla skanowania
+                digitAnim->setDuration(m_duration * 1.5);
 
                 sequentialGroup->addAnimation(digitAnim); // 2. Animacja digitalizacji
 
-                // Połącz koniec całej sekwencji
                 connect(sequentialGroup, &QSequentialAnimationGroup::finished, this, [this, joinDialog]() {
                     emit showAnimationFinished();
-                    joinDialog->setRefreshTimerInterval(100); // Wolniejsze odświeżanie po animacji
+                    joinDialog->setRefreshTimerInterval(100);
                      qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (JoinWavelengthDialog)";
                 });
             }
 
-            // Jeśli dialog nie jest specjalnym typem, uruchom tylko animację pozycji
+            // Jeśli dialog nie jest specjalnym typem, uruchom tylko animację wjazdu/pojawienia
             if (!isDialogAnimated) {
-                 qDebug() << "LOG: Uruchamiam tylko animację pozycji dla DigitalMaterialization";
-                // Połącz koniec animacji pozycji (bo nie ma sekwencji)
-                connect(posAnim, &QPropertyAnimation::finished, this, [this]() {
+                 qDebug() << "LOG: Uruchamiam tylko animację wjazdu/pojawienia dla DigitalMaterialization";
+                // Połącz koniec grupy równoległej (bo nie ma sekwencji)
+                connect(showParallelGroup, &QParallelAnimationGroup::finished, this, [this]() {
                     emit showAnimationFinished();
                 });
-                posAnim->start(QAbstractAnimation::DeleteWhenStopped);
-                finalAnimation = posAnim; // Ustaw finalAnimation na posAnim
+                showParallelGroup->start(QAbstractAnimation::DeleteWhenStopped);
+                finalAnimation = showParallelGroup; // Ustaw finalAnimation na grupę równoległą
             } else {
                  qDebug() << "LOG: Uruchamiam sekwencję animacji DigitalMaterialization";
                 sequentialGroup->start(QAbstractAnimation::DeleteWhenStopped); // Uruchom całą sekwencję
                 finalAnimation = sequentialGroup; // Ustaw finalAnimation na grupę sekwencyjną
             }
-            // --- KONIEC ZMIANY ---
+            // --- KONIEC ZMIANY 2 ---
 
             break; // Koniec przypadku DigitalMaterialization
         } // Koniec case DigitalMaterialization
@@ -266,12 +276,12 @@ case DigitalMaterialization: {
         animation->setDuration(m_duration);
         connect(animation, &QAbstractAnimation::finished, this, &AnimatedDialog::showAnimationFinished);
         animation->start(QAbstractAnimation::DeleteWhenStopped);
-        finalAnimation = animation; // Upewnij się, że finalAnimation jest ustawione
+        finalAnimation = animation;
     }
 
     // Jeśli z jakiegoś powodu żadna animacja nie została utworzona/uruchomiona
     if (!finalAnimation) {
-         qDebug() << "OSTRZEŻENIE: Nie utworzono/uruchomiono animacji w animateShow()";
+        qDebug() << "OSTRZEŻENIE: Nie utworzono/uruchomiono animacji w animateShow()";
         emit showAnimationFinished(); // Emituj sygnał od razu
     }
 }

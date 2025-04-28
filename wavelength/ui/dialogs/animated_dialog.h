@@ -20,8 +20,6 @@ public:
     void setOpacity(qreal opacity);
 
 private:
-    QPixmap m_buffer;
-    bool m_bufferDirty;
     qreal m_opacity;
     QRect m_excludeRect; // Obszar do wykluczenia (nawigacja)
 
