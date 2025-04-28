@@ -5,19 +5,19 @@
 #include <QDebug>
 #include <QObject>
 
-class ImageDecoder : public QObject {
+class ImageDecoder final : public QObject {
     Q_OBJECT
 
 public:
-    ImageDecoder(const QByteArray& imageData, QObject* parent = nullptr)
+    explicit ImageDecoder(const QByteArray& imageData, QObject* parent = nullptr)
         : QObject(parent), m_imageData(imageData) {
     }
 
-    ~ImageDecoder() {
+    ~ImageDecoder() override {
         // Nie wymaga specjalnego zwalniania zasobów jak w FFmpeg
     }
 
-    void releaseResources() {
+    static void releaseResources() {
         // Nic do zwalniania w tej implementacji
     }
 

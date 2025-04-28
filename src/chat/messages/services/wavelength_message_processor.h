@@ -4,7 +4,7 @@
 #include "wavelength_message_service.h"
 #include "../handler/message_handler.h"
 
-class WavelengthMessageProcessor : public QObject {
+class WavelengthMessageProcessor final : public QObject {
     Q_OBJECT
 
 public:
@@ -13,31 +13,31 @@ public:
         return &instance;
     }
 
-    bool areFrequenciesEqual(QString freq1, QString freq2) {
+    static bool areFrequenciesEqual(const QString &freq1, const QString &freq2) {
         return freq1 == freq2;
     }
 
-    void processIncomingMessage(const QString& message, QString frequency);
+    void processIncomingMessage(const QString& message, const QString &frequency);
 
-    void processIncomingBinaryMessage(const QByteArray& message, QString frequency);
+    void processIncomingBinaryMessage(const QByteArray& message, const QString &frequency);
 
     void setSocketMessageHandlers(QWebSocket* socket, QString frequency);
 
 private:
-    void processMessageContent(const QJsonObject& msgObj, QString frequency, const QString& messageId);
+    void processMessageContent(const QJsonObject& msgObj, const QString &frequency, const QString& messageId);
 
     // Dodaj tę metodę, jeśli jeszcze nie istnieje
-    Q_INVOKABLE void emitMessageReceived(QString frequency, const QString& formattedMessage) {
+    Q_INVOKABLE void emitMessageReceived(const QString &frequency, const QString& formattedMessage) {
         emit messageReceived(frequency, formattedMessage);
     }
 
-    void processSystemCommand(const QJsonObject& msgObj, QString frequency);
+    void processSystemCommand(const QJsonObject& msgObj, const QString &frequency);
 
-    void processUserJoined(const QJsonObject& msgObj, QString frequency);
+    void processUserJoined(const QJsonObject& msgObj, const QString &frequency);
 
-    void processUserLeft(const QJsonObject& msgObj, QString frequency);
+    void processUserLeft(const QJsonObject& msgObj, const QString &frequency);
 
-    void processWavelengthClosed(const QJsonObject& msgObj, QString frequency);
+    void processWavelengthClosed(const QJsonObject& msgObj, const QString &frequency);
 
 signals:
     void messageReceived(QString frequency, const QString& formattedMessage);
@@ -52,9 +52,9 @@ signals:
     void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private:
-    WavelengthMessageProcessor(QObject* parent = nullptr);
+    explicit WavelengthMessageProcessor(QObject* parent = nullptr);
 
-    ~WavelengthMessageProcessor() {}
+    ~WavelengthMessageProcessor() override {}
 
     WavelengthMessageProcessor(const WavelengthMessageProcessor&) = delete;
     WavelengthMessageProcessor& operator=(const WavelengthMessageProcessor&) = delete;

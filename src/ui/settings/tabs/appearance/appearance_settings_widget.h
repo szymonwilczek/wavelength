@@ -13,7 +13,7 @@ class QGridLayout;
 class QColorDialog;
 class QSpinBox;
 
-class AppearanceSettingsWidget : public QWidget {
+class AppearanceSettingsWidget final : public QWidget {
     Q_OBJECT
 
 public:
@@ -21,7 +21,7 @@ public:
     ~AppearanceSettingsWidget() override = default;
 
     void loadSettings();
-    void saveSettings();
+    void saveSettings() const;
 
     private slots:
         // Istniejące sloty
@@ -29,7 +29,7 @@ public:
     void chooseBlobColor();
     void chooseStreamColor();
     void updateRecentColorsUI();
-    void selectRecentColor(const QColor& color);
+    void selectRecentColor(const QColor& color) const;
 
     // NOWE sloty
     void chooseGridColor();
@@ -40,7 +40,8 @@ public:
 
 private:
     void setupUi();
-    void updateColorPreview(QWidget* previewWidget, const QColor& color);
+
+    static void updateColorPreview(QWidget* previewWidget, const QColor& color);
 
     WavelengthConfig *m_config;
 

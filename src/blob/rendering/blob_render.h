@@ -21,13 +21,13 @@ class BlobRenderer {
 public:
 
 
-    BlobRenderer() :
-    m_staticBackgroundInitialized(false),
-    m_glitchIntensity(0),
-    m_lastUpdateTime(0),
-    m_idleHudInitialized(false),
-    m_isRenderingActive(true),
-    m_lastAnimationState(BlobConfig::MOVING) {}
+    BlobRenderer() : m_staticBackgroundInitialized(false), m_lastGridSpacing(0),
+                     m_glitchIntensity(0),
+                     m_lastUpdateTime(0), m_idleAmplitude(0),
+                     m_idleHudInitialized(false),
+                     m_isRenderingActive(true),
+                     m_lastAnimationState(BlobConfig::MOVING), m_lastGlowRadius(0) {
+    }
 
     void renderBlob(QPainter &painter,
                     const std::vector<QPointF> &controlPoints,
@@ -62,16 +62,13 @@ public:
 
     void drawCompleteHUD(QPainter& painter, const QPointF& blobCenter, double blobRadius, const QColor& hudColor,
                          int width,
-                         int height);
-    void drawStaticHUD(QPainter& painter, const QPointF& blobCenter, double blobRadius, const QColor& hudColor,
-                       int width,
-                       int height);
+                         int height) const;
 
     void resetGridBuffer() {
         m_gridBuffer = QPixmap();
     }
 
-    void setGlitchIntensity(double intensity) {
+    void setGlitchIntensity(const double intensity) {
         m_glitchIntensity = intensity;
     }
 
@@ -120,28 +117,20 @@ private:
                        const QPainterPath &blobPath,
                        const QColor &borderColor,
                        int glowRadius);
-    void renderGlowEffect(QPainter& painter, const QPainterPath& blobPath, const QColor& borderColor, int glowRadius);
 
-    void drawBorder(QPainter &painter,
-                    const QPainterPath &blobPath,
-                    const QColor &borderColor,
-                    int borderWidth);
+    static void renderGlowEffect(QPainter& painter, const QPainterPath& blobPath, const QColor& borderColor, int glowRadius);
 
-    void drawFilling(QPainter &painter,
-                   const QPainterPath &blobPath,
-                   const QPointF &blobCenter,
-                   double blobRadius,
-                   const QColor &borderColor,
-                   BlobConfig::AnimationState animationState);
+    static void drawBorder(QPainter &painter,
+                           const QPainterPath &blobPath,
+                           const QColor &borderColor,
+                           int borderWidth);
 
-    void drawDynamicHUD(QPainter& painter, const QPointF& blobCenter, double blobRadius, const QColor& hudColor,
-                        int width,
-                        int height);
-    void drawHUD(QPainter &painter,
-                 const QPointF &blobCenter,
-                 double blobRadius,
-                 const QColor &hudColor,
-                 int width, int height);
+    static void drawFilling(QPainter &painter,
+                            const QPainterPath &blobPath,
+                            const QPointF &blobCenter,
+                            double blobRadius,
+                            const QColor &borderColor,
+                            BlobConfig::AnimationState animationState);
 };
 
 #endif // BLOB_RENDERER_H

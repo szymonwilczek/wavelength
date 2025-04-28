@@ -8,25 +8,25 @@
 RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     : SecurityLayer(parent), m_scanTimer(nullptr), m_completeTimer(nullptr), m_scanLine(0)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel("RETINA SCAN VERIFICATION", this);
+    const auto title = new QLabel("RETINA SCAN VERIFICATION", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
     // Widget dla obrazu oka
-    QWidget *eyeContainer = new QWidget(this);
+    const auto eyeContainer = new QWidget(this);
     eyeContainer->setFixedSize(220, 220);
     eyeContainer->setStyleSheet("background-color: transparent;");
 
-    QVBoxLayout *eyeLayout = new QVBoxLayout(eyeContainer);
+    const auto eyeLayout = new QVBoxLayout(eyeContainer);
     eyeLayout->setContentsMargins(0, 0, 0, 0);
     eyeLayout->setSpacing(0);
     eyeLayout->setAlignment(Qt::AlignCenter);
 
     // Pojedynczy kontener zamiast warstw
-    QWidget *scannerContainer = new QWidget(eyeContainer);
+    const auto scannerContainer = new QWidget(eyeContainer);
     scannerContainer->setFixedSize(200, 200);
     scannerContainer->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;");
 
@@ -35,13 +35,13 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     m_eyeImage->setFixedSize(200, 200);
     m_eyeImage->setAlignment(Qt::AlignCenter);
 
-    QVBoxLayout *scannerLayout = new QVBoxLayout(scannerContainer);
+    const auto scannerLayout = new QVBoxLayout(scannerContainer);
     scannerLayout->setContentsMargins(0, 0, 0, 0);
     scannerLayout->addWidget(m_eyeImage);
 
     eyeLayout->addWidget(scannerContainer);
 
-    QLabel *instructions = new QLabel("Please look directly at the scanner\nDo not move during scan process", this);
+    const auto instructions = new QLabel("Please look directly at the scanner\nDo not move during scan process", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -120,8 +120,7 @@ void RetinaScanLayer::reset() {
     m_scanLine = 0;
     m_scanProgress->setValue(0);
 
-    QWidget* eyeParent = m_eyeImage->parentWidget();
-    if (eyeParent) {
+    if (QWidget* eyeParent = m_eyeImage->parentWidget()) {
         eyeParent->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;"); // Niebiesko-zielony border
     }
     // Pasek postępu
@@ -143,15 +142,14 @@ void RetinaScanLayer::reset() {
     m_eyeImage->clear(); // Wyczyść aktualną pixmapę
 
     // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
 void RetinaScanLayer::updateScan() {
     // Aktualizacja paska postępu
-    int value = m_scanProgress->value() + 1;
+    const int value = m_scanProgress->value() + 1;
     m_scanProgress->setValue(value);
 
     // Aktualizacja linii skanowania - jeden pełny przebieg
@@ -170,12 +168,12 @@ void RetinaScanLayer::updateScan() {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Linia skanująca - na całą szerokość kwadratu (z marginesem 1px)
-    QPen scanPen(QColor(51, 204, 255, 180), 2);
+    const QPen scanPen(QColor(51, 204, 255, 180), 2);
     painter.setPen(scanPen);
     painter.drawLine(-10, m_scanLine, 219, m_scanLine);
 
     // Efekt świecenia linii - również na całą szerokość
-    QColor glowColor(51, 204, 255, 50);
+    constexpr QColor glowColor(51, 204, 255, 50);
     QPen glowPen(glowColor, 1);
 
     for (int i = 1; i <= 5; i++) {
@@ -207,15 +205,15 @@ void RetinaScanLayer::finishScan() {
     );
 
     // Pokazujemy finalny obraz bez linii skanującej
-    QImage finalImage = m_baseEyeImage.copy();
+    const QImage finalImage = m_baseEyeImage.copy();
     m_eyeImage->setPixmap(QPixmap::fromImage(finalImage));
 
     // Animacja zanikania po krótkim pokazaniu sukcesu
     QTimer::singleShot(800, this, [this]() {
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+        const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
 
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+        const auto animation = new QPropertyAnimation(effect, "opacity");
         animation->setDuration(500);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);
@@ -229,7 +227,7 @@ void RetinaScanLayer::finishScan() {
     });
 }
 
-void RetinaScanLayer::startScanAnimation() {
+void RetinaScanLayer::startScanAnimation() const {
     m_scanTimer->start();
     m_completeTimer->start();
 }
@@ -253,9 +251,8 @@ void RetinaScanLayer::generateEyeImage() {
     // Losowy kolor tęczówki
     QRandomGenerator* rng = QRandomGenerator::global();
     QColor irisColor;
-    int colorChoice = rng->bounded(5);
 
-    switch (colorChoice) {
+    switch (rng->bounded(5)) {
         case 0: irisColor = QColor(60, 120, 180); break;  // Niebieski
         case 1: irisColor = QColor(80, 140, 70); break;   // Zielony
         case 2: irisColor = QColor(110, 75, 50); break;   // Brązowy

@@ -11,7 +11,7 @@ TypingTestLayer::TypingTestLayer(QWidget *parent)
       m_testStarted(false),
       m_testCompleted(false)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
     layout->setSpacing(15);
 
@@ -24,11 +24,11 @@ TypingTestLayer::TypingTestLayer(QWidget *parent)
     m_instructionsLabel->setAlignment(Qt::AlignCenter);
 
     // Panel z tekstem do przepisania
-    QWidget* textPanel = new QWidget(this);
+    const auto textPanel = new QWidget(this);
     textPanel->setFixedSize(600, 120);
     textPanel->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;");
 
-    QVBoxLayout* textLayout = new QVBoxLayout(textPanel);
+    const auto textLayout = new QVBoxLayout(textPanel);
     textLayout->setContentsMargins(20, 20, 20, 20);
     textLayout->setAlignment(Qt::AlignVCenter);
 
@@ -84,8 +84,7 @@ void TypingTestLayer::reset() {
     // Reset stylów etykiety wyświetlającej tekst
     m_displayTextLabel->setStyleSheet("color: #bbbbbb; font-family: Consolas; font-size: 16pt; background-color: transparent; border: none;");
     // Reset stylów panelu i tytułu (na wypadek gdyby były zmieniane)
-    QWidget* textPanel = m_displayTextLabel->parentWidget();
-    if (textPanel) {
+    if (QWidget* textPanel = m_displayTextLabel->parentWidget()) {
         textPanel->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #ff3333; border-radius: 5px;"); // Czerwony border
     }
     m_titleLabel->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;"); // Czerwony tytuł
@@ -93,8 +92,7 @@ void TypingTestLayer::reset() {
 
 
     // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
         // Opcjonalnie: Można usunąć efekt
         // this->setGraphicsEffect(nullptr);
@@ -104,7 +102,7 @@ void TypingTestLayer::reset() {
 
 void TypingTestLayer::generateWords() {
     // Lista angielskich słów do losowania
-    QStringList wordPool = {
+    const QStringList wordPool = {
         "system", "access", "terminal", "password", "protocol",
         "network", "server", "data", "database", "module",
         "channel", "interface", "computer", "monitor", "keyboard",
@@ -130,11 +128,11 @@ void TypingTestLayer::generateWords() {
     QStringList recentWords;
 
     // Inicjalizacja metryki czcionki do pomiaru szerokości tekstu
-    QFont font("Consolas", 16);
-    QFontMetrics metrics(font);
+    const QFont font("Consolas", 16);
+    const QFontMetrics metrics(font);
 
     // Maksymalna szerokość etykiety
-    int maxWidth = 560; // 600 (szerokość panelu) - 2*20 (margines)
+    constexpr int maxWidth = 560; // 600 (szerokość panelu) - 2*20 (margines)
 
     // Symulacja tekstu i liczenie linii
     QString currentLine;
@@ -147,7 +145,7 @@ void TypingTestLayer::generateWords() {
 
         int attempts = 0;
         while (!validWord && attempts < 50) {
-            int index = QRandomGenerator::global()->bounded(wordPool.size());
+            const int index = QRandomGenerator::global()->bounded(wordPool.size());
             word = wordPool.at(index);
 
             // Sprawdź, czy słowo nie występuje wśród ostatnich 2 wybranych
@@ -159,7 +157,7 @@ void TypingTestLayer::generateWords() {
 
         // Jeśli nie znaleziono odpowiedniego słowa po 50 próbach, wybierz dowolne
         if (!validWord) {
-            int index = QRandomGenerator::global()->bounded(wordPool.size());
+            const int index = QRandomGenerator::global()->bounded(wordPool.size());
             word = wordPool.at(index);
         }
 
@@ -182,7 +180,7 @@ void TypingTestLayer::generateWords() {
                 // Spróbuj znaleźć krótsze słowo
                 bool foundShorterWord = false;
                 for (int i = 0; i < 10; i++) { // Maksymalnie 10 prób
-                    int index = QRandomGenerator::global()->bounded(wordPool.size());
+                    const int index = QRandomGenerator::global()->bounded(wordPool.size());
                     QString shorterWord = wordPool.at(index);
 
                     // Jeśli słowo jest krótsze i nie występuje wśród ostatnich 2
@@ -228,7 +226,7 @@ void TypingTestLayer::generateWords() {
     m_fullText = m_words.join(" ");
 }
 
-void TypingTestLayer::updateDisplayText() {
+void TypingTestLayer::updateDisplayText() const {
     if (m_fullText.isEmpty()) {
         return;
     }
@@ -292,10 +290,10 @@ void TypingTestLayer::onTextChanged(const QString& text) {
             
             // Opóźnienie przed zakończeniem warstwy
             QTimer::singleShot(1000, this, [this]() {
-                QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+                const auto effect = new QGraphicsOpacityEffect(this);
                 this->setGraphicsEffect(effect);
 
-                QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+                const auto animation = new QPropertyAnimation(effect, "opacity");
                 animation->setDuration(500);
                 animation->setStartValue(1.0);
                 animation->setEndValue(0.0);
@@ -311,15 +309,15 @@ void TypingTestLayer::onTextChanged(const QString& text) {
     } else {
         // Niepoprawny tekst - cofamy edycję
         QSignalBlocker blocker(m_hiddenInput);
-        QString correctText = text.left(m_currentPosition);
+        const QString correctText = text.left(m_currentPosition);
         m_hiddenInput->setText(correctText);
     }
 }
 
-void TypingTestLayer::updateHighlight() {
+void TypingTestLayer::updateHighlight() const {
     // Aktualizacja wyróżnienia po zakończeniu
     if (m_testCompleted) {
-        QString richText = "<span style='color: #33ff33;'>" + 
+        const QString richText = "<span style='color: #33ff33;'>" +
                           m_fullText.toHtmlEscaped() + 
                           "</span>";
         m_displayTextLabel->setText(richText);

@@ -8,55 +8,48 @@
 #include <QMoveEvent>
 #include <QDebug>
 
-class BlobEventHandler : public QObject {
+class BlobEventHandler final : public QObject {
     Q_OBJECT
 
 public:
     explicit BlobEventHandler(QWidget* parentWidget);
-    ~BlobEventHandler();
+    ~BlobEventHandler() override;
 
-    bool processEvent(QEvent* event);
-    bool processResizeEvent(QResizeEvent* event);
+    static bool processEvent();
+    bool processResizeEvent(const QResizeEvent* event);
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     void enableEvents();
     void disableEvents();
     bool areEventsEnabled() const { return m_eventsEnabled; }
 
-    void setTransitionInProgress(bool inProgress) { m_transitionInProgress = inProgress; }
+    void setTransitionInProgress(const bool inProgress) { m_transitionInProgress = inProgress; }
     bool isInTransition() const { return m_transitionInProgress; }
 
     signals:
-        // Sygnały dotyczące ruchu okna
         void windowMoved(const QPointF& newPosition, qint64 timestamp);
-    void movementSampleAdded(const QPointF& position, qint64 timestamp);
+        void movementSampleAdded(const QPointF& position, qint64 timestamp);
 
-    // Sygnały dotyczące zmiany rozmiaru
     void significantResizeDetected(const QSize& oldSize, const QSize& newSize);
     void resizeStateRequested();
     void stateResetTimerRequested();
 
-    // Sygnał informujący o włączeniu eventów po opóźnieniu
     void eventsReEnabled();
 
     private slots:
         void onEventReEnableTimeout();
 
 private:
-    // Metody pomocnicze
-    void handleMoveEvent(QMoveEvent* moveEvent);
+    void handleMoveEvent(const QMoveEvent* moveEvent);
 
-    // Pola przechowujące stan
     QWidget* m_parentWidget;
     bool m_eventsEnabled;
     bool m_transitionInProgress;
 
-    // Buforowanie ostatnich pozycji/czasów dla throttlingu
     QPointF m_lastProcessedPosition;
     qint64 m_lastProcessedMoveTime;
     qint64 m_lastDragEventTime;
 
-    // Timer do ponownego włączenia eventów
     QTimer m_eventReEnableTimer;
     bool m_isResizing = false;
 };

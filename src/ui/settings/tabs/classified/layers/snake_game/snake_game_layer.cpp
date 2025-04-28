@@ -17,15 +17,15 @@ SnakeGameLayer::SnakeGameLayer(QWidget *parent)
       m_borderAnimationProgress(0),
       m_snakePartsExited(0)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
     layout->setSpacing(15);
 
-    QLabel *title = new QLabel("SECURITY VERIFICATION: SNAKE GAME", this);
+    const auto title = new QLabel("SECURITY VERIFICATION: SNAKE GAME", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    QLabel *instructions = new QLabel("Zbierz 4 jabłka, aby otworzyć wyjście\nSterowanie: strzałki", this);
+    const auto instructions = new QLabel("Zbierz 4 jabłka, aby otworzyć wyjście\nSterowanie: strzałki", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -132,8 +132,7 @@ void SnakeGameLayer::reset() {
     m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Domyślne tło planszy (bez bordera)
     m_gameBoard->clear();
 
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
@@ -149,8 +148,8 @@ void SnakeGameLayer::initializeGame() {
     // Inicjalizacja węża
     m_snake.clear();
     // Zaczynamy od środka planszy
-    int startX = GRID_SIZE / 2;
-    int startY = GRID_SIZE / 2;
+    constexpr int startX = GRID_SIZE / 2;
+    constexpr int startY = GRID_SIZE / 2;
 
     m_snake.append(QPair<int, int>(startX, startY));     // Głowa
     m_snake.append(QPair<int, int>(startX-1, startY));   // Ciało
@@ -171,7 +170,7 @@ void SnakeGameLayer::initializeGame() {
     renderGame();
 }
 
-void SnakeGameLayer::renderGame() {
+void SnakeGameLayer::renderGame() const {
     // Rysowanie planszy
     QImage board(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE, QImage::Format_ARGB32);
     board.fill(QColor(10, 25, 40, 220));
@@ -329,8 +328,8 @@ void SnakeGameLayer::moveSnake() {
     m_lastProcessedDirection = m_direction;
 
     // Pobranie pozycji głowy węża
-    int headX = m_snake.first().first;
-    int headY = m_snake.first().second;
+    const int headX = m_snake.first().first;
+    const int headY = m_snake.first().second;
 
     // Obliczenie nowej pozycji głowy
     int newHeadX = headX;
@@ -372,7 +371,7 @@ void SnakeGameLayer::moveSnake() {
         }
 
         // W przypadku wychodzenia poza planszę, usuwamy ostatni segment bez względu na jabłko
-        QPair<int, int> tail = m_snake.last();
+        const QPair<int, int> tail = m_snake.last();
         // Bezpieczne usunięcie ostatniego segmentu (tylko jeśli jest w granicach planszy)
         if (tail.first >= 0 && tail.first < GRID_SIZE && tail.second >= 0 && tail.second < GRID_SIZE) {
             m_grid[tail.first][tail.second] = CellType::Empty;
@@ -401,7 +400,7 @@ void SnakeGameLayer::moveSnake() {
                 m_snakePartsExited++;
 
                 // Usunięcie ogona
-                QPair<int, int> tail = m_snake.last();
+                const QPair<int, int> tail = m_snake.last();
                 m_grid[tail.first][tail.second] = CellType::Empty;
                 m_snake.removeLast();
 
@@ -420,7 +419,7 @@ void SnakeGameLayer::moveSnake() {
     }
 
     // Sprawdzenie, czy wąż zebrał jabłko
-    bool appleCollected = (newHeadX == m_apple.first && newHeadY == m_apple.second);
+    const bool appleCollected = (newHeadX == m_apple.first && newHeadY == m_apple.second);
 
     // Aktualizacja pozycji węża
     // Usunięcie typu komórki dla starej głowy
@@ -436,7 +435,7 @@ void SnakeGameLayer::moveSnake() {
 
     // Jeśli nie zebrano jabłka, usunięcie ostatniego segmentu
     if (!appleCollected) {
-        QPair<int, int> tail = m_snake.last();
+        const QPair<int, int> tail = m_snake.last();
         m_snake.removeLast();
 
         // Jeśli ogon jest w granicach planszy, aktualizujemy grid
@@ -478,14 +477,14 @@ void SnakeGameLayer::generateApple() {
     }
 
     // Wybór losowej pustej komórki
-    int randomIndex = QRandomGenerator::global()->bounded(emptyCells.size());
+    const int randomIndex = QRandomGenerator::global()->bounded(emptyCells.size());
     m_apple = emptyCells.at(randomIndex);
 
     // Ustawienie jabłka na planszy
     m_grid[m_apple.first][m_apple.second] = CellType::Apple;
 }
 
-bool SnakeGameLayer::isCollision(int x, int y) {
+bool SnakeGameLayer::isCollision(const int x, const int y) const {
     // Kolizja ze ścianą - w trybie wyjścia sprawdzamy czy to punkt wyjścia
     if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
         if (m_gameState == GameState::ExitOpen) {
@@ -503,7 +502,7 @@ bool SnakeGameLayer::isCollision(int x, int y) {
     return m_grid[x][y] == CellType::Snake || m_grid[x][y] == CellType::SnakeHead;
 }
 
-void SnakeGameLayer::handleInput(int key) {
+void SnakeGameLayer::handleInput(const int key) {
     Direction newDirection = m_direction;
 
     switch (key) {
@@ -541,7 +540,7 @@ void SnakeGameLayer::keyPressEvent(QKeyEvent* event) {
 
 bool SnakeGameLayer::eventFilter(QObject* watched, QEvent* event) {
     if (watched == m_gameBoard && event->type() == QEvent::KeyPress) {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        const auto keyEvent = static_cast<QKeyEvent*>(event);
         handleInput(keyEvent->key());
         return true;
     }
@@ -554,7 +553,7 @@ void SnakeGameLayer::updateGame() {
     }
 }
 
-void SnakeGameLayer::finishGame(bool success) {
+void SnakeGameLayer::finishGame(const bool success) {
     m_gameTimer->stop();
     m_borderAnimationTimer->stop();
 
@@ -571,10 +570,10 @@ void SnakeGameLayer::finishGame(bool success) {
 
         // Krótkie opóźnienie przed zakończeniem warstwy
         QTimer::singleShot(1000, this, [this]() {
-            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
-            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            const auto animation = new QPropertyAnimation(effect, "opacity");
             animation->setDuration(500);
             animation->setStartValue(1.0);
             animation->setEndValue(0.0);
@@ -642,7 +641,7 @@ void SnakeGameLayer::updateBorderAnimation() {
     }
 }
 
-bool SnakeGameLayer::isExitPoint(int x, int y) {
+bool SnakeGameLayer::isExitPoint(const int x, const int y) const {
     // Sprawdzenie, czy punkt (x, y) jest punktem wyjścia
     if (m_exitSide == BorderSide::Left && x < 0 && y == m_exitPosition) {
         return true;

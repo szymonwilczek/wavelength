@@ -3,19 +3,19 @@
 #include "../../files/attachments/attachment_data_store.h"
 #include "../formatter/message_formatter.h"
 
-void WavelengthMessageProcessor::processIncomingMessage(const QString &message, QString frequency) {
+void WavelengthMessageProcessor::processIncomingMessage(const QString &message, const QString &frequency) {
     qDebug() << "Processing message for wavelength" << frequency << ":" << message.left(50) + "...";
     bool ok = false;
-    QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
+    const QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
 
     if (!ok) {
         qDebug() << "Failed to parse JSON message";
         return;
     }
 
-    QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
-    QString messageId = MessageHandler::getInstance()->getMessageId(msgObj);
-    QString msgFrequency = MessageHandler::getInstance()->getMessageFrequency(msgObj);
+    const QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
+    const QString messageId = MessageHandler::getInstance()->getMessageId(msgObj);
+    const QString msgFrequency = MessageHandler::getInstance()->getMessageFrequency(msgObj);
 
     qDebug() << "Message type:" << msgType << "ID:" << messageId << "Freq:" << msgFrequency;
 
@@ -46,15 +46,15 @@ void WavelengthMessageProcessor::processIncomingMessage(const QString &message, 
     } else if (msgType == "ptt_granted") {
         emit pttGranted(frequency); // Emituj sygnał do serwisu/koordynatora
     } else if (msgType == "ptt_denied") {
-        QString reason = msgObj.value("reason").toString("Transmission slot is busy.");
+        const QString reason = msgObj.value("reason").toString("Transmission slot is busy.");
         emit pttDenied(frequency, reason); // Emituj sygnał
     } else if (msgType == "ptt_start_receiving") {
-        QString senderId = msgObj.value("senderId").toString("Unknown");
+        const QString senderId = msgObj.value("senderId").toString("Unknown");
         emit pttStartReceiving(frequency, senderId); // Emituj sygnał
     } else if (msgType == "ptt_stop_receiving") {
         emit pttStopReceiving(frequency); // Emituj sygnał
     } else if (msgType == "audio_amplitude") { // Opcjonalne - jeśli serwer wysyła amplitudę
-        qreal amplitude = msgObj.value("amplitude").toDouble(0.0);
+        const qreal amplitude = msgObj.value("amplitude").toDouble(0.0);
         emit remoteAudioAmplitudeUpdate(frequency, amplitude);
     }
     // --- KONIEC NOWYCH TYPÓW WIADOMOŚCI PTT ---
@@ -63,7 +63,7 @@ void WavelengthMessageProcessor::processIncomingMessage(const QString &message, 
     }
 }
 
-void WavelengthMessageProcessor::processIncomingBinaryMessage(const QByteArray &message, QString frequency) {
+void WavelengthMessageProcessor::processIncomingBinaryMessage(const QByteArray &message, const QString &frequency) {
     qDebug() << "[CLIENT] processIncomingBinaryMessage: Received" << message.size() << "bytes for wavelength" << frequency;
     emit audioDataReceived(frequency, message);
 }
@@ -81,7 +81,7 @@ void WavelengthMessageProcessor::setSocketMessageHandlers(QWebSocket *socket, QS
 
 
     // Połącz dla wiadomości tekstowych
-    bool connectedText = connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
+    const bool connectedText = connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
         processIncomingMessage(message, frequency);
     });
     if (!connectedText) {
@@ -98,7 +98,7 @@ void WavelengthMessageProcessor::setSocketMessageHandlers(QWebSocket *socket, QS
     // --- KONIEC LOGOWANIA ---
 
     // Połącz dla wiadomości binarnych
-    bool connectedBinary = connect(socket, &QWebSocket::binaryMessageReceived, this, [this, frequency](const QByteArray& message) {
+    const bool connectedBinary = connect(socket, &QWebSocket::binaryMessageReceived, this, [this, frequency](const QByteArray& message) {
         // Ten log powinien się pojawić, jeśli sygnał zostanie odebrany
         qDebug() << "[CLIENT] binaryMessageReceived signal triggered for freq" << frequency << "Size:" << message.size();
         processIncomingBinaryMessage(message, frequency);
@@ -116,7 +116,7 @@ void WavelengthMessageProcessor::setSocketMessageHandlers(QWebSocket *socket, QS
     // Rozłączamy najpierw, aby uniknąć wielokrotnego podłączania tego samego slotu
     disconnect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, nullptr);
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
-            this, [socket, frequency](QAbstractSocket::SocketError error) {
+            this, [socket, frequency](const QAbstractSocket::SocketError error) {
                 qWarning() << "[CLIENT] WebSocket Error Occurred on freq" << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
             });
 
@@ -124,7 +124,7 @@ void WavelengthMessageProcessor::setSocketMessageHandlers(QWebSocket *socket, QS
     qDebug() << "Message handlers set for socket on frequency" << frequency; // Istniejący log
 }
 
-void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj, QString frequency,
+void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj, const QString &frequency,
     const QString &messageId) {
     // Sprawdź czy wiadomość już przetwarzana
     if (MessageHandler::getInstance()->isMessageProcessed(messageId)) {
@@ -135,42 +135,42 @@ void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj
     MessageHandler::getInstance()->markMessageAsProcessed(messageId);
 
     // Sprawdź, czy wiadomość zawiera załączniki
-    bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
+    const bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
     if (hasAttachment && msgObj.contains("attachmentData") && msgObj["attachmentData"].toString().length() > 100) {
         // Tworzymy lekką wersję wiadomości z referencją
         QJsonObject lightMsg = msgObj;
 
         // Zamiast surowych danych base64, zapisujemy dane w magazynie i używamy ID
-        QString attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
+        const QString attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
             msgObj["attachmentData"].toString());
 
         // Zastępujemy dane załącznika identyfikatorem
         lightMsg["attachmentData"] = attachmentId;
 
         // Formatujemy i emitujemy placeholder
-        QString placeholderMsg = MessageFormatter::formatMessage(lightMsg, frequency);
+        const QString placeholderMsg = MessageFormatter::formatMessage(lightMsg, frequency);
         emit messageReceived(frequency, placeholderMsg);
     } else {
         // Dla zwykłych wiadomości tekstowych lub już z referencjami
-        QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+        const QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
         emit messageReceived(frequency, formattedMsg);
     }
 }
 
-void WavelengthMessageProcessor::processSystemCommand(const QJsonObject &msgObj, QString frequency) {
-    QString command = msgObj["command"].toString();
+void WavelengthMessageProcessor::processSystemCommand(const QJsonObject &msgObj, const QString &frequency) {
+    const QString command = msgObj["command"].toString();
 
     if (command == "ping") {
         qDebug() << "Received ping command";
     } else if (command == "close_wavelength") {
         processWavelengthClosed(msgObj, frequency);
     } else if (command == "kick_user") {
-        QString userId = msgObj["userId"].toString();
-        QString reason = msgObj["reason"].toString("You have been kicked");
+        const QString userId = msgObj["userId"].toString();
+        const QString reason = msgObj["reason"].toString("You have been kicked");
 
-        WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
-        QString clientId = info.hostId; // Uproszczenie - potrzeba poprawić
+        const WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
+        const QString clientId = info.hostId; // Uproszczenie - potrzeba poprawić
 
         if (userId == clientId) {
             emit userKicked(frequency, reason);
@@ -178,7 +178,7 @@ void WavelengthMessageProcessor::processSystemCommand(const QJsonObject &msgObj,
             // Usuń wavelength z rejestru
             WavelengthRegistry* registry = WavelengthRegistry::getInstance();
             if (registry->hasWavelength(frequency)) {
-                QString activeFreq = registry->getActiveWavelength();
+                const QString activeFreq = registry->getActiveWavelength();
                 registry->removeWavelength(frequency);
                 if (activeFreq == frequency) {
                     registry->setActiveWavelength("-1");
@@ -188,26 +188,26 @@ void WavelengthMessageProcessor::processSystemCommand(const QJsonObject &msgObj,
     }
 }
 
-void WavelengthMessageProcessor::processUserJoined(const QJsonObject &msgObj, QString frequency) {
-    QString userId = msgObj["userId"].toString();
-    QString formattedMsg = MessageFormatter::formatSystemMessage(
+void WavelengthMessageProcessor::processUserJoined(const QJsonObject &msgObj, const QString &frequency) {
+    const QString userId = msgObj["userId"].toString();
+    const QString formattedMsg = MessageFormatter::formatSystemMessage(
         QString("User %1 joined the wavelength").arg(userId.left(5)));
     emit systemMessage(frequency, formattedMsg);
 }
 
-void WavelengthMessageProcessor::processUserLeft(const QJsonObject &msgObj, QString frequency) {
-    QString userId = msgObj["userId"].toString();
-    QString formattedMsg = MessageFormatter::formatSystemMessage(
+void WavelengthMessageProcessor::processUserLeft(const QJsonObject &msgObj, const QString &frequency) {
+    const QString userId = msgObj["userId"].toString();
+    const QString formattedMsg = MessageFormatter::formatSystemMessage(
         QString("User %1 left the wavelength").arg(userId.left(5)));
     emit systemMessage(frequency, formattedMsg);
 }
 
-void WavelengthMessageProcessor::processWavelengthClosed(const QJsonObject &msgObj, QString frequency) {
+void WavelengthMessageProcessor::processWavelengthClosed(const QJsonObject &msgObj, const QString &frequency) {
     qDebug() << "Wavelength" << frequency << "was closed";
 
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     if (registry->hasWavelength(frequency)) {
-        QString activeFreq = registry->getActiveWavelength();
+        const QString activeFreq = registry->getActiveWavelength();
         registry->markWavelengthClosing(frequency, true);
         registry->removeWavelength(frequency);
         if (activeFreq == frequency) {
@@ -218,7 +218,7 @@ void WavelengthMessageProcessor::processWavelengthClosed(const QJsonObject &msgO
 }
 
 WavelengthMessageProcessor::WavelengthMessageProcessor(QObject *parent): QObject(parent) {
-    WavelengthMessageService* service = WavelengthMessageService::getInstance();
+    const WavelengthMessageService* service = WavelengthMessageService::getInstance();
     // Połączenia sygnałów z WavelengthMessageService (powinny być OK)
     connect(this, &WavelengthMessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
     connect(this, &WavelengthMessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);

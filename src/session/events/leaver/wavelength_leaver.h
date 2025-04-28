@@ -8,7 +8,7 @@
 #include "../../../storage/database_manager.h"
 #include "../../../chat/messages/handler/message_handler.h"
 
-class WavelengthLeaver : public QObject {
+class WavelengthLeaver final : public QObject {
     Q_OBJECT
 
 public:
@@ -26,8 +26,8 @@ signals:
     void wavelengthClosed(QString frequency);
 
 private:
-    WavelengthLeaver(QObject* parent = nullptr) : QObject(parent) {}
-    ~WavelengthLeaver() {}
+    explicit WavelengthLeaver(QObject* parent = nullptr) : QObject(parent) {}
+    ~WavelengthLeaver() override {}
 
     WavelengthLeaver(const WavelengthLeaver&) = delete;
     WavelengthLeaver& operator=(const WavelengthLeaver&) = delete;

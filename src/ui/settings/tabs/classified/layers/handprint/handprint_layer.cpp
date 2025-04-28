@@ -11,10 +11,10 @@
 HandprintLayer::HandprintLayer(QWidget *parent)
     : SecurityLayer(parent), m_handprintTimer(nullptr), m_svgRenderer(nullptr)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel("HANDPRINT AUTHENTICATION", this);
+    const auto title = new QLabel("HANDPRINT AUTHENTICATION", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -25,7 +25,7 @@ HandprintLayer::HandprintLayer(QWidget *parent)
     m_handprintImage->setAlignment(Qt::AlignCenter);
     m_handprintImage->installEventFilter(this);
 
-    QLabel *instructions = new QLabel("Press and hold on handprint to scan", this);
+    const auto instructions = new QLabel("Press and hold on handprint to scan", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -108,8 +108,7 @@ void HandprintLayer::reset() {
         m_handprintImage->setPixmap(QPixmap::fromImage(m_baseHandprint));
     }
 
-    auto* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
@@ -131,7 +130,7 @@ void HandprintLayer::loadRandomHandprint() {
         return;
     }
 
-    int index = QRandomGenerator::global()->bounded(m_handprintFiles.size());
+    const int index = QRandomGenerator::global()->bounded(m_handprintFiles.size());
     m_currentHandprint = m_handprintFiles[index];
 
     if (!m_svgRenderer->load(m_currentHandprint)) {
@@ -157,7 +156,7 @@ void HandprintLayer::loadRandomHandprint() {
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     // Renderowanie odcisku w kolorze jasno-szarym z przezroczystością
-    QColor lightGrayColor(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
+    constexpr QColor lightGrayColor(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
 
     // Ustawienie koloru dla SVG poprzez kompozycję
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
@@ -190,7 +189,7 @@ void HandprintLayer::updateProgress() {
     }
 }
 
-void HandprintLayer::processHandprint(bool completed) {
+void HandprintLayer::processHandprint(const bool completed) {
     if (completed) {
         // Zmiana kolorów na zielony po pomyślnym przejściu
         m_handprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
@@ -231,10 +230,10 @@ void HandprintLayer::processHandprint(bool completed) {
         // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(500, this, [this]() {
             // Animacja zanikania
-            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
-            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            const auto animation = new QPropertyAnimation(effect, "opacity");
             animation->setDuration(500);
             animation->setStartValue(1.0);
             animation->setEndValue(0.0);
@@ -249,7 +248,7 @@ void HandprintLayer::processHandprint(bool completed) {
     }
 }
 
-void HandprintLayer::updateHandprintScan(int progressValue) {
+void HandprintLayer::updateHandprintScan(const int progressValue) const {
     if (!m_svgRenderer->isValid()) {
         return; // Brak prawidłowego SVG do renderowania
     }
@@ -266,8 +265,8 @@ void HandprintLayer::updateHandprintScan(int progressValue) {
     m_svgRenderer->render(&painter, QRectF(25, 25, 200, 200));
 
     // Obliczenie wysokości niebieskiej części (wypełnionej)
-    int totalHeight = 200;
-    int filledHeight = static_cast<int>((progressValue / 100.0) * totalHeight);
+    constexpr int totalHeight = 200;
+    const int filledHeight = static_cast<int>((progressValue / 100.0) * totalHeight);
 
     // Nałożenie koloru dla całego obrazu - najpierw szary
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);

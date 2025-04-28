@@ -13,7 +13,7 @@
 #include "../../audio/decoder/audio_decoder.h"
 
 
-class InlineAudioPlayer : public QFrame {
+class InlineAudioPlayer final : public QFrame {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
     Q_PROPERTY(double spectrumIntensity READ spectrumIntensity WRITE setSpectrumIntensity)
@@ -27,18 +27,18 @@ public:
 
     // Akcesory dla właściwości animacji
     double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(double opacity) {
+    void setScanlineOpacity(const double opacity) {
         m_scanlineOpacity = opacity;
         update();
     }
 
     double spectrumIntensity() const { return m_spectrumIntensity; }
-    void setSpectrumIntensity(double intensity) {
+    void setSpectrumIntensity(const double intensity) {
         m_spectrumIntensity = intensity;
         update();
     }
 
-    ~InlineAudioPlayer() {
+    ~InlineAudioPlayer() override {
         releaseResources();
     }
 
@@ -48,11 +48,11 @@ public:
 
     void deactivate();
 
-    void adjustVolume(int volume);
+    void adjustVolume(int volume) const;
 
     void toggleMute();
 
-    void updateVolumeIcon(float volume);
+    void updateVolumeIcon(float volume) const;
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -66,20 +66,20 @@ private slots:
 
     void updateTimeLabel(int position);
 
-    void updateSliderPosition(double position);
+    void updateSliderPosition(double position) const;
 
-    void seekAudio(int position);
+    void seekAudio(int position) const;
 
     void togglePlayback();
 
-    void handleError(const QString& message);
+    void handleError(const QString& message) const;
 
     void handleAudioInfo(int sampleRate, int channels, double duration);
 
     void updateUI();
 
     void increaseSpectrumIntensity() {
-        QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
+        const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
         spectrumAnim->setDuration(600);
         spectrumAnim->setStartValue(m_spectrumIntensity);
         spectrumAnim->setEndValue(0.6);
@@ -88,7 +88,7 @@ private slots:
     }
 
     void decreaseSpectrumIntensity() {
-        QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
+        const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
         spectrumAnim->setDuration(800);
         spectrumAnim->setStartValue(m_spectrumIntensity);
         spectrumAnim->setEndValue(0.2);

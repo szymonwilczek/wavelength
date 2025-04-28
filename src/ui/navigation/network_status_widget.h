@@ -6,12 +6,12 @@
 #include <QNetworkAccessManager>
 #include <QGraphicsDropShadowEffect>
 
-class NetworkStatusWidget : public QWidget {
+class NetworkStatusWidget final : public QWidget {
     Q_OBJECT
 
 public:
     explicit NetworkStatusWidget(QWidget *parent = nullptr);
-    ~NetworkStatusWidget();
+    ~NetworkStatusWidget() override;
 
     public slots:
         void checkNetworkStatus();
@@ -38,8 +38,9 @@ private:
     qint64 m_pingValue;   // Nowe pole do przechowywania pingu w ms
 
     void updateStatusDisplay();
-    void createNetworkIcon(NetworkQuality quality);
-    QColor getQualityColor(NetworkQuality quality);
+    void createNetworkIcon(NetworkQuality quality) const;
+
+    static QColor getQualityColor(NetworkQuality quality);
 };
 
 #endif // NETWORK_STATUS_WIDGET_H

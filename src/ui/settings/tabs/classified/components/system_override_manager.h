@@ -15,13 +15,13 @@
 // Forward declaration
 class FloatingEnergySphereWidget;
 
-class SystemOverrideManager : public QObject
+class SystemOverrideManager final : public QObject
 {
     Q_OBJECT
 
 public:
     explicit SystemOverrideManager(QObject *parent = nullptr);
-    ~SystemOverrideManager();
+    ~SystemOverrideManager() override;
 
 #ifdef Q_OS_WIN
     static bool isRunningAsAdmin();
@@ -41,8 +41,9 @@ public:
 private:
     bool changeWallpaper();
     bool restoreWallpaper();
-    bool sendWindowsNotification(const QString& title, const QString& message);
-    bool minimizeAllWindows();
+    bool sendWindowsNotification(const QString& title, const QString& message) const;
+
+    static bool minimizeAllWindows();
     void showFloatingAnimationWidget(bool isFirstTime);
 
     QSystemTrayIcon* m_trayIcon;
@@ -62,13 +63,17 @@ private:
 
     // --- Hooks ---
     static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
-    bool installKeyboardHook();
-    void uninstallKeyboardHook();
+
+    static bool installKeyboardHook();
+
+    static void uninstallKeyboardHook();
     static HHOOK m_keyboardHook;
 
     static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
-    bool installMouseHook();
-    void uninstallMouseHook();
+
+    static bool installMouseHook();
+
+    static void uninstallMouseHook();
     static HHOOK m_mouseHook;
     // --------------------------------------------
 #endif

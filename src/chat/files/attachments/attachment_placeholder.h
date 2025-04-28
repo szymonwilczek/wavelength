@@ -6,11 +6,10 @@
 #include <QWindow>
 
 #include "attachment_queue_manager.h"
-#include "../../../ui/files/cyber_attachment_viewer.h"
 #include "../gif/player/inline_gif_player.h"
 #include "../video/player/video_player_overlay.h"
 
-class AttachmentPlaceholder : public QWidget {
+class AttachmentPlaceholder final : public QWidget {
     Q_OBJECT
 
 public:
@@ -24,7 +23,7 @@ public:
 
     void setBase64Data(const QString& base64Data, const QString& mimeType);
 
-    void setLoading(bool loading);
+    void setLoading(bool loading) const;
 
 
 signals:
@@ -40,7 +39,7 @@ public slots:
     void showFullSizeDialog(const QByteArray& data, bool isGif);
 
     // Funkcja pomocnicza do dostosowania rozmiaru i pokazania dialogu
-    void adjustAndShowDialog(QDialog* dialog, QScrollArea* scrollArea, QWidget* contentWidget, QSize originalContentSize);
+    void adjustAndShowDialog(QDialog* dialog, const QScrollArea* scrollArea, QWidget* contentWidget, QSize originalContentSize) const;
 
     void showCyberImage(const QByteArray& data);
 

@@ -20,19 +20,19 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-class AudioDecoder : public QThread {
+class AudioDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    AudioDecoder(const QByteArray& audioData, QObject* parent = nullptr);
+    explicit AudioDecoder(const QByteArray& audioData, QObject* parent = nullptr);
 
-    ~AudioDecoder();
+    ~AudioDecoder() override;
 
     void releaseResources();
 
     bool reinitialize();
 
-    void setVolume(float volume);
+    void setVolume(float volume) const;
 
     float getVolume() const;
 
@@ -48,8 +48,8 @@ public:
 
     void reset();
 
-    bool isRunning() const {
-        return QThread::isRunning();
+    bool isDecoderRunning() const {
+        return isRunning();
     }
 
 signals:
@@ -61,7 +61,7 @@ signals:
 protected:
     void run() override;
 
-    void decodeAudioFrame(AVFrame* audioFrame);
+    void decodeAudioFrame(const AVFrame* audioFrame) const;
 
 private:
     // Funkcje callback dla custom I/O

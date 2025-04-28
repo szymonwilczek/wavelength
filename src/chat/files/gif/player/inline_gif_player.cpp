@@ -5,7 +5,7 @@ InlineGifPlayer::InlineGifPlayer(const QByteArray &gifData, QWidget *parent): QF
     // Usunięto setFrameStyle i setStyleSheet
     // Usunięto setMaximumSize
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
@@ -49,7 +49,7 @@ InlineGifPlayer::InlineGifPlayer(const QByteArray &gifData, QWidget *parent): QF
 void InlineGifPlayer::releaseResources() {
     if (m_decoder) {
         m_decoder->stop();
-        if (m_decoder->isRunning()) { // Czekaj tylko jeśli wątek działał
+        if (m_decoder->isDecoderRunning()) { // Czekaj tylko jeśli wątek działał
             m_decoder->wait(500);
         }
         // releaseResources w dekoderze jest wywoływane w jego destruktorze,
@@ -112,7 +112,7 @@ void InlineGifPlayer::displayThumbnail(const QImage &frame) {
     }
 }
 
-void InlineGifPlayer::updateFrame(const QImage &frame) {
+void InlineGifPlayer::updateFrame(const QImage &frame) const {
     // Ta metoda jest teraz wywoływana tylko gdy dekoder aktywnie dekoduje (m_isPlaying == true)
     if (frame.isNull() || !m_isPlaying) return; // Dodano sprawdzenie m_isPlaying
 
@@ -130,7 +130,7 @@ void InlineGifPlayer::handleError(const QString &message) {
     updateGeometry();
 }
 
-void InlineGifPlayer::handleGifInfo(int width, int height, double duration, double frameRate, int numStreams) {
+void InlineGifPlayer::handleGifInfo(const int width, const int height, const double duration, const double frameRate, int numStreams) {
     m_gifWidth = width;
     m_gifHeight = height;
     m_gifDuration = duration;

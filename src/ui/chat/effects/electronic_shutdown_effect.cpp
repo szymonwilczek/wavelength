@@ -7,7 +7,7 @@ ElectronicShutdownEffect::ElectronicShutdownEffect(QObject *parent): QGraphicsEf
                                                                      m_randomSeed(QRandomGenerator::global()->generate()) {
 }
 
-void ElectronicShutdownEffect::setProgress(qreal progress) {
+void ElectronicShutdownEffect::setProgress(const qreal progress) {
     m_progress = qBound(0.0, progress, 1.0);
     update();
 }
@@ -140,8 +140,6 @@ void ElectronicShutdownEffect::draw(QPainter *painter) {
                 // Efekt "jasności" - najjaśniejsza na końcu
                 int brightness = 40 + qMin(215, static_cast<int>(normalizedProgress * 120));
 
-                // Najpierw rysujemy poziomą linię (szczątkowy obraz)
-                QRect sourceRect = pixmap.rect();
                 QRect targetRect(lineOffset, centerY - 1, lineWidth, 2); // 2px wysokości
 
                 // Sprawdzenie poprawności wymiarów lineImage
@@ -164,7 +162,7 @@ void ElectronicShutdownEffect::draw(QPainter *painter) {
                         // Zwiększ jasność
                         for (int x = 0; x < lineWidth; x++) {
                             for (int y = 0; y < 2; y++) {
-                                QColor pixelColor = QColor(lineImage.pixel(x, y));
+                                auto pixelColor = QColor(lineImage.pixel(x, y));
                                 int r = qMin(255, pixelColor.red() + brightness);
                                 int g = qMin(255, pixelColor.green() + brightness);
                                 int b = qMin(255, pixelColor.blue() + brightness);
@@ -221,11 +219,9 @@ void ElectronicShutdownEffect::draw(QPainter *painter) {
         }
     }
 
-    // Rysujemy finalny efekt z cache, tylko jeśli jest prawidłowy
-    if (cachedResult) {
         painter->save();
         painter->translate(offset);
         painter->drawPixmap(0, 0, *cachedResult);
         painter->restore();
-    }
+
 }

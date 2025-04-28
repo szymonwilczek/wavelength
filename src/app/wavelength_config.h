@@ -1,7 +1,6 @@
 #ifndef WAVELENGTH_CONFIG_H
 #define WAVELENGTH_CONFIG_H
 
-
 #include <QColor>
 #include <QString>
 #include <QSettings>
@@ -10,7 +9,7 @@
 #include <QVariant>
 #include <QKeySequence>
 
-class WavelengthConfig : public QObject {
+class WavelengthConfig final : public QObject {
     Q_OBJECT
     static constexpr int MAX_RECENT_COLORS = 5;
 public:
@@ -41,15 +40,13 @@ public:
     void setDebugMode(bool enabled);
 
     QString getPreferredStartFrequency() const;
-    void setPreferredStartFrequency(QString frequency);
+    void setPreferredStartFrequency(const QString &frequency);
 
     // --- Kolory wyglądu ---
     QColor getBackgroundColor() const;
     void setBackgroundColor(const QColor& color);
     QColor getBlobColor() const;
     void setBlobColor(const QColor& color);
-    QColor getMessageColor() const;
-    void setMessageColor(const QColor& color);
     QColor getStreamColor() const;
     void setStreamColor(const QColor& color);
 

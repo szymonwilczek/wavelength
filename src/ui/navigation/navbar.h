@@ -9,15 +9,15 @@
 #include "../../ui/buttons/cyberpunk_button.h"
 #include "network_status_widget.h"
 
-class Navbar : public QToolBar {
+class Navbar final : public QToolBar {
     Q_OBJECT
 
 public:
     explicit Navbar(QWidget *parent = nullptr);
 
 public slots:
-    void setChatMode(const bool inChat);
-    void playClickSound();
+    void setChatMode(const bool inChat) const;
+    void playClickSound() const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;

@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QSvgRenderer>
 
-class HandprintLayer : public SecurityLayer {
+class HandprintLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -24,7 +24,7 @@ public:
 private:
     void loadRandomHandprint();
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void updateHandprintScan(int progressValue);
+    void updateHandprintScan(int progressValue) const;
 
     QLabel* m_handprintImage;
     QProgressBar* m_handprintProgress;

@@ -1,6 +1,6 @@
 #include "wavelength_registry.h"
 
-bool WavelengthRegistry::addWavelength(QString frequency, const WavelengthInfo &info) {
+bool WavelengthRegistry::addWavelength(const QString &frequency, const WavelengthInfo &info) {
     if (hasWavelength(frequency)) {
         qDebug() << "Wavelength" << frequency << "already exists";
         return false;
@@ -20,7 +20,7 @@ bool WavelengthRegistry::addWavelength(QString frequency, const WavelengthInfo &
     return true;
 }
 
-bool WavelengthRegistry::removeWavelength(QString frequency) {
+bool WavelengthRegistry::removeWavelength(const QString &frequency) {
     if (!hasWavelength(frequency)) {
         qDebug() << "Cannot remove - wavelength" << frequency << "does not exist";
         return false;
@@ -38,14 +38,14 @@ bool WavelengthRegistry::removeWavelength(QString frequency) {
     return true;
 }
 
-WavelengthInfo WavelengthRegistry::getWavelengthInfo(QString frequency) const {
+WavelengthInfo WavelengthRegistry::getWavelengthInfo(const QString &frequency) const {
     if (hasWavelength(frequency)) {
         return m_wavelengths[frequency];
     }
     return WavelengthInfo(); // Return empty info
 }
 
-bool WavelengthRegistry::updateWavelength(QString frequency, const WavelengthInfo &info) {
+bool WavelengthRegistry::updateWavelength(const QString &frequency, const WavelengthInfo &info) {
     if (!hasWavelength(frequency)) {
         qDebug() << "Cannot update - wavelength" << frequency << "does not exist";
         return false;
@@ -59,20 +59,20 @@ bool WavelengthRegistry::updateWavelength(QString frequency, const WavelengthInf
     return true;
 }
 
-void WavelengthRegistry::setActiveWavelength(QString frequency) {
+void WavelengthRegistry::setActiveWavelength(const QString &frequency) {
     if (frequency != -1 && !hasWavelength(frequency)) {
         qDebug() << "Cannot set active - wavelength" << frequency << "does not exist";
         return;
     }
 
-    QString previousActive = m_activeWavelength;
+    const QString previousActive = m_activeWavelength;
     m_activeWavelength = frequency;
 
     qDebug() << "Active wavelength changed from" << previousActive << "to" << frequency;
     emit activeWavelengthChanged(previousActive, frequency);
 }
 
-bool WavelengthRegistry::addPendingRegistration(QString frequency) {
+bool WavelengthRegistry::addPendingRegistration(const QString &frequency) {
     if (hasWavelength(frequency) || m_pendingRegistrations.contains(frequency)) {
         qDebug() << "Cannot add pending registration - wavelength"
                 << frequency << "already exists or is pending";
@@ -84,7 +84,7 @@ bool WavelengthRegistry::addPendingRegistration(QString frequency) {
     return true;
 }
 
-bool WavelengthRegistry::removePendingRegistration(QString frequency) {
+bool WavelengthRegistry::removePendingRegistration(const QString &frequency) {
     if (m_pendingRegistrations.contains(frequency)) {
         m_pendingRegistrations.remove(frequency);
         qDebug() << "Removed pending registration for wavelength:" << frequency;
@@ -93,21 +93,21 @@ bool WavelengthRegistry::removePendingRegistration(QString frequency) {
     return false;
 }
 
-QPointer<QWebSocket> WavelengthRegistry::getWavelengthSocket(QString frequency) const {
+QPointer<QWebSocket> WavelengthRegistry::getWavelengthSocket(const QString &frequency) const {
     if (hasWavelength(frequency)) {
         return m_wavelengths[frequency].socket;
     }
     return nullptr;
 }
 
-void WavelengthRegistry::setWavelengthSocket(QString frequency, QPointer<QWebSocket> socket) {
+void WavelengthRegistry::setWavelengthSocket(const QString &frequency, const QPointer<QWebSocket> &socket) {
     if (hasWavelength(frequency)) {
         m_wavelengths[frequency].socket = socket;
         qDebug() << "Set socket for wavelength:" << frequency;
     }
 }
 
-bool WavelengthRegistry::markWavelengthClosing(QString frequency, bool closing) {
+bool WavelengthRegistry::markWavelengthClosing(const QString &frequency, const bool closing) {
     if (!hasWavelength(frequency)) {
         return false;
     }
@@ -118,7 +118,7 @@ bool WavelengthRegistry::markWavelengthClosing(QString frequency, bool closing) 
     return true;
 }
 
-bool WavelengthRegistry::isWavelengthClosing(QString frequency) const {
+bool WavelengthRegistry::isWavelengthClosing(const QString &frequency) const {
     if (hasWavelength(frequency)) {
         return m_wavelengths[frequency].isClosing;
     }

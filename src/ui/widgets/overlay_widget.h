@@ -3,7 +3,7 @@
 #include <QWidget>
 
 
-class OverlayWidget : public QWidget {
+class OverlayWidget final : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
 

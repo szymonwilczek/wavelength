@@ -36,7 +36,7 @@ QSize CyberLongTextDisplay::sizeHint() const {
     return m_sizeHint;
 }
 
-void CyberLongTextDisplay::setScrollPosition(int position) {
+void CyberLongTextDisplay::setScrollPosition(const int position) {
     if (m_scrollPosition != position) {
         m_scrollPosition = position;
         update();
@@ -62,10 +62,8 @@ void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
     painter.setFont(m_font);
 
     // Podstawowe parametry
-    QFontMetrics fm(m_font);
-    int lineHeight = fm.lineSpacing();
-    int topMargin = 10;
-    int leftMargin = 15;
+    const QFontMetrics fm(m_font);
+    const int lineHeight = fm.lineSpacing();
 
     // Oblicz zakres widocznych linii
     int firstVisibleLine = m_scrollPosition / lineHeight;
@@ -78,7 +76,9 @@ void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
     // Rysujemy tylko widoczne linie tekstu
     painter.setPen(m_textColor);
     for (int i = firstVisibleLine; i <= lastVisibleLine; ++i) {
-        int y = topMargin + fm.ascent() + i * lineHeight - m_scrollPosition;
+        constexpr int leftMargin = 15;
+        constexpr int topMargin = 10;
+        const int y = topMargin + fm.ascent() + i * lineHeight - m_scrollPosition;
         painter.drawText(leftMargin, y, m_processedLines[i]);
     }
 
@@ -110,8 +110,8 @@ void CyberLongTextDisplay::processText() {
     // Czyścimy poprzednie przetworzone linie
     m_processedLines.clear();
 
-    QFontMetrics fm(m_font);
-    int availableWidth = width() - 30; // Margines 15px z każdej strony
+    const QFontMetrics fm(m_font);
+    const int availableWidth = width() - 30; // Margines 15px z każdej strony
 
     // Dzielimy tekst na akapity (zachowując oryginalne podziały na linię)
     QStringList paragraphs = m_originalText.split("\n", Qt::KeepEmptyParts);
@@ -172,7 +172,7 @@ void CyberLongTextDisplay::processText() {
     }
 
     // Obliczamy wymaganą wysokość
-    int requiredHeight = m_processedLines.size() * fm.lineSpacing() + 20; // 10px margines góra i dół
+    const int requiredHeight = m_processedLines.size() * fm.lineSpacing() + 20; // 10px margines góra i dół
 
     // Aktualizujemy sizeHint
     m_sizeHint = QSize(qMax(availableWidth + 30, 400), requiredHeight);

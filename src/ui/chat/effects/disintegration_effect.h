@@ -5,9 +5,9 @@
 #include <QRandomGenerator>
 #include <QCache>
 
-class DisintegrationEffect : public QGraphicsEffect {
+class DisintegrationEffect final : public QGraphicsEffect {
 public:
-    DisintegrationEffect(QObject* parent = nullptr);
+    explicit DisintegrationEffect(QObject* parent = nullptr);
 
     void setProgress(qreal progress);
 

@@ -38,7 +38,7 @@ void GLTransitionWidget::setWidgets(QWidget *currentWidget, QWidget *nextWidget)
     m_nextPixmap.setDevicePixelRatio(devicePixelRatio);
 }
 
-void GLTransitionWidget::startTransition(int duration)
+void GLTransitionWidget::startTransition(const int duration)
 {
     m_offset = 0.0f;
     m_animation->setDuration(duration);
@@ -47,7 +47,7 @@ void GLTransitionWidget::startTransition(int duration)
     m_animation->start();
 }
 
-void GLTransitionWidget::setOffset(float offset)
+void GLTransitionWidget::setOffset(const float offset)
 {
     if (m_offset != offset) {
         m_offset = offset;
@@ -71,14 +71,14 @@ void GLTransitionWidget::paintEvent(QPaintEvent *event)
                           QPainter::SmoothPixmapTransform |
                           QPainter::HighQualityAntialiasing);
 
-    int w = width();
-    int h = height();
+    const int w = width();
+    const int h = height();
 
     // Rysuje bieżący widget przesuwający się w lewo
-    int currentX = -w * m_offset;
+    const int currentX = -w * m_offset;
     painter.drawPixmap(currentX, 0, w, h, m_currentPixmap);
 
     // Rysuje następny widget wjeżdżający od prawej
-    int nextX = w * (1.0 - m_offset);
+    const int nextX = w * (1.0 - m_offset);
     painter.drawPixmap(nextX, 0, w, h, m_nextPixmap);
 }

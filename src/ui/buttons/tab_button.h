@@ -5,7 +5,7 @@
 #include <QPushButton>
 
 
-class TabButton : public QPushButton {
+class TabButton final : public QPushButton {
     Q_OBJECT
     Q_PROPERTY(double underlineOffset READ underlineOffset WRITE setUnderlineOffset)
 

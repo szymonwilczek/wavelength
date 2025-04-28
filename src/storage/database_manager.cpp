@@ -21,11 +21,11 @@ DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), m_isConnecte
 
             // Sprawdź czy tabela istnieje, jeśli nie - wyświetl ostrzeżenie
             pqxx::work txn{*m_connection};
-            pqxx::result result = txn.exec(
+            const pqxx::result result = txn.exec(
                 "SELECT EXISTS (SELECT FROM information_schema.tables "
                 "WHERE table_name = 'active_wavelengths')"
             );
-            bool tableExists = result[0][0].as<bool>();
+            const bool tableExists = result[0][0].as<bool>();
             if (!tableExists) {
                 qDebug() << "WARNING: Table 'active_wavelengths' does not exist in the database!";
             }

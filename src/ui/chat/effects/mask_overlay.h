@@ -7,7 +7,7 @@
 #include <QDateTime>
 #include <QRandomGenerator>
 
-class MaskOverlay : public QWidget {
+class MaskOverlay final : public QWidget {
     Q_OBJECT
 
 public:

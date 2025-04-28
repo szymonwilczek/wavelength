@@ -28,7 +28,7 @@
 #include "src/ui/views/settings_view.h"
 #include "src/ui/settings/tabs/classified/components/system_override_manager.h"
 
-void centerLabel(QLabel *label, BlobAnimation *animation) {
+void centerLabel(QLabel *label, const BlobAnimation *animation) {
     if (label && animation) {
         label->setGeometry(
             (animation->width() - label->sizeHint().width()) / 2,
@@ -43,7 +43,7 @@ void centerLabel(QLabel *label, BlobAnimation *animation) {
 void updateTitleLabelStyle(QLabel* label, const QColor& textColor, const QColor& borderColor) {
     if (!label) return;
     // Ostrożnie zrekonstruuj styl, zachowując inne właściwości
-    QString style = QString(
+    const QString style = QString(
         "QLabel {"
         "   font-family: 'Blender Pro Heavy';" // Zachowaj czcionkę
         "   letter-spacing: 8px;"             // Zachowaj odstępy
@@ -60,7 +60,7 @@ void updateTitleLabelStyle(QLabel* label, const QColor& textColor, const QColor&
     qDebug() << "Updated titleLabel style:" << style;
 }
 
-class ResizeEventFilter : public QObject {
+class ResizeEventFilter final : public QObject {
 public:
     ResizeEventFilter(QLabel *label, BlobAnimation *animation)
         : QObject(animation), m_label(label), m_animation(animation) {
@@ -92,11 +92,11 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
-    QSoundEffect *bootSound = new QSoundEffect(&app);
+    auto bootSound = new QSoundEffect(&app);
     bootSound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
     bootSound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
 
-    QSoundEffect *shutdownSound = new QSoundEffect(&app);
+    auto shutdownSound = new QSoundEffect(&app);
     shutdownSound->setSource(QUrl("qrc:/resources/sounds/interface/shutdown.wav"));
     shutdownSound->setVolume(1.0);
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     parser.setApplicationDescription("Wavelength Application");
     parser.addHelpOption();
     parser.addVersionOption();
-    QCommandLineOption overrideOption("run-override", "Internal flag to start the system override sequence immediately.");
+    const QCommandLineOption overrideOption("run-override", "Internal flag to start the system override sequence immediately.");
     parser.addOption(overrideOption);
     parser.process(app);
     // ---------------------------------------------
@@ -196,18 +196,18 @@ int main(int argc, char *argv[]) {
     window.setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     window.setContextMenuPolicy(Qt::NoContextMenu);
 
-    QWidget *centralWidget = new QWidget(&window);
-    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+    const auto centralWidget = new QWidget(&window);
+    const auto mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    AnimatedStackedWidget *stackedWidget = new AnimatedStackedWidget(centralWidget);
+    auto stackedWidget = new AnimatedStackedWidget(centralWidget);
     stackedWidget->setDuration(600);
     stackedWidget->setAnimationType(AnimatedStackedWidget::Slide);
     mainLayout->addWidget(stackedWidget);
 
-    QWidget *animationWidget = new QWidget(stackedWidget);
-    QVBoxLayout *animationLayout = new QVBoxLayout(animationWidget);
+    auto animationWidget = new QWidget(stackedWidget);
+    const auto animationLayout = new QVBoxLayout(animationWidget);
     animationLayout->setContentsMargins(0, 0, 0, 0);
     animationLayout->setSpacing(0);
 
@@ -225,17 +225,17 @@ int main(int argc, char *argv[]) {
 
     stackedWidget->addWidget(animationWidget);
 
-    WavelengthChatView *chatView = new WavelengthChatView(stackedWidget);
+    auto chatView = new WavelengthChatView(stackedWidget);
     stackedWidget->addWidget(chatView);
 
-    SettingsView *settingsView = new SettingsView(stackedWidget);
+    auto settingsView = new SettingsView(stackedWidget);
     stackedWidget->addWidget(settingsView);
 
     stackedWidget->setCurrentWidget(animationWidget);
 
     window.setCentralWidget(centralWidget);
 
-    QLabel *titleLabel = new QLabel("WAVELENGTH", animation);
+    auto titleLabel = new QLabel("WAVELENGTH", animation);
     titleLabel->setFont(QFont("Blender Pro Heavy", 40, QFont::Bold));
     titleLabel->setAlignment(Qt::AlignCenter);
 
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
     updateTitleLabelStyle(titleLabel, config->getTitleTextColor(), config->getTitleBorderColor());
 
     // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
-    QGraphicsDropShadowEffect *glowEffect = new QGraphicsDropShadowEffect(titleLabel);
+    auto glowEffect = new QGraphicsDropShadowEffect(titleLabel);
     glowEffect->setBlurRadius(15);
     glowEffect->setColor(QColor("#e0b0ff"));
     glowEffect->setOffset(0, 0);
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
 
     titleLabel->raise();
 
-    ResizeEventFilter *eventFilter = new ResizeEventFilter(titleLabel, animation);
+    auto eventFilter = new ResizeEventFilter(titleLabel, animation);
 
     auto *textEffect = new CyberpunkTextEffect(titleLabel, animation);
 
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
     coordinator->initialize();
 
-    auto toggleEventListening = [animation, eventFilter](bool enable) {
+    auto toggleEventListening = [animation, eventFilter](const bool enable) {
         if (enable) {
             // Włącz nasłuchiwanie eventów
             animation->installEventFilter(eventFilter);
@@ -349,22 +349,22 @@ int main(int argc, char *argv[]) {
     });
 
     QObject::connect(stackedWidget, &AnimatedStackedWidget::currentChanged,
-    [stackedWidget, animationWidget, animation](int index) {
+    [stackedWidget, animationWidget, animation](const int index) {
         static int lastIndex = -1;
         if (lastIndex == index) return;
         lastIndex = index;
 
-        QWidget *currentWidget = stackedWidget->widget(index);
+        const QWidget *currentWidget = stackedWidget->widget(index);
         if (currentWidget == animationWidget) {
             // Pokazujemy bloba tylko gdy przechodzimy DO widoku animacji
             QTimer::singleShot(stackedWidget->duration(), [animation]() {
-                animation->show();
+                animation->showAnimation();
             });
         }
     });
 
-    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString frequency) {
-        animation->hide();
+    auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString &frequency) {
+        animation->hideAnimation();
         navbar->setChatMode(true);
         chatView->setWavelength(frequency, "");
         stackedWidget->slideToWidget(chatView);
@@ -380,13 +380,13 @@ int main(int argc, char *argv[]) {
                      chatView, &WavelengthChatView::onWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
-                     [switchToChatView](QString frequency) {
+                     [switchToChatView](const QString &frequency) {
                          qDebug() << "Wavelength created signal received";
                          switchToChatView(frequency);
                      });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
-                     [switchToChatView](QString frequency) {
+                     [switchToChatView](const QString &frequency) {
                          qDebug() << "Wavelength joined signal received";
                          switchToChatView(frequency);
                      });
@@ -396,12 +396,12 @@ int main(int argc, char *argv[]) {
         qDebug() << "Wavelength aborted, switching back to animation view";
 
         navbar->setChatMode(false);
-        animation->hide();
+        animation->hideAnimation();
         animation->resetLifeColor();
         stackedWidget->slideToWidget(animationWidget);
 
         QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
-            animation->show();
+            animation->showAnimation();
             animation->resetVisualization();
             titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
             // Dodaj minimalne opóźnienie przed centrowaniem
@@ -422,7 +422,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(navbar, &Navbar::settingsClicked, [stackedWidget, settingsView, animation]() {
     qDebug() << "Settings button clicked";
 
-    animation->hide();
+    animation->hideAnimation();
 
     animation->pauseAllEventTracking();
 
@@ -433,12 +433,12 @@ int main(int argc, char *argv[]) {
 [stackedWidget, animationWidget, animation, titleLabel, textEffect]() {
     qDebug() << "Back from settings, switching to animation view";
 
-    animation->hide();
+    animation->hideAnimation();
     animation->resetLifeColor();
     stackedWidget->slideToWidget(animationWidget);
 
     QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
-        animation->show();
+        animation->showAnimation();
         animation->resetVisualization();
         titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
         // Dodaj minimalne opóźnienie przed centrowaniem
@@ -458,9 +458,9 @@ int main(int argc, char *argv[]) {
 
         WavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            QString frequency = dialog.getFrequency();
-            bool isPasswordProtected = dialog.isPasswordProtected();
-            QString password = dialog.getPassword();
+            const QString frequency = dialog.getFrequency();
+            const bool isPasswordProtected = dialog.isPasswordProtected();
+            const QString password = dialog.getPassword();
 
             if (coordinator->createWavelength(frequency, isPasswordProtected, password)) {
                 qDebug() << "Created and joined wavelength:" << frequency << "Hz";
@@ -481,8 +481,8 @@ int main(int argc, char *argv[]) {
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            QString frequency = dialog.getFrequency();
-            QString password = dialog.getPassword();
+            const QString frequency = dialog.getFrequency();
+            const QString password = dialog.getPassword();
 
             if (coordinator->joinWavelength(frequency, password)) {
                 qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
@@ -507,9 +507,9 @@ int main(int argc, char *argv[]) {
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
         // Windows 10 1809>=
-        HWND hwnd = (HWND) window.winId();
+        const auto hwnd = reinterpret_cast<HWND>(window.winId());
 
-        BOOL darkMode = TRUE;
+        constexpr BOOL darkMode = TRUE;
 
         DwmSetWindowAttribute(hwnd, 20, &darkMode, sizeof(darkMode));
     }
@@ -531,7 +531,7 @@ int main(int argc, char *argv[]) {
         });
     });
 
-    int exitCode = app.exec();
+    const int exitCode = app.exec();
 
     return exitCode;
 }

@@ -27,7 +27,7 @@ struct ImpactInfo {
     bool active = false;           // Czy ten slot jest aktywny
 };
 
-class FloatingEnergySphereWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
+class FloatingEnergySphereWidget final : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 
@@ -57,10 +57,10 @@ protected:
     private slots:
         void updateAnimation();
         void processAudioBuffer(); // <<< Dodano
-        void audioDecodingFinished(); // <<< Dodano
-        void handleMediaPlayerError(); // <<< Dodano
+        void audioDecodingFinished() const; // <<< Dodano
+        void handleMediaPlayerError() const; // <<< Dodano
         void handleAudioDecoderError(); // <<< Dodano
-        void playKonamiHint();
+        void playKonamiHint() const;
         void handlePlayerStateChanged(QMediaPlayer::State state);
         void startDestructionSequence();
         void simulateClick();
@@ -70,7 +70,7 @@ private:
     void setupSphereGeometry(int rings, int sectors);
     void setupShaders();
     void setupAudio(); // <<< Dodano
-    float calculateRMSAmplitude(const QAudioBuffer& buffer); // <<< Dodano
+    float calculateRMSAmplitude(const QAudioBuffer& buffer) const; // <<< Dodano
     void triggerImpactAtScreenPos(const QPoint& screenPos);
 
     bool m_isFirstTime;

@@ -15,7 +15,7 @@
 
 
 
-class StreamMessage : public QWidget {
+class StreamMessage final : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
     Q_PROPERTY(qreal glowIntensity READ glowIntensity WRITE setGlowIntensity)
@@ -48,7 +48,7 @@ public:
         painter.end(); // Zakończ malowanie na oryginalnej pixmapie
 
         // Utwórz maskę z kanału alfa oryginalnej pixmapy
-        QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
+        const QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
 
         // Utwórz nową pixmapę wypełnioną docelowym kolorem
         QPixmap coloredPixmap(size);
@@ -78,7 +78,7 @@ public:
     void setShutdownProgress(qreal progress);
 
     bool isRead() const { return m_isRead; }
-    QString sender() const { return m_sender; }
+    QString messageSender() const { return m_sender; }
     QString content() const { return m_content; }
     MessageType type() const { return m_type; }
     QString messageId() const {return m_messageId; }
@@ -96,11 +96,11 @@ void fadeIn();
 
     void fadeOut();
 
-    void updateScrollAreaMaxHeight();
+    void updateScrollAreaMaxHeight() const;
 
     void startDisintegrationAnimation();
 
-    void showNavigationButtons(bool hasPrev, bool hasNext);
+    void showNavigationButtons(bool hasPrev, bool hasNext) const;
 
     QPushButton* nextButton() const { return m_nextButton; }
     QPushButton* prevButton() const { return m_prevButton; }
@@ -128,7 +128,7 @@ protected:
 private slots:
     void updateAnimation();
 
-    void adjustScrollAreaStyle();
+    void adjustScrollAreaStyle() const;
 
 private:
     // Wyciąga atrybut z HTML

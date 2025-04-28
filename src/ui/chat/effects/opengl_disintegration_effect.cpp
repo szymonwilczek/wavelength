@@ -38,12 +38,12 @@ void OpenGLDisintegration::setSourcePixmap(const QPixmap &pixmap) {
     update();
 }
 
-void OpenGLDisintegration::setProgress(qreal progress) {
+void OpenGLDisintegration::setProgress(const qreal progress) {
     m_progress = qBound(0.0, progress, 1.0);
     update();
 }
 
-void OpenGLDisintegration::startAnimation(int duration) {
+void OpenGLDisintegration::startAnimation(const int duration) {
     m_progress = 0.0;
     m_animationDuration = duration;
     m_animationStart = QTime::currentTime();
@@ -62,7 +62,7 @@ void OpenGLDisintegration::initializeGL() {
     m_program = new QOpenGLShaderProgram();
 
     // Vertex shader
-    const char* vertexShaderSource = R"(
+    const auto vertexShaderSource = R"(
             #version 330 core
             layout (location = 0) in vec3 aPos;
             layout (location = 1) in vec2 aTexCoord;
@@ -102,7 +102,7 @@ void OpenGLDisintegration::initializeGL() {
         )";
 
     // Fragment shader
-    const char* fragmentShaderSource = R"(
+    const auto fragmentShaderSource = R"(
             #version 330 core
             out vec4 FragColor;
 
@@ -142,7 +142,7 @@ void OpenGLDisintegration::initializeGL() {
     m_vao.release();
 }
 
-void OpenGLDisintegration::resizeGL(int w, int h) {
+void OpenGLDisintegration::resizeGL(const int w, const int h) {
     glViewport(0, 0, w, h);
 }
 
@@ -162,7 +162,7 @@ void OpenGLDisintegration::paintGL() {
     m_program->bind();
 
     // Macierz modelu (tożsamościowa)
-    QMatrix4x4 model;
+    const QMatrix4x4 model;
     m_program->setUniformValue("model", model);
     m_program->setUniformValue("progress", static_cast<float>(m_progress));
     m_program->setUniformValue("resolution", QVector2D(width(), height()));
@@ -184,8 +184,8 @@ void OpenGLDisintegration::paintGL() {
 }
 
 void OpenGLDisintegration::updateAnimation() {
-    int elapsed = m_animationStart.msecsTo(QTime::currentTime());
-    qreal newProgress = static_cast<qreal>(elapsed) / m_animationDuration;
+    const int elapsed = m_animationStart.msecsTo(QTime::currentTime());
+    const qreal newProgress = static_cast<qreal>(elapsed) / m_animationDuration;
 
     if (newProgress >= 1.0) {
         m_progress = 1.0;
@@ -198,21 +198,21 @@ void OpenGLDisintegration::updateAnimation() {
     update();
 }
 
-void OpenGLDisintegration::createParticleGrid(int cols, int rows) {
+void OpenGLDisintegration::createParticleGrid(const int cols, const int rows) {
     m_vertices.clear();
 
     // Tworzymy siatkę cząstek
     for (int y = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x) {
-            float xPos = -1.0f + (x / float(cols - 1)) * 2.0f;
-            float yPos = -1.0f + (y / float(rows - 1)) * 2.0f;
+            float xPos = -1.0f + (x / static_cast<float>(cols - 1)) * 2.0f;
+            float yPos = -1.0f + (y / static_cast<float>(rows - 1)) * 2.0f;
 
             // Pozycja (x, y, z) i koordynaty tekstury (u, v)
             m_vertices.append(xPos);
             m_vertices.append(yPos);
             m_vertices.append(0.0f);
-            m_vertices.append(x / float(cols - 1));
-            m_vertices.append(y / float(rows - 1));
+            m_vertices.append(x / static_cast<float>(cols - 1));
+            m_vertices.append(y / static_cast<float>(rows - 1));
         }
     }
 

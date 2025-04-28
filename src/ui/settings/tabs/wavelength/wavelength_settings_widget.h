@@ -11,14 +11,14 @@ class QVBoxLayout;
 class QFormLayout;
 class QHBoxLayout;
 
-class WavelengthSettingsWidget : public QWidget {
+class WavelengthSettingsWidget final : public QWidget {
     Q_OBJECT
 
 public:
     explicit WavelengthSettingsWidget(QWidget *parent = nullptr);
     ~WavelengthSettingsWidget() override = default;
 
-    void loadSettings();
+    void loadSettings() const;
     void saveSettings();
 
 private:

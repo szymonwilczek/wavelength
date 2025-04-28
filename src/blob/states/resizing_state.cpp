@@ -1,4 +1,6 @@
 #include "resizing_state.h"
+
+#include <QSizeF>
 #include <QVector2D>
 
 ResizingState::ResizingState() {}
@@ -16,11 +18,11 @@ void ResizingState::handleResize(std::vector<QPointF>& controlPoints,
                                const QSize& oldSize,
                                const QSize& newSize) {
 
-    QPointF oldCenter = blobCenter;
+    const QPointF oldCenter = blobCenter;
 
     blobCenter = QPointF(newSize.width() / 2.0, newSize.height() / 2.0);
 
-    QPointF delta = blobCenter - oldCenter;
+    const QPointF delta = blobCenter - oldCenter;
 
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         controlPoints[i] += delta;
@@ -28,7 +30,7 @@ void ResizingState::handleResize(std::vector<QPointF>& controlPoints,
     }
 
     if (oldSize.isValid()) {
-        QVector2D resizeForce(
+        const QVector2D resizeForce(
             (newSize.width() - oldSize.width()) * 0.05,
             (newSize.height() - oldSize.height()) * 0.05
         );
@@ -41,11 +43,11 @@ void ResizingState::applyForce(const QVector2D& force,
                              std::vector<QPointF>& velocity,
                              QPointF& blobCenter,
                              const std::vector<QPointF>& controlPoints,
-                             double blobRadius) {
+                             const double blobRadius) {
     
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        double distanceFromCenter = QVector2D(vectorFromCenter).length();
+        const double distanceFromCenter = QVector2D(vectorFromCenter).length();
         
         double forceScale = distanceFromCenter / blobRadius;
         

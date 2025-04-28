@@ -9,7 +9,7 @@ void PathMarkersManager::initializeMarkers() {
     m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
 
     QRandomGenerator *rng = QRandomGenerator::global();
-    int numMarkers = rng->bounded(4, 7); // Liczba markerów
+    const int numMarkers = rng->bounded(4, 7); // Liczba markerów
     int lastMarkerType = -1; // Zmienna śledząca ostatni wygenerowany typ
 
     for (int i = 0; i < numMarkers; i++) {
@@ -24,7 +24,7 @@ void PathMarkersManager::initializeMarkers() {
         } else {
             // Kolejne markery - losuj typ różny od poprzedniego
             // Najpierw wybieramy losowo jeden z dwóch pozostałych typów
-            int offset = 1 + rng->bounded(2);  // 1 lub 2
+            const int offset = 1 + rng->bounded(2);  // 1 lub 2
             newMarkerType = (lastMarkerType + offset) % 3;
         }
 
@@ -67,7 +67,7 @@ void PathMarkersManager::initializeMarkers() {
     }
 }
 
-void PathMarkersManager::updateMarkers(double deltaTime) {
+void PathMarkersManager::updateMarkers(const double deltaTime) {
     QRandomGenerator *rng = QRandomGenerator::global();
 
     // Przesuń markery wzdłuż ścieżki
@@ -128,13 +128,13 @@ void PathMarkersManager::updateMarkers(double deltaTime) {
     }
 }
 
-void PathMarkersManager::drawMarkers(QPainter &painter, const QPainterPath &blobPath, qint64 currentTime) {
+void PathMarkersManager::drawMarkers(QPainter &painter, const QPainterPath &blobPath, const qint64 currentTime) {
     if (m_markers.empty()) {
         initializeMarkers();
     }
 
     // Oblicz deltaTime
-    double deltaTime = (currentTime - m_lastUpdateTime) / 1000.0; // Czas w sekundach
+    const double deltaTime = (currentTime - m_lastUpdateTime) / 1000.0; // Czas w sekundach
     m_lastUpdateTime = currentTime;
 
     // Aktualizacja wszystkich markerów
@@ -150,7 +150,7 @@ void PathMarkersManager::drawMarkers(QPainter &painter, const QPainterPath &blob
 
     // Rysuj markery w ich aktualnych pozycjach
     for (auto &marker: m_markers) {
-        double pos = marker.position * pathLength;
+        const double pos = marker.position * pathLength;
         double currentLength = 0;
         QPointF markerPos;
 
@@ -158,10 +158,10 @@ void PathMarkersManager::drawMarkers(QPainter &painter, const QPainterPath &blob
         for (int j = 0; j < blobPath.elementCount() - 1; j++) {
             QPointF p1 = blobPath.elementAt(j);
             QPointF p2 = blobPath.elementAt(j + 1);
-            double segmentLength = QLineF(p1, p2).length();
+            const double segmentLength = QLineF(p1, p2).length();
 
             if (currentLength + segmentLength >= pos) {
-                double t = (pos - currentLength) / segmentLength;
+                const double t = (pos - currentLength) / segmentLength;
                 markerPos = p1 * (1 - t) + p2 * t;
 
                 // Dla impulsów energii, zapisz punkty śladu
@@ -191,13 +191,13 @@ void PathMarkersManager::drawMarkers(QPainter &painter, const QPainterPath &blob
     }
 }
 
-void PathMarkersManager::calculateTrailPoints(PathMarker &marker, const QPainterPath &blobPath, double pos,
-    double pathLength) {
+void PathMarkersManager::calculateTrailPoints(PathMarker &marker, const QPainterPath &blobPath, const double pos,
+    const double pathLength) {
     marker.trailPoints.clear();
-    int numTrailPoints = 15; // Liczba punktów w śladzie
+    constexpr int numTrailPoints = 15; // Liczba punktów w śladzie
 
     for (int k = 0; k < numTrailPoints; k++) {
-        double trailT = static_cast<double>(k) / numTrailPoints;
+        const double trailT = static_cast<double>(k) / numTrailPoints;
 
         // Uwzględniamy kierunek ruchu markera
         double trailPosOnPath = pos - (marker.direction * trailT * marker.tailLength * pathLength);
@@ -211,10 +211,10 @@ void PathMarkersManager::calculateTrailPoints(PathMarker &marker, const QPainter
         for (int l = 0; l < blobPath.elementCount() - 1; l++) {
             QPointF tp1 = blobPath.elementAt(l);
             QPointF tp2 = blobPath.elementAt(l + 1);
-            double tSegmentLength = QLineF(tp1, tp2).length();
+            const double tSegmentLength = QLineF(tp1, tp2).length();
 
             if (trailLength + tSegmentLength >= trailPosOnPath) {
-                double trailPointT = (trailPosOnPath - trailLength) / tSegmentLength;
+                const double trailPointT = (trailPosOnPath - trailLength) / tSegmentLength;
                 QPointF trailPoint = tp1 * (1 - trailPointT) + tp2 * trailPointT;
                 marker.trailPoints.push_back(trailPoint);
                 break;
@@ -328,8 +328,8 @@ void PathMarkersManager::drawWaveMarker(QPainter &painter, const PathMarker &mar
     const QColor &markerColor) {
     if (marker.wavePhase > 0.0) {
         // Zmniejszony promień fali
-        double waveRadius = marker.size * 1.5 * marker.wavePhase;
-        double opacity = 1.0 - (marker.wavePhase / 5.0);
+        const double waveRadius = marker.size * 1.5 * marker.wavePhase;
+        const double opacity = 1.0 - (marker.wavePhase / 5.0);
 
         QColor waveColor = markerColor;
         waveColor.setAlphaF(opacity * 0.7);
@@ -339,21 +339,21 @@ void PathMarkersManager::drawWaveMarker(QPainter &painter, const PathMarker &mar
 
         // Rysuj delikatniejsze fale
         for (int i = 0; i < 2; i++) {
-            double ringRadius = waveRadius * (0.7 + 0.3 * i);
+            const double ringRadius = waveRadius * (0.7 + 0.3 * i);
             painter.drawEllipse(pos, ringRadius, ringRadius);
         }
 
         // Mniej zaburzony kształt fali
         QPainterPath distortionPath;
-        int points = 12;
+        constexpr int points = 12;
         // Zmniejszenie amplitudy zniekształcenia
-        double noiseAmplitude = waveRadius * 0.07;
+        const double noiseAmplitude = waveRadius * 0.07;
 
         for (int i = 0; i <= points; i++) {
-            double angle = (2.0 * M_PI * i) / points;
-            double noise = QRandomGenerator::global()->bounded(noiseAmplitude);
-            double x = pos.x() + cos(angle) * (waveRadius + noise);
-            double y = pos.y() + sin(angle) * (waveRadius + noise);
+            const double angle = (2.0 * M_PI * i) / points;
+            const double noise = QRandomGenerator::global()->bounded(noiseAmplitude);
+            const double x = pos.x() + cos(angle) * (waveRadius + noise);
+            const double y = pos.y() + sin(angle) * (waveRadius + noise);
 
             if (i == 0)
                 distortionPath.moveTo(x, y);
@@ -409,7 +409,7 @@ void PathMarkersManager::drawQuantumMarker(QPainter &painter, const PathMarker &
 
     // Jeśli nie jest w stanie pojedynczym (0), rysuj efekty kwantowe
     if (marker.quantumState > 0) {
-        const int numQuantumCopies = 5;
+        constexpr int numQuantumCopies = 5;
         QPainterPath quantumPath;
         QVector<QPointF> quantumPoints;
 
@@ -483,7 +483,7 @@ void PathMarkersManager::drawQuantumMarker(QPainter &painter, const PathMarker &
     }
 }
 
-QColor PathMarkersManager::getMarkerColor(int markerType, double colorPhase) const {
+QColor PathMarkersManager::getMarkerColor(const int markerType, const double colorPhase) {
     switch (markerType) {
         case 0: // Impulsy energii - Neonowa zieleń
             return QColor::fromHsvF(0.33 + 0.05 * sin(colorPhase * 2 * M_PI), 1.0, 0.95);

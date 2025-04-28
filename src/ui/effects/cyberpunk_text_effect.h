@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QRandomGenerator>
 
-class CyberpunkTextEffect : public QObject {
+class CyberpunkTextEffect final : public QObject {
 public:
     explicit CyberpunkTextEffect(QLabel *label, QWidget *parent = nullptr);
 

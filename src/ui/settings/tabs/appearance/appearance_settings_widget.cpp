@@ -29,22 +29,22 @@ AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
 
 void AppearanceSettingsWidget::setupUi() {
     qDebug() << "AppearanceSettingsWidget setupUi start";
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    const auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(20);
 
-    QLabel *infoLabel = new QLabel("Configure application appearance colors (click preview to change)", this);
+    const auto infoLabel = new QLabel("Configure application appearance colors (click preview to change)", this);
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     mainLayout->addWidget(infoLabel);
 
-    QGridLayout *gridLayout = new QGridLayout();
+    const auto gridLayout = new QGridLayout();
     gridLayout->setHorizontalSpacing(15);
     gridLayout->setVerticalSpacing(10);
     gridLayout->setColumnStretch(1, 0); // Podgląd/Input ma stały rozmiar
     gridLayout->setColumnStretch(2, 1); // Pusta kolumna się rozciąga
 
-    QString labelStyle = "color: #c0c0c0; background-color: transparent; font-family: Consolas; font-size: 10pt;";
-    QString spinBoxStyle = "QSpinBox { background-color: #1A2A3A; color: #E0E0E0; border: 1px solid #005577; border-radius: 3px; padding: 3px; font-family: Consolas; }"
+    const QString labelStyle = "color: #c0c0c0; background-color: transparent; font-family: Consolas; font-size: 10pt;";
+    const QString spinBoxStyle = "QSpinBox { background-color: #1A2A3A; color: #E0E0E0; border: 1px solid #005577; border-radius: 3px; padding: 3px; font-family: Consolas; }"
                            "QSpinBox::up-button, QSpinBox::down-button { width: 16px; background-color: #005577; border: 1px solid #0077AA; }"
                            "QSpinBox::up-arrow, QSpinBox::down-arrow { color: #E0E0E0; }"; // Prosty styl dla SpinBox
 
@@ -52,29 +52,29 @@ void AppearanceSettingsWidget::setupUi() {
 
     // --- Istniejące kolory ---
     // Background Color
-    QLabel* bgLabel = new QLabel("Background Color:", this); bgLabel->setStyleSheet(labelStyle);
+    const auto bgLabel = new QLabel("Background Color:", this); bgLabel->setStyleSheet(labelStyle);
     m_bgColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_bgColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBackgroundColor);
     gridLayout->addWidget(bgLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_bgColorPreview, row, 1); row++;
     // Blob Color
-    QLabel* blobLabel = new QLabel("Blob Color:", this); blobLabel->setStyleSheet(labelStyle);
+    const auto blobLabel = new QLabel("Blob Color:", this); blobLabel->setStyleSheet(labelStyle);
     m_blobColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_blobColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseBlobColor);
     gridLayout->addWidget(blobLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_blobColorPreview, row, 1); row++;
     // Stream Color
-    QLabel* streamLabel = new QLabel("Stream Color:", this); streamLabel->setStyleSheet(labelStyle);
+    const auto streamLabel = new QLabel("Stream Color:", this); streamLabel->setStyleSheet(labelStyle);
     m_streamColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_streamColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseStreamColor);
     gridLayout->addWidget(streamLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_streamColorPreview, row, 1); row++;
 
     // --- NOWE: Ustawienia siatki ---
     // Grid Color
-    QLabel* gridColorLabel = new QLabel("Grid Color:", this); gridColorLabel->setStyleSheet(labelStyle);
+    const auto gridColorLabel = new QLabel("Grid Color:", this); gridColorLabel->setStyleSheet(labelStyle);
     m_gridColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_gridColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseGridColor);
     gridLayout->addWidget(gridColorLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_gridColorPreview, row, 1); row++;
     // Grid Spacing
-    QLabel* gridSpacingLabel = new QLabel("Grid Spacing:", this); gridSpacingLabel->setStyleSheet(labelStyle);
+    const auto gridSpacingLabel = new QLabel("Grid Spacing:", this); gridSpacingLabel->setStyleSheet(labelStyle);
     m_gridSpacingSpinBox = new QSpinBox(this);
     m_gridSpacingSpinBox->setRange(5, 200); // Ustaw sensowny zakres
     m_gridSpacingSpinBox->setSuffix(" px");
@@ -85,29 +85,29 @@ void AppearanceSettingsWidget::setupUi() {
 
     // --- NOWE: Ustawienia tytułu ---
     // Title Text Color
-    QLabel* titleTextLabel = new QLabel("Title Text Color:", this); titleTextLabel->setStyleSheet(labelStyle);
+    const auto titleTextLabel = new QLabel("Title Text Color:", this); titleTextLabel->setStyleSheet(labelStyle);
     m_titleTextColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_titleTextColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleTextColor);
     gridLayout->addWidget(titleTextLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleTextColorPreview, row, 1); row++;
     // Title Border Color
-    QLabel* titleBorderLabel = new QLabel("Title Border Color:", this); titleBorderLabel->setStyleSheet(labelStyle);
+    const auto titleBorderLabel = new QLabel("Title Border Color:", this); titleBorderLabel->setStyleSheet(labelStyle);
     m_titleBorderColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_titleBorderColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleBorderColor);
     gridLayout->addWidget(titleBorderLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleBorderColorPreview, row, 1); row++;
     // Title Glow Color
-    QLabel* titleGlowLabel = new QLabel("Title Glow Color:", this); titleGlowLabel->setStyleSheet(labelStyle);
+    const auto titleGlowLabel = new QLabel("Title Glow Color:", this); titleGlowLabel->setStyleSheet(labelStyle);
     m_titleGlowColorPreview = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(m_titleGlowColorPreview), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::chooseTitleGlowColor);
-    gridLayout->addWidget(titleGlowLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleGlowColorPreview, row, 1); row++;
+    gridLayout->addWidget(titleGlowLabel, row, 0, Qt::AlignRight); gridLayout->addWidget(m_titleGlowColorPreview, row, 1);
     // -----------------------------
 
     mainLayout->addLayout(gridLayout);
 
     // Sekcja ostatnich kolorów (bez zmian)
-    QLabel *recentLabel = new QLabel("Recently Used Colors:", this);
+    const auto recentLabel = new QLabel("Recently Used Colors:", this);
     recentLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt; margin-top: 15px;");
     mainLayout->addWidget(recentLabel);
-    QWidget* recentColorsContainer = new QWidget(this);
+    const auto recentColorsContainer = new QWidget(this);
     m_recentColorsLayout = new QHBoxLayout(recentColorsContainer);
     m_recentColorsLayout->setContentsMargins(0, 5, 0, 0); m_recentColorsLayout->setSpacing(8); m_recentColorsLayout->setAlignment(Qt::AlignLeft);
     mainLayout->addWidget(recentColorsContainer);
@@ -142,7 +142,7 @@ void AppearanceSettingsWidget::loadSettings() {
     updateRecentColorsUI();
 }
 
-void AppearanceSettingsWidget::saveSettings() {
+void AppearanceSettingsWidget::saveSettings() const {
     // Wywołaj settery w config - chociaż zmiany są natychmiastowe,
     // to zapewnia spójność, jeśli użytkownik zmienił coś w innych zakładkach
     m_config->setBackgroundColor(m_selectedBgColor);
@@ -159,8 +159,7 @@ void AppearanceSettingsWidget::saveSettings() {
 }
 
 void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const QColor& color) {
-    ClickableColorPreview* preview = qobject_cast<ClickableColorPreview*>(previewWidget);
-    if (preview) {
+    if (const auto preview = qobject_cast<ClickableColorPreview*>(previewWidget)) {
         preview->setColor(color);
     } else {
         qWarning() << "Failed to cast QWidget* to ClickableColorPreview* in updateColorPreview.";
@@ -169,8 +168,8 @@ void AppearanceSettingsWidget::updateColorPreview(QWidget* previewWidget, const 
 
 void AppearanceSettingsWidget::chooseBackgroundColor() {
     // Zapisz bieżący kolor, aby można było go przywrócić, jeśli użytkownik anuluje
-    QColor originalColor = m_selectedBgColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Background Color", QColorDialog::ShowAlphaChannel);
+    const QColor originalColor = m_selectedBgColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Background Color", QColorDialog::ShowAlphaChannel);
 
     if (color.isValid()) {
         m_selectedBgColor = color; // Zaktualizuj kolor przechowywany lokalnie (na potrzeby przycisku Save)
@@ -192,8 +191,8 @@ void AppearanceSettingsWidget::chooseBackgroundColor() {
 
 
 void AppearanceSettingsWidget::chooseBlobColor() {
-    QColor originalColor = m_selectedBlobColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Blob Color"); // Usunięto ShowAlphaChannel, jeśli niepotrzebne dla bloba
+    const QColor originalColor = m_selectedBlobColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Blob Color"); // Usunięto ShowAlphaChannel, jeśli niepotrzebne dla bloba
 
     if (color.isValid()) {
         m_selectedBlobColor = color; // Zaktualizuj kolor lokalny
@@ -215,8 +214,8 @@ void AppearanceSettingsWidget::chooseBlobColor() {
 
 
 void AppearanceSettingsWidget::chooseStreamColor() {
-    QColor originalColor = m_selectedStreamColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Stream Color");
+    const QColor originalColor = m_selectedStreamColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Stream Color");
     if (color.isValid()) {
         m_selectedStreamColor = color;
         updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
@@ -228,8 +227,8 @@ void AppearanceSettingsWidget::chooseStreamColor() {
 }
 
 void AppearanceSettingsWidget::chooseGridColor() {
-    QColor originalColor = m_selectedGridColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Grid Color", QColorDialog::ShowAlphaChannel); // Pozwól na alfę dla siatki
+    const QColor originalColor = m_selectedGridColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Grid Color", QColorDialog::ShowAlphaChannel); // Pozwól na alfę dla siatki
     if (color.isValid()) {
         m_selectedGridColor = color;
         updateColorPreview(m_gridColorPreview, m_selectedGridColor);
@@ -238,7 +237,7 @@ void AppearanceSettingsWidget::chooseGridColor() {
     }
 }
 
-void AppearanceSettingsWidget::gridSpacingChanged(int value) {
+void AppearanceSettingsWidget::gridSpacingChanged(const int value) {
     if (m_selectedGridSpacing != value) {
         m_selectedGridSpacing = value;
         qDebug() << "Immediately setting grid spacing in config to:" << value;
@@ -248,8 +247,8 @@ void AppearanceSettingsWidget::gridSpacingChanged(int value) {
 }
 
 void AppearanceSettingsWidget::chooseTitleTextColor() {
-    QColor originalColor = m_selectedTitleTextColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Text Color");
+    const QColor originalColor = m_selectedTitleTextColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Title Text Color");
     if (color.isValid()) {
         m_selectedTitleTextColor = color;
         updateColorPreview(m_titleTextColorPreview, m_selectedTitleTextColor);
@@ -259,8 +258,8 @@ void AppearanceSettingsWidget::chooseTitleTextColor() {
 }
 
 void AppearanceSettingsWidget::chooseTitleBorderColor() {
-    QColor originalColor = m_selectedTitleBorderColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Border Color");
+    const QColor originalColor = m_selectedTitleBorderColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Title Border Color");
     if (color.isValid()) {
         m_selectedTitleBorderColor = color;
         updateColorPreview(m_titleBorderColorPreview, m_selectedTitleBorderColor);
@@ -270,8 +269,8 @@ void AppearanceSettingsWidget::chooseTitleBorderColor() {
 }
 
 void AppearanceSettingsWidget::chooseTitleGlowColor() {
-    QColor originalColor = m_selectedTitleGlowColor;
-    QColor color = QColorDialog::getColor(originalColor, this, "Select Title Glow Color");
+    const QColor originalColor = m_selectedTitleGlowColor;
+    const QColor color = QColorDialog::getColor(originalColor, this, "Select Title Glow Color");
     if (color.isValid()) {
         m_selectedTitleGlowColor = color;
         updateColorPreview(m_titleGlowColorPreview, m_selectedTitleGlowColor);
@@ -281,7 +280,7 @@ void AppearanceSettingsWidget::chooseTitleGlowColor() {
 }
 // --------------------
 
-void AppearanceSettingsWidget::selectRecentColor(const QColor& color) {
+void AppearanceSettingsWidget::selectRecentColor(const QColor& color) const {
     qDebug() << "Recent color selected:" << color.name();
     // Tutaj można by dodać logikę, który podgląd ma być zaktualizowany
     // na podstawie jakiegoś stanu, ale na razie samo dodanie do listy wystarczy.
@@ -316,7 +315,7 @@ void AppearanceSettingsWidget::updateRecentColorsUI() {
     for (const QString& hexColor : recentHexColors) {
         QColor color(hexColor);
         if (color.isValid()) {
-            QPushButton* colorButton = new QPushButton(m_recentColorsLayout->parentWidget());
+            auto colorButton = new QPushButton(m_recentColorsLayout->parentWidget());
             colorButton->setFixedSize(28, 28);
             // Usuwamy setFlat i setAutoFillBackground
             // colorButton->setFlat(true);

@@ -9,13 +9,13 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audioData, const QString 
     setFrameStyle(QFrame::NoFrame);
 
     // Główny layout
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(12, 12, 12, 10);
     layout->setSpacing(8);
 
     // Panel górny z informacjami
-    QWidget* topPanel = new QWidget(this);
-    QHBoxLayout* topLayout = new QHBoxLayout(topPanel);
+    const auto topPanel = new QWidget(this);
+    const auto topLayout = new QHBoxLayout(topPanel);
     topLayout->setContentsMargins(3, 3, 3, 3);
     topLayout->setSpacing(5);
 
@@ -64,8 +64,8 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audioData, const QString 
     layout->addWidget(m_spectrumView);
 
     // Panel kontrolny w stylu cyberpunk
-    QWidget* controlPanel = new QWidget(this);
-    QHBoxLayout* controlLayout = new QHBoxLayout(controlPanel);
+    const auto controlPanel = new QWidget(this);
+    const auto controlLayout = new QHBoxLayout(controlPanel);
     controlLayout->setContentsMargins(3, 1, 3, 1);
     controlLayout->setSpacing(8);
 
@@ -196,7 +196,7 @@ void InlineAudioPlayer::activate() {
     m_isActive = true;
 
     // Animacja aktywacji
-    QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
+    const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
     spectrumAnim->setDuration(700);
     spectrumAnim->setStartValue(0.1);
     spectrumAnim->setEndValue(0.6);
@@ -219,7 +219,7 @@ void InlineAudioPlayer::deactivate() {
     }
 
     // Animacja dezaktywacji
-    QPropertyAnimation* spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
+    const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
     spectrumAnim->setDuration(500);
     spectrumAnim->setStartValue(m_spectrumIntensity);
     spectrumAnim->setEndValue(0.1);
@@ -228,11 +228,11 @@ void InlineAudioPlayer::deactivate() {
     m_isActive = false;
 }
 
-void InlineAudioPlayer::adjustVolume(int volume) {
+void InlineAudioPlayer::adjustVolume(const int volume) const {
     if (!m_decoder)
         return;
 
-    float volumeFloat = volume / 100.0f;
+    const float volumeFloat = volume / 100.0f;
     m_decoder->setVolume(volumeFloat);
     updateVolumeIcon(volumeFloat);
 }
@@ -249,7 +249,7 @@ void InlineAudioPlayer::toggleMute() {
     }
 }
 
-void InlineAudioPlayer::updateVolumeIcon(float volume) {
+void InlineAudioPlayer::updateVolumeIcon(const float volume) const {
     if (volume <= 0.01f) {
         m_volumeButton->setText("🔈");
     } else if (volume < 0.5f) {
@@ -264,12 +264,12 @@ void InlineAudioPlayer::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Ramki w stylu AR
-    QColor borderColor(140, 80, 240);
+    constexpr QColor borderColor(140, 80, 240);
     painter.setPen(QPen(borderColor, 1));
 
     // Technologiczna ramka
     QPainterPath frame;
-    int clipSize = 15;
+    constexpr int clipSize = 15;
 
     // Górna krawędź
     frame.moveTo(clipSize, 0);
@@ -344,13 +344,13 @@ void InlineAudioPlayer::onSliderReleased() {
     }
 }
 
-void InlineAudioPlayer::updateTimeLabel(int position) {
+void InlineAudioPlayer::updateTimeLabel(const int position) {
     if (!m_decoder || m_audioDuration <= 0)
         return;
 
     m_currentPosition = position / 1000.0; // Milisekundy na sekundy
-    int currentSeconds = static_cast<int>(m_currentPosition);
-    int totalSeconds = static_cast<int>(m_audioDuration);
+    const int currentSeconds = static_cast<int>(m_currentPosition);
+    const int totalSeconds = static_cast<int>(m_audioDuration);
 
     m_timeLabel->setText(QString("%1:%2 / %3:%4")
         .arg(currentSeconds / 60, 2, 10, QChar('0'))
@@ -359,7 +359,7 @@ void InlineAudioPlayer::updateTimeLabel(int position) {
         .arg(totalSeconds % 60, 2, 10, QChar('0')));
 }
 
-void InlineAudioPlayer::updateSliderPosition(double position) {
+void InlineAudioPlayer::updateSliderPosition(double position) const {
     // Bezpośrednia aktualizacja pozycji suwaka z dekodera
     if (m_audioDuration <= 0)
         return;
@@ -374,11 +374,11 @@ void InlineAudioPlayer::updateSliderPosition(double position) {
     m_progressSlider->blockSignals(false);
 
     // Aktualizacja etykiety czasu
-    int seconds = int(position) % 60;
-    int minutes = int(position) / 60;
+    const int seconds = static_cast<int>(position) % 60;
+    const int minutes = static_cast<int>(position) / 60;
 
-    int totalSeconds = int(m_audioDuration) % 60;
-    int totalMinutes = int(m_audioDuration) / 60;
+    const int totalSeconds = static_cast<int>(m_audioDuration) % 60;
+    const int totalMinutes = static_cast<int>(m_audioDuration) / 60;
 
     m_timeLabel->setText(
         QString("%1:%2 / %3:%4")
@@ -389,11 +389,11 @@ void InlineAudioPlayer::updateSliderPosition(double position) {
     );
 }
 
-void InlineAudioPlayer::seekAudio(int position) {
+void InlineAudioPlayer::seekAudio(const int position) const {
     if (!m_decoder || m_audioDuration <= 0)
         return;
 
-    double seekPos = position / 1000.0; // Milisekundy na sekundy
+    const double seekPos = position / 1000.0; // Milisekundy na sekundy
     m_decoder->seek(seekPos);
 }
 
@@ -429,13 +429,13 @@ void InlineAudioPlayer::togglePlayback() {
     }
 }
 
-void InlineAudioPlayer::handleError(const QString &message) {
+void InlineAudioPlayer::handleError(const QString &message) const {
     qDebug() << "Audio decoder error:" << message;
     m_statusLabel->setText("ERROR: " + message.left(20));
     m_audioInfoLabel->setText("⚠️ " + message.left(30));
 }
 
-void InlineAudioPlayer::handleAudioInfo(int sampleRate, int channels, double duration) {
+void InlineAudioPlayer::handleAudioInfo(const int sampleRate, const int channels, const double duration) {
     m_audioDuration = duration;
     m_progressSlider->setRange(0, duration * 1000);
 
@@ -463,7 +463,7 @@ void InlineAudioPlayer::updateUI() {
     // Aktualizacja stanu UI i animacje
     if (m_decoder && !m_decoder->isPaused() && !m_playbackFinished) {
         // Co pewien czas aktualizacja statusu
-        int randomUpdate = QRandomGenerator::global()->bounded(100);
+        const int randomUpdate = QRandomGenerator::global()->bounded(100);
         if (randomUpdate < 2) {
             m_statusLabel->setText(QString("BUFFER: %1%").arg(QRandomGenerator::global()->bounded(95, 100)));
         } else if (randomUpdate < 4) {
@@ -472,10 +472,9 @@ void InlineAudioPlayer::updateUI() {
 
         // Aktualizacja danych spektrum - losowe fluktuacje dla efektów wizualnych
         for (int i = 0; i < m_spectrumData.size(); i++) {
-            double intensity = m_spectrumIntensity;
             if (!m_decoder->isPaused()) {
                 // Bardziej dynamiczne zmiany podczas odtwarzania
-                double change = (QRandomGenerator::global()->bounded(100) - 50) / 250.0;
+                const double change = (QRandomGenerator::global()->bounded(100) - 50) / 250.0;
                 m_spectrumData[i] += change;
                 m_spectrumData[i] = qBound(0.05, m_spectrumData[i], 1.0);
             } else {
@@ -498,24 +497,24 @@ void InlineAudioPlayer::paintSpectrum(QWidget *target) {
     // Rysujemy siatkę
     painter.setPen(QPen(QColor(50, 30, 90, 100), 1, Qt::DotLine));
 
-    int stepX = target->width() / 8;
+    const int stepX = target->width() / 8;
     for (int x = stepX; x < target->width(); x += stepX) {
         painter.drawLine(x, 0, x, target->height());
     }
 
-    int stepY = target->height() / 3;
+    const int stepY = target->height() / 3;
     for (int y = stepY; y < target->height(); y += stepY) {
         painter.drawLine(0, y, target->width(), y);
     }
 
     // Rysujemy słupki spektrum
     if (!m_spectrumData.isEmpty()) {
-        int barCount = qMin(32, m_spectrumData.size());
-        double barWidth = (double)target->width() / barCount;
+        const int barCount = qMin(32, m_spectrumData.size());
+        const double barWidth = static_cast<double>(target->width()) / barCount;
 
         for (int i = 0; i < barCount; i++) {
             // Wysokość słupka zależna od danych i intensywności
-            double height = m_spectrumData[i] * m_spectrumIntensity * target->height() * 0.9;
+            const double height = m_spectrumData[i] * m_spectrumIntensity * target->height() * 0.9;
 
             // Gradient dla słupka - od jasnego po ciemny
             QLinearGradient gradient(0, target->height() - height, 0, target->height());

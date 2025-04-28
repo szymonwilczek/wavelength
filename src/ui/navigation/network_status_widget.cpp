@@ -17,7 +17,7 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     setMinimumWidth(200);  // Nieznacznie zmniejszona szerokość
 
     // Układ poziomy dla ikon i tekstu z mniejszymi marginesami
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    const auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(10, 3, 10, 3);  // Zmniejszone marginesy
     layout->setSpacing(6);  // Zmniejszony odstęp między elementami
 
@@ -59,7 +59,7 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     setAttribute(Qt::WA_TranslucentBackground);
 
     // Efekt poświaty dla całego widgetu - zmniejszony blur
-    QGraphicsDropShadowEffect* widgetGlow = new QGraphicsDropShadowEffect(this);
+    const auto widgetGlow = new QGraphicsDropShadowEffect(this);
     widgetGlow->setBlurRadius(6);  // Zmniejszone z 8 na 6
     widgetGlow->setOffset(0, 0);
     widgetGlow->setColor(QColor(0, 195, 255, 100));
@@ -86,11 +86,11 @@ void NetworkStatusWidget::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Tworzymy zaokrągloną ramkę
-    QRect frameRect = rect().adjusted(1, 1, -1, -1);
-    int cornerRadius = 6;
+    const QRect frameRect = rect().adjusted(1, 1, -1, -1);
+    constexpr int cornerRadius = 6;
 
     // Rysowanie półprzezroczystego tła
-    QColor bgColor(20, 20, 30, 180);
+    constexpr QColor bgColor(20, 20, 30, 180);
     painter.setPen(Qt::NoPen);
     painter.setBrush(bgColor);
     painter.drawRoundedRect(frameRect, cornerRadius, cornerRadius);
@@ -107,7 +107,7 @@ void NetworkStatusWidget::paintEvent(QPaintEvent *event) {
 
 void NetworkStatusWidget::checkNetworkStatus() {
     // Wykonanie testowego żądania do Google, aby sprawdzić łączność
-    QNetworkRequest request(QUrl("https://www.google.com")); //TODO: change to ping a wavelength socket server
+    const QNetworkRequest request(QUrl("https://www.google.com")); //TODO: change to ping a wavelength socket server
     QNetworkReply *reply = m_networkManager->get(request);
 
     // Timeout dla żądania
@@ -123,13 +123,13 @@ void NetworkStatusWidget::checkNetworkStatus() {
     timer.start(2000);
 
     // Start pomiaru czasu
-    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
     // Oczekiwanie na odpowiedź lub timeout
     loop.exec();
 
     // Obliczenie czasu odpowiedzi
-    qint64 responseTime = QDateTime::currentMSecsSinceEpoch() - startTime;
+    const qint64 responseTime = QDateTime::currentMSecsSinceEpoch() - startTime;
 
     // Zachowujemy wartość pingu
     m_pingValue = responseTime;
@@ -187,7 +187,7 @@ void NetworkStatusWidget::updateStatusDisplay() {
 
     // Aktualizacja koloru wszystkich elementów
     m_borderColor = getQualityColor(m_currentQuality);
-    QString colorStyle = QString("color: %1;").arg(m_borderColor.name());
+    const QString colorStyle = QString("color: %1;").arg(m_borderColor.name());
     m_statusLabel->setStyleSheet(colorStyle);
     m_pingLabel->setStyleSheet(colorStyle);
 
@@ -198,7 +198,7 @@ void NetworkStatusWidget::updateStatusDisplay() {
     update();
 }
 
-QColor NetworkStatusWidget::getQualityColor(NetworkQuality quality) {
+QColor NetworkStatusWidget::getQualityColor(const NetworkQuality quality) {
     switch (quality) {
     case EXCELLENT:
         return QColor(0, 255, 170); // Neonowy cyjan
@@ -214,10 +214,10 @@ QColor NetworkStatusWidget::getQualityColor(NetworkQuality quality) {
     return QColor(100, 100, 100);
 }
 
-void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
+void NetworkStatusWidget::createNetworkIcon(const NetworkQuality quality) const {
     // Zmniejszone rozmiary ikony
-    const int iconWidth = 20;   // Zmniejszone z 28
-    const int iconHeight = 18;  // Zmniejszone z 24
+    constexpr int iconWidth = 20;   // Zmniejszone z 28
+    constexpr int iconHeight = 18;  // Zmniejszone z 24
 
     QPixmap pixmap(iconWidth, iconHeight);
     pixmap.fill(Qt::transparent);
@@ -225,12 +225,12 @@ void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QColor signalColor = getQualityColor(quality);
-    QColor inactiveColor(80, 80, 80, 100);
+    const QColor signalColor = getQualityColor(quality);
+    constexpr QColor inactiveColor(80, 80, 80, 100);
 
     // Rysuj symbol WiFi - łuki o rosnącym promieniu
-    QPointF center(iconWidth/2, iconHeight*0.8);
-    int maxArcs = 4;
+    constexpr QPointF center(iconWidth/2, iconHeight*0.8);
+    constexpr int maxArcs = 4;
     int activeArcs = 0;
 
     switch(quality) {
@@ -249,7 +249,7 @@ void NetworkStatusWidget::createNetworkIcon(NetworkQuality quality) {
     // Rysuj łuki WiFi - mniejsze i bliżej siebie
     for (int i = 0; i < maxArcs; i++) {
         // Wielkość łuku zależy od numeru (większe na zewnątrz) - zmniejszone wartości
-        int arcRadius = 4 + (i * 3);  // Zmniejszone z 5+(i*4)
+        const int arcRadius = 4 + (i * 3);  // Zmniejszone z 5+(i*4)
 
         QPen arcPen;
         if (i < activeArcs) {

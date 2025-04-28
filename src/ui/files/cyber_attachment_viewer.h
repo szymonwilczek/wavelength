@@ -8,12 +8,12 @@
 
 #include "../chat/effects/mask_overlay.h"
 
-class CyberAttachmentViewer : public QWidget {
+class CyberAttachmentViewer final : public QWidget {
     Q_OBJECT
     Q_PROPERTY(int decryptionCounter READ decryptionCounter WRITE setDecryptionCounter)
 
 public:
-    CyberAttachmentViewer(QWidget* parent = nullptr);
+    explicit CyberAttachmentViewer(QWidget* parent = nullptr);
 
     ~CyberAttachmentViewer() override;
 

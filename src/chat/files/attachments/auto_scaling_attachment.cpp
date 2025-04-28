@@ -1,13 +1,13 @@
 #include "auto_scaling_attachment.h"
 
 AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), m_content(content), m_isScaled(false) {
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     // Dodaj kontener zawartości
     m_contentContainer = new QWidget(this);
-    QVBoxLayout* contentLayout = new QVBoxLayout(m_contentContainer);
+    const auto contentLayout = new QVBoxLayout(m_contentContainer);
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
     contentLayout->addWidget(m_content);
@@ -47,8 +47,8 @@ AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent):
     setCursor(Qt::PointingHandCursor);
     m_contentContainer->setCursor(Qt::PointingHandCursor);
 
-    InlineImageViewer* imgView = qobject_cast<InlineImageViewer*>(m_content);
-    InlineGifPlayer* gifPlay = qobject_cast<InlineGifPlayer*>(m_content);
+    const auto imgView = qobject_cast<InlineImageViewer*>(m_content);
+    const auto gifPlay = qobject_cast<InlineGifPlayer*>(m_content);
     if (imgView) {
         connect(imgView, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::checkAndScaleContent);
         connect(imgView, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::checkAndScaleContent);
@@ -67,7 +67,7 @@ void AutoScalingAttachment::setMaxAllowedSize(const QSize &maxSize) {
 QSize AutoScalingAttachment::contentOriginalSize() const {
     if (m_content) {
         // Używamy sizeHint jako preferowanego oryginalnego rozmiaru
-        QSize hint = m_content->sizeHint();
+        const QSize hint = m_content->sizeHint();
         if (hint.isValid()) {
             return hint;
         }
@@ -94,7 +94,7 @@ QSize AutoScalingAttachment::sizeHint() const {
 bool AutoScalingAttachment::eventFilter(QObject *watched, QEvent *event) {
     // Zmieniamy watched na m_contentContainer
     if (watched == m_contentContainer && event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent* me = static_cast<QMouseEvent*>(event);
+        const auto me = static_cast<QMouseEvent*>(event);
         if (me->button() == Qt::LeftButton) {
             qDebug() << "AutoScalingAttachment: Kliknięto kontener!";
             emit clicked(); // Emituj zawsze po kliknięciu
@@ -155,14 +155,14 @@ void AutoScalingAttachment::checkAndScaleContent() {
         maxSize = QSize(400, 300);
     }
 
-    bool needsScaling = originalSize.width() > maxSize.width() ||
+    const bool needsScaling = originalSize.width() > maxSize.width() ||
                         originalSize.height() > maxSize.height();
 
     QSize targetSize;
     if (needsScaling) {
-        qreal scaleX = static_cast<qreal>(maxSize.width()) / originalSize.width();
-        qreal scaleY = static_cast<qreal>(maxSize.height()) / originalSize.height();
-        qreal scale = qMin(scaleX, scaleY);
+        const qreal scaleX = static_cast<qreal>(maxSize.width()) / originalSize.width();
+        const qreal scaleY = static_cast<qreal>(maxSize.height()) / originalSize.height();
+        const qreal scale = qMin(scaleX, scaleY);
         targetSize = QSize(qMax(1, static_cast<int>(originalSize.width() * scale)),
                            qMax(1, static_cast<int>(originalSize.height() * scale)));
         m_isScaled = true;
@@ -191,7 +191,7 @@ void AutoScalingAttachment::checkAndScaleContent() {
     }
 }
 
-void AutoScalingAttachment::updateInfoLabelPosition() {
+void AutoScalingAttachment::updateInfoLabelPosition() const {
     if (!m_contentContainer) return;
     // Pozycjonuj etykietę na dole, na środku kontenera zawartości
     int labelX = (m_contentContainer->width() - m_infoLabel->width()) / 2;

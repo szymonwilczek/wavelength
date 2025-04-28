@@ -12,7 +12,7 @@
 #include <QMediaPlaylist>
 
 
-class CyberTextDisplay : public QWidget {
+class CyberTextDisplay final : public QWidget {
     Q_OBJECT
     Q_PROPERTY(int revealedChars READ revealedChars WRITE setRevealedChars)
     Q_PROPERTY(qreal glitchIntensity READ glitchIntensity WRITE setGlitchIntensity)
@@ -25,7 +25,7 @@ public:
     };
     Q_ENUM(TypingSoundType)
 
-    CyberTextDisplay(const QString& text, TypingSoundType soundType = UserSound, QWidget* parent = nullptr);
+    explicit CyberTextDisplay(const QString& text, TypingSoundType soundType = UserSound, QWidget* parent = nullptr);
 
     ~CyberTextDisplay() override;
 
@@ -64,7 +64,7 @@ private slots:
     void triggerGlitch();
 
 private:
-    QString removeHtml(const QString& html);
+    static QString removeHtml(const QString& html);
 
     void recalculateHeight();
 

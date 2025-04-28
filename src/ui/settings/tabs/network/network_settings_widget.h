@@ -9,15 +9,15 @@ class QSpinBox;
 class QVBoxLayout;
 class QFormLayout;
 
-class NetworkSettingsWidget : public QWidget {
+class NetworkSettingsWidget final : public QWidget {
     Q_OBJECT
 
 public:
     explicit NetworkSettingsWidget(QWidget *parent = nullptr);
     ~NetworkSettingsWidget() override = default;
 
-    void loadSettings();
-    void saveSettings();
+    void loadSettings() const;
+    void saveSettings() const;
 
 private:
     void setupUi();

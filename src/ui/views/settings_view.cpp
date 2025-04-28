@@ -30,33 +30,33 @@
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
 m_config(WavelengthConfig::getInstance()),
-m_securityLayersStack(nullptr),
-m_fingerprintLayer(nullptr),
-m_handprintLayer(nullptr),
-m_securityCodeLayer(nullptr),
-m_securityQuestionLayer(nullptr),
-m_retinaScanLayer(nullptr),
-m_voiceRecognitionLayer(nullptr),
-m_typingTestLayer(nullptr),
-m_snakeGameLayer(nullptr),
-m_classifiedFeaturesWidget(nullptr),
-m_currentLayerIndex(FingerprintIndex),
-m_debugModeEnabled(true), // Zmieniono inicjalizację na false zgodnie z komentarzem w kodzie
-m_wavelengthTabWidget(nullptr), // Dodano inicjalizację wskaźników
-m_appearanceTabWidget(nullptr),
-m_advancedTabWidget(nullptr), // <<< Dodano inicjalizację
-m_saveButton(nullptr),
-m_defaultsButton(nullptr),
-m_backButton(nullptr),
-m_refreshTimer(nullptr),
-m_accessGrantedWidget(nullptr), // Nadal inicjalizowany, chociaż może nie być używany
-m_overrideButton(nullptr),
-m_systemOverrideManager(nullptr),
+m_tabContent(nullptr),
 m_titleLabel(nullptr),
 m_sessionLabel(nullptr),
 m_timeLabel(nullptr),
 m_tabBar(nullptr),
-m_tabContent(nullptr)
+m_wavelengthTabWidget(nullptr),
+m_appearanceTabWidget(nullptr),
+m_advancedTabWidget(nullptr),
+m_saveButton(nullptr),
+m_defaultsButton(nullptr),
+m_backButton(nullptr),
+m_refreshTimer(nullptr), // Zmieniono inicjalizację na false zgodnie z komentarzem w kodzie
+m_fingerprintLayer(nullptr), // Dodano inicjalizację wskaźników
+m_handprintLayer(nullptr),
+m_securityCodeLayer(nullptr), // <<< Dodano inicjalizację
+m_securityQuestionLayer(nullptr),
+m_retinaScanLayer(nullptr),
+m_voiceRecognitionLayer(nullptr),
+m_typingTestLayer(nullptr),
+m_snakeGameLayer(nullptr), // Nadal inicjalizowany, chociaż może nie być używany
+m_accessGrantedWidget(nullptr),
+m_securityLayersStack(nullptr),
+m_currentLayerIndex(FingerprintIndex),
+m_debugModeEnabled(true),
+m_classifiedFeaturesWidget(nullptr),
+m_overrideButton(nullptr),
+m_systemOverrideManager(nullptr)
 {
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("SettingsView { background-color: #101820; }");
@@ -67,7 +67,7 @@ m_tabContent(nullptr)
     m_refreshTimer = new QTimer(this);
     m_refreshTimer->setInterval(1000);
     connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+        const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
         if(m_timeLabel) m_timeLabel->setText(QString("TS: %1").arg(timestamp));
     });
     m_refreshTimer->start();
@@ -84,7 +84,7 @@ m_tabContent(nullptr)
     });
 }
 
-void SettingsView::setDebugMode(bool enabled) {
+void SettingsView::setDebugMode(const bool enabled) {
     if (m_debugModeEnabled != enabled) {
         m_debugModeEnabled = enabled;
         qDebug() << "SettingsView Debug Mode:" << (enabled ? "ENABLED" : "DISABLED");
@@ -104,7 +104,7 @@ SettingsView::~SettingsView() {
 }
 
 void SettingsView::setupUi() {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    const auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(40, 30, 40, 30);
     mainLayout->setSpacing(15);
 
@@ -112,7 +112,7 @@ void SettingsView::setupUi() {
 
     // Panel zakładek (przyciski zamiast QTabWidget)
     m_tabBar = new QWidget(this);
-    QHBoxLayout *tabLayout = new QHBoxLayout(m_tabBar);
+    const auto tabLayout = new QHBoxLayout(m_tabBar);
     tabLayout->setContentsMargins(0, 5, 0, 10);
     tabLayout->setSpacing(0);
     tabLayout->addStretch(1);
@@ -122,7 +122,7 @@ void SettingsView::setupUi() {
     QStringList tabNames = {"Wavelength", "Appearance", "Network","Shortcuts", "CLASSIFIED"};
 
     for (int i = 0; i < tabNames.size(); i++) {
-        TabButton *btn = new TabButton(tabNames[i], m_tabBar);
+        auto btn = new TabButton(tabNames[i], m_tabBar);
 
         // Specjalne formatowanie dla zakładki CLASSIFIED
         if (tabNames[i] == "CLASSIFIED") {
@@ -181,7 +181,7 @@ void SettingsView::setupUi() {
     mainLayout->addWidget(m_tabContent, 1);
 
     // Panel przycisków (bez zmian)
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    const auto buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(15);
     m_backButton = new CyberButton("BACK", this, false);
     m_backButton->setFixedHeight(40);
@@ -210,16 +210,16 @@ void SettingsView::setupUi() {
 
 void SettingsView::setupClassifiedTab() {
     // Implementacja bez zmian...
-    QWidget *tab = new QWidget(m_tabContent);
-    QVBoxLayout *layout = new QVBoxLayout(tab);
+    const auto tab = new QWidget(m_tabContent);
+    const auto layout = new QVBoxLayout(tab);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    QLabel *infoLabel = new QLabel("CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED", tab);
+    const auto infoLabel = new QLabel("CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED", tab);
     infoLabel->setStyleSheet("color: #ff3333; background-color: transparent; font-family: Consolas; font-size: 12pt; font-weight: bold;");
     layout->addWidget(infoLabel);
 
-    QLabel *warningLabel = new QLabel("Authorization required to access classified settings.\nMultiple security layers will be enforced.", tab);
+    const auto warningLabel = new QLabel("Authorization required to access classified settings.\nMultiple security layers will be enforced.", tab);
     warningLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(warningLabel);
 
@@ -236,25 +236,25 @@ void SettingsView::setupClassifiedTab() {
     m_snakeGameLayer = new SnakeGameLayer(m_securityLayersStack);
 
     m_classifiedFeaturesWidget = new QWidget(m_securityLayersStack);
-    QVBoxLayout *featuresLayout = new QVBoxLayout(m_classifiedFeaturesWidget);
+    const auto featuresLayout = new QVBoxLayout(m_classifiedFeaturesWidget);
     featuresLayout->setAlignment(Qt::AlignCenter);
     featuresLayout->setSpacing(20);
 
-    QLabel *featuresTitle = new QLabel("CLASSIFIED FEATURES UNLOCKED", m_classifiedFeaturesWidget);
+    const auto featuresTitle = new QLabel("CLASSIFIED FEATURES UNLOCKED", m_classifiedFeaturesWidget);
     featuresTitle->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
     featuresTitle->setAlignment(Qt::AlignCenter);
     featuresLayout->addWidget(featuresTitle);
 
-    QLabel *featuresDesc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", m_classifiedFeaturesWidget);
+    const auto featuresDesc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", m_classifiedFeaturesWidget);
     featuresDesc->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
     featuresDesc->setAlignment(Qt::AlignCenter);
     featuresLayout->addWidget(featuresDesc);
 
-    QWidget* buttonContainer = new QWidget(m_classifiedFeaturesWidget);
-    QHBoxLayout* buttonLayoutClassified = new QHBoxLayout(buttonContainer); // Zmieniono nazwę zmiennej
+    const auto buttonContainer = new QWidget(m_classifiedFeaturesWidget);
+    const auto buttonLayoutClassified = new QHBoxLayout(buttonContainer); // Zmieniono nazwę zmiennej
     buttonLayoutClassified->setSpacing(15);
 
-    QPushButton* waveSculptorButton = new QPushButton("Wave Sculptor", buttonContainer);
+    const auto waveSculptorButton = new QPushButton("Wave Sculptor", buttonContainer);
     waveSculptorButton->setMinimumHeight(40);
     waveSculptorButton->setStyleSheet(
         "QPushButton { background-color: #0077AA; border: 1px solid #00AAFF; padding: 10px; border-radius: 5px; color: #E0E0E0; font-family: Consolas; font-weight: bold; }"
@@ -263,7 +263,7 @@ void SettingsView::setupClassifiedTab() {
     );
     buttonLayoutClassified->addWidget(waveSculptorButton);
 
-    QPushButton* matrixVisionButton = new QPushButton("Matrix Vision (TBD)", buttonContainer);
+    const auto matrixVisionButton = new QPushButton("Matrix Vision (TBD)", buttonContainer);
     matrixVisionButton->setMinimumHeight(40);
     matrixVisionButton->setStyleSheet("QPushButton { background-color: #444; border: 1px solid #666; padding: 10px; border-radius: 5px; color: #999; }");
     matrixVisionButton->setEnabled(false);
@@ -400,7 +400,7 @@ void SettingsView::setupNextSecurityLayer() {
     // Implementacja bez zmian...
     // Sprawdź, czy obecny indeks jest prawidłowy i czy nie jest to ostatnia warstwa przed dostępem
     // Użyjemy indeksu widgetu funkcji zamiast AccessGrantedIndex
-    int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+    const int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
     if (featuresIndex == -1) {
         qWarning() << "Cannot setup next layer: ClassifiedFeaturesWidget not found.";
         return; // Błąd krytyczny
@@ -419,8 +419,7 @@ void SettingsView::setupNextSecurityLayer() {
          m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
          // Wywołaj initialize dla odpowiedniej warstwy
          QWidget* currentWidget = m_securityLayersStack->widget(m_currentLayerIndex);
-         SecurityLayer* currentLayer = qobject_cast<SecurityLayer*>(currentWidget);
-         if (currentLayer) {
+         if (const auto currentLayer = qobject_cast<SecurityLayer*>(currentWidget)) {
              currentLayer->initialize();
          } else {
              qWarning() << "Widget at index" << m_currentLayerIndex << "is not a SecurityLayer!";
@@ -433,7 +432,7 @@ void SettingsView::setupNextSecurityLayer() {
 
 void SettingsView::createHeaderPanel() {
     // Implementacja bez zmian...
-    QHBoxLayout *headerLayout = new QHBoxLayout();
+    const auto headerLayout = new QHBoxLayout();
     headerLayout->setSpacing(10);
 
     m_titleLabel = new QLabel("SYSTEM SETTINGS", this);
@@ -442,7 +441,7 @@ void SettingsView::createHeaderPanel() {
 
     headerLayout->addStretch();
 
-    QString sessionId = QString("%1-%2")
+    const QString sessionId = QString("%1-%2")
         .arg(QRandomGenerator::global()->bounded(1000, 9999))
         .arg(QRandomGenerator::global()->bounded(10000, 99999));
 
@@ -450,14 +449,13 @@ void SettingsView::createHeaderPanel() {
     m_sessionLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
     headerLayout->addWidget(m_sessionLabel);
 
-    QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+    const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
     m_timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
     m_timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
     headerLayout->addWidget(m_timeLabel);
 
     // Dodaj headerLayout do głównego layoutu (zakładając, że główny layout to QVBoxLayout)
-    QVBoxLayout* mainVLayout = qobject_cast<QVBoxLayout*>(layout());
-    if (mainVLayout) {
+    if (const auto mainVLayout = qobject_cast<QVBoxLayout*>(layout())) {
         mainVLayout->insertLayout(0, headerLayout); // Wstaw na górze
     } else {
         qWarning() << "Could not cast main layout to QVBoxLayout in createHeaderPanel";
@@ -473,7 +471,7 @@ void SettingsView::showEvent(QShowEvent *event) {
 }
 
 
-void SettingsView::loadSettingsFromRegistry() {
+void SettingsView::loadSettingsFromRegistry() const {
     // --- Wavelength ---
     if (m_wavelengthTabWidget) {
         m_wavelengthTabWidget->loadSettings();
@@ -526,7 +524,7 @@ void SettingsView::restoreDefaults() {
                              }
 }
 
-void SettingsView::switchToTab(int tabIndex) {
+void SettingsView::switchToTab(const int tabIndex) {
     if (tabIndex < 0 || tabIndex >= m_tabButtons.size()) return;
 
     for (int i = 0; i < m_tabButtons.size(); ++i) {
@@ -574,7 +572,7 @@ void SettingsView::resetSecurityLayers() {
     }
 
     if (m_debugModeEnabled) {
-        int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+        const int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
         if (featuresIndex != -1) {
             m_securityLayersStack->setCurrentIndex(featuresIndex);
             qDebug() << "Debug mode: Bypassed security layers, showing classified features.";

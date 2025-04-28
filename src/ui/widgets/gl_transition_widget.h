@@ -5,14 +5,14 @@
 #include <QOpenGLTexture>
 #include <QPropertyAnimation>
 
-class GLTransitionWidget : public QOpenGLWidget
+class GLTransitionWidget final : public QOpenGLWidget
 {
     Q_OBJECT
     Q_PROPERTY(float offset READ offset WRITE setOffset)
 
 public:
     explicit GLTransitionWidget(QWidget *parent = nullptr);
-    ~GLTransitionWidget();
+    ~GLTransitionWidget() override;
 
     // Ustawia widgety do animacji
     void setWidgets(QWidget *currentWidget, QWidget *nextWidget);

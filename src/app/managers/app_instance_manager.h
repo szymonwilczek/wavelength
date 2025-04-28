@@ -24,7 +24,7 @@ struct InstanceInfo {
     bool isCreator;
 };
 
-class AppInstanceManager : public QObject {
+class AppInstanceManager final : public QObject {
     Q_OBJECT
 
 public:

@@ -6,7 +6,7 @@ bool BlobMath::isValidPoint(const QPointF &point) {
         return false;
         }
 
-    const double maxCoord = 100000.0;
+    constexpr double maxCoord = 100000.0;
     if (qAbs(point.x()) > maxCoord || qAbs(point.y()) > maxCoord) {
         return false;
     }
@@ -14,18 +14,18 @@ bool BlobMath::isValidPoint(const QPointF &point) {
     return true;
 }
 
-double BlobMath::clamp(double value, double min, double max) {
+double BlobMath::clamp(const double value, const double min, const double max) {
     return qBound(min, value, max);
 }
 
-std::vector<QPointF> BlobMath::generateCircularPoints(const QPointF &center, double radius, int numPoints) {
+std::vector<QPointF> BlobMath::generateCircularPoints(const QPointF &center, const double radius, const int numPoints) {
     std::vector<QPointF> points;
     points.reserve(numPoints);
 
     for (int i = 0; i < numPoints; ++i) {
-        double angle = 2 * M_PI * i / numPoints;
+        const double angle = 2 * M_PI * i / numPoints;
 
-        double randomRadius = radius * (0.9 + 0.2 * (qrand() % 100) / 100.0);
+        const double randomRadius = radius * (0.9 + 0.2 * (qrand() % 100) / 100.0);
 
         QPointF point(
             center.x() + randomRadius * qCos(angle),
@@ -38,7 +38,7 @@ std::vector<QPointF> BlobMath::generateCircularPoints(const QPointF &center, dou
     return points;
 }
 
-QPointF BlobMath::calculateBezierControlPoint(const QPointF &p0, const QPointF &p1, const QPointF &p2, float tension) {
+QPointF BlobMath::calculateBezierControlPoint(const QPointF &p0, const QPointF &p1, const QPointF &p2, const float tension) {
     return QPointF(
         p1.x() + tension * (p2.x() - p0.x()),
         p1.y() + tension * (p2.y() - p0.y())

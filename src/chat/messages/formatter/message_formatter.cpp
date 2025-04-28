@@ -2,7 +2,7 @@
 
 #include <QJsonObject>
 
-QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequency) {
+QString MessageFormatter::formatMessage(const QJsonObject &msgObj, const QString &frequency) {
     // Pobierz treść wiadomości
     QString content;
     if (msgObj.contains("content")) {
@@ -14,8 +14,8 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequ
     if (msgObj.contains("sender")) {
         senderName = msgObj["sender"].toString();
     } else if (msgObj.contains("senderId")) {
-        QString senderId = msgObj["senderId"].toString();
-        WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
+        const QString senderId = msgObj["senderId"].toString();
+        const WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
 
         if (senderId == info.hostId) {
             senderName = "Host";
@@ -28,7 +28,7 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequ
     QString timestamp;
     if (msgObj.contains("timestamp")) {
         QDateTime msgTime;
-        QVariant timeVar = msgObj["timestamp"].toVariant();
+        const QVariant timeVar = msgObj["timestamp"].toVariant();
         if (timeVar.type() == QVariant::String) {
             msgTime = QDateTime::fromString(timeVar.toString(), Qt::ISODate);
         } else {
@@ -41,8 +41,8 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequ
 
     // Formatowanie wiadomości
     QString formattedMsg;
-    bool isSelf = msgObj.contains("isSelf") && msgObj["isSelf"].toBool();
-    bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
+    const bool isSelf = msgObj.contains("isSelf") && msgObj["isSelf"].toBool();
+    const bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();
 
     QString messageStart;
     if (isSelf) {
@@ -52,7 +52,7 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequ
     }
 
     if (hasAttachment) {
-        QString attachmentType = msgObj["attachmentType"].toString();
+        const QString attachmentType = msgObj["attachmentType"].toString();
         QString attachmentName = msgObj["attachmentName"].toString();
         QString attachmentMimeType = msgObj["attachmentMimeType"].toString();
 
@@ -143,7 +143,7 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, QString frequ
     return formattedMsg;
 }
 
-QString MessageFormatter::formatFileSize(qint64 sizeInBytes) {
+QString MessageFormatter::formatFileSize(const qint64 sizeInBytes) {
     if (sizeInBytes < 1024)
         return QString("%1 bytes").arg(sizeInBytes);
     else if (sizeInBytes < 1024 * 1024)

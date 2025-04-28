@@ -6,11 +6,11 @@
 #include "../gif/player/inline_gif_player.h"
 #include "../image/displayer/image_viewer.h"
 
-class AutoScalingAttachment : public QWidget {
+class AutoScalingAttachment final : public QWidget {
     Q_OBJECT
 
 public:
-    AutoScalingAttachment(QWidget* content, QWidget* parent = nullptr);
+    explicit AutoScalingAttachment(QWidget* content, QWidget* parent = nullptr);
 
     void setMaxAllowedSize(const QSize& maxSize);
 
@@ -42,7 +42,7 @@ private slots:
     void checkAndScaleContent();
 
 private:
-    void updateInfoLabelPosition();
+    void updateInfoLabelPosition() const;
 
     QWidget* m_content;
     QWidget* m_contentContainer;

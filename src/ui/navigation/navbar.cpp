@@ -32,13 +32,13 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     );
 
     // Główny kontener i layout
-    QWidget* mainContainer = new QWidget(this);
+    const auto mainContainer = new QWidget(this);
     m_mainLayout = new QHBoxLayout(mainContainer); // Przypisz do m_mainLayout
     m_mainLayout->setContentsMargins(0, 5, 0, 5);
     m_mainLayout->setSpacing(0);
 
     // Element narożny po lewej (bez zmian)
-    QLabel* cornerElement1 = new QLabel(this);
+    const auto cornerElement1 = new QLabel(this);
     cornerElement1->setStyleSheet(
     "QLabel {"
     "  margin-right: 5px;"
@@ -57,7 +57,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
    "   text-transform: uppercase;"
    "}"
     );
-    QGraphicsDropShadowEffect* textGlow = new QGraphicsDropShadowEffect(logoLabel);
+    const auto textGlow = new QGraphicsDropShadowEffect(logoLabel);
     textGlow->setBlurRadius(8);
     textGlow->setOffset(0, 0);
     textGlow->setColor(QColor(0, 195, 255, 150));
@@ -65,7 +65,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
 
     // Sekcja logo (lewa strona)
     m_logoContainer = new QWidget(this); // Przypisz do m_logoContainer
-    QHBoxLayout* logoLayout = new QHBoxLayout(m_logoContainer);
+    const auto logoLayout = new QHBoxLayout(m_logoContainer);
     logoLayout->setContentsMargins(0, 0, 0, 0);
     logoLayout->setSpacing(5);
     logoLayout->addWidget(cornerElement1);
@@ -77,7 +77,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
 
     // Kontener na przyciski (prawa strona)
     m_buttonsContainer = new QWidget(this); // Przypisz do m_buttonsContainer
-    QHBoxLayout* buttonsLayout = new QHBoxLayout(m_buttonsContainer);
+    const auto buttonsLayout = new QHBoxLayout(m_buttonsContainer);
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
     buttonsLayout->setSpacing(40);
 
@@ -132,7 +132,7 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     connect(settingsButton, &QPushButton::clicked, this, &Navbar::playClickSound);
 }
 
-void Navbar::setChatMode(const bool inChat) {
+void Navbar::setChatMode(const bool inChat) const {
     // Ukryj/pokaż kontener przycisków i prawy narożnik
     m_buttonsContainer->setVisible(!inChat);
     m_cornerElement2->setVisible(!inChat);
@@ -152,7 +152,7 @@ void Navbar::contextMenuEvent(QContextMenuEvent *event) {
     event->ignore(); // Bez zmian
 }
 
-void Navbar::playClickSound() {
+void Navbar::playClickSound() const {
     if (m_clickSound && m_clickSound->isLoaded()) {
         m_clickSound->play();
     } else if (m_clickSound) {

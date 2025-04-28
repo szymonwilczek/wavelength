@@ -14,7 +14,7 @@ bool MessageHandler::sendSystemCommand(QWebSocket *socket, const QString &comman
         commandObj[it.key()] = it.value();
     }
 
-    QJsonDocument doc(commandObj);
+    const QJsonDocument doc(commandObj);
     socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
 
     return true;
@@ -27,7 +27,7 @@ void MessageHandler::markMessageAsProcessed(const QString &messageId) {
         // Keep the processed message cache from growing too large
         if (m_processedMessageIds.size() > MAX_CACHED_MESSAGE_IDS) {
             // Remove approximately 20% of the oldest messages
-            int toRemove = MAX_CACHED_MESSAGE_IDS / 5;
+            constexpr int toRemove = MAX_CACHED_MESSAGE_IDS / 5;
             auto it = m_processedMessageIds.begin();
             for (int i = 0; i < toRemove && it != m_processedMessageIds.end(); ++i) {
                 it = m_processedMessageIds.erase(it);
@@ -37,7 +37,7 @@ void MessageHandler::markMessageAsProcessed(const QString &messageId) {
 }
 
 QJsonObject MessageHandler::parseMessage(const QString &message, bool *ok) {
-    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+    const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
     if (doc.isNull() || !doc.isObject()) {
         if (ok) *ok = false;
         qDebug() << "Failed to parse message JSON";
@@ -58,7 +58,7 @@ QJsonObject MessageHandler::createAuthRequest(const QString &frequency, const QS
     return authObj;
 }
 
-QJsonObject MessageHandler::createRegisterRequest(const QString &frequency, bool isPasswordProtected,
+QJsonObject MessageHandler::createRegisterRequest(const QString &frequency, const bool isPasswordProtected,
     const QString &password, const QString &hostId) {
     QJsonObject regObj;
     regObj["type"] = "register_wavelength";
@@ -69,7 +69,7 @@ QJsonObject MessageHandler::createRegisterRequest(const QString &frequency, bool
     return regObj;
 }
 
-QJsonObject MessageHandler::createLeaveRequest(QString frequency, bool isHost) {
+QJsonObject MessageHandler::createLeaveRequest(const QString &frequency, const bool isHost) {
     QJsonObject leaveObj;
     leaveObj["type"] = isHost ? "close_wavelength" : "leave_wavelength";
     leaveObj["frequency"] = frequency;

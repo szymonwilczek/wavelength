@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QImage>
 
-class RetinaScanLayer : public SecurityLayer {
+class RetinaScanLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -23,7 +23,7 @@ public:
 
 private:
     void generateEyeImage();
-    void startScanAnimation();
+    void startScanAnimation() const;
 
     QLabel* m_eyeImage;
     QProgressBar* m_scanProgress;

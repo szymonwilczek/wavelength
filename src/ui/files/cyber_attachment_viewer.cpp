@@ -71,7 +71,7 @@ CyberAttachmentViewer::~CyberAttachmentViewer() {
     }
 }
 
-void CyberAttachmentViewer::setDecryptionCounter(int counter) {
+void CyberAttachmentViewer::setDecryptionCounter(const int counter) {
     if (m_decryptionCounter != counter) {
         m_decryptionCounter = counter;
         updateDecryptionStatus();
@@ -154,19 +154,19 @@ void CyberAttachmentViewer::setContent(QWidget *content) {
 QSize CyberAttachmentViewer::sizeHint() const {
     QSize hint;
     int extraHeight = m_statusLabel->sizeHint().height() + m_layout->spacing();
-    int extraWidth = m_layout->contentsMargins().left() + m_layout->contentsMargins().right();
+    const int extraWidth = m_layout->contentsMargins().left() + m_layout->contentsMargins().right();
     extraHeight += m_layout->contentsMargins().top() + m_layout->contentsMargins().bottom();
 
     if (m_contentWidget) {
         // Pobieramy sizeHint zawartości (czyli AutoScalingAttachment)
-        QSize contentHint = m_contentWidget->sizeHint();
+        const QSize contentHint = m_contentWidget->sizeHint();
         if (contentHint.isValid()) {
             hint.setWidth(contentHint.width() + extraWidth);
             hint.setHeight(contentHint.height() + extraHeight);
             return hint;
         } else {
             // Jeśli contentHint jest nieprawidłowy, spróbujmy rozmiar widgetu
-            QSize contentSize = m_contentWidget->size();
+            const QSize contentSize = m_contentWidget->size();
             if (contentSize.isValid() && contentSize.width() > 0) {
                 hint.setWidth(contentSize.width() + extraWidth);
                 hint.setHeight(contentSize.height() + extraHeight);
@@ -176,7 +176,7 @@ QSize CyberAttachmentViewer::sizeHint() const {
     }
 
     // Podstawowy rozmiar, jeśli nie mamy zawartości lub jej rozmiar jest nieznany
-    QSize defaultSize(200, 100); // Zmniejszony domyślny rozmiar
+    constexpr QSize defaultSize(200, 100); // Zmniejszony domyślny rozmiar
     hint.setWidth(defaultSize.width() + extraWidth);
     hint.setHeight(defaultSize.height() + extraHeight);
     return hint;
@@ -196,12 +196,12 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Ramki w stylu AR
-    QColor borderColor(0, 200, 255);
+    constexpr QColor borderColor(0, 200, 255);
     painter.setPen(QPen(borderColor, 1));
 
     // Technologiczna ramka
     QPainterPath frame;
-    int clipSize = 15;
+    constexpr int clipSize = 15;
 
     // Górna krawędź
     frame.moveTo(clipSize, 0);
@@ -236,7 +236,7 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
 
     // Znaczniki AR w rogach
     painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-    int markerSize = 8;
+    constexpr int markerSize = 8;
 
     // Lewy górny
     painter.drawLine(clipSize, 5, clipSize + markerSize, 5);
@@ -259,11 +259,11 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
     painter.setFont(QFont("Consolas", 7));
 
     // Lewy dolny - poziom zabezpieczeń
-    int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
+    const int secLevel = m_isDecrypted ? 0 : QRandomGenerator::global()->bounded(1, 6);
     painter.drawText(20, height() - 10, QString("SEC:LVL%1").arg(secLevel));
 
     // Prawy dolny - status
-    QString status = m_isDecrypted ? "UNLOCKED" : "LOCKED";
+    const QString status = m_isDecrypted ? "UNLOCKED" : "LOCKED";
     painter.drawText(width() - 60, height() - 10, status);
 }
 
@@ -319,7 +319,7 @@ void CyberAttachmentViewer::startDecryptionAnimation() {
     m_maskOverlay->setVisible(true);
     m_maskOverlay->raise();
     // Animacja licznika (która przez sygnał/slot aktualizuje maskę)
-    QPropertyAnimation* decryptAnim = new QPropertyAnimation(this, "decryptionCounter");
+    const auto decryptAnim = new QPropertyAnimation(this, "decryptionCounter");
     decryptAnim->setDuration(6000);
     decryptAnim->setStartValue(0);
     decryptAnim->setEndValue(100);
@@ -344,9 +344,9 @@ void CyberAttachmentViewer::updateAnimation() const {
             }
 
             // Dodaj losowe znaki
-            int charToGlitch = QRandomGenerator::global()->bounded(baseText.length());
+            const int charToGlitch = QRandomGenerator::global()->bounded(baseText.length());
             if (charToGlitch < baseText.length()) {
-                QChar glitchChar = QChar(QRandomGenerator::global()->bounded(33, 126));
+                const auto glitchChar = QChar(QRandomGenerator::global()->bounded(33, 126));
                 baseText[charToGlitch] = glitchChar;
             }
 

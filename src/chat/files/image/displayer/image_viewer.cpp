@@ -5,7 +5,7 @@
 
 InlineImageViewer::InlineImageViewer(const QByteArray &imageData, QWidget *parent): QFrame(parent), m_imageData(imageData) { // Usunięto m_isZoomed
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
@@ -76,7 +76,7 @@ void InlineImageViewer::handleError(const QString &message) {
     updateGeometry();
 }
 
-void InlineImageViewer::handleImageInfo(int width, int height, bool hasAlpha) {
+void InlineImageViewer::handleImageInfo(const int width, const int height, const bool hasAlpha) {
     m_imageWidth = width;
     m_imageHeight = height;
     m_hasAlpha = hasAlpha;

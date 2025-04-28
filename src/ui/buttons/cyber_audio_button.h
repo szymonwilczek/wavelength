@@ -7,17 +7,17 @@
 #include <QTimer>
 
 
-class CyberAudioButton : public QPushButton {
+class CyberAudioButton final : public QPushButton {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberAudioButton(const QString& text, QWidget* parent = nullptr);
+    explicit CyberAudioButton(const QString& text, QWidget* parent = nullptr);
 
     ~CyberAudioButton() override;
 
     double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(double intensity) {
+    void setGlowIntensity(const double intensity) {
         m_glowIntensity = intensity;
         update();
     }

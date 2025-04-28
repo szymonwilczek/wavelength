@@ -16,7 +16,7 @@ void AttachmentQueueManager::addTask(const std::function<void()> &taskFunc) {
     // Tworzymy zadanie
     auto task = new AttachmentTask(taskFunc);
     connect(task, &AttachmentTask::finished, this, [this, task]() {
-        QMutexLocker locker(&m_mutex);
+        QMutexLocker taskLocker(&m_mutex);
         m_activeTasks.removeOne(task);
         task->deleteLater();
         processQueue();

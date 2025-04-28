@@ -9,10 +9,10 @@
 #include <functional>
 #include <QDebug>
 
-class AttachmentTask : public QObject, public QRunnable {
+class AttachmentTask final : public QObject, public QRunnable {
     Q_OBJECT
 public:
-    AttachmentTask(const std::function<void()>& taskFunc, QObject* parent = nullptr);
+    explicit AttachmentTask(const std::function<void()>& taskFunc, QObject* parent = nullptr);
 
     void run() override;
 
@@ -23,7 +23,7 @@ private:
     std::function<void()> m_taskFunc;
 };
 
-class AttachmentQueueManager : public QObject {
+class AttachmentQueueManager final : public QObject {
     Q_OBJECT
 public:
     static AttachmentQueueManager* getInstance() {
@@ -34,7 +34,7 @@ public:
     void addTask(const std::function<void()>& taskFunc);
 
 private:
-    AttachmentQueueManager(QObject* parent = nullptr);
+    explicit AttachmentQueueManager(QObject* parent = nullptr);
 
     void processQueue();
 

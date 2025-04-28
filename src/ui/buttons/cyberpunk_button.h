@@ -8,7 +8,7 @@
 
 #include "../../blob/core/dynamics/blob_event_handler.h"
 
-class CyberpunkButton : public QPushButton {
+class CyberpunkButton final : public QPushButton {
     Q_OBJECT
 
     // Nowa właściwość dla efektu propagacji światła

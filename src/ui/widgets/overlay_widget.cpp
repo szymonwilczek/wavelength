@@ -26,7 +26,7 @@ OverlayWidget::OverlayWidget(QWidget *parent)
     }
 }
 
-void OverlayWidget::setOpacity(qreal opacity)
+void OverlayWidget::setOpacity(const qreal opacity)
 {
     if (m_opacity != opacity) {
         m_opacity = opacity;
@@ -38,7 +38,7 @@ bool OverlayWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == parent()) {
         if (event->type() == QEvent::Resize) {
-            QResizeEvent *resizeEvent = dynamic_cast<QResizeEvent*>(event);
+            const auto resizeEvent = dynamic_cast<QResizeEvent*>(event);
             updateGeometry(QRect(QPoint(0,0), resizeEvent->size()));
         }
     }

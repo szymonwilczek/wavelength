@@ -12,7 +12,7 @@ MaskOverlay::MaskOverlay(QWidget *parent): QWidget(parent), m_revealPercentage(0
     m_scanTimer->start(30); // Szybkość aktualizacji linii skanującej
 }
 
-void MaskOverlay::setRevealProgress(int percentage) {
+void MaskOverlay::setRevealProgress(const int percentage) {
     m_revealPercentage = qBound(0, percentage, 100);
     update(); // Przerenderuj widget z nowym postępem
 }
@@ -49,7 +49,7 @@ void MaskOverlay::paintEvent(QPaintEvent *event) {
 
     if (maskRect.height() > 0) {
         // Wypełnienie tła maski (półprzezroczyste)
-        QColor maskBgColor = QColor(5, 15, 25, 230); // Ciemny, prawie nieprzezroczysty
+        auto maskBgColor = QColor(5, 15, 25, 230); // Ciemny, prawie nieprzezroczysty
         painter.fillRect(maskRect, maskBgColor);
 
         // Dodanie wzoru/tekstury do maski (przykład: losowe linie/glitche)
@@ -71,7 +71,7 @@ void MaskOverlay::paintEvent(QPaintEvent *event) {
 
     // --- Rysowanie Linii Skanującej ---
     // Linia jest rysowana na całej wysokości, ale może mieć inny wygląd w zależności od postępu
-    QColor scanLineColor = QColor(0, 255, 255, 180); // Jasny cyjan
+    auto scanLineColor = QColor(0, 255, 255, 180); // Jasny cyjan
     painter.setPen(QPen(scanLineColor, 1.5));
     painter.drawLine(0, m_scanLineY, w, m_scanLineY);
 

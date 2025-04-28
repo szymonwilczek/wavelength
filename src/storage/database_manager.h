@@ -5,9 +5,7 @@
 #include <QString>
 #include <pqxx/pqxx>
 
-#include "../util/wavelength_utilities.h"
-
-class DatabaseManager : public QObject {
+class DatabaseManager final : public QObject {
     Q_OBJECT
 
 public:
@@ -21,9 +19,9 @@ public:
     }
 
 private:
-    DatabaseManager(QObject* parent = nullptr);
+    explicit DatabaseManager(QObject* parent = nullptr);
 
-    ~DatabaseManager() {}
+    ~DatabaseManager() override {}
 
     DatabaseManager(const DatabaseManager&) = delete;
     DatabaseManager& operator=(const DatabaseManager&) = delete;

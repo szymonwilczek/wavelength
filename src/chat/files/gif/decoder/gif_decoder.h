@@ -19,11 +19,11 @@ extern "C" {
 #include <libavutil/imgutils.h>
 }
 
-class GifDecoder : public QThread {
+class GifDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    GifDecoder(const QByteArray& gifData, QObject* parent = nullptr);
+    explicit GifDecoder(const QByteArray& gifData, QObject* parent = nullptr);
 
     ~GifDecoder() override;
 
@@ -38,7 +38,6 @@ public:
     void pause();
 
     bool isPaused() const {
-        const QMutex *locker(&m_mutex);
         return m_paused;
     }
 
@@ -46,13 +45,13 @@ public:
 
     void reset();
 
-    bool isRunning() const {
+    bool isDecoderRunning() const {
         return QThread::isRunning();
     }
 
     double getDuration() const {
         if (m_formatContext && m_formatContext->duration != AV_NOPTS_VALUE) {
-            return m_formatContext->duration / (double)AV_TIME_BASE;
+            return m_formatContext->duration / static_cast<double>(AV_TIME_BASE);
         }
         return 0.0;
     }

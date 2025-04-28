@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QTimer>
 
-class SecurityQuestionLayer : public SecurityLayer {
+class SecurityQuestionLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -18,7 +18,7 @@ public:
 
     private slots:
         void checkSecurityAnswer();
-    void securityQuestionTimeout();
+    void securityQuestionTimeout() const;
 
 private:
     QLabel* m_securityQuestionLabel;

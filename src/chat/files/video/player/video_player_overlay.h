@@ -16,7 +16,7 @@
 #include "../../../../ui/sliders/cyber_slider.h"
 #include "../decoder/video_decoder.h"
 
-class VideoPlayerOverlay : public QDialog {
+class VideoPlayerOverlay final : public QDialog {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
     Q_PROPERTY(double gridOpacity READ gridOpacity WRITE setGridOpacity)
@@ -30,13 +30,13 @@ public:
 
     // Akcesory dla właściwości animacji
     double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(double opacity) {
+    void setScanlineOpacity(const double opacity) {
         m_scanlineOpacity = opacity;
         update();
     }
 
     double gridOpacity() const { return m_gridOpacity; }
-    void setGridOpacity(double opacity) {
+    void setGridOpacity(const double opacity) {
         m_gridOpacity = opacity;
         update();
     }
@@ -55,9 +55,9 @@ private slots:
 
     void onSliderReleased();
 
-    void updateTimeLabel(int position);
+    void updateTimeLabel(int position) const;
 
-    void updateSliderPosition(double position);
+    void updateSliderPosition(double position) const;
 
     void seekVideo(int position) const;
 
@@ -69,7 +69,7 @@ private slots:
 
     void handleVideoInfo(int width, int height, double fps, double duration);
 
-    void adjustVolume(int volume);
+    void adjustVolume(int volume) const;
 
     void toggleMute();
 

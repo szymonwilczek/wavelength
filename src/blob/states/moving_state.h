@@ -5,7 +5,7 @@
 #include "../blob_config.h"
 #include <QVector2D>
 
-class MovingState : public BlobState {
+class MovingState final : public BlobState {
 public:
     MovingState();
     
@@ -19,12 +19,12 @@ public:
                    QPointF& blobCenter,
                    const std::vector<QPointF>& controlPoints,
                    double blobRadius) override;
-                   
-    void applyInertiaForce(std::vector<QPointF>& velocity,
-                          QPointF& blobCenter,
-                          const std::vector<QPointF>& controlPoints,
-                          double blobRadius,
-                          const QVector2D& windowVelocity);
+
+    static void applyInertiaForce(std::vector<QPointF>& velocity,
+                                  QPointF& blobCenter,
+                                  const std::vector<QPointF>& controlPoints,
+                                  double blobRadius,
+                                  const QVector2D& windowVelocity);
 };
 
 #endif // MOVINGSTATE_H

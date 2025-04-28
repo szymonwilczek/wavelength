@@ -23,11 +23,11 @@ extern "C" {
 #pragma warning(pop)
 #endif
 
-class VideoDecoder : public QThread {
+class VideoDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    VideoDecoder(const QByteArray& videoData, QObject* parent = nullptr);
+    explicit VideoDecoder(const QByteArray& videoData, QObject* parent = nullptr);
 
     ~VideoDecoder() override;
 
@@ -47,7 +47,7 @@ public:
 
     void seek(double position);
 
-    void setVolume(float volume) {
+    void setVolume(const float volume) const {
         if (m_audioDecoder) {
             m_audioDecoder->setVolume(volume);
         }

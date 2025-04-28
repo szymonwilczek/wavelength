@@ -10,27 +10,27 @@
 SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     : SecurityLayer(parent), m_isCurrentCodeNumeric(true)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel("SECURITY CODE VERIFICATION", this);
+    const auto title = new QLabel("SECURITY CODE VERIFICATION", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    QLabel *instructions = new QLabel("Enter the security code", this);
+    const auto instructions = new QLabel("Enter the security code", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
     // Kontener dla inputów
-    QWidget* codeInputContainer = new QWidget(this);
-    QHBoxLayout* codeLayout = new QHBoxLayout(codeInputContainer);
+    const auto codeInputContainer = new QWidget(this);
+    const auto codeLayout = new QHBoxLayout(codeInputContainer);
     codeLayout->setSpacing(12); // Odstęp między polami
     codeLayout->setContentsMargins(0, 0, 0, 0);
     codeLayout->setAlignment(Qt::AlignCenter);
 
     // Tworzenie 4 pól na znaki
     for (int i = 0; i < 4; i++) {
-        QLineEdit* digitInput = new QLineEdit(this);
+        auto digitInput = new QLineEdit(this);
         digitInput->setFixedSize(60, 70);
         digitInput->setAlignment(Qt::AlignCenter);
         digitInput->setMaxLength(1);
@@ -142,8 +142,7 @@ void SecurityCodeLayer::reset() {
     resetInputs();
     m_securityCodeHint->setText("");
 
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
@@ -177,15 +176,15 @@ void SecurityCodeLayer::resetInputs() {
     }
 }
 
-void SecurityCodeLayer::setInputValidators(bool numericOnly) {
+void SecurityCodeLayer::setInputValidators(const bool numericOnly) {
     for (QLineEdit* input : m_codeInputs) {
         if (numericOnly) {
             // Tylko cyfry
-            QRegularExpressionValidator* validator = new QRegularExpressionValidator(QRegularExpression("[0-9]"), input);
+            const auto validator = new QRegularExpressionValidator(QRegularExpression("[0-9]"), input);
             input->setValidator(validator);
         } else {
             // Cyfry i wielkie litery (styl cyberpunk)
-            QRegularExpressionValidator* validator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Z]"), input);
+            const auto validator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Z]"), input);
             input->setValidator(validator);
         }
     }
@@ -193,15 +192,15 @@ void SecurityCodeLayer::setInputValidators(bool numericOnly) {
 
 void SecurityCodeLayer::onDigitEntered() {
     // Sprawdzamy, które pole zostało zmienione
-    QLineEdit* currentInput = qobject_cast<QLineEdit*>(sender());
+    const auto currentInput = qobject_cast<QLineEdit*>(sender());
     if (!currentInput)
         return;
 
-    int currentIndex = currentInput->property("index").toInt();
+    const int currentIndex = currentInput->property("index").toInt();
 
     // Automatyczna konwersja na wielkie litery dla kodów alfanumerycznych
     if (!m_isCurrentCodeNumeric && !currentInput->text().isEmpty()) {
-        QString text = currentInput->text().toUpper();
+        const QString text = currentInput->text().toUpper();
         if (text != currentInput->text()) {
             currentInput->setText(text);
             return; // Zapobiega nieskończonej pętli
@@ -215,7 +214,7 @@ void SecurityCodeLayer::onDigitEntered() {
 
     // Sprawdzamy, czy wszystkie pola są wypełnione
     bool allFilled = true;
-    for (QLineEdit* input : m_codeInputs) {
+    for (const QLineEdit* input : m_codeInputs) {
         if (input->text().isEmpty()) {
             allFilled = false;
             break;
@@ -231,12 +230,12 @@ void SecurityCodeLayer::onDigitEntered() {
 bool SecurityCodeLayer::eventFilter(QObject *obj, QEvent *event) {
     // Obsługa klawiszy w inputach
     if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        QLineEdit* input = qobject_cast<QLineEdit*>(obj);
+        const auto keyEvent = static_cast<QKeyEvent*>(event);
+        const auto input = qobject_cast<QLineEdit*>(obj);
 
         if (input && m_codeInputs.contains(input)) {
-            int key = keyEvent->key();
-            int currentIndex = input->property("index").toInt();
+            const int key = keyEvent->key();
+            const int currentIndex = input->property("index").toInt();
 
             // Obsługa klawisza Backspace
             if (key == Qt::Key_Backspace && input->text().isEmpty() && currentIndex > 0) {
@@ -264,7 +263,7 @@ bool SecurityCodeLayer::eventFilter(QObject *obj, QEvent *event) {
 
 void SecurityCodeLayer::checkSecurityCode() {
     // Pobieramy wprowadzony kod
-    QString enteredCode = getEnteredCode();
+    const QString enteredCode = getEnteredCode();
 
     // Sprawdzamy, czy wprowadzony kod zgadza się z wylosowanym
     if (enteredCode == m_currentSecurityCode) {
@@ -287,10 +286,10 @@ void SecurityCodeLayer::checkSecurityCode() {
         // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(800, this, [this]() {
             // Animacja zanikania
-            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
-            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            const auto animation = new QPropertyAnimation(effect, "opacity");
             animation->setDuration(500);
             animation->setStartValue(1.0);
             animation->setEndValue(0.0);
@@ -310,7 +309,7 @@ void SecurityCodeLayer::checkSecurityCode() {
 
 QString SecurityCodeLayer::getEnteredCode() const {
     QString code;
-    for (QLineEdit* input : m_codeInputs) {
+    for (const QLineEdit* input : m_codeInputs) {
         code += input->text();
     }
     return code;
@@ -335,7 +334,7 @@ void SecurityCodeLayer::showErrorEffect() {
         "}";
 
     // Styl błędu
-    QString errorStyle =
+    const QString errorStyle =
         "QLineEdit {"
         "  color: #ffffff;"
         "  background-color: rgba(255, 0, 0, 100);"
@@ -365,7 +364,7 @@ void SecurityCodeLayer::showErrorEffect() {
 }
 
 QString SecurityCodeLayer::getRandomSecurityCode(QString& hint, bool& isNumeric) {
-    int index = QRandomGenerator::global()->bounded(m_securityCodes.size());
+    const int index = QRandomGenerator::global()->bounded(m_securityCodes.size());
     hint = m_securityCodes[index].hint;
     isNumeric = m_securityCodes[index].isNumeric;
     return m_securityCodes[index].code;

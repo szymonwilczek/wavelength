@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QStringList>
 
-class TypingTestLayer : public SecurityLayer {
+class TypingTestLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -19,11 +19,11 @@ public:
 
     private slots:
         void onTextChanged(const QString& text);
-        void updateHighlight();
+        void updateHighlight() const;
 
 private:
     void generateWords();
-    void updateDisplayText();
+    void updateDisplayText() const;
 
     QLabel* m_titleLabel;
     QLabel* m_instructionsLabel;

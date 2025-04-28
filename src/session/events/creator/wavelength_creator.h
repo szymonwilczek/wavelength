@@ -5,7 +5,7 @@
 #include "../../../chat/messages/services/wavelength_message_processor.h"
 #include "../../../../src/app/wavelength_config.h"
 
-class WavelengthCreator : public QObject {
+class WavelengthCreator final : public QObject {
     Q_OBJECT
 
 public:
@@ -23,8 +23,8 @@ signals:
     void connectionError(const QString& errorMessage);
 
 private:
-    WavelengthCreator(QObject* parent = nullptr) : QObject(parent) {}
-    ~WavelengthCreator() {}
+    explicit WavelengthCreator(QObject* parent = nullptr) : QObject(parent) {}
+    ~WavelengthCreator() override {}
 
     WavelengthCreator(const WavelengthCreator&) = delete;
     WavelengthCreator& operator=(const WavelengthCreator&) = delete;

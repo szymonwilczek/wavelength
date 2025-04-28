@@ -6,7 +6,7 @@
 #include <QCryptographicHash>
 #include <QJsonDocument>
 
-class AuthenticationManager : public QObject {
+class AuthenticationManager final : public QObject {
     Q_OBJECT
 
 public:
@@ -53,6 +53,7 @@ private:
     AuthenticationManager(const AuthenticationManager&) = delete;
     AuthenticationManager& operator=(const AuthenticationManager&) = delete;
 
+    // ReSharper disable once CppDFANotInitializedField
     QMap<QString, QString> m_wavelengthPasswords;
     QMap<QString, SessionInfo> m_sessions;
 };

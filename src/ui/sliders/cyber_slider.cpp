@@ -2,11 +2,11 @@
 
 #include <QStyle>
 
-CyberSlider::CyberSlider(Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), m_glowIntensity(0.5) {
+CyberSlider::CyberSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), m_glowIntensity(0.5) {
     setStyleSheet("background: transparent; border: none;");
 }
 
-void CyberSlider::setGlowIntensity(double intensity) {
+void CyberSlider::setGlowIntensity(const double intensity) {
     m_glowIntensity = intensity;
     update();
 }
@@ -23,9 +23,9 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
     QColor handleColor(0, 240, 255);         // jaśniejszy neon
     QColor glowColor(0, 220, 255, 80);       // poświata
 
-    const int handleWidth = 14;
-    const int handleHeight = 20;
-    const int trackHeight = 4;
+    constexpr int handleWidth = 14;
+    constexpr int handleHeight = 20;
+    constexpr int trackHeight = 4;
 
     // Rysowanie ścieżki
     QRect trackRect = rect().adjusted(5, (height() - trackHeight) / 2, -5, -(height() - trackHeight) / 2);
@@ -99,7 +99,7 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
 
 void CyberSlider::enterEvent(QEvent *event) {
     // Animowana poświata przy najechaniu
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(300);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.9);
@@ -110,7 +110,7 @@ void CyberSlider::enterEvent(QEvent *event) {
 
 void CyberSlider::leaveEvent(QEvent *event) {
     // Wygaszenie poświaty przy opuszczeniu
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(300);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.5);

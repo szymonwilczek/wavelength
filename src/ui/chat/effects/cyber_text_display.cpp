@@ -2,7 +2,7 @@
 
 #include <QPropertyAnimation>
 
-CyberTextDisplay::CyberTextDisplay(const QString &text, TypingSoundType soundType, QWidget *parent): QWidget(parent), m_fullText(text), m_revealedChars(0),
+CyberTextDisplay::CyberTextDisplay(const QString &text, const TypingSoundType soundType, QWidget *parent): QWidget(parent), m_fullText(text), m_revealedChars(0),
                                                                                                      m_glitchIntensity(0.0), m_isFullyRevealed(false), m_hasBeenFullyRevealedOnce(false),
                                                                                                      m_mediaPlayer(nullptr), m_audioOutput(nullptr), m_playlist(nullptr), m_soundType(soundType) {
     setMinimumWidth(400);
@@ -10,11 +10,11 @@ CyberTextDisplay::CyberTextDisplay(const QString &text, TypingSoundType soundTyp
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     // Ładujemy albo upewniamy się, że mamy dobrą czcionkę dla efektu terminala
-    int fontId = QFontDatabase::addApplicationFont(":/fonts/ShareTechMono-Regular.ttf");
+    const int fontId = QFontDatabase::addApplicationFont(":/fonts/ShareTechMono-Regular.ttf");
     QString fontFamily = "Consolas"; // fallback
 
     if (fontId != -1) {
-        QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+        const QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
         if (!fontFamilies.isEmpty()) {
             fontFamily = fontFamilies.at(0);
         }
@@ -56,13 +56,13 @@ CyberTextDisplay::CyberTextDisplay(const QString &text, TypingSoundType soundTyp
     m_mediaPlayer->setPlaylist(m_playlist);
 
 
-    connect(m_mediaPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, [this](QMediaPlayer::Error error){
+    connect(m_mediaPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, [this](const QMediaPlayer::Error error){
         qWarning() << "MediaPlayer Error:" << error << m_mediaPlayer->errorString();
         // Można też sprawdzić błąd playlisty: m_playlist->errorString()
     });
 
     // Można nadal monitorować status odtwarzacza, np. aby ustawić głośność po załadowaniu
-    connect(m_mediaPlayer, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status){
+    connect(m_mediaPlayer, &QMediaPlayer::mediaStatusChanged, this, [this](const QMediaPlayer::MediaStatus status){
         if (status == QMediaPlayer::LoadedMedia) {
             m_mediaPlayer->setVolume(80); // Ustaw głośność (0-100)
         }
@@ -120,9 +120,9 @@ void CyberTextDisplay::setText(const QString &newText) {
     startReveal();       // Rozpocznij animację od nowa
 }
 
-void CyberTextDisplay::setRevealedChars(int chars) {
+void CyberTextDisplay::setRevealedChars(const int chars) {
     m_revealedChars = qMin(chars, m_plainText.length());
-    bool justRevealed = (m_revealedChars >= m_plainText.length() && !m_isFullyRevealed);
+    const bool justRevealed = (m_revealedChars >= m_plainText.length() && !m_isFullyRevealed);
 
     update(); // Zaplanuj odświeżenie interfejsu *przed* emisją sygnału
 
@@ -135,12 +135,12 @@ void CyberTextDisplay::setRevealedChars(int chars) {
     }
 }
 
-void CyberTextDisplay::setGlitchIntensity(qreal intensity) {
+void CyberTextDisplay::setGlitchIntensity(const qreal intensity) {
     m_glitchIntensity = intensity;
     update();
 }
 
-void CyberTextDisplay::setGlitchEffectEnabled(bool enabled) {
+void CyberTextDisplay::setGlitchEffectEnabled(const bool enabled) {
     if (enabled && !m_glitchTimer->isActive()) {
         m_glitchTimer->start(100);
     } else if (!enabled && m_glitchTimer->isActive()) {
@@ -151,9 +151,9 @@ void CyberTextDisplay::setGlitchEffectEnabled(bool enabled) {
 }
 
 QSize CyberTextDisplay::sizeHint() const {
-    QFontMetrics fm(m_font);
-    int width = 300; // minimalna szerokość
-    int height = fm.lineSpacing() * (m_plainText.count('\n') + 1) + 20; // margines
+    const QFontMetrics fm(m_font);
+    constexpr int width = 300; // minimalna szerokość
+    const int height = fm.lineSpacing() * (m_plainText.count('\n') + 1) + 20; // margines
     return QSize(width, height);
 }
 
@@ -199,7 +199,7 @@ void CyberTextDisplay::paintEvent(QPaintEvent *event) {
             // Dodajemy losowe glitche dla niektórych znaków
             if (m_glitchIntensity > 0.01 && QRandomGenerator::global()->bounded(100) < m_glitchIntensity * 100) {
                 // Zamieniamy znak na losowy
-                QChar glitchedChar = QChar(QRandomGenerator::global()->bounded(33, 126));
+                auto glitchedChar = QChar(QRandomGenerator::global()->bounded(33, 126));
                 charColor = QColor(0, 255, 255); // Błękitny dla glitchów
                 painter.setPen(charColor);
                 painter.drawText(x, y, QString(glitchedChar));
@@ -312,7 +312,7 @@ void CyberTextDisplay::randomGlitch() {
 
 void CyberTextDisplay::triggerGlitch() {
     // Krótkotrwały efekt zakłóceń
-    QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+    const auto glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
     glitchAnim->setDuration(200);
     glitchAnim->setStartValue(0.2);
     glitchAnim->setEndValue(0.0);
@@ -335,13 +335,13 @@ QString CyberTextDisplay::removeHtml(const QString &html) {
 }
 
 void CyberTextDisplay::recalculateHeight() {
-    QFontMetrics fm(m_font);
-    int textWidth = qMax(300, width() - 30); // Minimalna szerokość 300px
+    const QFontMetrics fm(m_font);
+    const int textWidth = qMax(300, width() - 30); // Minimalna szerokość 300px
 
     // Zachowaj oryginalny tekst jeśli się mieści w jednej linii
     if (fm.horizontalAdvance(m_plainText) <= textWidth) {
         // Tekst mieści się, nie trzeba nic robić
-        int requiredHeight = fm.lineSpacing() + 20;
+        const int requiredHeight = fm.lineSpacing() + 20;
         setMinimumHeight(requiredHeight);
         return;
     }
@@ -368,8 +368,8 @@ void CyberTextDisplay::recalculateHeight() {
     // Zapisujemy przeformatowany tekst i aktualizujemy wysokość
     m_plainText = wrappedText;
 
-    int lineCount = m_plainText.count('\n') + 1;
-    int requiredHeight = lineCount * fm.lineSpacing() + 20; // marginesy
+    const int lineCount = m_plainText.count('\n') + 1;
+    const int requiredHeight = lineCount * fm.lineSpacing() + 20; // marginesy
 
     setMinimumHeight(requiredHeight);
 }

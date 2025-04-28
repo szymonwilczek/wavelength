@@ -25,34 +25,34 @@ NetworkSettingsWidget::NetworkSettingsWidget(QWidget *parent)
 
 void NetworkSettingsWidget::setupUi() {
     qDebug() << "AdvancedSettingsWidget setupUi start";
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    QLabel *infoLabel = new QLabel("Configure network connection parameters", this);
+    const auto infoLabel = new QLabel("Configure network connection parameters", this);
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(infoLabel);
 
-    QFormLayout *formLayout = new QFormLayout();
+    const auto formLayout = new QFormLayout();
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setSpacing(15);
     formLayout->setRowWrapPolicy(QFormLayout::WrapLongRows); // Upewnij się, że jest to ustawione
 
     // --- Server Address --- (Przeniesione z WavelengthSettingsWidget)
-    QLabel *serverAddrLabel = new QLabel("Server Address:", this);
+    const auto serverAddrLabel = new QLabel("Server Address:", this);
     serverAddrLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     m_serverAddressEdit = new CyberLineEdit(this);
     m_serverAddressEdit->setPlaceholderText("Enter server address");
-    QLabel *serverAddrInfo = new QLabel("Leave unchanged unless using a custom server.", this);
+    const auto serverAddrInfo = new QLabel("Leave unchanged unless using a custom server.", this);
     serverAddrInfo->setStyleSheet("color: #aaaaaa; background-color: transparent; font-family: Consolas; font-size: 8pt; margin-left: 5px;");
     serverAddrInfo->setWordWrap(true);
-    QVBoxLayout* addrLayout = new QVBoxLayout;
+    const auto addrLayout = new QVBoxLayout;
     addrLayout->setSpacing(3); addrLayout->setContentsMargins(0,0,0,0);
     addrLayout->addWidget(m_serverAddressEdit); addrLayout->addWidget(serverAddrInfo);
     formLayout->addRow(serverAddrLabel, addrLayout);
 
     // --- Server Port --- (Przeniesione z WavelengthSettingsWidget)
-    QLabel *serverPortLabel = new QLabel("Server Port:", this);
+    const auto serverPortLabel = new QLabel("Server Port:", this);
     serverPortLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     m_serverPortEdit = new QSpinBox(this);
     m_serverPortEdit->setRange(1, 65535);
@@ -60,16 +60,16 @@ void NetworkSettingsWidget::setupUi() {
         "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; font-family: Consolas; }"
         "QSpinBox::up-button, QSpinBox::down-button { background-color: rgba(0, 150, 220, 100); }"
     );
-    QLabel *serverPortInfo = new QLabel("Mainly for debugging. Default server ignores this if address is unchanged.", this);
+    const auto serverPortInfo = new QLabel("Mainly for debugging. Default server ignores this if address is unchanged.", this);
     serverPortInfo->setStyleSheet("color: #aaaaaa; background-color: transparent; font-family: Consolas; font-size: 8pt; margin-left: 5px;");
     serverPortInfo->setWordWrap(true);
-    QVBoxLayout* portLayout = new QVBoxLayout;
+    const auto portLayout = new QVBoxLayout;
     portLayout->setSpacing(3); portLayout->setContentsMargins(0,0,0,0);
     portLayout->addWidget(m_serverPortEdit); portLayout->addWidget(serverPortInfo);
     formLayout->addRow(serverPortLabel, portLayout);
 
     // --- Connection Timeout --- (Przeniesione z SettingsView::setupNetworkTab)
-    QLabel *connTimeoutLabel = new QLabel("Connection Timeout:", this);
+    const auto connTimeoutLabel = new QLabel("Connection Timeout:", this);
     connTimeoutLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;"); // Styl z innych etykiet
     m_connectionTimeoutEdit = new QSpinBox(this);
     m_connectionTimeoutEdit->setRange(1000, 60000);
@@ -81,7 +81,7 @@ void NetworkSettingsWidget::setupUi() {
     formLayout->addRow(connTimeoutLabel, m_connectionTimeoutEdit);
 
     // --- Keep Alive Interval --- (Przeniesione z SettingsView::setupNetworkTab)
-    QLabel *keepAliveLabel = new QLabel("Keep Alive Interval:", this);
+    const auto keepAliveLabel = new QLabel("Keep Alive Interval:", this);
     keepAliveLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     m_keepAliveIntervalEdit = new QSpinBox(this);
     m_keepAliveIntervalEdit->setRange(1000, 60000);
@@ -93,7 +93,7 @@ void NetworkSettingsWidget::setupUi() {
     formLayout->addRow(keepAliveLabel, m_keepAliveIntervalEdit);
 
     // --- Max Reconnect Attempts --- (Przeniesione z SettingsView::setupNetworkTab)
-    QLabel *reconnectLabel = new QLabel("Max Reconnect Attempts:", this);
+    const auto reconnectLabel = new QLabel("Max Reconnect Attempts:", this);
     reconnectLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     m_maxReconnectAttemptsEdit = new QSpinBox(this);
     m_maxReconnectAttemptsEdit->setRange(0, 20);
@@ -107,7 +107,7 @@ void NetworkSettingsWidget::setupUi() {
     qDebug() << "AdvancedSettingsWidget setupUi end";
 }
 
-void NetworkSettingsWidget::loadSettings() {
+void NetworkSettingsWidget::loadSettings() const {
     if (!m_serverAddressEdit || !m_serverPortEdit || !m_connectionTimeoutEdit || !m_keepAliveIntervalEdit || !m_maxReconnectAttemptsEdit) {
         qWarning() << "AdvancedSettingsWidget::loadSettings - UI elements not initialized.";
         return;
@@ -120,7 +120,7 @@ void NetworkSettingsWidget::loadSettings() {
     qDebug() << "AdvancedSettingsWidget settings loaded.";
 }
 
-void NetworkSettingsWidget::saveSettings() {
+void NetworkSettingsWidget::saveSettings() const {
     if (!m_serverAddressEdit || !m_serverPortEdit || !m_connectionTimeoutEdit || !m_keepAliveIntervalEdit || !m_maxReconnectAttemptsEdit) {
         qWarning() << "AdvancedSettingsWidget::saveSettings - UI elements not initialized.";
         return;

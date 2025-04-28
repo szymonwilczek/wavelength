@@ -6,7 +6,7 @@
 #include "../../../storage/wavelength_registry.h"
 #include "../handler/message_handler.h"
 
-class WavelengthMessageService : public QObject {
+class WavelengthMessageService final : public QObject {
     Q_OBJECT
 
 public:
@@ -16,18 +16,18 @@ public:
     }
 
     // --- NOWE METODY PTT ---
-    bool sendPttRequest(const QString& frequency);
+    static bool sendPttRequest(const QString& frequency);
 
-    bool sendPttRelease(const QString& frequency);
+    static bool sendPttRelease(const QString& frequency);
 
-    bool sendAudioData(const QString& frequency, const QByteArray& audioData);
+    static bool sendAudioData(const QString& frequency, const QByteArray& audioData);
 
     bool sendMessage(const QString& message);
 
     bool sendFileMessage(const QString& filePath, const QString& progressMsgId = QString());
 
     // Dodaj nową wersję metody sendFileToServer, która zwraca bool
-bool sendFileToServer(const QString& jsonMessage, QString frequency, const QString& progressMsgId);
+bool sendFileToServer(const QString& jsonMessage, const QString &frequency, const QString& progressMsgId);
 
 
     QMap<QString, QString>* getSentMessageCache() {
@@ -55,7 +55,7 @@ bool sendFileToServer(const QString& jsonMessage, QString frequency, const QStri
     }
 
     // Dodajemy slot do wysyłania wiadomości przez socket
-    void handleSendJsonViaSocket(const QString& jsonMessage, QString frequency, const QString& progressMsgId);
+    void handleSendJsonViaSocket(const QString& jsonMessage, const QString &frequency, const QString& progressMsgId);
 
 signals:
     void messageSent(QString frequency, const QString& formattedMessage);
@@ -70,9 +70,9 @@ signals:
     void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private:
-    WavelengthMessageService(QObject* parent = nullptr);
+    explicit WavelengthMessageService(QObject* parent = nullptr);
 
-    ~WavelengthMessageService() {}
+    ~WavelengthMessageService() override {}
 
     WavelengthMessageService(const WavelengthMessageService&) = delete;
     WavelengthMessageService& operator=(const WavelengthMessageService&) = delete;
