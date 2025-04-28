@@ -21,130 +21,49 @@ public:
         return &instance;
     }
 
-    WavelengthInfo getWavelengthInfo(QString frequency, bool* isHost = nullptr) {
-        WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    WavelengthInfo getWavelengthInfo(QString frequency, bool* isHost = nullptr);
 
-        if (isHost) {
-            *isHost = info.isHost;
-        }
+    static QString getActiveWavelength();
 
-        return info;
-    }
+    void setActiveWavelength(QString frequency);
 
-    QString getActiveWavelength() {
-        return WavelengthRegistry::getInstance()->getActiveWavelength();
-    }
-
-    void setActiveWavelength(QString frequency) {
-        WavelengthRegistry::getInstance()->setActiveWavelength(frequency);
-        emit activeWavelengthChanged(frequency);
-    }
-
-    bool isActiveWavelengthHost() {
-        QString frequency = getActiveWavelength();
-        if (frequency == "-1") return false;
-
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.isHost;
-    }
+    bool isActiveWavelengthHost();
 
     // Pobiera listę częstotliwości do których użytkownik jest dołączony
-    QList<QString> getJoinedWavelengths() {
-        // Ponieważ nie mamy bezpośredniej metody, musimy śledzić dołączone wavelength sami
-        QList<QString> result;
-
-        // Dodaj zarejestrowane wavelength z naszej własnej listy
-        for (const auto& frequency : m_joinedWavelengths) {
-            if (WavelengthRegistry::getInstance()->hasWavelength(frequency)) {
-                result.append(frequency);
-            }
-        }
-
-        return result;
-    }
+    QList<QString> getJoinedWavelengths();
 
     // Rejestruje dołączenie do wavelength
-    void registerJoinedWavelength(QString frequency) {
-        if (!m_joinedWavelengths.contains(frequency)) {
-            m_joinedWavelengths.append(frequency);
-        }
-    }
+    void registerJoinedWavelength(QString frequency);
 
     // Wyrejestrowuje opuszczenie wavelength
-    void unregisterJoinedWavelength(QString frequency) {
-        m_joinedWavelengths.removeOne(frequency);
-    }
+    void unregisterJoinedWavelength(QString frequency);
 
     // Zwraca liczbę dołączonych wavelength
-    int getJoinedWavelengthCount() {
-        return getJoinedWavelengths().size();
-    }
+    int getJoinedWavelengthCount();
 
-    bool isWavelengthPasswordProtected(QString frequency) {
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.isPasswordProtected;
-    }
+    bool isWavelengthPasswordProtected(QString frequency);
 
-    bool isWavelengthHost(QString frequency) {
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.isHost;
-    }
+    bool isWavelengthHost(QString frequency);
 
 
-    QDateTime getWavelengthCreationTime(QString frequency) {
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.createdAt;
-    }
+    QDateTime getWavelengthCreationTime(QString frequency);
 
-    bool isWavelengthJoined(QString frequency) {
-        return WavelengthRegistry::getInstance()->hasWavelength(frequency);
-    }
+    bool isWavelengthJoined(QString frequency);
 
-    bool isWavelengthConnected(QString frequency) {
-        WavelengthInfo info = getWavelengthInfo(frequency);
-        return info.socket && info.socket->isValid() &&
-               info.socket->state() == QAbstractSocket::ConnectedState;
-    }
+    bool isWavelengthConnected(QString frequency);
 
-    void addActiveSessionData(QString frequency, const QString& key, const QVariant& value) {
-        if (!m_sessionData.contains(frequency)) {
-            m_sessionData[frequency] = QMap<QString, QVariant>();
-        }
+    void addActiveSessionData(QString frequency, const QString& key, const QVariant& value);
 
-        m_sessionData[frequency][key] = value;
-    }
+    QVariant getActiveSessionData(QString frequency, const QString& key, const QVariant& defaultValue = QVariant());
 
-    QVariant getActiveSessionData(QString frequency, const QString& key, const QVariant& defaultValue = QVariant()) {
-        if (!m_sessionData.contains(frequency) || !m_sessionData[frequency].contains(key)) {
-            return defaultValue;
-        }
+    void clearSessionData(QString frequency);
 
-        return m_sessionData[frequency][key];
-    }
-
-    void clearSessionData(QString frequency) {
-        if (m_sessionData.contains(frequency)) {
-            m_sessionData.remove(frequency);
-        }
-    }
-
-    void clearAllSessionData() {
-        m_sessionData.clear();
-    }
+    void clearAllSessionData();
 
     // Obsługa stanu połączenia
-    bool isConnecting(QString frequency) {
-        return m_connectingWavelengths.contains(frequency);
-    }
+    bool isConnecting(QString frequency);
 
-    void setConnecting(QString frequency, bool connecting) {
-        if (connecting && !m_connectingWavelengths.contains(frequency)) {
-            m_connectingWavelengths.append(frequency);
-        } else if (!connecting) {
-            m_connectingWavelengths.removeOne(frequency);
-        }
-    }
+    void setConnecting(QString frequency, bool connecting);
 
 signals:
     void activeWavelengthChanged(QString frequency);
