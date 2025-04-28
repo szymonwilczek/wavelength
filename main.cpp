@@ -94,6 +94,10 @@ int main(int argc, char *argv[]) {
     bootSound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
     bootSound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
 
+    QSoundEffect *shutdownSound = new QSoundEffect(&app);
+    shutdownSound->setSource(QUrl("qrc:/resources/sounds/interface/shutdown.wav"));
+    shutdownSound->setVolume(1.0);
+
 
 
     WavelengthConfig *config = WavelengthConfig::getInstance();
@@ -103,38 +107,34 @@ int main(int argc, char *argv[]) {
     parser.setApplicationDescription("Wavelength Application");
     parser.addHelpOption();
     parser.addVersionOption();
-
-    // Dodaj opcję dla sekwencji override
     QCommandLineOption overrideOption("run-override", "Internal flag to start the system override sequence immediately.");
     parser.addOption(overrideOption);
-
     parser.process(app);
     // ---------------------------------------------
 
     // --- Sprawdź, czy uruchomić sekwencję override ---
     if (parser.isSet(overrideOption)) {
         qDebug() << "--run-override flag detected.";
-
 #ifdef Q_OS_WIN
-        // Sprawdź, czy faktycznie mamy uprawnienia administratora
         if (!SystemOverrideManager::isRunningAsAdmin()) {
-            qCritical() << "Relaunched with --run-override but not running as admin! Aborting.";
-            QMessageBox::critical(nullptr, "Administrator Privileges Required",
-                                  "Failed to start the override sequence because administrator privileges are missing even after relaunch.");
-            return 1; // Zakończ z błędem
+            qWarning() << "Override sequence requires administrator privileges. Attempting relaunch...";
+            if (SystemOverrideManager::relaunchAsAdmin(app.arguments())) {
+                qDebug() << "Relaunch successful. Exiting current instance.";
+                return 0; // Zakończ bieżącą instancję
+            } else {
+                qCritical() << "Failed to relaunch as administrator. Override aborted.";
+                QMessageBox::critical(nullptr, "Admin Privileges Required", "Failed to relaunch with administrator privileges. The override sequence cannot continue.");
+                return 1; // Zakończ z błędem
+            }
+        } else {
+            qDebug() << "Running with administrator privileges.";
+            SystemOverrideManager overrideManager; // Utwórz na stosie
+            // Połącz sygnał zakończenia override z wyjściem z aplikacji
+            QObject::connect(&overrideManager, &SystemOverrideManager::overrideFinished, &app, &QCoreApplication::quit);
+            overrideManager.initiateOverrideSequence(false); // Rozpocznij sekwencję
+            return app.exec(); // Uruchom pętlę zdarzeń TYLKO dla override
         }
-        qDebug() << "Confirmed running as admin. Initiating override sequence...";
-
-        // Utwórz menedżera override i zainicjuj sekwencję
-        SystemOverrideManager overrideManager; // Utwórz na stosie, bo nie potrzebujemy głównego okna
-        overrideManager.initiateOverrideSequence(false); // false, bo to nie pierwsze uruchomienie
-
-        // Nie tworzymy głównego okna, tylko uruchamiamy pętlę zdarzeń
-        // Menedżer override sam pokaże swoją animację
-        return app.exec(); // Uruchom pętlę zdarzeń dla animacji override
-
 #else
-        // Na innych systemach, po prostu kontynuuj (brak implementacji UAC)
         qWarning() << "--run-override flag ignored on non-Windows OS.";
         // Kontynuuj normalne uruchomienie poniżej
 #endif
@@ -153,6 +153,22 @@ int main(int argc, char *argv[]) {
         qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << bootSound->source();
     }
     // --- Koniec odtwarzania dźwięku startowego ---
+
+    QObject::connect(&app, &QApplication::aboutToQuit, [shutdownSound]() {
+    qDebug() << "DEBUG: Entering aboutToQuit lambda."; // <<< Log 1
+    if (shutdownSound->isLoaded()) {
+        qDebug() << "DEBUG: Shutdown sound is loaded. Attempting to play."; // <<< Log 2
+        shutdownSound->play();
+        // Dajmy BARDZO dużo czasu na próbę
+        QEventLoop loop;
+        QTimer::singleShot(1500, &loop, &QEventLoop::quit); // Czekaj 1 sekundę
+        loop.exec();
+        qDebug() << "DEBUG: Delay finished after playing sound."; // <<< Log 3
+
+    } else {
+        qWarning() << "Shutdown sound not loaded when aboutToQuit emitted:" << shutdownSound->source();
+    }
+});
 
     FontManager* fontManager = FontManager::getInstance();
     if (!fontManager->initialize()) {
@@ -513,5 +529,7 @@ int main(int argc, char *argv[]) {
         });
     });
 
-    return app.exec();
+    int exitCode = app.exec();
+
+    return exitCode;
 }
