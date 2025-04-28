@@ -123,7 +123,7 @@ add_executable(
         src/ui/chat/effects/cyber_long_text_display.cpp
         src/ui/chat/effects/cyber_long_text_display.h
         src/app/style/cyberpunk_style.cpp
-        src/app/cyberpunk_style.h
+        src/app/style/cyberpunk_style.h
         src/ui/effects/cyberpunk_text_effect.cpp
         src/ui/effects/cyberpunk_text_effect.h
         src/ui/buttons/cyberpunk_button.cpp

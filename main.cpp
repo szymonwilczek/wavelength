@@ -19,7 +19,7 @@
 #include "src/ui/dialogs/wavelength_dialog.h"
 
 #include "src/session/wavelength_session_coordinator.h"
-#include "src/app/cyberpunk_style.h"
+#include "src/app/style/cyberpunk_style.h"
 #include "src/ui/effects/cyberpunk_text_effect.h"
 #include "src/ui/widgets/animated_stacked_widget.h"
 #include "src/app/managers/shortcut_manager.h"
