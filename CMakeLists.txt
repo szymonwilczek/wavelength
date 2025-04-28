@@ -184,6 +184,10 @@ add_executable(
         src/app/managers/shortcut_manager.h
         src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.cpp
         src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.h
+        src/ui/sliders/cyber_audio_slider.cpp
+        src/ui/sliders/cyber_audio_slider.h
+        src/ui/buttons/cyber_audio_button.cpp
+        src/ui/buttons/cyber_audio_button.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
