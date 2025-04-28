@@ -2,7 +2,7 @@
 
 WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(parent) {
     // Konfigurujemy główny układ
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    const auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     // Tworzymy strumień komunikacji (główny element)
@@ -22,7 +22,7 @@ WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(paren
     connect(m_messageTimer, &QTimer::timeout, this, &WavelengthStreamDisplay::processNextQueuedMessage);
 }
 
-void WavelengthStreamDisplay::setFrequency(QString frequency, const QString &name) {
+void WavelengthStreamDisplay::setFrequency(const QString &frequency, const QString &name) {
     // Ustawiamy nazwę strumienia
     if (name.isEmpty()) {
         m_communicationStream->setStreamName(QString("WAVELENGTH: %1 Hz").arg(frequency));
@@ -35,12 +35,11 @@ void WavelengthStreamDisplay::setFrequency(QString frequency, const QString &nam
 }
 
 void WavelengthStreamDisplay::addMessage(const QString &message, const QString &messageId,
-    StreamMessage::MessageType type) {
+    const StreamMessage::MessageType type) {
     // --- NOWA LOGIKA AKTUALIZACJI ---
     // Sprawdzamy, czy to wiadomość progresu (ma ID) i czy już jest wyświetlona
     if (!messageId.isEmpty() && m_displayedProgressMessages.contains(messageId)) {
-        StreamMessage* existingMessage = m_displayedProgressMessages.value(messageId);
-        if (existingMessage) {
+        if (StreamMessage* existingMessage = m_displayedProgressMessages.value(messageId)) {
             qDebug() << "Aktualizowanie istniejącej wiadomości progresu ID:" << messageId;
             existingMessage->updateContent(message);
             return; // Zaktualizowano, nie dodajemy do kolejki
@@ -70,8 +69,8 @@ void WavelengthStreamDisplay::addMessage(const QString &message, const QString &
         data.sender = "You";
     } else if (type == StreamMessage::Received) { // Zwykła wiadomość odebrana
         // Logika wyciągania nadawcy z HTML (jeśli potrzebna dla odebranych)
-        QRegularExpression re("<span[^>]*>([^<]+):</span>"); // Szukamy "Nadawca:"
-        QRegularExpressionMatch match = re.match(message);
+        const QRegularExpression re("<span[^>]*>([^<]+):</span>"); // Szukamy "Nadawca:"
+        const QRegularExpressionMatch match = re.match(message);
         if (match.hasMatch()) {
             data.sender = match.captured(1);
         } else {
@@ -103,7 +102,7 @@ void WavelengthStreamDisplay::processNextQueuedMessage() {
     if (m_messageQueue.isEmpty()) {
         return;
     }
-    MessageData data = m_messageQueue.dequeue();
+    const MessageData data = m_messageQueue.dequeue();
     StreamMessage* displayedMessage = nullptr;
 
     // Bezpiecznik - nie powinien być potrzebny, jeśli onStreamMessageDestroyed działa
@@ -154,12 +153,12 @@ void WavelengthStreamDisplay::processNextQueuedMessage() {
 
     // Uruchom timer dla następnej wiadomości w kolejce
     if (!m_messageQueue.isEmpty()) {
-        int delay = 300 + QRandomGenerator::global()->bounded(500);
+        const int delay = 300 + QRandomGenerator::global()->bounded(500);
         m_messageTimer->start(delay);
     }
 }
 
-void WavelengthStreamDisplay::onStreamMessageDestroyed(QObject *obj) {
+void WavelengthStreamDisplay::onStreamMessageDestroyed(const QObject *obj) {
     // Iterujemy po mapie, aby znaleźć wpis pasujący do zniszczonego obiektu
     // To jest bezpieczniejsze niż poleganie na ID, jeśli jakimś cudem ID nie zostało ustawione
     auto it = m_displayedProgressMessages.begin();

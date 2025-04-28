@@ -16,7 +16,7 @@ struct UserVisuals {
 };
 
 // Główny widget strumienia komunikacji - poprawiona wersja z OpenGL
-class CommunicationStream : public QOpenGLWidget, protected QOpenGLFunctions {
+class CommunicationStream final : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
     Q_PROPERTY(qreal waveAmplitude READ waveAmplitude WRITE setWaveAmplitude)
     Q_PROPERTY(qreal waveFrequency READ waveFrequency WRITE setWaveFrequency)
@@ -53,17 +53,17 @@ public:
     qreal waveThickness() const { return m_waveThickness; }
     void setWaveThickness(qreal thickness);
 
-    void setStreamName(const QString& name);
+    void setStreamName(const QString& name) const;
 
     StreamMessage* addMessage(const QString &content, const QString &sender, StreamMessage::MessageType type, const QString& messageId = QString());
 
     void clearMessages();
 
 public slots:
-    void setTransmittingUser(const QString& userId);
+    void setTransmittingUser(const QString& userId) const;
 
     // Slot do czyszczenia wskaźnika nadającego
-    void clearTransmittingUser();
+    void clearTransmittingUser() const;
 
     // Slot setAudioAmplitude (bez zmian)
     void setAudioAmplitude(qreal amplitude);

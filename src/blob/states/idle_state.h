@@ -6,7 +6,7 @@
 #include "blob_state.h"
 #include "../blob_config.h"
 
-class IdleState : public BlobState {
+class IdleState final : public BlobState {
 public:
     IdleState();
     
@@ -26,9 +26,9 @@ public:
     void resetInitialization();
 
     // Deklaracja nowej metody
-    void applyHeartbeatEffect(std::vector<QPointF>& controlPoints,
+    void applyHeartbeatEffect(const std::vector<QPointF>& controlPoints,
                              std::vector<QPointF>& velocity,
-                             QPointF& blobCenter,
+                             const QPointF& blobCenter,
                              const BlobConfig::BlobParameters& params);
     
 private:

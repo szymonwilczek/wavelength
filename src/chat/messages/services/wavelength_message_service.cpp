@@ -13,8 +13,8 @@ bool WavelengthMessageService::sendPttRequest(const QString &frequency) {
     // Można dodać ID sesji klienta, jeśli serwer tego wymaga
     // requestObj["senderId"] = AuthenticationManager::getInstance()->getClientId();
 
-    QJsonDocument doc(requestObj);
-    QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+    const QJsonDocument doc(requestObj);
+    const QString jsonMessage = doc.toJson(QJsonDocument::Compact);
     qDebug() << "Sending PTT Request:" << jsonMessage;
     socket->sendTextMessage(jsonMessage);
     return true;
@@ -28,8 +28,8 @@ bool WavelengthMessageService::sendPttRelease(const QString &frequency) {
     releaseObj["type"] = "release_ptt";
     releaseObj["frequency"] = frequency;
 
-    QJsonDocument doc(releaseObj);
-    QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+    const QJsonDocument doc(releaseObj);
+    const QString jsonMessage = doc.toJson(QJsonDocument::Compact);
     qDebug() << "Sending PTT Release:" << jsonMessage;
     socket->sendTextMessage(jsonMessage);
     return true;
@@ -40,14 +40,14 @@ bool WavelengthMessageService::sendAudioData(const QString &frequency, const QBy
     if (!socket) return false;
 
     // Wysyłamy surowe dane binarne
-    qint64 bytesSent = socket->sendBinaryMessage(audioData);
+    const qint64 bytesSent = socket->sendBinaryMessage(audioData);
     // qDebug() << "Sent" << bytesSent << "bytes of audio data for freq" << frequency;
     return bytesSent == audioData.size();
 }
 
 bool WavelengthMessageService::sendMessage(const QString &message) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    QString freq = registry->getActiveWavelength();
+    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const QString freq = registry->getActiveWavelength();
 
     if (freq == -1) {
         qDebug() << "Cannot send message - no active wavelength";
@@ -59,7 +59,7 @@ bool WavelengthMessageService::sendMessage(const QString &message) {
         return false;
     }
 
-    WavelengthInfo info = registry->getWavelengthInfo(freq);
+    const WavelengthInfo info = registry->getWavelengthInfo(freq);
     QWebSocket* socket = info.socket;
 
     if (!socket) {
@@ -73,17 +73,17 @@ bool WavelengthMessageService::sendMessage(const QString &message) {
     }
 
     // Generate a sender ID (use host ID if we're host, or client ID otherwise)
-    QString senderId = info.isHost ? info.hostId :
+    const QString senderId = info.isHost ? info.hostId :
                            AuthenticationManager::getInstance()->generateClientId();
 
-    QString messageId = MessageHandler::getInstance()->generateMessageId();
+    const QString messageId = MessageHandler::getInstance()->generateMessageId();
 
     // Zapamiętujemy treść wiadomości do późniejszego użycia
     m_sentMessages[messageId] = message;
 
     // Ograniczamy rozmiar cache'u wiadomości
     if (m_sentMessages.size() > 100) {
-        auto it = m_sentMessages.begin();
+        const auto it = m_sentMessages.begin();
         m_sentMessages.erase(it);
     }
 
@@ -96,8 +96,8 @@ bool WavelengthMessageService::sendMessage(const QString &message) {
     messageObj["timestamp"] = QDateTime::currentMSecsSinceEpoch();
     messageObj["messageId"] = messageId;
 
-    QJsonDocument doc(messageObj);
-    QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+    const QJsonDocument doc(messageObj);
+    const QString jsonMessage = doc.toJson(QJsonDocument::Compact);
     // qDebug() << "Sending message to server:" << jsonMessage;
     socket->sendTextMessage(jsonMessage);
 
@@ -123,7 +123,7 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
     // Przeniesienie całego przetwarzania do osobnego wątku przy użyciu AttachmentQueueManager
     AttachmentQueueManager::getInstance()->addTask([this, filePathCopy, progressMsgIdCopy]() {
         try {
-            QFileInfo fileInfo(filePathCopy);
+            const QFileInfo fileInfo(filePathCopy);
             if (!fileInfo.exists() || !fileInfo.isReadable()) {
                 emit progressMessageUpdated(progressMsgIdCopy,
                                             "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
@@ -138,7 +138,7 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
             }
 
             // Ustalamy typ pliku
-            QString fileExtension = fileInfo.suffix().toLower();
+            const QString fileExtension = fileInfo.suffix().toLower();
             QString fileType;
             QString mimeType;
 
@@ -165,8 +165,8 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
 
             // Czytamy plik w kawałkach
             QByteArray fileData;
-            qint64 fileSize = fileInfo.size();
-            const qint64 chunkSize = 1024 * 1024; // 1 MB chunks
+            const qint64 fileSize = fileInfo.size();
+            constexpr qint64 chunkSize = 1024 * 1024; // 1 MB chunks
             qint64 totalRead = 0;
             int lastProgressReported = 0;
 
@@ -177,7 +177,7 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
 
                 // Aktualizujemy postęp co 5%
                 if (fileSize > 0) {
-                    int progress = (totalRead * 100) / fileSize;
+                    const int progress = (totalRead * 100) / fileSize;
                     if (progress - lastProgressReported >= 5) {
                         lastProgressReported = progress;
                         emit progressMessageUpdated(progressMsgIdCopy,
@@ -201,13 +201,13 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
                                         .arg(fileInfo.fileName()));
 
             // Kodowanie base64
-            QByteArray base64Data = fileData.toBase64();
+            const QByteArray base64Data = fileData.toBase64();
 
             // Pobieramy dane potrzebne do wysłania
-            WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-            QString frequency = registry->getActiveWavelength();
-            QString senderId = AuthenticationManager::getInstance()->generateClientId();
-            QString messageId = MessageHandler::getInstance()->generateMessageId();
+            const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+            const QString frequency = registry->getActiveWavelength();
+            const QString senderId = AuthenticationManager::getInstance()->generateClientId();
+            const QString messageId = MessageHandler::getInstance()->generateMessageId();
 
             // Tworzymy obiekt wiadomości
             QJsonObject messageObj;
@@ -228,8 +228,8 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
                                         .arg(fileType)
                                         .arg(fileInfo.fileName()));
 
-            QJsonDocument doc(messageObj);
-            QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+            const QJsonDocument doc(messageObj);
+            const QString jsonMessage = doc.toJson(QJsonDocument::Compact);
 
             // Wysyłamy plik używając sygnału
             emit sendJsonViaSocket(jsonMessage, frequency, progressMsgIdCopy);
@@ -243,13 +243,13 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
     return true;
 }
 
-bool WavelengthMessageService::sendFileToServer(const QString &jsonMessage, QString frequency,
+bool WavelengthMessageService::sendFileToServer(const QString &jsonMessage, const QString &frequency,
     const QString &progressMsgId) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     QWebSocket* socket = nullptr;
 
     if (registry->hasWavelength(frequency)) {
-        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+        const WavelengthInfo info = registry->getWavelengthInfo(frequency);
         socket = info.socket;
     }
 
@@ -272,13 +272,13 @@ bool WavelengthMessageService::sendFileToServer(const QString &jsonMessage, QStr
     return true;
 }
 
-void WavelengthMessageService::handleSendJsonViaSocket(const QString &jsonMessage, QString frequency,
+void WavelengthMessageService::handleSendJsonViaSocket(const QString &jsonMessage, const QString &frequency,
     const QString &progressMsgId) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     QWebSocket* socket = nullptr;
 
     if (registry->hasWavelength(frequency)) {
-        WavelengthInfo info = registry->getWavelengthInfo(frequency);
+        const WavelengthInfo info = registry->getWavelengthInfo(frequency);
         socket = info.socket;
     }
 
@@ -309,7 +309,7 @@ WavelengthMessageService::WavelengthMessageService(QObject *parent): QObject(par
 }
 
 QWebSocket * WavelengthMessageService::getSocketForFrequency(const QString &frequency) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
     if (!registry->hasWavelength(frequency)) {
         qWarning() << "No wavelength info found for frequency" << frequency << "in getSocketForFrequency";
         return nullptr;

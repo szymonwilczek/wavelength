@@ -5,11 +5,11 @@
 #include <QPushButton>
 
 
-class CyberChatButton : public QPushButton {
+class CyberChatButton final : public QPushButton {
     Q_OBJECT
 
 public:
-    CyberChatButton(const QString &text, QWidget *parent = nullptr);
+    explicit CyberChatButton(const QString &text, QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

@@ -7,7 +7,7 @@
 
 #include "gl_transition_widget.h"
 
-class AnimatedStackedWidget : public QStackedWidget
+class AnimatedStackedWidget final : public QStackedWidget
 {
     Q_OBJECT
     Q_PROPERTY(int duration READ duration WRITE setDuration)
@@ -21,12 +21,12 @@ public:
     };
 
     explicit AnimatedStackedWidget(QWidget *parent = nullptr);
-    ~AnimatedStackedWidget();
+    ~AnimatedStackedWidget() override;
 
     // Ustawienia
-    void setDuration(int duration) { m_duration = duration; }
+    void setDuration(const int duration) { m_duration = duration; }
     int duration() const { return m_duration; }
-    void setAnimationType(AnimationType type) { m_animationType = type; }
+    void setAnimationType(const AnimationType type) { m_animationType = type; }
     AnimationType animationType() const { return m_animationType; }
     bool isAnimating() const { return m_animationRunning; }
 
@@ -36,14 +36,14 @@ public slots:
     void slideToNextIndex();  // Nowa metoda dla karuzelowego przewijania
 
 protected:
-    void animateFade(int nextIndex);
-    void animateSlide(int nextIndex);
-    void animateSlideAndFade(int nextIndex);
-    void animatePush(int nextIndex);
+    void animateFade(int nextIndex) const;
+    void animateSlide(int nextIndex) const;
+    void animateSlideAndFade(int nextIndex) const;
+    void animatePush(int nextIndex) const;
 
 private:
-    void prepareAnimation(int nextIndex);
-    void cleanupAfterAnimation();
+    void prepareAnimation(int nextIndex) const;
+    void cleanupAfterAnimation() const;
     void onGLTransitionFinished();
 
     int m_duration;

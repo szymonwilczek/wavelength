@@ -16,7 +16,7 @@ QSize CyberCheckBox::sizeHint() const {
     return size;
 }
 
-void CyberCheckBox::setGlowIntensity(double intensity) {
+void CyberCheckBox::setGlowIntensity(const double intensity) {
     m_glowIntensity = intensity;
     update();
 }
@@ -36,8 +36,8 @@ void CyberCheckBox::paintEvent(QPaintEvent *event) {
     QColor textColor(0, 200, 255);
 
     // Rysowanie pola wyboru (kwadrat ze ściętymi rogami)
-    const int checkboxSize = 16;
-    const int x = 0;
+    constexpr int checkboxSize = 16;
+    constexpr int x = 0;
     const int y = (height() - checkboxSize) / 2;
 
     // Ścieżka dla pola wyboru ze ściętymi rogami
@@ -95,7 +95,7 @@ void CyberCheckBox::paintEvent(QPaintEvent *event) {
 }
 
 void CyberCheckBox::enterEvent(QEvent *event) {
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(200);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.9);
@@ -104,7 +104,7 @@ void CyberCheckBox::enterEvent(QEvent *event) {
 }
 
 void CyberCheckBox::leaveEvent(QEvent *event) {
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(200);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.5);

@@ -4,10 +4,11 @@
 #include <QSequentialAnimationGroup>
 
 #include "../../chat/files/attachments/auto_scaling_attachment.h"
+#include "../files/cyber_attachment_viewer.h"
 
-StreamMessage::StreamMessage(QString content, QString sender, MessageType type, QString messageId, QWidget *parent): QWidget(parent), m_content(std::move(content)), m_sender(std::move(sender)), m_type(type),
-                                                                                                                     m_messageId(std::move(messageId)), // Store the message ID
-                                                                                                                     m_opacity(0.0), m_glowIntensity(0.8), m_isRead(false), m_disintegrationProgress(0.0) {
+StreamMessage::StreamMessage(QString content, QString sender, MessageType type, QString messageId, QWidget *parent): QWidget(parent), m_messageId(std::move(messageId)), m_content(std::move(content)), m_sender(std::move(sender)),
+                                                                                                                     m_type(type), // Store the message ID
+                                                                                                                     m_opacity(0.0), m_glowIntensity(0.8), m_disintegrationProgress(0.0), m_isRead(false) {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMinimumWidth(400);
     setMaximumWidth(600);
@@ -44,7 +45,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
             }
 
             // Dla długich wiadomości używamy QScrollArea z CyberLongTextDisplay
-            QScrollArea* scrollArea = new QScrollArea(this);
+            auto scrollArea = new QScrollArea(this);
             scrollArea->setObjectName("cyberpunkScrollArea");
             scrollArea->setWidgetResizable(true);
             scrollArea->setFrameShape(QFrame::NoFrame);
@@ -55,7 +56,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
             scrollArea->setStyleSheet("QScrollArea { background: transparent; border: none; }");
 
             // Tworzymy widget do wyświetlania tekstu
-            CyberLongTextDisplay* longTextDisplay = new CyberLongTextDisplay(m_cleanContent, textColor);
+            auto longTextDisplay = new CyberLongTextDisplay(m_cleanContent, textColor);
             scrollArea->setWidget(longTextDisplay);
 
             // Dodajemy scrollArea do głównego layoutu
@@ -69,7 +70,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
 
             // Połącz sygnał zmiany wysokości z aktualizacją obszaru przewijania
             connect(longTextDisplay, &CyberLongTextDisplay::contentHeightChanged, this,
-                    [scrollArea](int height) {
+                    [scrollArea](const int height) {
                         // Aktualizuj rzeczywistą wysokość widgetu
                         scrollArea->widget()->setMinimumHeight(height);
                     });
@@ -101,7 +102,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
     }
 
     // Efekt przeźroczystości
-    QGraphicsOpacityEffect* opacity = new QGraphicsOpacityEffect(this);
+    auto opacity = new QGraphicsOpacityEffect(this);
     opacity->setOpacity(0.0);
     setGraphicsEffect(opacity);
 
@@ -133,7 +134,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
     m_markReadButton->setFixedSize(25, 25);
 
     // Ustaw docelowy kolor i rozmiar ikony
-    QColor iconColor = QColor("#00ffcc"); // Kolor obramówki
+    auto iconColor = QColor("#00ffcc"); // Kolor obramówki
     QSize iconSize(20, 20); // Rozmiar ikony wewnątrz przycisku
 
     // Utwórz pokolorowaną ikonę za pomocą funkcji pomocniczej
@@ -192,26 +193,26 @@ void StreamMessage::updateContent(const QString &newContent) {
     update(); // Wymuś odświeżenie wyglądu
 }
 
-void StreamMessage::setOpacity(qreal opacity) {
+void StreamMessage::setOpacity(const qreal opacity) {
     m_opacity = opacity;
-    if (QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(graphicsEffect())) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(graphicsEffect())) {
         effect->setOpacity(opacity);
     }
 }
 
-void StreamMessage::setGlowIntensity(qreal intensity) {
+void StreamMessage::setGlowIntensity(const qreal intensity) {
     m_glowIntensity = intensity;
     update();
 }
 
-void StreamMessage::setDisintegrationProgress(qreal progress) {
+void StreamMessage::setDisintegrationProgress(const qreal progress) {
     m_disintegrationProgress = progress;
     if (m_disintegrationEffect) {
         m_disintegrationEffect->setProgress(progress);
     }
 }
 
-void StreamMessage::setShutdownProgress(qreal progress) {
+void StreamMessage::setShutdownProgress(const qreal progress) {
     m_shutdownProgress = progress;
     if (m_shutdownEffect) {
         m_shutdownEffect->setProgress(progress);
@@ -259,7 +260,7 @@ void StreamMessage::addAttachment(const QString &html) {
     setMaximumWidth(QWIDGETSIZE_MAX);
 
     // Tworzymy placeholder załącznika i ustawiamy referencję
-    AttachmentPlaceholder* attachmentWidget = new AttachmentPlaceholder(
+    const auto attachmentWidget = new AttachmentPlaceholder(
         filename, type, this, false);
     attachmentWidget->setAttachmentReference(attachmentId, mimeType);
 
@@ -285,7 +286,7 @@ void StreamMessage::addAttachment(const QString &html) {
                 QTimer::singleShot(200, this, [this]() {
                     if (m_attachmentWidget) {
                         // Określamy rozmiar widgetu załącznika
-                        QSize attachSize = m_attachmentWidget->sizeHint();
+                        const QSize attachSize = m_attachmentWidget->sizeHint();
                         qDebug() << "Rozmiar załącznika po załadowaniu:" << attachSize;
 
                         // Znajdujemy wszystkie widgety CyberAttachmentViewer w hierarchii
@@ -316,7 +317,7 @@ void StreamMessage::addAttachment(const QString &html) {
     // Dostosuj początkowy rozmiar wiadomości
     QTimer::singleShot(100, this, [this]() {
         if (m_attachmentWidget) {
-            QSize initialSize = m_attachmentWidget->sizeHint();
+            const QSize initialSize = m_attachmentWidget->sizeHint();
             setMinimumSize(qMax(initialSize.width() + 60, 500),
                            initialSize.height() + 100);
             qDebug() << "StreamMessage: Początkowy minimalny rozmiar:" << minimumSize();
@@ -332,12 +333,12 @@ void StreamMessage::adjustSizeToContent() {
     m_mainLayout->activate();
 
     // Pobieramy informacje o dostępnym miejscu na ekranie
-    QScreen* screen = QApplication::primaryScreen();
+    const QScreen* screen = QApplication::primaryScreen();
     if (window()) {
         screen = window()->screen();
     }
 
-    QRect availableGeometry = screen->availableGeometry();
+    const QRect availableGeometry = screen->availableGeometry();
 
     // Maksymalne dozwolone wymiary wiadomości (80% dostępnej przestrzeni)
     int maxWidth = availableGeometry.width() * 0.8;
@@ -349,7 +350,7 @@ void StreamMessage::adjustSizeToContent() {
     QTimer::singleShot(100, this, [this, maxWidth, maxHeight]() {
         if (m_attachmentWidget) {
             // Pobieramy rozmiar załącznika
-            QSize attachmentSize = m_attachmentWidget->sizeHint();
+            const QSize attachmentSize = m_attachmentWidget->sizeHint();
             qDebug() << "Rozmiar załącznika (sizeHint):" << attachmentSize;
 
             // Szukamy wszystkich CyberAttachmentViewer
@@ -359,18 +360,18 @@ void StreamMessage::adjustSizeToContent() {
 
                 // Aktualizujemy dane widgetu
                 viewer->updateGeometry();
-                QSize viewerSize = viewer->sizeHint();
+                const QSize viewerSize = viewer->sizeHint();
 
                 qDebug() << "CyberAttachmentViewer sizeHint:" << viewerSize;
 
                 // Obliczamy rozmiar, uwzględniając marginesy i dodatkową przestrzeń
-                int newWidth = qMin(
+                const int newWidth = qMin(
                     qMax(viewerSize.width() +
                          m_mainLayout->contentsMargins().left() +
                          m_mainLayout->contentsMargins().right() + 100, 500),
                     maxWidth);
 
-                int newHeight = qMin(
+                const int newHeight = qMin(
                     viewerSize.height() +
                     m_mainLayout->contentsMargins().top() +
                     m_mainLayout->contentsMargins().bottom() + 80,
@@ -388,7 +389,7 @@ void StreamMessage::adjustSizeToContent() {
                 QList<AutoScalingAttachment*> scalers = viewer->findChildren<AutoScalingAttachment*>();
                 if (!scalers.isEmpty()) {
                     // Ustawiamy maksymalny dozwolony rozmiar dla auto-skalowanej zawartości
-                    QSize contentMaxSize(
+                    const QSize contentMaxSize(
                         maxWidth - m_mainLayout->contentsMargins().left() - m_mainLayout->contentsMargins().right() + 20,
                         maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 100
                     );
@@ -413,7 +414,7 @@ void StreamMessage::adjustSizeToContent() {
 }
 
 QSize StreamMessage::sizeHint() const {
-    QSize baseSize(550, 180);
+    constexpr QSize baseSize(550, 180);
 
     if (m_scrollArea) {
         return QSize(550, 300); // Docelowy rozmiar dla długich wiadomości
@@ -421,7 +422,7 @@ QSize StreamMessage::sizeHint() const {
 
     // Jeśli mamy załącznik, dostosuj rozmiar na jego podstawie
     if (m_attachmentWidget) {
-        QSize attachmentSize = m_attachmentWidget->sizeHint();
+        const QSize attachmentSize = m_attachmentWidget->sizeHint();
 
         // Szukamy CyberAttachmentViewer w hierarchii
         QList<const CyberAttachmentViewer*> viewers =
@@ -429,25 +430,25 @@ QSize StreamMessage::sizeHint() const {
 
         if (!viewers.isEmpty()) {
             // Użyj rozmiaru CyberAttachmentViewer zamiast bezpośredniego attachmentSize
-            QSize viewerSize = viewers.first()->sizeHint();
+            const QSize viewerSize = viewers.first()->sizeHint();
 
             // Dodajemy marginesy i przestrzeń
-            int totalHeight = viewerSize.height() +
+            const int totalHeight = viewerSize.height() +
                               m_mainLayout->contentsMargins().top() +
                               m_mainLayout->contentsMargins().bottom() + 80;
 
-            int totalWidth = qMax(viewerSize.width() +
+            const int totalWidth = qMax(viewerSize.width() +
                                   m_mainLayout->contentsMargins().left() +
                                   m_mainLayout->contentsMargins().right() + 40, baseSize.width());
 
             return QSize(totalWidth, totalHeight);
         } else {
             // Standardowe zachowanie dla innych załączników
-            int totalHeight = attachmentSize.height() +
+            const int totalHeight = attachmentSize.height() +
                               m_mainLayout->contentsMargins().top() +
                               m_mainLayout->contentsMargins().bottom() + 70;
 
-            int totalWidth = qMax(attachmentSize.width() +
+            const int totalWidth = qMax(attachmentSize.width() +
                                   m_mainLayout->contentsMargins().left() +
                                   m_mainLayout->contentsMargins().right() + 30, baseSize.width());
 
@@ -460,14 +461,14 @@ QSize StreamMessage::sizeHint() const {
 
 void StreamMessage::fadeIn() {
     // Używamy QPropertyAnimation zamiast QTimeLine dla lepszej wydajności
-    QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
+    const auto opacityAnim = new QPropertyAnimation(this, "opacity");
     opacityAnim->setDuration(400); // krótszy czas dla lepszej responsywności
     opacityAnim->setStartValue(0.0);
     opacityAnim->setEndValue(1.0);
     opacityAnim->setEasingCurve(QEasingCurve::OutQuad);
 
     // Krótkotrwały efekt poświaty
-    QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
+    const auto glowAnim = new QPropertyAnimation(this, "glowIntensity");
     glowAnim->setDuration(600);
     glowAnim->setStartValue(0.9);
     glowAnim->setKeyValueAt(0.4, 0.7);
@@ -475,7 +476,7 @@ void StreamMessage::fadeIn() {
     glowAnim->setEasingCurve(QEasingCurve::OutQuad);
 
     // Grupa animacji - oddziela renderowanie animacji od głównej pętli
-    QParallelAnimationGroup* animGroup = new QParallelAnimationGroup(this);
+    auto animGroup = new QParallelAnimationGroup(this);
     animGroup->addAnimation(opacityAnim);
     animGroup->addAnimation(glowAnim);
 
@@ -497,14 +498,14 @@ void StreamMessage::fadeIn() {
 
 void StreamMessage::fadeOut() {
     // Używamy QPropertyAnimation dla lepszej wydajności renderowania
-    QPropertyAnimation* opacityAnim = new QPropertyAnimation(this, "opacity");
+    const auto opacityAnim = new QPropertyAnimation(this, "opacity");
     opacityAnim->setDuration(300);
     opacityAnim->setStartValue(1.0);
     opacityAnim->setEndValue(0.0);
     opacityAnim->setEasingCurve(QEasingCurve::InQuad);
 
     // Efekt błysku przy znikaniu
-    QPropertyAnimation* glowAnim = new QPropertyAnimation(this, "glowIntensity");
+    const auto glowAnim = new QPropertyAnimation(this, "glowIntensity");
     glowAnim->setDuration(300);
     glowAnim->setStartValue(0.8);
     glowAnim->setKeyValueAt(0.3, 0.6);
@@ -512,7 +513,7 @@ void StreamMessage::fadeOut() {
     glowAnim->setEndValue(0.0);
 
     // Grupa animacji - używa osobnej pętli czasowej
-    QParallelAnimationGroup* animGroup = new QParallelAnimationGroup(this);
+    auto animGroup = new QParallelAnimationGroup(this);
     animGroup->addAnimation(opacityAnim);
     animGroup->addAnimation(glowAnim);
 
@@ -526,24 +527,23 @@ void StreamMessage::fadeOut() {
     animGroup->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void StreamMessage::updateScrollAreaMaxHeight() {
+void StreamMessage::updateScrollAreaMaxHeight() const {
     if (!m_scrollArea)
         return;
 
     // Znajdź ekran, na którym wyświetlana jest wiadomość
-    QScreen* screen = QApplication::primaryScreen();
+    const QScreen* screen = QApplication::primaryScreen();
     if (window()) {
         screen = window()->screen();
     }
-    QRect availableGeometry = screen->availableGeometry();
+    const QRect availableGeometry = screen->availableGeometry();
 
     // Ograniczamy maksymalną wysokość scrollArea do 50% dostępnej wysokości ekranu
-    int maxHeight = availableGeometry.height() * 0.5;
+    const int maxHeight = availableGeometry.height() * 0.5;
     m_scrollArea->setMaximumHeight(maxHeight);
 
     // Aktualizujemy rozmiar widget'u wewnątrz scrollArea
-    QWidget* contentWidget = m_scrollArea->widget();
-    if (contentWidget) {
+    if (QWidget* contentWidget = m_scrollArea->widget()) {
         // Upewniamy się, że widget ma wystarczającą szerokość
         contentWidget->setMinimumWidth(m_scrollArea->width() - 20);
     }
@@ -558,7 +558,7 @@ void StreamMessage::startDisintegrationAnimation() {
     m_shutdownEffect->setProgress(0.0);
     setGraphicsEffect(m_shutdownEffect);
 
-    QPropertyAnimation* shutdownAnim = new QPropertyAnimation(this, "shutdownProgress");
+    const auto shutdownAnim = new QPropertyAnimation(this, "shutdownProgress");
     shutdownAnim->setDuration(1200); // Nieco szybsza animacja (1.2 sekundy)
     shutdownAnim->setStartValue(0.0);
     shutdownAnim->setEndValue(1.0);
@@ -572,7 +572,7 @@ void StreamMessage::startDisintegrationAnimation() {
     shutdownAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void StreamMessage::showNavigationButtons(bool hasPrev, bool hasNext) {
+void StreamMessage::showNavigationButtons(const bool hasPrev, const bool hasNext) const {
     // Pozycjonowanie przycisków nawigacyjnych
     m_nextButton->setVisible(hasNext);
     m_prevButton->setVisible(hasPrev);
@@ -772,8 +772,7 @@ void StreamMessage::resizeEvent(QResizeEvent *event) {
 
     // Dostosuj rozmiar scrollArea jeśli istnieje
     if (m_scrollArea) {
-        QWidget* contentWidget = m_scrollArea->widget();
-        if (contentWidget) {
+        if (QWidget* contentWidget = m_scrollArea->widget()) {
             // Ustaw minimalną szerokość contentu, aby zapewnić poprawne przewijanie
             contentWidget->setMinimumWidth(m_scrollArea->width() - 30);
         }
@@ -814,11 +813,11 @@ void StreamMessage::focusOutEvent(QFocusEvent *event) {
 
 void StreamMessage::updateAnimation() {
     // Subtelna pulsacja poświaty
-    qreal pulse = 0.05 * sin(QDateTime::currentMSecsSinceEpoch() * 0.002);
+    const qreal pulse = 0.05 * sin(QDateTime::currentMSecsSinceEpoch() * 0.002);
     setGlowIntensity(m_glowIntensity + pulse * (!m_isRead ? 1.0 : 0.3));
 }
 
-void StreamMessage::adjustScrollAreaStyle() {
+void StreamMessage::adjustScrollAreaStyle() const {
     if (!m_scrollArea) return;
 
     // Typy wiadomości mają różne kolory
@@ -862,7 +861,7 @@ QString StreamMessage::extractAttribute(const QString &html, const QString &attr
     int attrPos = html.indexOf(attribute + "='");
     if (attrPos >= 0) {
         attrPos += attribute.length() + 2; // przesunięcie za ='
-        int endPos = html.indexOf("'", attrPos);
+        const int endPos = html.indexOf("'", attrPos);
         if (endPos >= 0) {
             return html.mid(attrPos, endPos - attrPos);
         }
@@ -872,10 +871,10 @@ QString StreamMessage::extractAttribute(const QString &html, const QString &attr
 
 void StreamMessage::startLongMessageClosingAnimation() {
     // Prostszy, ale nadal cyberpunkowy efekt dla długich wiadomości
-    QSequentialAnimationGroup* animGroup = new QSequentialAnimationGroup(this);
+    const auto animGroup = new QSequentialAnimationGroup(this);
 
     // Faza 1: Szybkie migotanie (efekt glitch)
-    QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glowIntensity");
+    const auto glitchAnim = new QPropertyAnimation(this, "glowIntensity");
     glitchAnim->setDuration(300);
     glitchAnim->setStartValue(0.8);
     glitchAnim->setKeyValueAt(0.2, 1.2);
@@ -887,7 +886,7 @@ void StreamMessage::startLongMessageClosingAnimation() {
     animGroup->addAnimation(glitchAnim);
 
     // Faza 2: Szybkie zniknięcie całej wiadomości
-    QPropertyAnimation* fadeAnim = new QPropertyAnimation(this, "opacity");
+    const auto fadeAnim = new QPropertyAnimation(this, "opacity");
     fadeAnim->setDuration(250);  // krótki czas = szybka animacja
     fadeAnim->setStartValue(1.0);
     fadeAnim->setEndValue(0.0);
@@ -904,17 +903,17 @@ void StreamMessage::startLongMessageClosingAnimation() {
 }
 
 void StreamMessage::processImageAttachment(const QString &html) {
-    QString attachmentId = extractAttribute(html, "data-attachment-id");
-    QString mimeType = extractAttribute(html, "data-mime-type");
-    QString filename = extractAttribute(html, "data-filename");
+    const QString attachmentId = extractAttribute(html, "data-attachment-id");
+    const QString mimeType = extractAttribute(html, "data-mime-type");
+    const QString filename = extractAttribute(html, "data-filename");
 
     // Tworzymy widget zawierający placeholder załącznika
-    QWidget* container = new QWidget(this);
-    QVBoxLayout* containerLayout = new QVBoxLayout(container);
+    const auto container = new QWidget(this);
+    const auto containerLayout = new QVBoxLayout(container);
     containerLayout->setContentsMargins(5, 5, 5, 5);
 
     // Tworzymy placeholder załącznika
-    AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+    const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "image", container, false);
     placeholderWidget->setAttachmentReference(attachmentId, mimeType);
 
@@ -929,17 +928,17 @@ void StreamMessage::processImageAttachment(const QString &html) {
 }
 
 void StreamMessage::processGifAttachment(const QString &html) {
-    QString attachmentId = extractAttribute(html, "data-attachment-id");
-    QString mimeType = extractAttribute(html, "data-mime-type");
-    QString filename = extractAttribute(html, "data-filename");
+    const QString attachmentId = extractAttribute(html, "data-attachment-id");
+    const QString mimeType = extractAttribute(html, "data-mime-type");
+    const QString filename = extractAttribute(html, "data-filename");
 
     // Tworzymy widget zawierający placeholder załącznika
-    QWidget* container = new QWidget(this);
-    QVBoxLayout* containerLayout = new QVBoxLayout(container);
+    const auto container = new QWidget(this);
+    const auto containerLayout = new QVBoxLayout(container);
     containerLayout->setContentsMargins(5, 5, 5, 5);
 
     // Tworzymy placeholder załącznika
-    AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+    const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "gif", container, false);
     placeholderWidget->setAttachmentReference(attachmentId, mimeType);
 
@@ -954,17 +953,17 @@ void StreamMessage::processGifAttachment(const QString &html) {
 }
 
 void StreamMessage::processAudioAttachment(const QString &html) {
-    QString attachmentId = extractAttribute(html, "data-attachment-id");
-    QString mimeType = extractAttribute(html, "data-mime-type");
-    QString filename = extractAttribute(html, "data-filename");
+    const QString attachmentId = extractAttribute(html, "data-attachment-id");
+    const QString mimeType = extractAttribute(html, "data-mime-type");
+    const QString filename = extractAttribute(html, "data-filename");
 
     // Tworzymy widget zawierający placeholder załącznika
-    QWidget* container = new QWidget(this);
-    QVBoxLayout* containerLayout = new QVBoxLayout(container);
+    const auto container = new QWidget(this);
+    const auto containerLayout = new QVBoxLayout(container);
     containerLayout->setContentsMargins(5, 5, 5, 5);
 
     // Tworzymy placeholder załącznika
-    AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+    const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "audio", container, false);
     placeholderWidget->setAttachmentReference(attachmentId, mimeType);
 
@@ -979,17 +978,17 @@ void StreamMessage::processAudioAttachment(const QString &html) {
 }
 
 void StreamMessage::processVideoAttachment(const QString &html) {
-    QString attachmentId = extractAttribute(html, "data-attachment-id");
-    QString mimeType = extractAttribute(html, "data-mime-type");
-    QString filename = extractAttribute(html, "data-filename");
+    const QString attachmentId = extractAttribute(html, "data-attachment-id");
+    const QString mimeType = extractAttribute(html, "data-mime-type");
+    const QString filename = extractAttribute(html, "data-filename");
 
     // Tworzymy widget zawierający placeholder załącznika
-    QWidget* container = new QWidget(this);
-    QVBoxLayout* containerLayout = new QVBoxLayout(container);
+    const auto container = new QWidget(this);
+    const auto containerLayout = new QVBoxLayout(container);
     containerLayout->setContentsMargins(5, 5, 5, 5);
 
     // Tworzymy placeholder załącznika
-    AttachmentPlaceholder* placeholderWidget = new AttachmentPlaceholder(
+    const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "video", container, false);
     placeholderWidget->setAttachmentReference(attachmentId, mimeType);
 
@@ -1011,12 +1010,12 @@ void StreamMessage::cleanupContent() {
 
     // Zajmij się placeholderami załączników
     if (m_content.contains("placeholder")) {
-        int placeholderStart = m_content.indexOf("<div class='");
+        const int placeholderStart = m_content.indexOf("<div class='");
         if (placeholderStart >= 0) {
-            int placeholderEnd = m_content.indexOf("</div>", placeholderStart);
+            const int placeholderEnd = m_content.indexOf("</div>", placeholderStart);
             if (placeholderEnd > 0) {
-                QString before = m_cleanContent.left(placeholderStart);
-                QString after = m_cleanContent.mid(placeholderEnd + 6);
+                const QString before = m_cleanContent.left(placeholderStart);
+                const QString after = m_cleanContent.mid(placeholderEnd + 6);
                 m_cleanContent = before.trimmed() + " " + after.trimmed();
             }
         }

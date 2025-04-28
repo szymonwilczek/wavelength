@@ -19,14 +19,14 @@
 
 #ifdef Q_OS_WIN
 // --- DEFINICJA STATYCZNEGO POLA ---
-HHOOK SystemOverrideManager::m_keyboardHook = NULL;
-HHOOK SystemOverrideManager::m_mouseHook = NULL;
+HHOOK SystemOverrideManager::m_keyboardHook = nullptr;
+HHOOK SystemOverrideManager::m_mouseHook = nullptr;
 // ---------------------------------
 #endif
 
 // --- Stałe ---
-const int MOUSE_LOCK_INTERVAL_MS = 10;
-const int RESTORE_DELAY_MS = 500;
+constexpr int MOUSE_LOCK_INTERVAL_MS = 10;
+constexpr int RESTORE_DELAY_MS = 500;
 
 const std::set<DWORD> ALLOWED_KEYS = {
     VK_UP,       // Strzałka w górę
@@ -54,8 +54,8 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
 
 #ifdef Q_OS_WIN
     // Upewnij się, że hak jest NULL na starcie
-    m_keyboardHook = NULL;
-    m_mouseHook = NULL;
+    m_keyboardHook = nullptr;
+    m_mouseHook = nullptr;
 #endif
 
 
@@ -78,7 +78,7 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
     // m_mediaPlayer->setLoops(QMediaPlayer::Infinite); // Pętla dźwięku
 
 #ifdef Q_OS_WIN
-    CoInitialize(NULL);
+    CoInitialize(nullptr);
 #endif
 }
 
@@ -104,7 +104,7 @@ SystemOverrideManager::~SystemOverrideManager()
 #endif
 }
 
-void SystemOverrideManager::initiateOverrideSequence(bool isFirstTime)
+void SystemOverrideManager::initiateOverrideSequence(const bool isFirstTime)
 {
     if (m_overrideActive) {
         qWarning() << "System Override sequence already active.";
@@ -182,7 +182,7 @@ bool SystemOverrideManager::changeWallpaper()
     }
 
     // 3. Utwórz czarny obraz o rozmiarze ekranu
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    const QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
     QImage blackImage(screenGeometry.size(), QImage::Format_RGB32);
     if (blackImage.isNull()) {
         qCritical() << "Failed to create QImage for black wallpaper.";
@@ -200,8 +200,9 @@ bool SystemOverrideManager::changeWallpaper()
     qDebug() << "Black wallpaper image saved successfully.";
 
     // 5. Ustaw nową tapetę
-    std::wstring pathW = m_tempBlackWallpaperPath.toStdWString();
-    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)pathW.c_str(), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
+    const std::wstring pathW = m_tempBlackWallpaperPath.toStdWString();
+    // ReSharper disable once CppFunctionalStyleCast
+    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(pathW.c_str()), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
         qDebug() << "Black wallpaper set successfully.";
         return true;
     } else {
@@ -226,8 +227,10 @@ bool SystemOverrideManager::restoreWallpaper()
         // Mimo to spróbuj usunąć czarną tapetę, jeśli istnieje
     } else {
         qDebug() << "Restoring original wallpaper:" << m_originalWallpaperPath;
-        std::wstring pathW = m_originalWallpaperPath.toStdWString();
-        if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)pathW.c_str(), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
+        const std::wstring pathW = m_originalWallpaperPath.toStdWString();
+        // ReSharper disable once CppFunctionalStyleCast
+        if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(pathW.c_str()),
+                                  SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
             qDebug() << "Original wallpaper restored successfully.";
             m_originalWallpaperPath = ""; // Wyczyść po przywróceniu
             success = true; // Oznacz sukces przywracania
@@ -256,8 +259,7 @@ bool SystemOverrideManager::restoreWallpaper()
 #endif
 }
 
-bool SystemOverrideManager::sendWindowsNotification(const QString& title, const QString& message)
-{
+bool SystemOverrideManager::sendWindowsNotification(const QString& title, const QString& message) const {
     if (m_trayIcon) {
         if (!m_trayIcon->isVisible()) {
             qDebug() << "Tray icon is not visible, attempting to show it...";
@@ -292,8 +294,8 @@ bool SystemOverrideManager::minimizeAllWindows()
 {
 #ifdef Q_OS_WIN
     // Użycie COM jest bardziej niezawodne
-    IShellDispatch *pShellDispatch = NULL;
-    HRESULT hr = CoCreateInstance(CLSID_Shell, NULL, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pShellDispatch);
+    IShellDispatch *pShellDispatch = nullptr;
+    const HRESULT hr = CoCreateInstance(CLSID_Shell, nullptr, CLSCTX_INPROC_SERVER, IID_IShellDispatch, reinterpret_cast<void **>(&pShellDispatch));
     if (SUCCEEDED(hr)) {
         pShellDispatch->MinimizeAll();
         pShellDispatch->Release();
@@ -302,8 +304,7 @@ bool SystemOverrideManager::minimizeAllWindows()
     } else {
         qWarning() << "Failed to create IShellDispatch instance. HRESULT:" << hr;
         // Fallback na starszą metodę
-        HWND hwnd = FindWindowW(L"Shell_TrayWnd", NULL);
-        if (hwnd) {
+        if (const HWND hwnd = FindWindowW(L"Shell_TrayWnd", nullptr)) {
             SendMessageW(hwnd, WM_COMMAND, 419, 0);
             qDebug() << "Sent WM_COMMAND 419 to Shell_TrayWnd as fallback.";
             return true;
@@ -318,7 +319,7 @@ bool SystemOverrideManager::minimizeAllWindows()
 #endif
 }
 
-void SystemOverrideManager::showFloatingAnimationWidget(bool isFirstTime)
+void SystemOverrideManager::showFloatingAnimationWidget(const bool isFirstTime)
 {
     if (m_floatingWidget) {
         qWarning() << "Floating widget already exists.";
@@ -348,9 +349,9 @@ void SystemOverrideManager::showFloatingAnimationWidget(bool isFirstTime)
     connect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished,
             this, &SystemOverrideManager::restoreSystemState); // <<< NOWE POŁĄCZENIE
 
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    int x = (screenGeometry.width() - m_floatingWidget->width()) / 2;
-    int y = (screenGeometry.height() - m_floatingWidget->height()) / 2;
+    const QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    const int x = (screenGeometry.width() - m_floatingWidget->width()) / 2;
+    const int y = (screenGeometry.height() - m_floatingWidget->height()) / 2;
     m_floatingWidget->move(x, y);
 
     m_floatingWidget->show();
@@ -435,7 +436,7 @@ void SystemOverrideManager::restoreSystemState()
 bool SystemOverrideManager::isRunningAsAdmin()
 {
     BOOL isAdmin = FALSE;
-    HANDLE hToken = NULL;
+    HANDLE hToken = nullptr;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
         TOKEN_ELEVATION elevation;
         DWORD cbSize = sizeof(TOKEN_ELEVATION);
@@ -454,16 +455,16 @@ bool SystemOverrideManager::isRunningAsAdmin()
 
 bool SystemOverrideManager::relaunchAsAdmin(const QStringList& arguments)
 {
-    QStringList args = arguments;
-    QString appPath = QApplication::applicationFilePath();
+    const QStringList args = arguments;
+    const QString appPath = QApplication::applicationFilePath();
 
     SHELLEXECUTEINFOW sei = { sizeof(sei) };
     sei.lpVerb = L"runas"; // Kluczowe: żądanie podwyższenia uprawnień
     sei.lpFile = reinterpret_cast<LPCWSTR>(appPath.utf16());
     // Konwertuj argumenty na pojedynczy string rozdzielony spacjami
-    QString argsString = args.join(' ');
+    const QString argsString = args.join(' ');
     sei.lpParameters = argsString.isEmpty() ? nullptr : reinterpret_cast<LPCWSTR>(argsString.utf16());
-    sei.hwnd = NULL;
+    sei.hwnd = nullptr;
     sei.nShow = SW_SHOWNORMAL;
     sei.fMask = SEE_MASK_DEFAULT; // Można dodać SEE_MASK_NOCLOSEPROCESS jeśli potrzebujesz uchwytu
 
@@ -473,7 +474,7 @@ bool SystemOverrideManager::relaunchAsAdmin(const QStringList& arguments)
         qDebug() << "Relaunch successful (UAC prompt should appear).";
         return true;
     } else {
-        DWORD error = GetLastError();
+        const DWORD error = GetLastError();
         qWarning() << "ShellExecuteExW failed with error code:" << error;
         // ERROR_CANCELLED (1223) oznacza, że użytkownik anulował UAC
         if (error == ERROR_CANCELLED) {
@@ -486,15 +487,15 @@ bool SystemOverrideManager::relaunchAsAdmin(const QStringList& arguments)
 }
 
 
-LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(const int nCode, const WPARAM wParam, const LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {
         // Sprawdź tylko zdarzenia wciśnięcia klawisza
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
         {
-            KBDLLHOOKSTRUCT *pkhs = (KBDLLHOOKSTRUCT *)lParam;
-            DWORD vkCode = pkhs->vkCode;
+            const auto pkhs = reinterpret_cast<KBDLLHOOKSTRUCT *>(lParam);
+            const DWORD vkCode = pkhs->vkCode;
 
             // Sprawdź, czy klawisz jest na liście dozwolonych
             if (ALLOWED_KEYS.find(vkCode) == ALLOWED_KEYS.end())
@@ -515,7 +516,7 @@ LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(int nCode, WPARAM w
 
 bool SystemOverrideManager::installKeyboardHook()
 {
-    if (m_keyboardHook != NULL) {
+    if (m_keyboardHook != nullptr) {
         qWarning() << "Keyboard hook already installed.";
         return true; // Już zainstalowany
     }
@@ -526,7 +527,7 @@ bool SystemOverrideManager::installKeyboardHook()
     HINSTANCE hInstance = GetModuleHandleW(L"wavelength.dll"); // Zastąp poprawną nazwą DLL jeśli dotyczy
     if (!hInstance) {
          // Jeśli powyższe zawiedzie, spróbuj z NULL
-         hInstance = GetModuleHandle(NULL);
+         hInstance = GetModuleHandle(nullptr);
          if (!hInstance) {
             qCritical() << "Failed to get module handle for keyboard hook. Error:" << GetLastError();
             return false;
@@ -542,7 +543,7 @@ bool SystemOverrideManager::installKeyboardHook()
         0                           // ID wątku (0 dla globalnego haka)
     );
 
-    if (m_keyboardHook == NULL) {
+    if (m_keyboardHook == nullptr) {
         qCritical() << "Failed to install keyboard hook! Error code:" << GetLastError()
                    << ". Konami code might not work, and input won't be fully blocked.";
         return false;
@@ -554,18 +555,18 @@ bool SystemOverrideManager::installKeyboardHook()
 
 void SystemOverrideManager::uninstallKeyboardHook()
 {
-    if (m_keyboardHook != NULL) {
+    if (m_keyboardHook != nullptr) {
         qDebug() << "Uninstalling low-level keyboard hook. Handle:" << m_keyboardHook;
         if (UnhookWindowsHookEx(m_keyboardHook)) {
             qDebug() << "Keyboard hook uninstalled successfully.";
         } else {
             qWarning() << "Failed to uninstall keyboard hook! Error code:" << GetLastError();
         }
-        m_keyboardHook = NULL; // Zawsze resetuj uchwyt
+        m_keyboardHook = nullptr; // Zawsze resetuj uchwyt
     }
 }
 
-LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(const int nCode, const WPARAM wParam, const LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {
@@ -602,12 +603,12 @@ LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(int nCode, WPARAM wPar
 
 bool SystemOverrideManager::installMouseHook()
 {
-    if (m_mouseHook != NULL) {
+    if (m_mouseHook != nullptr) {
         qWarning() << "Mouse hook already installed.";
         return true;
     }
 
-    HINSTANCE hInstance = GetModuleHandle(NULL);
+    const HINSTANCE hInstance = GetModuleHandle(nullptr);
     if (!hInstance) {
         qCritical() << "Failed to get module handle for mouse hook. Error:" << GetLastError();
         return false;
@@ -621,7 +622,7 @@ bool SystemOverrideManager::installMouseHook()
         0                       // ID wątku (0 dla globalnego)
     );
 
-    if (m_mouseHook == NULL) {
+    if (m_mouseHook == nullptr) {
         qCritical() << "Failed to install mouse hook! Error code:" << GetLastError();
         return false;
     }
@@ -632,21 +633,21 @@ bool SystemOverrideManager::installMouseHook()
 
 void SystemOverrideManager::uninstallMouseHook()
 {
-    if (m_mouseHook != NULL) {
+    if (m_mouseHook != nullptr) {
         qDebug() << "Uninstalling low-level mouse hook. Handle:" << m_mouseHook;
         if (UnhookWindowsHookEx(m_mouseHook)) {
             qDebug() << "Mouse hook uninstalled successfully.";
         } else {
             qWarning() << "Failed to uninstall mouse hook! Error code:" << GetLastError();
         }
-        m_mouseHook = NULL;
+        m_mouseHook = nullptr;
     }
 }
 
 bool SystemOverrideManager::relaunchNormally(const QStringList& arguments)
 {
-    QString appPath = QApplication::applicationFilePath();
-    QStringList args = arguments; // Przekaż argumenty, jeśli są potrzebne
+    const QString appPath = QApplication::applicationFilePath();
+    const QStringList args = arguments; // Przekaż argumenty, jeśli są potrzebne
 
     qDebug() << "Relaunching normally:" << appPath << "with args:" << args.join(' ');
 

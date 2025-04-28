@@ -7,12 +7,12 @@
 #include <QDateTime>
 #include <QCache>
 
-class ElectronicShutdownEffect : public QGraphicsEffect {
+class ElectronicShutdownEffect final : public QGraphicsEffect {
     Q_OBJECT
     Q_PROPERTY(qreal progress READ progress WRITE setProgress)
     
 public:
-    ElectronicShutdownEffect(QObject* parent = nullptr);
+    explicit ElectronicShutdownEffect(QObject* parent = nullptr);
 
     void setProgress(qreal progress);
 

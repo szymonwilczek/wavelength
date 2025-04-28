@@ -7,12 +7,12 @@
 #include <QStyle>
 
 
-class CyberAudioSlider : public QSlider {
+class CyberAudioSlider final : public QSlider {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberAudioSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
+    explicit CyberAudioSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
 
     double glowIntensity() const { return m_glowIntensity; }
     void setGlowIntensity(double intensity);

@@ -25,31 +25,31 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     setFixedSize(450, 350);
     setAnimationDuration(400);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(12);
 
     // Nagłówek z tytułem
-    QLabel *titleLabel = new QLabel("JOIN WAVELENGTH", this);
+    auto titleLabel = new QLabel("JOIN WAVELENGTH", this);
     titleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     titleLabel->setContentsMargins(0, 0, 0, 3);
     mainLayout->addWidget(titleLabel);
 
     // Panel informacyjny z ID sesji
-    QWidget *infoPanel = new QWidget(this);
-    QHBoxLayout *infoPanelLayout = new QHBoxLayout(infoPanel);
+    auto infoPanel = new QWidget(this);
+    auto infoPanelLayout = new QHBoxLayout(infoPanel);
     infoPanelLayout->setContentsMargins(0, 0, 0, 0);
     infoPanelLayout->setSpacing(5);
 
     QString sessionId = QString("%1-%2")
             .arg(QRandomGenerator::global()->bounded(1000, 9999))
             .arg(QRandomGenerator::global()->bounded(10000, 99999));
-    QLabel *sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
+    auto sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
     sessionLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
     QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-    QLabel *timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
+    auto timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
     timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
     infoPanelLayout->addWidget(sessionLabel);
@@ -58,14 +58,14 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     mainLayout->addWidget(infoPanel);
 
     // Panel instrukcji
-    QLabel *infoLabel = new QLabel("Enter the wavelength frequency (130Hz - 180MHz)", this);
+    auto infoLabel = new QLabel("Enter the wavelength frequency (130Hz - 180MHz)", this);
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     infoLabel->setAlignment(Qt::AlignLeft);
     infoLabel->setWordWrap(true);
     mainLayout->addWidget(infoLabel);
 
     // Formularz
-    QFormLayout *formLayout = new QFormLayout();
+    auto formLayout = new QFormLayout();
     formLayout->setSpacing(12);
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -73,18 +73,18 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     formLayout->setContentsMargins(0, 15, 0, 15);
 
     // Etykieta częstotliwości
-    QLabel* frequencyTitleLabel = new QLabel("FREQUENCY:", this);
+    auto frequencyTitleLabel = new QLabel("FREQUENCY:", this);
     frequencyTitleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Kontener dla pola częstotliwości i selecta jednostki
-    QWidget* freqContainer = new QWidget(this);
-    QHBoxLayout* freqLayout = new QHBoxLayout(freqContainer);
+    auto freqContainer = new QWidget(this);
+    auto freqLayout = new QHBoxLayout(freqContainer);
     freqLayout->setContentsMargins(0, 0, 0, 0);
     freqLayout->setSpacing(5);
 
     // Pole wprowadzania częstotliwości
     frequencyEdit = new CyberLineEdit(this);
-    QDoubleValidator* validator = new QDoubleValidator(130, 180000000.0, 1, this);
+    auto validator = new QDoubleValidator(130, 180000000.0, 1, this);
     QLocale locale(QLocale::English);
     locale.setNumberOptions(QLocale::RejectGroupSeparator);
     validator->setLocale(locale);
@@ -119,12 +119,12 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     formLayout->addRow(frequencyTitleLabel, freqContainer);
 
     // Etykieta informacji o separatorze dziesiętnym
-    QLabel *decimalHintLabel = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
+    auto decimalHintLabel = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
     decimalHintLabel->setStyleSheet("color: #008888; background-color: transparent; font-family: Consolas; font-size: 8pt;");
     formLayout->addRow("", decimalHintLabel);
 
     // Etykieta hasła
-    QLabel* passwordLabel = new QLabel("PASSWORD:", this);
+    auto passwordLabel = new QLabel("PASSWORD:", this);
     passwordLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Pole hasła
@@ -142,7 +142,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     mainLayout->addWidget(statusLabel);
 
     // Panel przycisków
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    auto buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(15);
 
     joinButton = new CyberButton("JOIN WAVELENGTH", this, true);
@@ -173,8 +173,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     m_refreshTimer->setInterval(16);
     connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
         if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
-            int scanLineY = height() * m_digitalizationProgress;
-            int clipSize = 20;
+            const int scanLineY = height() * m_digitalizationProgress;
 
             if (scanLineY != m_lastScanlineY) {
                 // Odśwież tylko obszar wokół aktualnej i poprzedniej pozycji linii skanującej
@@ -201,19 +200,19 @@ JoinWavelengthDialog::~JoinWavelengthDialog() {
     }
 }
 
-void JoinWavelengthDialog::setDigitalizationProgress(double progress) {
+void JoinWavelengthDialog::setDigitalizationProgress(const double progress) {
     if (!m_animationStarted && progress > 0.01)
         m_animationStarted = true;
     m_digitalizationProgress = progress;
     update();
 }
 
-void JoinWavelengthDialog::setCornerGlowProgress(double progress) {
+void JoinWavelengthDialog::setCornerGlowProgress(const double progress) {
     m_cornerGlowProgress = progress;
     update();
 }
 
-void JoinWavelengthDialog::setScanlineOpacity(double opacity) {
+void JoinWavelengthDialog::setScanlineOpacity(const double opacity) {
     m_scanlineOpacity = opacity;
     update();
 }
@@ -255,7 +254,7 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
         initRenderBuffers(); // Inicjalizuje tylko m_scanlineBuffer
 
         int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
-        int clipSize = 20;
+        int clip_size = 20;
 
         if (!m_scanlineBuffer.isNull()) {
             painter.setClipping(false);
@@ -267,8 +266,8 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
             // Oblicz szerokość linii skanującej (bez zmian)
             int startX = 0;
             int endX = width();
-            if (scanLineY < clipSize) { /* ... */ }
-            else if (scanLineY > height() - clipSize) { /* ... */ }
+            if (scanLineY < clip_size) { /* ... */ }
+            else if (scanLineY > height() - clip_size) { /* ... */ }
 
             // Rysuj tylko główną linię skanującą (bez zmian)
             int scanWidth = endX - startX;
@@ -354,8 +353,8 @@ void JoinWavelengthDialog::tryJoin() {
     isJoining = true;
     statusLabel->hide();
 
-    QString frequency = getFrequency();
-    QString password = passwordEdit->text();
+    const QString frequency = getFrequency();
+    const QString password = passwordEdit->text();
 
     // if (frequency < 130 || frequency > 180000000.0) {
     //     statusLabel->setText("FREQUENCY MUST BE BETWEEN 130Hz AND 180MHz");
@@ -365,7 +364,7 @@ void JoinWavelengthDialog::tryJoin() {
     // }
 
     // Animacja scanline podczas łączenia
-    QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
     scanAnim->setDuration(800);
     scanAnim->setStartValue(0.1);
     scanAnim->setEndValue(0.4);
@@ -375,7 +374,7 @@ void JoinWavelengthDialog::tryJoin() {
     WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    auto result = joiner->joinWavelength(frequency, password);
+    const auto result = joiner->joinWavelength(frequency, password);
     QApplication::restoreOverrideCursor();
 
     if (!result.success) {
@@ -383,7 +382,7 @@ void JoinWavelengthDialog::tryJoin() {
         statusLabel->show();
 
         // Animacja błędu (więcej glitchy)
-        QPropertyAnimation* errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+        const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
         errorGlitchAnim->setDuration(1000);
         errorGlitchAnim->setStartValue(0.5);
         errorGlitchAnim->setEndValue(0.0);
@@ -399,7 +398,7 @@ void JoinWavelengthDialog::onAuthFailed(QString frequency) {
     statusLabel->show();
 
     // Animacja błędu autentykacji
-    QPropertyAnimation* errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+    const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
     errorGlitchAnim->setDuration(1000);
     errorGlitchAnim->setStartValue(0.5);
     errorGlitchAnim->setEndValue(0.0);
@@ -422,7 +421,7 @@ void JoinWavelengthDialog::onConnectionError(const QString &errorMessage) {
     statusLabel->show();
 
     // Animacja błędu połączenia
-    QPropertyAnimation* errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+    const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
     errorGlitchAnim->setDuration(1000);
     errorGlitchAnim->setStartValue(0.5);
     errorGlitchAnim->setEndValue(0.0);
@@ -432,8 +431,6 @@ void JoinWavelengthDialog::onConnectionError(const QString &errorMessage) {
 
 void JoinWavelengthDialog::initRenderBuffers() {
     if (!m_buffersInitialized || height() != m_previousHeight) {
-        int clipSize = 20;
-
         // --- ZMIANA: Inicjalizuj tylko bufor głównej linii skanującej ---
         m_scanlineBuffer = QPixmap(width(), 20);
         m_scanlineBuffer.fill(Qt::transparent);

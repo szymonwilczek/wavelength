@@ -11,7 +11,7 @@
 #include <QDir>
 #include <qmath.h>
 
-const char *vertexShaderSource = R"(
+auto vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
 
@@ -155,7 +155,7 @@ const char *vertexShaderSource = R"(
 )";
 
 // Fragment Shader: Bez zmian
-const char *fragmentShaderSource = R"(
+auto fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
 
@@ -196,11 +196,11 @@ const char *fragmentShaderSource = R"(
 // --- Koniec Shaders ---
 
 
-FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget *parent)
+FloatingEnergySphereWidget::FloatingEnergySphereWidget(const bool isFirstTime, QWidget *parent)
     : QOpenGLWidget(parent),
       QOpenGLFunctions_3_3_Core(),
+      m_isFirstTime(isFirstTime),
       m_timeValue(0.0f),
-      m_lastFrameTimeSecs(0.0f),
       m_program(nullptr),
       m_vbo(QOpenGLBuffer::VertexBuffer),
       m_cameraPosition(0.0f, 0.0f, 3.5f),
@@ -210,17 +210,17 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(bool isFirstTime, QWidget
       m_closable(true),
       m_angularVelocity(0.0f, 0.0f, 0.0f),
       m_dampingFactor(0.96f),
+      m_lastFrameTimeSecs(0.0f), // <<< Inicjalizacja
       m_player(nullptr), // <<< Inicjalizacja
       m_decoder(nullptr), // <<< Inicjalizacja
       m_audioBufferDurationMs(0), // <<< Inicjalizacja
       m_currentAudioAmplitude(0.0f), // <<< Inicjalizacja
-      m_audioReady(false), // <<< Inicjalizacja
-      m_isFirstTime(isFirstTime),
-      m_hintTimer(new QTimer(this)),
+      m_audioReady(false),
+      m_nextImpactIndex(0),
+m_hintTimer(new QTimer(this)),
 m_isDestroying(false),
 m_destructionProgress(0.0f),
-m_clickSimulationTimer(new QTimer(this)),
-m_nextImpactIndex(0)
+m_clickSimulationTimer(new QTimer(this))
 {
     if (MAX_IMPACTS > 0) { // Upewnij się, że MAX_IMPACTS jest dodatnie
         m_impacts.resize(MAX_IMPACTS); // <<< DODAJ ZMIANĘ ROZMIARU
@@ -278,7 +278,7 @@ FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
     doneCurrent();
 }
 
-void FloatingEnergySphereWidget::setClosable(bool closable) {
+void FloatingEnergySphereWidget::setClosable(const bool closable) {
     m_closable = closable;
 }
 
@@ -347,8 +347,8 @@ void FloatingEnergySphereWidget::setupAudio()
     connect(m_decoder, &QAudioDecoder::bufferReady, this, &FloatingEnergySphereWidget::processAudioBuffer);
     connect(m_decoder, &QAudioDecoder::finished, this, &FloatingEnergySphereWidget::audioDecodingFinished);
 
-    QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
+    const QString appDirPath = QCoreApplication::applicationDirPath();
+    const QString audioSubDir = "/assets/audio/";
 
     // <<< Wybór nazwy pliku na podstawie flagi >>>
     QString audioFileName;
@@ -370,9 +370,9 @@ void FloatingEnergySphereWidget::setupAudio()
     } else {
         // Spróbuj alternatywnego pliku (np. MP3), jeśli główny nie istnieje
         // LUB zgłoś krytyczny błąd, jeśli wybrany plik jest wymagany
-        QString fallbackFileName = m_isFirstTime ? "JOImp3.mp3" : ""; // Można dodać fallback dla hello_again
+        const QString fallbackFileName = m_isFirstTime ? "JOImp3.mp3" : ""; // Można dodać fallback dla hello_again
         if (!fallbackFileName.isEmpty()) {
-             QString fallbackFilePath = QDir::cleanPath(appDirPath + audioSubDir + fallbackFileName);
+             const QString fallbackFilePath = QDir::cleanPath(appDirPath + audioSubDir + fallbackFileName);
              if (QFile::exists(fallbackFilePath)) {
                  chosenFilePath = fallbackFilePath;
                  chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
@@ -426,17 +426,17 @@ void FloatingEnergySphereWidget::setupShaders()
     }
 }
 
-void FloatingEnergySphereWidget::setupSphereGeometry(int rings, int sectors)
+void FloatingEnergySphereWidget::setupSphereGeometry(const int rings, const int sectors)
 {
     m_vertices.clear();
-    const float PI = 3.14159265359f;
-    float radius = 1.0f;
-    float const R = 1. / (float)(rings - 1);
-    float const S = 1. / (float)(sectors - 1);
+    float const R = 1. / static_cast<float>(rings - 1);
+    float const S = 1. / static_cast<float>(sectors - 1);
     m_vertices.resize(rings * sectors * 3);
     auto v = m_vertices.begin();
     for (int r = 0; r < rings; ++r) {
         for (int s = 0; s < sectors; ++s) {
+            constexpr float radius = 1.0f;
+            constexpr float PI = 3.14159265359f;
             float const y = sin(-PI / 2 + PI * r * R);
             float const x = cos(2 * PI * s * S) * sin(PI * r * R);
             float const z = sin(2 * PI * s * S) * sin(PI * r * R);
@@ -449,7 +449,7 @@ void FloatingEnergySphereWidget::setupSphereGeometry(int rings, int sectors)
 }
 
 
-void FloatingEnergySphereWidget::resizeGL(int w, int h)
+void FloatingEnergySphereWidget::resizeGL(const int w, int h)
 {
     if (h == 0) h = 1; // Zapobieganie dzieleniu przez zero
 
@@ -457,26 +457,26 @@ void FloatingEnergySphereWidget::resizeGL(int w, int h)
     glViewport(0, 0, w, h);
 
     // --- Dynamiczne obliczanie FOV dla stałego rozmiaru sfery ---
-    float aspectRatio = static_cast<float>(w) / static_cast<float>(h);
-    float sphereRadius = 1.0f; // Promień sfery w przestrzeni modelu
+    const float aspectRatio = static_cast<float>(w) / static_cast<float>(h);
+    constexpr float sphereRadius = 1.0f; // Promień sfery w przestrzeni modelu
     // Współczynnik określający, jaką część mniejszego wymiaru widgetu ma zajmować sfera
     // Np. 1.1 oznacza, że sfera zajmie ok. 91% mniejszego wymiaru, dając mały margines.
     // Zwiększ tę wartość, aby sfera była mniejsza (większy margines).
     // Zmniejsz (bliżej 1.0), aby była większa (mniejszy margines).
-    float paddingFactor = 2.0f;
+    constexpr float paddingFactor = 2.0f;
 
     // Oblicz tangens połowy wymaganego kąta widzenia, aby zmieścić sferę z marginesem
     // Musimy zapewnić, że zmieści się zarówno w pionie, jak i w poziomie.
     // Wybieramy większy z wymaganych kątów (co odpowiada mniejszemu wymiarowi).
-    float requiredTanHalfFovVertical = (sphereRadius * paddingFactor) / m_cameraDistance;
-    float requiredTanHalfFovHorizontal = (sphereRadius * paddingFactor) / m_cameraDistance; // Dla sfery to to samo
+    const float requiredTanHalfFovVertical = (sphereRadius * paddingFactor) / m_cameraDistance;
+    const float requiredTanHalfFovHorizontal = (sphereRadius * paddingFactor) / m_cameraDistance; // Dla sfery to to samo
 
     // Oblicz tangens połowy pionowego FOV, który zapewni dopasowanie w obu osiach
-    float tanHalfFovY = qMax(requiredTanHalfFovVertical, requiredTanHalfFovHorizontal / aspectRatio);
+    const float tanHalfFovY = qMax(requiredTanHalfFovVertical, requiredTanHalfFovHorizontal / aspectRatio);
 
     // Oblicz pionowy FOV w radianach, a następnie przekonwertuj na stopnie
-    float fovYRadians = 2.0f * atan(tanHalfFovY);
-    float fovYDegrees = qRadiansToDegrees(fovYRadians);
+    const float fovYRadians = 2.0f * atan(tanHalfFovY);
+    const float fovYDegrees = qRadiansToDegrees(fovYRadians);
 
     // Ustawienie macierzy projekcji perspektywicznej z obliczonym FOV
     m_projectionMatrix.setToIdentity();
@@ -545,7 +545,7 @@ void FloatingEnergySphereWidget::paintGL()
 
 void FloatingEnergySphereWidget::updateAnimation()
 {
-    float currentTimeSecs = m_elapsedTimer.elapsed() / 1000.0f;
+    const float currentTimeSecs = m_elapsedTimer.elapsed() / 1000.0f;
     float deltaTime = currentTimeSecs - m_lastFrameTimeSecs;
     m_lastFrameTimeSecs = currentTimeSecs;
     deltaTime = qMin(deltaTime, 0.05f);
@@ -556,7 +556,7 @@ void FloatingEnergySphereWidget::updateAnimation()
     if (m_isDestroying) {
         // Zwiększaj postęp zniszczenia
         // Dostosuj czas trwania do długości dźwięku "goodbye.wav" lub własnych preferencji
-        float destructionDuration = 8.0f;
+        constexpr float destructionDuration = 8.0f;
         m_destructionProgress += deltaTime / destructionDuration;
         m_destructionProgress = qBound(0.0f, m_destructionProgress, 1.0f);
 
@@ -570,7 +570,7 @@ void FloatingEnergySphereWidget::updateAnimation()
         return; // Zakończ updateAnimation tutaj dla stanu niszczenia
     }
 
-    bool isPlaying = (m_player && m_player->state() == QMediaPlayer::PlayingState);
+    const bool isPlaying = (m_player && m_player->state() == QMediaPlayer::PlayingState);
 
     // --- Usunięto logikę blend factor ---
     // float targetBlendFactor = isPlaying ? 0.0f : 1.0f;
@@ -580,8 +580,8 @@ void FloatingEnergySphereWidget::updateAnimation()
 
     // --- Aktualizacja docelowej amplitudy (pozostaje bez zmian) ---
     if (isPlaying && m_audioReady && m_audioBufferDurationMs > 0) {
-        qint64 currentPositionMs = m_player->position();
-        int bufferIndex = static_cast<int>(currentPositionMs / m_audioBufferDurationMs);
+        const qint64 currentPositionMs = m_player->position();
+        const int bufferIndex = static_cast<int>(currentPositionMs / m_audioBufferDurationMs);
         if (bufferIndex >= 0 && bufferIndex < m_audioAmplitudes.size()) {
             m_targetAudioAmplitude = m_audioAmplitudes[bufferIndex];
         } else {
@@ -592,13 +592,13 @@ void FloatingEnergySphereWidget::updateAnimation()
     }
 
     // --- Płynne przejście dla aktualnej amplitudy (pozostaje bez zmian) ---
-    float amplitudeSmoothingFactor = 10.0f;
+    constexpr float amplitudeSmoothingFactor = 10.0f;
     m_currentAudioAmplitude += (m_targetAudioAmplitude - m_currentAudioAmplitude) * amplitudeSmoothingFactor * deltaTime;
 
     // --- Przywrócono oryginalną logikę obrotu (zawsze aktywna) ---
     if (!m_mousePressed && m_angularVelocity.lengthSquared() > 0.0001f) {
-        float rotationAngle = m_angularVelocity.length() * deltaTime;
-        QQuaternion deltaRotation = QQuaternion::fromAxisAndAngle(m_angularVelocity.normalized(), rotationAngle);
+        const float rotationAngle = m_angularVelocity.length() * deltaTime;
+        const QQuaternion deltaRotation = QQuaternion::fromAxisAndAngle(m_angularVelocity.normalized(), rotationAngle);
         m_rotation = deltaRotation * m_rotation;
         m_rotation.normalize();
         // Oryginalne tłumienie
@@ -608,7 +608,7 @@ void FloatingEnergySphereWidget::updateAnimation()
         }
     } else if (!m_mousePressed) {
         // Oryginalny stały obrót
-        QQuaternion slowSpin = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 2.0f * deltaTime);
+        const QQuaternion slowSpin = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 2.0f * deltaTime);
         m_rotation = slowSpin * m_rotation;
         m_rotation.normalize();
     }
@@ -622,7 +622,7 @@ void FloatingEnergySphereWidget::processAudioBuffer()
 {
     if (!m_decoder) return;
 
-    QAudioBuffer buffer = m_decoder->read();
+    const QAudioBuffer buffer = m_decoder->read();
     if (!buffer.isValid()) {
         qWarning() << "Invalid audio buffer received from decoder.";
         return;
@@ -634,9 +634,9 @@ void FloatingEnergySphereWidget::processAudioBuffer()
             m_audioBufferDurationMs = buffer.duration() / 1000; // duration() jest w mikrosekundach
             qDebug() << "Audio format set:" << m_audioFormat << "Buffer duration (ms):" << m_audioBufferDurationMs;
             // Oszacuj całkowitą liczbę buforów, jeśli dekoder podaje czas trwania
-            qint64 totalDurationMs = m_decoder->duration() / 1000;
+            const qint64 totalDurationMs = m_decoder->duration() / 1000;
              if (totalDurationMs > 0 && m_audioBufferDurationMs > 0) {
-                 int estimatedBuffers = static_cast<int>(totalDurationMs / m_audioBufferDurationMs) + 1;
+                 const int estimatedBuffers = static_cast<int>(totalDurationMs / m_audioBufferDurationMs) + 1;
                  m_audioAmplitudes.reserve(estimatedBuffers);
                  qDebug() << "Reserved space for approx." << estimatedBuffers << "amplitude values.";
              }
@@ -648,7 +648,7 @@ void FloatingEnergySphereWidget::processAudioBuffer()
     }
 
     // Oblicz i zapisz amplitudę RMS dla tego bufora
-    float amplitude = calculateRMSAmplitude(buffer);
+    const float amplitude = calculateRMSAmplitude(buffer);
     m_targetAudioAmplitude = amplitude;
     m_audioAmplitudes.push_back(amplitude);
 
@@ -660,8 +660,7 @@ void FloatingEnergySphereWidget::processAudioBuffer()
 }
 
 // <<< Nowa funkcja do obliczania amplitudy RMS >>>
-float FloatingEnergySphereWidget::calculateRMSAmplitude(const QAudioBuffer& buffer)
-{
+float FloatingEnergySphereWidget::calculateRMSAmplitude(const QAudioBuffer& buffer) const {
     if (!buffer.isValid() || buffer.frameCount() == 0 || !m_audioFormat.isValid()) {
         return 0.0f;
     }
@@ -673,7 +672,7 @@ float FloatingEnergySphereWidget::calculateRMSAmplitude(const QAudioBuffer& buff
     if (channelCount <= 0 || bytesPerSample <= 0) return 0.0f;
 
     double sumOfSquares = 0.0;
-    const unsigned char* dataPtr = reinterpret_cast<const unsigned char*>(buffer.constData());
+    const auto dataPtr = static_cast<const unsigned char*>(buffer.constData());
 
     // Przetwarzaj tylko pierwszy kanał dla uproszczenia
     for (qint64 i = 0; i < frameCount; ++i) {
@@ -713,20 +712,19 @@ float FloatingEnergySphereWidget::calculateRMSAmplitude(const QAudioBuffer& buff
     }
 
     // Oblicz RMS i znormalizuj (bardzo prosta normalizacja, może wymagać dostosowania)
-    double meanSquare = sumOfSquares / frameCount;
-    float rms = static_cast<float>(sqrt(meanSquare));
+    const double meanSquare = sumOfSquares / frameCount;
+    const float rms = static_cast<float>(sqrt(meanSquare));
 
     // Prosta normalizacja - zakładamy, że maksymalna amplituda RMS to ok. 0.707 dla pełnej fali sinusoidalnej
     // Można dostosować ten współczynnik lub wprowadzić dynamiczną normalizację
-    float normalizedRms = qBound(0.0f, rms / 0.707f, 1.0f);
+    const float normalizedRms = qBound(0.0f, rms / 0.707f, 1.0f);
 
     return normalizedRms;
 }
 
 
 // <<< Nowy slot wywoływany po zakończeniu dekodowania >>>
-void FloatingEnergySphereWidget::audioDecodingFinished()
-{
+void FloatingEnergySphereWidget::audioDecodingFinished() const {
     qDebug() << "Audio decoding finished. Total amplitude values stored:" << m_audioAmplitudes.size();
     // Można tu zwolnić dekoder, jeśli nie jest już potrzebny
     // delete m_decoder;
@@ -734,8 +732,7 @@ void FloatingEnergySphereWidget::audioDecodingFinished()
 }
 
 // <<< Nowy slot do obsługi błędów odtwarzacza >>>
-void FloatingEnergySphereWidget::handleMediaPlayerError()
-{
+void FloatingEnergySphereWidget::handleMediaPlayerError() const {
      if(m_player) {
         qCritical() << "Media Player Error:" << m_player->errorString();
      } else {
@@ -765,20 +762,20 @@ void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event)
 void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_mousePressed && (event->buttons() & Qt::LeftButton)) {
-        QPoint delta = event->pos() - m_lastMousePos;
+        const QPoint delta = event->pos() - m_lastMousePos;
         m_lastMousePos = event->pos();
 
-        float sensitivity = 0.2f; // Dostosuj czułość obrotu
-        float angularSpeedX = (float)-delta.y() * sensitivity;
-        float angularSpeedY = (float)-delta.x() * sensitivity;
+        constexpr float sensitivity = 0.2f; // Dostosuj czułość obrotu
+        const float angularSpeedX = static_cast<float>(-delta.y()) * sensitivity;
+        const float angularSpeedY = static_cast<float>(-delta.x()) * sensitivity;
 
         // Ustawiamy prędkość kątową (teraz w stopniach/klatkę, skalowanie w updateAnimation)
         m_angularVelocity = QVector3D(angularSpeedX, angularSpeedY, 0.0f);
 
 
         // Natychmiastowy obrót podczas przeciągania dla responsywności
-        QQuaternion rotationX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angularSpeedX);
-        QQuaternion rotationY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angularSpeedY);
+        const QQuaternion rotationX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angularSpeedX);
+        const QQuaternion rotationY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angularSpeedY);
         m_rotation = rotationY * rotationX * m_rotation;
         m_rotation.normalize();
 
@@ -804,7 +801,7 @@ void FloatingEnergySphereWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void FloatingEnergySphereWidget::wheelEvent(QWheelEvent *event)
 {
-    int delta = event->angleDelta().y();
+    const int delta = event->angleDelta().y();
     if (delta > 0) {
         m_cameraDistance *= 0.95f;
     } else if (delta < 0) {
@@ -819,7 +816,7 @@ void FloatingEnergySphereWidget::wheelEvent(QWheelEvent *event)
 
 void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
 {
-    int key = event->key();
+    const int key = event->key();
     qDebug() << "Key pressed:" << QKeySequence(key).toString();
 
     // Dodaj klawisz do sekwencji
@@ -877,13 +874,12 @@ void FloatingEnergySphereWidget::startDestructionSequence()
     }
 
     // Znajdź i odtwórz dźwięk "goodbye.wav"
-    QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
-    QString goodbyeFilePath = QDir::cleanPath(appDirPath + audioSubDir + GOODBYE_SOUND_FILENAME);
-    QUrl goodbyeFileUrl;
+    const QString appDirPath = QCoreApplication::applicationDirPath();
+    const QString audioSubDir = "/assets/audio/";
+    const QString goodbyeFilePath = QDir::cleanPath(appDirPath + audioSubDir + GOODBYE_SOUND_FILENAME);
 
     if (QFile::exists(goodbyeFilePath)) {
-        goodbyeFileUrl = QUrl::fromLocalFile(goodbyeFilePath);
+        const QUrl goodbyeFileUrl = QUrl::fromLocalFile(goodbyeFilePath);
         qDebug() << "Playing destruction audio:" << goodbyeFilePath;
         m_player->setMedia(goodbyeFileUrl);
         m_player->setVolume(80); // Ustaw głośność
@@ -899,7 +895,7 @@ void FloatingEnergySphereWidget::startDestructionSequence()
 }
 
 // --- Nowy slot do obsługi zmiany stanu odtwarzacza ---
-void FloatingEnergySphereWidget::handlePlayerStateChanged(QMediaPlayer::State state)
+void FloatingEnergySphereWidget::handlePlayerStateChanged(const QMediaPlayer::State state)
 {
     qDebug() << "Player state changed to:" << state;
 
@@ -945,8 +941,7 @@ void FloatingEnergySphereWidget::handlePlayerStateChanged(QMediaPlayer::State st
 
 
 // --- Nowy slot do odtwarzania podpowiedzi ---
-void FloatingEnergySphereWidget::playKonamiHint()
-{
+void FloatingEnergySphereWidget::playKonamiHint() const {
     qDebug() << "Hint timer timed out. Attempting to play Konami hint.";
 
     // Sprawdź, czy widget jest nadal widoczny/aktywny
@@ -955,14 +950,13 @@ void FloatingEnergySphereWidget::playKonamiHint()
         return;
     }
 
-    QString appDirPath = QCoreApplication::applicationDirPath();
-    QString audioSubDir = "/assets/audio/";
-    QString hintFileName = "konami.wav"; // Nazwa pliku podpowiedzi
-    QString hintFilePath = QDir::cleanPath(appDirPath + audioSubDir + hintFileName);
-    QUrl hintFileUrl;
+    const QString appDirPath = QCoreApplication::applicationDirPath();
+    const QString audioSubDir = "/assets/audio/";
+    const QString hintFileName = "konami.wav"; // Nazwa pliku podpowiedzi
+    const QString hintFilePath = QDir::cleanPath(appDirPath + audioSubDir + hintFileName);
 
     if (QFile::exists(hintFilePath)) {
-        hintFileUrl = QUrl::fromLocalFile(hintFilePath);
+        const QUrl hintFileUrl = QUrl::fromLocalFile(hintFilePath);
         qDebug() << "Playing Konami hint audio:" << hintFilePath;
 
         // Zatrzymaj dekoder, jeśli działał (nie powinien, ale na wszelki wypadek)
@@ -1013,16 +1007,16 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
     makeCurrent(); // Upewnij się, że kontekst GL jest aktywny
 
     // --- Logika Ray Casting (przeniesiona z mousePressEvent) ---
-    float winX = screenPos.x();
-    float winY = height() - screenPos.y(); // Odwróć Y dla OpenGL
+    const float winX = screenPos.x();
+    const float winY = height() - screenPos.y(); // Odwróć Y dla OpenGL
 
     // Potrzebujemy aktualnych macierzy widoku i projekcji
     // Jeśli nie są one składowymi klasy, trzeba je będzie uzyskać/obliczyć tutaj
     // Zakładając, że m_viewMatrix i m_projectionMatrix są aktualne:
-    QMatrix4x4 viewProj = m_projectionMatrix * m_viewMatrix * m_modelMatrix; // Połączone macierze
+    const QMatrix4x4 viewProj = m_projectionMatrix * m_viewMatrix * m_modelMatrix; // Połączone macierze
 
     bool invertible;
-    QMatrix4x4 inverseViewProj = viewProj.inverted(&invertible);
+    const QMatrix4x4 inverseViewProj = viewProj.inverted(&invertible);
 
     if (!invertible) {
         qWarning() << "Cannot invert view-projection matrix for ray casting.";
@@ -1031,12 +1025,12 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
     }
 
     // Normalizowane współrzędne urządzenia (NDC)
-    float ndcX = (2.0f * winX) / width() - 1.0f;
-    float ndcY = (2.0f * winY) / height() - 1.0f; // Y już odwrócone wcześniej
+    const float ndcX = (2.0f * winX) / width() - 1.0f;
+    const float ndcY = (2.0f * winY) / height() - 1.0f; // Y już odwrócone wcześniej
 
     // Współrzędne w przestrzeni świata (lub oka, zależnie od macierzy)
-    QVector4D nearPointH = inverseViewProj * QVector4D(ndcX, ndcY, -1.0f, 1.0f); // Bliska płaszczyzna
-    QVector4D farPointH  = inverseViewProj * QVector4D(ndcX, ndcY,  1.0f, 1.0f); // Daleka płaszczyzna
+    const QVector4D nearPointH = inverseViewProj * QVector4D(ndcX, ndcY, -1.0f, 1.0f); // Bliska płaszczyzna
+    const QVector4D farPointH  = inverseViewProj * QVector4D(ndcX, ndcY,  1.0f, 1.0f); // Daleka płaszczyzna
 
     if (qAbs(nearPointH.w()) < 1e-6 || qAbs(farPointH.w()) < 1e-6) {
          qWarning() << "W component is zero during unprojection.";
@@ -1045,38 +1039,38 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
     }
 
     // Podziel przez W, aby uzyskać współrzędne 3D
-    QVector3D nearPoint = nearPointH.toVector3DAffine(); // nearPointH.toVector3D() / nearPointH.w();
-    QVector3D farPoint  = farPointH.toVector3DAffine(); // farPointH.toVector3D() / farPointH.w();
+    const QVector3D nearPoint = nearPointH.toVector3DAffine(); // nearPointH.toVector3D() / nearPointH.w();
+    const QVector3D farPoint  = farPointH.toVector3DAffine(); // farPointH.toVector3D() / farPointH.w();
 
 
     // Kierunek promienia (z punktu widzenia kamery)
-    QVector3D rayDir = (farPoint - nearPoint).normalized();
+    const QVector3D rayDir = (farPoint - nearPoint).normalized();
     // Początek promienia (pozycja kamery w przestrzeni modelu)
     // Można użyć nearPoint lub pozycji kamery, jeśli jest znana
-    QVector3D rayOrigin = nearPoint; // Użycie nearPoint jest często wystarczające
+    const QVector3D rayOrigin = nearPoint; // Użycie nearPoint jest często wystarczające
 
 
     // Przecięcie Promień-Sfera (centrum w 0,0,0, promień ~1.0)
-    float R = 1.0f; // Załóżmy promień 1.0
-    float a = QVector3D::dotProduct(rayDir, rayDir); // Powinno być 1.0, jeśli znormalizowany
-    float b = 2.0f * QVector3D::dotProduct(rayOrigin, rayDir);
-    float c = QVector3D::dotProduct(rayOrigin, rayOrigin) - R * R;
+    constexpr float R = 1.0f; // Załóżmy promień 1.0
+    const float a = QVector3D::dotProduct(rayDir, rayDir); // Powinno być 1.0, jeśli znormalizowany
+    const float b = 2.0f * QVector3D::dotProduct(rayOrigin, rayDir);
+    const float c = QVector3D::dotProduct(rayOrigin, rayOrigin) - R * R;
 
-    float discriminant = b * b - 4.0f * a * c;
+    const float discriminant = b * b - 4.0f * a * c;
 
     if (discriminant >= 0) {
-        float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
+        const float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
         // float t2 = (-b + std::sqrt(discriminant)) / (2.0f * a); // Drugi punkt przecięcia
-        float t = t1; // Bierzemy bliższy punkt
+        const float t = t1; // Bierzemy bliższy punkt
 
         if (t > 0.001f) { // Sprawdź, czy przecięcie jest przed kamerą
-            QVector3D intersectionPoint = rayOrigin + t * rayDir;
-            QVector3D normalizedImpactPoint = intersectionPoint.normalized(); // Punkt na sferze jednostkowej
+            const QVector3D intersectionPoint = rayOrigin + t * rayDir;
+            const QVector3D normalizedImpactPoint = intersectionPoint.normalized(); // Punkt na sferze jednostkowej
 
             // --- Dodaj efekt uderzenia ---
             if (MAX_IMPACTS > 0) { // Sprawdź, czy tablica/wektor może istnieć
                 // Modulo zapewni, że indeks jest w zakresie [0, MAX_IMPACTS-1]
-                int indexToUse = m_nextImpactIndex % MAX_IMPACTS;
+                const int indexToUse = m_nextImpactIndex % MAX_IMPACTS;
 
                 // Dodatkowe sprawdzenie (jeśli używasz wektora i nie masz pewności co do rozmiaru)
                 // if (indexToUse >= 0 && indexToUse < m_impacts.size()) {
@@ -1111,7 +1105,7 @@ void FloatingEnergySphereWidget::simulateClick() {
     std::uniform_int_distribution<> distribX(0, width() - 1);
     std::uniform_int_distribution<> distribY(0, height() - 1);
 
-    QPoint randomScreenPos(distribX(gen), distribY(gen));
+    const QPoint randomScreenPos(distribX(gen), distribY(gen));
 
     // Wywołaj logikę uderzenia dla wylosowanego punktu
     triggerImpactAtScreenPos(randomScreenPos);

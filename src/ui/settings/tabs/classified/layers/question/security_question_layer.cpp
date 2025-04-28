@@ -6,14 +6,14 @@
 SecurityQuestionLayer::SecurityQuestionLayer(QWidget *parent) 
     : SecurityLayer(parent), m_securityQuestionTimer(nullptr)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel("SECURITY QUESTION VERIFICATION", this);
+    const auto title = new QLabel("SECURITY QUESTION VERIFICATION", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    QLabel *instructions = new QLabel("Answer your security question", this);
+    const auto instructions = new QLabel("Answer your security question", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -95,8 +95,7 @@ void SecurityQuestionLayer::reset() {
     m_securityQuestionLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
     m_securityQuestionInput->setReadOnly(false);
 
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
@@ -124,10 +123,10 @@ void SecurityQuestionLayer::checkSecurityAnswer() {
     // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
     QTimer::singleShot(800, this, [this]() {
         // Animacja zanikania
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+        const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
 
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+        const auto animation = new QPropertyAnimation(effect, "opacity");
         animation->setDuration(500);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);
@@ -141,7 +140,7 @@ void SecurityQuestionLayer::checkSecurityAnswer() {
     });
 }
 
-void SecurityQuestionLayer::securityQuestionTimeout() {
+void SecurityQuestionLayer::securityQuestionTimeout() const {
     // Po 10 sekundach pokazujemy podpowiedź
     m_securityQuestionLabel->setText("If this was really you, you would know the answer.\nYou don't need a question.");
 }

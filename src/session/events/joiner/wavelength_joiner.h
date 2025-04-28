@@ -11,7 +11,7 @@ struct JoinResult {
     QString errorReason;
 };
 
-class WavelengthJoiner : public QObject {
+class WavelengthJoiner final : public QObject {
     Q_OBJECT
 
 public:
@@ -31,8 +31,8 @@ signals:
     void wavelengthLeft(QString frequency);
 
 private:
-    WavelengthJoiner(QObject* parent = nullptr) : QObject(parent) {}
-    ~WavelengthJoiner() {}
+    explicit WavelengthJoiner(QObject* parent = nullptr) : QObject(parent) {}
+    ~WavelengthJoiner() override {}
 
     WavelengthJoiner(const WavelengthJoiner&) = delete;
     WavelengthJoiner& operator=(const WavelengthJoiner&) = delete;

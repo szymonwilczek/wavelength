@@ -7,12 +7,12 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     setObjectName("chatViewContainer");
 
     // Podstawowy layout
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    const auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(15);
 
     // Nagłówek z dodatkowym efektem
-    QHBoxLayout *headerLayout = new QHBoxLayout();
+    const auto headerLayout = new QHBoxLayout();
     headerLayout->setContentsMargins(0, 0, 0, 0);
 
     headerLabel = new QLabel(this);
@@ -40,34 +40,34 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     mainLayout->addWidget(messageArea, 1);
 
     // Panel informacji technicznych
-    QWidget *infoPanel = new QWidget(this);
-    QHBoxLayout *infoLayout = new QHBoxLayout(infoPanel);
+    const auto infoPanel = new QWidget(this);
+    const auto infoLayout = new QHBoxLayout(infoPanel);
     infoLayout->setContentsMargins(3, 3, 3, 3);
     infoLayout->setSpacing(10);
 
     // Techniczne etykiety w stylu cyberpunk
-    QString infoStyle =
+    const QString infoStyle =
             "color: #00aaff;"
             "background-color: transparent;"
             "font-family: 'Consolas';"
             "font-size: 8pt;";
 
-    QLabel *sessionLabel = new QLabel(QString("SID:%1").arg(QRandomGenerator::global()->bounded(1000, 9999)), this);
+    const auto sessionLabel = new QLabel(QString("SID:%1").arg(QRandomGenerator::global()->bounded(1000, 9999)), this);
     sessionLabel->setStyleSheet(infoStyle);
     infoLayout->addWidget(sessionLabel);
 
-    QLabel *bufferLabel = new QLabel("BUFFER:100%", this);
+    const auto bufferLabel = new QLabel("BUFFER:100%", this);
     bufferLabel->setStyleSheet(infoStyle);
     infoLayout->addWidget(bufferLabel);
 
     infoLayout->addStretch();
 
-    QLabel *timeLabel = new QLabel(QDateTime::currentDateTime().toString("HH:mm:ss"), this);
+    auto timeLabel = new QLabel(QDateTime::currentDateTime().toString("HH:mm:ss"), this);
     timeLabel->setStyleSheet(infoStyle);
     infoLayout->addWidget(timeLabel);
 
     // Timer dla aktualnego czasu
-    QTimer *timeTimer = new QTimer(this);
+    const auto timeTimer = new QTimer(this);
     connect(timeTimer, &QTimer::timeout, [timeLabel]() {
         timeLabel->setText(QDateTime::currentDateTime().toString("HH:mm:ss"));
     });
@@ -76,7 +76,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     mainLayout->addWidget(infoPanel);
 
     // Panel wprowadzania wiadomości
-    QHBoxLayout *inputLayout = new QHBoxLayout();
+    const auto inputLayout = new QHBoxLayout();
     inputLayout->setSpacing(10);
 
     // Przycisk załączania plików - niestandardowy wygląd
@@ -141,13 +141,13 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     connect(attachButton, &QPushButton::clicked, this, &WavelengthChatView::attachFile);
     connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
 
-    WavelengthMessageService *messageService = WavelengthMessageService::getInstance();
+    const WavelengthMessageService *messageService = WavelengthMessageService::getInstance();
     connect(messageService, &WavelengthMessageService::progressMessageUpdated,
             this, &WavelengthChatView::updateProgressMessage);
     // connect(messageService, &WavelengthMessageService::removeProgressMessage,
     //         this, &WavelengthChatView::removeProgressMessage);
 
-    WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+    const WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
     connect(coordinator, &WavelengthSessionCoordinator::pttGranted, this, &WavelengthChatView::onPttGranted);
     connect(coordinator, &WavelengthSessionCoordinator::pttDenied, this, &WavelengthChatView::onPttDenied);
     connect(coordinator, &WavelengthSessionCoordinator::pttStartReceiving, this, &WavelengthChatView::onPttStartReceiving);
@@ -155,11 +155,11 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     connect(coordinator, &WavelengthSessionCoordinator::audioDataReceived, this, &WavelengthChatView::onAudioDataReceived);
 
     // Timer dla efektów wizualnych
-    QTimer *glitchTimer = new QTimer(this);
+    const auto glitchTimer = new QTimer(this);
     connect(glitchTimer, &QTimer::timeout, this, &WavelengthChatView::triggerVisualEffect);
     glitchTimer->start(5000 + QRandomGenerator::global()->bounded(5000));
 
-    setVisible(false);
+    QWidget::setVisible(false);
 }
 
 WavelengthChatView::~WavelengthChatView() {
@@ -171,12 +171,12 @@ WavelengthChatView::~WavelengthChatView() {
     // m_inputDevice i m_outputDevice są zarządzane przez QAudioInput/Output
 }
 
-void WavelengthChatView::setScanlineOpacity(double opacity) {
+void WavelengthChatView::setScanlineOpacity(const double opacity) {
     m_scanlineOpacity = opacity;
     update();
 }
 
-void WavelengthChatView::setWavelength(QString frequency, const QString &name) {
+void WavelengthChatView::setWavelength(const QString &frequency, const QString &name) {
     currentFrequency = frequency;
 
     resetStatusIndicator();
@@ -191,7 +191,7 @@ void WavelengthChatView::setWavelength(QString frequency, const QString &name) {
 
     messageArea->clear();
 
-    QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Połączono z wavelength %1 Hz o %2</span>")
+    const QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Połączono z wavelength %1 Hz o %2</span>")
             .arg(frequency)
             .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
     messageArea->addMessage(welcomeMsg, "system", StreamMessage::MessageType::System);
@@ -214,7 +214,7 @@ void WavelengthChatView::setWavelength(QString frequency, const QString &name) {
     updatePttButtonState();
 }
 
-void WavelengthChatView::onMessageReceived(QString frequency, const QString &message) {
+void WavelengthChatView::onMessageReceived(const QString &frequency, const QString &message) {
     if (frequency != currentFrequency) return;
     QTimer::singleShot(0, this, [this, message]() {
         messageArea->addMessage(message, QString(), StreamMessage::MessageType::Received);
@@ -222,12 +222,12 @@ void WavelengthChatView::onMessageReceived(QString frequency, const QString &mes
     });
 }
 
-void WavelengthChatView::onMessageSent(QString frequency, const QString &message) {
+void WavelengthChatView::onMessageSent(const QString &frequency, const QString &message) const {
     if (frequency != currentFrequency) return;
     messageArea->addMessage(message, QString(), StreamMessage::MessageType::Transmitted);
 }
 
-void WavelengthChatView::onWavelengthClosed(QString frequency) {
+void WavelengthChatView::onWavelengthClosed(const QString &frequency) {
     if (frequency != currentFrequency || m_isAborting) {
         return;
     }
@@ -242,7 +242,7 @@ void WavelengthChatView::onWavelengthClosed(QString frequency) {
         "font-size: 9pt;"
     );
 
-    QString closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength zostało zamknięte przez hosta.</span>");
+    const auto closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength zostało zamknięte przez hosta.</span>");
     messageArea->addMessage(closeMsg, "system", StreamMessage::MessageType::System);
 
     QTimer::singleShot(2000, this, [this]() {
@@ -260,7 +260,7 @@ void WavelengthChatView::clear() {
 }
 
 void WavelengthChatView::attachFile() {
-    QString filePath = QFileDialog::getOpenFileName(this,
+    const QString filePath = QFileDialog::getOpenFileName(this,
                                                     "Select File to Attach",
                                                     QString(),
                                                     "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
@@ -270,21 +270,21 @@ void WavelengthChatView::attachFile() {
     }
 
     // Pobieramy nazwę pliku
-    QFileInfo fileInfo(filePath);
-    QString fileName = fileInfo.fileName();
+    const QFileInfo fileInfo(filePath);
+    const QString fileName = fileInfo.fileName();
 
     // Generujemy identyfikator dla komunikatu
-    QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
+    const QString progressMsgId = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
 
     // Wyświetlamy początkowy komunikat
-    QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
+    const QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
             .arg(fileName);
 
     messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
 
     // Uruchamiamy asynchroniczny proces przetwarzania pliku
     WavelengthMessageService *service = WavelengthMessageService::getInstance();
-    bool started = service->sendFileMessage(filePath, progressMsgId);
+    const bool started = service->sendFileMessage(filePath, progressMsgId);
 
     if (!started) {
         messageArea->addMessage(progressMsgId,
@@ -300,12 +300,12 @@ void WavelengthChatView::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Rysowanie ramki w stylu AR/cyberpunk
-    QColor borderColor(0, 170, 255);
+    constexpr QColor borderColor(0, 170, 255);
     painter.setPen(QPen(borderColor, 1));
 
     // Zewnętrzna technologiczna ramka ze ściętymi rogami
     QPainterPath frame;
-    int clipSize = 15;
+    constexpr int clipSize = 15;
 
     // Górna krawędź
     frame.moveTo(clipSize, 0);
@@ -336,7 +336,7 @@ void WavelengthChatView::paintEvent(QPaintEvent *event) {
 
     // Znaczniki AR w rogach
     painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-    int markerSize = 8;
+    constexpr int markerSize = 8;
 
     // Lewy górny
     painter.drawLine(clipSize, 5, clipSize + markerSize, 5);
@@ -409,7 +409,7 @@ void WavelengthChatView::onPttButtonReleased() {
     pttButton->setStyleSheet("");
 }
 
-void WavelengthChatView::onPttGranted(QString frequency) {
+void WavelengthChatView::onPttGranted(const QString &frequency) {
     if (frequency == currentFrequency && m_pttState == Requesting) {
         qDebug() << "PTT Granted for" << frequency;
         m_pttState = Transmitting;
@@ -425,7 +425,7 @@ void WavelengthChatView::onPttGranted(QString frequency) {
     }
 }
 
-void WavelengthChatView::onPttDenied(QString frequency, QString reason) {
+void WavelengthChatView::onPttDenied(const QString &frequency, const QString &reason) {
     if (frequency == currentFrequency && m_pttState == Requesting) {
         qDebug() << "PTT Denied for" << frequency << ":" << reason;
         // Wyświetl powód odmowy (opcjonalnie)
@@ -439,7 +439,7 @@ void WavelengthChatView::onPttDenied(QString frequency, QString reason) {
     }
 }
 
-void WavelengthChatView::onPttStartReceiving(QString frequency, QString senderId) {
+void WavelengthChatView::onPttStartReceiving(const QString &frequency, const QString &senderId) {
     if (frequency == currentFrequency && m_pttState == Idle) {
         qDebug() << "Starting to receive PTT audio from" << senderId << "on" << frequency;
         m_pttState = Receiving;
@@ -455,7 +455,7 @@ void WavelengthChatView::onPttStartReceiving(QString frequency, QString senderId
     }
 }
 
-void WavelengthChatView::onPttStopReceiving(QString frequency) {
+void WavelengthChatView::onPttStopReceiving(const QString &frequency) {
     if (frequency == currentFrequency && m_pttState == Receiving) {
         qDebug() << "Stopping PTT audio reception on" << frequency;
         stopAudioOutput();
@@ -470,7 +470,7 @@ void WavelengthChatView::onPttStopReceiving(QString frequency) {
     }
 }
 
-void WavelengthChatView::onAudioDataReceived(QString frequency, const QByteArray &audioData) {
+void WavelengthChatView::onAudioDataReceived(const QString &frequency, const QByteArray &audioData) const {
     if (frequency == currentFrequency && m_pttState == Receiving) {
         if (m_audioOutput) {
             qDebug() << "[CLIENT] onAudioDataReceived: Current Audio Output State before write:" << m_audioOutput->state();
@@ -480,7 +480,7 @@ void WavelengthChatView::onAudioDataReceived(QString frequency, const QByteArray
         }
 
         if (m_outputDevice) {
-            qint64 bytesWritten = m_outputDevice->write(audioData);
+            const qint64 bytesWritten = m_outputDevice->write(audioData);
 
             if (bytesWritten < 0) {
                 qWarning() << "Audio Output Error writing data:" << m_audioOutput->error();
@@ -491,7 +491,7 @@ void WavelengthChatView::onAudioDataReceived(QString frequency, const QByteArray
             if (bytesWritten > 0) {
                 // --- OBLICZ AMPLITUDĘ I ZAKTUALIZUJ WIZUALIZACJĘ ODBIORCY ---
                 // Używamy danych, które faktycznie zostały zapisane (lub całego bufora, jeśli zapis się powiódł)
-                qreal amplitude = calculateAmplitude(audioData.left(bytesWritten));
+                const qreal amplitude = calculateAmplitude(audioData.left(bytesWritten));
                 if (messageArea) {
                     messageArea->setAudioAmplitude(amplitude); // Bezpośrednia aktualizacja wizualizacji
                 }
@@ -507,7 +507,7 @@ void WavelengthChatView::onAudioDataReceived(QString frequency, const QByteArray
     }
 }
 
-void WavelengthChatView::onReadyReadInput() {
+void WavelengthChatView::onReadyReadInput() const {
     // --- DODANE LOGOWANIE ---
     qDebug() << "[HOST] onReadyReadInput triggered!";
     // --- KONIEC DODANIA ---
@@ -517,19 +517,19 @@ void WavelengthChatView::onReadyReadInput() {
         return;
     }
 
-    QByteArray buffer = m_inputDevice->readAll();
+    const QByteArray buffer = m_inputDevice->readAll();
     qDebug() << "[HOST] onReadyReadInput: Read" << buffer.size() << "bytes from input device."; // Loguj rozmiar bufora
 
     if (!buffer.isEmpty()) {
         // 1. Wyślij dane binarne przez WebSocket
-        bool sent = WavelengthMessageService::getInstance()->sendAudioData(currentFrequency, buffer);
+        const bool sent = WavelengthMessageService::getInstance()->sendAudioData(currentFrequency, buffer);
         // --- DODANE LOGOWANIE ---
         qDebug() << "[HOST] onReadyReadInput: Attempted to send audio data. Success:" << sent;
         // --- KONIEC DODANIA ---
 
 
         // 2. Oblicz amplitudę
-        qreal amplitude = calculateAmplitude(buffer);
+        const qreal amplitude = calculateAmplitude(buffer);
 
         // 3. Zaktualizuj wizualizację lokalnie
         if (messageArea) {
@@ -541,12 +541,12 @@ void WavelengthChatView::onReadyReadInput() {
     }
 }
 
-void WavelengthChatView::updateProgressMessage(const QString &messageId, const QString &message) {
+void WavelengthChatView::updateProgressMessage(const QString &messageId, const QString &message) const {
     messageArea->addMessage(message, messageId, StreamMessage::MessageType::System);
 }
 
-void WavelengthChatView::sendMessage() {
-    QString message = inputField->text().trimmed();
+void WavelengthChatView::sendMessage() const {
+    const QString message = inputField->text().trimmed();
     if (message.isEmpty()) {
         return;
     }
@@ -574,7 +574,7 @@ void WavelengthChatView::abortWavelength() {
         "font-size: 9pt;"
     );
 
-    WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
+    const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
 
     bool isHost = false;
     if (coordinator->getWavelengthInfo(currentFrequency, &isHost).isHost) {
@@ -599,7 +599,7 @@ void WavelengthChatView::abortWavelength() {
 
 void WavelengthChatView::triggerVisualEffect() {
     // Losowy efekt scanlines co jakiś czas
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto anim = new QPropertyAnimation(this, "scanlineOpacity");
     anim->setDuration(800);
     anim->setStartValue(m_scanlineOpacity);
     anim->setKeyValueAt(0.4, 0.3 + QRandomGenerator::global()->bounded(10) / 100.0);
@@ -610,7 +610,7 @@ void WavelengthChatView::triggerVisualEffect() {
 
 void WavelengthChatView::triggerConnectionEffect() {
     // Efekt przy połączeniu
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto anim = new QPropertyAnimation(this, "scanlineOpacity");
     anim->setDuration(1200);
     anim->setStartValue(0.6);
     anim->setEndValue(0.15);
@@ -620,7 +620,7 @@ void WavelengthChatView::triggerConnectionEffect() {
 
 void WavelengthChatView::triggerActivityEffect() {
     // Subtelny efekt przy aktywności
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto anim = new QPropertyAnimation(this, "scanlineOpacity");
     anim->setDuration(300);
     anim->setStartValue(m_scanlineOpacity);
     anim->setKeyValueAt(0.3, 0.25);
@@ -636,13 +636,13 @@ void WavelengthChatView::initializeAudio() {
     m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
-    QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
+    const QAudioDeviceInfo inputInfo = QAudioDeviceInfo::defaultInputDevice();
     if (!inputInfo.isFormatSupported(m_audioFormat)) {
         qWarning() << "Domyślny format wejściowy nie jest obsługiwany, próbuję znaleźć najbliższy.";
         m_audioFormat = inputInfo.nearestFormat(m_audioFormat);
     }
 
-    QAudioDeviceInfo outputInfo = QAudioDeviceInfo::defaultOutputDevice();
+    const QAudioDeviceInfo outputInfo = QAudioDeviceInfo::defaultOutputDevice();
     if (!outputInfo.isFormatSupported(m_audioFormat)) {
         qWarning() << "Domyślny format wyjściowy nie jest obsługiwany, próbuję znaleźć najbliższy.";
         m_audioFormat = outputInfo.nearestFormat(m_audioFormat);
@@ -753,19 +753,19 @@ qreal WavelengthChatView::calculateAmplitude(const QByteArray &buffer) const {
         return 0.0;
     }
 
-    const qint16* data = reinterpret_cast<const qint16*>(buffer.constData());
-    int sampleCount = buffer.size() / (m_audioFormat.sampleSize() / 8);
+    const auto data = reinterpret_cast<const qint16*>(buffer.constData());
+    const int sampleCount = buffer.size() / (m_audioFormat.sampleSize() / 8);
     if (sampleCount == 0) return 0.0;
 
     double sumOfSquares = 0.0;
     for (int i = 0; i < sampleCount; ++i) {
         // Normalizuj próbkę do zakresu [-1.0, 1.0]
-        double normalizedSample = static_cast<double>(data[i]) / 32767.0;
+        const double normalizedSample = static_cast<double>(data[i]) / 32767.0;
         sumOfSquares += normalizedSample * normalizedSample;
     }
 
-    double meanSquare = sumOfSquares / sampleCount;
-    double rms = std::sqrt(meanSquare);
+    const double meanSquare = sumOfSquares / sampleCount;
+    const double rms = std::sqrt(meanSquare);
 
     // Zwróć wartość RMS (zwykle między 0.0 a ~0.7, rzadko 1.0)
     // Można przeskalować, jeśli potrzebny jest większy zakres dla glitchIntensity

@@ -6,12 +6,12 @@
 #include <QPushButton>
 
 
-class CyberButton : public QPushButton {
+class CyberButton final : public QPushButton {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberButton(const QString& text, QWidget* parent = nullptr, bool isPrimary = true);
+    explicit CyberButton(const QString& text, QWidget* parent = nullptr, bool isPrimary = true);
 
     double glowIntensity() const { return m_glowIntensity; }
     void setGlowIntensity(double intensity);

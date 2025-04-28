@@ -22,8 +22,7 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
 #ifdef Q_OS_WINDOWS
     // Ustaw ciemny pasek tytułu dla Windows 10/11
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
-        HWND hwnd = (HWND)this->winId(); // Pobierz uchwyt okna dialogowego
-        if (hwnd) {
+        if (auto hwnd = reinterpret_cast<HWND>(this->winId())) {
             // Użyj atrybutu 20 dla Windows 10 1809+ / Windows 11
             BOOL darkMode = TRUE;
             ::DwmSetWindowAttribute(hwnd, 20, &darkMode, sizeof(darkMode));
@@ -32,17 +31,17 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
 #endif
 
     // Główny layout
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    auto mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(10);
     mainLayout->setContentsMargins(15, 15, 15, 15);
 
     // Panel górny z informacjami
-    QWidget* topPanel = new QWidget(this);
-    QHBoxLayout* topLayout = new QHBoxLayout(topPanel);
+    auto topPanel = new QWidget(this);
+    auto topLayout = new QHBoxLayout(topPanel);
     topLayout->setContentsMargins(5, 5, 5, 5);
 
     // Lewy panel z tytułem
-    QLabel* titleLabel = new QLabel("VISUAL STREAM DECODER v2.5", this);
+    auto titleLabel = new QLabel("VISUAL STREAM DECODER v2.5", this);
     titleLabel->setStyleSheet(
         "color: #00ffff;"
         "background-color: #001822;"
@@ -68,8 +67,8 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
     mainLayout->addWidget(topPanel);
 
     // Container na wideo z ramką AR
-    QWidget* videoContainer = new QWidget(this);
-    QVBoxLayout* videoLayout = new QVBoxLayout(videoContainer);
+    auto videoContainer = new QWidget(this);
+    auto videoLayout = new QVBoxLayout(videoContainer);
     videoLayout->setContentsMargins(20, 20, 20, 20);
 
     // Stylizacja kontenera
@@ -94,8 +93,8 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
     mainLayout->addWidget(videoContainer);
 
     // Panel kontrolny w stylu cyberpunk
-    QWidget* controlPanel = new QWidget(this);
-    QHBoxLayout* controlLayout = new QHBoxLayout(controlPanel);
+    auto controlPanel = new QWidget(this);
+    auto controlLayout = new QHBoxLayout(controlPanel);
     controlLayout->setContentsMargins(5, 5, 5, 5);
 
     // Cyberpunkowe przyciski
@@ -137,8 +136,8 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
     mainLayout->addWidget(controlPanel);
 
     // Panel dolny z informacjami technicznymi
-    QWidget* infoPanel = new QWidget(this);
-    QHBoxLayout* infoLayout = new QHBoxLayout(infoPanel);
+    auto infoPanel = new QWidget(this);
+    auto infoLayout = new QHBoxLayout(infoPanel);
     infoLayout->setContentsMargins(2, 2, 2, 2);
 
     // Neonowe etykiety z danymi technicznymi
@@ -147,13 +146,13 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &videoData, const QStrin
     m_bitrateLabel = new QLabel("BITRATE: --", this);
     m_fpsLabel = new QLabel("FPS: --", this);
 
-    QLabel* securityLabel = new QLabel(
+    auto securityLabel = new QLabel(
         QString("SEC: LVL%1").arg(QRandomGenerator::global()->bounded(1, 6)), this);
 
     QString sessionId = QString("%1-%2")
             .arg(QRandomGenerator::global()->bounded(1000, 9999))
             .arg(QRandomGenerator::global()->bounded(10000, 99999));
-    QLabel* sessionLabel = new QLabel(QString("SESS: %1").arg(sessionId), this);
+    auto sessionLabel = new QLabel(QString("SESS: %1").arg(sessionId), this);
 
     // Stylizacja etykiet informacyjnych
     QString infoLabelStyle =
@@ -322,19 +321,19 @@ void VideoPlayerOverlay::togglePlayback() {
 
 
     // Animacja efektów przy zmianie stanu
-    QPropertyAnimation* gridAnim = new QPropertyAnimation(this, "gridOpacity");
+    const auto gridAnim = new QPropertyAnimation(this, "gridOpacity");
     gridAnim->setDuration(500);
     gridAnim->setStartValue(m_gridOpacity);
     gridAnim->setEndValue(0.5);
     gridAnim->setKeyValueAt(0.5, 0.7);
 
-    QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
     scanAnim->setDuration(500);
     scanAnim->setStartValue(m_scanlineOpacity);
     scanAnim->setEndValue(0.15);
     scanAnim->setKeyValueAt(0.5, 0.4);
 
-    QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
+    const auto group = new QParallelAnimationGroup(this);
     group->addAnimation(gridAnim);
     group->addAnimation(scanAnim);
     group->start(QAbstractAnimation::DeleteWhenStopped);
@@ -361,15 +360,15 @@ void VideoPlayerOverlay::onSliderReleased() {
     }
 }
 
-void VideoPlayerOverlay::updateTimeLabel(int position) {
+void VideoPlayerOverlay::updateTimeLabel(const int position) const {
     if (!m_decoder || m_videoDuration <= 0)
         return;
 
-    double seekPosition = position / 1000.0;
-    int seconds = int(seekPosition) % 60;
-    int minutes = int(seekPosition) / 60;
-    int totalSeconds = int(m_videoDuration) % 60;
-    int totalMinutes = int(m_videoDuration) / 60;
+    const double seekPosition = position / 1000.0;
+    const int seconds = static_cast<int>(seekPosition) % 60;
+    const int minutes = static_cast<int>(seekPosition) / 60;
+    const int totalSeconds = static_cast<int>(m_videoDuration) % 60;
+    const int totalMinutes = static_cast<int>(m_videoDuration) / 60;
 
     m_timeLabel->setText(
         QString("%1:%2 / %3:%4")
@@ -380,16 +379,16 @@ void VideoPlayerOverlay::updateTimeLabel(int position) {
     );
 }
 
-void VideoPlayerOverlay::updateSliderPosition(double position) {
+void VideoPlayerOverlay::updateSliderPosition(const double position) const {
     if (m_videoDuration <= 0)
         return;
 
     m_progressSlider->setValue(position * 1000);
 
-    int seconds = int(position) % 60;
-    int minutes = int(position) / 60;
-    int totalSeconds = int(m_videoDuration) % 60;
-    int totalMinutes = int(m_videoDuration) / 60;
+    const int seconds = static_cast<int>(position) % 60;
+    const int minutes = static_cast<int>(position) / 60;
+    const int totalSeconds = static_cast<int>(m_videoDuration) % 60;
+    const int totalMinutes = static_cast<int>(m_videoDuration) / 60;
 
     m_timeLabel->setText(
         QString("%1:%2 / %3:%4")
@@ -400,11 +399,11 @@ void VideoPlayerOverlay::updateSliderPosition(double position) {
     );
 }
 
-void VideoPlayerOverlay::seekVideo(int position) const {
+void VideoPlayerOverlay::seekVideo(const int position) const {
     if (!m_decoder || m_videoDuration <= 0)
         return;
 
-    double seekPosition = position / 1000.0;
+    const double seekPosition = position / 1000.0;
     m_decoder->seek(seekPosition);
 }
 
@@ -427,12 +426,12 @@ void VideoPlayerOverlay::updateFrame(const QImage &frame) {
     targetSize.scale(displayWidth, displayHeight, Qt::KeepAspectRatio);
 
     // Skalujemy oryginalną klatkę
-    QImage scaledFrame = frame.scaled(targetSize.width(), targetSize.height(),
+    const QImage scaledFrame = frame.scaled(targetSize.width(), targetSize.height(),
                                       Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     // Obliczamy pozycję do umieszczenia przeskalowanej klatki (wyśrodkowana)
-    int xOffset = (displayWidth - scaledFrame.width()) / 2;
-    int yOffset = (displayHeight - scaledFrame.height()) / 2;
+    const int xOffset = (displayWidth - scaledFrame.width()) / 2;
+    const int yOffset = (displayHeight - scaledFrame.height()) / 2;
 
     // Rysujemy przeskalowaną klatkę na kontenerze
     QPainter painter(&containerImage);
@@ -452,7 +451,7 @@ void VideoPlayerOverlay::updateFrame(const QImage &frame) {
     if (m_showHUD) {
         // Rysujemy narożniki HUD-a
         painter.setPen(QPen(QColor(0, 200, 255, 150), 1));
-        int cornerSize = 20;
+        constexpr int cornerSize = 20;
 
         // Lewy górny
         painter.drawLine(5, 5, 5 + cornerSize, 5);
@@ -476,11 +475,11 @@ void VideoPlayerOverlay::updateFrame(const QImage &frame) {
         painter.setFont(QFont("Consolas", 8));
 
         // Timestamp w prawym górnym rogu
-        QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+        const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
         painter.drawText(containerImage.width() - 80, 20, timestamp);
 
         // Wskaźnik klatki w lewym dolnym rogu
-        int frameNumber = m_frameCounter % 10000;
+        const int frameNumber = m_frameCounter % 10000;
         painter.drawText(10, containerImage.height() - 10,
                          QString("FRAME: %1").arg(frameNumber, 4, 10, QChar('0')));
 
@@ -497,10 +496,10 @@ void VideoPlayerOverlay::updateFrame(const QImage &frame) {
         painter.setPen(Qt::NoPen);
 
         for (int i = 0; i < m_currentGlitchIntensity * 20; ++i) {
-            int glitchHeight = QRandomGenerator::global()->bounded(1, 5);
-            int glitchY = QRandomGenerator::global()->bounded(containerImage.height());
-            int glitchX = QRandomGenerator::global()->bounded(containerImage.width());
-            int glitchWidth = QRandomGenerator::global()->bounded(20, 100);
+            const int glitchHeight = QRandomGenerator::global()->bounded(1, 5);
+            const int glitchY = QRandomGenerator::global()->bounded(containerImage.height());
+            const int glitchX = QRandomGenerator::global()->bounded(containerImage.width());
+            const int glitchWidth = QRandomGenerator::global()->bounded(20, 100);
 
             QColor glitchColor(
                 QRandomGenerator::global()->bounded(0, 255),
@@ -531,7 +530,7 @@ void VideoPlayerOverlay::updateUI() {
 
     // Pulsujący efekt poświaty
     if (m_playbackStarted && !m_playbackFinished && !m_decoder->isPaused()) {
-        qreal pulseFactor = 0.05 * sin(pulse);
+        const qreal pulseFactor = 0.05 * sin(pulse);
         setScanlineOpacity(0.15 + pulseFactor);
         setGridOpacity(0.1 + pulseFactor);
     }
@@ -539,7 +538,7 @@ void VideoPlayerOverlay::updateUI() {
     // Aktualizacja statusu
     if (m_decoder && m_playbackStarted && !m_statusLabel->text().startsWith("ERROR")) {
         // Co pewien czas pokazujemy losowe informacje "techniczne"
-        int randomUpdate = QRandomGenerator::global()->bounded(100);
+        const int randomUpdate = QRandomGenerator::global()->bounded(100);
 
         if (randomUpdate < 2 && !m_decoder->isPaused()) {
             m_statusLabel->setText(QString("FRAME BUFFER: %1%").arg(QRandomGenerator::global()->bounded(90, 100)));
@@ -558,7 +557,7 @@ void VideoPlayerOverlay::handleError(const QString &message) const {
     m_videoLabel->setText("⚠️ " + message);
 }
 
-void VideoPlayerOverlay::handleVideoInfo(int width, int height, double fps, double duration) {
+void VideoPlayerOverlay::handleVideoInfo(const int width, const int height, const double fps, const double duration) {
     m_playbackStarted = true;
     m_videoWidth = width;
     m_videoHeight = height;
@@ -582,7 +581,7 @@ void VideoPlayerOverlay::handleVideoInfo(int width, int height, double fps, doub
 
     // Dostosuj timer odświeżania do wykrytego FPS
     if (m_updateTimer && m_videoFps > 0) {
-        int interval = qMax(16, qRound(1000 / m_videoFps));
+        const int interval = qMax(16, qRound(1000 / m_videoFps));
         m_updateTimer->setInterval(interval);
     }
 
@@ -593,10 +592,10 @@ void VideoPlayerOverlay::handleVideoInfo(int width, int height, double fps, doub
     m_showHUD = true;
 }
 
-void VideoPlayerOverlay::adjustVolume(int volume) {
+void VideoPlayerOverlay::adjustVolume(const int volume) const {
     if (!m_decoder) return;
 
-    float normalizedVolume = volume / 100.0f;
+    const float normalizedVolume = volume / 100.0f;
     m_decoder->setVolume(normalizedVolume);
     updateVolumeIcon(normalizedVolume);
 }
@@ -612,7 +611,7 @@ void VideoPlayerOverlay::toggleMute() {
     }
 }
 
-void VideoPlayerOverlay::updateVolumeIcon(float volume) const {
+void VideoPlayerOverlay::updateVolumeIcon(const float volume) const {
     if (volume <= 0.01f) {
         m_volumeButton->setText("🔇");
     } else if (volume < 0.5f) {

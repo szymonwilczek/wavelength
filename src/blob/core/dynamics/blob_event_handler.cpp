@@ -28,33 +28,32 @@ BlobEventHandler::~BlobEventHandler() {
     }
 }
 
-bool BlobEventHandler::processEvent(QEvent* event) {
+bool BlobEventHandler::processEvent() {
     // Ta metoda może być używana dla zdarzeń ogólnych
     // obecnie nie jest używana, ale może być przydatna w przyszłości
     return false;  // przekazanie zdarzenia dalej
 }
 
-bool BlobEventHandler::processResizeEvent(QResizeEvent* event) {
+bool BlobEventHandler::processResizeEvent(const QResizeEvent* event) {
     if (!m_eventsEnabled) return false;
     if (!m_eventsEnabled || m_transitionInProgress) {
         return false;
     }
 
     // Pobierz aktualny rozmiar
-    QSize currentSize = m_parentWidget->size();
-    QSize oldSize = event->oldSize();
+    const QSize currentSize = m_parentWidget->size();
+    const QSize oldSize = event->oldSize();
 
     // Sprawdź, czy zmiana rozmiaru jest znacząca
-    int minDimChange = 3; // minimalna zmiana w pikselach, żeby reagować
-    bool significantChange =
+    constexpr int minDimChange = 3; // minimalna zmiana w pikselach, żeby reagować
+    const bool significantChange =
         abs(currentSize.width() - oldSize.width()) > minDimChange ||
         abs(currentSize.height() - oldSize.height()) > minDimChange;
 
     static qint64 lastResizeTime = 0;
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     // Zastosuj throttling - przetwarzaj resize tylko co 16ms (~60 FPS)
-    if (significantChange && (currentTime - lastResizeTime >= 16)) {
+    if (const qint64 currentTime = QDateTime::currentMSecsSinceEpoch(); significantChange && (currentTime - lastResizeTime >= 16)) {
         lastResizeTime = currentTime;
 
 
@@ -71,21 +70,20 @@ bool BlobEventHandler::processResizeEvent(QResizeEvent* event) {
     return false;
 }
 
-void BlobEventHandler::handleMoveEvent(QMoveEvent* moveEvent) {
+void BlobEventHandler::handleMoveEvent(const QMoveEvent* moveEvent) {
     if (m_isResizing) {
         return;
     }
 
-    QPointF newPos = moveEvent->pos();
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    const QPointF newPos = moveEvent->pos();
+    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     // Zwiększone progi dla lepszej wydajności
-    double moveDist = QVector2D(newPos - m_lastProcessedPosition).length();
-    qint64 timeDelta = currentTime - m_lastProcessedMoveTime;
+    const double moveDist = QVector2D(newPos - m_lastProcessedPosition).length();
+    const qint64 timeDelta = currentTime - m_lastProcessedMoveTime;
 
     // Adaptacyjny próg odległości
     double distThreshold = 5.0;
-    int timeThreshold = 16; // ~60 FPS
 
     // Bardziej agresywne filtrowanie przy szybkim ruchu
     if (timeDelta < 8) {
@@ -100,12 +98,11 @@ void BlobEventHandler::handleMoveEvent(QMoveEvent* moveEvent) {
         m_lastProcessedPosition = newPos;
         m_lastProcessedMoveTime = currentTime;
 
-        QWidget* currentWindow = m_parentWidget->window();
-        if (currentWindow) {
-            QPointF windowPos = currentWindow->pos();
+        if (const QWidget* currentWindow = m_parentWidget->window()) {
+            const QPointF windowPos = currentWindow->pos();
             emit windowMoved(windowPos, currentTime);
 
-            if (timeDelta > timeThreshold) {
+            if (constexpr int timeThreshold = 16; timeDelta > timeThreshold) {
                 emit movementSampleAdded(windowPos, currentTime);
             }
         }

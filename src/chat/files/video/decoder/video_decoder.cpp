@@ -4,7 +4,7 @@ VideoDecoder::VideoDecoder(const QByteArray &videoData, QObject *parent): QThrea
     m_buffer.setData(m_videoData);
     m_buffer.open(QIODevice::ReadOnly);
     m_ioContext = avio_alloc_context(
-        (unsigned char*)av_malloc(8192), 8192, 0, &m_buffer,
+        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &m_buffer,
         &VideoDecoder::readPacket, nullptr, &VideoDecoder::seekPacket
     );
 }
@@ -51,7 +51,7 @@ bool VideoDecoder::initialize() {
         return false;
     }
 
-    AVCodecParameters* codecParams = m_formatContext->streams[m_videoStream]->codecpar;
+    const AVCodecParameters* codecParams = m_formatContext->streams[m_videoStream]->codecpar;
     const AVCodec* codec = avcodec_find_decoder(codecParams->codec_id);
     if (!codec) {
         emit error("Nie znaleziono kodeka wideo");
@@ -79,9 +79,9 @@ bool VideoDecoder::initialize() {
         return false;
     }
 
-    AVRational frameRateRational = av_guess_frame_rate(m_formatContext, m_formatContext->streams[m_videoStream], nullptr);
+    const AVRational frameRateRational = av_guess_frame_rate(m_formatContext, m_formatContext->streams[m_videoStream], nullptr);
     m_frameRate = frameRateRational.num > 0 && frameRateRational.den > 0 ? av_q2d(frameRateRational) : 30.0;
-    m_duration = m_formatContext->duration > 0 ? (double)m_formatContext->duration / AV_TIME_BASE : 0.0;
+    m_duration = m_formatContext->duration > 0 ? static_cast<double>(m_formatContext->duration) / AV_TIME_BASE : 0.0;
 
     if (m_audioStreamIndex != -1) {
         m_audioDecoder = new AudioDecoder(m_videoData, nullptr);
@@ -111,7 +111,7 @@ void VideoDecoder::extractFirstFrame() {
     tempBuffer.open(QIODevice::ReadOnly);
 
     AVIOContext* tempIoCtx = avio_alloc_context(
-        (unsigned char*)av_malloc(8192), 8192, 0, &tempBuffer,
+        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &tempBuffer,
         &VideoDecoder::readPacket, nullptr, &VideoDecoder::seekPacket
     );
     if (!tempIoCtx) {
@@ -150,7 +150,7 @@ void VideoDecoder::extractFirstFrame() {
     }
 
     // 3. Otwórz kodek wideo
-    AVCodecParameters* codecParams = tempFormatCtx->streams[videoStreamIdx]->codecpar;
+    const AVCodecParameters* codecParams = tempFormatCtx->streams[videoStreamIdx]->codecpar;
     const AVCodec* codec = avcodec_find_decoder(codecParams->codec_id);
     if (!codec) { /* cleanup */ return; }
     AVCodecContext* tempCodecCtx = avcodec_alloc_context3(codec);
@@ -178,7 +178,7 @@ void VideoDecoder::extractFirstFrame() {
                     // Mamy klatkę! Konwertuj i emituj.
                     QImage frameImage(tempCodecCtx->width, tempCodecCtx->height, QImage::Format_RGB888);
                     uint8_t* dstData[4] = { frameImage.bits(), nullptr, nullptr, nullptr };
-                    int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
+                    const int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
                     sws_scale(tempSwsCtx, (const uint8_t* const*)tempFrame->data, tempFrame->linesize, 0,
                               tempCodecCtx->height, dstData, dstLinesize);
 
@@ -252,7 +252,7 @@ void VideoDecoder::pause() {
         m_waitCondition.wakeOne();
 }
 
-void VideoDecoder::seek(double position) {
+void VideoDecoder::seek(const double position) {
     if (m_audioDecoder) {
         m_audioDecoder->seek(position);
     }
@@ -291,8 +291,7 @@ void VideoDecoder::run() {
     }
 
     AVPacket packet;
-    bool frameFinished;
-    double frameDuration = m_frameRate > 0 ? 1000.0 / m_frameRate : 33.3;
+    const double frameDuration = m_frameRate > 0 ? 1000.0 / m_frameRate : 33.3;
 
     m_frameTimer.start();
     m_firstFrame = true;
@@ -334,9 +333,8 @@ void VideoDecoder::run() {
 
         if (packet.stream_index == m_videoStream) {
             avcodec_send_packet(m_codecContext, &packet);
-            frameFinished = (avcodec_receive_frame(m_codecContext, m_frame) == 0);
 
-            if (frameFinished) {
+            if (avcodec_receive_frame(m_codecContext, m_frame) == 0) {
                 double videoPts = -1.0;
                 if (m_frame->pts != AV_NOPTS_VALUE) {
                     videoPts = m_frame->pts * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
@@ -344,16 +342,16 @@ void VideoDecoder::run() {
 
                 if (m_audioDecoder && videoPts >= 0) {
                     QMutexLocker syncLocker(&m_mutex);
-                    double audioPts = m_currentAudioPosition;
+                    const double audioPts = m_currentAudioPosition;
                     syncLocker.unlock();
 
-                    double diff = videoPts - audioPts;
-                    const double syncThreshold = 0.05;
-                    const double maxSleep = 100.0;
+                    const double diff = videoPts - audioPts;
+                    constexpr double syncThreshold = 0.05;
 
                     if (diff > syncThreshold) {
+                        constexpr double maxSleep = 100.0;
                         int sleepTime = qRound((diff - syncThreshold / 2.0) * 1000.0);
-                        QThread::msleep(qMin((int)maxSleep, qMax(0, sleepTime)));
+                        msleep(qMin(static_cast<int>(maxSleep), qMax(0, sleepTime)));
                     } else if (diff < -syncThreshold * 2.0) {
                         av_packet_unref(&packet);
                         av_frame_unref(m_frame);
@@ -361,14 +359,14 @@ void VideoDecoder::run() {
                     }
                 } else if (!m_audioDecoder) {
                     if (!m_firstFrame) {
-                        int64_t currentPts = m_frame->pts;
+                        const int64_t currentPts = m_frame->pts;
                         double ptsDiff = (currentPts - m_lastFramePts) *
                                          av_q2d(m_formatContext->streams[m_videoStream]->time_base) * 1000.0;
                         if (ptsDiff <= 0 || ptsDiff > 1000.0) {
                             ptsDiff = frameDuration;
                         }
-                        int elapsedTime = m_frameTimer.elapsed();
-                        int sleepTime = qMax(0, qRound(ptsDiff - elapsedTime));
+                        const int elapsedTime = m_frameTimer.elapsed();
+                        const int sleepTime = qMax(0, qRound(ptsDiff - elapsedTime));
                         if (sleepTime > 0) {
                             QThread::msleep(sleepTime);
                         }
@@ -380,7 +378,7 @@ void VideoDecoder::run() {
 
                 QImage frameImage(m_codecContext->width, m_codecContext->height, QImage::Format_RGB888);
                 uint8_t* dstData[4] = { frameImage.bits(), nullptr, nullptr, nullptr };
-                int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
+                const int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
                 sws_scale(m_swsContext, (const uint8_t* const*)m_frame->data, m_frame->linesize, 0,
                           m_codecContext->height, dstData, dstLinesize);
 
@@ -406,7 +404,7 @@ void VideoDecoder::handleAudioFinished() {
     }
 }
 
-void VideoDecoder::updateAudioPosition(double position) {
+void VideoDecoder::updateAudioPosition(const double position) {
     QMutexLocker locker(&m_mutex);
     m_currentAudioPosition = position;
     locker.unlock();
@@ -445,14 +443,14 @@ void VideoDecoder::cleanupFFmpegResources() {
     m_videoStream = -1;
 }
 
-int VideoDecoder::readPacket(void *opaque, uint8_t *buf, int buf_size) {
-    QBuffer* buffer = static_cast<QBuffer*>(opaque);
-    qint64 bytesRead = buffer->read((char*)buf, buf_size);
-    return (int)bytesRead;
+int VideoDecoder::readPacket(void *opaque, uint8_t *buf, const int buf_size) {
+    const auto buffer = static_cast<QBuffer*>(opaque);
+    const qint64 bytesRead = buffer->read(reinterpret_cast<char *>(buf), buf_size);
+    return static_cast<int>(bytesRead);
 }
 
-int64_t VideoDecoder::seekPacket(void *opaque, int64_t offset, int whence) {
-    QBuffer* buffer = static_cast<QBuffer*>(opaque);
+int64_t VideoDecoder::seekPacket(void *opaque, const int64_t offset, const int whence) {
+    const auto buffer = static_cast<QBuffer*>(opaque);
     if (whence == AVSEEK_SIZE) {
         return buffer->size();
     }

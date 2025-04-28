@@ -11,8 +11,8 @@ class BlobPhysics {
 public:
     BlobPhysics();
 
-    void updatePhysicsOptimized(std::vector<QPointF> &controlPoints, std::vector<QPointF> &targetPoints,
-                                std::vector<QPointF> &velocity, QPointF &blobCenter,
+    void updatePhysicsOptimized(std::vector<QPointF> &controlPoints, const std::vector<QPointF> &targetPoints,
+                                std::vector<QPointF> &velocity, const QPointF &blobCenter,
                                 const BlobConfig::BlobParameters &params,
                                 const BlobConfig::PhysicsParameters &physicsParams);
 
@@ -21,44 +21,43 @@ public:
                                const BlobConfig::BlobParameters &params,
                                const BlobConfig::PhysicsParameters &physicsParams);
 
-    void updatePhysics(std::vector<QPointF>& controlPoints,
-                       std::vector<QPointF>& targetPoints,
-                       std::vector<QPointF>& velocity,
-                       QPointF& blobCenter,
-                       const BlobConfig::BlobParameters& params,
-                       const BlobConfig::PhysicsParameters& physicsParams,
-                       QWidget* parent);
+    void updatePhysics(std::vector<QPointF> &controlPoints,
+                       const std::vector<QPointF> &targetPoints,
+                       std::vector<QPointF> &velocity,
+                       const QPointF &blobCenter,
+                       const BlobConfig::BlobParameters &params,
+                       const BlobConfig::PhysicsParameters &physicsParams);
 
-    void initializeBlob(std::vector<QPointF>& controlPoints,
-                        std::vector<QPointF>& targetPoints,
-                        std::vector<QPointF>& velocity,
-                        QPointF& blobCenter,
-                        const BlobConfig::BlobParameters& params,
-                        int width, int height);
+    static void initializeBlob(std::vector<QPointF>& controlPoints,
+                               std::vector<QPointF>& targetPoints,
+                               std::vector<QPointF>& velocity,
+                               QPointF& blobCenter,
+                               const BlobConfig::BlobParameters& params,
+                               int width, int height);
 
-    void handleBorderCollisions(std::vector<QPointF>& controlPoints,
-                                std::vector<QPointF>& velocity,
-                                QPointF& blobCenter,
-                                int width, int height,
-                                double restitution,
-                                int padding);
+    static void handleBorderCollisions(std::vector<QPointF>& controlPoints,
+                                       std::vector<QPointF>& velocity,
+                                       QPointF& blobCenter,
+                                       int width, int height,
+                                       double restitution,
+                                       int padding);
 
-    void constrainNeighborDistances(std::vector<QPointF>& controlPoints,
-                                   std::vector<QPointF>& velocity,
-                                   double minDistance,
-                                   double maxDistance);
+    static void constrainNeighborDistances(std::vector<QPointF>& controlPoints,
+                                           std::vector<QPointF>& velocity,
+                                           double minDistance,
+                                           double maxDistance);
 
-    void smoothBlobShape(std::vector<QPointF>& controlPoints);
+    static void smoothBlobShape(std::vector<QPointF>& controlPoints);
 
-    void stabilizeBlob(std::vector<QPointF>& controlPoints,
-                      const QPointF& blobCenter,
-                      double blobRadius,
-                      double stabilizationRate);
+    static void stabilizeBlob(std::vector<QPointF>& controlPoints,
+                              const QPointF& blobCenter,
+                              double blobRadius,
+                              double stabilizationRate);
 
-    bool validateAndRepairControlPoints(std::vector<QPointF>& controlPoints,
-                                      std::vector<QPointF>& velocity,
-                                      const QPointF& blobCenter,
-                                      double blobRadius);
+    static bool validateAndRepairControlPoints(std::vector<QPointF>& controlPoints,
+                                               std::vector<QPointF>& velocity,
+                                               const QPointF& blobCenter,
+                                               double blobRadius);
 
     QVector2D calculateWindowVelocity(const QPointF& currentPos);
 

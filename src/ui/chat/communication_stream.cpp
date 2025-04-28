@@ -10,8 +10,8 @@ CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent)
                                                            m_waveFrequency(2.0), m_waveSpeed(1.0),
                                                            m_glitchIntensity(0.0), m_waveThickness(0.008),
                                                            m_state(Idle), m_currentMessageIndex(-1),
-                                                           m_initialized(false), m_timeOffset(0.0), m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
-                                                           m_shaderProgram(nullptr) {
+                                                           m_initialized(false), m_timeOffset(0.0), m_shaderProgram(nullptr),
+                                                           m_vertexBuffer(QOpenGLBuffer::VertexBuffer) {
     setMinimumSize(600, 200);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -85,11 +85,11 @@ CommunicationStream::~CommunicationStream() {
 }
 
 StreamMessage * CommunicationStream::addMessageWithAttachment(const QString &content, const QString &sender,
-    StreamMessage::MessageType type, const QString &messageId) {
+    const StreamMessage::MessageType type, const QString &messageId) {
     startReceivingAnimation();
 
     // Tworzymy nową wiadomość, przekazując messageId
-    StreamMessage* message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
+    const auto message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
     message->hide();
 
     qDebug() << "Dodawanie załącznika dla wiadomości ID:" << messageId << " Content:" << content.left(30) << "...";
@@ -116,43 +116,43 @@ StreamMessage * CommunicationStream::addMessageWithAttachment(const QString &con
     return message;
 }
 
-void CommunicationStream::setWaveAmplitude(qreal amplitude) {
+void CommunicationStream::setWaveAmplitude(const qreal amplitude) {
     m_waveAmplitude = amplitude;
     update();
 }
 
-void CommunicationStream::setWaveFrequency(qreal frequency) {
+void CommunicationStream::setWaveFrequency(const qreal frequency) {
     m_waveFrequency = frequency;
     update();
 }
 
-void CommunicationStream::setWaveSpeed(qreal speed) {
+void CommunicationStream::setWaveSpeed(const qreal speed) {
     m_waveSpeed = speed;
     update();
 }
 
-void CommunicationStream::setGlitchIntensity(qreal intensity) {
+void CommunicationStream::setGlitchIntensity(const qreal intensity) {
     m_glitchIntensity = intensity;
     update();
 }
 
-void CommunicationStream::setWaveThickness(qreal thickness) {
+void CommunicationStream::setWaveThickness(const qreal thickness) {
     m_waveThickness = thickness;
     update();
 }
 
-void CommunicationStream::setStreamName(const QString &name) {
+void CommunicationStream::setStreamName(const QString &name) const {
     m_streamNameLabel->setText(name);
     m_streamNameLabel->adjustSize();
     m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 }
 
 StreamMessage * CommunicationStream::addMessage(const QString &content, const QString &sender,
-    StreamMessage::MessageType type, const QString &messageId) {
+    const StreamMessage::MessageType type, const QString &messageId) {
     startReceivingAnimation();
 
     // Tworzymy nową wiadomość, przekazując messageId
-    StreamMessage* message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
+    const auto message = new StreamMessage(content, sender, type, messageId, this); // Przekazujemy ID!
     message->hide();
 
     m_messages.append(message);
@@ -195,7 +195,7 @@ void CommunicationStream::clearMessages() {
     update(); // Odśwież widok
 }
 
-void CommunicationStream::setTransmittingUser(const QString &userId) {
+void CommunicationStream::setTransmittingUser(const QString &userId) const {
     QString displayText = userId;
     // Skracanie ID (bez zmian)
     if (userId.length() > 15 && userId.startsWith("client_")) {
@@ -207,7 +207,7 @@ void CommunicationStream::setTransmittingUser(const QString &userId) {
     }
 
     // --- GENERUJ KOLOR I USTAW LABEL ---
-    UserVisuals visuals = generateUserVisuals(userId);
+    const UserVisuals visuals = generateUserVisuals(userId);
     // m_transmittingUserLabel->setShape(visuals.shape); // USUNIĘTO
     m_transmittingUserLabel->setShapeColor(visuals.color); // Ustaw tylko kolor
     m_transmittingUserLabel->setText(displayText);
@@ -218,12 +218,12 @@ void CommunicationStream::setTransmittingUser(const QString &userId) {
     m_transmittingUserLabel->show();
 }
 
-void CommunicationStream::clearTransmittingUser() {
+void CommunicationStream::clearTransmittingUser() const {
     m_transmittingUserLabel->hide();
     m_transmittingUserLabel->setText(""); // Wyczyść tekst na wszelki wypadek
 }
 
-void CommunicationStream::setAudioAmplitude(qreal amplitude) {
+void CommunicationStream::setAudioAmplitude(const qreal amplitude) {
     m_targetWaveAmplitude = m_baseWaveAmplitude + qBound(0.0, amplitude, 1.0) * m_amplitudeScale;
 }
 
@@ -236,7 +236,7 @@ void CommunicationStream::initializeGL() {
     m_shaderProgram = new QOpenGLShaderProgram();
 
     // Vertex shader
-    const char* vertexShaderSource = R"(
+    const auto vertexShaderSource = R"(
             #version 330 core
             layout (location = 0) in vec2 aPos;
 
@@ -251,7 +251,7 @@ void CommunicationStream::initializeGL() {
     // W metodzie initializeGL() zmodyfikuj fragment shader:
 
     // Fragment shader - naprawiony, aby zachować podstawową linię
-    const char* fragmentShaderSource = R"(
+    const auto fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
 
@@ -340,7 +340,7 @@ void CommunicationStream::initializeGL() {
     m_vao.bind();
 
     // Wierzchołki prostokąta dla fullscreen quad
-    static const GLfloat vertices[] = {
+    static constexpr GLfloat vertices[] = {
         -1.0f,  1.0f,
         -1.0f, -1.0f,
         1.0f, -1.0f,
@@ -360,7 +360,7 @@ void CommunicationStream::initializeGL() {
     m_initialized = true;
 }
 
-void CommunicationStream::resizeGL(int w, int h) {
+void CommunicationStream::resizeGL(const int w, const int h) {
     glViewport(0, 0, w, h);
     m_streamNameLabel->move((width() - m_streamNameLabel->width()) / 2, 10);
 
@@ -404,7 +404,7 @@ void CommunicationStream::keyPressEvent(QKeyEvent *event) {
     }
 
     if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
-        StreamMessage* currentMsg = m_messages[m_currentMessageIndex];
+        const StreamMessage* currentMsg = m_messages[m_currentMessageIndex];
 
         switch (event->key()) {
             case Qt::Key_Right:
@@ -467,7 +467,7 @@ void CommunicationStream::updateAnimation() {
     }
 
     // Wymuszamy aktualizację warstwy OpenGL
-    QRegion updateRegion(0, 0, width(), height());
+    const QRegion updateRegion(0, 0, width(), height());
     update(updateRegion);
 }
 
@@ -475,7 +475,7 @@ void CommunicationStream::triggerRandomGlitch() {
     // Wywołujemy losowe zakłócenia tylko w trybie bezczynności
     if (m_state == Idle) {
         // Silniejsza intensywność dla lepszej widoczności
-        float intensity = 0.3 + QRandomGenerator::global()->bounded(40) / 100.0;
+        const float intensity = 0.3 + QRandomGenerator::global()->bounded(40) / 100.0;
 
         // Wywołujemy animację zakłócenia
         startGlitchAnimation(intensity);
@@ -490,7 +490,7 @@ void CommunicationStream::startReceivingAnimation() {
     m_state = Receiving;
 
     // Animujemy parametry fali
-    QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
+    const auto ampAnim = new QPropertyAnimation(this, "waveAmplitude");
     ampAnim->setDuration(1000);
     ampAnim->setStartValue(m_waveAmplitude);
     // Zamiast dużej amplitudy, ustawiamy tylko nieznacznie podniesioną bazę
@@ -498,25 +498,25 @@ void CommunicationStream::startReceivingAnimation() {
     ampAnim->setEndValue(0.15); // Np. podwójna bazowa
     ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
+    const auto freqAnim = new QPropertyAnimation(this, "waveFrequency");
     freqAnim->setDuration(1000);
     freqAnim->setStartValue(m_waveFrequency);
     freqAnim->setEndValue(6.0);  // Wyższa częstotliwość
     freqAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* speedAnim = new QPropertyAnimation(this, "waveSpeed");
+    const auto speedAnim = new QPropertyAnimation(this, "waveSpeed");
     speedAnim->setDuration(1000);
     speedAnim->setStartValue(m_waveSpeed);
     speedAnim->setEndValue(2.5);  // Szybsza prędkość
     speedAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* thicknessAnim = new QPropertyAnimation(this, "waveThickness");
+    const auto thicknessAnim = new QPropertyAnimation(this, "waveThickness");
     thicknessAnim->setDuration(1000);
     thicknessAnim->setStartValue(m_waveThickness);
     thicknessAnim->setEndValue(0.012);  // Grubsza linia podczas aktywności
     thicknessAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+    const auto glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
     glitchAnim->setDuration(1000);
     glitchAnim->setStartValue(0.0);
     glitchAnim->setKeyValueAt(0.3, 0.6);  // Większe zakłócenia
@@ -524,7 +524,7 @@ void CommunicationStream::startReceivingAnimation() {
     glitchAnim->setEndValue(0.2);
     glitchAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
+    const auto group = new QParallelAnimationGroup(this);
     group->addAnimation(ampAnim);
     group->addAnimation(freqAnim);
     group->addAnimation(speedAnim);
@@ -547,31 +547,31 @@ void CommunicationStream::returnToIdleAnimation() {
     // --- KONIEC RESETU ---
 
     // Animujemy powrót do stanu bezczynności
-    QPropertyAnimation* ampAnim = new QPropertyAnimation(this, "waveAmplitude");
+    const auto ampAnim = new QPropertyAnimation(this, "waveAmplitude");
     ampAnim->setDuration(1500);
     ampAnim->setStartValue(m_waveAmplitude);
     ampAnim->setEndValue(0.01); // Powrót do bazowej
     ampAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* freqAnim = new QPropertyAnimation(this, "waveFrequency");
+    const auto freqAnim = new QPropertyAnimation(this, "waveFrequency");
     freqAnim->setDuration(1500);
     freqAnim->setStartValue(m_waveFrequency);
     freqAnim->setEndValue(2.0);
     freqAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* speedAnim = new QPropertyAnimation(this, "waveSpeed");
+    const auto speedAnim = new QPropertyAnimation(this, "waveSpeed");
     speedAnim->setDuration(1500);
     speedAnim->setStartValue(m_waveSpeed);
     speedAnim->setEndValue(1.0);
     speedAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QPropertyAnimation* thicknessAnim = new QPropertyAnimation(this, "waveThickness");
+    const auto thicknessAnim = new QPropertyAnimation(this, "waveThickness");
     thicknessAnim->setDuration(1500);
     thicknessAnim->setStartValue(m_waveThickness);
     thicknessAnim->setEndValue(0.008);  // Powrót do normalnej grubości
     thicknessAnim->setEasingCurve(QEasingCurve::OutQuad);
 
-    QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
+    const auto group = new QParallelAnimationGroup(this);
     group->addAnimation(ampAnim);
     group->addAnimation(freqAnim);
     group->addAnimation(speedAnim);
@@ -579,11 +579,11 @@ void CommunicationStream::returnToIdleAnimation() {
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void CommunicationStream::startGlitchAnimation(qreal intensity) {
+void CommunicationStream::startGlitchAnimation(const qreal intensity) {
     // Krótszy czas dla szybszego efektu
-    int duration = 600 + QRandomGenerator::global()->bounded(400);
+    const int duration = 600 + QRandomGenerator::global()->bounded(400);
 
-    QPropertyAnimation* glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
+    const auto glitchAnim = new QPropertyAnimation(this, "glitchIntensity");
     glitchAnim->setDuration(duration);
     glitchAnim->setStartValue(m_glitchIntensity);
     glitchAnim->setKeyValueAt(0.1, intensity); // Szybki wzrost
@@ -619,9 +619,9 @@ void CommunicationStream::showMessageAtIndex(int index) {
 
 
     // Ukrywamy poprzednią wiadomość (jeśli była inna niż nowa)
-    StreamMessage* previousMsgPtr = nullptr; // Użyj wskaźnika, aby uniknąć problemów z indeksem po usunięciu
     if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
         if (m_currentMessageIndex != index) {
+            StreamMessage* previousMsgPtr = nullptr;
             previousMsgPtr = m_messages[m_currentMessageIndex];
             qDebug() << "CommunicationStream::showMessageAtIndex - Ukrywanie poprzedniej wiadomości (indeks:" << m_currentMessageIndex << ")";
             disconnectSignalsForMessage(previousMsgPtr);
@@ -694,7 +694,7 @@ void CommunicationStream::onMessageRead() {
 }
 
 void CommunicationStream::handleMessageHidden() {
-    StreamMessage* hiddenMsg = qobject_cast<StreamMessage*>(sender());
+    const auto hiddenMsg = qobject_cast<StreamMessage*>(sender());
     if (!hiddenMsg) {
         qWarning() << "CommunicationStream::handleMessageHidden - Otrzymano sygnał hidden() od nieznanego obiektu.";
         return;
@@ -703,7 +703,7 @@ void CommunicationStream::handleMessageHidden() {
     qDebug() << "CommunicationStream::handleMessageHidden - Wiadomość została ukryta. ID:" << hiddenMsg->messageId() << "Typ:" << hiddenMsg->type() << "m_isClearingAllMessages:" << m_isClearingAllMessages;
 
     // Znajdź indeks ukrytej wiadomości PRZED potencjalnym usunięciem
-    int hiddenMsgIndex = m_messages.indexOf(hiddenMsg);
+    const int hiddenMsgIndex = m_messages.indexOf(hiddenMsg);
 
     // Zawsze rozłączamy sygnały od ukrytej wiadomości
     disconnectSignalsForMessage(hiddenMsg);
@@ -816,13 +816,13 @@ void CommunicationStream::handleMessageHidden() {
 
 UserVisuals CommunicationStream::generateUserVisuals(const QString &userId) {
     UserVisuals visuals;
-    quint32 hash = qHash(userId);
+    const quint32 hash = qHash(userId);
 
     // Wygeneruj kolor na podstawie hasha (w przestrzeni HSL dla lepszych kolorów)
-    int hue = hash % 360; // Odcień 0-359
+    const int hue = hash % 360; // Odcień 0-359
     // Utrzymuj wysokie nasycenie i jasność dla neonowego efektu
-    int saturation = 230 + ((hash >> 8) % 26); // Nasycenie 230-255 (bardzo nasycone)
-    int lightness = 140 + ((hash >> 16) % 31); // Jasność 140-170 (jasne, ale nie białe)
+    const int saturation = 230 + ((hash >> 8) % 26); // Nasycenie 230-255 (bardzo nasycone)
+    const int lightness = 140 + ((hash >> 16) % 31); // Jasność 140-170 (jasne, ale nie białe)
 
     visuals.color = QColor::fromHsl(hue, saturation, lightness);
     return visuals;
@@ -850,8 +850,8 @@ void CommunicationStream::disconnectSignalsForMessage(StreamMessage *message) co
 void CommunicationStream::updateNavigationButtonsForCurrentMessage() {
     if (m_currentMessageIndex >= 0 && m_currentMessageIndex < m_messages.size()) {
         StreamMessage* currentMsg = m_messages[m_currentMessageIndex];
-        bool hasPrev = m_currentMessageIndex > 0;
-        bool hasNext = m_currentMessageIndex < m_messages.size() - 1;
+        const bool hasPrev = m_currentMessageIndex > 0;
+        const bool hasNext = m_currentMessageIndex < m_messages.size() - 1;
         currentMsg->showNavigationButtons(hasPrev, hasNext);
     }
 }

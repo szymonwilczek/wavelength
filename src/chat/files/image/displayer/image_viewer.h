@@ -11,13 +11,13 @@
 #include "../decoder/image_decoder.h"
 
 // Klasa wyświetlacza statycznych obrazów zintegrowanego z czatem
-class InlineImageViewer : public QFrame {
+class InlineImageViewer final : public QFrame {
     Q_OBJECT
 
 public:
-    InlineImageViewer(const QByteArray& imageData, QWidget* parent = nullptr);
+    explicit InlineImageViewer(const QByteArray& imageData, QWidget* parent = nullptr);
 
-    ~InlineImageViewer() {
+    ~InlineImageViewer() override {
         releaseResources();
     }
 
@@ -29,7 +29,7 @@ public:
     // Usunięto eventFilter
 
 private slots:
-    void loadImage() {
+    void loadImage() const {
         if (!m_decoder) return;
         m_decoder->decode();
     }

@@ -11,10 +11,10 @@ void BlobRenderer::renderBlob(QPainter &painter,
                               const std::vector<QPointF> &controlPoints,
                               const QPointF &blobCenter,
                               const BlobConfig::BlobParameters &params,
-                              BlobConfig::AnimationState animationState) {  // Dodany parametr
+                              const BlobConfig::AnimationState animationState) {  // Dodany parametr
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
+    const QPainterPath blobPath = BlobPath::createBlobPath(controlPoints, controlPoints.size());
 
     drawGlowEffect(painter, blobPath, params.borderColor, params.glowRadius);
 
@@ -25,8 +25,8 @@ void BlobRenderer::renderBlob(QPainter &painter,
 
 void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
                                     const QColor &gridColor,
-                                    int gridSpacing,
-                                    int width, int height) {
+                                    const int gridSpacing,
+                                    const int width, const int height) {
     m_gridBuffer = QPixmap(width, height);
 
     QPainter bufferPainter(&m_gridBuffer);
@@ -53,9 +53,9 @@ void BlobRenderer::updateGridBuffer(const QColor &backgroundColor,
 void BlobRenderer::drawBackground(QPainter &painter,
                                   const QColor &backgroundColor,
                                   const QColor &gridColor,
-                                  int gridSpacing,
-                                  int width, int height) {
-    bool needsGridUpdate = m_gridBuffer.isNull() ||
+                                  const int gridSpacing,
+                                  const int width, const int height) {
+    const bool needsGridUpdate = m_gridBuffer.isNull() ||
                            backgroundColor != m_lastBgColor ||
                            gridColor != m_lastGridColor ||
                            gridSpacing != m_lastGridSpacing ||
@@ -65,7 +65,7 @@ void BlobRenderer::drawBackground(QPainter &painter,
     // Tworzymy statyczną teksturę tła tylko raz (z neonowymi punktami)
     if (!m_staticBackgroundInitialized) {
         // Stała wielkość tekstury bazowej (niezależnie od rozmiaru okna)
-        const int textureSize = 800;
+        constexpr int textureSize = 800;
         m_staticBackgroundTexture = QPixmap(textureSize, textureSize);
         m_staticBackgroundTexture.fill(Qt::transparent);
 
@@ -106,11 +106,11 @@ void BlobRenderer::drawBackground(QPainter &painter,
         }
 
         // Dodajemy podsiatkę o mniejszej intensywności
-        QColor subgridColor = QColor(gridColor.redF(), gridColor.greenF(), gridColor.blueF(), 0.35);
+        auto subgridColor = QColor(gridColor.redF(), gridColor.greenF(), gridColor.blueF(), 0.35);
         subgridColor.setAlphaF(0.3);
         bufferPainter.setPen(QPen(subgridColor, 0.5, Qt::DotLine));
 
-        int subGridSpacing = gridSpacing / 2;
+        const int subGridSpacing = gridSpacing / 2;
         for (int y = subGridSpacing; y < height; y += gridSpacing) {
             bufferPainter.drawLine(0, y, width, y);
         }
@@ -132,11 +132,11 @@ void BlobRenderer::drawBackground(QPainter &painter,
 void BlobRenderer::drawGlowEffect(QPainter &painter,
                                   const QPainterPath &blobPath,
                                   const QColor &borderColor,
-                                  int glowRadius) {
-    QSize viewportSize = QSize(painter.device()->width(), painter.device()->height());
+                                  const int glowRadius) {
+    const auto viewportSize = QSize(painter.device()->width(), painter.device()->height());
 
     // Sprawdzamy, czy możemy użyć istniejącego bufora
-    bool bufferNeedsUpdate = m_glowBuffer.isNull() ||
+    const bool bufferNeedsUpdate = m_glowBuffer.isNull() ||
                             blobPath != m_lastGlowPath ||
                             borderColor != m_lastGlowColor ||
                             glowRadius != m_lastGlowRadius ||
@@ -150,7 +150,7 @@ void BlobRenderer::drawGlowEffect(QPainter &painter,
 
     // W stanie animacji buforuj efekt co kilka klatek dla lepszej wydajności
     static int frameCounter = 0;
-    bool shouldUpdateBuffer = bufferNeedsUpdate ||
+    const bool shouldUpdateBuffer = bufferNeedsUpdate ||
                              (m_lastAnimationState != BlobConfig::IDLE &&
                               frameCounter++ % 5 == 0);  // Aktualizuj co 5 klatek
 
@@ -256,7 +256,7 @@ void BlobRenderer::renderGlowEffect(QPainter &painter,
 void BlobRenderer::drawBorder(QPainter &painter,
                               const QPainterPath &blobPath,
                               const QColor &borderColor,
-                              int borderWidth) {
+                              const int borderWidth) {
 
     // Główne obramowanie neonowe
     QPen borderPen(borderColor);
@@ -312,22 +312,20 @@ void BlobRenderer::renderScene(QPainter &painter,
                                const QPointF &blobCenter,
                                const BlobConfig::BlobParameters &params,
                                const BlobRenderState &renderState,
-                               int width, int height,
+                               const int width, const int height,
                                QPixmap &backgroundCache,
                                QSize &lastBackgroundSize,
                                QColor &lastBgColor,
                                QColor &lastGridColor,
                                int &lastGridSpacing) {
     // Wykrywamy, czy będzie zmiana stanu
-    bool stateChangingToIdle = (renderState.animationState == BlobConfig::IDLE && m_lastAnimationState != BlobConfig::IDLE);
+    const bool stateChangingToIdle = (renderState.animationState == BlobConfig::IDLE && m_lastAnimationState != BlobConfig::IDLE);
 
     // Wykrycie przejścia do stanu IDLE - PRZYGOTUJ BUFORY PRZED ZMIANĄ STANU
     if (stateChangingToIdle) {
         // Najpierw inicjalizujemy wartości dla stanu IDLE
         initializeIdleState(blobCenter, params.blobRadius, params.borderColor, width, height);
 
-        // Przygotowujemy bufor HUD przed resetowaniem flag
-        if (!m_idleHudInitialized) {
             m_staticHudBuffer = QPixmap(width, height);
             m_staticHudBuffer.fill(Qt::transparent);
 
@@ -337,7 +335,7 @@ void BlobRenderer::renderScene(QPainter &painter,
             hudPainter.end();
 
             m_idleHudInitialized = true;
-        }
+
     }
 
     // Po przygotowaniu buforów możemy aktualizować stan
@@ -353,7 +351,7 @@ void BlobRenderer::renderScene(QPainter &painter,
     m_lastAnimationState = renderState.animationState;
 
     // Sprawdź czy potrzebujemy zaktualizować bufor tła - POZOSTAŁA CZĘŚĆ BEZ ZMIAN
-    bool shouldUpdateBackgroundCache =
+    const bool shouldUpdateBackgroundCache =
             backgroundCache.isNull() ||
             lastBackgroundSize != QSize(width, height) ||
             lastBgColor != params.backgroundColor ||
@@ -402,11 +400,6 @@ void BlobRenderer::renderScene(QPainter &painter,
 
         // Renderuj blob
         renderBlob(painter, controlPoints, blobCenter, params, renderState.animationState);
-
-        // Po wyjściu ze stanu IDLE możemy zresetować flagi buforów
-        if (m_lastAnimationState == BlobConfig::IDLE && renderState.animationState != BlobConfig::IDLE) {
-            m_idleHudInitialized = false;
-        }
     }
 }
 
@@ -426,8 +419,8 @@ void BlobRenderer::initializeIdleState(const QPointF &blobCenter, double blobRad
 
 
 void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
-                             double blobRadius, const QColor &hudColor,
-                             int width, int height) {
+                             const double blobRadius, const QColor &hudColor,
+                             const int width, const int height) const {
 
 
     QColor techColor = hudColor.lighter(120);
@@ -436,7 +429,7 @@ void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
     painter.setFont(QFont("Consolas", 8));
 
     // Narożniki ekranu (styl AR)
-    int cornerSize = 15;
+    constexpr int cornerSize = 15;
 
     // Lewy górny
     painter.drawLine(10, 10, 10 + cornerSize, 10);
@@ -452,7 +445,7 @@ void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
     // Prawy dolny
     painter.drawLine(width - 10 - cornerSize, height - 10, width - 10, height - 10);
     painter.drawLine(width - 10, height - 10, width - 10, height - 10 - cornerSize);
-    painter.drawText(width - 70, height - 25, QString("R: %1").arg(int(blobRadius)));
+    painter.drawText(width - 70, height - 25, QString("R: %1").arg(static_cast<int>(blobRadius)));
 
     // Lewy dolny
     painter.drawLine(10, height - 10, 10 + cornerSize, height - 10);
@@ -460,18 +453,18 @@ void BlobRenderer::drawCompleteHUD(QPainter &painter, const QPointF &blobCenter,
     painter.drawText(15, height - 25, QString("AMP: %1").arg(m_idleAmplitude, 0, 'f', 1));  // Ustalona amplituda
 
     // Okrąg wokół bloba (cel)
-    QPen targetPen(techColor, 1, Qt::DotLine);
+    const QPen targetPen(techColor, 1, Qt::DotLine);
     painter.setPen(targetPen);
     painter.drawEllipse(blobCenter, blobRadius + 20, blobRadius + 20);
 
     // Wyświetlamy ustalony ID bloba
-    QFontMetrics fm(painter.font());
-    int textWidth = fm.horizontalAdvance(m_idleBlobId);
+    const QFontMetrics fm(painter.font());
+    const int textWidth = fm.horizontalAdvance(m_idleBlobId);
     painter.drawText(blobCenter.x() - textWidth / 2, blobCenter.y() + blobRadius + 30, m_idleBlobId);
 }
 
-void BlobRenderer::forceHUDInitialization(const QPointF &blobCenter, double blobRadius, const QColor &hudColor,
-    int width, int height) {
+void BlobRenderer::forceHUDInitialization(const QPointF &blobCenter, const double blobRadius, const QColor &hudColor,
+    const int width, const int height) {
     initializeIdleState(blobCenter, blobRadius, hudColor, width, height);
 
     m_staticHudBuffer = QPixmap(width, height);

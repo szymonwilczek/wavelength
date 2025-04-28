@@ -4,7 +4,7 @@
 
 #include "../../ui/chat/communication_stream.h"
 
-class WavelengthStreamDisplay : public QWidget {
+class WavelengthStreamDisplay final : public QWidget {
     Q_OBJECT
 
     // Struktura przechowująca dane wiadomości w kolejce
@@ -17,9 +17,9 @@ class WavelengthStreamDisplay : public QWidget {
     };
 
 public:
-    WavelengthStreamDisplay(QWidget* parent = nullptr);
+    explicit WavelengthStreamDisplay(QWidget* parent = nullptr);
 
-    void setFrequency(QString frequency, const QString& name = QString());
+    void setFrequency(const QString &frequency, const QString& name = QString());
 
     // Główna metoda publiczna do dodawania/aktualizowania wiadomości
     void addMessage(const QString& message, const QString& messageId, StreamMessage::MessageType type);
@@ -28,27 +28,27 @@ public:
     void clear();
 
 public slots:
-    void setGlitchIntensity(qreal intensity) {
+    void setGlitchIntensity(const qreal intensity) const {
         m_communicationStream->setGlitchIntensity(intensity);
     }
 
     // --- NOWE SLOTY PRZEKAZUJĄCE ---
-    void setTransmittingUser(const QString& userId) {
+    void setTransmittingUser(const QString& userId) const {
         m_communicationStream->setTransmittingUser(userId);
     }
 
-    void clearTransmittingUser() {
+    void clearTransmittingUser() const {
         m_communicationStream->clearTransmittingUser();
     }
 
-    void setAudioAmplitude(qreal amplitude) {
+    void setAudioAmplitude(const qreal amplitude) const {
         m_communicationStream->setAudioAmplitude(amplitude);
     }
 
 private slots:
     void processNextQueuedMessage();
 
-    void onStreamMessageDestroyed(QObject* obj);
+    void onStreamMessageDestroyed(const QObject* obj);
 
 private:
     CommunicationStream* m_communicationStream;

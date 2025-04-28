@@ -8,7 +8,7 @@
 #include <QPair>
 #include <QKeyEvent>
 
-class SnakeGameLayer : public SecurityLayer {
+class SnakeGameLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -57,21 +57,22 @@ private:
     };
 
     void initializeGame();
-    void renderGame();
+    void renderGame() const;
     void moveSnake();
     void generateApple();
-    bool isCollision(int x, int y);
+    bool isCollision(int x, int y) const;
     void handleInput(int key);
-    bool isExitPoint(int x, int y);
-    void checkForExitProgress();
+    bool isExitPoint(int x, int y) const;
+
+    static void checkForExitProgress();
 
     QLabel* m_gameBoard;
     QLabel* m_scoreLabel;
     QTimer* m_gameTimer;
     QTimer* m_borderAnimationTimer;
 
-    static const int GRID_SIZE = 12; // Zwiększony rozmiar siatki
-    static const int CELL_SIZE = 20; // Zmniejszony rozmiar komórki, by całość zmieściła się na ekranie
+    static constexpr int GRID_SIZE = 12; // Zwiększony rozmiar siatki
+    static constexpr int CELL_SIZE = 20; // Zmniejszony rozmiar komórki, by całość zmieściła się na ekranie
 
     CellType m_grid[GRID_SIZE][GRID_SIZE];
     QVector<QPair<int, int>> m_snake;

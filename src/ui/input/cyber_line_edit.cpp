@@ -21,7 +21,7 @@ CyberLineEdit::CyberLineEdit(QWidget *parent): QLineEdit(parent), m_glowIntensit
 
         // Wymuszamy odświeżenie tylko obszaru kursora dla lepszej wydajności
         if (hasFocus()) {
-            QRect cursorRect = this->cursorRect();
+            QRect cursorRect = this->cyberCursorRect();
             cursorRect.adjust(-2, -2, 2, 2); // Dodajemy mały margines
             update(cursorRect);
         }
@@ -40,26 +40,26 @@ QSize CyberLineEdit::sizeHint() const {
     return size;
 }
 
-void CyberLineEdit::setGlowIntensity(double intensity) {
+void CyberLineEdit::setGlowIntensity(const double intensity) {
     m_glowIntensity = intensity;
     update();
 }
 
-QRect CyberLineEdit::cursorRect() const {
+QRect CyberLineEdit::cyberCursorRect() const {
     // Obliczamy pozycję kursora
     int cursorX = 10;
-    QString content = text();
+    const QString content = text();
 
     if (!content.isEmpty()) {
-        QString textBeforeCursor = content.left(cursorPosition());
-        QFontMetrics fm(font());
+        const QString textBeforeCursor = content.left(cursorPosition());
+        const QFontMetrics fm(font());
         cursorX += fm.horizontalAdvance(echoMode() == QLineEdit::Password ?
                                             QString(textBeforeCursor.length(), '•') :
                                             textBeforeCursor);
     }
 
-    int cursorHeight = height() * 0.75;
-    int cursorY = (height() - cursorHeight) / 2;
+    const int cursorHeight = height() * 0.75;
+    const int cursorY = (height() - cursorHeight) / 2;
 
     return QRect(cursorX - 1, cursorY, 2, cursorHeight);
 }
@@ -163,7 +163,7 @@ void CyberLineEdit::focusInEvent(QFocusEvent *event) {
         m_cursorBlinkTimer->start();
     }
 
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(200);
     anim->setStartValue(0.0);
     anim->setEndValue(1.0);
@@ -178,7 +178,7 @@ void CyberLineEdit::focusOutEvent(QFocusEvent *event) {
         m_cursorBlinkTimer->stop();
     }
 
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(300);
     anim->setStartValue(1.0);
     anim->setEndValue(0.0);
@@ -189,7 +189,7 @@ void CyberLineEdit::focusOutEvent(QFocusEvent *event) {
 
 void CyberLineEdit::enterEvent(QEvent *event) {
     if (!hasFocus()) {
-        QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+        const auto anim = new QPropertyAnimation(this, "glowIntensity");
         anim->setDuration(200);
         anim->setStartValue(m_glowIntensity);
         anim->setEndValue(0.5);
@@ -200,7 +200,7 @@ void CyberLineEdit::enterEvent(QEvent *event) {
 
 void CyberLineEdit::leaveEvent(QEvent *event) {
     if (!hasFocus()) {
-        QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+        const auto anim = new QPropertyAnimation(this, "glowIntensity");
         anim->setDuration(200);
         anim->setStartValue(m_glowIntensity);
         anim->setEndValue(0.0);

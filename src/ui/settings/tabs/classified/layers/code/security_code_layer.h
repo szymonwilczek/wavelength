@@ -7,7 +7,7 @@
 #include <QVector>
 #include <QList>
 
-class SecurityCodeLayer : public SecurityLayer {
+class SecurityCodeLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -31,12 +31,11 @@ private:
         QString hint;       // Podpowiedź
         bool isNumeric;     // Czy kod jest tylko numeryczny
 
-        SecurityCode(const QString& c, const QString& h, bool num = true)
+        SecurityCode(const QString& c, const QString& h, const bool num = true)
             : code(c), hint(h), isNumeric(num) {}
     };
 
     QString getRandomSecurityCode(QString& hint, bool& isNumeric);
-    void setupCodeInputs(bool isNumeric);
     void resetInputs();
     QString getEnteredCode() const;
     void showErrorEffect();

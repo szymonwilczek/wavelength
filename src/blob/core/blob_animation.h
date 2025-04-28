@@ -20,7 +20,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 
-class BlobAnimation : public QOpenGLWidget, protected QOpenGLFunctions {
+class BlobAnimation final : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
 public:
@@ -49,9 +49,9 @@ public:
     void resetVisualization();
 
     public slots:
-    void show();
+    void showAnimation();
 
-    void hide();
+    void hideAnimation();
 
     void setBackgroundColor(const QColor &color);
 

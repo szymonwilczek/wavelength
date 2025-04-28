@@ -18,10 +18,10 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
       m_silenceCounter(0),
       m_currentAudioLevel(0.0f)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel("VOICE RECOGNITION VERIFICATION", this);
+    const auto title = new QLabel("VOICE RECOGNITION VERIFICATION", this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -35,7 +35,7 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
     m_visualizerData.resize(100);
     m_visualizerData.fill(0);
 
-    QLabel *instructions = new QLabel("Proszę mówić do mikrofonu\nWeryfikacja wzorca głosowego w toku", this);
+    const auto instructions = new QLabel("Proszę mówić do mikrofonu\nWeryfikacja wzorca głosowego w toku", this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -150,8 +150,7 @@ void VoiceRecognitionLayer::reset() {
     updateAudioVisualizer(QByteArray());
 
     // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
         // Opcjonalnie: Można usunąć efekt
         // this->setGraphicsEffect(nullptr);
@@ -173,7 +172,7 @@ void VoiceRecognitionLayer::startRecording() {
     format.setCodec("audio/pcm");
 
     // Sprawdzenie dostępnych urządzeń
-    QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
+    const QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
     if (!inputDevice.isFormatSupported(format)) {
         format = inputDevice.nearestFormat(format);
     }
@@ -208,7 +207,7 @@ void VoiceRecognitionLayer::stopRecording() {
     m_isRecording = false;
 }
 
-bool VoiceRecognitionLayer::isSpeaking(float audioLevel) {
+bool VoiceRecognitionLayer::isSpeaking(const float audioLevel) const {
     return audioLevel > m_noiseThreshold;
 }
 
@@ -218,7 +217,7 @@ void VoiceRecognitionLayer::processAudioInput() {
 
     // Odczytaj dane audio
     QByteArray data;
-    qint64 len = m_audioInput->bytesReady();
+    const qint64 len = m_audioInput->bytesReady();
 
     if (len > 0) {
         data.resize(len);
@@ -227,8 +226,8 @@ void VoiceRecognitionLayer::processAudioInput() {
         // Obliczenie poziomu głośności dla progu detekcji mowy
         float currentLevel = 0.0f;
         if (data.size() > 0) {
-            const qint16 *samples = reinterpret_cast<const qint16*>(data.constData());
-            int numSamples = data.size() / sizeof(qint16);
+            const auto samples = reinterpret_cast<const qint16*>(data.constData());
+            const int numSamples = data.size() / sizeof(qint16);
 
             // Obliczenie poziomu dźwięku jako średniej wartości bezwzględnej
             float sum = 0;
@@ -269,7 +268,7 @@ void VoiceRecognitionLayer::processAudioInput() {
 void VoiceRecognitionLayer::updateAudioVisualizer(const QByteArray &data) {
     // Konwersja danych audio na wartości wizualizatora
     if (data.size() > 0) {
-        const qint16 *samples = reinterpret_cast<const qint16*>(data.constData());
+        auto samples = reinterpret_cast<const qint16*>(data.constData());
         int numSamples = data.size() / sizeof(qint16);
 
         // Przesunięcie wszystkich wartości w lewo
@@ -358,7 +357,7 @@ void VoiceRecognitionLayer::updateAudioVisualizer(const QByteArray &data) {
 }
 
 void VoiceRecognitionLayer::updateProgress() {
-    int currentValue = m_recognitionProgress->value();
+    const int currentValue = m_recognitionProgress->value();
     int newValue = currentValue;
 
     // Aktualizacja postępu w zależności od stanu mowy
@@ -414,8 +413,8 @@ void VoiceRecognitionLayer::finishRecognition() {
 
     // Rysowanie wizualizacji dźwięku w kolorze zielonym
     QPainterPath path;
-    int centerY = finalVisualizer.height() / 2;
-    int barWidth = finalVisualizer.width() / m_visualizerData.size();
+    const int centerY = finalVisualizer.height() / 2;
+    const int barWidth = finalVisualizer.width() / m_visualizerData.size();
 
     painter.setPen(QPen(QColor(50, 200, 50, 200), 2));
     painter.setBrush(QBrush(QColor(50, 200, 50, 50)));
@@ -423,13 +422,13 @@ void VoiceRecognitionLayer::finishRecognition() {
     // Górna część fali
     path.moveTo(0, centerY);
     for (int i = 0; i < m_visualizerData.size(); i++) {
-        float amplitude = m_visualizerData[i] * 80.0f;
+        const float amplitude = m_visualizerData[i] * 80.0f;
         path.lineTo(i * barWidth, centerY - amplitude);
     }
 
     // Dolna część fali
     for (int i = m_visualizerData.size() - 1; i >= 0; i--) {
-        float amplitude = m_visualizerData[i] * 80.0f;
+        const float amplitude = m_visualizerData[i] * 80.0f;
         path.lineTo(i * barWidth, centerY + amplitude);
     }
 
@@ -447,10 +446,10 @@ void VoiceRecognitionLayer::finishRecognition() {
     
     // Animacja zanikania po krótkim pokazaniu sukcesu
     QTimer::singleShot(800, this, [this]() {
-        QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+        const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
 
-        QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+        const auto animation = new QPropertyAnimation(effect, "opacity");
         animation->setDuration(500);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);

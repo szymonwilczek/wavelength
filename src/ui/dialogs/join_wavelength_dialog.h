@@ -7,7 +7,7 @@
 #include "../../session/wavelength_session_coordinator.h"
 #include "../../ui/dialogs/animated_dialog.h"
 
-class JoinWavelengthDialog : public AnimatedDialog {
+class JoinWavelengthDialog final : public AnimatedDialog {
     Q_OBJECT
     Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
     Q_PROPERTY(double digitalizationProgress READ digitalizationProgress WRITE setDigitalizationProgress)
@@ -48,7 +48,7 @@ public:
             m_refreshTimer->stop();
         }
     }
-    void setRefreshTimerInterval(int interval) const {
+    void setRefreshTimerInterval(const int interval) const {
         if (m_refreshTimer) {
             m_refreshTimer->setInterval(interval);
         }

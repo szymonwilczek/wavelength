@@ -10,7 +10,7 @@
 #include <QIODevice>
 #include <QByteArray>
 
-class VoiceRecognitionLayer : public SecurityLayer {
+class VoiceRecognitionLayer final : public SecurityLayer {
     Q_OBJECT
 
 public:
@@ -29,7 +29,7 @@ private:
     void startRecording();
     void stopRecording();
     void updateAudioVisualizer(const QByteArray &data);
-    bool isSpeaking(float audioLevel);
+    bool isSpeaking(float audioLevel) const;
 
     QLabel* m_audioVisualizerLabel;
     QProgressBar* m_recognitionProgress;

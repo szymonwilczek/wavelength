@@ -1,11 +1,11 @@
 #include "cyber_button.h"
 
-CyberButton::CyberButton(const QString &text, QWidget *parent, bool isPrimary): QPushButton(text, parent), m_glowIntensity(0.5), m_isPrimary(isPrimary) {
+CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent), m_glowIntensity(0.5), m_isPrimary(isPrimary) {
     setCursor(Qt::PointingHandCursor);
     setStyleSheet("background-color: transparent; border: none; font-family: Consolas; font-size: 9pt; font-weight: bold;");
 }
 
-void CyberButton::setGlowIntensity(double intensity) {
+void CyberButton::setGlowIntensity(const double intensity) {
     m_glowIntensity = intensity;
     update();
 }
@@ -119,7 +119,7 @@ void CyberButton::paintEvent(QPaintEvent *event) {
 }
 
 void CyberButton::enterEvent(QEvent *event) {
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(200);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.9);
@@ -128,7 +128,7 @@ void CyberButton::enterEvent(QEvent *event) {
 }
 
 void CyberButton::leaveEvent(QEvent *event) {
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "glowIntensity");
+    const auto anim = new QPropertyAnimation(this, "glowIntensity");
     anim->setDuration(200);
     anim->setStartValue(m_glowIntensity);
     anim->setEndValue(0.5);

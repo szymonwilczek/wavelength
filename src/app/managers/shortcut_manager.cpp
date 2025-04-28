@@ -24,24 +24,18 @@ void ShortcutManager::registerShortcuts(QWidget* parent) {
         return;
     }
 
-    // Wyczyść stare skróty dla tego rodzica, jeśli istnieją
     if (m_registeredShortcuts.contains(parent)) {
         qDebug() << "[ShortcutMgr] Clearing old shortcuts for widget:" << parent->objectName();
-        // Pobierz mapę skrótów dla tego widgetu
         QMap<QString, QShortcut*>& shortcutsMap = m_registeredShortcuts[parent];
-        // Usuń obiekty QShortcut
         qDeleteAll(shortcutsMap.values());
-        // Wyczyść mapę wewnętrzną
         shortcutsMap.clear();
     } else {
-        // Jeśli widget nie istnieje w mapie, dodaj pustą mapę wewnętrzną
         m_registeredShortcuts.insert(parent, QMap<QString, QShortcut*>());
     }
 
     // Zidentyfikuj typ widgetu i zarejestruj odpowiednie skróty
     if (auto* mainWindow = qobject_cast<QMainWindow*>(parent)) {
-        Navbar* navbar = mainWindow->findChild<Navbar*>();
-        if (navbar) {
+        if (const auto navbar = mainWindow->findChild<Navbar*>()) {
             registerMainWindowShortcuts(mainWindow, navbar);
         } else { qWarning() << "[ShortcutMgr] Could not find Navbar in QMainWindow."; }
     } else if (auto* chatView = qobject_cast<WavelengthChatView*>(parent)) {
@@ -55,7 +49,7 @@ void ShortcutManager::registerShortcuts(QWidget* parent) {
 
 template<typename Func>
 void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda) {
-    QKeySequence sequence = m_config->getShortcut(actionId); // Pobierz sekwencję (powinna być już załadowana z pliku)
+    const QKeySequence sequence = m_config->getShortcut(actionId); // Pobierz sekwencję (powinna być już załadowana z pliku)
 
     // <<< Dodane logowanie >>>
     qDebug() << "[ShortcutMgr] createAndConnectShortcut(" << actionId << "): Using sequence" << sequence.toString();
@@ -66,7 +60,7 @@ void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget*
         return;
     }
 
-    QShortcut* shortcut = new QShortcut(sequence, parent);
+    auto shortcut = new QShortcut(sequence, parent);
     shortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(shortcut, &QShortcut::activated, parent, lambda);
 
@@ -83,7 +77,7 @@ void ShortcutManager::updateRegisteredShortcuts() {
     qDebug() << "[ShortcutMgr] Updating registered shortcuts...";
     // Iteruj po wszystkich zarejestrowanych widgetach
     for (auto widgetIt = m_registeredShortcuts.begin(); widgetIt != m_registeredShortcuts.end(); ++widgetIt) {
-        QWidget* parentWidget = widgetIt.key();
+        const QWidget* parentWidget = widgetIt.key();
         QMap<QString, QShortcut*>& shortcutsMap = widgetIt.value(); // Mapa ActionID -> QShortcut* dla danego widgetu
         qDebug() << "[ShortcutMgr] Updating shortcuts for widget:" << (parentWidget ? parentWidget->objectName() : "NULL");
 
@@ -98,10 +92,9 @@ void ShortcutManager::updateRegisteredShortcuts() {
             }
 
             // Pobierz potencjalnie zaktualizowaną sekwencję klawiszy z konfiguracji
-            QKeySequence newSequence = m_config->getShortcut(actionId);
 
             // Jeśli nowa sekwencja różni się od obecnej w QShortcut, zaktualizuj ją
-            if (shortcut->key() != newSequence) {
+            if (QKeySequence newSequence = m_config->getShortcut(actionId); shortcut->key() != newSequence) {
                 qDebug() << "[ShortcutMgr] Updating key for" << actionId << "from" << shortcut->key().toString() << "to" << newSequence.toString();
                 shortcut->setKey(newSequence);
             }

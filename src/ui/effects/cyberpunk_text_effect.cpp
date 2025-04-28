@@ -19,28 +19,10 @@ void CyberpunkTextEffect::startAnimation() {
     m_timer->start(50); // 50ms pomiędzy krokami animacji
 }
 
-void CyberpunkTextEffect::nextAnimationStep() {
-    switch (m_phase) {
-        case 0: // Faza skanowania - pionowa linia przesuwająca się
-            animateScanning();
-            break;
-        case 1: // Faza wypełniania tekstu
-            animateTyping();
-            break;
-        case 2: // Faza glitchowania ostateczna
-            animateGlitching();
-            break;
-        case 3: // Koniec animacji
-            m_timer->stop();
-            m_label->setText(m_originalText);
-            break;
-    }
-}
-
 void CyberpunkTextEffect::animateScanning() {
     // Symulacja skanowania - pionowa linia
     if (m_charIndex < m_originalText.length() * 2) {
-        int scanPos = m_charIndex / 2;
+        const int scanPos = m_charIndex / 2;
 
         // Przygotuj tekst ze spacjami i znakiem |
         QString scanText;
@@ -68,7 +50,7 @@ void CyberpunkTextEffect::animateTyping() {
 
         // Dodaj losowy glitch
         if (QRandomGenerator::global()->bounded(100) < 30) {
-            QString glitchChar = QString(QChar(QRandomGenerator::global()->bounded(33, 126)));
+            const auto glitchChar = QString(QChar(QRandomGenerator::global()->bounded(33, 126)));
             displayText += glitchChar;
         }
 
@@ -87,7 +69,7 @@ void CyberpunkTextEffect::animateGlitching() {
             // Dodaj losowe znaki glitchujące
             QString glitchText = m_originalText;
             for (int i = 0; i < 3; i++) {
-                int pos = QRandomGenerator::global()->bounded(glitchText.length());
+                const int pos = QRandomGenerator::global()->bounded(glitchText.length());
                 glitchText.insert(pos, QString(QChar(QRandomGenerator::global()->bounded(33, 126))));
             }
             m_label->setText(glitchText);
@@ -99,3 +81,23 @@ void CyberpunkTextEffect::animateGlitching() {
         m_phase = 3;
     }
 }
+
+
+void CyberpunkTextEffect::nextAnimationStep() {
+    switch (m_phase) {
+        case 0: // Faza skanowania - pionowa linia przesuwająca się
+            animateScanning();
+            break;
+        case 1: // Faza wypełniania tekstu
+            animateTyping();
+            break;
+        case 2: // Faza glitchowania ostateczna
+            animateGlitching();
+            break;
+        case 3: // Koniec animacji
+            m_timer->stop();
+            m_label->setText(m_originalText);
+            break;
+    }
+}
+

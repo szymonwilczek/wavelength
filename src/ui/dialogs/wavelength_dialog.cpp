@@ -25,31 +25,31 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
 
     setAnimationDuration(400);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(12);
 
     // Nagłówek z tytułem
-    QLabel *titleLabel = new QLabel("GENERATE WAVELENGTH", this);
+    auto titleLabel = new QLabel("GENERATE WAVELENGTH", this);
     titleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     titleLabel->setContentsMargins(0, 0, 0, 3);
     mainLayout->addWidget(titleLabel);
 
     // Panel informacyjny z ID sesji
-    QWidget *infoPanel = new QWidget(this);
-    QHBoxLayout *infoPanelLayout = new QHBoxLayout(infoPanel);
+    auto infoPanel = new QWidget(this);
+    auto infoPanelLayout = new QHBoxLayout(infoPanel);
     infoPanelLayout->setContentsMargins(0, 0, 0, 0);
     infoPanelLayout->setSpacing(5);
 
     QString sessionId = QString("%1-%2")
             .arg(QRandomGenerator::global()->bounded(1000, 9999))
             .arg(QRandomGenerator::global()->bounded(10000, 99999));
-    QLabel *sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
+    auto sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
     sessionLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
     QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-    QLabel *timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
+    auto timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
     timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
     infoPanelLayout->addWidget(sessionLabel);
@@ -58,14 +58,14 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     mainLayout->addWidget(infoPanel);
 
     // Panel instrukcji - poprawka dla responsywności
-    QLabel *infoLabel = new QLabel("System automatically assigns the lowest available frequency", this);
+    auto infoLabel = new QLabel("System automatically assigns the lowest available frequency", this);
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     infoLabel->setAlignment(Qt::AlignLeft);
     infoLabel->setWordWrap(true); // Włącz zawijanie tekstu
     mainLayout->addWidget(infoLabel);
 
     // Uprościliśmy panel formularza - bez dodatkowego kontenera
-    QFormLayout *formLayout = new QFormLayout();
+    auto formLayout = new QFormLayout();
     formLayout->setSpacing(12); // Zwiększ odstępy
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -73,7 +73,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     formLayout->setContentsMargins(0, 15, 0, 15); // Dodaj więcej przestrzeni w pionie
 
     // Etykiety w formularzu
-    QLabel* frequencyTitleLabel = new QLabel("ASSIGNED FREQUENCY:", this);
+    auto frequencyTitleLabel = new QLabel("ASSIGNED FREQUENCY:", this);
     frequencyTitleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Pole wyświetlające częstotliwość
@@ -92,7 +92,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     formLayout->addRow("", passwordProtectedCheckbox);
 
     // Etykieta i pole hasła
-    QLabel* passwordLabel = new QLabel("PASSWORD:", this);
+    auto passwordLabel = new QLabel("PASSWORD:", this);
     passwordLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     passwordEdit = new CyberLineEdit(this);
@@ -117,7 +117,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     mainLayout->addWidget(statusLabel);
 
     // Panel przycisków
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    auto buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(15);
 
     generateButton = new CyberButton("CREATE WAVELENGTH", this, true);
@@ -132,7 +132,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     mainLayout->addLayout(buttonLayout);
 
     // Połączenia sygnałów i slotów
-    connect(passwordProtectedCheckbox, &QCheckBox::toggled, this, [this](bool checked) {
+    connect(passwordProtectedCheckbox, &QCheckBox::toggled, this, [this](const bool checked) {
         passwordEdit->setEnabled(checked);
 
         // Zmiana wyglądu pola w zależności od stanu
@@ -165,10 +165,10 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     m_refreshTimer->setInterval(16); // ~60fps dla płynności animacji
     connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
         if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
-            int currentScanlineY = static_cast<int>(height() * m_digitalizationProgress);
-            int scanlineHeight = 20; // Wysokość bufora linii skanującej
+            const int currentScanlineY = static_cast<int>(height() * m_digitalizationProgress);
 
             if (currentScanlineY != m_lastScanlineY) {
+                constexpr int scanlineHeight = 20;
                 // Określ obszar do odświeżenia: obejmuje starą i nową pozycję linii
                 int updateY_start = qMin(currentScanlineY, m_lastScanlineY) - scanlineHeight / 2 - 2; // Trochę zapasu
                 int updateY_end = qMax(currentScanlineY, m_lastScanlineY) + scanlineHeight / 2 + 2;
@@ -197,19 +197,19 @@ WavelengthDialog::~WavelengthDialog() {
     }
 }
 
-void WavelengthDialog::setDigitalizationProgress(double progress) {
+void WavelengthDialog::setDigitalizationProgress(const double progress) {
     if (!m_animationStarted && progress > 0.01)
         m_animationStarted = true;
     m_digitalizationProgress = progress;
     update();
 }
 
-void WavelengthDialog::setCornerGlowProgress(double progress) {
+void WavelengthDialog::setCornerGlowProgress(const double progress) {
     m_cornerGlowProgress = progress;
     update();
 }
 
-void WavelengthDialog::setScanlineOpacity(double opacity) {
+void WavelengthDialog::setScanlineOpacity(const double opacity) {
     m_scanlineOpacity = opacity;
     update();
 }
@@ -252,7 +252,7 @@ void WavelengthDialog::paintEvent(QPaintEvent *event) {
         initRenderBuffers(); // Teraz inicjalizuje tylko m_scanlineBuffer
 
         int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
-        int clipSize = 20;
+        int clip_size = 20;
 
         // Sprawdź, czy bufor linii skanującej jest gotowy
         if (!m_scanlineBuffer.isNull()) {
@@ -264,14 +264,14 @@ void WavelengthDialog::paintEvent(QPaintEvent *event) {
             // Oblicz szerokość linii skanującej na danej wysokości (bez zmian)
             int startX = 0;
             int endX = width();
-            if (scanLineY < clipSize) {
-                float ratio = (float)scanLineY / clipSize;
-                startX = clipSize * (1.0f - ratio);
-                endX = width() - clipSize * (1.0f - ratio);
-            } else if (scanLineY > height() - clipSize) {
-                float ratio = (float)(height() - scanLineY) / clipSize;
-                startX = clipSize * (1.0f - ratio);
-                endX = width() - clipSize * (1.0f - ratio);
+            if (scanLineY < clip_size) {
+                float ratio = static_cast<float>(scanLineY) / clip_size;
+                startX = clip_size * (1.0f - ratio);
+                endX = width() - clip_size * (1.0f - ratio);
+            } else if (scanLineY > height() - clip_size) {
+                float ratio = static_cast<float>(height() - scanLineY) / clip_size;
+                startX = clip_size * (1.0f - ratio);
+                endX = width() - clip_size * (1.0f - ratio);
             }
 
             // Rysuj tylko główną linię skanującą (bez zmian)
@@ -328,7 +328,7 @@ void WavelengthDialog::startFrequencySearch() {
     loadingIndicator->setText("SEARCHING FOR AVAILABLE FREQUENCY...");
 
     // Timer zabezpieczający przed zbyt długim wyszukiwaniem
-    QTimer* timeoutTimer = new QTimer(this);
+    const auto timeoutTimer = new QTimer(this);
     timeoutTimer->setSingleShot(true);
     timeoutTimer->setInterval(5000); // 5 sekund limitu na szukanie
     connect(timeoutTimer, &QTimer::timeout, [this]() {
@@ -343,7 +343,7 @@ void WavelengthDialog::startFrequencySearch() {
     timeoutTimer->start();
 
     // Uruchom asynchroniczne wyszukiwanie
-    QFuture<QString> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
+    const QFuture<QString> future = QtConcurrent::run(&WavelengthDialog::findLowestAvailableFrequency);
     frequencyWatcher->setFuture(future);
 }
 
@@ -358,8 +358,8 @@ void WavelengthDialog::tryGenerate() {
     isGenerating = true;
     qDebug() << "LOG: tryGenerate - start";
 
-    bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
-    QString password = passwordEdit->text();
+    const bool isPasswordProtected = passwordProtectedCheckbox->isChecked();
+    const QString password = passwordEdit->text();
 
     // Sprawdź warunki bezpieczeństwa - tutaj pokazujemy błąd, gdy próbujemy wygenerować hasło
     if (isPasswordProtected && password.isEmpty()) {
@@ -378,7 +378,7 @@ void WavelengthDialog::tryGenerate() {
 
 void WavelengthDialog::onFrequencyFound() {
     // Zatrzymujemy timer zabezpieczający jeśli istnieje
-    QTimer* timeoutTimer = findChild<QTimer*>();
+    const auto timeoutTimer = findChild<QTimer*>();
     if (timeoutTimer && timeoutTimer->isActive()) {
         timeoutTimer->stop();
     }
@@ -398,26 +398,26 @@ void WavelengthDialog::onFrequencyFound() {
     QString frequencyText = m_frequency;
 
     // Przygotowanie animacji dla wskaźnika ładowania (znikanie)
-    QPropertyAnimation *loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
+    const auto loaderSlideAnimation = new QPropertyAnimation(loadingIndicator, "maximumHeight");
     loaderSlideAnimation->setDuration(400);
     loaderSlideAnimation->setStartValue(loadingIndicator->sizeHint().height());
     loaderSlideAnimation->setEndValue(0);
     loaderSlideAnimation->setEasingCurve(QEasingCurve::OutQuint);
 
     // Dodanie efektu przezroczystości dla etykiety częstotliwości
-    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(frequencyLabel);
+    const auto opacityEffect = new QGraphicsOpacityEffect(frequencyLabel);
     frequencyLabel->setGraphicsEffect(opacityEffect);
     opacityEffect->setOpacity(0.0); // Początkowo niewidoczny
 
     // Animacja pojawiania się etykiety częstotliwości
-    QPropertyAnimation *frequencyAnimation = new QPropertyAnimation(opacityEffect, "opacity");
+    auto frequencyAnimation = new QPropertyAnimation(opacityEffect, "opacity");
     frequencyAnimation->setDuration(600);
     frequencyAnimation->setStartValue(0.0);
     frequencyAnimation->setEndValue(1.0);
     frequencyAnimation->setEasingCurve(QEasingCurve::InQuad);
 
     // Utwórz grupę animacji, która zostanie uruchomiona sekwencyjnie
-    QParallelAnimationGroup *animGroup = new QParallelAnimationGroup(this);
+    const auto animGroup = new QParallelAnimationGroup(this);
     animGroup->addAnimation(loaderSlideAnimation);
 
     // Sygnalizacja kiedy pierwsza animacja się kończy
@@ -450,7 +450,7 @@ void WavelengthDialog::onFrequencyFound() {
     validateInputs();
 
     // Dodaj efekt scanline przy znalezieniu częstotliwości
-    QPropertyAnimation* scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
+    const auto scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
     scanAnim->setDuration(1500);
     scanAnim->setStartValue(0.3);
     scanAnim->setEndValue(0.08);
@@ -458,7 +458,7 @@ void WavelengthDialog::onFrequencyFound() {
     scanAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-QString WavelengthDialog::formatFrequencyText(double frequency) {
+QString WavelengthDialog::formatFrequencyText(const double frequency) {
     QString unitText;
     double displayValue;
 
@@ -481,18 +481,17 @@ QString WavelengthDialog::findLowestAvailableFrequency() {
     qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
     // Pobierz preferowaną częstotliwość startową z konfiguracji
-    WavelengthConfig* config = WavelengthConfig::getInstance();
-    QString preferredFreq = config->getPreferredStartFrequency();
+    const WavelengthConfig* config = WavelengthConfig::getInstance();
+    const QString preferredFreq = config->getPreferredStartFrequency();
     qDebug() << "LOG: Używam preferowanej częstotliwości startowej:" << preferredFreq << "Hz";
 
     QNetworkAccessManager manager;
     QEventLoop loop;
-    QNetworkReply *reply;
 
-    QString serverAddress = config->getRelayServerAddress();
-    int serverPort = config->getRelayServerPort();
+    const QString serverAddress = config->getRelayServerAddress();
+    const int serverPort = config->getRelayServerPort();
 
-    QString baseUrlString = QString("http://%1:%2/api/next-available-frequency").arg(serverAddress).arg(serverPort);
+    const QString baseUrlString = QString("http://%1:%2/api/next-available-frequency").arg(serverAddress).arg(serverPort);
     QUrl url(baseUrlString);
 
     QUrlQuery query;
@@ -500,10 +499,10 @@ QString WavelengthDialog::findLowestAvailableFrequency() {
     url.setQuery(query);
 
     qDebug() << "LOG: Wysyłanie żądania do:" << url.toString();
-    QNetworkRequest request(url);
+    const QNetworkRequest request(url);
 
     // Wykonaj żądanie synchronicznie (w kontekście asynchronicznego QtConcurrent::run)
-    reply = manager.get(request);
+    QNetworkReply *reply = manager.get(request);
 
     // Połącz sygnał zakończenia z pętlą zdarzeń
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
@@ -514,8 +513,8 @@ QString WavelengthDialog::findLowestAvailableFrequency() {
     QString resultFrequency = "130.0"; // Domyślna wartość w razie błędu
 
     if (reply->error() == QNetworkReply::NoError) {
-        QByteArray responseData = reply->readAll();
-        QJsonDocument doc = QJsonDocument::fromJson(responseData);
+        const QByteArray responseData = reply->readAll();
+        const QJsonDocument doc = QJsonDocument::fromJson(responseData);
         QJsonObject obj = doc.object();
 
         if (obj.contains("frequency") && obj["frequency"].isString()) {
@@ -538,8 +537,6 @@ QString WavelengthDialog::findLowestAvailableFrequency() {
 
 void WavelengthDialog::initRenderBuffers() {
     if (!m_buffersInitialized || height() != m_previousHeight) {
-        int clipSize = 20;
-
         // --- ZMIANA: Inicjalizuj tylko bufor głównej linii skanującej ---
         m_scanlineBuffer = QPixmap(width(), 20); // Stała wysokość 20px
         m_scanlineBuffer.fill(Qt::transparent);

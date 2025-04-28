@@ -7,7 +7,7 @@
 #include <QStyleOption>
 #include <QPainter>
 
-class ClickableColorPreview : public QWidget {
+class ClickableColorPreview final : public QWidget {
     Q_OBJECT
 
 public:

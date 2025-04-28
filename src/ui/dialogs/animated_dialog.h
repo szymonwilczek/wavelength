@@ -21,9 +21,9 @@ public:
     };
 
     explicit AnimatedDialog(QWidget *parent = nullptr, AnimationType type = SlideFromBottom);
-    ~AnimatedDialog();
+    ~AnimatedDialog() override;
 
-    void setAnimationDuration(int duration) { m_duration = duration; }
+    void setAnimationDuration(const int duration) { m_duration = duration; }
     int animationDuration() const { return m_duration; }
 
     signals:

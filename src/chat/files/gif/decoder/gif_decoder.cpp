@@ -18,7 +18,7 @@ GifDecoder::GifDecoder(const QByteArray &gifData, QObject *parent): QThread(pare
     m_frameDelay = 100; // Domyślne opóźnienie w ms
 
     // Zainicjuj bufor z danymi GIF
-    m_ioBuffer = (unsigned char*)av_malloc(m_gifData.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+    m_ioBuffer = static_cast<unsigned char *>(av_malloc(m_gifData.size() + AV_INPUT_BUFFER_PADDING_SIZE));
     if (!m_ioBuffer) {
         emit error("Nie można zaalokować pamięci dla danych GIF");
         return;
@@ -102,8 +102,7 @@ bool GifDecoder::reinitialize() {
     QMutexLocker locker(&m_mutex);
 
     // Zatrzymaj wątek jeśli działa
-    bool wasRunning = isRunning();
-    if (wasRunning) {
+    if (isDecoderRunning()) {
         m_stopped = true;
         m_waitCondition.wakeAll();
         locker.unlock();
@@ -124,7 +123,7 @@ bool GifDecoder::reinitialize() {
 
     // Przygotowanie buforów I/O jeśli zostały zwolnione
     if (!m_ioBuffer) {
-        m_ioBuffer = (unsigned char*)av_malloc(m_gifData.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+        m_ioBuffer = static_cast<unsigned char *>(av_malloc(m_gifData.size() + AV_INPUT_BUFFER_PADDING_SIZE));
         if (!m_ioBuffer) {
             emit error("Nie można zaalokować pamięci dla danych GIF");
             return false;
@@ -189,7 +188,7 @@ bool GifDecoder::initialize() {
     }
 
     // Ustal częstotliwość klatek
-    AVStream* stream = m_formatContext->streams[m_gifStream];
+    const AVStream* stream = m_formatContext->streams[m_gifStream];
     if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
         m_frameRate = av_q2d(stream->avg_frame_rate);
         m_frameDelay = 1000.0 / m_frameRate; // W milisekundach
@@ -246,7 +245,7 @@ bool GifDecoder::initialize() {
         1
     );
 
-    m_buffer = (uint8_t*)av_malloc(m_bufferSize);
+    m_buffer = static_cast<uint8_t *>(av_malloc(m_bufferSize));
     if (!m_buffer) {
         emit error("Nie można zaalokować bufora GIF");
         return false;
@@ -304,7 +303,7 @@ void GifDecoder::pause() {
     }
 }
 
-void GifDecoder::seek(double position) {
+void GifDecoder::seek(const double position) {
     QMutexLocker locker(&m_mutex);
 
     if (!m_formatContext || m_gifStream < 0) return;
@@ -353,7 +352,7 @@ void GifDecoder::resume() {
     if (m_paused) {
         m_paused = false;
         qDebug() << "GifDecoder::resume() - Resuming playback.";
-        if (!isRunning()) { // Jeśli wątek nie działa, uruchom go
+        if (!isDecoderRunning()) { // Jeśli wątek nie działa, uruchom go
             qDebug() << "GifDecoder::resume() - Thread not running, starting...";
             locker.unlock(); // Odblokuj przed startem wątku
             start(); // Uruchom pętlę run()
@@ -391,11 +390,6 @@ void GifDecoder::run() {
                 qDebug() << "GifDecoder::run() - Paused, waiting...";
                 m_waitCondition.wait(&m_mutex);
                 qDebug() << "GifDecoder::run() - Woken up.";
-                // Po obudzeniu pętla sprawdzi m_stopped i m_paused ponownie
-                if (!m_paused && !m_stopped) { // Jeśli wznowiono
-                    m_frameTimer.restart(); // Zresetuj timer klatki
-                    isFirstFrameAfterResume = true; // Traktuj następną klatkę jako pierwszą po wznowieniu
-                }
                 continue; // Wróć na początek pętli
             }
             // Jeśli nie jest zatrzymany i nie jest spauzowany, kontynuuj dekodowanie
@@ -403,7 +397,7 @@ void GifDecoder::run() {
                 qDebug() << "GifDecoder::run() - Seeking to position:" << m_seekPosition;
                 if (m_formatContext && m_gifStream >= 0) {
                     // Użyj AVSEEK_FLAG_ANY dla GIFów, może być bardziej niezawodne
-                    int seek_ret = av_seek_frame(m_formatContext, m_gifStream, m_seekPosition, AVSEEK_FLAG_BACKWARD); // lub AVSEEK_FLAG_ANY
+                    const int seek_ret = av_seek_frame(m_formatContext, m_gifStream, m_seekPosition, AVSEEK_FLAG_BACKWARD); // lub AVSEEK_FLAG_ANY
                     if (seek_ret < 0) {
                         qDebug() << "GifDecoder::run() - Seek failed:" << seek_ret;
                     } else {
@@ -429,15 +423,14 @@ void GifDecoder::run() {
             }
         } // Koniec zakresu lockera
 
-        int readResult = av_read_frame(m_formatContext, &packet);
+        const int readResult = av_read_frame(m_formatContext, &packet);
 
         if (readResult < 0) {
             if (readResult == AVERROR_EOF) {
                 // Koniec strumienia - zapętlanie
                 QMutexLocker locker(&m_mutex);
-                if (m_stopped) break; // Sprawdź ponownie przed seek
                 qDebug() << "GifDecoder::run() - End of stream, looping...";
-                int seek_ret = av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
+                const int seek_ret = av_seek_frame(m_formatContext, m_gifStream, 0, AVSEEK_FLAG_BACKWARD);
                 if (seek_ret < 0) {
                     qDebug() << "GifDecoder::run() - Loop seek failed:" << seek_ret;
                     m_stopped = true; // Zatrzymaj, jeśli przewinięcie się nie powiodło
@@ -465,7 +458,7 @@ void GifDecoder::run() {
 
         // --- Przetwarzanie pakietu ---
         if (packet.stream_index == m_gifStream) {
-            int sendResult = avcodec_send_packet(m_codecContext, &packet);
+            const int sendResult = avcodec_send_packet(m_codecContext, &packet);
             if (sendResult < 0) {
                 char errbuf[AV_ERROR_MAX_STRING_SIZE] = {0};
                 av_make_error_string(errbuf, AV_ERROR_MAX_STRING_SIZE, sendResult);
@@ -478,7 +471,7 @@ void GifDecoder::run() {
                 // Odbieranie klatek (może być więcej niż jedna na pakiet)
                 while (true) {
                     // qDebug() << "GifDecoder::run() - Receiving frame from decoder...";
-                    int receiveResult = avcodec_receive_frame(m_codecContext, m_frame);
+                    const int receiveResult = avcodec_receive_frame(m_codecContext, m_frame);
                     // qDebug() << "GifDecoder::run() - avcodec_receive_frame result:" << receiveResult;
 
                     if (receiveResult == 0) {
@@ -517,8 +510,8 @@ void GifDecoder::run() {
                         // Opóźnienie
                         qint64 delayTime = static_cast<qint64>(m_frameDelay); // Użyj m_frameDelay
                         if (!isFirstFrameAfterResume) { // Użyj nowej flagi
-                            qint64 elapsed = m_frameTimer.elapsed();
-                            delayTime = qMax((qint64)0, delayTime - elapsed);
+                            const qint64 elapsed = m_frameTimer.elapsed();
+                            delayTime = qMax(static_cast<qint64>(0), delayTime - elapsed);
                         }
                         if (delayTime > 0) {
                             // Użyj usleep lub innego mechanizmu czekania, który można przerwać
@@ -558,9 +551,9 @@ void GifDecoder::run() {
     // emit playbackFinished();
 }
 
-int GifDecoder::readPacket(void *opaque, uint8_t *buf, int buf_size) {
-    GifDecoder* decoder = static_cast<GifDecoder*>(opaque);
-    int size = qMin(buf_size, decoder->m_readPosition >= decoder->m_gifData.size() ?
+int GifDecoder::readPacket(void *opaque, uint8_t *buf, const int buf_size) {
+    const auto decoder = static_cast<GifDecoder*>(opaque);
+    const int size = qMin(buf_size, decoder->m_readPosition >= decoder->m_gifData.size() ?
                                   0 : decoder->m_gifData.size() - decoder->m_readPosition);
 
     if (size <= 0)
@@ -571,8 +564,8 @@ int GifDecoder::readPacket(void *opaque, uint8_t *buf, int buf_size) {
     return size;
 }
 
-int64_t GifDecoder::seekPacket(void *opaque, int64_t offset, int whence) {
-    GifDecoder* decoder = static_cast<GifDecoder*>(opaque);
+int64_t GifDecoder::seekPacket(void *opaque, const int64_t offset, const int whence) {
+    const auto decoder = static_cast<GifDecoder*>(opaque);
 
     switch (whence) {
         case SEEK_SET:

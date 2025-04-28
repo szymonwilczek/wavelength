@@ -3,10 +3,9 @@
 
 #include "blob_state.h"
 #include "../blob_config.h"
-#include <QSize>
 #include <QVector2D>
 
-class ResizingState : public BlobState {
+class ResizingState final : public BlobState {
 public:
     ResizingState();
     

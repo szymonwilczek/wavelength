@@ -10,7 +10,7 @@
 #include "../../ui/checkbox/cyber_checkbox.h"
 #include "../../ui/input/cyber_line_edit.h"
 
-class WavelengthDialog : public AnimatedDialog {
+class WavelengthDialog final : public AnimatedDialog {
     Q_OBJECT
      Q_PROPERTY(double scanlineOpacity READ scanlineOpacity WRITE setScanlineOpacity)
      Q_PROPERTY(double digitalizationProgress READ digitalizationProgress WRITE setDigitalizationProgress)
@@ -43,7 +43,7 @@ public:
             m_refreshTimer->stop();
         }
     }
-    void setRefreshTimerInterval(int interval) const {
+    void setRefreshTimerInterval(const int interval) const {
         if (m_refreshTimer) {
             m_refreshTimer->setInterval(interval);
         }

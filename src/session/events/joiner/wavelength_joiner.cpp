@@ -4,7 +4,7 @@
 
 JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &password) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    WavelengthConfig* config = WavelengthConfig::getInstance();
+    const WavelengthConfig* config = WavelengthConfig::getInstance();
 
     if (registry->hasWavelength(frequency)) {
         qDebug() << "Already joined wavelength" << frequency;
@@ -20,10 +20,10 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
 
     registry->addPendingRegistration(frequency);
     QString clientId = AuthenticationManager::getInstance()->generateClientId();
-    bool* connectedCallbackExecuted = new bool(false);
-    QTimer* keepAliveTimer = new QTimer(this);
+    auto connectedCallbackExecuted = new bool(false);
+    auto keepAliveTimer = new QTimer(this);
 
-    QWebSocket* socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
+    auto socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
     auto joinResultHandler = [this, frequency, socket, keepAliveTimer, registry](const QString& message) {
         qDebug() << "[Joiner] JoinResultHandler received message:" << message;
@@ -35,14 +35,14 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
             return;
         }
 
-        QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
+        const QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
         qDebug() << "[Joiner] Message type in JoinResultHandler:" << msgType;
 
         if (msgType == "join_result") {
             disconnect(socket, &QWebSocket::textMessageReceived, this, nullptr);
 
-            bool success = msgObj["success"].toBool();
-            QString errorMessage = msgObj["error"].toString();
+            const bool success = msgObj["success"].toBool();
+            const QString errorMessage = msgObj["error"].toString();
 
             registry->removePendingRegistration(frequency);
 
@@ -95,7 +95,7 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
 
         if (registry->hasWavelength(frequency)) {
             qDebug() << "[Joiner] Removing wavelength" << frequency << "due to socket disconnect";
-            QString activeFreq = registry->getActiveWavelength();
+            const QString activeFreq = registry->getActiveWavelength();
             registry->removeWavelength(frequency);
             if (activeFreq == frequency) {
                 registry->setActiveWavelength("-1");
@@ -111,7 +111,7 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
     };
 
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
-            this, [this, socket, frequency, keepAliveTimer, connectedCallbackExecuted, registry](QAbstractSocket::SocketError error) {
+            this, [this, socket, frequency, keepAliveTimer, registry](const QAbstractSocket::SocketError error) {
                 qDebug() << "[Joiner] WebSocket error:" << socket->errorString() << "(Code:" << error << ")";
                 keepAliveTimer->stop();
 
@@ -160,15 +160,15 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
             joinData["password"] = password;
         }
         joinData["clientId"] = clientId;
-        QJsonDocument doc(joinData);
-        QString message = doc.toJson(QJsonDocument::Compact);
+        const QJsonDocument doc(joinData);
+        const QString message = doc.toJson(QJsonDocument::Compact);
         qDebug() << "[Joiner] Sending join message:" << message;
         socket->sendTextMessage(message);
     });
 
-    QString address = config->getRelayServerAddress();
-    int port = config->getRelayServerPort();
-    QUrl url(QString("ws://%1:%2").arg(address).arg(port));
+    const QString address = config->getRelayServerAddress();
+    const int port = config->getRelayServerPort();
+    const QUrl url(QString("ws://%1:%2").arg(address).arg(port));
     qDebug() << "[Joiner] Opening WebSocket connection to URL for joining:" << url.toString();
     socket->open(url);
 

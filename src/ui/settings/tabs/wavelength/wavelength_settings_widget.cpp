@@ -13,9 +13,9 @@
 #include <QLocale>
 
 namespace FreqLimits {
-    const double MIN_HZ = 130.0;
-    const double MAX_VALUE_PER_UNIT = 999.9;
-    const double MAX_HZ = 999900000.0;
+    constexpr double MIN_HZ = 130.0;
+    constexpr double MAX_VALUE_PER_UNIT = 999.9;
+    constexpr double MAX_HZ = 999900000.0;
 }
 
 WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
@@ -32,27 +32,27 @@ WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
 
 void WavelengthSettingsWidget::setupUi() {
     qDebug() << "WavelengthSettingsWidget setupUi start";
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    QLabel *infoLabel = new QLabel("Configure frequency preferences", this); // Zmieniono opis
+    const auto infoLabel = new QLabel("Configure frequency preferences", this); // Zmieniono opis
     infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(infoLabel);
 
-    QFormLayout *formLayout = new QFormLayout();
+    const auto formLayout = new QFormLayout();
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setSpacing(15);
     formLayout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
     // --- Preferred Start Frequency --- (bez zmian)
-    QLabel *preferredFreqLabel = new QLabel("Preferred Start Frequency:", this);
+    const auto preferredFreqLabel = new QLabel("Preferred Start Frequency:", this);
     preferredFreqLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    QHBoxLayout *freqLayout = new QHBoxLayout();
+    const auto freqLayout = new QHBoxLayout();
     freqLayout->setSpacing(5);
     m_frequencyValueEdit = new QLineEdit(this);
     m_frequencyValueEdit->setPlaceholderText("e.g., 150.5 or 98.7");
-    QDoubleValidator *validator = new QDoubleValidator(0.0, FreqLimits::MAX_VALUE_PER_UNIT * 10, 3, this);
+    const auto validator = new QDoubleValidator(0.0, FreqLimits::MAX_VALUE_PER_UNIT * 10, 3, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
     validator->setLocale(QLocale::C);
     m_frequencyValueEdit->setValidator(validator);
@@ -78,13 +78,13 @@ void WavelengthSettingsWidget::setupUi() {
     qDebug() << "WavelengthSettingsWidget setupUi end";
 }
 
-void WavelengthSettingsWidget::loadSettings() {
+void WavelengthSettingsWidget::loadSettings() const {
     if (!m_frequencyValueEdit || !m_frequencyUnitCombo) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
         qWarning() << "WavelengthSettingsWidget::loadSettings - UI elements not initialized.";
         return;
     }
 
-    QString freqStringHz = m_config->getPreferredStartFrequency();
+    const QString freqStringHz = m_config->getPreferredStartFrequency();
     bool ok;
     double freqValueHz = freqStringHz.toDouble(&ok);
 
@@ -116,12 +116,12 @@ void WavelengthSettingsWidget::loadSettings() {
 bool WavelengthSettingsWidget::validateFrequencyInput(double& valueHz) {
     if (!m_frequencyValueEdit || !m_frequencyUnitCombo) return false;
 
-    QString valueStr = m_frequencyValueEdit->text();
-    QString unitStr = m_frequencyUnitCombo->currentText();
+    const QString valueStr = m_frequencyValueEdit->text();
+    const QString unitStr = m_frequencyUnitCombo->currentText();
     bool ok;
 
-    QLocale cLocale(QLocale::C);
-    double valueDouble = cLocale.toDouble(valueStr, &ok);
+    const QLocale cLocale(QLocale::C);
+    const double valueDouble = cLocale.toDouble(valueStr, &ok);
 
     if (!ok || valueDouble <= 0) {
         QMessageBox::warning(this, "Invalid Input", "Please enter a valid positive number for the frequency value.");
@@ -175,7 +175,7 @@ void WavelengthSettingsWidget::saveSettings() {
         return;
     }
 
-    QString frequencyStringHz = QString::number(frequencyValueHz, 'f', 1);
+    const QString frequencyStringHz = QString::number(frequencyValueHz, 'f', 1);
     m_config->setPreferredStartFrequency(frequencyStringHz);
 
     // Usunięto zapis m_config->setRelayServerAddress(...)

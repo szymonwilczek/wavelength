@@ -100,7 +100,7 @@ void CyberpunkButton::paintEvent(QPaintEvent *event) {
     // Dodajemy efekt poświaty dla samej ramki - opcjonalnie
     if (m_glowIntensity > 0.3) { // Tylko przy większej intensywności
         QPen glowPen;
-        QColor glowColor = QColor(r, g, b, int(70 * m_glowIntensity));
+        auto glowColor = QColor(r, g, b, static_cast<int>(70 * m_glowIntensity));
         glowPen.setColor(glowColor);
         glowPen.setWidthF(penWidth + 0.6);
         painter.setPen(glowPen);
@@ -111,18 +111,18 @@ void CyberpunkButton::paintEvent(QPaintEvent *event) {
     }
 }
 
-void CyberpunkButton::setGlowIntensity(qreal intensity) {
+void CyberpunkButton::setGlowIntensity(const qreal intensity) {
     m_glowIntensity = intensity;
 
     // Aktualizacja efektu poświaty dla tekstu
     if (m_glowEffect) {
         // Zwiększenie blasku i promienia poświaty dla tekstu
-        int baseBlur = 7;
-        int deltaBlur = 2;
+        constexpr int baseBlur = 7;
+        constexpr int deltaBlur = 2;
         m_glowEffect->setBlurRadius(baseBlur + deltaBlur * intensity);
 
         // Zwiększenie jasności poświaty tekstu
-        QColor glowColor = QColor(0, 255, 255, 160 + 95 * intensity);
+        const auto glowColor = QColor(0, 255, 255, 160 + 95 * intensity);
         m_glowEffect->setColor(glowColor);
     }
 

@@ -6,12 +6,12 @@
 #include <QStyleOptionButton>
 
 
-class CyberCheckBox : public QCheckBox {
+class CyberCheckBox final : public QCheckBox {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberCheckBox(const QString& text, QWidget* parent = nullptr);
+    explicit CyberCheckBox(const QString& text, QWidget* parent = nullptr);
 
     QSize sizeHint() const override;
 

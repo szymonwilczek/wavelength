@@ -8,11 +8,11 @@
 #include "../decoder/gif_decoder.h"
 
 // Klasa odtwarzacza GIF zintegrowanego z czatem
-class InlineGifPlayer : public QFrame {
+class InlineGifPlayer final : public QFrame {
     Q_OBJECT
 
 public:
-    InlineGifPlayer(const QByteArray& gifData, QWidget* parent = nullptr);
+    explicit InlineGifPlayer(const QByteArray& gifData, QWidget* parent = nullptr);
 
     // Usunięto getActivePlayer i logikę s_activePlayer
 
@@ -39,10 +39,10 @@ protected:
 private slots:
     void displayThumbnail(const QImage& frame);
 
-    void updateFrame(const QImage& frame);
+    void updateFrame(const QImage& frame) const;
 
 
-    void updatePosition(double position) {
+    void updatePosition(const double position) {
         m_currentPosition = position;
     }
 

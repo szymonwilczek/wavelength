@@ -27,7 +27,7 @@ class QLabel;
 class QTimer;
 class QPushButton;
 
-class SettingsView : public QWidget {
+class SettingsView final : public QWidget {
     Q_OBJECT
 
 public:
@@ -50,7 +50,7 @@ private slots:
     void handleBackButton();
 
 private:
-    void loadSettingsFromRegistry();
+    void loadSettingsFromRegistry() const;
     void setupUi();
     void setupClassifiedTab();
     void setupNextSecurityLayer();

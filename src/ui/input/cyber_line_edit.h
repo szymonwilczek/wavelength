@@ -6,12 +6,12 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 
-class CyberLineEdit : public QLineEdit {
+class CyberLineEdit final : public QLineEdit {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberLineEdit(QWidget* parent = nullptr);
+    explicit CyberLineEdit(QWidget* parent = nullptr);
 
     ~CyberLineEdit() override;
 
@@ -20,7 +20,7 @@ public:
     double glowIntensity() const { return m_glowIntensity; }
     void setGlowIntensity(double intensity);
 
-    QRect cursorRect() const;
+    QRect cyberCursorRect() const;
 
 protected:
     void paintEvent(QPaintEvent* event) override;

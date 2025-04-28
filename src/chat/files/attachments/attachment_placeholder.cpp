@@ -6,11 +6,12 @@
 #include "attachment_data_store.h"
 #include "auto_scaling_attachment.h"
 #include "../image/displayer/image_viewer.h"
+#include "../../../ui/files/cyber_attachment_viewer.h"
 
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type, QWidget *parent,
                                              bool autoLoad): QWidget(parent), m_filename(filename), m_isLoaded(false) {
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
 
     // Ikona i typ załącznika
@@ -21,11 +22,11 @@ AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QStr
     else if (type == "gif") icon = "🎞️";
     else icon = "📎";
 
-    QFileInfo fileInfo(filename);
-    QString baseName = fileInfo.baseName(); // Nazwa pliku bez ostatniego rozszerzenia
-    QString suffix = fileInfo.completeSuffix(); // Całe rozszerzenie (np. tar.gz)
+    const QFileInfo fileInfo(filename);
+    const QString baseName = fileInfo.baseName(); // Nazwa pliku bez ostatniego rozszerzenia
+    const QString suffix = fileInfo.completeSuffix(); // Całe rozszerzenie (np. tar.gz)
 
-    const int maxBaseNameLength = 25;
+    constexpr int maxBaseNameLength = 25;
     QString displayedName;
 
     if (baseName.length() > maxBaseNameLength) {
@@ -129,7 +130,7 @@ void AttachmentPlaceholder::setContent(QWidget *content) {
     // Dajemy trochę czasu na ustalenie rozmiaru i informujemy rodzica
     QTimer::singleShot(50, this, [this, content]() {
         // Wymuszamy update layoutu w CyberAttachmentViewer, jeśli to on jest zawartością
-        if (CyberAttachmentViewer* viewer = qobject_cast<CyberAttachmentViewer*>(content)) {
+        if (const auto viewer = qobject_cast<CyberAttachmentViewer*>(content)) {
             viewer->updateContentLayout(); // Ta funkcja powinna zadbać o aktualizację w dół
         } else {
             // Jeśli zawartością nie jest viewer, nadal aktualizuj geometrię
@@ -152,27 +153,27 @@ void AttachmentPlaceholder::setContent(QWidget *content) {
 
 QSize AttachmentPlaceholder::sizeHint() const {
     // Bazowy rozmiar dla widgetu bez zawartości
-    QSize baseSize(400, 100);
+    constexpr QSize baseSize(400, 100);
 
     // Jeśli mamy zawartość, sprawdzamy jej rozmiar
-    QWidget* content = nullptr;
+    const QWidget* content = nullptr;
     if (m_contentContainer && m_contentContainer->isVisible() && m_contentLayout->count() > 0) {
         content = m_contentLayout->itemAt(0)->widget();
     }
 
     if (content) {
-        QSize contentSize = content->sizeHint();
+        const QSize contentSize = content->sizeHint();
         if (contentSize.isValid() && contentSize.width() > 0 && contentSize.height() > 0) {
             // Dodajemy przestrzeń na etykietę i przyciski
-            int totalHeight = contentSize.height() +
+            const int totalHeight = contentSize.height() +
                               m_infoLabel->sizeHint().height() +
                               (m_progressLabel->isVisible() ? m_progressLabel->sizeHint().height() : 0) +
                               (m_loadButton->isVisible() ? m_loadButton->sizeHint().height() : 0) +
                               20; // dodatkowy margines
 
-            int totalWidth = qMax(contentSize.width(), baseSize.width());
+            const int totalWidth = qMax(contentSize.width(), baseSize.width());
 
-            QSize result(totalWidth, totalHeight);
+            const QSize result(totalWidth, totalHeight);
             return result;
         }
     }
@@ -191,7 +192,7 @@ void AttachmentPlaceholder::setBase64Data(const QString &base64Data, const QStri
     m_mimeType = mimeType;
 }
 
-void AttachmentPlaceholder::setLoading(bool loading) {
+void AttachmentPlaceholder::setLoading(const bool loading) const {
     if (loading) {
         m_loadButton->setEnabled(false);
         m_loadButton->setText("DEKODOWANIE W TOKU...");
@@ -213,7 +214,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
     if (m_hasReference) {
         // Pobieramy dane z magazynu w wątku roboczym
         AttachmentQueueManager::getInstance()->addTask([this]() {
-            QString base64Data = AttachmentDataStore::getInstance()->getAttachmentData(m_attachmentId);
+            const QString base64Data = AttachmentDataStore::getInstance()->getAttachmentData(m_attachmentId);
 
             if (base64Data.isEmpty()) {
                 QMetaObject::invokeMethod(this, "setError",
@@ -223,7 +224,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             }
 
             // Dekodujemy dane i kontynuujemy jak wcześniej
-            QByteArray data = QByteArray::fromBase64(base64Data.toUtf8());
+            const QByteArray data = QByteArray::fromBase64(base64Data.toUtf8());
 
             if (data.isEmpty()) {
                 QMetaObject::invokeMethod(this, "setError",
@@ -258,7 +259,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
     } else {
         AttachmentQueueManager::getInstance()->addTask([this]() {
             try {
-                QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
+                const QByteArray data = QByteArray::fromBase64(m_base64Data.toUtf8());
 
                 if (data.isEmpty()) {
                     QMetaObject::invokeMethod(this, "setError",
@@ -285,27 +286,26 @@ void AttachmentPlaceholder::setError(const QString &errorMsg) {
     m_isLoaded = false;
 }
 
-void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGif) {
+void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, const bool isGif) {
     QWidget* parentWindow = window();
-    QDialog* fullSizeDialog = new QDialog(parentWindow, Qt::Window | Qt::FramelessWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    auto fullSizeDialog = new QDialog(parentWindow, Qt::Window | Qt::FramelessWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
     fullSizeDialog->setWindowTitle(isGif ? "Podgląd animacji" : "Podgląd załącznika");
     fullSizeDialog->setModal(false);
     fullSizeDialog->setAttribute(Qt::WA_DeleteOnClose);
 
-    QVBoxLayout* layout = new QVBoxLayout(fullSizeDialog);
+    const auto layout = new QVBoxLayout(fullSizeDialog);
     layout->setContentsMargins(5, 5, 5, 5);
 
-    QScrollArea* scrollArea = new QScrollArea(fullSizeDialog);
+    auto scrollArea = new QScrollArea(fullSizeDialog);
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setStyleSheet("QScrollArea { background-color: #001018; border: none; }");
 
     QWidget* contentWidget = nullptr;
-    InlineGifPlayer* fullGif = nullptr;
 
     // Lambda do wywołania po uzyskaniu rozmiaru (przeniesiona logika z sizeReadyCallback)
-    auto adjustAndShowWithSizeCheck = [this, fullSizeDialog, scrollArea](QWidget* contentWgt, QSize size) {
+    auto adjustAndShowWithSizeCheck = [this, fullSizeDialog, scrollArea](QWidget* contentWgt, const QSize size) {
         if (size.isValid()) {
             qDebug() << "Dialog: Content size ready:" << size;
             adjustAndShowDialog(fullSizeDialog, scrollArea, contentWgt, size);
@@ -316,6 +316,7 @@ void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGi
     };
 
     if (isGif) {
+        InlineGifPlayer* fullGif = nullptr;
         fullGif = new InlineGifPlayer(data, scrollArea); // Przypisz do wskaźnika
         contentWidget = fullGif;
         // Połącz gifLoaded, aby uzyskać rozmiar i pokazać dialog
@@ -339,7 +340,7 @@ void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGi
             }
         });
     } else {
-        InlineImageViewer* fullImage = new InlineImageViewer(data, scrollArea);
+        const auto fullImage = new InlineImageViewer(data, scrollArea);
         contentWidget = fullImage;
         connect(fullImage, &InlineImageViewer::imageLoaded, this, [=]() {
             QTimer::singleShot(0, this, [=]() {
@@ -348,13 +349,13 @@ void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGi
             });
         });
         // Fallback z imageInfoReady
-        connect(fullImage, &InlineImageViewer::imageInfoReady, this, [=](int w, int h, bool) {
+        connect(fullImage, &InlineImageViewer::imageInfoReady, this, [=](const int w, const int h, bool) {
             // Sprawdź, czy dialog nie został już pokazany (np. przez imageLoaded)
             // Proste sprawdzenie widoczności może wystarczyć
             if (!fullSizeDialog->isVisible()) {
                 QTimer::singleShot(0, this, [=]() {
                     // Pobierz sizeHint ponownie, na wypadek gdyby imageLoaded zadziałało w międzyczasie
-                    QSize currentHint = fullImage->sizeHint();
+                    const QSize currentHint = fullImage->sizeHint();
                     if (currentHint.isValid()) {
                         adjustAndShowWithSizeCheck(fullImage, currentHint);
                     } else {
@@ -368,7 +369,7 @@ void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGi
     scrollArea->setWidget(contentWidget);
     layout->addWidget(scrollArea, 1);
 
-    QPushButton* closeButton = new QPushButton("Zamknij", fullSizeDialog);
+    const auto closeButton = new QPushButton("Zamknij", fullSizeDialog);
     closeButton->setStyleSheet(
         "QPushButton {"
         "  background-color: #002b3d;"
@@ -398,8 +399,8 @@ void AttachmentPlaceholder::showFullSizeDialog(const QByteArray &data, bool isGi
     );
 }
 
-void AttachmentPlaceholder::adjustAndShowDialog(QDialog *dialog, QScrollArea *scrollArea, QWidget *contentWidget,
-    QSize originalContentSize) {
+void AttachmentPlaceholder::adjustAndShowDialog(QDialog *dialog, const QScrollArea *scrollArea, QWidget *contentWidget,
+    const QSize originalContentSize) const {
     if (!dialog || !contentWidget || !originalContentSize.isValid()) {
         qDebug() << "adjustAndShowDialog: Invalid arguments or size.";
         if(dialog) dialog->deleteLater();
@@ -407,35 +408,35 @@ void AttachmentPlaceholder::adjustAndShowDialog(QDialog *dialog, QScrollArea *sc
     }
 
     // 1. Pobierz geometrię ekranu (bez zmian)
-    QScreen* screen = nullptr;
+    const QScreen* screen = nullptr;
     if (window() && window()->windowHandle()) {
         screen = window()->windowHandle()->screen();
     }
     if (!screen) {
         screen = QApplication::primaryScreen();
     }
-    QRect availableGeometry = screen ? screen->availableGeometry() : QRect(0, 0, 1024, 768);
+    const QRect availableGeometry = screen ? screen->availableGeometry() : QRect(0, 0, 1024, 768);
     qDebug() << "Dialog: Using Screen geometry:" << availableGeometry;
 
     // 2. Marginesy okna dialogowego (bez zmian)
-    const int margin = 50;
+    constexpr int margin = 50;
 
     // 3. Ustaw ROZMIAR ZAWARTOŚCI na ORYGINALNY
     qDebug() << "Dialog: Setting content widget fixed size to ORIGINAL:" << originalContentSize;
     contentWidget->setFixedSize(originalContentSize); // Kluczowa zmiana!
 
     // 4. Oblicz preferowany rozmiar okna dialogu na podstawie ORYGINALNEGO rozmiaru zawartości
-    QPushButton* closeButton = dialog->findChild<QPushButton*>();
-    int buttonHeight = closeButton ? closeButton->sizeHint().height() : 30; // Użyj sizeHint przycisku
-    int verticalMargins = dialog->layout()->contentsMargins().top() + dialog->layout()->contentsMargins().bottom() + dialog->layout()->spacing() + buttonHeight;
-    int horizontalMargins = dialog->layout()->contentsMargins().left() + dialog->layout()->contentsMargins().right();
+    const auto closeButton = dialog->findChild<QPushButton*>();
+    const int buttonHeight = closeButton ? closeButton->sizeHint().height() : 30; // Użyj sizeHint przycisku
+    const int verticalMargins = dialog->layout()->contentsMargins().top() + dialog->layout()->contentsMargins().bottom() + dialog->layout()->spacing() + buttonHeight;
+    const int horizontalMargins = dialog->layout()->contentsMargins().left() + dialog->layout()->contentsMargins().right();
 
     QSize preferredDialogSize = originalContentSize;
     preferredDialogSize.rwidth() += horizontalMargins;
     preferredDialogSize.rheight() += verticalMargins;
 
     // Dodaj miejsce na paski przewijania, jeśli będą potrzebne (porównaj oryginalny rozmiar z dostępnym miejscem *wewnątrz* okna)
-    QSize maxContentAreaSize(
+    const QSize maxContentAreaSize(
         availableGeometry.width() - margin * 2 - horizontalMargins - scrollArea->verticalScrollBar()->sizeHint().width(),
         availableGeometry.height() - margin * 2 - verticalMargins - scrollArea->horizontalScrollBar()->sizeHint().height() // Dodano odjęcie paska poziomego
     );
@@ -458,8 +459,8 @@ void AttachmentPlaceholder::adjustAndShowDialog(QDialog *dialog, QScrollArea *sc
     dialog->resize(finalDialogSize);
 
     // 6. Wyśrodkuj dialog na ekranie (bez zmian)
-    int x = availableGeometry.left() + (availableGeometry.width() - finalDialogSize.width()) / 2;
-    int y = availableGeometry.top() + (availableGeometry.height() - finalDialogSize.height()) / 2;
+    const int x = availableGeometry.left() + (availableGeometry.width() - finalDialogSize.width()) / 2;
+    const int y = availableGeometry.top() + (availableGeometry.height() - finalDialogSize.height()) / 2;
     dialog->move(x, y);
     qDebug() << "Dialog: Moving to:" << QPoint(x,y);
 
@@ -468,26 +469,25 @@ void AttachmentPlaceholder::adjustAndShowDialog(QDialog *dialog, QScrollArea *sc
 }
 
 void AttachmentPlaceholder::showCyberImage(const QByteArray &data) {
-    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+    const auto viewer = new CyberAttachmentViewer(m_contentContainer);
 
     // Tworzymy widget z obrazem z zachowaniem oryginalnych wymiarów
-    InlineImageViewer* imageViewer = new InlineImageViewer(data, viewer);
+    const auto imageViewer = new InlineImageViewer(data, viewer);
     imageViewer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     qDebug() << "showCyberImage - rozmiar obrazu:" << imageViewer->sizeHint();
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(imageViewer, viewer);
+    const auto scalingAttachment = new AutoScalingAttachment(imageViewer, viewer);
 
     QSize maxSize(400, 300);
 
     if (parentWidget() && parentWidget()->parentWidget()) { // Zakładając hierarchię StreamMessage -> Placeholder -> Viewer -> ScalingAttachment
-        QWidget* streamMessage = parentWidget()->parentWidget();
+        const QWidget* streamMessage = parentWidget()->parentWidget();
         maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50)); // Odejmij marginesy
         maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
     } else {
-        QScreen* screen = QApplication::primaryScreen();
-        if(screen) {
+        if(const QScreen* screen = QApplication::primaryScreen()) {
             maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
             maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
         }
@@ -508,22 +508,21 @@ void AttachmentPlaceholder::showCyberImage(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::showCyberGif(const QByteArray &data) {
-    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+    const auto viewer = new CyberAttachmentViewer(m_contentContainer);
 
     // Tworzymy widget z gifem
-    InlineGifPlayer* gifPlayer = new InlineGifPlayer(data, viewer);
+    const auto gifPlayer = new InlineGifPlayer(data, viewer);
 
     // Opakowujemy w AutoScalingAttachment
-    AutoScalingAttachment* scalingAttachment = new AutoScalingAttachment(gifPlayer, viewer);
+    const auto scalingAttachment = new AutoScalingAttachment(gifPlayer, viewer);
 
     QSize maxSize(400, 300);
     if (parentWidget() && parentWidget()->parentWidget()) {
-        QWidget* streamMessage = parentWidget()->parentWidget();
+        const QWidget* streamMessage = parentWidget()->parentWidget();
         maxSize.setWidth(qMin(maxSize.width(), streamMessage->width() - 50));
         maxSize.setHeight(qMin(maxSize.height(), streamMessage->height() / 2));
     } else {
-        QScreen* screen = QApplication::primaryScreen();
-        if(screen) {
+        if(const QScreen* screen = QApplication::primaryScreen()) {
             maxSize.setWidth(qMin(maxSize.width(), screen->availableGeometry().width() / 3));
             maxSize.setHeight(qMin(maxSize.height(), screen->availableGeometry().height() / 3));
         }
@@ -543,10 +542,10 @@ void AttachmentPlaceholder::showCyberGif(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::showCyberAudio(const QByteArray &data) {
-    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+    const auto viewer = new CyberAttachmentViewer(m_contentContainer);
 
     // Tworzymy widget z audio
-    InlineAudioPlayer* audioPlayer = new InlineAudioPlayer(data, m_mimeType, viewer);
+    const auto audioPlayer = new InlineAudioPlayer(data, m_mimeType, viewer);
 
     // Opakowujemy w AutoScalingAttachment
 
@@ -564,15 +563,15 @@ void AttachmentPlaceholder::showCyberAudio(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::showCyberVideo(const QByteArray &data) {
-    CyberAttachmentViewer* viewer = new CyberAttachmentViewer(m_contentContainer);
+    const auto viewer = new CyberAttachmentViewer(m_contentContainer);
 
     // Tworzymy widget z miniaturką wideo
-    QWidget* videoPreview = new QWidget(viewer);
-    QVBoxLayout* previewLayout = new QVBoxLayout(videoPreview);
+    const auto videoPreview = new QWidget(viewer);
+    const auto previewLayout = new QVBoxLayout(videoPreview);
     previewLayout->setContentsMargins(0, 0, 0, 0);
 
     // Tworzymy miniaturkę
-    QLabel* thumbnailLabel = new QLabel(videoPreview);
+    const auto thumbnailLabel = new QLabel(videoPreview);
     thumbnailLabel->setFixedSize(480, 270);
     thumbnailLabel->setAlignment(Qt::AlignCenter);
     thumbnailLabel->setStyleSheet("background-color: #000000; color: white; font-size: 48px;");
@@ -585,7 +584,7 @@ void AttachmentPlaceholder::showCyberVideo(const QByteArray &data) {
     previewLayout->addWidget(thumbnailLabel);
 
     // Dodajemy przycisk odtwarzania pod miniaturką
-    QPushButton* playButton = new QPushButton("ODTWÓRZ WIDEO", videoPreview);
+    const auto playButton = new QPushButton("ODTWÓRZ WIDEO", videoPreview);
     playButton->setStyleSheet(
         "QPushButton { "
         "  background-color: #002b3d; "
@@ -607,7 +606,7 @@ void AttachmentPlaceholder::showCyberVideo(const QByteArray &data) {
     // Po kliknięciu miniaturki lub przycisku, otwórz dialog z odtwarzaczem
     auto openPlayer = [this, data]() {
         m_videoData = data;
-        VideoPlayerOverlay* playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
+        auto playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
 
         // Dodajemy cyberpunkowy styl do overlay'a
         playerOverlay->setStyleSheet(
@@ -650,11 +649,11 @@ void AttachmentPlaceholder::showCyberVideo(const QByteArray &data) {
 
 void AttachmentPlaceholder::showVideo(const QByteArray &data) {
     // Zamiast osadzać odtwarzacz bezpośrednio, tworzymy miniaturkę z przyciskiem odtwarzania
-    QWidget* videoPreview = new QWidget(m_contentContainer);
-    QVBoxLayout* previewLayout = new QVBoxLayout(videoPreview);
+    const auto videoPreview = new QWidget(m_contentContainer);
+    const auto previewLayout = new QVBoxLayout(videoPreview);
 
     // Tworzymy miniaturkę (czarny prostokąt z ikoną odtwarzania)
-    QLabel* thumbnailLabel = new QLabel(videoPreview);
+    const auto thumbnailLabel = new QLabel(videoPreview);
     thumbnailLabel->setFixedSize(480, 270);
     thumbnailLabel->setAlignment(Qt::AlignCenter);
     thumbnailLabel->setStyleSheet("background-color: #000000; color: white; font-size: 48px;");
@@ -667,7 +666,7 @@ void AttachmentPlaceholder::showVideo(const QByteArray &data) {
     previewLayout->addWidget(thumbnailLabel);
 
     // Dodajemy przycisk odtwarzania pod miniaturką
-    QPushButton* playButton = new QPushButton("Odtwórz wideo", videoPreview);
+    const auto playButton = new QPushButton("Odtwórz wideo", videoPreview);
     playButton->setStyleSheet("QPushButton { background-color: #2c5e9e; color: white; padding: 6px; border-radius: 3px; }");
     previewLayout->addWidget(playButton);
 
@@ -675,7 +674,7 @@ void AttachmentPlaceholder::showVideo(const QByteArray &data) {
     auto openPlayer = [this, data]() {
         // Zachowujemy kopię danych wideo w m_videoData
         m_videoData = data;
-        VideoPlayerOverlay* playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
+        auto playerOverlay = new VideoPlayerOverlay(data, m_mimeType, nullptr);
         playerOverlay->setAttribute(Qt::WA_DeleteOnClose);
 
         // Ważne - rozłącz połączenie przed zamknięciem
@@ -713,7 +712,7 @@ void AttachmentPlaceholder::generateThumbnail(const QByteArray &videoData, QLabe
             QObject::connect(tempDecoder.get(), &VideoDecoder::frameReady,
                              thumbnailLabel, [thumbnailLabel, tempDecoder](const QImage& frame) {
                                  // Skalujemy klatkę do rozmiaru miniaturki
-                                 QImage scaledFrame = frame.scaled(thumbnailLabel->width(), thumbnailLabel->height(),
+                                 const QImage scaledFrame = frame.scaled(thumbnailLabel->width(), thumbnailLabel->height(),
                                                                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
                                  // Tworzymy obraz z ikoną odtwarzania na środku
@@ -722,8 +721,8 @@ void AttachmentPlaceholder::generateThumbnail(const QByteArray &videoData, QLabe
 
                                  // Rysujemy przeskalowaną klatkę na środku
                                  QPainter painter(&overlayImage);
-                                 int x = (thumbnailLabel->width() - scaledFrame.width()) / 2;
-                                 int y = (thumbnailLabel->height() - scaledFrame.height()) / 2;
+                                 const int x = (thumbnailLabel->width() - scaledFrame.width()) / 2;
+                                 const int y = (thumbnailLabel->height() - scaledFrame.height()) / 2;
                                  painter.drawImage(x, y, scaledFrame);
 
                                  // Dodajemy ikonę odtwarzania

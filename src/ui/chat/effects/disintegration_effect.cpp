@@ -12,7 +12,7 @@ DisintegrationEffect::DisintegrationEffect(QObject *parent): QGraphicsEffect(par
     }
 }
 
-void DisintegrationEffect::setProgress(qreal progress) {
+void DisintegrationEffect::setProgress(const qreal progress) {
     m_progress = qBound(0.0, progress, 1.0);
     update();
 }
@@ -24,12 +24,12 @@ void DisintegrationEffect::draw(QPainter *painter) {
     }
 
     QPoint offset;
-    QPixmap pixmap = sourcePixmap(Qt::LogicalCoordinates, &offset);
+    const QPixmap pixmap = sourcePixmap(Qt::LogicalCoordinates, &offset);
     if (pixmap.isNull())
         return;
 
     // Sprawdź, czy mamy już ten efekt w cache
-    QString cacheKey = QString("%1").arg(m_progress, 0, 'f', 2);
+    const QString cacheKey = QString("%1").arg(m_progress, 0, 'f', 2);
     QPixmap* cachedResult = m_particleCache.object(cacheKey);
 
     if (!cachedResult) {
@@ -41,21 +41,21 @@ void DisintegrationEffect::draw(QPainter *painter) {
         resultPainter.setRenderHint(QPainter::Antialiasing);
         resultPainter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-        int w = pixmap.width();
-        int h = pixmap.height();
+        const int w = pixmap.width();
+        const int h = pixmap.height();
 
         // Zmniejszamy liczbę cząstek dla lepszej wydajności
-        int particleSize = 4 + m_progress * 8.0; // Większe cząstki
-        int particlesX = w / particleSize;
-        int particlesY = h / particleSize;
+        const int particleSize = 4 + m_progress * 8.0; // Większe cząstki
+        const int particlesX = w / particleSize;
+        const int particlesY = h / particleSize;
 
         // Maksymalna liczba cząstek
-        const int maxParticles = 800;
-        int totalParticles = particlesX * particlesY;
-        double particleProbability = qMin(1.0, double(maxParticles) / totalParticles);
+        constexpr int maxParticles = 800;
+        const int totalParticles = particlesX * particlesY;
+        const double particleProbability = qMin(1.0, static_cast<double>(maxParticles) / totalParticles);
 
         // Współczynnik rozproszenia
-        int spread = qRound(m_progress * 80.0);
+        const int spread = qRound(m_progress * 80.0);
 
         // Używamy pregenerowanych punktów przesunięcia zamiast losowania w czasie rzeczywistym
         int offsetIndex = 0;
@@ -69,11 +69,11 @@ void DisintegrationEffect::draw(QPainter *painter) {
                     offsetIndex++;
 
                     // Skaluj offset zgodnie z postępem
-                    int dx = pregeneratedOffset.x() * m_progress * spread / 100;
-                    int dy = pregeneratedOffset.y() * m_progress * spread / 100;
+                    const int dx = pregeneratedOffset.x() * m_progress * spread / 100;
+                    const int dy = pregeneratedOffset.y() * m_progress * spread / 100;
 
                     // Zmniejszamy nieprzezroczystość w miarę postępu
-                    int alpha = qRound(255 * (1.0 - m_progress));
+                    const int alpha = qRound(255 * (1.0 - m_progress));
 
                     // Rysujemy tylko wierzchy cząsteczek
                     if (x % (particleSize * 2) == 0 && y % (particleSize * 2) == 0) {

@@ -7,7 +7,8 @@ class SecurityLayer : public QWidget {
     Q_OBJECT
 public:
     explicit SecurityLayer(QWidget *parent = nullptr) : QWidget(parent) {}
-    virtual ~SecurityLayer() = default;
+
+    ~SecurityLayer() override = default;
 
     // Metoda inicjalizująca warstwę zabezpieczeń
     virtual void initialize() = 0;

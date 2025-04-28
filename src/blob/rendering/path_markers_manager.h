@@ -44,7 +44,7 @@ public:
     }
     
     // Getter dla konkretnego markera
-    const PathMarker& getMarker(size_t index) const {
+    const PathMarker& getMarker(const size_t index) const {
         return m_markers.at(index);
     }
     
@@ -53,19 +53,19 @@ private:
     qint64 m_lastUpdateTime;
     
     // Oblicza punkty śladu dla markera typu impuls
-    void calculateTrailPoints(PathMarker &marker, const QPainterPath &blobPath, double pos, double pathLength);
+    static void calculateTrailPoints(PathMarker &marker, const QPainterPath &blobPath, double pos, double pathLength);
 
     // Rysuje marker typu impuls energii
-    void drawImpulseMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor, qint64 currentTime);
+    static void drawImpulseMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor, qint64 currentTime);
 
     // Rysuje marker typu fala zakłóceń
-    void drawWaveMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor);
+    static void drawWaveMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor);
 
     // Rysuje marker typu quantum computing
-    void drawQuantumMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor, qint64 currentTime);
+    static void drawQuantumMarker(QPainter &painter, const PathMarker &marker, const QPointF &pos, const QColor &markerColor, qint64 currentTime);
 
     // Funkcja zwracająca kolor markera w zależności od typu i fazy
-    QColor getMarkerColor(int markerType, double colorPhase) const;
+    static QColor getMarkerColor(int markerType, double colorPhase);
 };
 
 #endif // PATH_MARKERS_MANAGER_H

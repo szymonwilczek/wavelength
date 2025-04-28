@@ -21,15 +21,15 @@ void BlobTransitionManager::processMovementBuffer(
     std::vector<QPointF>& velocity,
     QPointF& blobCenter,
     std::vector<QPointF>& controlPoints,
-    float blobRadius,
-    std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> applyInertiaForce,
-    std::function<void(const QPointF&)> setLastWindowPos)
+    const float blobRadius,
+    const std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> &applyInertiaForce,
+    const std::function<void(const QPointF&)> &setLastWindowPos)
 {
     if (m_isResizing) {
         return;
     }
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     if (m_movementBuffer.size() < 2)
         return;
@@ -40,14 +40,13 @@ void BlobTransitionManager::processMovementBuffer(
     // Obliczanie wektora prędkości na podstawie próbek ruchu
     for (size_t i = 1; i < m_movementBuffer.size(); i++) {
         QPointF posDelta = m_movementBuffer[i].position - m_movementBuffer[i-1].position;
-        qint64 timeDelta = m_movementBuffer[i].timestamp - m_movementBuffer[i-1].timestamp;
 
-        if (timeDelta > 0) {
-            double scale = 700.0 / timeDelta;
+        if (const qint64 timeDelta = m_movementBuffer[i].timestamp - m_movementBuffer[i-1].timestamp; timeDelta > 0) {
+            const double scale = 700.0 / timeDelta;
             QVector2D sampleVelocity(posDelta.x() * scale, posDelta.y() * scale);
 
             // Nowsze próbki mają większą wagę
-            double weight = 0.5 + 0.5 * (i / (double)(m_movementBuffer.size() - 1));
+            const double weight = 0.5 + 0.5 * (i / static_cast<double>(m_movementBuffer.size() - 1));
 
             newVelocity += sampleVelocity * weight;
             totalWeight += weight;
@@ -65,13 +64,12 @@ void BlobTransitionManager::processMovementBuffer(
         m_smoothedVelocity = newVelocity;
     }
 
-    double velocityMagnitude = m_smoothedVelocity.length();
-    bool significantMovement = velocityMagnitude > 0.3;
+    const double velocityMagnitude = m_smoothedVelocity.length();
 
-    if (significantMovement || (currentTime - m_lastMovementTime) < 200) { // 200ms "pamięci" ruchu
+    if (const bool significantMovement = velocityMagnitude > 0.3; significantMovement || (currentTime - m_lastMovementTime) < 200) { // 200ms "pamięci" ruchu
         if (significantMovement) {
             // Stosujemy siłę inercji do blobu
-            QVector2D scaledVelocity = m_smoothedVelocity * 0.6;
+            const QVector2D scaledVelocity = m_smoothedVelocity * 0.6;
             applyInertiaForce(
                 velocity,
                 blobCenter,
@@ -99,15 +97,15 @@ void BlobTransitionManager::processMovementBuffer(
 
     // Czyścimy bufor ruchu po okresie bezczynności
     if (m_movementBuffer.size() > 1 && (currentTime - m_lastMovementTime) > 500) { // 0.5s bez ruchu
-        QPointF lastPosition = m_movementBuffer.back().position;
-        qint64 lastTimestamp = m_movementBuffer.back().timestamp;
+        const QPointF lastPosition = m_movementBuffer.back().position;
+        const qint64 lastTimestamp = m_movementBuffer.back().timestamp;
 
         m_movementBuffer.clear();
         m_movementBuffer.push_back({lastPosition, lastTimestamp});
     }
 }
 
-void BlobTransitionManager::addMovementSample(const QPointF& position, qint64 timestamp)
+void BlobTransitionManager::addMovementSample(const QPointF& position, const qint64 timestamp)
 {
     m_movementBuffer.push_back({position, timestamp});
     if (m_movementBuffer.size() > MAX_MOVEMENT_SAMPLES) {

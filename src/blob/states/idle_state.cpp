@@ -45,21 +45,21 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
     // Standardowa animacja idle z falami - istniejący kod
     updatePhases();
 
-    double rotationStrength = 0.15 * std::sin(m_rotationPhase * 0.3);
+    const double rotationStrength = 0.15 * std::sin(m_rotationPhase * 0.3);
 
-    QPointF originalCenter = blobCenter;
-    QPointF screenCenter(params.screenWidth / 2.0, params.screenHeight / 2.0);
+    const QPointF originalCenter = blobCenter;
+    const QPointF screenCenter(params.screenWidth / 2.0, params.screenHeight / 2.0);
 
     // POPRAWKA: Delikatna siła przyciągająca do środka ekranu
-    QPointF centeringForce = (screenCenter - blobCenter) * 0.01;
+    const QPointF centeringForce = (screenCenter - blobCenter) * 0.01;
     blobCenter += centeringForce;
 
     QPointF totalDisplacement(0, 0);
 
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        double angle = std::atan2(vectorFromCenter.y(), vectorFromCenter.x());
-        double distanceFromCenter = QVector2D(vectorFromCenter).length();
+        const double angle = std::atan2(vectorFromCenter.y(), vectorFromCenter.x());
+        const double distanceFromCenter = QVector2D(vectorFromCenter).length();
 
         // Fala 1: główna fala obwodowa
         double waveStrength = m_idleParams.waveAmplitude * 0.9 *
@@ -76,7 +76,7 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
         QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
         QPointF perpVector(-normalizedVector.y(), normalizedVector.x());
 
-        double rotationFactor = rotationStrength * (distanceFromCenter / params.blobRadius);
+        const double rotationFactor = rotationStrength * (distanceFromCenter / params.blobRadius);
         QPointF rotationForce = rotationFactor * perpVector;
 
         QPointF forceVector = QPointF(normalizedVector.x(), normalizedVector.y()) * waveStrength + rotationForce;
@@ -84,13 +84,13 @@ void IdleState::apply(std::vector<QPointF>& controlPoints,
         double forceScale = 0.2 + 0.8 * (distanceFromCenter / params.blobRadius);
         if (forceScale > 1.0) forceScale = 1.0;
 
-        QPointF forceDelta = forceVector * forceScale * 0.15;
+        const QPointF forceDelta = forceVector * forceScale * 0.15;
         velocity[i] += forceDelta;
 
         totalDisplacement += forceDelta;
     }
 
-    QPointF avgDisplacement = totalDisplacement / controlPoints.size();
+    const QPointF avgDisplacement = totalDisplacement / controlPoints.size();
     for (auto& vel : velocity) {
         vel -= avgDisplacement;
     }
@@ -105,11 +105,11 @@ void IdleState::applyForce(const QVector2D& force,
                          std::vector<QPointF>& velocity,
                          QPointF& blobCenter,
                          const std::vector<QPointF>& controlPoints,
-                         double blobRadius) {
+                         const double blobRadius) {
 
     for (size_t i = 0; i < controlPoints.size(); ++i) {
         QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        double distanceFromCenter = QVector2D(vectorFromCenter).length();
+        const double distanceFromCenter = QVector2D(vectorFromCenter).length();
 
         double forceScale = distanceFromCenter / blobRadius;
         if (forceScale > 1.0) forceScale = 1.0;
@@ -123,9 +123,9 @@ void IdleState::applyForce(const QVector2D& force,
     blobCenter += QPointF(force.x() * 0.2, force.y() * 0.2);
 }
 
-void IdleState::applyHeartbeatEffect(std::vector<QPointF>& controlPoints,
+void IdleState::applyHeartbeatEffect(const std::vector<QPointF>& controlPoints,
                                     std::vector<QPointF>& velocity,
-                                    QPointF& blobCenter,
+                                    const QPointF& blobCenter,
                                     const BlobConfig::BlobParameters& params) {
     // Zmniejsz wartość, aby zwolnić tempo bicia serca
     m_heartbeatPhase += 0.02;  // Zwolnione z 0.03 na 0.015
@@ -164,11 +164,11 @@ void IdleState::applyHeartbeatEffect(std::vector<QPointF>& controlPoints,
         QVector2D normalizedVector = QVector2D(vectorFromCenter).normalized();
 
         // Siła pulsu - ekspansja i kontrakcja
-        double distanceRatio = QVector2D(vectorFromCenter).length() / params.blobRadius;
+        const double distanceRatio = QVector2D(vectorFromCenter).length() / params.blobRadius;
         // Zmniejszamy mnożnik z 0.8 na 0.5 dla subtelniejszego efektu
-        double scaledPulse = pulseStrength * distanceRatio * 0.5;
+        const double scaledPulse = pulseStrength * distanceRatio * 0.5;
 
-        QPointF pulseForce = QPointF(normalizedVector.x(), normalizedVector.y()) * scaledPulse;
+        const QPointF pulseForce = QPointF(normalizedVector.x(), normalizedVector.y()) * scaledPulse;
         velocity[i] += pulseForce;
     }
 }

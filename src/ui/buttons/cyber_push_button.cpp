@@ -7,7 +7,7 @@ CyberPushButton::CyberPushButton(const QString &text, QWidget *parent): QPushBut
     // Timer dla subtelnych efektów
     m_pulseTimer = new QTimer(this);
     connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
-        double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
+        const double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
         setGlowIntensity(m_baseGlowIntensity + phase);
     });
     m_pulseTimer->start(50);

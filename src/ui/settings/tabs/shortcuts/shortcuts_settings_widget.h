@@ -10,22 +10,23 @@ class QKeySequenceEdit;
 class QLabel;
 class QPushButton;
 
-class ShortcutsSettingsWidget : public QWidget {
+class ShortcutsSettingsWidget final : public QWidget {
     Q_OBJECT
 
 public:
     explicit ShortcutsSettingsWidget(QWidget *parent = nullptr);
     ~ShortcutsSettingsWidget() override = default;
 
-    void loadSettings();
-    void saveSettings(); // Zapisuje zmiany dokonane w UI
+    void loadSettings() const;
+    void saveSettings() const; // Zapisuje zmiany dokonane w UI
 
 private slots:
     void restoreDefaultShortcuts();
 
 private:
     void setupUi();
-    QString getActionDescription(const QString& actionId); // Zwraca czytelny opis akcji
+
+    static QString getActionDescription(const QString& actionId); // Zwraca czytelny opis akcji
 
     WavelengthConfig *m_config;
     QFormLayout *m_formLayout;

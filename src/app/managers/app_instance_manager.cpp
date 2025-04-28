@@ -8,9 +8,9 @@
 #include <QThread>
 #include <QDebug>
 #include <QRandomGenerator>
-#include <QTime>
 #include <chrono>
 
+// ReSharper disable once CppDFATimeOver
 const QString AppInstanceManager::SERVER_NAME = "pk4-projekt-blob-animation";
 
 AppInstanceManager::AppInstanceManager(QMainWindow* window, BlobAnimation* blob, QObject* parent)

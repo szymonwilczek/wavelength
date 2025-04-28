@@ -5,31 +5,29 @@
 #include <QCoreApplication>
 #include <qkeysequence.h>
 
-// Prefiks dla skrótów
 const QString SHORTCUTS_PREFIX = "Shortcuts/";
 
-// Domyślne wartości
 namespace DefaultConfig {
     const QString RELAY_SERVER_ADDRESS = "127.0.0.1";
-    const int RELAY_SERVER_PORT = 8080;
-    const int MAX_CHAT_HISTORY_SIZE = 1000;
-    const int MAX_PROCESSED_MESSAGE_IDS = 5000;
-    const int MAX_SENT_MESSAGE_CACHE_SIZE = 100;
-    const int MAX_RECENT_WAVELENGTH = 10;
-    const int CONNECTION_TIMEOUT = 5000; // ms
-    const int KEEP_ALIVE_INTERVAL = 30000; // ms
-    const int MAX_RECONNECT_ATTEMPTS = 5;
-    const bool DEBUG_MODE = false;
-    const QColor BACKGROUND_COLOR = QColor(0x101820); // Ciemny niebiesko-szary
-    const QColor BLOB_COLOR = QColor(0x4682B4); // Steel Blue
-    const QColor MESSAGE_COLOR = QColor(0xE0E0E0); // Jasnoszary
-    const QColor STREAM_COLOR = QColor(0x00FF00); // Zielony (placeholder)
+    constexpr int RELAY_SERVER_PORT = 8080;
+    constexpr int MAX_CHAT_HISTORY_SIZE = 1000;
+    constexpr int MAX_PROCESSED_MESSAGE_IDS = 5000;
+    constexpr int MAX_SENT_MESSAGE_CACHE_SIZE = 100;
+    constexpr int MAX_RECENT_WAVELENGTH = 10;
+    constexpr int CONNECTION_TIMEOUT = 5000; // ms
+    constexpr int KEEP_ALIVE_INTERVAL = 30000; // ms
+    constexpr int MAX_RECONNECT_ATTEMPTS = 5;
+    constexpr bool DEBUG_MODE = false;
+    const auto BACKGROUND_COLOR = QColor(0x101820); // Ciemny niebiesko-szary
+    const auto BLOB_COLOR = QColor(0x4682B4); // Steel Blue
+    const auto MESSAGE_COLOR = QColor(0xE0E0E0); // Jasnoszary
+    const auto STREAM_COLOR = QColor(0x00FF00); // Zielony (placeholder)
     // NOWE domyślne
-    const QColor GRID_COLOR = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
-    const int GRID_SPACING = 35;
-    const QColor TITLE_TEXT_COLOR = QColor(0xFFFFFF); // Biały
-    const QColor TITLE_BORDER_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
-    const QColor TITLE_GLOW_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
+    constexpr auto GRID_COLOR = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
+    constexpr int GRID_SPACING = 35;
+    const auto TITLE_TEXT_COLOR = QColor(0xFFFFFF); // Biały
+    const auto TITLE_BORDER_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
+    const auto TITLE_GLOW_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
 }
 
 WavelengthConfig* WavelengthConfig::m_instance = nullptr;
@@ -333,25 +331,25 @@ QString WavelengthConfig::getRelayServerUrl() const {
     return QString("ws://%1:%2").arg(m_relayServerAddress).arg(m_relayServerPort);
 }
 int WavelengthConfig::getMaxChatHistorySize() const { return m_maxChatHistorySize; }
-void WavelengthConfig::setMaxChatHistorySize(int size) { if(m_maxChatHistorySize != size && size > 0) { m_maxChatHistorySize = size; emit configChanged("maxChatHistorySize"); } }
+void WavelengthConfig::setMaxChatHistorySize(const int size) { if(m_maxChatHistorySize != size && size > 0) { m_maxChatHistorySize = size; emit configChanged("maxChatHistorySize"); } }
 int WavelengthConfig::getMaxProcessedMessageIds() const { return m_maxProcessedMessageIds; }
-void WavelengthConfig::setMaxProcessedMessageIds(int size) { if(m_maxProcessedMessageIds != size && size > 0) { m_maxProcessedMessageIds = size; emit configChanged("maxProcessedMessageIds"); } }
+void WavelengthConfig::setMaxProcessedMessageIds(const int size) { if(m_maxProcessedMessageIds != size && size > 0) { m_maxProcessedMessageIds = size; emit configChanged("maxProcessedMessageIds"); } }
 int WavelengthConfig::getMaxSentMessageCacheSize() const { return m_maxSentMessageCacheSize; }
-void WavelengthConfig::setMaxSentMessageCacheSize(int size) { if(m_maxSentMessageCacheSize != size && size > 0) { m_maxSentMessageCacheSize = size; emit configChanged("maxSentMessageCacheSize"); } }
+void WavelengthConfig::setMaxSentMessageCacheSize(const int size) { if(m_maxSentMessageCacheSize != size && size > 0) { m_maxSentMessageCacheSize = size; emit configChanged("maxSentMessageCacheSize"); } }
 int WavelengthConfig::getMaxRecentWavelength() const { return m_maxRecentWavelength; }
-void WavelengthConfig::setMaxRecentWavelength(int size) { if(m_maxRecentWavelength != size && size > 0) { m_maxRecentWavelength = size; emit configChanged("maxRecentWavelength"); } }
+void WavelengthConfig::setMaxRecentWavelength(const int size) { if(m_maxRecentWavelength != size && size > 0) { m_maxRecentWavelength = size; emit configChanged("maxRecentWavelength"); } }
 int WavelengthConfig::getConnectionTimeout() const { return m_connectionTimeout; }
-void WavelengthConfig::setConnectionTimeout(int timeout) { if(m_connectionTimeout != timeout && timeout > 0) { m_connectionTimeout = timeout; emit configChanged("connectionTimeout"); } }
+void WavelengthConfig::setConnectionTimeout(const int timeout) { if(m_connectionTimeout != timeout && timeout > 0) { m_connectionTimeout = timeout; emit configChanged("connectionTimeout"); } }
 int WavelengthConfig::getKeepAliveInterval() const { return m_keepAliveInterval; }
-void WavelengthConfig::setKeepAliveInterval(int interval) { if(m_keepAliveInterval != interval && interval > 0) { m_keepAliveInterval = interval; emit configChanged("keepAliveInterval"); } }
+void WavelengthConfig::setKeepAliveInterval(const int interval) { if(m_keepAliveInterval != interval && interval > 0) { m_keepAliveInterval = interval; emit configChanged("keepAliveInterval"); } }
 int WavelengthConfig::getMaxReconnectAttempts() const { return m_maxReconnectAttempts; }
-void WavelengthConfig::setMaxReconnectAttempts(int attempts) { if(m_maxReconnectAttempts != attempts && attempts >= 0) { m_maxReconnectAttempts = attempts; emit configChanged("maxReconnectAttempts"); } }
+void WavelengthConfig::setMaxReconnectAttempts(const int attempts) { if(m_maxReconnectAttempts != attempts && attempts >= 0) { m_maxReconnectAttempts = attempts; emit configChanged("maxReconnectAttempts"); } }
 bool WavelengthConfig::isDebugMode() const { return m_debugMode; }
-void WavelengthConfig::setDebugMode(bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
+void WavelengthConfig::setDebugMode(const bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
 
 QKeySequence WavelengthConfig::getShortcut(const QString& actionId, const QKeySequence& defaultSequence) const {
     // Odczytaj z mapy m_shortcuts, używając domyślnego jako fallback
-    QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
+    const QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
     QKeySequence result = m_shortcuts.value(actionId, actualDefault);
     qDebug() << "[Config] getShortcut(" << actionId << "): Returning from map:" << result.toString();
     return result;
@@ -405,13 +403,11 @@ QString WavelengthConfig::getPreferredStartFrequency() const {
     return m_preferredStartFrequency;
 }
 
-void WavelengthConfig::setPreferredStartFrequency(QString frequency) {
+void WavelengthConfig::setPreferredStartFrequency(const QString &frequency) {
     bool ok;
-    double freqValue = frequency.toDouble(&ok);
 
-    if (ok && freqValue >= 130.0) {
-        QString normalizedFrequency = QString::number(freqValue, 'f', 1);
-        if (m_preferredStartFrequency != normalizedFrequency) {
+    if (const double freqValue = frequency.toDouble(&ok); ok && freqValue >= 130.0) {
+        if (const QString normalizedFrequency = QString::number(freqValue, 'f', 1); m_preferredStartFrequency != normalizedFrequency) {
             m_preferredStartFrequency = normalizedFrequency;
             emit configChanged("preferredStartFrequency");
             qDebug() << "Config: Preferred start frequency set to" << m_preferredStartFrequency;

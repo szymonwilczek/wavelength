@@ -7,7 +7,7 @@
 
 class MessageFormatter {
 public:
-    static QString formatMessage(const QJsonObject& msgObj, QString frequency);
+    static QString formatMessage(const QJsonObject& msgObj, const QString &frequency);
 
     static QString formatFileSize(qint64 sizeInBytes);
 

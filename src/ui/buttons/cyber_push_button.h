@@ -7,21 +7,21 @@
 #include <QTimer>
 
 
-class CyberPushButton : public QPushButton {
+class CyberPushButton final : public QPushButton {
     Q_OBJECT
     Q_PROPERTY(double glowIntensity READ glowIntensity WRITE setGlowIntensity)
 
 public:
-    CyberPushButton(const QString& text, QWidget* parent = nullptr);
+    explicit CyberPushButton(const QString& text, QWidget* parent = nullptr);
 
-    ~CyberPushButton() {
+    ~CyberPushButton() override {
         if (m_pulseTimer) {
             m_pulseTimer->stop();
         }
     }
 
     double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(double intensity) {
+    void setGlowIntensity(const double intensity) {
         m_glowIntensity = intensity;
         update();
     }

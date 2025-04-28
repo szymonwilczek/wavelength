@@ -38,7 +38,7 @@ void ClickableColorPreview::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
 
     // Pobierz kolor tła z palety (teraz powinien być poprawny)
-    QColor bgColor = palette().color(QPalette::Window);
+    const QColor bgColor = palette().color(QPalette::Window);
 
     qDebug() << "ClickableColorPreview::paintEvent for" << this << "Drawing background:" << bgColor.name();
 

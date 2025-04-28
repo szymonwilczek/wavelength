@@ -8,7 +8,7 @@
 #include <QScrollBar>
 #include <QTimer>
 
-class CyberLongTextDisplay : public QWidget {
+class CyberLongTextDisplay final : public QWidget {
     Q_OBJECT
 
 public:

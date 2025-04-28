@@ -27,19 +27,19 @@ TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, pa
     );
 }
 
-void TabButton::setUnderlineOffset(double offset) {
+void TabButton::setUnderlineOffset(const double offset) {
     m_underlineOffset = offset;
     update();
 }
 
-void TabButton::setActive(bool active) {
+void TabButton::setActive(const bool active) {
     m_isActive = active;
     update();
 }
 
 void TabButton::enterEvent(QEvent *event) {
     if (!m_isActive) {
-        QPropertyAnimation *anim = new QPropertyAnimation(this, "underlineOffset");
+        const auto anim = new QPropertyAnimation(this, "underlineOffset");
         anim->setDuration(300);
         anim->setStartValue(0.0);
         anim->setEndValue(5.0);
@@ -51,7 +51,7 @@ void TabButton::enterEvent(QEvent *event) {
 
 void TabButton::leaveEvent(QEvent *event) {
     if (!m_isActive) {
-        QPropertyAnimation *anim = new QPropertyAnimation(this, "underlineOffset");
+        const auto anim = new QPropertyAnimation(this, "underlineOffset");
         anim->setDuration(300);
         anim->setStartValue(m_underlineOffset);
         anim->setEndValue(0.0);
@@ -67,10 +67,10 @@ void TabButton::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QColor underlineColor = m_isActive ? QColor(0, 220, 255) : QColor(0, 180, 220, 180);
+    const QColor underlineColor = m_isActive ? QColor(0, 220, 255) : QColor(0, 180, 220, 180);
 
     // Rysowanie podkreślenia
-    int lineY = height() - 5;
+    const int lineY = height() - 5;
 
     if (m_isActive) {
         // Aktywna zakładka ma pełne podkreślenie
@@ -81,9 +81,9 @@ void TabButton::paintEvent(QPaintEvent *event) {
         painter.setPen(QPen(underlineColor, 1.5));
 
         // Animowane podkreślenie porusza się lekko w poziomie
-        double offset = sin(m_underlineOffset) * 2.0;
-        int centerX = width() / 2;
-        int lineWidth = width() * 0.6 * (m_underlineOffset / 5.0);
+        const double offset = sin(m_underlineOffset) * 2.0;
+        const int centerX = width() / 2;
+        const int lineWidth = width() * 0.6 * (m_underlineOffset / 5.0);
 
         painter.drawLine(centerX - lineWidth/2 + offset, lineY,
                          centerX + lineWidth/2 + offset, lineY);

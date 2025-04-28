@@ -10,7 +10,7 @@
 #include <functional>
 #include "../../blob_config.h"
 
-class BlobTransitionManager : public QObject {
+class BlobTransitionManager final : public QObject {
     Q_OBJECT
 
 public:
@@ -27,8 +27,8 @@ public:
         QPointF& blobCenter,
         std::vector<QPointF>& controlPoints,
         float blobRadius,
-        std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> applyInertiaForce,
-        std::function<void(const QPointF&)> setLastWindowPos
+        const std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> &applyInertiaForce,
+        const std::function<void(const QPointF&)> &setLastWindowPos
     );
 
     void clearAllMovementBuffers() {
@@ -39,15 +39,15 @@ public:
     void clearMovementBuffer();
     
     bool isMoving() const { return m_isMoving; }
-    void setMoving(bool isMoving) { m_isMoving = isMoving; }
-    void setResizingState(bool isResizing) { m_isResizing = isResizing; }
+    void setMoving(const bool isMoving) { m_isMoving = isMoving; }
+    void setResizingState(const bool isResizing) { m_isResizing = isResizing; }
     
     void resetInactivityCounter() { m_inactivityCounter = 0; }
     int getInactivityCounter() const { return m_inactivityCounter; }
     void incrementInactivityCounter() { m_inactivityCounter++; }
 
     qint64 getLastMovementTime() const { return m_lastMovementTime; }
-    void setLastMovementTime(qint64 time) { m_lastMovementTime = time; }
+    void setLastMovementTime(const qint64 time) { m_lastMovementTime = time; }
 
     std::pmr::deque<WindowMovementSample> getMovementBuffer() const { return m_movementBuffer; }
 
@@ -57,7 +57,7 @@ signals:
     void movementStopped();
 
 private:
-    static const int MAX_MOVEMENT_SAMPLES = 10;
+    static constexpr int MAX_MOVEMENT_SAMPLES = 10;
     std::pmr::deque<WindowMovementSample> m_movementBuffer;
     QVector2D m_smoothedVelocity;
 

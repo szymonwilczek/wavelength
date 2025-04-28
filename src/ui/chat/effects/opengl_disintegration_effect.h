@@ -11,12 +11,12 @@
 #include <QTime>
 #include <QTimer>
 
-class OpenGLDisintegration : public QOpenGLWidget, protected QOpenGLFunctions {
+class OpenGLDisintegration final : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
     Q_PROPERTY(qreal progress READ progress WRITE setProgress)
 
 public:
-    OpenGLDisintegration(QWidget* parent = nullptr);
+    explicit OpenGLDisintegration(QWidget* parent = nullptr);
 
     ~OpenGLDisintegration() override;
 

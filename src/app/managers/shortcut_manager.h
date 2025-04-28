@@ -11,15 +11,14 @@ class WavelengthConfig;
 class QMainWindow;
 class WavelengthChatView;
 class SettingsView;
-class Navbar; // Potrzebne do dostępu do przycisków
+class Navbar;
 
-class ShortcutManager : public QObject {
+class ShortcutManager final : public QObject {
     Q_OBJECT
 
 public:
     static ShortcutManager* getInstance();
 
-    // Rejestruje skróty dla danego widgetu (kontekstu)
     void registerShortcuts(QWidget* parent);
 
     public slots:
@@ -33,15 +32,12 @@ private:
 
     WavelengthConfig* m_config;
 
-    // Mapowanie widgetu na listę jego aktywnych skrótów (do ewentualnej aktualizacji)
     QMap<QWidget*, QMap<QString, QShortcut*>> m_registeredShortcuts;
 
-    // Funkcje pomocnicze do rejestracji dla konkretnych widoków
     void registerMainWindowShortcuts(QMainWindow* window, Navbar* navbar);
     void registerChatViewShortcuts(WavelengthChatView* chatView);
     void registerSettingsViewShortcuts(SettingsView* settingsView);
 
-    // Funkcja pomocnicza do tworzenia i łączenia skrótu
     template<typename Func>
     void createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda);
 };

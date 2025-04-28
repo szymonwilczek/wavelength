@@ -7,7 +7,7 @@
 #include <QStyleOption>
 #include <QtMath>
 
-class UserInfoLabel : public QLabel {
+class UserInfoLabel final : public QLabel {
     Q_OBJECT
 
 public:

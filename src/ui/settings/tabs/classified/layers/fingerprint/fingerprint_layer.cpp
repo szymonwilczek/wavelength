@@ -111,8 +111,7 @@ void FingerprintLayer::reset() {
     if (!m_baseFingerprint.isNull()) {
          m_fingerprintImage->setPixmap(QPixmap::fromImage(m_baseFingerprint));
     }
-    QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
-    if (effect) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
@@ -132,7 +131,7 @@ void FingerprintLayer::loadRandomFingerprint() {
         return;
     }
 
-    int index = QRandomGenerator::global()->bounded(m_fingerprintFiles.size());
+    const int index = QRandomGenerator::global()->bounded(m_fingerprintFiles.size());
     m_currentFingerprint = m_fingerprintFiles[index];
 
     if (!m_svgRenderer->load(m_currentFingerprint)) {
@@ -158,7 +157,7 @@ void FingerprintLayer::loadRandomFingerprint() {
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     // Renderowanie odcisku w kolorze jasno-szarym z przezroczystością
-    QColor lightGrayColor(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
+    constexpr QColor lightGrayColor(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
 
     // Ustawienie koloru dla SVG poprzez kompozycję
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
@@ -191,7 +190,7 @@ void FingerprintLayer::updateProgress() {
     }
 }
 
-void FingerprintLayer::processFingerprint(bool completed) {
+void FingerprintLayer::processFingerprint(const bool completed) {
     if (completed) {
         // Zmiana kolorów na zielony po pomyślnym przejściu
         m_fingerprintImage->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
@@ -232,10 +231,10 @@ void FingerprintLayer::processFingerprint(bool completed) {
         // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(500, this, [this]() {
             // Animacja zanikania
-            QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+            const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
-            QPropertyAnimation* animation = new QPropertyAnimation(effect, "opacity");
+            const auto animation = new QPropertyAnimation(effect, "opacity");
             animation->setDuration(500);
             animation->setStartValue(1.0);
             animation->setEndValue(0.0);
@@ -250,7 +249,7 @@ void FingerprintLayer::processFingerprint(bool completed) {
     }
 }
 
-void FingerprintLayer::updateFingerprintScan(int progressValue) {
+void FingerprintLayer::updateFingerprintScan(const int progressValue) const {
     if (!m_svgRenderer->isValid()) {
         return; // Brak prawidłowego SVG do renderowania
     }
@@ -267,8 +266,8 @@ void FingerprintLayer::updateFingerprintScan(int progressValue) {
     m_svgRenderer->render(&painter, QRectF(20, 20, 160, 160));
 
     // Obliczenie wysokości niebieskiej części (wypełnionej)
-    int totalHeight = 160;
-    int filledHeight = static_cast<int>((progressValue / 100.0) * totalHeight);
+    constexpr int totalHeight = 160;
+    const int filledHeight = static_cast<int>((progressValue / 100.0) * totalHeight);
 
     // Nałożenie koloru dla całego obrazu - najpierw szary
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
