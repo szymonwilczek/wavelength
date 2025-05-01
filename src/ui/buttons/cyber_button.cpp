@@ -1,6 +1,7 @@
 #include "cyber_button.h"
 
 #include <QPainter>
+#include <QPropertyAnimation>
 
 CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent), glow_intensity_(0.5), is_primary_(isPrimary) {
     setCursor(Qt::PointingHandCursor);
