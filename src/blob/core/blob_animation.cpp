@@ -333,24 +333,24 @@ void BlobAnimation::processMovementBuffer() {
             moving_state_->applyInertiaForce(vel, center, points, radius, force);
         },
         [this](const QPointF &pos) {
-            physics_.setLastWindowPos(pos);
+            physics_.SetLastWindowPos(pos);
         }
     );
 }
 
 void BlobAnimation::updatePhysics() {
-    physics_.updatePhysicsParallel(control_points_, target_points_, velocity_,
+    physics_.UpdatePhysicsParallel(control_points_, target_points_, velocity_,
                                     blob_center_, params_, physics_params_);
 
     const int padding = params_.borderWidth + params_.glowRadius;
-    physics_.handleBorderCollisions(control_points_, velocity_, blob_center_,
+    physics_.HandleBorderCollisions(control_points_, velocity_, blob_center_,
                                      width(), height(), physics_params_.restitution, padding);
 
-    physics_.smoothBlobShape(control_points_);
+    physics_.SmoothBlobShape(control_points_);
 
     const double min_distance = params_.blobRadius * physics_params_.minNeighborDistance;
     const double max_distance = params_.blobRadius * physics_params_.maxNeighborDistance;
-    physics_.constrainNeighborDistances(control_points_, velocity_, min_distance, max_distance);
+    physics_.ConstrainNeighborDistances(control_points_, velocity_, min_distance, max_distance);
 }
 
 

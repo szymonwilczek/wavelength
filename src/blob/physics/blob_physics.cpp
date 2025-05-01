@@ -3,344 +3,344 @@
 #include <qtconcurrentrun.h>
 
 BlobPhysics::BlobPhysics() {
-    m_physicsTimer.start();
-    m_threadPool.setMaxThreadCount(QThread::idealThreadCount());
+    physics_timer_.start();
+    thread_pool_.setMaxThreadCount(QThread::idealThreadCount());
 }
 
-void BlobPhysics::updatePhysicsOptimized(std::vector<QPointF> &controlPoints,
-                                         const std::vector<QPointF> &targetPoints,
+void BlobPhysics::UpdatePhysicsOptimized(std::vector<QPointF> &control_points,
+                                         const std::vector<QPointF> &target_points,
                                          std::vector<QPointF> &velocity,
-                                         const QPointF &blobCenter,
+                                         const QPointF &blob_center,
                                          const BlobConfig::BlobParameters &params,
-                                         const BlobConfig::PhysicsParameters &physicsParams) {
+                                         const BlobConfig::PhysicsParameters &physics_params) {
 
     // --- DODANE ZABEZPIECZENIE ---
     // Sprawdź, czy wszystkie wektory mają oczekiwany i spójny rozmiar
-    if (const auto expectedSize = static_cast<size_t>(params.numPoints); controlPoints.size() != expectedSize ||
-                                                                           targetPoints.size() != expectedSize ||
-                                                                           velocity.size() != expectedSize) {
+    if (const auto expected_size = static_cast<size_t>(params.numPoints); control_points.size() != expected_size ||
+                                                                           target_points.size() != expected_size ||
+                                                                           velocity.size() != expected_size) {
         qCritical() << "BlobPhysics::updatePhysicsOptimized - Niespójne rozmiary wektorów!";
-        qCritical() << "controlPoints:" << controlPoints.size() << "targetPoints:" << targetPoints.size() << "velocity:" << velocity.size() << "expected:" << expectedSize;
+        qCritical() << "controlPoints:" << control_points.size() << "targetPoints:" << target_points.size() << "velocity:" << velocity.size() << "expected:" << expected_size;
         // assert(false && "Niespójne rozmiary wektorów w updatePhysicsOptimized!"); // Można zostawić lub usunąć asercję tutaj
         return; // <--- DODAJ TĘ LINIĘ
         }
     // --- KONIEC ZABEZPIECZENIA ---
 
-    const size_t numPoints = controlPoints.size();
+    const size_t num_of_points = control_points.size();
 
     // Używamy struktur danych zoptymalizowanych pod kątem wydajności pamięci podręcznej
-    static std::vector<float> posX, posY, targX, targY, velX, velY, forceX, forceY;
+    static std::vector<float> pos_x, pos_y, target_x, target_y, velocity_x, vel_y, force_x, force_y;
 
     // Rezerwuj pamięć raz
-    if (posX.size() != numPoints) {
-        posX.resize(numPoints);
-        posY.resize(numPoints);
-        targX.resize(numPoints);
-        targY.resize(numPoints);
-        velX.resize(numPoints);
-        velY.resize(numPoints);
-        forceX.resize(numPoints);
-        forceY.resize(numPoints);
+    if (pos_x.size() != num_of_points) {
+        pos_x.resize(num_of_points);
+        pos_y.resize(num_of_points);
+        target_x.resize(num_of_points);
+        target_y.resize(num_of_points);
+        velocity_x.resize(num_of_points);
+        vel_y.resize(num_of_points);
+        force_x.resize(num_of_points);
+        force_y.resize(num_of_points);
     }
 
     // Konwertuj dane na zoptymalizowane struktury (SoA - Structure of Arrays)
-    const auto centerX = static_cast<float>(blobCenter.x());
-    const auto centerY = static_cast<float>(blobCenter.y());
-    const auto radiusThreshold = static_cast<float>(params.blobRadius * 1.1f);
-    const float radiusThresholdSquared = radiusThreshold * radiusThreshold;
-    const auto dampingFactor = static_cast<float>(physicsParams.damping);
-    const auto viscosity = static_cast<float>(physicsParams.viscosity);
-    const auto velocityThreshold = static_cast<float>(physicsParams.velocityThreshold);
-    const float velocityThresholdSquared = velocityThreshold * velocityThreshold;
-    const auto maxSpeed = static_cast<float>(params.blobRadius * physicsParams.maxSpeed);
-    const float maxSpeedSquared = maxSpeed * maxSpeed;
+    const auto center_x = static_cast<float>(blob_center.x());
+    const auto center_y = static_cast<float>(blob_center.y());
+    const auto radius_threshold = static_cast<float>(params.blobRadius * 1.1f);
+    const float radius_threshold_squared = radius_threshold * radius_threshold;
+    const auto damping_factor = static_cast<float>(physics_params.damping);
+    const auto viscosity = static_cast<float>(physics_params.viscosity);
+    const auto velocity_threshold = static_cast<float>(physics_params.velocityThreshold);
+    const float velocity_threshold_squared = velocity_threshold * velocity_threshold;
+    const auto max_speed = static_cast<float>(params.blobRadius * physics_params.maxSpeed);
+    const float max_speed_squared = max_speed * max_speed;
 
     // Kopiuj dane do zoptymalizowanych buforów
     #pragma omp parallel for
-    for (int i = 0; i < numPoints; ++i) {
-        posX[i] = static_cast<float>(controlPoints[i].x());
-        posY[i] = static_cast<float>(controlPoints[i].y());
-        targX[i] = static_cast<float>(targetPoints[i].x());
-        targY[i] = static_cast<float>(targetPoints[i].y());
-        velX[i] = static_cast<float>(velocity[i].x());
-        velY[i] = static_cast<float>(velocity[i].y());
-        forceX[i] = 0.0f;
-        forceY[i] = 0.0f;
+    for (int i = 0; i < num_of_points; ++i) {
+        pos_x[i] = static_cast<float>(control_points[i].x());
+        pos_y[i] = static_cast<float>(control_points[i].y());
+        target_x[i] = static_cast<float>(target_points[i].x());
+        target_y[i] = static_cast<float>(target_points[i].y());
+        velocity_x[i] = static_cast<float>(velocity[i].x());
+        vel_y[i] = static_cast<float>(velocity[i].y());
+        force_x[i] = 0.0f;
+        force_y[i] = 0.0f;
     }
 
-    bool isInMotion = false;
+    bool is_in_motion = false;
 
     // Przetwarzaj w blokach dla lepszej wydajności cache
-    constexpr int blockSize = 64;  // Zoptymalizowane pod kątem linii cache
+    constexpr int block_size = 64;  // Zoptymalizowane pod kątem linii cache
 
     #pragma omp parallel for reduction(|:isInMotion)
-    for (int blockStart = 0; blockStart < numPoints; blockStart += blockSize) {
-        const int blockEnd = std::min(blockStart + blockSize, static_cast<int>(numPoints));
+    for (int block_start = 0; block_start < num_of_points; block_start += block_size) {
+        const int block_end = std::min(block_start + block_size, static_cast<int>(num_of_points));
 
-        for (int i = blockStart; i < blockEnd; ++i) {
+        for (int i = block_start; i < block_end; ++i) {
             // Oblicz siłę
-            forceX[i] = (targX[i] - posX[i]) * viscosity;
-            forceY[i] = (targY[i] - posY[i]) * viscosity;
+            force_x[i] = (target_x[i] - pos_x[i]) * viscosity;
+            force_y[i] = (target_y[i] - pos_y[i]) * viscosity;
 
             // Oblicz wektor do środka
-            const float vecToCenterX = centerX - posX[i];
-            const float vecToCenterY = centerY - posY[i];
+            const float vector_to_center_x = center_x - pos_x[i];
+            const float vector_to_center_y = center_y - pos_y[i];
 
-            if (const float distSquared = vecToCenterX * vecToCenterX + vecToCenterY * vecToCenterY; distSquared > radiusThresholdSquared) {
+            if (const float distance_squared = vector_to_center_x * vector_to_center_x + vector_to_center_y * vector_to_center_y; distance_squared > radius_threshold_squared) {
                 // Fast inverse square root approximation
-                const float invDist = 1.0f / sqrtf(distSquared);
-                const float factor = 0.03f * invDist;
-                forceX[i] += vecToCenterX * factor;
-                forceY[i] += vecToCenterY * factor;
+                const float inversed_distance = 1.0f / sqrtf(distance_squared);
+                const float factor = 0.03f * inversed_distance;
+                force_x[i] += vector_to_center_x * factor;
+                force_y[i] += vector_to_center_y * factor;
             }
 
             // Aktualizuj prędkość
-            velX[i] += forceX[i];
-            velY[i] += forceY[i];
+            velocity_x[i] += force_x[i];
+            vel_y[i] += force_y[i];
 
             // Zastosuj tłumienie
-            velX[i] *= dampingFactor;
-            velY[i] *= dampingFactor;
+            velocity_x[i] *= damping_factor;
+            vel_y[i] *= damping_factor;
 
             // Sprawdź prędkość
 
-            if (const float speedSquared = velX[i] * velX[i] + velY[i] * velY[i]; speedSquared < velocityThresholdSquared) {
-                velX[i] = 0.0f;
-                velY[i] = 0.0f;
+            if (const float speed_squared = velocity_x[i] * velocity_x[i] + vel_y[i] * vel_y[i]; speed_squared < velocity_threshold_squared) {
+                velocity_x[i] = 0.0f;
+                vel_y[i] = 0.0f;
             } else {
-                isInMotion = true;
+                is_in_motion = true;
 
-                if (speedSquared > maxSpeedSquared) {
-                    const float scaleFactor = maxSpeed / sqrtf(speedSquared);
-                    velX[i] *= scaleFactor;
-                    velY[i] *= scaleFactor;
+                if (speed_squared > max_speed_squared) {
+                    const float scaleFactor = max_speed / sqrtf(speed_squared);
+                    velocity_x[i] *= scaleFactor;
+                    vel_y[i] *= scaleFactor;
                 }
             }
 
             // Aktualizuj pozycję
-            posX[i] += velX[i];
-            posY[i] += velY[i];
+            pos_x[i] += velocity_x[i];
+            pos_y[i] += vel_y[i];
         }
     }
 
     // Kopiuj dane z powrotem
     #pragma omp parallel for
-    for (int i = 0; i < numPoints; ++i) {
-        controlPoints[i].rx() = posX[i];
-        controlPoints[i].ry() = posY[i];
-        velocity[i].rx() = velX[i];
-        velocity[i].ry() = velY[i];
+    for (int i = 0; i < num_of_points; ++i) {
+        control_points[i].rx() = pos_x[i];
+        control_points[i].ry() = pos_y[i];
+        velocity[i].rx() = velocity_x[i];
+        velocity[i].ry() = vel_y[i];
     }
 
-    if (!isInMotion) {
-        stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
+    if (!is_in_motion) {
+        StabilizeBlob(control_points, blob_center, params.blobRadius, physics_params.stabilizationRate);
     }
 
-    validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius);
+    ValidateAndRepairControlPoints(control_points, velocity, blob_center, params.blobRadius);
 }
 
-void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
-                                      std::vector<QPointF>& targetPoints,
+void BlobPhysics::UpdatePhysicsParallel(std::vector<QPointF>& control_points,
+                                      std::vector<QPointF>& target_points,
                                       std::vector<QPointF>& velocity,
-                                      QPointF& blobCenter,
+                                      const QPointF& blob_center,
                                       const BlobConfig::BlobParameters& params,
-                                      const BlobConfig::PhysicsParameters& physicsParams) {
+                                      const BlobConfig::PhysicsParameters& physics_params) {
 
     // --- DODANE ZABEZPIECZENIE ---
-    const size_t expectedSize = static_cast<size_t>(params.numPoints);
-    if (controlPoints.size() != expectedSize ||
-        targetPoints.size() != expectedSize ||
-        velocity.size() != expectedSize) {
+    const size_t expected_size = static_cast<size_t>(params.numPoints);
+    if (control_points.size() != expected_size ||
+        target_points.size() != expected_size ||
+        velocity.size() != expected_size) {
         qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów PRZED odczytem!";
-        qCritical() << "controlPoints:" << controlPoints.size() << "targetPoints:" << targetPoints.size() << "velocity:" << velocity.size() << "expected:" << expectedSize;
+        qCritical() << "controlPoints:" << control_points.size() << "targetPoints:" << target_points.size() << "velocity:" << velocity.size() << "expected:" << expected_size;
         return; // Zatrzymujemy, jeśli rozmiary są niespójne na starcie
         }
     // Odczytaj rozmiary *przed* uruchomieniem wątków
-    const size_t initialControlPointsSize = controlPoints.size();
-    const size_t initialTargetPointsSize = targetPoints.size();
+    const size_t initial_control_points_size = control_points.size();
+    const size_t initial_target_points_size = target_points.size();
 
     // Sprawdzenie spójności (można usunąć, bo jest już wyżej)
-    if (const size_t initialVelocitySize = velocity.size(); initialControlPointsSize != expectedSize ||
-                                                            initialTargetPointsSize != expectedSize ||
-                                                            initialVelocitySize != expectedSize) {
+    if (const size_t initial_velocity_size = velocity.size(); initial_control_points_size != expected_size ||
+                                                            initial_target_points_size != expected_size ||
+                                                            initial_velocity_size != expected_size) {
         qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary wektorów! (Asercja)";
-        qCritical() << "controlPoints:" << initialControlPointsSize << "targetPoints:" << initialTargetPointsSize << "velocity:" << initialVelocitySize << "expected:" << expectedSize;
+        qCritical() << "controlPoints:" << initial_control_points_size << "targetPoints:" << initial_target_points_size << "velocity:" << initial_velocity_size << "expected:" << expected_size;
         // assert(false && "Niespójne rozmiary wektorów w updatePhysicsParallel!"); // Usunięto asercję
         return;
         }
     // --- KONIEC ZABEZPIECZENIA ---
 
     // Użyj rozmiaru odczytanego pod blokadą
-    const size_t numPoints = initialControlPointsSize;
+    const size_t num_of_points = initial_control_points_size;
 
-    if (numPoints < 24) { // Lub inna wartość progowa używana później
+    if (num_of_points < 24) { // Lub inna wartość progowa używana później
         // Jeśli jest zbyt małe, od razu przejdź do wersji sekwencyjnej
-        updatePhysics(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams);
+        UpdatePhysics(control_points, target_points, velocity, blob_center, params, physics_params);
         return;
     }
 
     // Użyj SIMD-friendly struktury danych gdy liczba punktów jest duża
-    if (numPoints > 64) {
-        updatePhysicsOptimized(controlPoints, targetPoints, velocity, blobCenter, params, physicsParams);
+    if (num_of_points > 64) {
+        UpdatePhysicsOptimized(control_points, target_points, velocity, blob_center, params, physics_params);
         return;
     }
 
-    const int numThreads = qMin(m_threadPool.maxThreadCount(), static_cast<int>(numPoints / 8 + 1));
-    const int batchSize = std::max(1, static_cast<int>(numPoints) / m_threadPool.maxThreadCount());
+    const int num_of_threads = qMin(thread_pool_.maxThreadCount(), static_cast<int>(num_of_points / 8 + 1));
+    const int batch_size = std::max(1, static_cast<int>(num_of_points) / thread_pool_.maxThreadCount());
     std::vector<std::pair<int, int>> ranges;
     // Upewnij się, że pętla używa int, jeśli numPoints może być duże, rozważ size_t
-    for (int i = 0; i < static_cast<int>(numPoints); i += batchSize) {
-        ranges.push_back({i, std::min(i + batchSize, static_cast<int>(numPoints))});
+    for (int i = 0; i < static_cast<int>(num_of_points); i += batch_size) {
+        ranges.push_back({i, std::min(i + batch_size, static_cast<int>(num_of_points))});
     }
 
 
     // Prekalkujemy stałe wartości dla wszystkich wątków
-    const double radiusThreshold = params.blobRadius * 1.1;
-    const double radiusThresholdSquared = radiusThreshold * radiusThreshold;
-    const double dampingFactor = physicsParams.damping;
-    const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
-    const double velocityThresholdSquared = physicsParams.velocityThreshold * physicsParams.velocityThreshold;
-    const double maxSpeedSquared = maxSpeed * maxSpeed;
+    const double radius_threshold = params.blobRadius * 1.1;
+    const double radius_threshold_squared = radius_threshold * radius_threshold;
+    const double damping_factor = physics_params.damping;
+    const double max_speed = params.blobRadius * physics_params.maxSpeed;
+    const double velocity_threshold_squared = physics_params.velocityThreshold * physics_params.velocityThreshold;
+    const double max_speed_squared = max_speed * max_speed;
 
     // Użyj statycznego bufora dla poprzednich prędkości, aby uniknąć realokacji
-    if (velocity.size() != numPoints) {
-        qCritical() << "BlobPhysics::updatePhysicsParallel - Rozmiar 'velocity' (" << velocity.size() << ") zmienił się przed kopiowaniem! Oczekiwano:" << numPoints;
+    if (velocity.size() != num_of_points) {
+        qCritical() << "BlobPhysics::updatePhysicsParallel - Rozmiar 'velocity' (" << velocity.size() << ") zmienił się przed kopiowaniem! Oczekiwano:" << num_of_points;
         assert(false && "Rozmiar 'velocity' zmienił się przed kopiowaniem!");
         return;
     }
     // --- Koniec sprawdzenia ---
 
-    static std::vector<QPointF> previousVelocity;
-    if (previousVelocity.size() != numPoints) {
-        previousVelocity.resize(numPoints);
+    static std::vector<QPointF> previous_velocity;
+    if (previous_velocity.size() != num_of_points) {
+        previous_velocity.resize(num_of_points);
     }
     // --- Dodatkowe sprawdzenie po resize i przed copy ---
-    if (velocity.size() != previousVelocity.size()) {
+    if (velocity.size() != previous_velocity.size()) {
         qCritical() << "BlobPhysics::updatePhysicsParallel - Niespójne rozmiary 'velocity' (" << velocity.size()
-                    << ") i 'previousVelocity' (" << previousVelocity.size() << ") przed std::copy!";
+                    << ") i 'previousVelocity' (" << previous_velocity.size() << ") przed std::copy!";
         assert(false && "Niespójne rozmiary velocity i previousVelocity przed std::copy!");
         return;
     }
     // --- Koniec sprawdzenia ---
-    std::copy(velocity.begin(), velocity.end(), previousVelocity.begin());
+    std::ranges::copy(velocity, previous_velocity.begin());
 
 
-    std::atomic<bool> isInMotion(false);
+    std::atomic is_in_motion(false);
     QVector<QFuture<void>> futures;
-    futures.reserve(numThreads);
+    futures.reserve(num_of_threads);
 
-    for (int t = 0; t < numThreads; ++t) {
-        constexpr double prevVelocityBlend = 0.2;
-        constexpr double velocityBlend = 0.8;
-        const size_t startIdx = t * (numPoints / numThreads);
-        const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * (numPoints / numThreads);
+    for (int t = 0; t < num_of_threads; ++t) {
+        constexpr double prev_velocity_blend = 0.2;
+        constexpr double velocity_blend = 0.8;
+        const size_t start_idx = t * (num_of_points / num_of_threads);
+        const size_t end_idx = (t == num_of_threads-1) ? num_of_points : (t+1) * (num_of_points / num_of_threads);
 
         // --- Sprawdzenie poprawności zakresu wątku ---
-        if (startIdx >= numPoints || endIdx > numPoints || startIdx > endIdx) {
-            qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres dla wątku" << t << "! startIdx:" << startIdx << "endIdx:" << endIdx << "numPoints:" << numPoints;
+        if (start_idx >= num_of_points || end_idx > num_of_points || start_idx > end_idx) {
+            qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres dla wątku" << t << "! startIdx:" << start_idx << "endIdx:" << end_idx << "numPoints:" << num_of_points;
             assert(false && "Nieprawidłowy zakres dla wątku!");
             continue; // Pomiń ten wątek
         }
         // --- Koniec sprawdzenia ---
 
-        futures.append(QtConcurrent::run(&m_threadPool, [&, startIdx, endIdx, radiusThresholdSquared,
-                                        dampingFactor, velocityBlend, prevVelocityBlend,
-                                        velocityThresholdSquared, maxSpeedSquared]() {
+        futures.append(QtConcurrent::run(&thread_pool_, [&, start_idx, end_idx, radius_threshold_squared,
+                                        damping_factor, velocity_blend, prev_velocity_blend,
+                                        velocity_threshold_squared, max_speed_squared]() {
             // Prekalkujemy środek jeden raz dla każdego wątku
-            const double centerX = blobCenter.x();
-            const double centerY = blobCenter.y();
+            const double center_x = blob_center.x();
+            const double center_y = blob_center.y();
 
-            for (size_t batchStart = startIdx; batchStart < endIdx; batchStart += batchSize) {
-                const size_t batchEnd = qMin(batchStart + batchSize, endIdx);
+            for (size_t batch_start = start_idx; batch_start < end_idx; batch_start += batch_size) {
+                const size_t batch_end = qMin(batch_start + batch_size, end_idx);
 
-                if (batchStart >= numPoints || batchEnd > numPoints || batchStart > batchEnd) {
-                    qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres partii! batchStart:" << batchStart << "batchEnd:" << batchEnd << "numPoints:" << numPoints << "Wątek:" << QThread::currentThreadId();
+                if (batch_start >= num_of_points || batch_end > num_of_points || batch_start > batch_end) {
+                    qCritical() << "BlobPhysics::updatePhysicsParallel - Nieprawidłowy zakres partii! batchStart:" << batch_start << "batchEnd:" << batch_end << "numPoints:" << num_of_points << "Wątek:" << QThread::currentThreadId();
                     assert(false && "Nieprawidłowy zakres partii!");
                     continue; // Pomiń tę partię
                  }
 
-                for (size_t i = batchStart; i < batchEnd; ++i) {
+                for (size_t i = batch_start; i < batch_end; ++i) {
 
-                    size_t currentControlPointsSize = controlPoints.size(); // Odczytaj AKTUALNY rozmiar
-                    if (i >= currentControlPointsSize) {
+                    const size_t current_control_points_size = control_points.size(); // Odczytaj AKTUALNY rozmiar
+                    if (i >= current_control_points_size) {
                         qCritical() << "BlobPhysics::updatePhysicsParallel - WYKRYTO DOSTĘP POZA ZAKRES controlPoints! Index 'i':" << i
-                                    << "Aktualny rozmiar:" << currentControlPointsSize
-                                    << "Oczekiwany rozmiar (numPoints):" << numPoints
-                                    << "Zakres wątku:" << startIdx << "-" << endIdx
-                                    << "Zakres partii:" << batchStart << "-" << batchEnd
+                                    << "Aktualny rozmiar:" << current_control_points_size
+                                    << "Oczekiwany rozmiar (numPoints):" << num_of_points
+                                    << "Zakres wątku:" << start_idx << "-" << end_idx
+                                    << "Zakres partii:" << batch_start << "-" << batch_end
                                     << "Wątek ID:" << QThread::currentThreadId();
                          assert(false && "Dostęp poza zakres controlPoints w pętli równoległej!");
                         return; // Zakończ to zadanie, aby uniknąć crasha
                     }
 
-                    QPointF& currentPoint = controlPoints[i];
+                    QPointF& current_point = control_points[i];
 
-                    size_t currentTargetPointsSize = targetPoints.size();
-                    if (i >= currentTargetPointsSize) {
-                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres targetPoints! Index 'i':" << i << "Aktualny rozmiar:" << currentTargetPointsSize << "Wątek ID:" << QThread::currentThreadId();
+                    const size_t current_target_points_size = target_points.size();
+                    if (i >= current_target_points_size) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres targetPoints! Index 'i':" << i << "Aktualny rozmiar:" << current_target_points_size << "Wątek ID:" << QThread::currentThreadId();
                          assert(false && "Dostęp poza zakres targetPoints!");
                          return;
                     }
-                    size_t currentVelocitySize = velocity.size();
-                     if (i >= currentVelocitySize) {
-                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres velocity! Index 'i':" << i << "Aktualny rozmiar:" << currentVelocitySize << "Wątek ID:" << QThread::currentThreadId();
+                    const size_t current_velocity_size = velocity.size();
+                     if (i >= current_velocity_size) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres velocity! Index 'i':" << i << "Aktualny rozmiar:" << current_velocity_size << "Wątek ID:" << QThread::currentThreadId();
                          assert(false && "Dostęp poza zakres velocity!");
                          return;
                     }
-                    size_t currentPreviousVelocitySize = previousVelocity.size();
-                     if (i >= currentPreviousVelocitySize) {
-                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres previousVelocity! Index 'i':" << i << "Aktualny rozmiar:" << currentPreviousVelocitySize << "Wątek ID:" << QThread::currentThreadId();
+                    const size_t previous_velocity_size = previous_velocity.size();
+                     if (i >= previous_velocity_size) {
+                         qCritical() << "BlobPhysics::updatePhysicsParallel - Dostęp poza zakres previousVelocity! Index 'i':" << i << "Aktualny rozmiar:" << previous_velocity_size << "Wątek ID:" << QThread::currentThreadId();
                          assert(false && "Dostęp poza zakres previousVelocity!");
                          return;
                     }
 
-                    QPointF& currentTarget = targetPoints[i];
-                    QPointF& currentVelocity = velocity[i];
-                    const QPointF& prevVelocity = previousVelocity[i];
+                    QPointF& current_target = target_points[i];
+                    QPointF& current_velocity = velocity[i];
+                    const QPointF& prev_velocity = previous_velocity[i];
 
                     // Oblicz siłę bezpośrednio bez tworzenia pośrednich obiektów
-                    double forceX = (currentTarget.x() - currentPoint.x()) * physicsParams.viscosity;
-                    double forceY = (currentTarget.y() - currentPoint.y()) * physicsParams.viscosity;
+                    double force_x = (current_target.x() - current_point.x()) * physics_params.viscosity;
+                    double force_y = (current_target.y() - current_point.y()) * physics_params.viscosity;
 
                     // Oblicz wektor do środka bez tworzenia obiektu QPointF
-                    double vectorToCenterX = centerX - currentPoint.x();
-                    double vectorToCenterY = centerY - currentPoint.y();
-                    double distFromCenter2 = vectorToCenterX*vectorToCenterX + vectorToCenterY*vectorToCenterY;
+                    const double vector_to_center_x = center_x - current_point.x();
+                    const double vector_to_center_y = center_y - current_point.y();
+                    const double dist_from_center_squared = vector_to_center_x*vector_to_center_x + vector_to_center_y*vector_to_center_y;
 
-                    if (distFromCenter2 > radiusThresholdSquared) {
+                    if (dist_from_center_squared > radius_threshold_squared) {
                         // Fast inverse square root approximation można zastosować zamiast qSqrt dla wyższej wydajności
-                        double factor = 0.03 / qSqrt(distFromCenter2);
-                        forceX += vectorToCenterX * factor;
-                        forceY += vectorToCenterY * factor;
+                        const double factor = 0.03 / qSqrt(dist_from_center_squared);
+                        force_x += vector_to_center_x * factor;
+                        force_y += vector_to_center_y * factor;
                     }
 
-                    currentVelocity.rx() += forceX;
-                    currentVelocity.ry() += forceY;
+                    current_velocity.rx() += force_x;
+                    current_velocity.ry() += force_y;
 
                     // Blend prędkości
-                    currentVelocity.rx() = currentVelocity.x() * velocityBlend + prevVelocity.x() * prevVelocityBlend;
-                    currentVelocity.ry() = currentVelocity.y() * velocityBlend + prevVelocity.y() * prevVelocityBlend;
+                    current_velocity.rx() = current_velocity.x() * velocity_blend + prev_velocity.x() * prev_velocity_blend;
+                    current_velocity.ry() = current_velocity.y() * velocity_blend + prev_velocity.y() * prev_velocity_blend;
 
                     // Zastosuj tłumienie
-                    currentVelocity *= dampingFactor;
+                    current_velocity *= damping_factor;
 
-                    double speedSquared = currentVelocity.x()*currentVelocity.x() +
-                                         currentVelocity.y()*currentVelocity.y();
+                    const double speed_squared = current_velocity.x()*current_velocity.x() +
+                                         current_velocity.y()*current_velocity.y();
 
-                    if (speedSquared < velocityThresholdSquared) {
-                        currentVelocity = QPointF(0, 0);
+                    if (speed_squared < velocity_threshold_squared) {
+                        current_velocity = QPointF(0, 0);
                     } else {
-                        isInMotion = true;
+                        is_in_motion = true;
 
-                        if (speedSquared > maxSpeedSquared) {
-                            double scaleFactor = maxSpeed / qSqrt(speedSquared);
-                            currentVelocity *= scaleFactor;
+                        if (speed_squared > max_speed_squared) {
+                            const double scale_factor = max_speed / qSqrt(speed_squared);
+                            current_velocity *= scale_factor;
                         }
                     }
 
                     // Aktualizuj pozycję punktu
-                    currentPoint.rx() += currentVelocity.x();
-                    currentPoint.ry() += currentVelocity.y();
+                    current_point.rx() += current_velocity.x();
+                    current_point.ry() += current_velocity.y();
                 }
             }
         }));
@@ -350,101 +350,101 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
         future.waitForFinished();
     }
 
-    if (!isInMotion) {
-        stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
+    if (!is_in_motion) {
+        StabilizeBlob(control_points, blob_center, params.blobRadius, physics_params.stabilizationRate);
     }
 
-    validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius);
+    ValidateAndRepairControlPoints(control_points, velocity, blob_center, params.blobRadius);
 }
 
-void BlobPhysics::updatePhysics(std::vector<QPointF> &controlPoints,
-                                const std::vector<QPointF> &targetPoints,
+void BlobPhysics::UpdatePhysics(std::vector<QPointF> &control_points,
+                                const std::vector<QPointF> &target_points,
                                 std::vector<QPointF> &velocity,
-                                const QPointF &blobCenter,
+                                const QPointF &blob_center,
                                 const BlobConfig::BlobParameters &params,
-                                const BlobConfig::PhysicsParameters &physicsParams) {
+                                const BlobConfig::PhysicsParameters &physics_params) {
 
     // --- DODANE ZABEZPIECZENIE ---
-    if (const size_t expectedSize = static_cast<size_t>(params.numPoints); controlPoints.size() != expectedSize ||
-                                                                           targetPoints.size() != expectedSize ||
-                                                                           velocity.size() != expectedSize) {
+    if (const size_t expected_size = static_cast<size_t>(params.numPoints); control_points.size() != expected_size ||
+                                                                           target_points.size() != expected_size ||
+                                                                           velocity.size() != expected_size) {
         qCritical() << "BlobPhysics::updatePhysics - Niespójne rozmiary wektorów!";
         assert(false && "Niespójne rozmiary wektorów w updatePhysics!");
         return;
         }
     // --- KONIEC ZABEZPIECZENIA ---
 
-    static std::vector<QPointF> previousVelocity;
-    if (previousVelocity.size() != velocity.size()) {
-        previousVelocity.resize(velocity.size());
+    static std::vector<QPointF> previous_velocity;
+    if (previous_velocity.size() != velocity.size()) {
+        previous_velocity.resize(velocity.size());
     }
 
-    const double radiusThreshold = params.blobRadius * 1.1;
-    const double dampingFactor = physicsParams.damping;
-    const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
+    const double radius_threshold = params.blobRadius * 1.1;
+    const double damping_factor = physics_params.damping;
+    const double max_speed = params.blobRadius * physics_params.maxSpeed;
 
-    bool isInMotion = false;
+    bool is_in_motion = false;
 
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
-        constexpr double prevVelocityBlend = 0.2;
-        constexpr double velocityBlend = 0.8;
-        previousVelocity[i] = velocity[i];
+    for (size_t i = 0; i < control_points.size(); ++i) {
+        constexpr double prev_velocity_blend = 0.2;
+        constexpr double velocity_blend = 0.8;
+        previous_velocity[i] = velocity[i];
 
-        QPointF force = (targetPoints[i] - controlPoints[i]) * physicsParams.viscosity;
+        QPointF force = (target_points[i] - control_points[i]) * physics_params.viscosity;
 
-        QPointF vectorToCenter = blobCenter - controlPoints[i];
+        QPointF vector_to_center = blob_center - control_points[i];
 
-        if (const double distFromCenter2 = vectorToCenter.x()*vectorToCenter.x() + vectorToCenter.y()*vectorToCenter.y(); distFromCenter2 > radiusThreshold * radiusThreshold) {
-            const double factor = 0.03 / qSqrt(distFromCenter2);
-            force.rx() += vectorToCenter.x() * factor;
-            force.ry() += vectorToCenter.y() * factor;
+        if (const double dist_from_center_squared = vector_to_center.x()*vector_to_center.x() + vector_to_center.y()*vector_to_center.y(); dist_from_center_squared > radius_threshold * radius_threshold) {
+            const double factor = 0.03 / qSqrt(dist_from_center_squared);
+            force.rx() += vector_to_center.x() * factor;
+            force.ry() += vector_to_center.y() * factor;
         }
 
         velocity[i] += force;
 
         // Miksowanie prędkości
-        velocity[i].rx() = velocity[i].x() * velocityBlend + previousVelocity[i].x() * prevVelocityBlend;
-        velocity[i].ry() = velocity[i].y() * velocityBlend + previousVelocity[i].y() * prevVelocityBlend;
+        velocity[i].rx() = velocity[i].x() * velocity_blend + previous_velocity[i].x() * prev_velocity_blend;
+        velocity[i].ry() = velocity[i].y() * velocity_blend + previous_velocity[i].y() * prev_velocity_blend;
 
         // Tłumienie
-        velocity[i] *= dampingFactor;
+        velocity[i] *= damping_factor;
 
-        const double speedSquared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
+        const double speed_squared = velocity[i].x()*velocity[i].x() + velocity[i].y()*velocity[i].y();
 
-        if (const double thresholdSquared = physicsParams.velocityThreshold * physicsParams.velocityThreshold; speedSquared < thresholdSquared) {
+        if (const double threshold_squared = physics_params.velocityThreshold * physics_params.velocityThreshold; speed_squared < threshold_squared) {
             velocity[i] = QPointF(0, 0);
         } else {
-            isInMotion = true;
+            is_in_motion = true;
 
-            if (speedSquared > maxSpeed * maxSpeed) {
-                const double scaleFactor = maxSpeed / qSqrt(speedSquared);
+            if (speed_squared > max_speed * max_speed) {
+                const double scaleFactor = max_speed / qSqrt(speed_squared);
                 velocity[i] *= scaleFactor;
             }
         }
 
-        controlPoints[i] += velocity[i];
+        control_points[i] += velocity[i];
     }
 
-    if (!isInMotion) {
-        stabilizeBlob(controlPoints, blobCenter, params.blobRadius, physicsParams.stabilizationRate);
+    if (!is_in_motion) {
+        StabilizeBlob(control_points, blob_center, params.blobRadius, physics_params.stabilizationRate);
     }
 
-    if (Q_UNLIKELY(validateAndRepairControlPoints(controlPoints, velocity, blobCenter, params.blobRadius))) {
+    if (Q_UNLIKELY(ValidateAndRepairControlPoints(control_points, velocity, blob_center, params.blobRadius))) {
         qDebug() << "Wykryto nieprawidłowe punkty kontrolne. Zresetowano kształt blobu.";
     }
 }
 
-void BlobPhysics::initializeBlob(std::vector<QPointF>& controlPoints,
-                               std::vector<QPointF>& targetPoints,
+void BlobPhysics::InitializeBlob(std::vector<QPointF>& control_points,
+                               std::vector<QPointF>& target_points,
                                std::vector<QPointF>& velocity,
-                               QPointF& blobCenter,
+                               QPointF& blob_center,
                                const BlobConfig::BlobParameters& params,
                                const int width, const int height) {
 
-    blobCenter = QPointF(width / 2.0, height / 2.0);
+    blob_center = QPointF(width / 2.0, height / 2.0);
 
-    controlPoints = BlobMath::generateCircularPoints(blobCenter, params.blobRadius, params.numPoints);
-    targetPoints = controlPoints;
+    control_points = BlobMath::generateCircularPoints(blob_center, params.blobRadius, params.numPoints);
+    target_points = control_points;
 
     velocity.resize(params.numPoints);
     for (auto& vel : velocity) {
@@ -452,73 +452,73 @@ void BlobPhysics::initializeBlob(std::vector<QPointF>& controlPoints,
     }
 }
 
-void BlobPhysics::handleBorderCollisions(std::vector<QPointF>& controlPoints,
+void BlobPhysics::HandleBorderCollisions(std::vector<QPointF>& control_points,
                                        std::vector<QPointF>& velocity,
-                                       QPointF& blobCenter,
+                                       QPointF& blob_center,
                                        const int width, const int height,
                                        const double restitution,
                                        const int padding) {
 
-    const int minX = padding;
-    const int minY = padding;
-    const int maxX = width - padding;
-    const int maxY = height - padding;
+    const int min_x = padding;
+    const int min_y = padding;
+    const int max_x = width - padding;
+    const int max_y = height - padding;
 
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
+    for (size_t i = 0; i < control_points.size(); ++i) {
         // Kolizje w osi X
-        if (controlPoints[i].x() < minX) {
-            controlPoints[i].setX(minX);
+        if (control_points[i].x() < min_x) {
+            control_points[i].setX(min_x);
             velocity[i].setX(-velocity[i].x() * restitution);
         }
-        else if (controlPoints[i].x() > maxX) {
-            controlPoints[i].setX(maxX);
+        else if (control_points[i].x() > max_x) {
+            control_points[i].setX(max_x);
             velocity[i].setX(-velocity[i].x() * restitution);
         }
 
         // Kolizje w osi Y
-        if (controlPoints[i].y() < minY) {
-            controlPoints[i].setY(minY);
+        if (control_points[i].y() < min_y) {
+            control_points[i].setY(min_y);
             velocity[i].setY(-velocity[i].y() * restitution);
         }
-        else if (controlPoints[i].y() > maxY) {
-            controlPoints[i].setY(maxY);
+        else if (control_points[i].y() > max_y) {
+            control_points[i].setY(max_y);
             velocity[i].setY(-velocity[i].y() * restitution);
         }
     }
 
-    if (blobCenter.x() < minX) blobCenter.setX(minX);
-    if (blobCenter.x() > maxX) blobCenter.setX(maxX);
-    if (blobCenter.y() < minY) blobCenter.setY(minY);
-    if (blobCenter.y() > maxY) blobCenter.setY(maxY);
+    if (blob_center.x() < min_x) blob_center.setX(min_x);
+    if (blob_center.x() > max_x) blob_center.setX(max_x);
+    if (blob_center.y() < min_y) blob_center.setY(min_y);
+    if (blob_center.y() > max_y) blob_center.setY(max_y);
 }
 
-void BlobPhysics::constrainNeighborDistances(std::vector<QPointF>& controlPoints,
+void BlobPhysics::ConstrainNeighborDistances(std::vector<QPointF>& control_points,
                                            std::vector<QPointF>& velocity,
-                                           const double minDistance,
-                                           const double maxDistance) {
+                                           const double min_distance,
+                                           const double max_distance) {
 
-    if (controlPoints.empty()) return;
+    if (control_points.empty()) return;
 
-    const int numPoints = controlPoints.size();
+    const int num_of_points = control_points.size();
 
-    for (int i = 0; i < numPoints; ++i) {
-        const int next = (i + 1) % numPoints;
+    for (int i = 0; i < num_of_points; ++i) {
+        const int next = (i + 1) % num_of_points;
 
-        QPointF diff = controlPoints[next] - controlPoints[i];
-        const double distance = QVector2D(diff).length();
+        QPointF difference = control_points[next] - control_points[i];
+        const double distance = QVector2D(difference).length();
 
-        if (distance < minDistance || distance > maxDistance) {
-            QPointF direction = diff / distance;
-            const double targetDistance = BlobMath::clamp(distance, minDistance, maxDistance);
+        if (distance < min_distance || distance > max_distance) {
+            QPointF direction = difference / distance;
+            const double target_distance = BlobMath::clamp(distance, min_distance, max_distance);
 
-            const QPointF correction = direction * (distance - targetDistance) * 0.5;
-            controlPoints[i] += correction;
-            controlPoints[next] -= correction;
+            const QPointF correction = direction * (distance - target_distance) * 0.5;
+            control_points[i] += correction;
+            control_points[next] -= correction;
 
-            if (distance < minDistance) {
+            if (distance < min_distance) {
                 velocity[i] -= direction * 0.3;
                 velocity[next] += direction * 0.3;
-            } else if (distance > maxDistance) {
+            } else if (distance > max_distance) {
                 velocity[i] += direction * 0.3;
                 velocity[next] -= direction * 0.3;
             }
@@ -526,94 +526,94 @@ void BlobPhysics::constrainNeighborDistances(std::vector<QPointF>& controlPoints
     }
 }
 
-void BlobPhysics::smoothBlobShape(std::vector<QPointF>& controlPoints) {
-    if (controlPoints.empty()) return;
+void BlobPhysics::SmoothBlobShape(std::vector<QPointF>& control_points) {
+    if (control_points.empty()) return;
 
-    const int numPoints = controlPoints.size();
-    std::vector<QPointF> smoothedPoints = controlPoints;
+    const int num_of_points = control_points.size();
+    std::vector<QPointF> smoothed_points = control_points;
 
-    for (int i = 0; i < numPoints; ++i) {
-        const int prev = (i + numPoints - 1) % numPoints;
-        const int next = (i + 1) % numPoints;
+    for (int i = 0; i < num_of_points; ++i) {
+        const int prev = (i + num_of_points - 1) % num_of_points;
+        const int next = (i + 1) % num_of_points;
 
-        QPointF neighborAverage = (controlPoints[prev] + controlPoints[next]) * 0.5;
+        QPointF neighbor_average = (control_points[prev] + control_points[next]) * 0.5;
 
-        smoothedPoints[i] += (neighborAverage - controlPoints[i]) * 0.15;
+        smoothed_points[i] += (neighbor_average - control_points[i]) * 0.15;
     }
 
-    controlPoints = smoothedPoints;
+    control_points = smoothed_points;
 }
 
-void BlobPhysics::stabilizeBlob(std::vector<QPointF>& controlPoints,
-                              const QPointF& blobCenter,
-                              const double blobRadius,
-                              const double stabilizationRate) {
-    const int numPoints = controlPoints.size();
+void BlobPhysics::StabilizeBlob(std::vector<QPointF>& control_points,
+                              const QPointF& blob_center,
+                              const double blob_radius,
+                              const double stabilization_rate) {
+    const int num_of_points = control_points.size();
 
-    double avgDistance = 0.0;
-    for (int i = 0; i < numPoints; ++i) {
-        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        avgDistance += QVector2D(vectorFromCenter).length();
+    double avg_distance = 0.0;
+    for (int i = 0; i < num_of_points; ++i) {
+        QPointF vector_from_center = control_points[i] - blob_center;
+        avg_distance += QVector2D(vector_from_center).length();
     }
-    avgDistance /= numPoints;
+    avg_distance /= num_of_points;
 
-    const double radiusRatio = blobRadius / avgDistance;
+    const double radius_ratio = blob_radius / avg_distance;
 
-    static std::vector<double> randomOffsets;
-    if (randomOffsets.size() != numPoints) {
-        randomOffsets.resize(numPoints);
-        for (int i = 0; i < numPoints; ++i) {
-            randomOffsets[i] = 0.95 + 0.1 * (qrand() % 100) / 100.0;
+    static std::vector<double> random_offsets;
+    if (random_offsets.size() != num_of_points) {
+        random_offsets.resize(num_of_points);
+        for (int i = 0; i < num_of_points; ++i) {
+            random_offsets[i] = 0.95 + 0.1 * (qrand() % 100) / 100.0;
         }
     }
 
-    for (int i = 0; i < numPoints; ++i) {
-        const double angle = 2 * M_PI * i / numPoints;
+    for (int i = 0; i < num_of_points; ++i) {
+        const double angle = 2 * M_PI * i / num_of_points;
 
-        QPointF idealPoint(
-            blobCenter.x() + blobRadius * randomOffsets[i] * qCos(angle),
-            blobCenter.y() + blobRadius * randomOffsets[i] * qSin(angle)
+        QPointF ideal_point(
+            blob_center.x() + blob_radius * random_offsets[i] * qCos(angle),
+            blob_center.y() + blob_radius * random_offsets[i] * qSin(angle)
         );
 
-        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        const double currentDistance = QVector2D(vectorFromCenter).length();
+        QPointF vector_from_center = control_points[i] - blob_center;
+        const double current_distance = QVector2D(vector_from_center).length();
 
-        if (radiusRatio < 0.9 || radiusRatio > 1.1) {
-            const double correctedDistance = currentDistance * radiusRatio;
-            if (currentDistance > 0.001) {
-                QPointF normalizedVector = vectorFromCenter * (1.0 / currentDistance);
-                controlPoints[i] = blobCenter + normalizedVector * correctedDistance;
+        if (radius_ratio < 0.9 || radius_ratio > 1.1) {
+            const double corrected_distance = current_distance * radius_ratio;
+            if (current_distance > 0.001) {
+                QPointF normalized_vector = vector_from_center * (1.0 / current_distance);
+                control_points[i] = blob_center + normalized_vector * corrected_distance;
             }
         }
 
-        controlPoints[i] += (idealPoint - controlPoints[i]) * stabilizationRate;
+        control_points[i] += (ideal_point - control_points[i]) * stabilization_rate;
     }
 }
 
-bool BlobPhysics::validateAndRepairControlPoints(std::vector<QPointF>& controlPoints,
+bool BlobPhysics::ValidateAndRepairControlPoints(std::vector<QPointF>& control_points,
                                                std::vector<QPointF>& velocity,
-                                               const QPointF& blobCenter,
-                                               const double blobRadius) {
+                                               const QPointF& blob_center,
+                                               const double blob_radius) {
 
-    bool hasInvalidPoints = false;
+    bool has_invalid_points = false;
 
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
-        if (!BlobMath::isValidPoint(controlPoints[i]) || !BlobMath::isValidPoint(velocity[i])) {
-            hasInvalidPoints = true;
+    for (size_t i = 0; i < control_points.size(); ++i) {
+        if (!BlobMath::isValidPoint(control_points[i]) || !BlobMath::isValidPoint(velocity[i])) {
+            has_invalid_points = true;
             break;
         }
     }
 
-    if (hasInvalidPoints) {
-        const int numPoints = controlPoints.size();
+    if (has_invalid_points) {
+        const int num_of_points = control_points.size();
 
-        for (int i = 0; i < numPoints; ++i) {
-            const double angle = 2 * M_PI * i / numPoints;
-            const double randomRadius = blobRadius * (0.9 + 0.2 * (qrand() % 100) / 100.0);
+        for (int i = 0; i < num_of_points; ++i) {
+            const double angle = 2 * M_PI * i / num_of_points;
+            const double random_radius = blob_radius * (0.9 + 0.2 * (qrand() % 100) / 100.0);
 
-            controlPoints[i] = QPointF(
-                blobCenter.x() + randomRadius * qCos(angle),
-                blobCenter.y() + randomRadius * qSin(angle)
+            control_points[i] = QPointF(
+                blob_center.x() + random_radius * qCos(angle),
+                blob_center.y() + random_radius * qSin(angle)
             );
 
             velocity[i] = QPointF(0, 0);
@@ -624,43 +624,43 @@ bool BlobPhysics::validateAndRepairControlPoints(std::vector<QPointF>& controlPo
     return false;
 }
 
-QVector2D BlobPhysics::calculateWindowVelocity(const QPointF& currentPos) {
-    double deltaTime = m_physicsTimer.restart() / 1000.0;
+QVector2D BlobPhysics::CalculateWindowVelocity(const QPointF& current_position) {
+    double delta_time = physics_timer_.restart() / 1000.0;
 
-    if (deltaTime < 0.001) {
-        deltaTime = 0.016; // ~~60 FPS
-    } else if (deltaTime > 0.1) {
-        deltaTime = 0.1;  // min 10 FPS
+    if (delta_time < 0.001) {
+        delta_time = 0.016; // ~~60 FPS
+    } else if (delta_time > 0.1) {
+        delta_time = 0.1;  // min 10 FPS
     }
 
-    QVector2D windowVelocity(
-        (currentPos.x() - m_lastWindowPos.x()) / deltaTime,
-        (currentPos.y() - m_lastWindowPos.y()) / deltaTime
+    QVector2D window_velocity(
+        (current_position.x() - last_window_position_.x()) / delta_time,
+        (current_position.y() - last_window_position_.y()) / delta_time
     );
 
-    static QVector2D lastVelocity(0, 0);
+    static QVector2D last_velocity(0, 0);
 
-    windowVelocity = windowVelocity * 0.7 + lastVelocity * 0.3;
-    lastVelocity = windowVelocity;
+    window_velocity = window_velocity * 0.7 + last_velocity * 0.3;
+    last_velocity = window_velocity;
 
-    constexpr double maxVelocity = 3000.0;
-    if (windowVelocity.length() > maxVelocity) {
-        windowVelocity = windowVelocity.normalized() * maxVelocity;
+    constexpr double max_velocity = 3000.0;
+    if (window_velocity.length() > max_velocity) {
+        window_velocity = window_velocity.normalized() * max_velocity;
     }
 
-    m_lastWindowVelocity = windowVelocity;
+    last_window_velocity_ = window_velocity;
 
-    return windowVelocity;
+    return window_velocity;
 }
 
-void BlobPhysics::setLastWindowPos(const QPointF& pos) {
-    m_lastWindowPos = pos;
+void BlobPhysics::SetLastWindowPos(const QPointF& position) {
+    last_window_position_ = position;
 }
 
-QPointF BlobPhysics::getLastWindowPos() const {
-    return m_lastWindowPos;
+QPointF BlobPhysics::GetLastWindowPos() const {
+    return last_window_position_;
 }
 
-QVector2D BlobPhysics::getLastWindowVelocity() const {
-    return m_lastWindowVelocity;
+QVector2D BlobPhysics::GetLastWindowVelocity() const {
+    return last_window_velocity_;
 }
