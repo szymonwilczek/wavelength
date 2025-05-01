@@ -117,9 +117,9 @@ int main(int argc, char *argv[]) {
     if (parser.isSet(overrideOption)) {
         qDebug() << "--run-override flag detected.";
 #ifdef Q_OS_WIN
-        if (!SystemOverrideManager::isRunningAsAdmin()) {
+        if (!SystemOverrideManager::IsRunningAsAdmin()) {
             qWarning() << "Override sequence requires administrator privileges. Attempting relaunch...";
-            if (SystemOverrideManager::relaunchAsAdmin(app.arguments())) {
+            if (SystemOverrideManager::RelaunchAsAdmin(app.arguments())) {
                 qDebug() << "Relaunch successful. Exiting current instance.";
                 return 0; // Zakończ bieżącą instancję
             } else {
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
             SystemOverrideManager overrideManager; // Utwórz na stosie
             // Połącz sygnał zakończenia override z wyjściem z aplikacji
             QObject::connect(&overrideManager, &SystemOverrideManager::overrideFinished, &app, &QCoreApplication::quit);
-            overrideManager.initiateOverrideSequence(false); // Rozpocznij sekwencję
+            overrideManager.InitiateOverrideSequence(false); // Rozpocznij sekwencję
             return QApplication::exec(); // Uruchom pętlę zdarzeń TYLKO dla override
         }
 #else

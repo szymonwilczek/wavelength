@@ -302,7 +302,7 @@ void SettingsView::setupClassifiedTab() {
     connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
         qDebug() << "Override button clicked.";
 #ifdef Q_OS_WIN
-        if (SystemOverrideManager::isRunningAsAdmin()) {
+        if (SystemOverrideManager::IsRunningAsAdmin()) {
             qDebug() << "Already running as admin. Initiating sequence directly.";
             m_overrideButton->setEnabled(false);
             m_overrideButton->setText("OVERRIDE IN PROGRESS...");
@@ -311,7 +311,7 @@ void SettingsView::setupClassifiedTab() {
             qDebug() << "Not running as admin. Attempting relaunch with elevation request...";
             QStringList args;
             args << "--run-override";
-            if (SystemOverrideManager::relaunchAsAdmin(args)) {
+            if (SystemOverrideManager::RelaunchAsAdmin(args)) {
                 qDebug() << "Relaunch initiated. Closing current instance.";
                 QApplication::quit();
             } else {
