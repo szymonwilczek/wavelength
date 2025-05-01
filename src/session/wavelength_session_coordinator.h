@@ -48,41 +48,41 @@ public:
 
     // Pobieranie informacji o wavelength
     static WavelengthInfo getWavelengthInfo(const QString &frequency, bool* isHost = nullptr) {
-        return WavelengthStateManager::getInstance()->getWavelengthInfo(frequency, isHost);
+        return WavelengthStateManager::GetInstance()->GetWavelengthInfo(frequency, isHost);
     }
 
     // Aktywny wavelength
     static QString getActiveWavelength() {
-        return WavelengthStateManager::getInstance()->getActiveWavelength();
+        return WavelengthStateManager::GetInstance()->GetActiveWavelength();
     }
 
     static void setActiveWavelength(const QString &frequency) {
-        WavelengthStateManager::getInstance()->setActiveWavelength(frequency);
+        WavelengthStateManager::GetInstance()->SetActiveWavelength(frequency);
     }
 
     // Sprawdzanie czy użytkownik jest hostem aktywnego wavelength
     static bool isActiveWavelengthHost() {
-        return WavelengthStateManager::getInstance()->isActiveWavelengthHost();
+        return WavelengthStateManager::GetInstance()->IsActiveWavelengthHost();
     }
 
     // Lista dołączonych wavelength
     static QList<QString> getJoinedWavelengths() {
-        return WavelengthStateManager::getInstance()->getJoinedWavelengths();
+        return WavelengthStateManager::GetInstance()->GetJoinedWavelengths();
     }
 
     // Liczba dołączonych wavelength
     static int getJoinedWavelengthCount() {
-        return WavelengthStateManager::getInstance()->getJoinedWavelengthCount();
+        return WavelengthStateManager::GetInstance()->GetJoinedWavelengthCount();
     }
 
     // Sprawdzanie czy wavelength jest chroniony hasłem
     static bool isWavelengthPasswordProtected(const QString &frequency) {
-        return WavelengthStateManager::getInstance()->isWavelengthPasswordProtected(frequency);
+        return WavelengthStateManager::GetInstance()->IsWavelengthPasswordProtected(frequency);
     }
 
     // Sprawdzanie czy jesteśmy hostem dla danego wavelength
     static bool isWavelengthHost(const QString &frequency) {
-        return WavelengthStateManager::getInstance()->isWavelengthHost(frequency);
+        return WavelengthStateManager::GetInstance()->IsWavelengthHost(frequency);
     }
 
 

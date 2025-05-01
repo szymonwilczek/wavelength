@@ -22,7 +22,7 @@ bool WavelengthSessionCoordinator::createWavelength(const QString &frequency, co
         frequency, isPasswordProtected, password);
 
     if (success) {
-        WavelengthStateManager::getInstance()->registerJoinedWavelength(frequency);
+        WavelengthStateManager::GetInstance()->RegisterJoinedWavelength(frequency);
     }
 
     return success;
@@ -33,7 +33,7 @@ bool WavelengthSessionCoordinator::joinWavelength(const QString &frequency, cons
     const auto result = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
 
     if (result.success) {
-        WavelengthStateManager::getInstance()->registerJoinedWavelength(frequency);
+        WavelengthStateManager::GetInstance()->RegisterJoinedWavelength(frequency);
     }
 
     return result.success;
@@ -41,10 +41,10 @@ bool WavelengthSessionCoordinator::joinWavelength(const QString &frequency, cons
 
 void WavelengthSessionCoordinator::leaveWavelength() {
     qDebug() << "Coordinator: Leaving active wavelength";
-    const QString frequency = WavelengthStateManager::getInstance()->getActiveWavelength();
+    const QString frequency = WavelengthStateManager::GetInstance()->GetActiveWavelength();
 
     if (frequency != -1) {
-        WavelengthStateManager::getInstance()->unregisterJoinedWavelength(frequency);
+        WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
     }
 
     WavelengthLeaver::getInstance()->leaveWavelength();
@@ -52,7 +52,7 @@ void WavelengthSessionCoordinator::leaveWavelength() {
 
 void WavelengthSessionCoordinator::closeWavelength(const QString &frequency) {
     qDebug() << "Coordinator: Closing wavelength" << frequency;
-    WavelengthStateManager::getInstance()->unregisterJoinedWavelength(frequency);
+    WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
     WavelengthLeaver::getInstance()->closeWavelength(frequency);
 }
 
@@ -62,11 +62,11 @@ bool WavelengthSessionCoordinator::sendMessage(const QString &message) {
 }
 
 bool WavelengthSessionCoordinator::isWavelengthJoined(const QString &frequency) {
-    return WavelengthStateManager::getInstance()->isWavelengthJoined(frequency);
+    return WavelengthStateManager::GetInstance()->IsWavelengthJoined(frequency);
 }
 
 bool WavelengthSessionCoordinator::isWavelengthConnected(const QString &frequency) {
-    return WavelengthStateManager::getInstance()->isWavelengthConnected(frequency);
+    return WavelengthStateManager::GetInstance()->IsWavelengthConnected(frequency);
 }
 
 void WavelengthSessionCoordinator::connectSignals() {
@@ -117,7 +117,7 @@ void WavelengthSessionCoordinator::connectSignals() {
             this, &WavelengthSessionCoordinator::userKicked, Qt::DirectConnection);
 
     // WavelengthStateManager
-    connect(WavelengthStateManager::getInstance(), &WavelengthStateManager::activeWavelengthChanged,
+    connect(WavelengthStateManager::GetInstance(), &WavelengthStateManager::activeWavelengthChanged,
             this, &WavelengthSessionCoordinator::onActiveWavelengthChanged, Qt::DirectConnection);
 
     // WavelengthConfig
