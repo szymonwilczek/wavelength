@@ -8,129 +8,126 @@
 #include "../blob_config.h"
 
 struct BlobRenderState {
-    bool isBeingAbsorbed = false;
-    bool isAbsorbing = false;
-    bool isClosingAfterAbsorption = false;
-    bool isPulseActive = false;
+    bool is_being_absorbed = false;
+    bool is_absorbing = false;
+    bool is_closing_after_absorption = false;
+    bool is_pulse_active = false;
     double opacity = 1.0;
     double scale = 1.0;
-    BlobConfig::AnimationState animationState = BlobConfig::IDLE;
+    BlobConfig::AnimationState animation_state = BlobConfig::IDLE;
 };
 
 class BlobRenderer {
 public:
 
-
-    BlobRenderer() : m_staticBackgroundInitialized(false), m_lastGridSpacing(0),
-                     m_glitchIntensity(0),
-                     m_lastUpdateTime(0), m_idleAmplitude(0),
-                     m_idleHudInitialized(false),
-                     m_isRenderingActive(true),
-                     m_lastAnimationState(BlobConfig::MOVING), m_lastGlowRadius(0) {
+    BlobRenderer() : static_background_initialized_(false), last_grid_spacing_(0),
+                     glitch_intensity_(0),
+                     last_update_time_(0), idle_amplitude_(0),
+                     idle_hud_initialized_(false),
+                     is_rendering_active_(true),
+                     last_animation_state_(BlobConfig::MOVING), last_glow_radius_(0) {
     }
 
-    void renderBlob(QPainter &painter,
-                    const std::vector<QPointF> &controlPoints,
-                    const QPointF &blobCenter,
+    void RenderBlob(QPainter &painter,
+                    const std::vector<QPointF> &control_points,
+                    const QPointF &blob_center,
                     const BlobConfig::BlobParameters &params,
-                    BlobConfig::AnimationState animationState);
+                    BlobConfig::AnimationState animation_state);
 
-    void updateGridBuffer(const QColor &backgroundColor,
-                          const QColor &gridColor,
-                          int gridSpacing,
+    void UpdateGridBuffer(const QColor &background_color,
+                          const QColor &grid_color,
+                          int grid_spacing,
                           int width, int height);
 
-    void drawBackground(QPainter &painter,
-                        const QColor &backgroundColor,
-                        const QColor &gridColor,
-                        int gridSpacing,
+    void DrawBackground(QPainter &painter,
+                        const QColor &background_color,
+                        const QColor &grid_color,
+                        int grid_spacing,
                         int width, int height);
 
-    void renderScene(QPainter &painter,
-                     const std::vector<QPointF> &controlPoints,
-                     const QPointF &blobCenter,
+    void RenderScene(QPainter &painter,
+                     const std::vector<QPointF> &control_points,
+                     const QPointF &blob_center,
                      const BlobConfig::BlobParameters &params,
-                     const BlobRenderState &renderState,
+                     const BlobRenderState &render_state,
                      int width, int height,
-                     QPixmap &backgroundCache,
-                     QSize &lastBackgroundSize,
-                     QColor &lastBgColor,
-                     QColor &lastGridColor,
-                     int &lastGridSpacing);
-    void initializeIdleState(const QPointF& blobCenter, double blobRadius, const QColor& hudColor, int width,
+                     QPixmap &background_cache,
+                     QSize &last_background_size,
+                     QColor &last_background_color,
+                     QColor &last_grid_color,
+                     int &last_grid_spacing);
+
+    void InitializeIdleState(const QPointF& blob_center, double blob_radius, const QColor& hud_color, int width,
                              int height);
 
-    void drawCompleteHUD(QPainter& painter, const QPointF& blobCenter, double blobRadius, const QColor& hudColor,
+    void DrawCompleteHUD(QPainter& painter, const QPointF& blob_center, double blob_radius, const QColor& hud_color,
                          int width,
                          int height) const;
 
-    void resetGridBuffer() {
-        m_gridBuffer = QPixmap();
+    void ResetGridBuffer() {
+        grid_buffer_ = QPixmap();
     }
 
-    void setGlitchIntensity(const double intensity) {
-        m_glitchIntensity = intensity;
+    void SetGlitchIntensity(const double intensity) {
+        glitch_intensity_ = intensity;
     }
 
-    void resetHUD() {
+    void ResetHUD() {
         // Wymuś ponowną inicjalizację HUD
-        m_idleHudInitialized = false;
-        m_staticHudBuffer = QPixmap();
+        idle_hud_initialized_ = false;
+        static_hud_buffer_ = QPixmap();
     }
 
-    void forceHUDInitialization(const QPointF& blobCenter, double blobRadius,
-                           const QColor& hudColor, int width, int height);
+    void ForceHUDInitialization(const QPointF& blob_center, double blob_radius,
+                           const QColor& hud_color, int width, int height);
 
 private:
-    QPixmap m_staticBackgroundTexture;
-    bool m_staticBackgroundInitialized;
-    QPixmap m_gridBuffer;
-    QColor m_lastBgColor;
-    QColor m_lastGridColor;
-    int m_lastGridSpacing;
-    QSize m_lastSize;
-    double m_glitchIntensity;
-
-    // Nowy obiekt zarządzający markerami
+    QPixmap static_background_texture_;
+    bool static_background_initialized_;
+    QPixmap grid_buffer_;
+    QColor last_background_color_;
+    QColor last_grid_color_;
+    int last_grid_spacing_;
+    QSize last_size_;
+    double glitch_intensity_;
     // PathMarkersManager m_markersManager;
-    qint64 m_lastUpdateTime;
+    qint64 last_update_time_;
 
-    QString m_idleBlobId;
-    double m_idleAmplitude;
-    QString m_idleTimestamp;
-    bool m_idleHudInitialized;
-    QPixmap m_completeHudBuffer;
+    QString idle_blob_id_;
+    double idle_amplitude_;
+    QString idle_timestamp_;
+    bool idle_hud_initialized_;
+    QPixmap complete_hud_buffer_;
 
-    // Flaga wskazująca czy renderowanie jest aktywne
-    bool m_isRenderingActive;
-    BlobConfig::AnimationState m_lastAnimationState;
+    bool is_rendering_active_;
+    BlobConfig::AnimationState last_animation_state_;
 
-    QPixmap m_staticHudBuffer;  // Tylko dla elementów HUD
+    QPixmap static_hud_buffer_;
 
-    QPixmap m_glowBuffer;
-    QPainterPath m_lastGlowPath;
-    QColor m_lastGlowColor;
-    int m_lastGlowRadius;
-    QSize m_lastGlowSize;
+    QPixmap glow_buffer_;
+    QPainterPath last_glow_path_;
+    QColor last_glow_color_;
+    int last_glow_radius_;
+    QSize last_glow_size_;
 
-    void drawGlowEffect(QPainter &painter,
-                       const QPainterPath &blobPath,
-                       const QColor &borderColor,
-                       int glowRadius);
+    void DrawGlowEffect(QPainter &painter,
+                       const QPainterPath &blob_path,
+                       const QColor &border_color,
+                       int glow_radius);
 
-    static void renderGlowEffect(QPainter& painter, const QPainterPath& blobPath, const QColor& borderColor, int glowRadius);
+    static void RenderGlowEffect(QPainter& painter, const QPainterPath& blob_path, const QColor& border_color, int glow_radius);
 
-    static void drawBorder(QPainter &painter,
-                           const QPainterPath &blobPath,
-                           const QColor &borderColor,
-                           int borderWidth);
+    static void DrawBorder(QPainter &painter,
+                           const QPainterPath &blob_path,
+                           const QColor &border_color,
+                           int border_width);
 
-    static void drawFilling(QPainter &painter,
-                            const QPainterPath &blobPath,
-                            const QPointF &blobCenter,
-                            double blobRadius,
-                            const QColor &borderColor,
-                            BlobConfig::AnimationState animationState);
+    static void DrawFilling(QPainter &painter,
+                            const QPainterPath &blob_path,
+                            const QPointF &blob_center,
+                            double blob_radius,
+                            const QColor &border_color,
+                            BlobConfig::AnimationState animation_state);
 };
 
 #endif // BLOB_RENDERER_H

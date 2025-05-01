@@ -93,7 +93,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
                 // Resetuj bufor siatki tylko gdy zmiana rozmiaru jest znacząca
                 if (abs(newSize.width() - last_size_.width()) > 20 ||
                     abs(newSize.height() - last_size_.height()) > 20) {
-                    renderer_.resetGridBuffer();
+                    renderer_.ResetGridBuffer();
                 }
 
                 last_size_ = newSize;
@@ -137,7 +137,7 @@ void BlobAnimation::HandleResizeTimeout() {
     ResetBlobToCenter();
 
     // Resetujemy bufor siatki
-    renderer_.resetGridBuffer();
+    renderer_.ResetGridBuffer();
     last_size_ = size();
 
     // Odświeżamy widok
@@ -252,10 +252,10 @@ void BlobAnimation::paintEvent(QPaintEvent *event) {
 
     // Przygotuj stan renderowania
     BlobRenderState blob_render_state;
-    blob_render_state.animationState = current_state_;
+    blob_render_state.animation_state = current_state_;
 
     // Deleguj renderowanie do BlobRenderer
-    renderer_.renderScene(
+    renderer_.RenderScene(
         painter,
         control_points_,
         blob_center_,
@@ -441,7 +441,7 @@ void BlobAnimation::setBackgroundColor(const QColor &color) {
     if (params_.backgroundColor != color) {
         params_.backgroundColor = color;
         // Czy updateGridBuffer używa tego koloru? Czy trzeba wywołać coś jeszcze?
-        renderer_.updateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
         update(); // Wymuś przemalowanie
     }
 }
@@ -451,7 +451,7 @@ void BlobAnimation::setGridColor(const QColor &color) {
     if (params_.gridColor != color) {
         params_.gridColor = color;
         // Aktualizuj bufor siatki
-        renderer_.updateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
         update();
     }
 }
@@ -461,7 +461,7 @@ void BlobAnimation::setGridSpacing(const int spacing) {
     if (params_.gridSpacing != spacing && spacing > 0) {
         params_.gridSpacing = spacing;
         // Aktualizuj bufor siatki
-        renderer_.updateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
         update();
     }
 }
@@ -746,7 +746,7 @@ void BlobAnimation::ResumeAllEventTracking() {
     event_handler_.EnableEvents();
 
     // Wymuś reset hudu
-    renderer_.resetHUD();
+    renderer_.ResetHUD();
 
     // Wymuś odświeżenie animacji
     SwitchToState(BlobConfig::IDLE);
@@ -862,8 +862,8 @@ void BlobAnimation::ResetVisualization() {
     ResetBlobToCenter();
 
     // Wymuś reset i reinicjalizację HUD
-    renderer_.resetHUD();
-    renderer_.forceHUDInitialization(blob_center_, params_.blobRadius,
+    renderer_.ResetHUD();
+    renderer_.ForceHUDInitialization(blob_center_, params_.blobRadius,
                                     params_.borderColor, width(), height());
 
     // Sygnał informujący o konieczności aktualizacji innych elementów UI
