@@ -281,8 +281,8 @@ int main(int argc, char *argv[]) {
 });
 
 
-    WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
-    coordinator->initialize();
+    WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
+    coordinator->Initialize();
 
     auto toggleEventListening = [animation, eventFilter](const bool enable) {
         if (enable) {
@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
             const bool isPasswordProtected = dialog.isPasswordProtected();
             const QString password = dialog.getPassword();
 
-            if (coordinator->createWavelength(frequency, isPasswordProtected, password)) {
+            if (coordinator->CreateWavelength(frequency, isPasswordProtected, password)) {
                 qDebug() << "Created and joined wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to create wavelength";
@@ -483,7 +483,7 @@ int main(int argc, char *argv[]) {
             const QString frequency = dialog.getFrequency();
             const QString password = dialog.getPassword();
 
-            if (coordinator->joinWavelength(frequency, password)) {
+            if (coordinator->JoinWavelength(frequency, password)) {
                 qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to join wavelength";

@@ -18,117 +18,115 @@ class WavelengthSessionCoordinator final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthSessionCoordinator* getInstance() {
+    static WavelengthSessionCoordinator* GetInstance() {
         static WavelengthSessionCoordinator instance;
         return &instance;
     }
 
     // Inicjalizacja koordynatora
-    void initialize();
+    void Initialize();
 
     // ---- Metody fasadowe dla głównych operacji na wavelength ----
 
     // Tworzenie nowego wavelength
-    static bool createWavelength(const QString &frequency,
-                                 bool isPasswordProtected, const QString& password);
+    static bool CreateWavelength(const QString &frequency,
+                                 bool is_password_protected, const QString& password);
 
     // Dołączanie do istniejącego wavelength
-    static bool joinWavelength(const QString &frequency, const QString& password = QString());
+    static bool JoinWavelength(const QString &frequency, const QString& password = QString());
 
     // Opuszczanie wavelength
-    static void leaveWavelength();
+    static void LeaveWavelength();
 
     // Zamykanie wavelength (tylko dla hosta)
-    static void closeWavelength(const QString &frequency);
+    static void CloseWavelength(const QString &frequency);
 
     // Wysyłanie wiadomości
-    static bool sendMessage(const QString& message);
+    static bool SendMessage(const QString& message);
 
     // ---- Metody zarządzania stanem ----
 
     // Pobieranie informacji o wavelength
-    static WavelengthInfo getWavelengthInfo(const QString &frequency, bool* isHost = nullptr) {
-        return WavelengthStateManager::GetInstance()->GetWavelengthInfo(frequency, isHost);
+    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool* is_host = nullptr) {
+        return WavelengthStateManager::GetInstance()->GetWavelengthInfo(frequency, is_host);
     }
 
     // Aktywny wavelength
-    static QString getActiveWavelength() {
+    static QString GetActiveWavelength() {
         return WavelengthStateManager::GetInstance()->GetActiveWavelength();
     }
 
-    static void setActiveWavelength(const QString &frequency) {
+    static void SetActiveWavelength(const QString &frequency) {
         WavelengthStateManager::GetInstance()->SetActiveWavelength(frequency);
     }
 
     // Sprawdzanie czy użytkownik jest hostem aktywnego wavelength
-    static bool isActiveWavelengthHost() {
+    static bool IsActiveWavelengthHost() {
         return WavelengthStateManager::GetInstance()->IsActiveWavelengthHost();
     }
 
     // Lista dołączonych wavelength
-    static QList<QString> getJoinedWavelengths() {
+    static QList<QString> GetJoinedWavelengths() {
         return WavelengthStateManager::GetInstance()->GetJoinedWavelengths();
     }
 
     // Liczba dołączonych wavelength
-    static int getJoinedWavelengthCount() {
+    static int GetJoinedWavelengthCount() {
         return WavelengthStateManager::GetInstance()->GetJoinedWavelengthCount();
     }
 
     // Sprawdzanie czy wavelength jest chroniony hasłem
-    static bool isWavelengthPasswordProtected(const QString &frequency) {
+    static bool IsWavelengthPasswordProtected(const QString &frequency) {
         return WavelengthStateManager::GetInstance()->IsWavelengthPasswordProtected(frequency);
     }
 
     // Sprawdzanie czy jesteśmy hostem dla danego wavelength
-    static bool isWavelengthHost(const QString &frequency) {
+    static bool IsWavelengthHost(const QString &frequency) {
         return WavelengthStateManager::GetInstance()->IsWavelengthHost(frequency);
     }
 
 
     // Sprawdzanie czy dołączyliśmy do wavelength
-    static bool isWavelengthJoined(const QString &frequency);
+    static bool IsWavelengthJoined(const QString &frequency);
 
     // Sprawdzanie czy wavelength jest podłączony
-    static bool isWavelengthConnected(const QString &frequency);
+    static bool IsWavelengthConnected(const QString &frequency);
 
     // ---- Metody konfiguracji ----
 
     // Adres serwera relay
-    static QString getRelayServerAddress() {
+    static QString GetRelayServerAddress() {
         return WavelengthConfig::GetInstance()->GetRelayServerAddress();
     }
 
-    static void setRelayServerAddress(const QString& address) {
+    static void SetRelayServerAddress(const QString& address) {
         WavelengthConfig::GetInstance()->SetRelayServerAddress(address);
     }
 
     // Pełny URL serwera relay
-    static QString getRelayServerUrl() {
+    static QString GetRelayServerUrl() {
         return WavelengthConfig::GetInstance()->GetRelayServerUrl();
     }
 
 signals:
-    // Przekazywane sygnały dla WavelengthManager
     void wavelengthCreated(QString frequency);
     void wavelengthJoined(QString frequency);
     void wavelengthLeft(QString frequency);
     void wavelengthClosed(QString frequency);
     void messageReceived(QString frequency, const QString& message);
     void messageSent(QString frequency, const QString& message);
-    void connectionError(const QString& errorMessage);
+    void connectionError(const QString& error_message);
     void authenticationFailed(QString frequency);
     void userKicked(QString frequency, const QString& reason);
     void activeWavelengthChanged(QString frequency);
     void pttGranted(QString frequency);
     void pttDenied(QString frequency, QString reason);
-    void pttStartReceiving(QString frequency, QString senderId);
+    void pttStartReceiving(QString frequency, QString sender_id);
     void pttStopReceiving(QString frequency);
-    void audioDataReceived(QString frequency, const QByteArray& audioData);
+    void audioDataReceived(QString frequency, const QByteArray& audio_data);
     void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private slots:
-    // Obsługa zdarzeń z różnych komponentów - tutaj naprawiamy propagację sygnałów
     void onWavelengthCreated(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
         emit wavelengthCreated(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
@@ -190,9 +188,9 @@ private slots:
     // --- NOWE SLOTY PTT (odbierające z WavelengthMessageService) ---
     void onPttGranted(const QString &frequency) { emit pttGranted(frequency); }
     void onPttDenied(const QString &frequency, const QString &reason) { emit pttDenied(frequency, reason); }
-    void onPttStartReceiving(const QString &frequency, const QString &senderId) { emit pttStartReceiving(frequency, senderId); }
+    void onPttStartReceiving(const QString &frequency, const QString &sender_id) { emit pttStartReceiving(frequency, sender_id); }
     void onPttStopReceiving(const QString &frequency) { emit pttStopReceiving(frequency); }
-    void onAudioDataReceived(const QString &frequency, const QByteArray& audioData) { emit audioDataReceived(frequency, audioData); }
+    void onAudioDataReceived(const QString &frequency, const QByteArray& audio_data) { emit audioDataReceived(frequency, audio_data); }
     void onRemoteAudioAmplitudeUpdate(const QString &frequency, const qreal amplitude) { emit remoteAudioAmplitudeUpdate(frequency, amplitude); }
     // --- KONIEC NOWYCH SLOTÓW PTT ---
 
@@ -206,9 +204,9 @@ private:
     WavelengthSessionCoordinator(const WavelengthSessionCoordinator&) = delete;
     WavelengthSessionCoordinator& operator=(const WavelengthSessionCoordinator&) = delete;
 
-    void connectSignals();
+    void ConnectSignals();
 
-    static void loadConfig();
+    static void LoadConfig();
 };
 
 #endif // WAVELENGTH_SESSION_COORDINATOR_H

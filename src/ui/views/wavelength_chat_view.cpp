@@ -147,7 +147,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     // connect(messageService, &WavelengthMessageService::removeProgressMessage,
     //         this, &WavelengthChatView::removeProgressMessage);
 
-    const WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::getInstance();
+    const WavelengthSessionCoordinator* coordinator = WavelengthSessionCoordinator::GetInstance();
     connect(coordinator, &WavelengthSessionCoordinator::pttGranted, this, &WavelengthChatView::onPttGranted);
     connect(coordinator, &WavelengthSessionCoordinator::pttDenied, this, &WavelengthChatView::onPttDenied);
     connect(coordinator, &WavelengthSessionCoordinator::pttStartReceiving, this, &WavelengthChatView::onPttStartReceiving);
@@ -574,17 +574,17 @@ void WavelengthChatView::abortWavelength() {
         "font-size: 9pt;"
     );
 
-    const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::getInstance();
+    const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
 
     bool isHost = false;
-    if (coordinator->getWavelengthInfo(currentFrequency, &isHost).isHost) {
+    if (coordinator->GetWavelengthInfo(currentFrequency, &isHost).isHost) {
         if (isHost) {
-            coordinator->closeWavelength(currentFrequency);
+            coordinator->CloseWavelength(currentFrequency);
         } else {
-            coordinator->leaveWavelength();
+            coordinator->LeaveWavelength();
         }
     } else {
-        coordinator->leaveWavelength();
+        coordinator->LeaveWavelength();
     }
 
     // Emitujemy sygnał przed czyszczeniem widoku

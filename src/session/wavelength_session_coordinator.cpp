@@ -3,23 +3,23 @@
 #include "events/creator/wavelength_creator.h"
 #include "events/leaver/wavelength_leaver.h"
 
-void WavelengthSessionCoordinator::initialize() {
+void WavelengthSessionCoordinator::Initialize() {
     qDebug() << "Initializing WavelengthSessionCoordinator";
 
     // Połącz sygnały między komponentami
-    connectSignals();
+    ConnectSignals();
 
     // Załaduj konfigurację
-    loadConfig();
+    LoadConfig();
 
     qDebug() << "WavelengthSessionCoordinator initialized successfully";
 }
 
-bool WavelengthSessionCoordinator::createWavelength(const QString &frequency, const bool isPasswordProtected,
+bool WavelengthSessionCoordinator::CreateWavelength(const QString &frequency, const bool is_password_protected,
     const QString &password) {
     qDebug() << "Coordinator: Creating wavelength" << frequency;
     const bool success = WavelengthCreator::getInstance()->createWavelength(
-        frequency, isPasswordProtected, password);
+        frequency, is_password_protected, password);
 
     if (success) {
         WavelengthStateManager::GetInstance()->RegisterJoinedWavelength(frequency);
@@ -28,18 +28,18 @@ bool WavelengthSessionCoordinator::createWavelength(const QString &frequency, co
     return success;
 }
 
-bool WavelengthSessionCoordinator::joinWavelength(const QString &frequency, const QString &password) {
+bool WavelengthSessionCoordinator::JoinWavelength(const QString &frequency, const QString &password) {
     qDebug() << "Coordinator: Joining wavelength" << frequency;
-    const auto result = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
+    const auto [success, errorReason] = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
 
-    if (result.success) {
+    if (success) {
         WavelengthStateManager::GetInstance()->RegisterJoinedWavelength(frequency);
     }
 
-    return result.success;
+    return success;
 }
 
-void WavelengthSessionCoordinator::leaveWavelength() {
+void WavelengthSessionCoordinator::LeaveWavelength() {
     qDebug() << "Coordinator: Leaving active wavelength";
     const QString frequency = WavelengthStateManager::GetInstance()->GetActiveWavelength();
 
@@ -50,26 +50,26 @@ void WavelengthSessionCoordinator::leaveWavelength() {
     WavelengthLeaver::getInstance()->leaveWavelength();
 }
 
-void WavelengthSessionCoordinator::closeWavelength(const QString &frequency) {
+void WavelengthSessionCoordinator::CloseWavelength(const QString &frequency) {
     qDebug() << "Coordinator: Closing wavelength" << frequency;
     WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
     WavelengthLeaver::getInstance()->closeWavelength(frequency);
 }
 
-bool WavelengthSessionCoordinator::sendMessage(const QString &message) {
+bool WavelengthSessionCoordinator::SendMessage(const QString &message) {
     qDebug() << "Coordinator: Sending message to active wavelength";
     return WavelengthMessageService::GetInstance()->SendMessage(message);
 }
 
-bool WavelengthSessionCoordinator::isWavelengthJoined(const QString &frequency) {
+bool WavelengthSessionCoordinator::IsWavelengthJoined(const QString &frequency) {
     return WavelengthStateManager::GetInstance()->IsWavelengthJoined(frequency);
 }
 
-bool WavelengthSessionCoordinator::isWavelengthConnected(const QString &frequency) {
+bool WavelengthSessionCoordinator::IsWavelengthConnected(const QString &frequency) {
     return WavelengthStateManager::GetInstance()->IsWavelengthConnected(frequency);
 }
 
-void WavelengthSessionCoordinator::connectSignals() {
+void WavelengthSessionCoordinator::ConnectSignals() {
     // BEZPOŚREDNIE POŁĄCZENIA Z SYGNAŁAMI KOMPONENTÓW
 
     // WavelengthCreator
@@ -125,7 +125,7 @@ void WavelengthSessionCoordinator::connectSignals() {
             this, &WavelengthSessionCoordinator::onConfigChanged, Qt::DirectConnection);
 }
 
-void WavelengthSessionCoordinator::loadConfig() {
+void WavelengthSessionCoordinator::LoadConfig() {
     WavelengthConfig* config = WavelengthConfig::GetInstance();
 
     if (!QFile::exists(config->GetSetting("configFilePath").toString())) {
