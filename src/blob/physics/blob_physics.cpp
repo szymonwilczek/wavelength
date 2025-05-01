@@ -1,5 +1,6 @@
 #include "blob_physics.h"
-#include <QDebug>
+#include <qfuture.h>
+#include <qtconcurrentrun.h>
 
 BlobPhysics::BlobPhysics() {
     m_physicsTimer.start();
@@ -197,7 +198,6 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     const double radiusThreshold = params.blobRadius * 1.1;
     const double radiusThresholdSquared = radiusThreshold * radiusThreshold;
     const double dampingFactor = physicsParams.damping;
-    const double prevVelocityBlend = 0.2;
     const double maxSpeed = params.blobRadius * physicsParams.maxSpeed;
     const double velocityThresholdSquared = physicsParams.velocityThreshold * physicsParams.velocityThreshold;
     const double maxSpeedSquared = maxSpeed * maxSpeed;
@@ -230,6 +230,7 @@ void BlobPhysics::updatePhysicsParallel(std::vector<QPointF>& controlPoints,
     futures.reserve(numThreads);
 
     for (int t = 0; t < numThreads; ++t) {
+        constexpr double prevVelocityBlend = 0.2;
         constexpr double velocityBlend = 0.8;
         const size_t startIdx = t * (numPoints / numThreads);
         const size_t endIdx = (t == numThreads-1) ? numPoints : (t+1) * (numPoints / numThreads);

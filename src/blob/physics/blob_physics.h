@@ -1,7 +1,6 @@
 #ifndef BLOBPHYSICS_H
 #define BLOBPHYSICS_H
 
-#include <QtConcurrent>
 #include <QThreadPool>
 #include <QTime>
 #include "../blob_config.h"
