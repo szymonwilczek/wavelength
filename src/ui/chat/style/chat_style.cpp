@@ -21,12 +21,12 @@ QString ChatStyle::getChatStyleSheet() {
                 "  border-radius: 0px;"
                 "}"
             )
-            .arg(CyberpunkStyle::bgDarkColor().name())
-            .arg(CyberpunkStyle::primaryColor().name())
-            .arg(CyberpunkStyle::primaryColor().name())
-            .arg(CyberpunkStyle::secondaryColor().name())
-            .arg(CyberpunkStyle::bgDarkColor().darker(120).name())
-            .arg(CyberpunkStyle::primaryColor().name());
+            .arg(CyberpunkStyle::GetBackgroundDarkColor().name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name())
+            .arg(CyberpunkStyle::GetSecondaryColor().name())
+            .arg(CyberpunkStyle::GetBackgroundDarkColor().darker(120).name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name());
 }
 
 QString ChatStyle::getSentMessageStyle() {
@@ -39,7 +39,7 @@ QString ChatStyle::getSentMessageStyle() {
                 "color: #e0ffff;"
                 "font-family: 'Consolas';"
             )
-            .arg(CyberpunkStyle::primaryColor().name());
+            .arg(CyberpunkStyle::GetPrimaryColor().name());
 }
 
 QString ChatStyle::getReceivedMessageStyle() {
@@ -52,7 +52,7 @@ QString ChatStyle::getReceivedMessageStyle() {
                 "color: #f0e0ff;"
                 "font-family: 'Consolas';"
             )
-            .arg(CyberpunkStyle::accentColor().name());
+            .arg(CyberpunkStyle::GetAccentColor().name());
 }
 
 QString ChatStyle::getSystemMessageStyle() {
@@ -66,7 +66,7 @@ QString ChatStyle::getSystemMessageStyle() {
                 "font-family: 'Consolas';"
                 "font-size: 90%;"
             )
-            .arg(CyberpunkStyle::warningColor().name());
+            .arg(CyberpunkStyle::GetWarningColor().name());
 }
 
 QString ChatStyle::getInputFieldStyle() {
@@ -85,9 +85,9 @@ QString ChatStyle::getInputFieldStyle() {
                 "  background-color: rgba(0, 35, 45, 220);"
                 "}"
             )
-            .arg(CyberpunkStyle::secondaryColor().name())
-            .arg(CyberpunkStyle::primaryColor().name())
-            .arg(CyberpunkStyle::secondaryColor().name());
+            .arg(CyberpunkStyle::GetSecondaryColor().name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name())
+            .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
 QString ChatStyle::getSendButtonStyle() {
@@ -109,9 +109,9 @@ QString ChatStyle::getSendButtonStyle() {
                 "  background-color: #003344;"
                 "}"
             )
-            .arg(CyberpunkStyle::secondaryColor().name())
-            .arg(CyberpunkStyle::primaryColor().name())
-            .arg(CyberpunkStyle::secondaryColor().name());
+            .arg(CyberpunkStyle::GetSecondaryColor().name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name())
+            .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
 QString ChatStyle::getAttachButtonStyle() {
@@ -133,9 +133,9 @@ QString ChatStyle::getAttachButtonStyle() {
                 "  background-color: #003344;"
                 "}"
             )
-            .arg(CyberpunkStyle::secondaryColor().name())
-            .arg(CyberpunkStyle::primaryColor().name())
-            .arg(CyberpunkStyle::secondaryColor().name());
+            .arg(CyberpunkStyle::GetSecondaryColor().name())
+            .arg(CyberpunkStyle::GetPrimaryColor().name())
+            .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
 QString ChatStyle::getScrollBarStyle() {

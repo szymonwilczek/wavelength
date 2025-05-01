@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 
     app.setStyle(QStyleFactory::create("Fusion"));
 
-    CyberpunkStyle::applyStyle();
+    CyberpunkStyle::ApplyStyle();
 
     // app.setPalette(darkPalette);
     // app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
