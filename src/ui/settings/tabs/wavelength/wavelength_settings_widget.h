@@ -18,20 +18,17 @@ public:
     explicit WavelengthSettingsWidget(QWidget *parent = nullptr);
     ~WavelengthSettingsWidget() override = default;
 
-    void loadSettings() const;
-    void saveSettings();
+    void LoadSettings() const;
+    void SaveSettings();
 
 private:
     void setupUi();
-    bool validateFrequencyInput(double& valueHz);
+    bool ValidateFrequencyInput(double& hz);
 
-    WavelengthConfig *m_config;
+    WavelengthConfig *config_;
 
-    // Kontrolki UI dla tej zakładki
-    QLineEdit *m_frequencyValueEdit;
-    QComboBox *m_frequencyUnitCombo;
-    // Usunięto: CyberLineEdit *m_serverAddressEdit;
-    // Usunięto: QSpinBox *m_serverPortEdit;
+    QLineEdit *frequency_value_edit_;
+    QComboBox *frequency_unit_combo_;
 };
 
 #endif // WAVELENGTH_SETTINGS_WIDGET_H

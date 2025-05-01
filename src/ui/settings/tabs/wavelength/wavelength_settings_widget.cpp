@@ -12,21 +12,21 @@
 #include <QMessageBox>
 #include <QLocale>
 
-namespace FreqLimits {
-    constexpr double MIN_HZ = 130.0;
-    constexpr double MAX_VALUE_PER_UNIT = 999.9;
-    constexpr double MAX_HZ = 999900000.0;
+namespace FrequencyLimits {
+    constexpr double kMinHz = 130.0;
+    constexpr double kMaxValuePerUnit = 999.9;
+    constexpr double kMaxHz = 999900000.0;
 }
 
 WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::GetInstance()),
-      m_frequencyValueEdit(nullptr),
-      m_frequencyUnitCombo(nullptr)
+      config_(WavelengthConfig::GetInstance()),
+      frequency_value_edit_(nullptr),
+      frequency_unit_combo_(nullptr)
 {
     qDebug() << "WavelengthSettingsWidget constructor start";
     setupUi();
-    loadSettings();
+    LoadSettings();
     qDebug() << "WavelengthSettingsWidget constructor end";
 }
 
@@ -36,126 +36,120 @@ void WavelengthSettingsWidget::setupUi() {
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto infoLabel = new QLabel("Configure frequency preferences", this); // Zmieniono opis
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(infoLabel);
+    const auto info_label = new QLabel("Configure frequency preferences", this); // Zmieniono opis
+    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    layout->addWidget(info_label);
 
-    const auto formLayout = new QFormLayout();
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setSpacing(15);
-    formLayout->setRowWrapPolicy(QFormLayout::WrapLongRows);
+    const auto form_layout = new QFormLayout();
+    form_layout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    form_layout->setSpacing(15);
+    form_layout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
     // --- Preferred Start Frequency --- (bez zmian)
-    const auto preferredFreqLabel = new QLabel("Preferred Start Frequency:", this);
-    preferredFreqLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    const auto freqLayout = new QHBoxLayout();
-    freqLayout->setSpacing(5);
-    m_frequencyValueEdit = new QLineEdit(this);
-    m_frequencyValueEdit->setPlaceholderText("e.g., 150.5 or 98.7");
-    const auto validator = new QDoubleValidator(0.0, FreqLimits::MAX_VALUE_PER_UNIT * 10, 3, this);
+    const auto preferred_frequency_label = new QLabel("Preferred Start Frequency:", this);
+    preferred_frequency_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    const auto freq_layout = new QHBoxLayout();
+    freq_layout->setSpacing(5);
+    frequency_value_edit_ = new QLineEdit(this);
+    frequency_value_edit_->setPlaceholderText("e.g., 150.5 or 98.7");
+    const auto validator = new QDoubleValidator(0.0, FrequencyLimits::kMaxValuePerUnit * 10, 3, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
     validator->setLocale(QLocale::C);
-    m_frequencyValueEdit->setValidator(validator);
-    m_frequencyValueEdit->setStyleSheet(
+    frequency_value_edit_->setValidator(validator);
+    frequency_value_edit_->setStyleSheet(
         "QLineEdit { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; font-family: Consolas; }"
     );
-    freqLayout->addWidget(m_frequencyValueEdit, 3);
-    m_frequencyUnitCombo = new QComboBox(this);
-    m_frequencyUnitCombo->addItems({"Hz", "kHz", "MHz"});
-    m_frequencyUnitCombo->setStyleSheet(
+    freq_layout->addWidget(frequency_value_edit_, 3);
+    frequency_unit_combo_ = new QComboBox(this);
+    frequency_unit_combo_->addItems({"Hz", "kHz", "MHz"});
+    frequency_unit_combo_->setStyleSheet(
         "QComboBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; font-family: Consolas; }"
         "QComboBox::drop-down { border: none; background-color: rgba(0, 150, 220, 100); }"
         "QComboBox QAbstractItemView { background-color: #0A1928; color: #00eeff; selection-background-color: #4682B4; }"
     );
-    freqLayout->addWidget(m_frequencyUnitCombo, 1);
-    formLayout->addRow(preferredFreqLabel, freqLayout);
+    freq_layout->addWidget(frequency_unit_combo_, 1);
+    form_layout->addRow(preferred_frequency_label, freq_layout);
 
-    // --- Usunięto Server Address ---
-    // --- Usunięto Server Port ---
-
-    layout->addLayout(formLayout);
+    layout->addLayout(form_layout);
     layout->addStretch();
     qDebug() << "WavelengthSettingsWidget setupUi end";
 }
 
-void WavelengthSettingsWidget::loadSettings() const {
-    if (!m_frequencyValueEdit || !m_frequencyUnitCombo) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
+void WavelengthSettingsWidget::LoadSettings() const {
+    if (!frequency_value_edit_ || !frequency_unit_combo_) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
         qWarning() << "WavelengthSettingsWidget::loadSettings - UI elements not initialized.";
         return;
     }
 
-    const QString freqStringHz = m_config->GetPreferredStartFrequency();
+    const QString frequency_string = config_->GetPreferredStartFrequency();
     bool ok;
-    double freqValueHz = freqStringHz.toDouble(&ok);
+    double frequency_hz = frequency_string.toDouble(&ok);
 
-    if (!ok || freqValueHz < FreqLimits::MIN_HZ) {
-        qWarning() << "WavelengthSettingsWidget::loadSettings - Invalid frequency in config:" << freqStringHz << ". Using default 130.0 Hz.";
-        freqValueHz = FreqLimits::MIN_HZ;
+    if (!ok || frequency_hz < FrequencyLimits::kMinHz) {
+        qWarning() << "WavelengthSettingsWidget::loadSettings - Invalid frequency in config:" << frequency_string << ". Using default 130.0 Hz.";
+        frequency_hz = FrequencyLimits::kMinHz;
     }
 
-    double displayValue = freqValueHz;
-    int unitIndex = 0;
+    double display_value = frequency_hz;
+    int unit_index = 0;
 
-    if (freqValueHz >= 1000000.0 && freqValueHz <= FreqLimits::MAX_HZ) {
-        displayValue = freqValueHz / 1000000.0;
-        unitIndex = 2;
-    } else if (freqValueHz >= 1000.0) {
-        displayValue = freqValueHz / 1000.0;
-        unitIndex = 1;
+    if (frequency_hz >= 1000000.0 && frequency_hz <= FrequencyLimits::kMaxHz) {
+        display_value = frequency_hz / 1000000.0;
+        unit_index = 2;
+    } else if (frequency_hz >= 1000.0) {
+        display_value = frequency_hz / 1000.0;
+        unit_index = 1;
     }
 
-    m_frequencyValueEdit->setText(QString::number(displayValue, 'f', (unitIndex > 0) ? 3 : 1));
-    m_frequencyUnitCombo->setCurrentIndex(unitIndex);
+    frequency_value_edit_->setText(QString::number(display_value, 'f', (unit_index > 0) ? 3 : 1));
+    frequency_unit_combo_->setCurrentIndex(unit_index);
 
-    // Usunięto ładowanie m_serverAddressEdit->setText(...)
-    // Usunięto ładowanie m_serverPortEdit->setValue(...)
-
-    qDebug() << "WavelengthSettingsWidget settings loaded. Displayed:" << displayValue << m_frequencyUnitCombo->currentText();
+    qDebug() << "WavelengthSettingsWidget settings loaded. Displayed:" << display_value << frequency_unit_combo_->currentText();
 }
 
-bool WavelengthSettingsWidget::validateFrequencyInput(double& valueHz) {
-    if (!m_frequencyValueEdit || !m_frequencyUnitCombo) return false;
+bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
+    if (!frequency_value_edit_ || !frequency_unit_combo_) return false;
 
-    const QString valueStr = m_frequencyValueEdit->text();
-    const QString unitStr = m_frequencyUnitCombo->currentText();
+    const QString value_str = frequency_value_edit_->text();
+    const QString unit_str = frequency_unit_combo_->currentText();
     bool ok;
 
-    const QLocale cLocale(QLocale::C);
-    const double valueDouble = cLocale.toDouble(valueStr, &ok);
+    const QLocale c_locale(QLocale::C);
+    const double value_double = c_locale.toDouble(value_str, &ok);
 
-    if (!ok || valueDouble <= 0) {
+    if (!ok || value_double <= 0) {
         QMessageBox::warning(this, "Invalid Input", "Please enter a valid positive number for the frequency value.");
-        m_frequencyValueEdit->setFocus();
-        m_frequencyValueEdit->selectAll();
+        frequency_value_edit_->setFocus();
+        frequency_value_edit_->selectAll();
         return false;
     }
 
-    if (valueDouble > FreqLimits::MAX_VALUE_PER_UNIT) {
-         QMessageBox::warning(this, "Invalid Input", QString("The maximum value for %1 is %2.").arg(unitStr).arg(FreqLimits::MAX_VALUE_PER_UNIT));
-         m_frequencyValueEdit->setFocus();
-         m_frequencyValueEdit->selectAll();
+    if (value_double > FrequencyLimits::kMaxValuePerUnit) {
+         QMessageBox::warning(this, "Invalid Input", QString("The maximum value for %1 is %2.").arg(unit_str).arg(FrequencyLimits::kMaxValuePerUnit));
+         frequency_value_edit_->setFocus();
+         frequency_value_edit_->selectAll();
          return false;
     }
 
-    if (unitStr == "kHz") {
-        valueHz = valueDouble * 1000.0;
-    } else if (unitStr == "MHz") {
-        valueHz = valueDouble * 1000000.0;
+    if (unit_str == "kHz") {
+        hz = value_double * 1000.0;
+    } else if (unit_str == "MHz") {
+        hz = value_double * 1000000.0;
     } else {
-        valueHz = valueDouble;
+        hz = value_double;
     }
 
-    if (valueHz < FreqLimits::MIN_HZ) {
-        QMessageBox::warning(this, "Invalid Input", QString("The minimum frequency allowed is %1 Hz.").arg(FreqLimits::MIN_HZ));
-         m_frequencyValueEdit->setFocus();
-         m_frequencyValueEdit->selectAll();
+    if (hz < FrequencyLimits::kMinHz) {
+        QMessageBox::warning(this, "Invalid Input", QString("The minimum frequency allowed is %1 Hz.").arg(FrequencyLimits::kMinHz));
+         frequency_value_edit_->setFocus();
+         frequency_value_edit_->selectAll();
         return false;
     }
 
-     if (valueHz > FreqLimits::MAX_HZ) {
-         QMessageBox::warning(this, "Invalid Input", QString("The maximum frequency allowed is %1 MHz.").arg(FreqLimits::MAX_VALUE_PER_UNIT));
-         m_frequencyValueEdit->setFocus();
-         m_frequencyValueEdit->selectAll();
+     if (hz > FrequencyLimits::kMaxHz) {
+         QMessageBox::warning(this, "Invalid Input", QString("The maximum frequency allowed is %1 MHz.").arg(FrequencyLimits::kMaxValuePerUnit));
+         frequency_value_edit_->setFocus();
+         frequency_value_edit_->selectAll();
          return false;
      }
 
@@ -163,23 +157,20 @@ bool WavelengthSettingsWidget::validateFrequencyInput(double& valueHz) {
 }
 
 
-void WavelengthSettingsWidget::saveSettings() {
-    if (!m_frequencyValueEdit || !m_frequencyUnitCombo) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
+void WavelengthSettingsWidget::SaveSettings() {
+    if (!frequency_value_edit_ || !frequency_unit_combo_) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
         qWarning() << "WavelengthSettingsWidget::saveSettings - UI elements not initialized.";
         return;
     }
 
-    double frequencyValueHz = 0.0;
-    if (!validateFrequencyInput(frequencyValueHz)) {
+    double frequency_value_hz = 0.0;
+    if (!ValidateFrequencyInput(frequency_value_hz)) {
         qWarning() << "WavelengthSettingsWidget::saveSettings - Invalid frequency input. Settings not saved.";
         return;
     }
 
-    const QString frequencyStringHz = QString::number(frequencyValueHz, 'f', 1);
-    m_config->SetPreferredStartFrequency(frequencyStringHz);
+    const QString frequency_string_hz = QString::number(frequency_value_hz, 'f', 1);
+    config_->SetPreferredStartFrequency(frequency_string_hz);
 
-    // Usunięto zapis m_config->setRelayServerAddress(...)
-    // Usunięto zapis m_config->setRelayServerPort(...)
-
-    qDebug() << "WavelengthSettingsWidget settings prepared for saving. Preferred Frequency (Hz):" << frequencyStringHz;
+    qDebug() << "WavelengthSettingsWidget settings prepared for saving. Preferred Frequency (Hz):" << frequency_string_hz;
 }

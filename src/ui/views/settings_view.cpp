@@ -474,7 +474,7 @@ void SettingsView::showEvent(QShowEvent *event) {
 void SettingsView::loadSettingsFromRegistry() const {
     // --- Wavelength ---
     if (m_wavelengthTabWidget) {
-        m_wavelengthTabWidget->loadSettings();
+        m_wavelengthTabWidget->LoadSettings();
     }
     // --- Appearance ---
     if (m_appearanceTabWidget) {
@@ -491,7 +491,7 @@ void SettingsView::loadSettingsFromRegistry() const {
 void SettingsView::saveSettings() {
     // --- Wavelength ---
     if (m_wavelengthTabWidget) {
-        m_wavelengthTabWidget->saveSettings();
+        m_wavelengthTabWidget->SaveSettings();
     }
     // --- Appearance ---
     if (m_appearanceTabWidget) {
