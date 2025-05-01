@@ -1,8 +1,9 @@
 #ifndef SECURITY_CODE_LAYER_H
 #define SECURITY_CODE_LAYER_H
 
-#include "../security_layer.h"
 #include <QLabel>
+
+#include "../security_layer.h"
 #include <QLineEdit>
 #include <QVector>
 #include <QList>
@@ -14,40 +15,38 @@ public:
     explicit SecurityCodeLayer(QWidget *parent = nullptr);
     ~SecurityCodeLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void checkSecurityCode();
-    void onDigitEntered();
+        void CheckSecurityCode();
+        void OnDigitEntered();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    // Struktura kodu zabezpieczającego
     struct SecurityCode {
         QString code;       // Kod jako string (może zawierać cyfry/litery)
         QString hint;       // Podpowiedź
-        bool isNumeric;     // Czy kod jest tylko numeryczny
+        bool is_numeric;     // Czy kod jest tylko numeryczny
 
         SecurityCode(const QString& c, const QString& h, const bool num = true)
-            : code(c), hint(h), isNumeric(num) {}
+            : code(c), hint(h), is_numeric(num) {}
     };
 
-    QString getRandomSecurityCode(QString& hint, bool& isNumeric);
-    void resetInputs();
-    QString getEnteredCode() const;
-    void showErrorEffect();
-    void setInputValidators(bool numericOnly);
+    QString GetRandomSecurityCode(QString& hint, bool& is_numeric);
+    void ResetInputs();
+    QString GetEnteredCode() const;
+    void ShowErrorEffect();
+    void SetInputValidators(bool numeric_only);
 
-    QList<QLineEdit*> m_codeInputs;
-    QLabel* m_securityCodeHint;
-    QString m_currentSecurityCode;
-    bool m_isCurrentCodeNumeric;
+    QList<QLineEdit*> code_inputs_;
+    QLabel* security_code_hint_;
+    QString current_security_code_;
+    bool is_current_code_numeric_;
 
-    // Baza kodów bezpieczeństwa z podpowiedziami
-    QVector<SecurityCode> m_securityCodes;
+    QVector<SecurityCode> security_codes_;
 };
 
 #endif // SECURITY_CODE_LAYER_H

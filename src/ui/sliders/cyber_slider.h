@@ -13,8 +13,8 @@ class CyberSlider final : public QSlider {
 public:
     explicit CyberSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
 
-    double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(double intensity);
+    double GetGlowIntensity() const { return glow_intensity_; }
+    void SetGlowIntensity(double intensity);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -24,7 +24,7 @@ protected:
     void leaveEvent(QEvent* event) override;
 
 private:
-    double m_glowIntensity;
+    double glow_intensity_;
 };
 
 

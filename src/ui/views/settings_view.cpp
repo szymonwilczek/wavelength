@@ -29,103 +29,103 @@
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
-m_config(WavelengthConfig::getInstance()),
-m_tabContent(nullptr),
-m_titleLabel(nullptr),
-m_sessionLabel(nullptr),
-m_timeLabel(nullptr),
-m_tabBar(nullptr),
-m_wavelengthTabWidget(nullptr),
-m_appearanceTabWidget(nullptr),
-m_advancedTabWidget(nullptr),
-m_saveButton(nullptr),
-m_defaultsButton(nullptr),
-m_backButton(nullptr),
-m_refreshTimer(nullptr), // Zmieniono inicjalizację na false zgodnie z komentarzem w kodzie
-m_fingerprintLayer(nullptr), // Dodano inicjalizację wskaźników
-m_handprintLayer(nullptr),
-m_securityCodeLayer(nullptr), // <<< Dodano inicjalizację
-m_securityQuestionLayer(nullptr),
-m_retinaScanLayer(nullptr),
-m_voiceRecognitionLayer(nullptr),
-m_typingTestLayer(nullptr),
-m_snakeGameLayer(nullptr), // Nadal inicjalizowany, chociaż może nie być używany
-m_accessGrantedWidget(nullptr),
-m_securityLayersStack(nullptr),
-m_currentLayerIndex(FingerprintIndex),
-m_debugModeEnabled(true),
-m_classifiedFeaturesWidget(nullptr),
-m_overrideButton(nullptr),
-m_systemOverrideManager(nullptr)
+config_(WavelengthConfig::GetInstance()),
+tab_content_(nullptr),
+title_label_(nullptr),
+session_label_(nullptr),
+time_label_(nullptr),
+tab_bar_(nullptr),
+wavelength_tab_widget_(nullptr),
+appearance_tab_widget_(nullptr),
+advanced_tab_widget_(nullptr),
+save_button_(nullptr),
+defaults_button_(nullptr),
+back_button_(nullptr),
+refresh_timer_(nullptr), // Zmieniono inicjalizację na false zgodnie z komentarzem w kodzie
+fingerprint_layer_(nullptr), // Dodano inicjalizację wskaźników
+handprint_layer_(nullptr),
+security_code_layer_(nullptr), // <<< Dodano inicjalizację
+security_question_layer_(nullptr),
+retina_scan_layer_(nullptr),
+voice_recognition_layer_(nullptr),
+typing_test_layer_(nullptr),
+snake_game_layer_(nullptr), // Nadal inicjalizowany, chociaż może nie być używany
+access_granted_widget_(nullptr),
+security_layers_stack_(nullptr),
+current_layer_index_(FingerprintIndex),
+debug_mode_enabled_(true),
+classified_features_widget_(nullptr),
+override_button_(nullptr),
+system_override_manager_(nullptr)
 {
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("SettingsView { background-color: #101820; }");
 
-    setupUi();
+    SetupUi();
 
     // Timer do aktualizacji czasu
-    m_refreshTimer = new QTimer(this);
-    m_refreshTimer->setInterval(1000);
-    connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
+    refresh_timer_ = new QTimer(this);
+    refresh_timer_->setInterval(1000);
+    connect(refresh_timer_, &QTimer::timeout, this, [this]() {
         const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-        if(m_timeLabel) m_timeLabel->setText(QString("TS: %1").arg(timestamp));
+        if(time_label_) time_label_->setText(QString("TS: %1").arg(timestamp));
     });
-    m_refreshTimer->start();
+    refresh_timer_->start();
 
-    m_systemOverrideManager = new SystemOverrideManager(this);
+    system_override_manager_ = new SystemOverrideManager(this);
 
-    connect(m_systemOverrideManager, &SystemOverrideManager::overrideFinished, this, [this](){
+    connect(system_override_manager_, &SystemOverrideManager::overrideFinished, this, [this](){
         qDebug() << "Override sequence finished signal received in SettingsView.";
-        if (m_overrideButton) {
-            m_overrideButton->setEnabled(true);
-            m_overrideButton->setText("CAUTION: SYSTEM OVERRIDE");
+        if (override_button_) {
+            override_button_->setEnabled(true);
+            override_button_->setText("CAUTION: SYSTEM OVERRIDE");
         }
         // Można dodać inne akcje po zakończeniu override
     });
 }
 
-void SettingsView::setDebugMode(const bool enabled) {
-    if (m_debugModeEnabled != enabled) {
-        m_debugModeEnabled = enabled;
+void SettingsView::SetDebugMode(const bool enabled) {
+    if (debug_mode_enabled_ != enabled) {
+        debug_mode_enabled_ = enabled;
         qDebug() << "SettingsView Debug Mode:" << (enabled ? "ENABLED" : "DISABLED");
         // Po zmianie trybu debugowania, zresetuj stan zakładki CLASSIFIED
-        resetSecurityLayers();
+        ResetSecurityLayers();
     }
 }
 
 SettingsView::~SettingsView() {
     // Nie trzeba usuwać widgetów-dzieci, Qt zrobi to samo
     // Wystarczy zatrzymać i usunąć timer
-    if (m_refreshTimer) {
-        m_refreshTimer->stop();
+    if (refresh_timer_) {
+        refresh_timer_->stop();
         // delete m_refreshTimer; // Qt zarządza pamięcią dzieci, nie usuwaj ręcznie
         // m_refreshTimer = nullptr;
     }
 }
 
-void SettingsView::setupUi() {
-    const auto mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(40, 30, 40, 30);
-    mainLayout->setSpacing(15);
+void SettingsView::SetupUi() {
+    const auto main_layout = new QVBoxLayout(this);
+    main_layout->setContentsMargins(40, 30, 40, 30);
+    main_layout->setSpacing(15);
 
-    createHeaderPanel();
+    CreateHeaderPanel();
 
     // Panel zakładek (przyciski zamiast QTabWidget)
-    m_tabBar = new QWidget(this);
-    const auto tabLayout = new QHBoxLayout(m_tabBar);
-    tabLayout->setContentsMargins(0, 5, 0, 10);
-    tabLayout->setSpacing(0);
-    tabLayout->addStretch(1);
+    tab_bar_ = new QWidget(this);
+    const auto tab_layout = new QHBoxLayout(tab_bar_);
+    tab_layout->setContentsMargins(0, 5, 0, 10);
+    tab_layout->setSpacing(0);
+    tab_layout->addStretch(1);
 
     // Tworzenie przycisków zakładek
     // Zmieniono "Performance" na "Network"
-    QStringList tabNames = {"Wavelength", "Appearance", "Network","Shortcuts", "CLASSIFIED"};
+    QStringList tab_names = {"Wavelength", "Appearance", "Network","Shortcuts", "CLASSIFIED"};
 
-    for (int i = 0; i < tabNames.size(); i++) {
-        auto btn = new TabButton(tabNames[i], m_tabBar);
+    for (int i = 0; i < tab_names.size(); i++) {
+        auto btn = new TabButton(tab_names[i], tab_bar_);
 
         // Specjalne formatowanie dla zakładki CLASSIFIED
-        if (tabNames[i] == "CLASSIFIED") {
+        if (tab_names[i] == "CLASSIFIED") {
             btn->setStyleSheet(
                 "TabButton {"
                 "  color: #ff3333;"
@@ -147,132 +147,117 @@ void SettingsView::setupUi() {
             );
         }
 
-        connect(btn, &QPushButton::clicked, this, [this, i](){ switchToTab(i); });
-        tabLayout->addWidget(btn);
-        m_tabButtons.append(btn);
+        connect(btn, &QPushButton::clicked, this, [this, i](){ SwitchToTab(i); });
+        tab_layout->addWidget(btn);
+        tab_buttons_.append(btn);
     }
 
-    tabLayout->addStretch(1);
-    mainLayout->addWidget(m_tabBar);
+    tab_layout->addStretch(1);
+    main_layout->addWidget(tab_bar_);
 
     // Widget ze stosem zawartości zakładek
-    m_tabContent = new QStackedWidget(this);
-    m_tabContent->setStyleSheet(
+    tab_content_ = new QStackedWidget(this);
+    tab_content_->setStyleSheet(
         "QWidget { background-color: rgba(10, 25, 40, 180); border: 1px solid #005577; border-radius: 5px; }"
     );
 
     // Tworzenie zawartości dla każdej zakładki
-    m_wavelengthTabWidget = new WavelengthSettingsWidget(m_tabContent);
-    m_tabContent->addWidget(m_wavelengthTabWidget); // Index 0
+    wavelength_tab_widget_ = new WavelengthSettingsWidget(tab_content_);
+    tab_content_->addWidget(wavelength_tab_widget_); // Index 0
 
-    m_appearanceTabWidget = new AppearanceSettingsWidget(m_tabContent);
-    m_tabContent->addWidget(m_appearanceTabWidget); // Index 1
+    appearance_tab_widget_ = new AppearanceSettingsWidget(tab_content_);
+    tab_content_->addWidget(appearance_tab_widget_); // Index 1
 
     // Usunięto wywołanie setupNetworkTab();
     // Dodano tworzenie AdvancedSettingsWidget (zakładka Network)
-    m_advancedTabWidget = new NetworkSettingsWidget(m_tabContent); // <<< Utworzenie nowej zakładki
-    m_tabContent->addWidget(m_advancedTabWidget); // Index 2
+    advanced_tab_widget_ = new NetworkSettingsWidget(tab_content_); // <<< Utworzenie nowej zakładki
+    tab_content_->addWidget(advanced_tab_widget_); // Index 2
 
-    m_shortcutsTabWidget = new ShortcutsSettingsWidget(m_tabContent);
-    m_tabContent->addWidget(m_shortcutsTabWidget); // Index 3
+    shortcuts_tab_widget_ = new ShortcutsSettingsWidget(tab_content_);
+    tab_content_->addWidget(shortcuts_tab_widget_); // Index 3
 
-    setupClassifiedTab(); // Tworzy zakładkę "CLASSIFIED" - Index 4
+    SetupClassifiedTab(); // Tworzy zakładkę "CLASSIFIED" - Index 4
 
-    mainLayout->addWidget(m_tabContent, 1);
+    main_layout->addWidget(tab_content_, 1);
 
     // Panel przycisków (bez zmian)
-    const auto buttonLayout = new QHBoxLayout();
-    buttonLayout->setSpacing(15);
-    m_backButton = new CyberButton("BACK", this, false);
-    m_backButton->setFixedHeight(40);
-    m_defaultsButton = new CyberButton("RESTORE DEFAULTS", this, false);
-    m_defaultsButton->setFixedHeight(40);
-    m_saveButton = new CyberButton("SAVE SETTINGS", this, true);
-    m_saveButton->setFixedHeight(40);
-    buttonLayout->addWidget(m_backButton, 1);
-    buttonLayout->addStretch(1);
-    buttonLayout->addWidget(m_defaultsButton, 1);
-    buttonLayout->addWidget(m_saveButton, 2);
-    mainLayout->addLayout(buttonLayout);
+    const auto button_layout = new QHBoxLayout();
+    button_layout->setSpacing(15);
+    back_button_ = new CyberButton("BACK", this, false);
+    back_button_->setFixedHeight(40);
+    defaults_button_ = new CyberButton("RESTORE DEFAULTS", this, false);
+    defaults_button_->setFixedHeight(40);
+    save_button_ = new CyberButton("SAVE SETTINGS", this, true);
+    save_button_->setFixedHeight(40);
+    button_layout->addWidget(back_button_, 1);
+    button_layout->addStretch(1);
+    button_layout->addWidget(defaults_button_, 1);
+    button_layout->addWidget(save_button_, 2);
+    main_layout->addLayout(button_layout);
 
     // Połączenia (bez zmian)
-    connect(m_backButton, &CyberButton::clicked, this, &SettingsView::handleBackButton);
-    connect(m_saveButton, &CyberButton::clicked, this, &SettingsView::saveSettings);
-    connect(m_defaultsButton, &CyberButton::clicked, this, &SettingsView::restoreDefaults);
+    connect(back_button_, &CyberButton::clicked, this, &SettingsView::HandleBackButton);
+    connect(save_button_, &CyberButton::clicked, this, &SettingsView::SaveSettings);
+    connect(defaults_button_, &CyberButton::clicked, this, &SettingsView::RestoreDefaults);
 
     // Domyślnie aktywna pierwsza zakładka
-    if (!m_tabButtons.isEmpty()) {
-        m_tabButtons[0]->setActive(true);
-        m_tabButtons[0]->setChecked(true);
+    if (!tab_buttons_.isEmpty()) {
+        tab_buttons_[0]->SetActive(true);
+        tab_buttons_[0]->setChecked(true);
     }
-    m_tabContent->setCurrentIndex(0);
+    tab_content_->setCurrentIndex(0);
 }
 
-void SettingsView::setupClassifiedTab() {
+void SettingsView::SetupClassifiedTab() {
     // Implementacja bez zmian...
-    const auto tab = new QWidget(m_tabContent);
+    const auto tab = new QWidget(tab_content_);
     const auto layout = new QVBoxLayout(tab);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto infoLabel = new QLabel("CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED", tab);
-    infoLabel->setStyleSheet("color: #ff3333; background-color: transparent; font-family: Consolas; font-size: 12pt; font-weight: bold;");
-    layout->addWidget(infoLabel);
+    const auto info_label = new QLabel("CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED", tab);
+    info_label->setStyleSheet("color: #ff3333; background-color: transparent; font-family: Consolas; font-size: 12pt; font-weight: bold;");
+    layout->addWidget(info_label);
 
-    const auto warningLabel = new QLabel("Authorization required to access classified settings.\nMultiple security layers will be enforced.", tab);
-    warningLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    layout->addWidget(warningLabel);
+    const auto warning_label = new QLabel("Authorization required to access classified settings.\nMultiple security layers will be enforced.", tab);
+    warning_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    layout->addWidget(warning_label);
 
-    m_securityLayersStack = new QStackedWidget(tab);
-    layout->addWidget(m_securityLayersStack, 1);
+    security_layers_stack_ = new QStackedWidget(tab);
+    layout->addWidget(security_layers_stack_, 1);
 
-    m_fingerprintLayer = new FingerprintLayer(m_securityLayersStack);
-    m_handprintLayer = new HandprintLayer(m_securityLayersStack);
-    m_securityCodeLayer = new SecurityCodeLayer(m_securityLayersStack);
-    m_securityQuestionLayer = new SecurityQuestionLayer(m_securityLayersStack);
-    m_retinaScanLayer = new RetinaScanLayer(m_securityLayersStack);
-    m_voiceRecognitionLayer = new VoiceRecognitionLayer(m_securityLayersStack);
-    m_typingTestLayer = new TypingTestLayer(m_securityLayersStack);
-    m_snakeGameLayer = new SnakeGameLayer(m_securityLayersStack);
+    fingerprint_layer_ = new FingerprintLayer(security_layers_stack_);
+    handprint_layer_ = new HandprintLayer(security_layers_stack_);
+    security_code_layer_ = new SecurityCodeLayer(security_layers_stack_);
+    security_question_layer_ = new SecurityQuestionLayer(security_layers_stack_);
+    retina_scan_layer_ = new RetinaScanLayer(security_layers_stack_);
+    voice_recognition_layer_ = new VoiceRecognitionLayer(security_layers_stack_);
+    typing_test_layer_ = new TypingTestLayer(security_layers_stack_);
+    snake_game_layer_ = new SnakeGameLayer(security_layers_stack_);
 
-    m_classifiedFeaturesWidget = new QWidget(m_securityLayersStack);
-    const auto featuresLayout = new QVBoxLayout(m_classifiedFeaturesWidget);
-    featuresLayout->setAlignment(Qt::AlignCenter);
-    featuresLayout->setSpacing(20);
+    classified_features_widget_ = new QWidget(security_layers_stack_);
+    const auto features_layout = new QVBoxLayout(classified_features_widget_);
+    features_layout->setAlignment(Qt::AlignCenter);
+    features_layout->setSpacing(20);
 
-    const auto featuresTitle = new QLabel("CLASSIFIED FEATURES UNLOCKED", m_classifiedFeaturesWidget);
-    featuresTitle->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
-    featuresTitle->setAlignment(Qt::AlignCenter);
-    featuresLayout->addWidget(featuresTitle);
+    const auto features_title = new QLabel("CLASSIFIED FEATURES UNLOCKED", classified_features_widget_);
+    features_title->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
+    features_title->setAlignment(Qt::AlignCenter);
+    features_layout->addWidget(features_title);
 
-    const auto featuresDesc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", m_classifiedFeaturesWidget);
-    featuresDesc->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    featuresDesc->setAlignment(Qt::AlignCenter);
-    featuresLayout->addWidget(featuresDesc);
+    const auto features_desc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", classified_features_widget_);
+    features_desc->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    features_desc->setAlignment(Qt::AlignCenter);
+    features_layout->addWidget(features_desc);
 
-    const auto buttonContainer = new QWidget(m_classifiedFeaturesWidget);
-    const auto buttonLayoutClassified = new QHBoxLayout(buttonContainer); // Zmieniono nazwę zmiennej
-    buttonLayoutClassified->setSpacing(15);
+    const auto button_container = new QWidget(classified_features_widget_);
+    const auto button_layout_classified = new QHBoxLayout(button_container); // Zmieniono nazwę zmiennej
+    button_layout_classified->setSpacing(15);
 
-    const auto waveSculptorButton = new QPushButton("Wave Sculptor", buttonContainer);
-    waveSculptorButton->setMinimumHeight(40);
-    waveSculptorButton->setStyleSheet(
-        "QPushButton { background-color: #0077AA; border: 1px solid #00AAFF; padding: 10px; border-radius: 5px; color: #E0E0E0; font-family: Consolas; font-weight: bold; }"
-        "QPushButton:hover { background-color: #0099CC; }"
-        "QPushButton:pressed { background-color: #005588; }"
-    );
-    buttonLayoutClassified->addWidget(waveSculptorButton);
-
-    const auto matrixVisionButton = new QPushButton("Matrix Vision (TBD)", buttonContainer);
-    matrixVisionButton->setMinimumHeight(40);
-    matrixVisionButton->setStyleSheet("QPushButton { background-color: #444; border: 1px solid #666; padding: 10px; border-radius: 5px; color: #999; }");
-    matrixVisionButton->setEnabled(false);
-    buttonLayoutClassified->addWidget(matrixVisionButton);
-
-    m_overrideButton = new QPushButton("CAUTION: SYSTEM OVERRIDE", buttonContainer);
-    m_overrideButton->setMinimumHeight(50);
-    m_overrideButton->setMinimumWidth(250);
-    m_overrideButton->setStyleSheet(
+    override_button_ = new QPushButton("CAUTION: SYSTEM OVERRIDE", button_container);
+    override_button_->setMinimumHeight(50);
+    override_button_->setMinimumWidth(250);
+    override_button_->setStyleSheet(
         "QPushButton {"
         "  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #AA0000, stop:1 #660000);"
         "  border: 2px solid #FF3333;"
@@ -298,20 +283,20 @@ void SettingsView::setupClassifiedTab() {
         "  color: #999;"
         "}"
     );
-    m_overrideButton->setEnabled(true);
-    connect(m_overrideButton, &QPushButton::clicked, this, [this]() {
+    override_button_->setEnabled(true);
+    connect(override_button_, &QPushButton::clicked, this, [this]() {
         qDebug() << "Override button clicked.";
 #ifdef Q_OS_WIN
-        if (SystemOverrideManager::isRunningAsAdmin()) {
+        if (SystemOverrideManager::IsRunningAsAdmin()) {
             qDebug() << "Already running as admin. Initiating sequence directly.";
-            m_overrideButton->setEnabled(false);
-            m_overrideButton->setText("OVERRIDE IN PROGRESS...");
-            QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
+            override_button_->setEnabled(false);
+            override_button_->setText("OVERRIDE IN PROGRESS...");
+            QMetaObject::invokeMethod(system_override_manager_, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
         } else {
             qDebug() << "Not running as admin. Attempting relaunch with elevation request...";
             QStringList args;
             args << "--run-override";
-            if (SystemOverrideManager::relaunchAsAdmin(args)) {
+            if (SystemOverrideManager::RelaunchAsAdmin(args)) {
                 qDebug() << "Relaunch initiated. Closing current instance.";
                 QApplication::quit();
             } else {
@@ -325,89 +310,89 @@ void SettingsView::setupClassifiedTab() {
         QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
 #endif
     });
-    buttonLayoutClassified->addWidget(m_overrideButton);
+    button_layout_classified->addWidget(override_button_);
 
-    featuresLayout->addWidget(buttonContainer, 0, Qt::AlignCenter);
-    featuresLayout->addStretch();
+    features_layout->addWidget(button_container, 0, Qt::AlignCenter);
+    features_layout->addStretch();
 
-    m_securityLayersStack->addWidget(m_fingerprintLayer);
-    m_securityLayersStack->addWidget(m_handprintLayer);
-    m_securityLayersStack->addWidget(m_securityCodeLayer);
-    m_securityLayersStack->addWidget(m_securityQuestionLayer);
-    m_securityLayersStack->addWidget(m_retinaScanLayer);
-    m_securityLayersStack->addWidget(m_voiceRecognitionLayer);
-    m_securityLayersStack->addWidget(m_typingTestLayer);
-    m_securityLayersStack->addWidget(m_snakeGameLayer);
-    m_securityLayersStack->addWidget(m_classifiedFeaturesWidget);
+    security_layers_stack_->addWidget(fingerprint_layer_);
+    security_layers_stack_->addWidget(handprint_layer_);
+    security_layers_stack_->addWidget(security_code_layer_);
+    security_layers_stack_->addWidget(security_question_layer_);
+    security_layers_stack_->addWidget(retina_scan_layer_);
+    security_layers_stack_->addWidget(voice_recognition_layer_);
+    security_layers_stack_->addWidget(typing_test_layer_);
+    security_layers_stack_->addWidget(snake_game_layer_);
+    security_layers_stack_->addWidget(classified_features_widget_);
 
     // Połączenia warstw (bez zmian)
-    connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = HandprintIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_handprintLayer->initialize();
+    connect(fingerprint_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = HandprintIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        handprint_layer_->Initialize();
     });
-    connect(m_handprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = SecurityCodeIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_securityCodeLayer->initialize();
+    connect(handprint_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = SecurityCodeIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        security_code_layer_->Initialize();
     });
-    connect(m_securityCodeLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = SecurityQuestionIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_securityQuestionLayer->initialize();
+    connect(security_code_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = SecurityQuestionIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        security_question_layer_->Initialize();
     });
-    connect(m_securityQuestionLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = RetinaScanIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_retinaScanLayer->initialize();
+    connect(security_question_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = RetinaScanIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        retina_scan_layer_->Initialize();
     });
-    connect(m_retinaScanLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = VoiceRecognitionIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_voiceRecognitionLayer->initialize();
+    connect(retina_scan_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = VoiceRecognitionIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        voice_recognition_layer_->Initialize();
     });
-    connect(m_voiceRecognitionLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = TypingTestIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_typingTestLayer->initialize();
+    connect(voice_recognition_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = TypingTestIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        typing_test_layer_->Initialize();
     });
-    connect(m_typingTestLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        m_currentLayerIndex = SnakeGameIndex;
-        m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_snakeGameLayer->initialize();
+    connect(typing_test_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        current_layer_index_ = SnakeGameIndex;
+        security_layers_stack_->setCurrentIndex(current_layer_index_);
+        snake_game_layer_->Initialize();
     });
-    connect(m_snakeGameLayer, &SecurityLayer::layerCompleted, this, [this]() {
-        int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
-        if (featuresIndex != -1) {
+    connect(snake_game_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+        int features_index = security_layers_stack_->indexOf(classified_features_widget_);
+        if (features_index != -1) {
              // Rzutowanie jest ok, jeśli AccessGrantedIndex jest ostatnim elementem enum PRZED dodaniem widgetu
              // Lepiej użyć bezpośrednio featuresIndex
-             m_currentLayerIndex = static_cast<SecurityLayerIndex>(featuresIndex); // Lub jakaś wartość specjalna
-             m_securityLayersStack->setCurrentIndex(featuresIndex);
+             current_layer_index_ = static_cast<SecurityLayerIndex>(features_index); // Lub jakaś wartość specjalna
+             security_layers_stack_->setCurrentIndex(features_index);
              qDebug() << "All security layers passed. Showing classified features.";
         } else {
              qWarning() << "Could not find ClassifiedFeaturesWidget in the stack!";
-             m_securityLayersStack->setCurrentIndex(m_securityLayersStack->count() - 1);
+             security_layers_stack_->setCurrentIndex(security_layers_stack_->count() - 1);
         }
     });
 
     layout->addStretch();
-    m_tabContent->addWidget(tab); // Dodaj zakładkę do stosu
+    tab_content_->addWidget(tab); // Dodaj zakładkę do stosu
 
-    resetSecurityLayers(); // Zresetuj na końcu
+    ResetSecurityLayers(); // Zresetuj na końcu
 }
 
-void SettingsView::setupNextSecurityLayer() {
+void SettingsView::SetupNextSecurityLayer() {
     // Implementacja bez zmian...
     // Sprawdź, czy obecny indeks jest prawidłowy i czy nie jest to ostatnia warstwa przed dostępem
     // Użyjemy indeksu widgetu funkcji zamiast AccessGrantedIndex
-    const int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
-    if (featuresIndex == -1) {
+    const int features_index = security_layers_stack_->indexOf(classified_features_widget_);
+    if (features_index == -1) {
         qWarning() << "Cannot setup next layer: ClassifiedFeaturesWidget not found.";
         return; // Błąd krytyczny
     }
 
-    if (static_cast<int>(m_currentLayerIndex) < featuresIndex) {
-         m_currentLayerIndex = static_cast<SecurityLayerIndex>(static_cast<int>(m_currentLayerIndex) + 1);
+    if (static_cast<int>(current_layer_index_) < features_index) {
+         current_layer_index_ = static_cast<SecurityLayerIndex>(static_cast<int>(current_layer_index_) + 1);
     } else {
         // Jeśli już jesteśmy na ClassifiedFeaturesWidget lub dalej (co nie powinno się zdarzyć), nie rób nic
         return;
@@ -415,178 +400,176 @@ void SettingsView::setupNextSecurityLayer() {
 
     // Przygotowanie następnego zabezpieczenia
     // Używamy indeksów enum, które odpowiadają indeksom widgetów dodanych wcześniej
-    if (m_currentLayerIndex < featuresIndex) {
-         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
+    if (current_layer_index_ < features_index) {
+         security_layers_stack_->setCurrentIndex(current_layer_index_);
          // Wywołaj initialize dla odpowiedniej warstwy
-         QWidget* currentWidget = m_securityLayersStack->widget(m_currentLayerIndex);
-         if (const auto currentLayer = qobject_cast<SecurityLayer*>(currentWidget)) {
-             currentLayer->initialize();
+         QWidget* current_widget = security_layers_stack_->widget(current_layer_index_);
+         if (const auto current_layer = qobject_cast<SecurityLayer*>(current_widget)) {
+             current_layer->Initialize();
          } else {
-             qWarning() << "Widget at index" << m_currentLayerIndex << "is not a SecurityLayer!";
+             qWarning() << "Widget at index" << current_layer_index_ << "is not a SecurityLayer!";
          }
-    } else if (m_currentLayerIndex == featuresIndex) {
+    } else if (current_layer_index_ == features_index) {
          // Osiągnięto widget funkcji, nie ma initialize()
-         m_securityLayersStack->setCurrentIndex(featuresIndex);
+         security_layers_stack_->setCurrentIndex(features_index);
     }
 }
 
-void SettingsView::createHeaderPanel() {
-    // Implementacja bez zmian...
-    const auto headerLayout = new QHBoxLayout();
-    headerLayout->setSpacing(10);
+void SettingsView::CreateHeaderPanel() {
+    const auto header_layout = new QHBoxLayout();
+    header_layout->setSpacing(10);
 
-    m_titleLabel = new QLabel("SYSTEM SETTINGS", this);
-    m_titleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
-    headerLayout->addWidget(m_titleLabel);
+    title_label_ = new QLabel("SYSTEM SETTINGS", this);
+    title_label_->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
+    header_layout->addWidget(title_label_);
 
-    headerLayout->addStretch();
+    header_layout->addStretch();
 
-    const QString sessionId = QString("%1-%2")
+    const QString session_id = QString("%1-%2")
         .arg(QRandomGenerator::global()->bounded(1000, 9999))
         .arg(QRandomGenerator::global()->bounded(10000, 99999));
 
-    m_sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
-    m_sessionLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
-    headerLayout->addWidget(m_sessionLabel);
+    session_label_ = new QLabel(QString("SESSION_ID: %1").arg(session_id), this);
+    session_label_->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
+    header_layout->addWidget(session_label_);
 
     const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-    m_timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
-    m_timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
-    headerLayout->addWidget(m_timeLabel);
+    time_label_ = new QLabel(QString("TS: %1").arg(timestamp), this);
+    time_label_->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
+    header_layout->addWidget(time_label_);
 
     // Dodaj headerLayout do głównego layoutu (zakładając, że główny layout to QVBoxLayout)
-    if (const auto mainVLayout = qobject_cast<QVBoxLayout*>(layout())) {
-        mainVLayout->insertLayout(0, headerLayout); // Wstaw na górze
+    if (const auto main_v_layout = qobject_cast<QVBoxLayout*>(layout())) {
+        main_v_layout->insertLayout(0, header_layout); // Wstaw na górze
     } else {
         qWarning() << "Could not cast main layout to QVBoxLayout in createHeaderPanel";
         // Awaryjnie dodaj na końcu
-        layout()->addItem(headerLayout);
+        layout()->addItem(header_layout);
     }
 }
 
 void SettingsView::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
-    loadSettingsFromRegistry();
-    resetSecurityLayers(); // Resetuj warstwy przy każdym pokazaniu widoku
+    LoadSettingsFromRegistry();
+    ResetSecurityLayers(); // Resetuj warstwy przy każdym pokazaniu widoku
 }
 
 
-void SettingsView::loadSettingsFromRegistry() const {
+void SettingsView::LoadSettingsFromRegistry() const {
     // --- Wavelength ---
-    if (m_wavelengthTabWidget) {
-        m_wavelengthTabWidget->loadSettings();
+    if (wavelength_tab_widget_) {
+        wavelength_tab_widget_->LoadSettings();
     }
     // --- Appearance ---
-    if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->loadSettings();
+    if (appearance_tab_widget_) {
+        appearance_tab_widget_->LoadSettings();
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
-    if (m_advancedTabWidget) { // <<< Dodano ładowanie nowej zakładki
-        m_advancedTabWidget->loadSettings();
+    if (advanced_tab_widget_) { // <<< Dodano ładowanie nowej zakładki
+        advanced_tab_widget_->LoadSettings();
     }
 
-    if (m_shortcutsTabWidget) m_shortcutsTabWidget->loadSettings();
+    if (shortcuts_tab_widget_) shortcuts_tab_widget_->LoadSettings();
 }
 
-void SettingsView::saveSettings() {
+void SettingsView::SaveSettings() {
     // --- Wavelength ---
-    if (m_wavelengthTabWidget) {
-        m_wavelengthTabWidget->saveSettings();
+    if (wavelength_tab_widget_) {
+        wavelength_tab_widget_->SaveSettings();
     }
     // --- Appearance ---
-    if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->saveSettings();
+    if (appearance_tab_widget_) {
+        appearance_tab_widget_->SaveSettings();
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
-    if (m_advancedTabWidget) { // <<< Dodano zapisywanie nowej zakładki
-        m_advancedTabWidget->saveSettings();
+    if (advanced_tab_widget_) { // <<< Dodano zapisywanie nowej zakładki
+        advanced_tab_widget_->SaveSettings();
     }
 
-    if (m_shortcutsTabWidget) m_shortcutsTabWidget->saveSettings();
+    if (shortcuts_tab_widget_) shortcuts_tab_widget_->SaveSettings();
 
     // Zapisanie wszystkich ustawień do pliku/rejestru
-    m_config->saveSettings();
+    config_->SaveSettings();
 
-    ShortcutManager::getInstance()->updateRegisteredShortcuts();
+    ShortcutManager::GetInstance()->updateRegisteredShortcuts();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
     emit settingsChanged(); // Emituj sygnał po zapisaniu
 }
 
-void SettingsView::restoreDefaults() {
+void SettingsView::RestoreDefaults() {
     if (QMessageBox::question(this, "Restore Defaults",
                              "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings.", // Zaktualizowano komunikat
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        m_config->restoreDefaults();
-        loadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie
+        config_->RestoreDefaults();
+        LoadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie
         QMessageBox::information(this, "Defaults Restored", "Settings have been restored to their default values.");
         emit settingsChanged(); // Emituj sygnał również po przywróceniu domyślnych
                              }
 }
 
-void SettingsView::switchToTab(const int tabIndex) {
-    if (tabIndex < 0 || tabIndex >= m_tabButtons.size()) return;
+void SettingsView::SwitchToTab(const int tab_index) {
+    if (tab_index < 0 || tab_index >= tab_buttons_.size()) return;
 
-    for (int i = 0; i < m_tabButtons.size(); ++i) {
-        m_tabButtons[i]->setActive(i == tabIndex);
-        m_tabButtons[i]->setChecked(i == tabIndex);
+    for (int i = 0; i < tab_buttons_.size(); ++i) {
+        tab_buttons_[i]->SetActive(i == tab_index);
+        tab_buttons_[i]->setChecked(i == tab_index);
     }
-    m_tabContent->setCurrentIndex(tabIndex);
+    tab_content_->setCurrentIndex(tab_index);
 
-    constexpr int ClassifiedTabIndex = 4;
-    if (tabIndex == ClassifiedTabIndex) {
-        resetSecurityLayers();
+    constexpr int classified_tab_index = 4;
+    if (tab_index == classified_tab_index) {
+        ResetSecurityLayers();
     }
 }
 
-void SettingsView::handleBackButton() {
-    resetSecurityLayers(); // Zresetuj warstwy przed wyjściem
+void SettingsView::HandleBackButton() {
+    ResetSecurityLayers(); // Zresetuj warstwy przed wyjściem
     emit backToMainView(); // Wyemituj sygnał powrotu
 }
 
 
-void SettingsView::resetSecurityLayers() {
-    // Implementacja bez zmian...
-    if (!m_securityLayersStack || !m_fingerprintLayer || !m_handprintLayer ||
-        !m_securityCodeLayer || !m_securityQuestionLayer || !m_retinaScanLayer ||
-        !m_voiceRecognitionLayer || !m_typingTestLayer || !m_snakeGameLayer ||
-        !m_classifiedFeaturesWidget) {
+void SettingsView::ResetSecurityLayers() {
+    if (!security_layers_stack_ || !fingerprint_layer_ || !handprint_layer_ ||
+        !security_code_layer_ || !security_question_layer_ || !retina_scan_layer_ ||
+        !voice_recognition_layer_ || !typing_test_layer_ || !snake_game_layer_ ||
+        !classified_features_widget_) {
         qWarning() << "Cannot reset security layers: Stack or layers not fully initialized.";
         return;
     }
 
-    qDebug() << "Resetting security layers... Debug mode:" << m_debugModeEnabled;
+    qDebug() << "Resetting security layers... Debug mode:" << debug_mode_enabled_;
 
-    m_fingerprintLayer->reset();
-    m_handprintLayer->reset();
-    m_securityCodeLayer->reset();
-    m_securityQuestionLayer->reset();
-    m_retinaScanLayer->reset();
-    m_voiceRecognitionLayer->reset();
-    m_typingTestLayer->reset();
-    m_snakeGameLayer->reset();
+    fingerprint_layer_->Reset();
+    handprint_layer_->Reset();
+    security_code_layer_->Reset();
+    security_question_layer_->Reset();
+    retina_scan_layer_->Reset();
+    voice_recognition_layer_->Reset();
+    typing_test_layer_->Reset();
+    snake_game_layer_->Reset();
 
-    if (m_overrideButton) {
-        m_overrideButton->setEnabled(true);
-        m_overrideButton->setText("CAUTION: SYSTEM OVERRIDE");
+    if (override_button_) {
+        override_button_->setEnabled(true);
+        override_button_->setText("CAUTION: SYSTEM OVERRIDE");
     }
 
-    if (m_debugModeEnabled) {
-        const int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
+    if (debug_mode_enabled_) {
+        const int featuresIndex = security_layers_stack_->indexOf(classified_features_widget_);
         if (featuresIndex != -1) {
-            m_securityLayersStack->setCurrentIndex(featuresIndex);
+            security_layers_stack_->setCurrentIndex(featuresIndex);
             qDebug() << "Debug mode: Bypassed security layers, showing classified features.";
         } else {
             qWarning() << "Debug mode error: Could not find ClassifiedFeaturesWidget index!";
-            m_securityLayersStack->setCurrentIndex(FingerprintIndex);
-            m_currentLayerIndex = FingerprintIndex;
-            m_fingerprintLayer->initialize();
+            security_layers_stack_->setCurrentIndex(FingerprintIndex);
+            current_layer_index_ = FingerprintIndex;
+            fingerprint_layer_->Initialize();
         }
     } else {
-        m_currentLayerIndex = FingerprintIndex;
-        m_securityLayersStack->setCurrentIndex(FingerprintIndex);
-        m_fingerprintLayer->initialize();
+        current_layer_index_ = FingerprintIndex;
+        security_layers_stack_->setCurrentIndex(FingerprintIndex);
+        fingerprint_layer_->Initialize();
         qDebug() << "Normal mode: Starting security layers sequence.";
     }
-    qDebug() << "Security layers reset complete. Current index:" << m_securityLayersStack->currentIndex();
+    qDebug() << "Security layers reset complete. Current index:" << security_layers_stack_->currentIndex();
 }

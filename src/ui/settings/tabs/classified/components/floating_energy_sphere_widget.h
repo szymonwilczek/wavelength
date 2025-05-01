@@ -23,7 +23,7 @@
 
 struct ImpactInfo {
     QVector3D point = QVector3D(0,0,0); // Punkt uderzenia w lokalnych koordynatach sfery (znormalizowany)
-    float startTime = -1.0f;       // Czas rozpoczęcia uderzenia (m_timeValue)
+    float start_time = -1.0f;       // Czas rozpoczęcia uderzenia (m_timeValue)
     bool active = false;           // Czy ten slot jest aktywny
 };
 
@@ -32,10 +32,10 @@ class FloatingEnergySphereWidget final : public QOpenGLWidget, protected QOpenGL
     Q_OBJECT
 
 public:
-    explicit FloatingEnergySphereWidget(bool isFirstTime, QWidget *parent = nullptr);
+    explicit FloatingEnergySphereWidget(bool is_first_time, QWidget *parent = nullptr);
     ~FloatingEnergySphereWidget() override;
 
-    void setClosable(bool closable);
+    void SetClosable(bool closable);
 
     signals:
         void widgetClosed();
@@ -55,82 +55,82 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
     private slots:
-        void updateAnimation();
-        void processAudioBuffer(); // <<< Dodano
-        void audioDecodingFinished() const; // <<< Dodano
-        void handleMediaPlayerError() const; // <<< Dodano
-        void handleAudioDecoderError(); // <<< Dodano
-        void playKonamiHint() const;
-        void handlePlayerStateChanged(QMediaPlayer::State state);
-        void startDestructionSequence();
-        void simulateClick();
+        void UpdateAnimation();
+        void ProcessAudioBuffer(); // <<< Dodano
+        void AudioDecodingFinished() const; // <<< Dodano
+        void HandleMediaPlayerError() const; // <<< Dodano
+        void HandleAudioDecoderError(); // <<< Dodano
+        void PlayKonamiHint() const;
+        void HandlePlayerStateChanged(QMediaPlayer::State state);
+        void StartDestructionSequence();
+        void SimulateClick();
 
 
 private:
-    void setupSphereGeometry(int rings, int sectors);
-    void setupShaders();
-    void setupAudio(); // <<< Dodano
-    float calculateRMSAmplitude(const QAudioBuffer& buffer) const; // <<< Dodano
-    void triggerImpactAtScreenPos(const QPoint& screenPos);
+    void SetupSphereGeometry(int rings, int sectors);
+    void SetupShaders();
+    void SetupAudio(); // <<< Dodano
+    float CalculateRMSAmplitude(const QAudioBuffer& buffer) const; // <<< Dodano
+    void TriggerImpactAtScreenPos(const QPoint& screen_position);
 
-    bool m_isFirstTime;
+    bool is_first_time_;
 
-    QTimer m_timer;
-    float m_timeValue;
+    QTimer timer_;
+    float time_value_;
 
-    QOpenGLShaderProgram *m_program;
-    QOpenGLBuffer m_vbo;
-    QOpenGLVertexArrayObject m_vao;
+    QOpenGLShaderProgram *shader_program_;
+    QOpenGLBuffer vbo_;
+    QOpenGLVertexArrayObject vao_;
 
-    QMatrix4x4 m_projectionMatrix;
-    QMatrix4x4 m_viewMatrix;
-    QMatrix4x4 m_modelMatrix;
+    QMatrix4x4 projection_matrix_;
+    QMatrix4x4 view_matrix_;
+    QMatrix4x4 model_matrix_;
 
-    QVector3D m_cameraPosition;
-    float m_cameraDistance;
+    QVector3D camera_position_;
+    float camera_distance_;
 
-    QPoint m_lastMousePos;
-    bool m_mousePressed;
-    QQuaternion m_rotation;
+    QPoint last_mouse_position_;
+    bool mouse_pressed_;
+    QQuaternion rotation_;
 
-    std::vector<GLfloat> m_vertices;
-    int m_vertexCount;
+    std::vector<GLfloat> vertices_;
+    int vertex_count_;
 
-    bool m_closable;
+    bool closable_;
 
-    QVector3D m_angularVelocity;
-    float m_dampingFactor;
+    QVector3D angular_velocity_;
+    float damping_factor_;
 
-    QElapsedTimer m_elapsedTimer;
-    float m_lastFrameTimeSecs;
+    QElapsedTimer elapsed_timer_;
+    float last_frame_time_secs_;
 
     // --- Audio ---
-    QMediaPlayer *m_player; // <<< Dodano
-    QAudioDecoder *m_decoder; // <<< Dodano
-    std::vector<float> m_audioAmplitudes; // <<< Dodano: Przechowuje znormalizowane amplitudy RMS dla każdego bufora
-    QAudioFormat m_audioFormat; // <<< Dodano: Przechowuje format dekodowanego audio
-    qint64 m_audioBufferDurationMs; // <<< Dodano: Czas trwania jednego bufora audio w ms
-    float m_currentAudioAmplitude; // <<< Dodano: Aktualna amplituda do przekazania do shadera
-    float m_targetAudioAmplitude;
-    bool m_audioReady; // <<< Dodano: Flaga wskazująca, czy dane audio są gotowe
+    QMediaPlayer *media_player_; // <<< Dodano
+    QAudioDecoder *audio_decoder_; // <<< Dodano
+    std::vector<float> audio_amplitudes_; // <<< Dodano: Przechowuje znormalizowane amplitudy RMS dla każdego bufora
+    QAudioFormat audio_format_; // <<< Dodano: Przechowuje format dekodowanego audio
+    qint64 audio_buffer_duration_ms_; // <<< Dodano: Czas trwania jednego bufora audio w ms
+    float current_audio_amplitude_; // <<< Dodano: Aktualna amplituda do przekazania do shadera
+    float target_audio_amplitude_;
+    bool audio_ready_; // <<< Dodano: Flaga wskazująca, czy dane audio są gotowe
 
-    std::vector<ImpactInfo> m_impacts;
-    int m_nextImpactIndex;
+    std::vector<ImpactInfo> impacts_;
+    int next_impact_index_;
 
     // --- Konami Code ---
-    std::deque<int> m_keySequence;
-    const std::vector<int> m_konamiCode = {
+    std::deque<int> key_sequence_;
+    const std::vector<int> konami_code_ = {
         Qt::Key_Up, Qt::Key_Down, Qt::Key_Up, Qt::Key_Down,
         Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
         Qt::Key_B, Qt::Key_A, Qt::Key_Return
     };
-    QTimer* m_hintTimer;
+    QTimer* hint_timer_;
 
-    bool m_isDestroying;
-    float m_destructionProgress;
-    const QString GOODBYE_SOUND_FILENAME = "goodbye.wav";
+    bool is_destroying_;
+    float destruction_progress_;
+    const QString kGoodbyeSoundFilename = "goodbye.wav";
 
-    QTimer* m_clickSimulationTimer;
+    QTimer* click_simulation_timer_;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H

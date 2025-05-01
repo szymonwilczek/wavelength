@@ -14,24 +14,24 @@ public:
     explicit RetinaScanLayer(QWidget *parent = nullptr);
     ~RetinaScanLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void updateScan();
-        void finishScan();
+        void UpdateScan();
+        void FinishScan();
 
 private:
-    void generateEyeImage();
-    void startScanAnimation() const;
+    void GenerateEyeImage();
+    void StartScanAnimation() const;
 
-    QLabel* m_eyeImage;
-    QProgressBar* m_scanProgress;
-    QTimer* m_scanTimer;
-    QTimer* m_completeTimer;
-    int m_scanLine;
+    QLabel* eye_image_;
+    QProgressBar* scan_progress_;
+    QTimer* scan_timer_;
+    QTimer* complete_timer_;
+    int scanline_;
 
-    QImage m_baseEyeImage;
+    QImage base_eye_image_;
 };
 
 #endif // RETINA_SCAN_LAYER_H

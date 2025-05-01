@@ -9,18 +9,18 @@ class WavelengthCreator final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthCreator* getInstance() {
+    static WavelengthCreator* GetInstance() {
         static WavelengthCreator instance;
         return &instance;
     }
 
-    bool createWavelength(QString frequency, bool isPasswordProtected,
+    bool CreateWavelength(QString frequency, bool is_password_protected,
                   const QString& password);
 
 signals:
     void wavelengthCreated(QString frequency);
     void wavelengthClosed(QString frequency);
-    void connectionError(const QString& errorMessage);
+    void connectionError(const QString& error_message);
 
 private:
     explicit WavelengthCreator(QObject* parent = nullptr) : QObject(parent) {}

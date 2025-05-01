@@ -26,47 +26,47 @@ class CommunicationStream final : public QOpenGLWidget, protected QOpenGLFunctio
 
 public:
     enum StreamState {
-        Idle,        // Prosta linia z okazjonalnymi zakłóceniami
-        Receiving,   // Aktywna animacja podczas otrzymywania wiadomości
-        Displaying   // Wyświetlanie wiadomości
+        kIdle,        // Prosta linia z okazjonalnymi zakłóceniami
+        kReceiving,   // Aktywna animacja podczas otrzymywania wiadomości
+        kDisplaying   // Wyświetlanie wiadomości
     };
 
     explicit CommunicationStream(QWidget* parent = nullptr);
 
     ~CommunicationStream() override;
 
-    StreamMessage* addMessageWithAttachment(const QString& content, const QString& sender, StreamMessage::MessageType type, const QString& messageId = QString());
+    StreamMessage* AddMessageWithAttachment(const QString& content, const QString& sender, StreamMessage::MessageType type, const QString& message_id = QString());
 
     // Settery i gettery dla animacji fali
-    qreal waveAmplitude() const { return m_waveAmplitude; }
-    void setWaveAmplitude(qreal amplitude);
+    qreal GetWaveAmplitude() const { return wave_amplitude_; }
+    void SetWaveAmplitude(qreal amplitude);
 
-    qreal waveFrequency() const { return m_waveFrequency; }
-    void setWaveFrequency(qreal frequency);
+    qreal getWaveFrequency() const { return wave_frequency_; }
+    void SetWaveFrequency(qreal frequency);
 
-    qreal waveSpeed() const { return m_waveSpeed; }
-    void setWaveSpeed(qreal speed);
+    qreal GetWaveSpeed() const { return wave_speed_; }
+    void SetWaveSpeed(qreal speed);
 
-    qreal glitchIntensity() const { return m_glitchIntensity; }
-    void setGlitchIntensity(qreal intensity);
+    qreal GetGlitchIntensity() const { return glitch_intensity_; }
+    void SetGlitchIntensity(qreal intensity);
 
-    qreal waveThickness() const { return m_waveThickness; }
-    void setWaveThickness(qreal thickness);
+    qreal GetWaveThickness() const { return wave_thickness_; }
+    void SetWaveThickness(qreal thickness);
 
-    void setStreamName(const QString& name) const;
+    void SetStreamName(const QString& name) const;
 
-    StreamMessage* addMessage(const QString &content, const QString &sender, StreamMessage::MessageType type, const QString& messageId = QString());
+    StreamMessage* AddMessage(const QString &content, const QString &sender, StreamMessage::MessageType type, const QString& message_id = QString());
 
-    void clearMessages();
+    void ClearMessages();
 
 public slots:
-    void setTransmittingUser(const QString& userId) const;
+    void SetTransmittingUser(const QString& user_id) const;
 
     // Slot do czyszczenia wskaźnika nadającego
-    void clearTransmittingUser() const;
+    void ClearTransmittingUser() const;
 
     // Slot setAudioAmplitude (bez zmian)
-    void setAudioAmplitude(qreal amplitude);
+    void SetAudioAmplitude(qreal amplitude);
 
 protected:
     void initializeGL() override;
@@ -78,70 +78,69 @@ protected:
     void keyPressEvent(QKeyEvent* event) override;
 
 private slots:
-    void updateAnimation();
+    void UpdateAnimation();
 
+    void TriggerRandomGlitch();
 
-    void triggerRandomGlitch();
+    void StartReceivingAnimation();
 
-    void startReceivingAnimation();
+    void ReturnToIdleAnimation();
 
-    void returnToIdleAnimation();
+    void StartGlitchAnimation(qreal intensity);
 
-    void startGlitchAnimation(qreal intensity);
+    void ShowMessageAtIndex(int index);
 
-    void showMessageAtIndex(int index);
+    void ShowNextMessage();
 
-    void showNextMessage();
+    void ShowPreviousMessage();
 
-    void showPreviousMessage();
+    void OnMessageRead();
 
-    void onMessageRead();
-
-    void handleMessageHidden();
+    void HandleMessageHidden();
 
 private:
-    static UserVisuals generateUserVisuals(const QString& userId);
+    static UserVisuals GenerateUserVisuals(const QString& user_id);
 
-    void connectSignalsForMessage(StreamMessage* message);
+    void ConnectSignalsForMessage(StreamMessage* message);
 
     // disconnectSignalsForMessage: Rozłącza sygnały nawigacyjne, odczytu i ukrycia
-    void disconnectSignalsForMessage(StreamMessage* message) const;
+    void DisconnectSignalsForMessage(StreamMessage* message) const;
 
     // Metoda pomocnicza do aktualizacji przycisków nawigacyjnych
-    void updateNavigationButtonsForCurrentMessage();
+    void UpdateNavigationButtonsForCurrentMessage();
 
-    void optimizeForMessageTransition() const;
+    void OptimizeForMessageTransition() const;
 
-    void updateMessagePosition();
+    void UpdateMessagePosition();
 
 
     // Parametry animacji fali
-    const qreal m_baseWaveAmplitude; // Bazowa amplituda
-    const qreal m_amplitudeScale;    // Skala dla amplitudy audio
-    qreal m_waveAmplitude;           // Aktualna amplituda (animowana)
-    qreal m_targetWaveAmplitude;
-    UserInfoLabel* m_transmittingUserLabel;
-    qreal m_waveFrequency;
-    qreal m_waveSpeed;
-    qreal m_glitchIntensity;
-    qreal m_waveThickness;
+    const qreal base_wave_amplitude_; // Bazowa amplituda
+    const qreal amplitude_scale_;    // Skala dla amplitudy audio
+    qreal wave_amplitude_;           // Aktualna amplituda (animowana)
+    qreal target_wave_amplitude_;
+    UserInfoLabel* transmitting_user_label_;
+    qreal wave_frequency_;
+    qreal wave_speed_;
+    qreal glitch_intensity_;
+    qreal wave_thickness_;
 
-    StreamState m_state;
-    QList<StreamMessage*> m_messages;  // Zmienione z QQueue na QList dla indeksowania
-    int m_currentMessageIndex;
-    bool m_isClearingAllMessages = false;
+    StreamState state_;
+    QList<StreamMessage*> messages_;  // Zmienione z QQueue na QList dla indeksowania
+    int current_message_index_;
+    bool is_clearing_all_messages_ = false;
 
-    QLabel* m_streamNameLabel;
-    bool m_initialized;
-    qreal m_timeOffset;
+    QLabel* stream_name_label_;
+    bool initialized_;
+    qreal time_offset_;
 
-    QTimer* m_animTimer;
-    QTimer* m_glitchTimer;
+    QTimer* animation_timer_;
+    QTimer* glitch_timer_;
 
     // OpenGL
-    QOpenGLShaderProgram* m_shaderProgram;
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_vertexBuffer;
+    QOpenGLShaderProgram* shader_program_;
+    QOpenGLVertexArrayObject vao_;
+    QOpenGLBuffer vertex_buffer_;
 };
 
 #endif // COMMUNICATION_STREAM_H

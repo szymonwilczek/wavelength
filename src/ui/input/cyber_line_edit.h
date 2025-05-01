@@ -17,10 +17,10 @@ public:
 
     QSize sizeHint() const override;
 
-    double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(double intensity);
+    double GetGlowIntensity() const { return glow_intensity_; }
+    void SetGlowIntensity(double intensity);
 
-    QRect cyberCursorRect() const;
+    QRect CyberCursorRect() const;
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -33,13 +33,12 @@ protected:
 
     void leaveEvent(QEvent* event) override;
 
-    // Obsługa zdarzeń klawiatury - zresetuj kursor
     void keyPressEvent(QKeyEvent* event) override;
 
 private:
-    double m_glowIntensity;
-    QTimer* m_cursorBlinkTimer;
-    bool m_cursorVisible;
+    double glow_intensity_;
+    QTimer* cursor_blink_timer_;
+    bool cursor_visible_;
 };
 
 

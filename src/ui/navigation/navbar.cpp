@@ -32,22 +32,22 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     );
 
     // Główny kontener i layout
-    const auto mainContainer = new QWidget(this);
-    m_mainLayout = new QHBoxLayout(mainContainer); // Przypisz do m_mainLayout
-    m_mainLayout->setContentsMargins(0, 5, 0, 5);
-    m_mainLayout->setSpacing(0);
+    const auto main_container = new QWidget(this);
+    main_layout_ = new QHBoxLayout(main_container); // Przypisz do m_mainLayout
+    main_layout_->setContentsMargins(0, 5, 0, 5);
+    main_layout_->setSpacing(0);
 
     // Element narożny po lewej (bez zmian)
-    const auto cornerElement1 = new QLabel(this);
-    cornerElement1->setStyleSheet(
+    const auto corner_element1 = new QLabel(this);
+    corner_element1->setStyleSheet(
     "QLabel {"
     "  margin-right: 5px;"
     "}"
     );
 
     // Logo (bez zmian)
-    logoLabel = new QLabel("WAVELENGTH", this);
-    logoLabel->setStyleSheet(
+    logo_label_ = new QLabel("WAVELENGTH", this);
+    logo_label_->setStyleSheet(
     "QLabel {"
    "   font-family: 'Blender Pro Heavy';"
    "   font-size: 28px;"
@@ -57,92 +57,92 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
    "   text-transform: uppercase;"
    "}"
     );
-    const auto textGlow = new QGraphicsDropShadowEffect(logoLabel);
-    textGlow->setBlurRadius(8);
-    textGlow->setOffset(0, 0);
-    textGlow->setColor(QColor(0, 195, 255, 150));
-    logoLabel->setGraphicsEffect(textGlow);
+    const auto text_glow = new QGraphicsDropShadowEffect(logo_label_);
+    text_glow->setBlurRadius(8);
+    text_glow->setOffset(0, 0);
+    text_glow->setColor(QColor(0, 195, 255, 150));
+    logo_label_->setGraphicsEffect(text_glow);
 
     // Sekcja logo (lewa strona)
-    m_logoContainer = new QWidget(this); // Przypisz do m_logoContainer
-    const auto logoLayout = new QHBoxLayout(m_logoContainer);
-    logoLayout->setContentsMargins(0, 0, 0, 0);
-    logoLayout->setSpacing(5);
-    logoLayout->addWidget(cornerElement1);
-    logoLayout->addWidget(logoLabel);
+    logo_container_ = new QWidget(this); // Przypisz do m_logoContainer
+    const auto logo_layout = new QHBoxLayout(logo_container_);
+    logo_layout->setContentsMargins(0, 0, 0, 0);
+    logo_layout->setSpacing(5);
+    logo_layout->addWidget(corner_element1);
+    logo_layout->addWidget(logo_label_);
 
     // Widget statusu sieci (środek)
-    m_networkStatus = new NetworkStatusWidget(this); // Przypisz do m_networkStatus
-    m_networkStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    network_status_ = new NetworkStatusWidget(this); // Przypisz do m_networkStatus
+    network_status_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     // Kontener na przyciski (prawa strona)
-    m_buttonsContainer = new QWidget(this); // Przypisz do m_buttonsContainer
-    const auto buttonsLayout = new QHBoxLayout(m_buttonsContainer);
-    buttonsLayout->setContentsMargins(0, 0, 0, 0);
-    buttonsLayout->setSpacing(40);
+    buttons_container_ = new QWidget(this); // Przypisz do m_buttonsContainer
+    const auto buttons_layout = new QHBoxLayout(buttons_container_);
+    buttons_layout->setContentsMargins(0, 0, 0, 0);
+    buttons_layout->setSpacing(40);
 
     // Przyciski akcji (bez zmian)
-    createWavelengthButton = new CyberpunkButton("Generate Wavelength", m_buttonsContainer);
-    joinWavelengthButton = new CyberpunkButton("Merge Wavelength", m_buttonsContainer);
-    settingsButton = new CyberpunkButton("Settings", m_buttonsContainer);
+    create_button_ = new CyberpunkButton("Generate Wavelength", buttons_container_);
+    join_button_ = new CyberpunkButton("Merge Wavelength", buttons_container_);
+    settings_button_ = new CyberpunkButton("Settings", buttons_container_);
 
-    buttonsLayout->addWidget(createWavelengthButton);
-    buttonsLayout->addWidget(joinWavelengthButton);
-    buttonsLayout->addWidget(settingsButton);
+    buttons_layout->addWidget(create_button_);
+    buttons_layout->addWidget(join_button_);
+    buttons_layout->addWidget(settings_button_);
 
     // Element narożny po prawej
-    m_cornerElement2 = new QLabel(this); // Przypisz do m_cornerElement2
-    m_cornerElement2->setStyleSheet(
+    corner_element_ = new QLabel(this); // Przypisz do m_cornerElement2
+    corner_element_->setStyleSheet(
         "QLabel {"
         "  margin-left: 5px;"
         "}"
     );
 
     // Utwórz QSpacerItem zamiast addStretch
-    m_spacer1 = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    m_spacer2 = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer1_ = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer2_ = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // Dodanie wszystkich elementów do głównego layoutu
-    m_mainLayout->addWidget(m_logoContainer, 0, Qt::AlignLeft); // Indeks 0
-    m_mainLayout->addSpacerItem(m_spacer1);                     // Indeks 1
-    m_mainLayout->addWidget(m_networkStatus, 0, Qt::AlignCenter); // Indeks 2
-    m_mainLayout->addSpacerItem(m_spacer2);                     // Indeks 3
-    m_mainLayout->addWidget(m_buttonsContainer, 0, Qt::AlignRight); // Indeks 4
-    m_mainLayout->addWidget(m_cornerElement2, 0, Qt::AlignRight);   // Indeks 5
+    main_layout_->addWidget(logo_container_, 0, Qt::AlignLeft); // Indeks 0
+    main_layout_->addSpacerItem(spacer1_);                     // Indeks 1
+    main_layout_->addWidget(network_status_, 0, Qt::AlignCenter); // Indeks 2
+    main_layout_->addSpacerItem(spacer2_);                     // Indeks 3
+    main_layout_->addWidget(buttons_container_, 0, Qt::AlignRight); // Indeks 4
+    main_layout_->addWidget(corner_element_, 0, Qt::AlignRight);   // Indeks 5
 
     // Ustawienie początkowych współczynników rozciągania dla spacerów
-    m_mainLayout->setStretch(1, 1); // spacer1
-    m_mainLayout->setStretch(3, 1); // spacer2
+    main_layout_->setStretch(1, 1); // spacer1
+    main_layout_->setStretch(3, 1); // spacer2
 
-    addWidget(mainContainer);
+    addWidget(main_container);
 
     // Inicjalizacja QSoundEffect (bez zmian)
-    m_clickSound = new QSoundEffect(this);
-    m_clickSound->setSource(QUrl("qrc:/resources/sounds/interface/button_click.wav"));
-    m_clickSound->setVolume(0.8);
+    click_sound_ = new QSoundEffect(this);
+    click_sound_->setSource(QUrl("qrc:/resources/sounds/interface/button_click.wav"));
+    click_sound_->setVolume(0.8);
 
     // Połączenia sygnałów (bez zmian)
-    connect(createWavelengthButton, &QPushButton::clicked, this, &Navbar::createWavelengthClicked);
-    connect(joinWavelengthButton, &QPushButton::clicked, this, &Navbar::joinWavelengthClicked);
-    connect(settingsButton, &QPushButton::clicked, this, &Navbar::settingsClicked);
+    connect(create_button_, &QPushButton::clicked, this, &Navbar::createWavelengthClicked);
+    connect(join_button_, &QPushButton::clicked, this, &Navbar::joinWavelengthClicked);
+    connect(settings_button_, &QPushButton::clicked, this, &Navbar::settingsClicked);
 
     // Połącz wszystkie przyciski z odtwarzaniem dźwięku
-    connect(createWavelengthButton, &QPushButton::clicked, this, &Navbar::playClickSound);
-    connect(joinWavelengthButton, &QPushButton::clicked, this, &Navbar::playClickSound);
-    connect(settingsButton, &QPushButton::clicked, this, &Navbar::playClickSound);
+    connect(create_button_, &QPushButton::clicked, this, &Navbar::PlayClickSound);
+    connect(join_button_, &QPushButton::clicked, this, &Navbar::PlayClickSound);
+    connect(settings_button_, &QPushButton::clicked, this, &Navbar::PlayClickSound);
 }
 
-void Navbar::setChatMode(const bool inChat) const {
+void Navbar::SetChatMode(const bool inChat) const {
     // Ukryj/pokaż kontener przycisków i prawy narożnik
-    m_buttonsContainer->setVisible(!inChat);
-    m_cornerElement2->setVisible(!inChat);
+    buttons_container_->setVisible(!inChat);
+    corner_element_->setVisible(!inChat);
 
     if (inChat) {
         // Tryb czatu: wyłącz rozciąganie drugiego odstępu, aby status sieci przesunął się w prawo
-        m_mainLayout->setStretch(3, 0); // Indeks spacer2
+        main_layout_->setStretch(3, 0); // Indeks spacer2
     } else {
         // Tryb normalny: przywróć rozciąganie drugiego odstępu
-        m_mainLayout->setStretch(3, 1); // Indeks spacer2
+        main_layout_->setStretch(3, 1); // Indeks spacer2
     }
     // Nie ma potrzeby wywoływania invalidate() lub activate(), setStretch powinien wystarczyć
 }
@@ -152,10 +152,10 @@ void Navbar::contextMenuEvent(QContextMenuEvent *event) {
     event->ignore(); // Bez zmian
 }
 
-void Navbar::playClickSound() const {
-    if (m_clickSound && m_clickSound->isLoaded()) {
-        m_clickSound->play();
-    } else if (m_clickSound) {
-        qWarning() << "Click sound not loaded:" << m_clickSound->source();
+void Navbar::PlayClickSound() const {
+    if (click_sound_ && click_sound_->isLoaded()) {
+        click_sound_->play();
+    } else if (click_sound_) {
+        qWarning() << "Click sound not loaded:" << click_sound_->source();
     }
 }

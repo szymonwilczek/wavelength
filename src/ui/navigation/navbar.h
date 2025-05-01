@@ -16,33 +16,33 @@ public:
     explicit Navbar(QWidget *parent = nullptr);
 
 public slots:
-    void setChatMode(const bool inChat) const;
-    void playClickSound() const;
+    void SetChatMode(bool inChat) const;
+    void PlayClickSound() const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
     signals:
         void createWavelengthClicked();
-    void joinWavelengthClicked();
-    void settingsClicked();
+        void joinWavelengthClicked();
+        void settingsClicked();
 
 private:
-    QHBoxLayout* m_mainLayout; // Wskaźnik do głównego layoutu
-    QWidget* m_logoContainer;
-    QLabel *logoLabel;
-    NetworkStatusWidget* m_networkStatus; // Wskaźnik do widgetu statusu sieci
-    QWidget* m_buttonsContainer; // Wskaźnik do kontenera przycisków
-    QLabel* m_cornerElement2; // Wskaźnik do prawego elementu narożnego
+    QHBoxLayout* main_layout_; // Wskaźnik do głównego layoutu
+    QWidget* logo_container_;
+    QLabel *logo_label_;
+    NetworkStatusWidget* network_status_; // Wskaźnik do widgetu statusu sieci
+    QWidget* buttons_container_; // Wskaźnik do kontenera przycisków
+    QLabel* corner_element_; // Wskaźnik do prawego elementu narożnego
 
-    CyberpunkButton *createWavelengthButton;
-    CyberpunkButton *joinWavelengthButton;
-    CyberpunkButton *settingsButton;
+    CyberpunkButton *create_button_;
+    CyberpunkButton *join_button_;
+    CyberpunkButton *settings_button_;
 
-    QSpacerItem* m_spacer1; // Pierwszy element rozciągający
-    QSpacerItem* m_spacer2; // Drugi element rozciągający
+    QSpacerItem* spacer1_; // Pierwszy element rozciągający
+    QSpacerItem* spacer2_; // Drugi element rozciągający
 
-    QSoundEffect* m_clickSound;
+    QSoundEffect* click_sound_;
 };
 
 #endif // NAVBAR_H

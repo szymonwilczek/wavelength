@@ -11,37 +11,36 @@
 #include <chrono>
 #include <QSequentialAnimationGroup>
 
-// ReSharper disable once CppDFATimeOver
-const QString AppInstanceManager::SERVER_NAME = "pk4-projekt-blob-animation";
+const QString AppInstanceManager::kServerName = "pk4-projekt-blob-animation";
 
 AppInstanceManager::AppInstanceManager(QMainWindow* window, BlobAnimation* blob, QObject* parent)
     : QObject(parent),
-      m_window(window),
-      m_blob(blob),
-      m_instanceId(QUuid::createUuid().toString())
+      main_window_(window),
+      blob_(blob),
+      instance_id_(QUuid::createUuid().toString())
 {
-    m_positionTimer.setInterval(UPDATE_INTERVAL_MS);
-    connect(&m_positionTimer, &QTimer::timeout, this, &AppInstanceManager::sendPositionUpdate);
+    position_timer_.setInterval(kUpdateIntervalMs);
+    connect(&position_timer_, &QTimer::timeout, this, &AppInstanceManager::sendPositionUpdate);
 }
 
 AppInstanceManager::~AppInstanceManager() {
-    if (m_attractionThread && m_threadRunning) {
-        m_threadRunning = false;
-        m_attractionThread->join();
+    if (attraction_thread_ && is_thread_running) {
+        is_thread_running = false;
+        attraction_thread_->join();
     }
-    if (m_server) {
-        m_server->close();
+    if (server_) {
+        server_->close();
     }
 
-    if (m_socket) {
-        m_socket->disconnectFromServer();
-        m_socket->close();
+    if (socket_) {
+        socket_->disconnectFromServer();
+        socket_->close();
     }
 }
 
-bool AppInstanceManager::isAnotherInstanceRunning() {
+bool AppInstanceManager::IsAnotherInstanceRunning() {
     QLocalSocket socket;
-    socket.connectToServer(SERVER_NAME);
+    socket.connectToServer(kServerName);
     const bool exists = socket.waitForConnected(500);
     if (exists) {
         socket.disconnectFromServer();
@@ -49,61 +48,61 @@ bool AppInstanceManager::isAnotherInstanceRunning() {
     return exists;
 }
 
-bool AppInstanceManager::start() {
-    if (isAnotherInstanceRunning()) {
-        m_isCreator = false;
-        connectToServer();
+bool AppInstanceManager::Start() {
+    if (IsAnotherInstanceRunning()) {
+        is_creator_ = false;
+        ConnectToServer();
     } else {
-        m_isCreator = true;
-        setupServer();
+        is_creator_ = true;
+        SetupServer();
     }
-    m_positionTimer.start();
-    m_absorptionCheckTimer.start();
-    initAttractionThread();
+    position_timer_.start();
+    absorption_check_timer_.start();
+    InitAttractionThread();
 
-    if (!m_isCreator) {
-        m_window->setWindowFlags(m_window->windowFlags() | Qt::WindowStaysOnTopHint);
-        m_window->show();
+    if (!is_creator_) {
+        main_window_->setWindowFlags(main_window_->windowFlags() | Qt::WindowStaysOnTopHint);
+        main_window_->show();
     }
 
     return true;
 }
 
-void AppInstanceManager::setupServer() {
-    m_server = new QLocalServer(this);
-    QLocalServer::removeServer(SERVER_NAME);
+void AppInstanceManager::SetupServer() {
+    server_ = new QLocalServer(this);
+    QLocalServer::removeServer(kServerName);
 
-    if (!m_server->listen(SERVER_NAME)) {
-        qWarning() << "[INSTANCE MANAGER] SERVER CANNOT BE STARTED:" << m_server->errorString();
+    if (!server_->listen(kServerName)) {
+        qWarning() << "[INSTANCE MANAGER] SERVER CANNOT BE STARTED:" << server_->errorString();
         return;
     }
 
-    connect(m_server, &QLocalServer::newConnection, this, &AppInstanceManager::onNewConnection);
+    connect(server_, &QLocalServer::newConnection, this, &AppInstanceManager::onNewConnection);
 }
 
-void AppInstanceManager::connectToServer() {
-    m_socket = new QLocalSocket(this);
+void AppInstanceManager::ConnectToServer() {
+    socket_ = new QLocalSocket(this);
 
-    connect(m_socket, &QLocalSocket::readyRead, this, &AppInstanceManager::readData);
-    connect(m_socket, &QLocalSocket::disconnected, this, &AppInstanceManager::clientDisconnected);
+    connect(socket_, &QLocalSocket::readyRead, this, &AppInstanceManager::readData);
+    connect(socket_, &QLocalSocket::disconnected, this, &AppInstanceManager::clientDisconnected);
 
-    m_socket->connectToServer(SERVER_NAME);
+    socket_->connectToServer(kServerName);
 
-    if (m_socket->waitForConnected(1000)) {
+    if (socket_->waitForConnected(1000)) {
         QByteArray message;
         QDataStream stream(&message, QIODevice::WriteOnly);
-        stream << static_cast<quint8>(IDENTIFY) << m_instanceId;
-        m_socket->write(message);
+        stream << static_cast<quint8>(kIdentify) << instance_id_;
+        socket_->write(message);
     } else {
-        qWarning() << "[INSTANCE MANAGER] CANNOT ESTABLISH CONNECTION" << m_socket->errorString();
+        qWarning() << "[INSTANCE MANAGER] CANNOT ESTABLISH CONNECTION" << socket_->errorString();
     }
 }
 
 void AppInstanceManager::onNewConnection() {
-    QLocalSocket* clientSocket = m_server->nextPendingConnection();
+    const QLocalSocket* client_socket = server_->nextPendingConnection();
 
-    connect(clientSocket, &QLocalSocket::readyRead, this, &AppInstanceManager::readData);
-    connect(clientSocket, &QLocalSocket::disconnected, this, &AppInstanceManager::clientDisconnected);
+    connect(client_socket, &QLocalSocket::readyRead, this, &AppInstanceManager::readData);
+    connect(client_socket, &QLocalSocket::disconnected, this, &AppInstanceManager::clientDisconnected);
 }
 
 void AppInstanceManager::readData() {
@@ -112,7 +111,7 @@ void AppInstanceManager::readData() {
 
     while (socket->bytesAvailable() > 0) {
         QByteArray data = socket->readAll();
-        processMessage(data, socket);
+        ProcessMessage(data, socket);
     }
 }
 
@@ -120,34 +119,34 @@ void AppInstanceManager::clientDisconnected() {
     auto* socket = qobject_cast<QLocalSocket*>(sender());
     if (!socket) return;
 
-    if (m_isCreator) {
-        if (const QString clientId = m_clientIds.value(socket, QString()); !clientId.isNull()) {
+    if (is_creator_) {
+        if (const QString clientId = client_ids_.value(socket, QString()); !clientId.isNull()) {
             qDebug() << "[INSTANCE MANAGER] Client disconnected:" << clientId;
             {
-                QMutexLocker locker(&m_instancesMutex);
-                m_connectedInstances.erase(
-                    std::remove_if(m_connectedInstances.begin(), m_connectedInstances.end(),
-                                   [&](const InstanceInfo& info){ return info.instanceId == clientId; }),
-                    m_connectedInstances.end()
+                QMutexLocker locker(&instances_mutex_);
+                connected_instances_.erase(
+                    std::ranges::remove_if(connected_instances_,
+                                           [&](const InstanceInfo& info){ return info.instance_id == clientId; }).begin(),
+                    connected_instances_.end()
                 );
             }
 
-            m_clientIds.remove(socket);
+            client_ids_.remove(socket);
             emit instanceDisconnected(clientId);
 
-            QMetaObject::invokeMethod(m_window, [this]() {
-                if (m_window && !m_window->isEnabled()) {
+            QMetaObject::invokeMethod(main_window_, [this]() {
+                if (main_window_ && !main_window_->isEnabled()) {
                     qDebug() << "[INSTANCE MANAGER] Re-enabling main window after client disconnect.";
-                    m_window->setEnabled(true);
+                    main_window_->setEnabled(true);
                 }
-                if (m_window && !m_window->isActiveWindow()) {
+                if (main_window_ && !main_window_->isActiveWindow()) {
                      qDebug() << "[INSTANCE MANAGER] Activating main window after client disconnect.";
-                    m_window->activateWindow();
-                    m_window->raise();
+                    main_window_->activateWindow();
+                    main_window_->raise();
                 }
-                 if (m_window && m_window->testAttribute(Qt::WA_TransparentForMouseEvents)) {
+                 if (main_window_ && main_window_->testAttribute(Qt::WA_TransparentForMouseEvents)) {
                     qDebug() << "[INSTANCE MANAGER] Disabling WA_TransparentForMouseEvents on main window.";
-                    m_window->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+                    main_window_->setAttribute(Qt::WA_TransparentForMouseEvents, false);
                  }
 
             }, Qt::QueuedConnection);
@@ -157,52 +156,52 @@ void AppInstanceManager::clientDisconnected() {
         }
     } else {
         qDebug() << "[INSTANCE MANAGER] Disconnected from server.";
-        if (!isAnotherInstanceRunning()) {
+        if (!IsAnotherInstanceRunning()) {
             qDebug() << "[INSTANCE MANAGER] Server not running, becoming creator.";
-            m_isCreator = true;
-            if (m_attractionThread && m_threadRunning) {
-                m_threadRunning = false;
-                if (m_attractionThread->joinable()) {
-                    m_attractionThread->join();
+            is_creator_ = true;
+            if (attraction_thread_ && is_thread_running) {
+                is_thread_running = false;
+                if (attraction_thread_->joinable()) {
+                    attraction_thread_->join();
                 }
-                m_attractionThread.reset();
+                attraction_thread_.reset();
             }
-            if(m_socket) {
-                m_socket->deleteLater();
-                m_socket = nullptr;
+            if(socket_) {
+                socket_->deleteLater();
+                socket_ = nullptr;
             }
             {
-                QMutexLocker locker(&m_instancesMutex);
-                m_connectedInstances.clear();
+                QMutexLocker locker(&instances_mutex_);
+                connected_instances_.clear();
             }
-            setupServer();
+            SetupServer();
         }
     }
 
     socket->deleteLater();
 }
 
-bool AppInstanceManager::processMessage(const QByteArray& message, QLocalSocket* sender) {
+bool AppInstanceManager::ProcessMessage(const QByteArray& message, QLocalSocket* sender) {
     QDataStream stream(message);
-    quint8 messageType;
-    stream >> messageType;
+    quint8 message_type;
+    stream >> message_type;
 
-    switch (messageType) {
-        case POSITION_UPDATE: {
+    switch (message_type) {
+        case kPositionUpdate: {
             QString id;
-            QPointF blobCenter;
-            QPoint windowPos;
-            QSize windowSize;
+            QPointF blob_center;
+            QPoint window_position;
+            QSize window_size;
 
-            stream >> id >> blobCenter >> windowPos >> windowSize;
+            stream >> id >> blob_center >> window_position >> window_size;
 
-            QMutexLocker locker(&m_instancesMutex);
+            QMutexLocker locker(&instances_mutex_);
             bool found = false;
-            for (auto& instance : m_connectedInstances) {
-                if (instance.instanceId == id) {
-                    instance.blobCenter = blobCenter;
-                    instance.windowPosition = windowPos;
-                    instance.windowSize = windowSize;
+            for (auto& instance : connected_instances_) {
+                if (instance.instance_id == id) {
+                    instance.blob_center = blob_center;
+                    instance.window_position = window_position;
+                    instance.window_size = window_size;
                     found = true;
                     break;
                 }
@@ -210,53 +209,53 @@ bool AppInstanceManager::processMessage(const QByteArray& message, QLocalSocket*
 
             if (!found) {
                 InstanceInfo info;
-                info.instanceId = id;
-                info.blobCenter = blobCenter;
-                info.windowPosition = windowPos;
-                info.windowSize = windowSize;
-                info.isCreator = m_isCreator ? false : (sender == nullptr);
-                m_connectedInstances.append(info);
+                info.instance_id = id;
+                info.blob_center = blob_center;
+                info.window_position = window_position;
+                info.window_size = window_size;
+                info.is_creator = is_creator_ ? false : (sender == nullptr);
+                connected_instances_.append(info);
 
-                if (sender && m_isCreator) {
-                    m_clientIds[sender] = id;
+                if (sender && is_creator_) {
+                    client_ids_[sender] = id;
                     emit instanceConnected(id);
                 }
             }
 
-            emit otherInstancePositionChanged(id, blobCenter, windowPos);
+            emit otherInstancePositionHasChanged(id, blob_center, window_position);
             return true;
         }
 
-        case IDENTIFY: {
+        case kIdentify: {
             QString id;
             stream >> id;
 
-            if (m_isCreator && sender) {
-                m_clientIds[sender] = id;
+            if (is_creator_ && sender) {
+                client_ids_[sender] = id;
                 QByteArray response;
-                QDataStream responseStream(&response, QIODevice::WriteOnly);
-                responseStream << static_cast<quint8>(IDENTITY_RESPONSE) << m_instanceId << true;
+                QDataStream response_stream(&response, QIODevice::WriteOnly);
+                response_stream << static_cast<quint8>(kIdentifyResponse) << instance_id_ << true;
                 sender->write(response);
-                sender->write(createPositionMessage());
+                sender->write(CreatePositionMessage());
 
                 emit instanceConnected(id);
             }
             return true;
         }
 
-        case IDENTITY_RESPONSE: {
+        case kIdentifyResponse: {
             QString id;
-            bool isCreator;
-            stream >> id >> isCreator;
+            bool is_creator;
+            stream >> id >> is_creator;
 
 
-            if (!m_isCreator) {
+            if (!is_creator_) {
                 InstanceInfo info;
-                info.instanceId = id;
-                info.isCreator = true;
+                info.instance_id = id;
+                info.is_creator = true;
 
-                QMutexLocker locker(&m_instancesMutex);
-                m_connectedInstances.append(info);
+                QMutexLocker locker(&instances_mutex_);
+                connected_instances_.append(info);
 
                 emit instanceConnected(id);
             }
@@ -264,40 +263,40 @@ bool AppInstanceManager::processMessage(const QByteArray& message, QLocalSocket*
         }
 
         default:
-            qWarning() << "[INSTANCE MANAGER] UNKNOWN TYPE OF A MESSAGE: " << messageType;
+            qWarning() << "[INSTANCE MANAGER] UNKNOWN TYPE OF A MESSAGE: " << message_type;
             return false;
     }
 }
 
 void AppInstanceManager::sendPositionUpdate() {
 
-    const QByteArray message = createPositionMessage();
+    const QByteArray message = CreatePositionMessage();
 
-    if (m_isCreator) {
-        sendToAllClients(message);
-    } else if (m_socket && m_socket->isOpen()) {
-        m_socket->write(message);
+    if (is_creator_) {
+        SendToAllClients(message);
+    } else if (socket_ && socket_->isOpen()) {
+        socket_->write(message);
     }
 }
 
-QByteArray AppInstanceManager::createPositionMessage() const {
+QByteArray AppInstanceManager::CreatePositionMessage() const {
     QByteArray message;
     QDataStream stream(&message, QIODevice::WriteOnly);
 
-    const QPointF blobCenter = m_blob->getBlobCenter();
-    const QPoint windowPos = m_window->pos();
-    const QSize windowSize = m_window->size();
+    const QPointF blobCenter = blob_->GetBlobCenter();
+    const QPoint windowPos = main_window_->pos();
+    const QSize windowSize = main_window_->size();
 
-    stream << static_cast<quint8>(POSITION_UPDATE) << m_instanceId << blobCenter << windowPos << windowSize;
+    stream << static_cast<quint8>(kPositionUpdate) << instance_id_ << blobCenter << windowPos << windowSize;
 
     return message;
 }
 
 
-void AppInstanceManager::sendToAllClients(const QByteArray& message) {
-    if (!m_isCreator) return;
+void AppInstanceManager::SendToAllClients(const QByteArray& message) {
+    if (!is_creator_) return;
 
-    for (auto it = m_clientIds.begin(); it != m_clientIds.end(); ++it) {
+    for (auto it = client_ids_.begin(); it != client_ids_.end(); ++it) {
         if (QLocalSocket* socket = it.key(); socket && socket->isOpen()) {
             socket->write(message);
         }
@@ -305,45 +304,45 @@ void AppInstanceManager::sendToAllClients(const QByteArray& message) {
 }
 
 
-void AppInstanceManager::initAttractionThread() {
-    m_threadRunning = true;
-    m_attractionThread = std::make_unique<std::thread>([this]() {
-        while (m_threadRunning) {
-            constexpr int sleepTimeMs = 16;
-            if (m_isBeingAbsorbed || m_isAbsorbing) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+void AppInstanceManager::InitAttractionThread() {
+    is_thread_running = true;
+    attraction_thread_ = std::make_unique<std::thread>([this]() {
+        while (is_thread_running) {
+            constexpr int sleep_time_ms = 16;
+            if (is_being_absorbed_ || is_absorbing_) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
                 continue;
             }
 
-            QVector<InstanceInfo> instancesCopy;
+            QVector<InstanceInfo> instances_copy;
             {
-                QMutexLocker locker(&m_instancesMutex);
-                instancesCopy = m_connectedInstances;
+                QMutexLocker locker(&instances_mutex_);
+                instances_copy = connected_instances_;
             }
 
-            if (!m_isCreator) {
-                for (const auto& instance : instancesCopy) {
-                    if (instance.isCreator) {
-                        QPointF myBlobCenter = m_blob->getBlobCenter();
-                        QPoint myWindowPos = m_window->pos();
-                        QPointF globalMyPos(myWindowPos.x() + myBlobCenter.x(),
-                                          myWindowPos.y() + myBlobCenter.y());
+            if (!is_creator_) {
+                for (const auto& instance : instances_copy) {
+                    if (instance.is_creator) {
+                        QPointF blob_center = blob_->GetBlobCenter();
+                        QPoint window_position = main_window_->pos();
+                        QPointF global_position(window_position.x() + blob_center.x(),
+                                          window_position.y() + blob_center.y());
 
-                        QPointF otherBlobCenter = instance.blobCenter;
-                        QPoint otherWindowPos = instance.windowPosition;
-                        QPointF globalCreatorPos(otherWindowPos.x() + otherBlobCenter.x(),
-                                               otherWindowPos.y() + otherBlobCenter.y());
+                        QPointF other_blob_center = instance.blob_center;
+                        QPoint other_window_position = instance.window_position;
+                        QPointF global_creator_position(other_window_position.x() + other_blob_center.x(),
+                                               other_window_position.y() + other_blob_center.y());
 
-                        if (const double distance = QLineF(globalMyPos, globalCreatorPos).length(); distance < ABSORPTION_DISTANCE && !m_isBeingAbsorbed) {
+                        if (const double distance = QLineF(global_position, global_creator_position).length(); distance < kAbsorptionDistance && !is_being_absorbed_) {
                             QMetaObject::invokeMethod(this, [this]() {
-                                m_isBeingAbsorbed = true;
-                                m_window->setWindowFlags(m_window->windowFlags() | Qt::WindowStaysOnTopHint);
-                                m_window->show();
-                                startAbsorptionAnimation();
+                                is_being_absorbed_ = true;
+                                main_window_->setWindowFlags(main_window_->windowFlags() | Qt::WindowStaysOnTopHint);
+                                main_window_->show();
+                                StartAbsorptionAnimation();
                             }, Qt::QueuedConnection);
                         } else {
-                            QMetaObject::invokeMethod(this, [this, globalCreatorPos]() {
-                                applyAttractionForce(globalCreatorPos);
+                            QMetaObject::invokeMethod(this, [this, global_creator_position]() {
+                                ApplyAttractionForce(global_creator_position);
                             }, Qt::QueuedConnection);
                         }
                         break;
@@ -351,89 +350,89 @@ void AppInstanceManager::initAttractionThread() {
                 }
             }
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
         }
     });
 }
 
-void AppInstanceManager::applyAttractionForce(const QPointF& targetPos) {
-    if (m_isBeingAbsorbed || m_isAbsorbing) return;
+void AppInstanceManager::ApplyAttractionForce(const QPointF& target_position) {
+    if (is_being_absorbed_ || is_absorbing_) return;
 
-    const QPoint currentPos = m_window->pos();
-    const QSize windowSize = m_window->size();
+    const QPoint current_position = main_window_->pos();
+    const QSize window_size = main_window_->size();
 
-    const QPointF currentCenter(
-        currentPos.x() + windowSize.width() / 2.0,
-        currentPos.y() + windowSize.height() / 2.0
+    const QPointF current_center(
+        current_position.x() + window_size.width() / 2.0,
+        current_position.y() + window_size.height() / 2.0
     );
 
-    const QPointF diff = targetPos - currentCenter;
+    const QPointF difference = target_position - current_center;
 
-    static constexpr double SMOOTH_FORCE = 0.02;
+    static constexpr double kSmoothForce = 0.02;
 
-    const QPointF newCenter = currentCenter + (diff * SMOOTH_FORCE);
+    const QPointF new_center = current_center + (difference * kSmoothForce);
 
-    const QPointF newPos(
-        newCenter.x() - windowSize.width() / 2.0,
-        newCenter.y() - windowSize.height() / 2.0
+    const QPointF new_position(
+        new_center.x() - window_size.width() / 2.0,
+        new_center.y() - window_size.height() / 2.0
     );
 
-    m_window->setEnabled(false);
-    m_window->move(newPos.toPoint());
+    main_window_->setEnabled(false);
+    main_window_->move(new_position.toPoint());
 
-    if (diff.manhattanLength() < ABSORPTION_DISTANCE && !m_isBeingAbsorbed) {
-        m_isBeingAbsorbed = true;
-        startAbsorptionAnimation();
+    if (difference.manhattanLength() < kAbsorptionDistance && !is_being_absorbed_) {
+        is_being_absorbed_ = true;
+        StartAbsorptionAnimation();
     }
 }
 
-void AppInstanceManager::startAbsorptionAnimation() {
-    const auto absorptionSequence = new QSequentialAnimationGroup(this);
+void AppInstanceManager::StartAbsorptionAnimation() {
+    const auto absorption_sequence = new QSequentialAnimationGroup(this);
 
     // 1. wyrównanie pozycji
-    auto* positionAnimation = new QPropertyAnimation(m_window, "pos");
-    positionAnimation->setDuration(500);
-    positionAnimation->setEasingCurve(QEasingCurve::InOutQuad);
+    auto* position_animation = new QPropertyAnimation(main_window_, "pos");
+    position_animation->setDuration(500);
+    position_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-    QPoint targetPos;
+    QPoint target_position;
     {
-        QMutexLocker locker(&m_instancesMutex);
-        for (const auto& instance : m_connectedInstances) {
-            if (instance.isCreator) {
-                targetPos = instance.windowPosition;
+        QMutexLocker locker(&instances_mutex_);
+        for (const auto& instance : connected_instances_) {
+            if (instance.is_creator) {
+                target_position = instance.window_position;
                 break;
             }
         }
     }
 
-    positionAnimation->setStartValue(m_window->pos());
-    positionAnimation->setEndValue(targetPos);
-    absorptionSequence->addAnimation(positionAnimation);
+    position_animation->setStartValue(main_window_->pos());
+    position_animation->setEndValue(target_position);
+    absorption_sequence->addAnimation(position_animation);
 
     // 2. animacja przezroczystości
-    auto* fadeAnimation = new QPropertyAnimation(m_window, "windowOpacity");
-    fadeAnimation->setDuration(2000);
-    fadeAnimation->setEasingCurve(QEasingCurve::InOutCubic);
+    auto* fade_animation = new QPropertyAnimation(main_window_, "windowOpacity");
+    fade_animation->setDuration(2000);
+    fade_animation->setEasingCurve(QEasingCurve::InOutCubic);
 
-    fadeAnimation->setKeyValueAt(0.0, 1.0);    // Start - pełna widoczność
-    fadeAnimation->setKeyValueAt(0.2, 0.95);   // Subtelne rozpoczęcie zanikania
-    fadeAnimation->setKeyValueAt(0.4, 0.8);    // Stopniowe zanikanie
-    fadeAnimation->setKeyValueAt(0.6, 0.6);    // Połowa przezroczystości
-    fadeAnimation->setKeyValueAt(0.8, 0.3);    // Większa przezroczystość
-    fadeAnimation->setKeyValueAt(0.9, 0.15);   // Prawie niewidoczne
-    fadeAnimation->setKeyValueAt(1.0, 0.0);    // Całkowicie niewidoczne
+    fade_animation->setKeyValueAt(0.0, 1.0);    // Start - pełna widoczność
+    fade_animation->setKeyValueAt(0.2, 0.95);   // Subtelne rozpoczęcie zanikania
+    fade_animation->setKeyValueAt(0.4, 0.8);    // Stopniowe zanikanie
+    fade_animation->setKeyValueAt(0.6, 0.6);    // Połowa przezroczystości
+    fade_animation->setKeyValueAt(0.8, 0.3);    // Większa przezroczystość
+    fade_animation->setKeyValueAt(0.9, 0.15);   // Prawie niewidoczne
+    fade_animation->setKeyValueAt(1.0, 0.0);    // Całkowicie niewidoczne
 
-    absorptionSequence->addAnimation(fadeAnimation);
+    absorption_sequence->addAnimation(fade_animation);
 
-    connect(absorptionSequence, &QSequentialAnimationGroup::finished, this, [this]() {
-        finalizeAbsorption();
+    connect(absorption_sequence, &QSequentialAnimationGroup::finished, this, [this]() {
+        FinalizeAbsorption();
     });
 
-    absorptionSequence->start(QAbstractAnimation::DeleteWhenStopped);
+    absorption_sequence->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void AppInstanceManager::finalizeAbsorption() {
-    if (m_isBeingAbsorbed) {
+void AppInstanceManager::FinalizeAbsorption() {
+    if (is_being_absorbed_) {
         QMetaObject::invokeMethod(this, [this]() {
             QTimer::singleShot(100, [this]() {
                 qApp->quit();

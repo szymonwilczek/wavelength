@@ -10,63 +10,59 @@ class WavelengthMessageService final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthMessageService* getInstance() {
+    static WavelengthMessageService* GetInstance() {
         static WavelengthMessageService instance;
         return &instance;
     }
 
     // --- NOWE METODY PTT ---
-    static bool sendPttRequest(const QString& frequency);
+    static bool SendPttRequest(const QString& frequency);
 
-    static bool sendPttRelease(const QString& frequency);
+    static bool SendPttRelease(const QString& frequency);
 
-    static bool sendAudioData(const QString& frequency, const QByteArray& audioData);
+    static bool SendAudioData(const QString& frequency, const QByteArray& audio_data);
 
-    bool sendMessage(const QString& message);
+    bool SendMessage(const QString& message);
 
-    bool sendFileMessage(const QString& filePath, const QString& progressMsgId = QString());
+    bool SendFile(const QString& file_path, const QString& progress_message_id = QString());
 
-    // Dodaj nową wersję metody sendFileToServer, która zwraca bool
-bool sendFileToServer(const QString& jsonMessage, const QString &frequency, const QString& progressMsgId);
+    bool SendFileToServer(const QString& json_message, const QString &frequency, const QString& progress_message_id);
 
 
-    QMap<QString, QString>* getSentMessageCache() {
-        return &m_sentMessages;
+    QMap<QString, QString>* GetSentMessageCache() {
+        return &sent_messages_;
     }
 
-    void clearSentMessageCache() {
-        m_sentMessages.clear();
+    void ClearSentMessageCache() {
+        sent_messages_.clear();
     }
 
-    QString getClientId() const {
-        return m_clientId;
+    QString GetClientId() const {
+        return client_id_;
     }
 
-    void setClientId(const QString& clientId) {
-        m_clientId = clientId;
+    void SetClientId(const QString& clientId) {
+        client_id_ = clientId;
     }
 
     public slots:
-    void updateProgressMessage(const QString& progressMsgId, const QString& message) {
-        if (progressMsgId.isEmpty()) return;
-        // Ten sygnał jest podłączony do WavelengthChatView::updateProgressMessage,
-        // który wywoła addMessage, a ten z kolei StreamMessage::updateContent
-        emit progressMessageUpdated(progressMsgId, message);
-    }
+        void UpdateProgressMessage(const QString& progress_message_id, const QString& message) {
+            if (progress_message_id.isEmpty()) return;
+            emit progressMessageUpdated(progress_message_id, message);
+        }
 
-    // Dodajemy slot do wysyłania wiadomości przez socket
-    void handleSendJsonViaSocket(const QString& jsonMessage, const QString &frequency, const QString& progressMsgId);
+        void HandleSendJsonViaSocket(const QString& json_message, const QString &frequency, const QString& progress_message_id);
 
 signals:
-    void messageSent(QString frequency, const QString& formattedMessage);
-    void progressMessageUpdated(const QString& messageId, const QString& message);
-    void removeProgressMessage(const QString& messageId);
-    void sendJsonViaSocket(const QString& jsonMessage, QString frequency, const QString& progressMsgId);
+    void messageSent(QString frequency, const QString& formatted_message);
+    void progressMessageUpdated(const QString& message_id, const QString& message);
+    void removeProgressMessage(const QString& message_id);
+    void sendJsonViaSocket(const QString& json_message, QString frequency, const QString& progress_message_id);
     void pttGranted(QString frequency);
     void pttDenied(QString frequency, QString reason);
-    void pttStartReceiving(QString frequency, QString senderId);
+    void pttStartReceiving(QString frequency, QString sender_id);
     void pttStopReceiving(QString frequency);
-    void audioDataReceived(QString frequency, const QByteArray& audioData);
+    void audioDataReceived(QString frequency, const QByteArray& audio_data);
     void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
 private:
@@ -77,10 +73,10 @@ private:
     WavelengthMessageService(const WavelengthMessageService&) = delete;
     WavelengthMessageService& operator=(const WavelengthMessageService&) = delete;
 
-    QMap<QString, QString> m_sentMessages;
-    QString m_clientId;
+    QMap<QString, QString> sent_messages_;
+    QString client_id_;
 
-    static QWebSocket* getSocketForFrequency(const QString& frequency);
+    static QWebSocket* GetSocketForFrequency(const QString& frequency);
 };
 
 #endif // WAVELENGTH_MESSAGE_SERVICE_H

@@ -5,39 +5,39 @@
 
 namespace BlobConfig {
     enum AnimationState {
-        IDLE,
-        MOVING,
-        RESIZING
+        kIdle,
+        kMoving,
+        kResizing
     };
 
     struct BlobParameters {
-        double blobRadius = 250.0f; // Pozostaw promień, jeśli nie jest konfigurowalny
-        int numPoints = 24;         // Pozostaw liczbę punktów, jeśli nie jest konfigurowalna
-        QColor borderColor;         // <<< Usunięto domyślny kolor
-        int glowRadius = 10;        // Pozostaw, jeśli nie jest konfigurowalne
-        int borderWidth = 6;        // Pozostaw, jeśli nie jest konfigurowalne
-        QColor backgroundColor;     // <<< Usunięto domyślny kolor
-        QColor gridColor;           // <<< Usunięto domyślny kolor
-        int gridSpacing;            // <<< Usunięto domyślny odstęp
-        int screenWidth = 0;
-        int screenHeight = 0;
+        double blob_radius = 250.0f; // Pozostaw promień, jeśli nie jest konfigurowalny
+        int num_of_points = 24;         // Pozostaw liczbę punktów, jeśli nie jest konfigurowalna
+        QColor border_color;         // <<< Usunięto domyślny kolor
+        int glow_radius = 10;        // Pozostaw, jeśli nie jest konfigurowalne
+        int border_width = 6;        // Pozostaw, jeśli nie jest konfigurowalne
+        QColor background_color;     // <<< Usunięto domyślny kolor
+        QColor grid_color;           // <<< Usunięto domyślny kolor
+        int grid_spacing;            // <<< Usunięto domyślny odstęp
+        int screen_width = 0;
+        int screen_height = 0;
     };
 
     struct PhysicsParameters {
         double viscosity = 0.015;
         double damping = 0.91;
-        double velocityThreshold = 0.1;
-        double maxSpeed = 0.05;
+        double velocity_threshold = 0.1;
+        double max_speed = 0.05;
         double restitution = 0.2;
-        double stabilizationRate = 0.001;
-        double minNeighborDistance = 0.1;
-        double maxNeighborDistance = 0.6;
+        double stabilization_rate = 0.001;
+        double min_neighbor_distance = 0.1;
+        double max_neighbor_distance = 0.6;
     };
 
     struct IdleParameters {
-        double waveAmplitude = 2.0;
-        double waveFrequency = 3.0;
-        double wavePhase = 0.0;
+        double wave_amplitude = 2.0;
+        double wave_frequency = 3.0;
+        double wave_phase = 0.0;
     };
 }
 

@@ -19,70 +19,69 @@ public:
     ~JoinWavelengthDialog() override;
 
     // Akcesory do animacji
-    double digitalizationProgress() const { return m_digitalizationProgress; }
-    void setDigitalizationProgress(double progress);
+    double GetDigitalizationProgress() const { return digitalization_progress_; }
+    void SetDigitalizationProgress(double progress);
 
-    double cornerGlowProgress() const { return m_cornerGlowProgress; }
-    void setCornerGlowProgress(double progress);
+    double GetCornerGlowProgress() const { return corner_glow_progress_; }
+    void SetCornerGlowProgress(double progress);
 
-
-    double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(double opacity);
+    double GetScanlineOpacity() const { return scanline_opacity_; }
+    void SetScanlineOpacity(double opacity);
 
     void paintEvent(QPaintEvent *event) override;
 
-    QString getFrequency() const;
+    QString GetFrequency() const;
 
-    QString getPassword() const {
-        return passwordEdit->text();
+    QString GetPassword() const {
+        return password_edit_->text();
     }
 
-    QTimer* getRefreshTimer() const { return m_refreshTimer; }
-    void startRefreshTimer() const {
-        if (m_refreshTimer) {
-            m_refreshTimer->start();
+    QTimer* GetRefreshTimer() const { return refresh_timer_; }
+    void StartRefreshTimer() const {
+        if (refresh_timer_) {
+            refresh_timer_->start();
         }
     }
-    void stopRefreshTimer() const {
-        if (m_refreshTimer) {
-            m_refreshTimer->stop();
+    void StopRefreshTimer() const {
+        if (refresh_timer_) {
+            refresh_timer_->stop();
         }
     }
-    void setRefreshTimerInterval(const int interval) const {
-        if (m_refreshTimer) {
-            m_refreshTimer->setInterval(interval);
+    void SetRefreshTimerInterval(const int interval) const {
+        if (refresh_timer_) {
+            refresh_timer_->setInterval(interval);
         }
     }
 
 private slots:
-    void validateInput() const;
+    void ValidateInput() const;
 
-    void tryJoin();
+    void TryJoin();
 
-    void onAuthFailed(QString frequency);
+    void OnAuthFailed();
 
-    void onConnectionError(const QString& errorMessage);
+    void OnConnectionError(const QString& error_message);
 
 private:
-    void initRenderBuffers();
+    void InitRenderBuffers();
 
-    bool m_animationStarted = false;
-    CyberLineEdit *frequencyEdit;
-    QComboBox *frequencyUnitCombo;
-    CyberLineEdit *passwordEdit;
-    QLabel *statusLabel;
-    CyberButton *joinButton;
-    CyberButton *cancelButton;
-    QTimer *m_refreshTimer;
+    bool animation_started_ = false;
+    CyberLineEdit *frequency_edit_;
+    QComboBox *frequency_unit_combo_;
+    CyberLineEdit *password_edit_;
+    QLabel *status_label_;
+    CyberButton *join_button_;
+    CyberButton *cancel_button_;
+    QTimer *refresh_timer_;
 
-    const int m_shadowSize;
-    double m_scanlineOpacity;
-    double m_digitalizationProgress = 0.0;
-    double m_cornerGlowProgress = 0.0;
-    QPixmap m_scanlineBuffer;
-    bool m_buffersInitialized = false;
-    int m_lastScanlineY = -1;
-    int m_previousHeight = 0;
+    const int shadow_size_;
+    double scanline_opacity_;
+    double digitalization_progress_ = 0.0;
+    double corner_glow_progress_ = 0.0;
+    QPixmap scanline_buffer_;
+    bool buffers_initialized_ = false;
+    int last_scanline_y_ = -1;
+    int previous_height_ = 0;
 };
 
 #endif // JOIN_WAVELENGTH_DIALOG_H

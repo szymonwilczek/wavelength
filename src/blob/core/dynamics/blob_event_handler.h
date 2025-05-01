@@ -12,46 +12,44 @@ class BlobEventHandler final : public QObject {
     Q_OBJECT
 
 public:
-    explicit BlobEventHandler(QWidget* parentWidget);
+    explicit BlobEventHandler(QWidget* parent_widget);
     ~BlobEventHandler() override;
 
-    static bool processEvent();
-    bool processResizeEvent(const QResizeEvent* event);
+    static bool ProcessEvent();
+    bool ProcessResizeEvent(const QResizeEvent* event);
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void enableEvents();
-    void disableEvents();
-    bool areEventsEnabled() const { return m_eventsEnabled; }
+    void EnableEvents();
+    void DisableEvents();
+    bool AreEventsEnabled() const { return events_enabled_; }
 
-    void setTransitionInProgress(const bool inProgress) { m_transitionInProgress = inProgress; }
-    bool isInTransition() const { return m_transitionInProgress; }
+    void SetTransitionInProgress(const bool inProgress) { transition_in_progress_ = inProgress; }
+    bool IsInTransition() const { return transition_in_progress_; }
 
     signals:
-        void windowMoved(const QPointF& newPosition, qint64 timestamp);
+        void windowMoved(const QPointF& new_position, qint64 timestamp);
         void movementSampleAdded(const QPointF& position, qint64 timestamp);
-
-    void significantResizeDetected(const QSize& oldSize, const QSize& newSize);
-    void resizeStateRequested();
-    void stateResetTimerRequested();
-
-    void eventsReEnabled();
+        void significantResizeDetected(const QSize& old_size, const QSize& new_size);
+        void resizeStateRequested();
+        void stateResetTimerRequested();
+        void eventsReEnabled();
 
     private slots:
         void onEventReEnableTimeout();
 
 private:
-    void handleMoveEvent(const QMoveEvent* moveEvent);
+    void HandleMoveEvent(const QMoveEvent* move_event);
 
-    QWidget* m_parentWidget;
-    bool m_eventsEnabled;
-    bool m_transitionInProgress;
+    QWidget* parent_widget_;
+    bool events_enabled_;
+    bool transition_in_progress_;
 
-    QPointF m_lastProcessedPosition;
-    qint64 m_lastProcessedMoveTime;
-    qint64 m_lastDragEventTime;
+    QPointF last_processed_position_;
+    qint64 last_processed_move_time_;
+    qint64 last_drag_event_time_;
 
-    QTimer m_eventReEnableTimer;
-    bool m_isResizing = false;
+    QTimer event_re_enable_timer_;
+    bool is_resizing_ = false;
 };
 
 #endif // BLOBEVENTHANDLER_H

@@ -20,55 +20,52 @@ public:
     explicit AppearanceSettingsWidget(QWidget *parent = nullptr);
     ~AppearanceSettingsWidget() override = default;
 
-    void loadSettings();
-    void saveSettings() const;
+    void LoadSettings();
+    void SaveSettings() const;
 
     private slots:
-        // Istniejące sloty
-        void chooseBackgroundColor();
-    void chooseBlobColor();
-    void chooseStreamColor();
-    void updateRecentColorsUI();
-    void selectRecentColor(const QColor& color) const;
-
-    // NOWE sloty
-    void chooseGridColor();
-    void gridSpacingChanged(int value);
-    void chooseTitleTextColor();
-    void chooseTitleBorderColor();
-    void chooseTitleGlowColor();
+        void ChooseBackgroundColor();
+        void ChooseBlobColor();
+        void ChooseStreamColor();
+        void UpdateRecentColorsUI();
+        void SelectRecentColor(const QColor& color) const;
+        void ChooseGridColor();
+        void GridSpacingChanged(int value);
+        void ChooseTitleTextColor();
+        void ChooseTitleBorderColor();
+        void ChooseTitleGlowColor();
 
 private:
-    void setupUi();
+    void SetupUi();
 
-    static void updateColorPreview(QWidget* previewWidget, const QColor& color);
+    static void UpdateColorPreview(QWidget* preview_widget, const QColor& color);
 
     WavelengthConfig *m_config;
 
     // Istniejące elementy UI i zmienne
-    QWidget* m_bgColorPreview;
-    QWidget* m_blobColorPreview;
-    QWidget* m_streamColorPreview;
-    QColor m_selectedBgColor;
-    QColor m_selectedBlobColor;
-    QColor m_selectedStreamColor;
+    QWidget* bg_color_preview_;
+    QWidget* blob_color_preview_;
+    QWidget* stream_color_preview_;
+    QColor selected_background_color_;
+    QColor selected_blob_color_;
+    QColor selected_stream_color_;
 
     // NOWE elementy UI i zmienne
-    QWidget* m_gridColorPreview;
-    QSpinBox* m_gridSpacingSpinBox;
-    QWidget* m_titleTextColorPreview;
-    QWidget* m_titleBorderColorPreview;
-    QWidget* m_titleGlowColorPreview;
+    QWidget* grid_color_preview_;
+    QSpinBox* grid_spacing_spin_box_;
+    QWidget* title_text_color_preview_;
+    QWidget* title_border_color_preview_;
+    QWidget* title_glow_color_preview_;
 
-    QColor m_selectedGridColor;
-    int m_selectedGridSpacing;
-    QColor m_selectedTitleTextColor;
-    QColor m_selectedTitleBorderColor;
-    QColor m_selectedTitleGlowColor;
+    QColor selected_grid_color_;
+    int selected_grid_spacing_;
+    QColor selected_title_text_color_;
+    QColor selected_title_border_color_;
+    QColor selected_title_glow_color_;
     // -----------------------------
 
-    QHBoxLayout* m_recentColorsLayout;
-    QList<QPushButton*> m_recentColorButtons;
+    QHBoxLayout* recent_colors_layout_;
+    QList<QPushButton*> recent_color_buttons_;
 };
 
 #endif // APPEARANCE_SETTINGS_WIDGET_H

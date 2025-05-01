@@ -9,13 +9,13 @@ class DatabaseManager final : public QObject {
     Q_OBJECT
 
 public:
-    static DatabaseManager* getInstance() {
+    static DatabaseManager* GetInstance() {
         static DatabaseManager instance;
         return &instance;
     }
 
-    bool isConnected() const {
-        return m_isConnected;
+    bool IsConnected() const {
+        return is_connected_;
     }
 
 private:
@@ -26,8 +26,8 @@ private:
     DatabaseManager(const DatabaseManager&) = delete;
     DatabaseManager& operator=(const DatabaseManager&) = delete;
 
-    std::unique_ptr<pqxx::connection> m_connection;
-    bool m_isConnected;
+    std::unique_ptr<pqxx::connection> connection_;
+    bool is_connected_;
 };
 
 #endif // DATABASE_MANAGER_H

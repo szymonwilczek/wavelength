@@ -24,17 +24,17 @@ class StreamMessage final : public QWidget {
 
 public:
     enum MessageType {
-        Received,
-        Transmitted,
-        System
+        kReceived,
+        kTransmitted,
+        kSystem
     };
-    QPushButton* m_markReadButton;
+    QPushButton* mark_read_button;
 
 
-    static QIcon createColoredSvgIcon(const QString& svgPath, const QColor& color, const QSize& size) {
+    static QIcon CreateColoredSvgIcon(const QString& svg_path, const QColor& color, const QSize& size) {
         QSvgRenderer renderer;
-        if (!renderer.load(svgPath)) {
-            qWarning() << "Nie można załadować SVG:" << svgPath;
+        if (!renderer.load(svg_path)) {
+            qWarning() << "Nie można załadować SVG:" << svg_path;
             return QIcon(); // Zwróć pustą ikonę w razie błędu
         }
 
@@ -51,59 +51,59 @@ public:
         const QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
 
         // Utwórz nową pixmapę wypełnioną docelowym kolorem
-        QPixmap coloredPixmap(size);
-        coloredPixmap.fill(color);
+        QPixmap colored_pixmap(size);
+        colored_pixmap.fill(color);
 
         // Zastosuj maskę do kolorowej pixmapy
-        coloredPixmap.setMask(mask);
+        colored_pixmap.setMask(mask);
 
-        return QIcon(coloredPixmap);
+        return QIcon(colored_pixmap);
     }
 
-    StreamMessage(QString  content, QString  sender, MessageType type, QString messageId = QString(), QWidget* parent = nullptr);
+    StreamMessage(QString  content, QString  sender, MessageType type, QString message_id = QString(), QWidget* parent = nullptr);
 
-    void updateContent(const QString& newContent);
+    void UpdateContent(const QString& new_content);
 
     // Właściwości do animacji
-    qreal opacity() const { return m_opacity; }
-    void setOpacity(qreal opacity);
+    qreal GetOpacity() const { return opacity_; }
+    void SetOpacity(qreal opacity);
 
-    qreal glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(qreal intensity);
+    qreal GetGlowIntensity() const { return glow_intensity_; }
+    void SetGlowIntensity(qreal intensity);
 
-    qreal disintegrationProgress() const { return m_disintegrationProgress; }
-    void setDisintegrationProgress(qreal progress);
+    qreal GetDisintegrationProgress() const { return disintegration_progress_; }
+    void SetDisintegrationProgress(qreal progress);
 
-    qreal shutdownProgress() const { return m_shutdownProgress; }
-    void setShutdownProgress(qreal progress);
+    qreal GetShutdownProgress() const { return shutdown_progress_; }
+    void SetShutdownProgress(qreal progress);
 
-    bool isRead() const { return m_isRead; }
-    QString messageSender() const { return m_sender; }
-    QString content() const { return m_content; }
-    MessageType type() const { return m_type; }
-    QString messageId() const {return m_messageId; }
+    bool IsRead() const { return is_read_; }
+    QString GetMessageSender() const { return sender_; }
+    QString GetContent() const { return content_; }
+    MessageType GetType() const { return type_; }
+    QString GetMessageId() const {return message_id_; }
 
-void addAttachment(const QString& html);
+void AddAttachment(const QString& html);
 
     // Nowa metoda do dostosowywania rozmiaru wiadomości
-void adjustSizeToContent();
+void AdjustSizeToContent();
 
     QSize sizeHint() const override;
 
     // Zoptymalizowane metody fadeIn i fadeOut
 
-void fadeIn();
+void FadeIn();
 
-    void fadeOut();
+    void FadeOut();
 
-    void updateScrollAreaMaxHeight() const;
+    void UpdateScrollAreaMaxHeight() const;
 
-    void startDisintegrationAnimation();
+    void StartDisintegrationAnimation();
 
-    void showNavigationButtons(bool hasPrev, bool hasNext) const;
+    void ShowNavigationButtons(bool has_previous, bool has_next) const;
 
-    QPushButton* nextButton() const { return m_nextButton; }
-    QPushButton* prevButton() const { return m_prevButton; }
+    QPushButton* GetNextButton() const { return next_button_; }
+    QPushButton* GetPrevButton() const { return prev_button_; }
 
 
 signals:
@@ -111,7 +111,7 @@ signals:
     void hidden();
 
 public slots:
-    void markAsRead();
+    void MarkAsRead();
 
 protected:
 
@@ -126,51 +126,51 @@ protected:
     void focusOutEvent(QFocusEvent* event) override;
 
 private slots:
-    void updateAnimation();
+    void UpdateAnimation();
 
-    void adjustScrollAreaStyle() const;
+    void AdjustScrollAreaStyle() const;
 
 private:
     // Wyciąga atrybut z HTML
-    static QString extractAttribute(const QString& html, const QString& attribute);
+    static QString ExtractAttribute(const QString& html, const QString& attribute);
 
-    void startLongMessageClosingAnimation();
+    void StartLongMessageClosingAnimation();
 
-    void processImageAttachment(const QString& html);
+    void ProcessImageAttachment(const QString& html);
 
-    void processGifAttachment(const QString& html);
+    void ProcessGifAttachment(const QString& html);
 
-    void processAudioAttachment(const QString& html);
+    void ProcessAudioAttachment(const QString& html);
 
-    void processVideoAttachment(const QString& html);
+    void ProcessVideoAttachment(const QString& html);
 
     // Funkcja do czyszczenia zawartości wiadomości, usuwania HTML i placeholderów
-    void cleanupContent();
+    void CleanupContent();
 
-    void updateLayout() const;
+    void UpdateLayout() const;
 
-    QString m_messageId;
-    QString m_content;
-    QString m_cleanContent;
-    QString m_sender;
-    MessageType m_type;
-    qreal m_opacity;
-    qreal m_glowIntensity;
-    qreal m_disintegrationProgress;
-    bool m_isRead;
+    QString message_id_;
+    QString content_;
+    QString clean_content_;
+    QString sender_;
+    MessageType type_;
+    qreal opacity_;
+    qreal glow_intensity_;
+    qreal disintegration_progress_;
+    bool is_read_;
 
-    QVBoxLayout* m_mainLayout;
-    QPushButton* m_nextButton;
-    QPushButton* m_prevButton;
-    QTimer* m_animationTimer;
-    DisintegrationEffect* m_disintegrationEffect = nullptr;
-    QWidget* m_attachmentWidget = nullptr;
-    QLabel* m_contentLabel = nullptr;
-    CyberTextDisplay* m_textDisplay = nullptr;
-    ElectronicShutdownEffect* m_shutdownEffect = nullptr;
-    qreal m_shutdownProgress = 0.0;
-    QScrollArea* m_scrollArea = nullptr;
-    CyberLongTextDisplay* m_longTextDisplay = nullptr;
+    QVBoxLayout* main_layout_;
+    QPushButton* next_button_;
+    QPushButton* prev_button_;
+    QTimer* animation_timer_;
+    DisintegrationEffect* disintegration_effect_ = nullptr;
+    QWidget* attachment_widget_ = nullptr;
+    QLabel* content_label_ = nullptr;
+    CyberTextDisplay* text_display_ = nullptr;
+    ElectronicShutdownEffect* shutdown_effect_ = nullptr;
+    qreal shutdown_progress_ = 0.0;
+    QScrollArea* scroll_area_ = nullptr;
+    CyberLongTextDisplay* long_text_display_ = nullptr;
 };
 
 #endif // STREAM_MESSAGE_H

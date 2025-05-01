@@ -9,27 +9,27 @@ class ImageDecoder final : public QObject {
     Q_OBJECT
 
 public:
-    explicit ImageDecoder(const QByteArray& imageData, QObject* parent = nullptr)
-        : QObject(parent), m_imageData(imageData) {
+    explicit ImageDecoder(const QByteArray& image_data, QObject* parent = nullptr)
+        : QObject(parent), image_data_(image_data) {
     }
 
     ~ImageDecoder() override {
         // Nie wymaga specjalnego zwalniania zasobów jak w FFmpeg
     }
 
-    static void releaseResources() {
+    static void ReleaseResources() {
         // Nic do zwalniania w tej implementacji
     }
 
-    QImage decode();
+    QImage Decode();
 
-signals:
-        void imageReady(const QImage& image);
+    signals:
+    void imageReady(const QImage& image);
     void error(const QString& message);
-    void imageInfo(int width, int height, bool hasAlpha);
+    void imageInfo(int width, int height, bool has_alpha);
 
 private:
-    QByteArray m_imageData;
+    QByteArray image_data_;
 };
 
 #endif // IMAGE_DECODER_H

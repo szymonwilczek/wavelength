@@ -22,34 +22,34 @@ public:
         qint64 timestamp;
     };
 
-    void processMovementBuffer(
+    void ProcessMovementBuffer(
         std::vector<QPointF>& velocity,
-        QPointF& blobCenter,
-        std::vector<QPointF>& controlPoints,
-        float blobRadius,
-        const std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> &applyInertiaForce,
-        const std::function<void(const QPointF&)> &setLastWindowPos
+        QPointF& blob_center,
+        std::vector<QPointF>& control_points,
+        float blob_radius,
+        const std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> &ApplyInertiaForce,
+        const std::function<void(const QPointF&)> &SetLastWindowPos
     );
 
-    void clearAllMovementBuffers() {
-        m_movementBuffer.clear();
+    void ClearAllMovementBuffers() {
+        movement_buffer_.clear();
     }
 
-    void addMovementSample(const QPointF& position, qint64 timestamp);
-    void clearMovementBuffer();
+    void AddMovementSample(const QPointF& position, qint64 timestamp);
+    void ClearMovementBuffer();
     
-    bool isMoving() const { return m_isMoving; }
-    void setMoving(const bool isMoving) { m_isMoving = isMoving; }
-    void setResizingState(const bool isResizing) { m_isResizing = isResizing; }
+    bool IsMoving() const { return is_moving_; }
+    void SetMoving(const bool is_moving) { is_moving_ = is_moving; }
+    void SetResizingState(const bool is_resizing) { is_resizing_ = is_resizing; }
     
-    void resetInactivityCounter() { m_inactivityCounter = 0; }
-    int getInactivityCounter() const { return m_inactivityCounter; }
-    void incrementInactivityCounter() { m_inactivityCounter++; }
+    void ResetInactivityCounter() { inactivity_counter_ = 0; }
+    int GetInactivityCounter() const { return inactivity_counter_; }
+    void IncrementInactivityCounter() { inactivity_counter_++; }
 
-    qint64 getLastMovementTime() const { return m_lastMovementTime; }
-    void setLastMovementTime(const qint64 time) { m_lastMovementTime = time; }
+    qint64 GetLastMovementTime() const { return last_movement_time_; }
+    void SetLastMovementTime(const qint64 time) { last_movement_time_ = time; }
 
-    std::pmr::deque<WindowMovementSample> getMovementBuffer() const { return m_movementBuffer; }
+    std::pmr::deque<WindowMovementSample> GetMovementBuffer() const { return movement_buffer_; }
 
 signals:
     void transitionCompleted();
@@ -57,24 +57,24 @@ signals:
     void movementStopped();
 
 private:
-    static constexpr int MAX_MOVEMENT_SAMPLES = 10;
-    std::pmr::deque<WindowMovementSample> m_movementBuffer;
-    QVector2D m_smoothedVelocity;
+    static constexpr int kMaxMovementSamples = 10;
+    std::pmr::deque<WindowMovementSample> movement_buffer_;
+    QVector2D m_smoothed_velocity_;
 
-    bool m_inTransitionToIdle = false;
-    qint64 m_transitionToIdleStartTime = 0;
-    qint64 m_transitionToIdleDuration = 0;
-    std::vector<QPointF> m_originalControlPoints;
-    std::vector<QPointF> m_originalVelocities;
-    QPointF m_originalBlobCenter;
-    std::vector<QPointF> m_targetIdlePoints;
-    QPointF m_targetIdleCenter;
-    QTimer* m_transitionToIdleTimer = nullptr;
+    bool in_transition_to_idle_ = false;
+    qint64 transition_to_idle_start_time_ = 0;
+    qint64 transition_to_idle_duration_ = 0;
+    std::vector<QPointF> original_control_points_;
+    std::vector<QPointF> original_velocities_;
+    QPointF original_blob_center_;
+    std::vector<QPointF> target_idle_points_;
+    QPointF target_idle_center_;
+    QTimer* transition_to_idle_timer_ = nullptr;
 
-    bool m_isMoving = false;
-    int m_inactivityCounter = 0;
-    qint64 m_lastMovementTime = 0;
-    bool m_isResizing = false;
+    bool is_moving_ = false;
+    int inactivity_counter_ = 0;
+    qint64 last_movement_time_ = 0;
+    bool is_resizing_ = false;
 };
 
 #endif // BLOB_TRANSITION_MANAGER_H

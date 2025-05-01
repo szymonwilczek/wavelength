@@ -21,84 +21,80 @@ public:
 
     ~WavelengthDialog()  override;
 
-    double digitalizationProgress() const { return m_digitalizationProgress; }
-    void setDigitalizationProgress(double progress);
+    double GetDigitalizationProgress() const { return digitalization_progress_; }
+    void SetDigitalizationProgress(double progress);
 
-    double cornerGlowProgress() const { return m_cornerGlowProgress; }
-    void setCornerGlowProgress(double progress);
+    double GetCornerGlowProgress() const { return corner_glow_progress_; }
+    void SetCornerGlowProgress(double progress);
 
+    double GetScanlineOpacity() const { return scanline_opacity_; }
+    void SetScanlineOpacity(double opacity);
 
-    // Akcesory dla animacji scanlines
-    double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(double opacity);
-
-    QTimer* getRefreshTimer() const { return m_refreshTimer; }
-    void startRefreshTimer() const {
-        if (m_refreshTimer) {
-            m_refreshTimer->start();
+    QTimer* GetRefreshTimer() const { return refresh_timer_; }
+    void StartRefreshTimer() const {
+        if (refresh_timer_) {
+            refresh_timer_->start();
         }
     }
-    void stopRefreshTimer() const {
-        if (m_refreshTimer) {
-            m_refreshTimer->stop();
+    void StopRefreshTimer() const {
+        if (refresh_timer_) {
+            refresh_timer_->stop();
         }
     }
-    void setRefreshTimerInterval(const int interval) const {
-        if (m_refreshTimer) {
-            m_refreshTimer->setInterval(interval);
+    void SetRefreshTimerInterval(const int interval) const {
+        if (refresh_timer_) {
+            refresh_timer_->setInterval(interval);
         }
     }
 
     void paintEvent(QPaintEvent *event) override;
 
-    QString getFrequency() const {
-        return m_frequency;
+    QString GetFrequency() const {
+        return frequency_;
     }
 
-    bool isPasswordProtected() const {
-        return passwordProtectedCheckbox->isChecked();
+    bool IsPasswordProtected() const {
+        return password_protected_checkbox_->isChecked();
     }
 
-    QString getPassword() const {
-        return passwordEdit->text();
+    QString GetPassword() const {
+        return password_edit_->text();
     }
 
 private slots:
-    void validateInputs() const;
+    void ValidateInputs() const;
 
-    void startFrequencySearch();
+    void StartFrequencySearch();
 
-    void tryGenerate();
+    void TryGenerate();
 
-    void onFrequencyFound();
+    void OnFrequencyFound();
 
-    // Nowa pomocnicza metoda do formatowania tekstu częstotliwości
-    static QString formatFrequencyText(double frequency);
-
-private:
-    static QString findLowestAvailableFrequency();
-
-    void initRenderBuffers();
+    static QString FormatFrequencyText(double frequency);
 
 private:
-    bool m_animationStarted = false;
-    QLabel *frequencyLabel;
-    QLabel *loadingIndicator;
-    CyberCheckBox *passwordProtectedCheckbox;
-    CyberLineEdit *passwordEdit;
-    QLabel *statusLabel;
-    CyberButton *generateButton;
-    CyberButton *cancelButton;
-    QFutureWatcher<QString> *frequencyWatcher;
-    QTimer *m_refreshTimer;
-    QString m_frequency = "130.0"; // Domyślna wartość
-    bool m_frequencyFound = false; // Flaga oznaczająca znalezienie częstotliwości
-    const int m_shadowSize; // Rozmiar cienia
-    double m_scanlineOpacity; // Przezroczystość linii skanowania
-    QPixmap m_scanlineBuffer;
-    bool m_buffersInitialized = false;
-    int m_lastScanlineY = -1;
-    int m_previousHeight = 0;
+    static QString FindLowestAvailableFrequency();
+
+    void InitRenderBuffers();
+
+    bool animation_started_ = false;
+    QLabel *frequency_label_;
+    QLabel *loading_indicator_;
+    CyberCheckBox *password_protected_checkbox_;
+    CyberLineEdit *password_edit_;
+    QLabel *status_label_;
+    CyberButton *generate_button_;
+    CyberButton *cancel_button_;
+    QFutureWatcher<QString> *frequency_watcher_;
+    QTimer *refresh_timer_;
+    QString frequency_ = "130.0";
+    bool frequency_found_ = false;
+    const int shadow_size_;
+    double scanline_opacity_;
+    QPixmap scanline_buffer_;
+    bool buffers_initialized_ = false;
+    int last_scanline_y_ = -1;
+    int previous_height_ = 0;
 };
 
 #endif // WAVELENGTH_DIALOG_H

@@ -19,40 +19,40 @@ class InlineAudioPlayer final : public QFrame {
     Q_PROPERTY(double spectrumIntensity READ spectrumIntensity WRITE setSpectrumIntensity)
 
 public:
-    static InlineAudioPlayer* getActivePlayer() {
-        return s_activePlayer;
+    static InlineAudioPlayer* GetActivePlayer() {
+        return active_player_;
     }
 
-    InlineAudioPlayer(const QByteArray& audioData, const QString& mimeType, QWidget* parent = nullptr);
+    InlineAudioPlayer(const QByteArray& audio_data, const QString& mime_type, QWidget* parent = nullptr);
 
     // Akcesory dla właściwości animacji
-    double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(const double opacity) {
-        m_scanlineOpacity = opacity;
+    double GetScanlineOpacity() const { return scanline_opacity_; }
+    void SetScanlineOpacity(const double opacity) {
+        scanline_opacity_ = opacity;
         update();
     }
 
-    double spectrumIntensity() const { return m_spectrumIntensity; }
-    void setSpectrumIntensity(const double intensity) {
-        m_spectrumIntensity = intensity;
+    double GetSpectrumIntensity() const { return spectrum_intensity_; }
+    void SetSpectrumIntensity(const double intensity) {
+        spectrum_intensity_ = intensity;
         update();
     }
 
     ~InlineAudioPlayer() override {
-        releaseResources();
+        ReleaseResources();
     }
 
-    void releaseResources();
+    void ReleaseResources();
 
-    void activate();
+    void Activate();
 
-    void deactivate();
+    void Deactivate();
 
-    void adjustVolume(int volume) const;
+    void AdjustVolume(int volume) const;
 
-    void toggleMute();
+    void ToggleMute();
 
-    void updateVolumeIcon(float volume) const;
+    void UpdateVolumeIcon(float volume) const;
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -60,76 +60,75 @@ protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-    void onSliderPressed();
+    void OnSliderPressed();
 
-    void onSliderReleased();
+    void OnSliderReleased();
 
-    void updateTimeLabel(int position);
+    void UpdateTimeLabel(int position);
 
-    void updateSliderPosition(double position) const;
+    void UpdateSliderPosition(double position) const;
 
-    void seekAudio(int position) const;
+    void SeekAudio(int position) const;
 
-    void togglePlayback();
+    void TogglePlayback();
 
-    void handleError(const QString& message) const;
+    void HandleError(const QString& message) const;
 
-    void handleAudioInfo(int sampleRate, int channels, double duration);
+    void HandleAudioInfo(int sample_rate, int channels, double duration);
 
-    void updateUI();
+    void UpdateUI();
 
-    void increaseSpectrumIntensity() {
-        const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
-        spectrumAnim->setDuration(600);
-        spectrumAnim->setStartValue(m_spectrumIntensity);
-        spectrumAnim->setEndValue(0.6);
-        spectrumAnim->setEasingCurve(QEasingCurve::OutCubic);
-        spectrumAnim->start(QPropertyAnimation::DeleteWhenStopped);
+    void IncreaseSpectrumIntensity() {
+        const auto spectrum_animation = new QPropertyAnimation(this, "spectrumIntensity");
+        spectrum_animation->setDuration(600);
+        spectrum_animation->setStartValue(spectrum_intensity_);
+        spectrum_animation->setEndValue(0.6);
+        spectrum_animation->setEasingCurve(QEasingCurve::OutCubic);
+        spectrum_animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
 
-    void decreaseSpectrumIntensity() {
-        const auto spectrumAnim = new QPropertyAnimation(this, "spectrumIntensity");
-        spectrumAnim->setDuration(800);
-        spectrumAnim->setStartValue(m_spectrumIntensity);
-        spectrumAnim->setEndValue(0.2);
-        spectrumAnim->setEasingCurve(QEasingCurve::OutCubic);
-        spectrumAnim->start(QPropertyAnimation::DeleteWhenStopped);
+    void DecreaseSpectrumIntensity() {
+        const auto spectrum_animation = new QPropertyAnimation(this, "spectrumIntensity");
+        spectrum_animation->setDuration(800);
+        spectrum_animation->setStartValue(spectrum_intensity_);
+        spectrum_animation->setEndValue(0.2);
+        spectrum_animation->setEasingCurve(QEasingCurve::OutCubic);
+        spectrum_animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
 
 private:
-    void paintSpectrum(QWidget* target);
+    void PaintSpectrum(QWidget* target);
 
     // Pola klasy InlineAudioPlayer
-    QLabel* m_audioInfoLabel;
-    QLabel* m_statusLabel;
-    QWidget* m_spectrumView;
-    CyberAudioButton* m_playButton;
-    CyberAudioSlider* m_progressSlider;
-    QLabel* m_timeLabel;
-    CyberAudioButton* m_volumeButton;
-    CyberAudioSlider* m_volumeSlider;
+    QLabel* audio_info_label_;
+    QLabel* status_label_;
+    QWidget* spectrum_view_;
+    CyberAudioButton* play_button_;
+    CyberAudioSlider* progress_slider_;
+    QLabel* time_label_;
+    CyberAudioButton* volume_button_;
+    CyberAudioSlider* volume_slider_;
 
-    std::shared_ptr<AudioDecoder> m_decoder;
-    QTimer* m_uiTimer;
-    QTimer* m_spectrumTimer;
+    std::shared_ptr<AudioDecoder> decoder_;
+    QTimer* ui_timer_;
+    QTimer* spectrum_timer_;
 
     QByteArray m_audioData;
-    QString m_mimeType;
+    QString mime_type_;
 
-    double m_audioDuration = 0;
-    double m_currentPosition = 0;
-    bool m_sliderDragging = false;
-    int m_lastVolume = 100;
-    bool m_playbackFinished = false;
-    bool m_wasPlaying = false;
-    bool m_isActive = false;
+    double audio_duration_ = 0;
+    double current_position_ = 0;
+    bool slider_dragging_ = false;
+    int last_volume_ = 100;
+    bool playback_finished_ = false;
+    bool was_playing_ = false;
+    bool is_active_ = false;
 
-    // Właściwości animacji
-    double m_scanlineOpacity;
-    double m_spectrumIntensity;
-    QVector<double> m_spectrumData;
+    double scanline_opacity_;
+    double spectrum_intensity_;
+    QVector<double> spectrum_data_;
     
-    static inline InlineAudioPlayer* s_activePlayer = nullptr;
+    static inline InlineAudioPlayer* active_player_ = nullptr;
 };
 
 #endif //INLINE_AUDIO_PLAYER_H

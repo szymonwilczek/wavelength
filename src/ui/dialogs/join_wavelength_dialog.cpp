@@ -3,8 +3,8 @@
 #include <QFormLayout>
 #include <QVBoxLayout>
 
-JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(parent, AnimatedDialog::DigitalMaterialization),
-                                                             m_shadowSize(10), m_scanlineOpacity(0.08) {
+JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
+                                                             shadow_size_(10), scanline_opacity_(0.08) {
     // Dodaj flagi optymalizacyjne
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
@@ -12,93 +12,88 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     setAttribute(Qt::WA_StaticContents, true);
     setAttribute(Qt::WA_ContentsPropagated, false);
 
-    // Preferuj akcelerację graficzną
-    // QSurfaceFormat format;
-    // format.setRenderableType(QSurfaceFormat::OpenGL);
-    // QSurfaceFormat::setDefaultFormat(format);
-
-    m_digitalizationProgress = 0.0;
-    m_animationStarted = false;
+    digitalization_progress_ = 0.0;
+    animation_started_ = false;
 
     setWindowTitle("JOIN_WAVELENGTH::CONNECT");
     setModal(true);
     setFixedSize(450, 350);
-    setAnimationDuration(400);
+    SetAnimationDuration(400);
 
-    auto mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(20, 20, 20, 20);
-    mainLayout->setSpacing(12);
+    auto main_layout = new QVBoxLayout(this);
+    main_layout->setContentsMargins(20, 20, 20, 20);
+    main_layout->setSpacing(12);
 
     // Nagłówek z tytułem
-    auto titleLabel = new QLabel("JOIN WAVELENGTH", this);
-    titleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
-    titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    titleLabel->setContentsMargins(0, 0, 0, 3);
-    mainLayout->addWidget(titleLabel);
+    auto title_label = new QLabel("JOIN WAVELENGTH", this);
+    title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
+    title_label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    title_label->setContentsMargins(0, 0, 0, 3);
+    main_layout->addWidget(title_label);
 
     // Panel informacyjny z ID sesji
-    auto infoPanel = new QWidget(this);
-    auto infoPanelLayout = new QHBoxLayout(infoPanel);
-    infoPanelLayout->setContentsMargins(0, 0, 0, 0);
-    infoPanelLayout->setSpacing(5);
+    auto info_panel = new QWidget(this);
+    auto info_panel_layout = new QHBoxLayout(info_panel);
+    info_panel_layout->setContentsMargins(0, 0, 0, 0);
+    info_panel_layout->setSpacing(5);
 
-    QString sessionId = QString("%1-%2")
+    QString session_id = QString("%1-%2")
             .arg(QRandomGenerator::global()->bounded(1000, 9999))
             .arg(QRandomGenerator::global()->bounded(10000, 99999));
-    auto sessionLabel = new QLabel(QString("SESSION_ID: %1").arg(sessionId), this);
-    sessionLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
+    auto session_label = new QLabel(QString("SESSION_ID: %1").arg(session_id), this);
+    session_label->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
     QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
-    auto timeLabel = new QLabel(QString("TS: %1").arg(timestamp), this);
-    timeLabel->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
+    auto time_label = new QLabel(QString("TS: %1").arg(timestamp), this);
+    time_label->setStyleSheet("color: #00aa88; background-color: transparent; font-family: Consolas; font-size: 8pt;");
 
-    infoPanelLayout->addWidget(sessionLabel);
-    infoPanelLayout->addStretch();
-    infoPanelLayout->addWidget(timeLabel);
-    mainLayout->addWidget(infoPanel);
+    info_panel_layout->addWidget(session_label);
+    info_panel_layout->addStretch();
+    info_panel_layout->addWidget(time_label);
+    main_layout->addWidget(info_panel);
 
     // Panel instrukcji
-    auto infoLabel = new QLabel("Enter the wavelength frequency (130Hz - 180MHz)", this);
-    infoLabel->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    infoLabel->setAlignment(Qt::AlignLeft);
-    infoLabel->setWordWrap(true);
-    mainLayout->addWidget(infoLabel);
+    auto info_label = new QLabel("Enter the wavelength frequency (130Hz - 180MHz)", this);
+    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    info_label->setAlignment(Qt::AlignLeft);
+    info_label->setWordWrap(true);
+    main_layout->addWidget(info_label);
 
     // Formularz
-    auto formLayout = new QFormLayout();
-    formLayout->setSpacing(12);
-    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-    formLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    formLayout->setContentsMargins(0, 15, 0, 15);
+    auto form_layout = new QFormLayout();
+    form_layout->setSpacing(12);
+    form_layout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    form_layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    form_layout->setFormAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    form_layout->setContentsMargins(0, 15, 0, 15);
 
     // Etykieta częstotliwości
-    auto frequencyTitleLabel = new QLabel("FREQUENCY:", this);
-    frequencyTitleLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    auto frequency_title_label = new QLabel("FREQUENCY:", this);
+    frequency_title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Kontener dla pola częstotliwości i selecta jednostki
-    auto freqContainer = new QWidget(this);
-    auto freqLayout = new QHBoxLayout(freqContainer);
-    freqLayout->setContentsMargins(0, 0, 0, 0);
-    freqLayout->setSpacing(5);
+    auto freq_container = new QWidget(this);
+    auto freq_layout = new QHBoxLayout(freq_container);
+    freq_layout->setContentsMargins(0, 0, 0, 0);
+    freq_layout->setSpacing(5);
 
     // Pole wprowadzania częstotliwości
-    frequencyEdit = new CyberLineEdit(this);
+    frequency_edit_ = new CyberLineEdit(this);
     auto validator = new QDoubleValidator(130, 180000000.0, 1, this);
     QLocale locale(QLocale::English);
     locale.setNumberOptions(QLocale::RejectGroupSeparator);
     validator->setLocale(locale);
-    frequencyEdit->setValidator(validator);
-    frequencyEdit->setPlaceholderText("ENTER FREQUENCY");
-    freqLayout->addWidget(frequencyEdit, 3);
+    frequency_edit_->setValidator(validator);
+    frequency_edit_->setPlaceholderText("ENTER FREQUENCY");
+    freq_layout->addWidget(frequency_edit_, 3);
 
     // ComboBox z jednostkami
-    frequencyUnitCombo = new QComboBox(this);
-    frequencyUnitCombo->addItem("Hz");
-    frequencyUnitCombo->addItem("kHz");
-    frequencyUnitCombo->addItem("MHz");
-    frequencyUnitCombo->setFixedHeight(30);
-    frequencyUnitCombo->setStyleSheet(
+    frequency_unit_combo_ = new QComboBox(this);
+    frequency_unit_combo_->addItem("Hz");
+    frequency_unit_combo_->addItem("kHz");
+    frequency_unit_combo_->addItem("MHz");
+    frequency_unit_combo_->setFixedHeight(30);
+    frequency_unit_combo_->setStyleSheet(
         "QComboBox {"
         "  background-color: #001822;"
         "  color: #00ccff;"
@@ -114,106 +109,106 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
         "  border-left: 1px solid #00a0cc;"
         "}"
     );
-    freqLayout->addWidget(frequencyUnitCombo, 1);
+    freq_layout->addWidget(frequency_unit_combo_, 1);
 
-    formLayout->addRow(frequencyTitleLabel, freqContainer);
+    form_layout->addRow(frequency_title_label, freq_container);
 
     // Etykieta informacji o separatorze dziesiętnym
-    auto decimalHintLabel = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
-    decimalHintLabel->setStyleSheet("color: #008888; background-color: transparent; font-family: Consolas; font-size: 8pt;");
-    formLayout->addRow("", decimalHintLabel);
+    auto decimal_hint_label = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
+    decimal_hint_label->setStyleSheet("color: #008888; background-color: transparent; font-family: Consolas; font-size: 8pt;");
+    form_layout->addRow("", decimal_hint_label);
 
     // Etykieta hasła
-    auto passwordLabel = new QLabel("PASSWORD:", this);
-    passwordLabel->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    auto password_label = new QLabel("PASSWORD:", this);
+    password_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Pole hasła
-    passwordEdit = new CyberLineEdit(this);
-    passwordEdit->setEchoMode(QLineEdit::Password);
-    passwordEdit->setPlaceholderText("WAVELENGTH PASSWORD (IF REQUIRED)");
-    formLayout->addRow(passwordLabel, passwordEdit);
+    password_edit_ = new CyberLineEdit(this);
+    password_edit_->setEchoMode(QLineEdit::Password);
+    password_edit_->setPlaceholderText("WAVELENGTH PASSWORD (IF REQUIRED)");
+    form_layout->addRow(password_label, password_edit_);
 
-    mainLayout->addLayout(formLayout);
+    main_layout->addLayout(form_layout);
 
     // Etykieta statusu
-    statusLabel = new QLabel(this);
-    statusLabel->setStyleSheet("color: #ff3355; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    statusLabel->hide();
-    mainLayout->addWidget(statusLabel);
+    status_label_ = new QLabel(this);
+    status_label_->setStyleSheet("color: #ff3355; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    status_label_->hide();
+    main_layout->addWidget(status_label_);
 
     // Panel przycisków
-    auto buttonLayout = new QHBoxLayout();
-    buttonLayout->setSpacing(15);
+    auto button_layout = new QHBoxLayout();
+    button_layout->setSpacing(15);
 
-    joinButton = new CyberButton("JOIN WAVELENGTH", this, true);
-    joinButton->setFixedHeight(35);
+    join_button_ = new CyberButton("JOIN WAVELENGTH", this, true);
+    join_button_->setFixedHeight(35);
 
-    cancelButton = new CyberButton("CANCEL", this, false);
-    cancelButton->setFixedHeight(35);
+    cancel_button_ = new CyberButton("CANCEL", this, false);
+    cancel_button_->setFixedHeight(35);
 
-    buttonLayout->addWidget(joinButton, 2);
-    buttonLayout->addWidget(cancelButton, 1);
-    mainLayout->addLayout(buttonLayout);
+    button_layout->addWidget(join_button_, 2);
+    button_layout->addWidget(cancel_button_, 1);
+    main_layout->addLayout(button_layout);
 
     // Połączenia sygnałów i slotów
-    connect(frequencyEdit, &QLineEdit::textChanged, this, &JoinWavelengthDialog::validateInput);
-    connect(passwordEdit, &QLineEdit::textChanged, this, &JoinWavelengthDialog::validateInput);
-    connect(joinButton, &QPushButton::clicked, this, &JoinWavelengthDialog::tryJoin);
-    connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+    connect(frequency_edit_, &QLineEdit::textChanged, this, &JoinWavelengthDialog::ValidateInput);
+    connect(password_edit_, &QLineEdit::textChanged, this, &JoinWavelengthDialog::ValidateInput);
+    connect(join_button_, &QPushButton::clicked, this, &JoinWavelengthDialog::TryJoin);
+    connect(cancel_button_, &QPushButton::clicked, this, &QDialog::reject);
 
-    WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
+    WavelengthJoiner* joiner = WavelengthJoiner::GetInstance();
     connect(joiner, &WavelengthJoiner::wavelengthJoined, this, &JoinWavelengthDialog::accept);
-    connect(joiner, &WavelengthJoiner::authenticationFailed, this, &JoinWavelengthDialog::onAuthFailed);
-    connect(joiner, &WavelengthJoiner::connectionError, this, &JoinWavelengthDialog::onConnectionError);
+    connect(joiner, &WavelengthJoiner::authenticationFailed, this, &JoinWavelengthDialog::OnAuthFailed);
+    connect(joiner, &WavelengthJoiner::connectionError, this, &JoinWavelengthDialog::OnConnectionError);
 
-    validateInput();
+    ValidateInput();
 
     // Inicjuj timer odświeżania
-    m_refreshTimer = new QTimer(this);
-    m_refreshTimer->setInterval(16);
-    connect(m_refreshTimer, &QTimer::timeout, this, [this]() {
-        if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0) {
-            const int scanLineY = height() * m_digitalizationProgress;
+    refresh_timer_ = new QTimer(this);
+    refresh_timer_->setInterval(16);
+    connect(refresh_timer_, &QTimer::timeout, this, [this]() {
+        if (digitalization_progress_ > 0.0 && digitalization_progress_ < 1.0) {
+            const int scanline_y = height() * digitalization_progress_;
 
-            if (scanLineY != m_lastScanlineY) {
+            if (scanline_y != last_scanline_y_) {
                 // Odśwież tylko obszar wokół aktualnej i poprzedniej pozycji linii skanującej
-                int minY = qMin(scanLineY, m_lastScanlineY) - 15;
-                int maxY = qMax(scanLineY, m_lastScanlineY) + 15;
+                int min_y = qMin(scanline_y, last_scanline_y_) - 15;
+                int max_y = qMax(scanline_y, last_scanline_y_) + 15;
 
                 // Ograniczenie zakresu do widocznego obszaru
-                minY = qMax(0, minY);
-                maxY = qMin(height(), maxY);
+                min_y = qMax(0, min_y);
+                max_y = qMin(height(), max_y);
 
-                update(0, minY, width(), maxY - minY);
+                update(0, min_y, width(), max_y - min_y);
             }
         } else {
-            m_refreshTimer->setInterval(33); // Mniej intensywne odświeżanie gdy nie ma animacji
+            refresh_timer_->setInterval(33); // Mniej intensywne odświeżanie gdy nie ma animacji
         }
     });
 }
 
 JoinWavelengthDialog::~JoinWavelengthDialog() {
-    if (m_refreshTimer) {
-        m_refreshTimer->stop();
-        delete m_refreshTimer;
-        m_refreshTimer = nullptr;
+    if (refresh_timer_) {
+        refresh_timer_->stop();
+        delete refresh_timer_;
+        refresh_timer_ = nullptr;
     }
 }
 
-void JoinWavelengthDialog::setDigitalizationProgress(const double progress) {
-    if (!m_animationStarted && progress > 0.01)
-        m_animationStarted = true;
-    m_digitalizationProgress = progress;
+void JoinWavelengthDialog::SetDigitalizationProgress(const double progress) {
+    if (!animation_started_ && progress > 0.01)
+        animation_started_ = true;
+    digitalization_progress_ = progress;
     update();
 }
 
-void JoinWavelengthDialog::setCornerGlowProgress(const double progress) {
-    m_cornerGlowProgress = progress;
+void JoinWavelengthDialog::SetCornerGlowProgress(const double progress) {
+    corner_glow_progress_ = progress;
     update();
 }
 
-void JoinWavelengthDialog::setScanlineOpacity(const double opacity) {
-    m_scanlineOpacity = opacity;
+void JoinWavelengthDialog::SetScanlineOpacity(const double opacity) {
+    scanline_opacity_ = opacity;
     update();
 }
 
@@ -222,59 +217,56 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     // Główne tło dialogu z gradientem (bez zmian)
-    QLinearGradient bgGradient(0, 0, 0, height());
-    bgGradient.setColorAt(0, QColor(10, 21, 32));
-    bgGradient.setColorAt(1, QColor(7, 18, 24));
+    QLinearGradient background_gradient(0, 0, 0, height());
+    background_gradient.setColorAt(0, QColor(10, 21, 32));
+    background_gradient.setColorAt(1, QColor(7, 18, 24));
 
     // Ścieżka dialogu ze ściętymi rogami (bez zmian)
-    QPainterPath dialogPath;
-    int clipSize = 20;
-    dialogPath.moveTo(clipSize, 0);
-    dialogPath.lineTo(width() - clipSize, 0);
-    dialogPath.lineTo(width(), clipSize);
-    dialogPath.lineTo(width(), height() - clipSize);
-    dialogPath.lineTo(width() - clipSize, height());
-    dialogPath.lineTo(clipSize, height());
-    dialogPath.lineTo(0, height() - clipSize);
-    dialogPath.lineTo(0, clipSize);
-    dialogPath.closeSubpath();
+    QPainterPath dialog_path;
+    int clip_size = 20;
+    dialog_path.moveTo(clip_size, 0);
+    dialog_path.lineTo(width() - clip_size, 0);
+    dialog_path.lineTo(width(), clip_size);
+    dialog_path.lineTo(width(), height() - clip_size);
+    dialog_path.lineTo(width() - clip_size, height());
+    dialog_path.lineTo(clip_size, height());
+    dialog_path.lineTo(0, height() - clip_size);
+    dialog_path.lineTo(0, clip_size);
+    dialog_path.closeSubpath();
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(bgGradient);
-    painter.drawPath(dialogPath);
+    painter.setBrush(background_gradient);
+    painter.drawPath(dialog_path);
 
     // Obramowanie dialogu (bez zmian)
-    QColor borderColor(0, 195, 255, 150);
-    painter.setPen(QPen(borderColor, 1));
+    QColor border_color(0, 195, 255, 150);
+    painter.setPen(QPen(border_color, 1));
     painter.setBrush(Qt::NoBrush);
-    painter.drawPath(dialogPath);
+    painter.drawPath(dialog_path);
 
     // --- ZMIANA: Rysowanie tylko pojedynczej linii skanującej ---
-    if (m_digitalizationProgress > 0.0 && m_digitalizationProgress < 1.0 && m_animationStarted) {
-        initRenderBuffers(); // Inicjalizuje tylko m_scanlineBuffer
+    if (digitalization_progress_ > 0.0 && digitalization_progress_ < 1.0 && animation_started_) {
+        InitRenderBuffers(); // Inicjalizuje tylko m_scanlineBuffer
 
-        int scanLineY = static_cast<int>(height() * m_digitalizationProgress);
-        int clip_size = 20;
+        int scanline_y = static_cast<int>(height() * digitalization_progress_);
 
-        if (!m_scanlineBuffer.isNull()) {
+        if (!scanline_buffer_.isNull()) {
             painter.setClipping(false);
             QPainter::CompositionMode previousMode = painter.compositionMode();
             painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-            // --- USUNIĘTO: Rysowanie m_scanLinesBuffer (śladu) ---
-
             // Oblicz szerokość linii skanującej (bez zmian)
-            int startX = 0;
-            int endX = width();
-            if (scanLineY < clip_size) { /* ... */ }
-            else if (scanLineY > height() - clip_size) { /* ... */ }
+            int start_x = 0;
+            int end_x = width();
+            if (scanline_y < clip_size) { /* ... */ }
+            else if (scanline_y > height() - clip_size) { /* ... */ }
 
             // Rysuj tylko główną linię skanującą (bez zmian)
-            int scanWidth = endX - startX;
-            if (scanWidth > 0) {
-                painter.drawPixmap(startX, scanLineY - 10, scanWidth, 20,
-                                   m_scanlineBuffer,
-                                   (width() - scanWidth) / 2, 0, scanWidth, 20);
+            int scan_width = end_x - start_x;
+            if (scan_width > 0) {
+                painter.drawPixmap(start_x, scanline_y - 10, scan_width, 20,
+                                   scanline_buffer_,
+                                   (width() - scan_width) / 2, 0, scan_width, 20);
             }
 
             painter.setCompositionMode(previousMode);
@@ -283,41 +275,41 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
     // --- KONIEC ZMIANY ---
 
     // Podświetlanie rogów
-    if (m_cornerGlowProgress > 0.0) {
-        QColor cornerColor(0, 220, 255, 150);
-        painter.setPen(QPen(cornerColor, 2));
+    if (corner_glow_progress_ > 0.0) {
+        QColor corner_color(0, 220, 255, 150);
+        painter.setPen(QPen(corner_color, 2));
 
         double step = 1.0 / 4;
 
-        if (m_cornerGlowProgress >= step * 0) {
-            painter.drawLine(0, clipSize * 1.5, 0, clipSize);
-            painter.drawLine(0, clipSize, clipSize, 0);
-            painter.drawLine(clipSize, 0, clipSize * 1.5, 0);
+        if (corner_glow_progress_ >= step * 0) {
+            painter.drawLine(0, clip_size * 1.5, 0, clip_size);
+            painter.drawLine(0, clip_size, clip_size, 0);
+            painter.drawLine(clip_size, 0, clip_size * 1.5, 0);
         }
 
-        if (m_cornerGlowProgress >= step * 1) {
-            painter.drawLine(width() - clipSize * 1.5, 0, width() - clipSize, 0);
-            painter.drawLine(width() - clipSize, 0, width(), clipSize);
-            painter.drawLine(width(), clipSize, width(), clipSize * 1.5);
+        if (corner_glow_progress_ >= step * 1) {
+            painter.drawLine(width() - clip_size * 1.5, 0, width() - clip_size, 0);
+            painter.drawLine(width() - clip_size, 0, width(), clip_size);
+            painter.drawLine(width(), clip_size, width(), clip_size * 1.5);
         }
 
-        if (m_cornerGlowProgress >= step * 2) {
-            painter.drawLine(width(), height() - clipSize * 1.5, width(), height() - clipSize);
-            painter.drawLine(width(), height() - clipSize, width() - clipSize, height());
-            painter.drawLine(width() - clipSize, height(), width() - clipSize * 1.5, height());
+        if (corner_glow_progress_ >= step * 2) {
+            painter.drawLine(width(), height() - clip_size * 1.5, width(), height() - clip_size);
+            painter.drawLine(width(), height() - clip_size, width() - clip_size, height());
+            painter.drawLine(width() - clip_size, height(), width() - clip_size * 1.5, height());
         }
 
-        if (m_cornerGlowProgress >= step * 3) {
-            painter.drawLine(clipSize * 1.5, height(), clipSize, height());
-            painter.drawLine(clipSize, height(), 0, height() - clipSize);
-            painter.drawLine(0, height() - clipSize, 0, height() - clipSize * 1.5);
+        if (corner_glow_progress_ >= step * 3) {
+            painter.drawLine(clip_size * 1.5, height(), clip_size, height());
+            painter.drawLine(clip_size, height(), 0, height() - clip_size);
+            painter.drawLine(0, height() - clip_size, 0, height() - clip_size * 1.5);
         }
     }
 
     // Efekt scanline
-    if (m_scanlineOpacity > 0.01) {
+    if (scanline_opacity_ > 0.01) {
         painter.setPen(Qt::NoPen);
-        painter.setBrush(QColor(0, 0, 0, 60 * m_scanlineOpacity));
+        painter.setBrush(QColor(0, 0, 0, 60 * scanline_opacity_));
 
         for (int y = 0; y < height(); y += 3) {
             painter.drawRect(0, y, width(), 1);
@@ -325,132 +317,109 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
     }
 }
 
-QString JoinWavelengthDialog::getFrequency() const {
-    QString value = frequencyEdit->text();
-
-    // // Przelicz wartość na Hz w zależności od wybranej jednostki
-    // if (frequencyUnitCombo->currentText() == "kHz") {
-    //     value *= 1000.0;
-    // } else if (frequencyUnitCombo->currentText() == "MHz") {
-    //     value *= 1000000.0;
-    // }
-
-    return value;
+QString JoinWavelengthDialog::GetFrequency() const {
+    return frequency_edit_->text();
 }
 
-void JoinWavelengthDialog::validateInput() const {
-    statusLabel->hide();
-    joinButton->setEnabled(!frequencyEdit->text().isEmpty());
+void JoinWavelengthDialog::ValidateInput() const {
+    status_label_->hide();
+    join_button_->setEnabled(!frequency_edit_->text().isEmpty());
 }
 
-void JoinWavelengthDialog::tryJoin() {
-    static bool isJoining = false;
+void JoinWavelengthDialog::TryJoin() {
+    static bool is_joining = false;
 
-    if (isJoining) {
+    if (is_joining) {
         return;
     }
 
-    isJoining = true;
-    statusLabel->hide();
+    is_joining = true;
+    status_label_->hide();
 
-    const QString frequency = getFrequency();
-    const QString password = passwordEdit->text();
+    const QString frequency = GetFrequency();
+    const QString password = password_edit_->text();
 
-    // if (frequency < 130 || frequency > 180000000.0) {
-    //     statusLabel->setText("FREQUENCY MUST BE BETWEEN 130Hz AND 180MHz");
-    //     statusLabel->show();
-    //     isJoining = false;
-    //     return;
-    // }
+    const auto scanline_animation = new QPropertyAnimation(this, "scanlineOpacity");
+    scanline_animation->setDuration(800);
+    scanline_animation->setStartValue(0.1);
+    scanline_animation->setEndValue(0.4);
+    scanline_animation->setKeyValueAt(0.5, 0.6);
+    scanline_animation->start(QAbstractAnimation::DeleteWhenStopped);
 
-    // Animacja scanline podczas łączenia
-    const auto scanAnim = new QPropertyAnimation(this, "scanlineOpacity");
-    scanAnim->setDuration(800);
-    scanAnim->setStartValue(0.1);
-    scanAnim->setEndValue(0.4);
-    scanAnim->setKeyValueAt(0.5, 0.6);
-    scanAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-    WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
+    WavelengthJoiner* joiner = WavelengthJoiner::GetInstance();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const auto result = joiner->joinWavelength(frequency, password);
+    const auto [success, error_reason] = joiner->JoinWavelength(frequency, password);
     QApplication::restoreOverrideCursor();
 
-    if (!result.success) {
-        statusLabel->setText(result.errorReason);
-        statusLabel->show();
+    if (!success) {
+        status_label_->setText(error_reason);
+        status_label_->show();
 
-        // Animacja błędu (więcej glitchy)
-        const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
-        errorGlitchAnim->setDuration(1000);
-        errorGlitchAnim->setStartValue(0.5);
-        errorGlitchAnim->setEndValue(0.0);
-        errorGlitchAnim->setKeyValueAt(0.2, 0.8);
-        errorGlitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
+        const auto error_glitch_animation = new QPropertyAnimation(this, "glitchIntensity");
+        error_glitch_animation->setDuration(1000);
+        error_glitch_animation->setStartValue(0.5);
+        error_glitch_animation->setEndValue(0.0);
+        error_glitch_animation->setKeyValueAt(0.2, 0.8);
+        error_glitch_animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    isJoining = false;
+    is_joining = false;
 }
 
-void JoinWavelengthDialog::onAuthFailed(QString frequency) {
-    statusLabel->setText("AUTHENTICATION FAILED: INCORRECT PASSWORD");
-    statusLabel->show();
+void JoinWavelengthDialog::OnAuthFailed() {
+    status_label_->setText("AUTHENTICATION FAILED: INCORRECT PASSWORD");
+    status_label_->show();
 
-    // Animacja błędu autentykacji
-    const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
-    errorGlitchAnim->setDuration(1000);
-    errorGlitchAnim->setStartValue(0.5);
-    errorGlitchAnim->setEndValue(0.0);
-    errorGlitchAnim->setKeyValueAt(0.3, 0.7);
-    errorGlitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    const auto error_glitch_animation = new QPropertyAnimation(this, "glitchIntensity");
+    error_glitch_animation->setDuration(1000);
+    error_glitch_animation->setStartValue(0.5);
+    error_glitch_animation->setEndValue(0.0);
+    error_glitch_animation->setKeyValueAt(0.3, 0.7);
+    error_glitch_animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void JoinWavelengthDialog::onConnectionError(const QString &errorMessage) {
-    QString displayMessage;
+void JoinWavelengthDialog::OnConnectionError(const QString &error_message) {
+    QString display_message;
 
-    if (errorMessage.contains("Password required")) {
-        displayMessage = "WAVELENGTH PASSWORD PROTECTED";
-    } else if (errorMessage.contains("Invalid password")) {
-        displayMessage = "INCORRECT PASSWORD";
+    if (error_message.contains("Password required")) {
+        display_message = "WAVELENGTH PASSWORD PROTECTED";
+    } else if (error_message.contains("Invalid password")) {
+        display_message = "INCORRECT PASSWORD";
     } else {
-        displayMessage = "WAVELENGTH UNAVAILABLE";
+        display_message = "WAVELENGTH UNAVAILABLE";
     }
 
-    statusLabel->setText(displayMessage);
-    statusLabel->show();
+    status_label_->setText(display_message);
+    status_label_->show();
 
-    // Animacja błędu połączenia
-    const auto errorGlitchAnim = new QPropertyAnimation(this, "glitchIntensity");
-    errorGlitchAnim->setDuration(1000);
-    errorGlitchAnim->setStartValue(0.5);
-    errorGlitchAnim->setEndValue(0.0);
-    errorGlitchAnim->setKeyValueAt(0.2, 0.9);
-    errorGlitchAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    const auto error_glitch_animation = new QPropertyAnimation(this, "glitchIntensity");
+    error_glitch_animation->setDuration(1000);
+    error_glitch_animation->setStartValue(0.5);
+    error_glitch_animation->setEndValue(0.0);
+    error_glitch_animation->setKeyValueAt(0.2, 0.9);
+    error_glitch_animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void JoinWavelengthDialog::initRenderBuffers() {
-    if (!m_buffersInitialized || height() != m_previousHeight) {
-        // --- ZMIANA: Inicjalizuj tylko bufor głównej linii skanującej ---
-        m_scanlineBuffer = QPixmap(width(), 20);
-        m_scanlineBuffer.fill(Qt::transparent);
+void JoinWavelengthDialog::InitRenderBuffers() {
+    if (!buffers_initialized_ || height() != previous_height_) {
+        scanline_buffer_ = QPixmap(width(), 20);
+        scanline_buffer_.fill(Qt::transparent);
 
-        QPainter scanPainter(&m_scanlineBuffer);
-        scanPainter.setRenderHint(QPainter::Antialiasing, false);
+        QPainter scan_painter(&scanline_buffer_);
+        scan_painter.setRenderHint(QPainter::Antialiasing, false);
 
-        QLinearGradient scanGradient(0, 0, 0, 20);
-        scanGradient.setColorAt(0, QColor(0, 200, 255, 0));
-        scanGradient.setColorAt(0.5, QColor(0, 220, 255, 180));
-        scanGradient.setColorAt(1, QColor(0, 200, 255, 0));
+        QLinearGradient scan_gradient(0, 0, 0, 20);
+        scan_gradient.setColorAt(0, QColor(0, 200, 255, 0));
+        scan_gradient.setColorAt(0.5, QColor(0, 220, 255, 180));
+        scan_gradient.setColorAt(1, QColor(0, 200, 255, 0));
 
-        scanPainter.setPen(Qt::NoPen);
-        scanPainter.setBrush(scanGradient);
-        scanPainter.drawRect(0, 0, width(), 20);
+        scan_painter.setPen(Qt::NoPen);
+        scan_painter.setBrush(scan_gradient);
+        scan_painter.drawRect(0, 0, width(), 20);
 
-        // --- USUNIĘTO: Inicjalizacja m_scanLinesBuffer ---
-
-        m_buffersInitialized = true;
-        m_previousHeight = height();
-        m_lastScanlineY = -1;
+        buffers_initialized_ = true;
+        previous_height_ = height();
+        last_scanline_y_ = -1;
     }
 }

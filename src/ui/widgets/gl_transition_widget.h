@@ -14,15 +14,12 @@ public:
     explicit GLTransitionWidget(QWidget *parent = nullptr);
     ~GLTransitionWidget() override;
 
-    // Ustawia widgety do animacji
-    void setWidgets(QWidget *currentWidget, QWidget *nextWidget);
+    void SetWidgets(QWidget *current_widget, QWidget *next_widget);
 
-    // Rozpoczyna animację przejścia
-    void startTransition(int duration);
+    void StartTransition(int duration);
 
-    // Właściwość do animacji - offset przesunięcia
-    float offset() const { return m_offset; }
-    void setOffset(float offset);
+    float GetOffset() const { return offset_; }
+    void SetOffset(float offset);
 
     signals:
         void transitionFinished();
@@ -31,15 +28,10 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    // Obrazy zamiast tekstur OpenGL
-    QPixmap m_currentPixmap;
-    QPixmap m_nextPixmap;
-
-    // Offset animacji (0.0 - 1.0)
-    float m_offset = 0.0f;
-
-    // Animacja
-    QPropertyAnimation *m_animation = nullptr;
+    QPixmap current_pixmap_;
+    QPixmap next_pixmap_;
+    float offset_ = 0.0f;
+    QPropertyAnimation *animation_ = nullptr;
 };
 
 #endif // GL_TRANSITION_WIDGET_H

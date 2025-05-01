@@ -4,7 +4,7 @@
 
 OverlayWidget::OverlayWidget(QWidget *parent)
     : QWidget(parent)
-    , m_opacity(0.0)
+    , opacity_(0.0)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -22,14 +22,14 @@ OverlayWidget::OverlayWidget(QWidget *parent)
     // Znajdź Navbar i zapisz jego geometrię
     QList<Navbar*> navbars = parent->findChildren<Navbar*>();
     if (!navbars.isEmpty()) {
-        m_excludeRect = navbars.first()->geometry();
+        exclude_rect_ = navbars.first()->geometry();
     }
 }
 
-void OverlayWidget::setOpacity(const qreal opacity)
+void OverlayWidget::SetOpacity(const qreal opacity)
 {
-    if (m_opacity != opacity) {
-        m_opacity = opacity;
+    if (opacity_ != opacity) {
+        opacity_ = opacity;
         update();
     }
 }
@@ -39,13 +39,13 @@ bool OverlayWidget::eventFilter(QObject *watched, QEvent *event)
     if (watched == parent()) {
         if (event->type() == QEvent::Resize) {
             const auto resizeEvent = dynamic_cast<QResizeEvent*>(event);
-            updateGeometry(QRect(QPoint(0,0), resizeEvent->size()));
+            UpdateGeometry(QRect(QPoint(0,0), resizeEvent->size()));
         }
     }
     return QWidget::eventFilter(watched, event);
 }
 
-void OverlayWidget::updateGeometry(const QRect& rect)
+void OverlayWidget::UpdateGeometry(const QRect& rect)
 {
     setGeometry(rect);
 }
@@ -60,10 +60,10 @@ void OverlayWidget::paintEvent(QPaintEvent *event)
 
     // Rysujemy tło z wyłączeniem obszaru nawigacji
     QRegion region = rect();
-    if (!m_excludeRect.isNull()) {
-        region = region.subtracted(QRegion(m_excludeRect));
+    if (!exclude_rect_.isNull()) {
+        region = region.subtracted(QRegion(exclude_rect_));
     }
 
     painter.setClipRegion(region);
-    painter.fillRect(rect(), QColor(0, 0, 0, m_opacity * 120));
+    painter.fillRect(rect(), QColor(0, 0, 0, opacity_ * 120));
 }

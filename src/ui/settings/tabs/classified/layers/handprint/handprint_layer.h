@@ -14,26 +14,26 @@ public:
     explicit HandprintLayer(QWidget *parent = nullptr);
     ~HandprintLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void updateProgress();
-        void processHandprint(bool completed);
+        void UpdateProgress();
+        void ProcessHandprint(bool completed);
 
 private:
-    void loadRandomHandprint();
+    void LoadRandomHandprint();
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void updateHandprintScan(int progressValue) const;
+    void UpdateHandprintScan(int progress_value) const;
 
-    QLabel* m_handprintImage;
-    QProgressBar* m_handprintProgress;
-    QTimer* m_handprintTimer;
+    QLabel* handprint_image_;
+    QProgressBar* handprint_progress_;
+    QTimer* handprint_timer_;
 
-    QSvgRenderer* m_svgRenderer;
-    QImage m_baseHandprint;
-    QStringList m_handprintFiles;
-    QString m_currentHandprint;
+    QSvgRenderer* svg_renderer_;
+    QImage base_handprint_;
+    QStringList handprint_files_;
+    QString current_handprint_;
 };
 
 #endif // HANDPRINT_LAYER_H

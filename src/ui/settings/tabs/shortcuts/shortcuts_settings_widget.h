@@ -17,23 +17,22 @@ public:
     explicit ShortcutsSettingsWidget(QWidget *parent = nullptr);
     ~ShortcutsSettingsWidget() override = default;
 
-    void loadSettings() const;
-    void saveSettings() const; // Zapisuje zmiany dokonane w UI
+    void LoadSettings() const;
+    void SaveSettings() const; // Zapisuje zmiany dokonane w UI
 
 private slots:
-    void restoreDefaultShortcuts();
+    void RestoreDefaultShortcuts();
 
 private:
-    void setupUi();
+    void SetupUi();
 
-    static QString getActionDescription(const QString& actionId); // Zwraca czytelny opis akcji
+    static QString GetActionDescription(const QString& action_id); // Zwraca czytelny opis akcji
 
-    WavelengthConfig *m_config;
-    QFormLayout *m_formLayout;
-    QPushButton *m_restoreButton;
+    WavelengthConfig *config_;
+    QFormLayout *form_layout_;
+    QPushButton *restore_button_;
 
-    // Mapa przechowująca widgety edycji dla każdej akcji
-    QMap<QString, QKeySequenceEdit*> m_shortcutEdits;
+    QMap<QString, QKeySequenceEdit*> shortcut_edits_;
 };
 
 #endif // SHORTCUTS_SETTINGS_WIDGET_H

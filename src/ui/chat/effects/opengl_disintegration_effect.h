@@ -20,15 +20,15 @@ public:
 
     ~OpenGLDisintegration() override;
 
-    void setSourcePixmap(const QPixmap& pixmap);
+    void SetSourcePixmap(const QPixmap& pixmap);
 
-    qreal progress() const { return m_progress; }
+    qreal GetProgress() const { return progress_; }
     
-    void setProgress(qreal progress);
+    void SetProgress(qreal progress);
 
-    void startAnimation(int duration = 1000);
+    void StartAnimation(int duration = 1000);
 
-    void stopAnimation() const;
+    void StopAnimation() const;
 
 signals:
     void animationFinished();
@@ -41,21 +41,21 @@ protected:
     void paintGL() override;
 
 private slots:
-    void updateAnimation();
+    void UpdateAnimation();
 
 private:
-    void createParticleGrid(int cols, int rows);
+    void CreateParticleGrid(int cols, int rows);
 
-    QPixmap m_sourcePixmap;
-    qreal m_progress;
-    QOpenGLTexture* m_texture;
-    QOpenGLShaderProgram* m_program;
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_vbo;
-    QVector<float> m_vertices;
-    QTimer* m_timer;
-    QTime m_animationStart;
-    int m_animationDuration;
+    QPixmap source_pixmap_;
+    qreal progress_;
+    QOpenGLTexture* texture_;
+    QOpenGLShaderProgram* shader_program_;
+    QOpenGLVertexArrayObject vao_;
+    QOpenGLBuffer vbo_;
+    QVector<float> vertices_;
+    QTimer* timer_;
+    QTime animation_start_;
+    int animation_duration_{};
 };
 
 #endif // OPENGL_DISINTEGRATION_H

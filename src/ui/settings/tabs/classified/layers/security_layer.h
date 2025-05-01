@@ -11,14 +11,14 @@ public:
     ~SecurityLayer() override = default;
 
     // Metoda inicjalizująca warstwę zabezpieczeń
-    virtual void initialize() = 0;
+    virtual void Initialize() = 0;
 
     // Resetuje stan warstwy zabezpieczeń
-    virtual void reset() = 0;
+    virtual void Reset() = 0;
 
     signals:
         void layerCompleted();
-    void layerFailed();
+        void layerFailed();
 };
 
 #endif // SECURITY_LAYER_H

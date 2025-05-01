@@ -34,7 +34,7 @@ public:
     explicit SettingsView(QWidget *parent = nullptr);
     ~SettingsView() override;
 
-    void setDebugMode(bool enabled);
+    void SetDebugMode(bool enabled);
 
 signals:
     void backToMainView();
@@ -44,50 +44,50 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void saveSettings();
-    void restoreDefaults();
-    void switchToTab(int tabIndex);
-    void handleBackButton();
+    void SaveSettings();
+    void RestoreDefaults();
+    void SwitchToTab(int tab_index);
+    void HandleBackButton();
 
 private:
-    void loadSettingsFromRegistry() const;
-    void setupUi();
-    void setupClassifiedTab();
-    void setupNextSecurityLayer();
-    void resetSecurityLayers();
-    void createHeaderPanel();
+    void LoadSettingsFromRegistry() const;
+    void SetupUi();
+    void SetupClassifiedTab();
+    void SetupNextSecurityLayer();
+    void ResetSecurityLayers();
+    void CreateHeaderPanel();
 
-    WavelengthConfig *m_config;
-    QStackedWidget *m_tabContent;
-    QLabel *m_titleLabel;
-    QLabel *m_sessionLabel;
-    QLabel *m_timeLabel;
-    QWidget *m_tabBar;
-    QList<TabButton*> m_tabButtons;
+    WavelengthConfig *config_;
+    QStackedWidget *tab_content_;
+    QLabel *title_label_;
+    QLabel *session_label_;
+    QLabel *time_label_;
+    QWidget *tab_bar_;
+    QList<TabButton*> tab_buttons_;
 
-    WavelengthSettingsWidget* m_wavelengthTabWidget;
-    AppearanceSettingsWidget* m_appearanceTabWidget;
-    NetworkSettingsWidget* m_advancedTabWidget;
-    ShortcutsSettingsWidget* m_shortcutsTabWidget;
+    WavelengthSettingsWidget* wavelength_tab_widget_;
+    AppearanceSettingsWidget* appearance_tab_widget_;
+    NetworkSettingsWidget* advanced_tab_widget_;
+    ShortcutsSettingsWidget* shortcuts_tab_widget_;
 
     // Przyciski akcji
-    CyberButton *m_saveButton;
-    CyberButton *m_defaultsButton;
-    CyberButton *m_backButton;
+    CyberButton *save_button_;
+    CyberButton *defaults_button_;
+    CyberButton *back_button_;
 
-    QTimer *m_refreshTimer;
+    QTimer *refresh_timer_;
 
     // Warstwy bezpieczeństwa (bez zmian)
-    FingerprintLayer* m_fingerprintLayer;
-    HandprintLayer* m_handprintLayer;
-    SecurityCodeLayer* m_securityCodeLayer;
-    SecurityQuestionLayer* m_securityQuestionLayer;
-    RetinaScanLayer* m_retinaScanLayer;
-    VoiceRecognitionLayer* m_voiceRecognitionLayer;
-    TypingTestLayer* m_typingTestLayer;
-    SnakeGameLayer* m_snakeGameLayer;
-    QWidget* m_accessGrantedWidget;
-    QStackedWidget* m_securityLayersStack;
+    FingerprintLayer* fingerprint_layer_;
+    HandprintLayer* handprint_layer_;
+    SecurityCodeLayer* security_code_layer_;
+    SecurityQuestionLayer* security_question_layer_;
+    RetinaScanLayer* retina_scan_layer_;
+    VoiceRecognitionLayer* voice_recognition_layer_;
+    TypingTestLayer* typing_test_layer_;
+    SnakeGameLayer* snake_game_layer_;
+    QWidget* access_granted_widget_;
+    QStackedWidget* security_layers_stack_;
 
     enum SecurityLayerIndex {
         FingerprintIndex = 0,
@@ -101,12 +101,12 @@ private:
         AccessGrantedIndex
     };
 
-    SecurityLayerIndex m_currentLayerIndex;
-    bool m_debugModeEnabled;
+    SecurityLayerIndex current_layer_index_;
+    bool debug_mode_enabled_;
 
-    QWidget* m_classifiedFeaturesWidget;
-    QPushButton* m_overrideButton;
-    SystemOverrideManager* m_systemOverrideManager;
+    QWidget* classified_features_widget_;
+    QPushButton* override_button_;
+    SystemOverrideManager* system_override_manager_;
 };
 
 #endif // SETTINGS_VIEW_H

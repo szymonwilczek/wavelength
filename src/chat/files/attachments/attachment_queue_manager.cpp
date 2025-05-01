@@ -1,42 +1,42 @@
 
 #include "attachment_queue_manager.h"
 
-AttachmentTask::AttachmentTask(const std::function<void()> &taskFunc, QObject *parent): QObject(parent), m_taskFunc(taskFunc) {
+AttachmentTask::AttachmentTask(const std::function<void()> &taskFunc, QObject *parent): QObject(parent), TaskFunc_(taskFunc) {
     setAutoDelete(false);
 }
 
 void AttachmentTask::run() {
-    m_taskFunc();
+    TaskFunc_();
     emit finished();
 }
 
-void AttachmentQueueManager::addTask(const std::function<void()> &taskFunc) {
-    QMutexLocker locker(&m_mutex);
+void AttachmentQueueManager::AddTask(const std::function<void()> &TaskFunc) {
+    QMutexLocker locker(&mutex_);
 
     // Tworzymy zadanie
-    auto task = new AttachmentTask(taskFunc);
+    auto task = new AttachmentTask(TaskFunc);
     connect(task, &AttachmentTask::finished, this, [this, task]() {
-        QMutexLocker taskLocker(&m_mutex);
-        m_activeTasks.removeOne(task);
+        QMutexLocker taskLocker(&mutex_);
+        active_tasks_.removeOne(task);
         task->deleteLater();
-        processQueue();
+        ProcessQueue();
     });
 
-    m_taskQueue.enqueue(task);
-    processQueue();
+    task_queue_.enqueue(task);
+    ProcessQueue();
 }
 
 AttachmentQueueManager::AttachmentQueueManager(QObject *parent): QObject(parent) {
     // Ograniczamy liczbę jednoczesnych zadań do połowy dostępnych wątków
-    m_maxActiveTasks = qMax(1, QThreadPool::globalInstance()->maxThreadCount() / 2);
-    qDebug() << "AttachmentQueueManager: Max active tasks:" << m_maxActiveTasks;
+    max_active_tasks_ = qMax(1, QThreadPool::globalInstance()->maxThreadCount() / 2);
+    qDebug() << "AttachmentQueueManager: Max active tasks:" << max_active_tasks_;
 }
 
-void AttachmentQueueManager::processQueue() {
+void AttachmentQueueManager::ProcessQueue() {
     // Sprawdzamy czy możemy uruchomić nowe zadanie
-    while (!m_taskQueue.isEmpty() && m_activeTasks.size() < m_maxActiveTasks) {
-        AttachmentTask* task = m_taskQueue.dequeue();
-        m_activeTasks.append(task);
+    while (!task_queue_.isEmpty() && active_tasks_.size() < max_active_tasks_) {
+        AttachmentTask* task = task_queue_.dequeue();
+        active_tasks_.append(task);
         QThreadPool::globalInstance()->start(task);
     }
 }

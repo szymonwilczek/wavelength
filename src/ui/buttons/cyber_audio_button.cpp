@@ -1,24 +1,24 @@
 #include "cyber_audio_button.h"
 
-CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent), m_glowIntensity(0.5) {
+CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent), glow_intensity_(0.5) {
     setCursor(Qt::PointingHandCursor);
     setStyleSheet("background-color: transparent; border: none;");
 
     // Timer dla subtelnych efektów
-    m_pulseTimer = new QTimer(this);
-    connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
+    pulse_timer_ = new QTimer(this);
+    connect(pulse_timer_, &QTimer::timeout, this, [this]() {
         const double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
-        setGlowIntensity(m_baseGlowIntensity + phase);
+        SetGlowIntensity(base_glow_intensity_ + phase);
     });
-    m_pulseTimer->start(50);
+    pulse_timer_->start(50);
 
-    m_baseGlowIntensity = 0.5;
+    base_glow_intensity_ = 0.5;
 }
 
 CyberAudioButton::~CyberAudioButton() {
-    if (m_pulseTimer) {
-        m_pulseTimer->stop();
-        m_pulseTimer->deleteLater();
+    if (pulse_timer_) {
+        pulse_timer_->stop();
+        pulse_timer_->deleteLater();
     }
 }
 
@@ -36,29 +36,29 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
 
     // Ścieżka przycisku - ścięte rogi dla cyberpunkowego stylu
     QPainterPath path;
-    int clipSize = 4; // mniejszy rozmiar ścięcia dla mniejszego przycisku
+    int clip_size = 4; // mniejszy rozmiar ścięcia dla mniejszego przycisku
 
-    path.moveTo(clipSize, 0);
-    path.lineTo(width() - clipSize, 0);
-    path.lineTo(width(), clipSize);
-    path.lineTo(width(), height() - clipSize);
-    path.lineTo(width() - clipSize, height());
-    path.lineTo(clipSize, height());
-    path.lineTo(0, height() - clipSize);
-    path.lineTo(0, clipSize);
+    path.moveTo(clip_size, 0);
+    path.lineTo(width() - clip_size, 0);
+    path.lineTo(width(), clip_size);
+    path.lineTo(width(), height() - clip_size);
+    path.lineTo(width() - clip_size, height());
+    path.lineTo(clip_size, height());
+    path.lineTo(0, height() - clip_size);
+    path.lineTo(0, clip_size);
     path.closeSubpath();
 
     // Efekt poświaty przy hover/pressed
-    if (m_glowIntensity > 0.2) {
+    if (glow_intensity_ > 0.2) {
         painter.setPen(Qt::NoPen);
         painter.setBrush(glowColor);
 
         for (int i = 3; i > 0; i--) {
-            double glowSize = i * 1.5 * m_glowIntensity;
-            QPainterPath glowPath;
-            glowPath.addRoundedRect(rect().adjusted(-glowSize, -glowSize, glowSize, glowSize), 3, 3);
-            painter.setOpacity(0.15 * m_glowIntensity);
-            painter.drawPath(glowPath);
+            double glow_size = i * 1.5 * glow_intensity_;
+            QPainterPath glow_path;
+            glow_path.addRoundedRect(rect().adjusted(-glow_size, -glow_size, glow_size, glow_size), 3, 3);
+            painter.setOpacity(0.15 * glow_intensity_);
+            painter.drawPath(glow_path);
         }
 
         painter.setOpacity(1.0);
@@ -80,24 +80,24 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     painter.drawLine(4, height() - 4, width() - 4, height() - 4);
 
     // Znaczniki w rogach (mniejsze dla audio)
-    int markerSize = 2;
+    int marker_size = 2;
     painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
 
     // Lewy górny marker
-    painter.drawLine(clipSize + 1, 2, clipSize + 1 + markerSize, 2);
-    painter.drawLine(clipSize + 1, 2, clipSize + 1, 2 + markerSize);
+    painter.drawLine(clip_size + 1, 2, clip_size + 1 + marker_size, 2);
+    painter.drawLine(clip_size + 1, 2, clip_size + 1, 2 + marker_size);
 
     // Prawy górny marker
-    painter.drawLine(width() - clipSize - 1 - markerSize, 2, width() - clipSize - 1, 2);
-    painter.drawLine(width() - clipSize - 1, 2, width() - clipSize - 1, 2 + markerSize);
+    painter.drawLine(width() - clip_size - 1 - marker_size, 2, width() - clip_size - 1, 2);
+    painter.drawLine(width() - clip_size - 1, 2, width() - clip_size - 1, 2 + marker_size);
 
     // Prawy dolny marker
-    painter.drawLine(width() - clipSize - 1 - markerSize, height() - 2, width() - clipSize - 1, height() - 2);
-    painter.drawLine(width() - clipSize - 1, height() - 2, width() - clipSize - 1, height() - 2 - markerSize);
+    painter.drawLine(width() - clip_size - 1 - marker_size, height() - 2, width() - clip_size - 1, height() - 2);
+    painter.drawLine(width() - clip_size - 1, height() - 2, width() - clip_size - 1, height() - 2 - marker_size);
 
     // Lewy dolny marker
-    painter.drawLine(clipSize + 1, height() - 2, clipSize + 1 + markerSize, height() - 2);
-    painter.drawLine(clipSize + 1, height() - 2, clipSize + 1, height() - 2 - markerSize);
+    painter.drawLine(clip_size + 1, height() - 2, clip_size + 1 + marker_size, height() - 2);
+    painter.drawLine(clip_size + 1, height() - 2, clip_size + 1, height() - 2 - marker_size);
 
     // Tekst przycisku
     painter.setPen(QPen(textColor, 1));

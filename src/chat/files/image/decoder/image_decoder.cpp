@@ -1,10 +1,10 @@
 #include "image_decoder.h"
 
-QImage ImageDecoder::decode() {
+QImage ImageDecoder::Decode() {
     QImage image;
 
     // Próbujemy bezpośrednio załadować obraz z danych binarnych
-    if (!image.loadFromData(m_imageData)) {
+    if (!image.loadFromData(image_data_)) {
         emit error("Nie można załadować obrazu - nieprawidłowy format pliku");
         return QImage();
     }

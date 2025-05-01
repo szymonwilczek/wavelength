@@ -2,22 +2,22 @@
 
 #include <QUuid>
 
-QString AttachmentDataStore::storeAttachmentData(const QString &base64Data) {
-    QMutexLocker locker(&m_mutex);
-    QString attachmentId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    m_attachmentData[attachmentId] = base64Data;
-    return attachmentId;
+QString AttachmentDataStore::StoreAttachmentData(const QString &base64_data) {
+    QMutexLocker locker(&mutex_);
+    QString attachment_id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    attachment_data_[attachment_id] = base64_data;
+    return attachment_id;
 }
 
-QString AttachmentDataStore::getAttachmentData(const QString &attachmentId) {
-    QMutexLocker locker(&m_mutex);
-    if (m_attachmentData.contains(attachmentId)) {
-        return m_attachmentData[attachmentId];
+QString AttachmentDataStore::GetAttachmentData(const QString &attachment_id) {
+    QMutexLocker locker(&mutex_);
+    if (attachment_data_.contains(attachment_id)) {
+        return attachment_data_[attachment_id];
     }
     return QString();
 }
 
-void AttachmentDataStore::removeAttachmentData(const QString &attachmentId) {
-    QMutexLocker locker(&m_mutex);
-    m_attachmentData.remove(attachmentId);
+void AttachmentDataStore::RemoveAttachmentData(const QString &attachment_id) {
+    QMutexLocker locker(&mutex_);
+    attachment_data_.remove(attachment_id);
 }

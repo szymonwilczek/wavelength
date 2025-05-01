@@ -16,9 +16,9 @@ public:
 
     ~CyberAudioButton() override;
 
-    double glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(const double intensity) {
-        m_glowIntensity = intensity;
+    double GetGlowIntensity() const { return glow_intensity_; }
+    void SetGlowIntensity(const double intensity) {
+        glow_intensity_ = intensity;
         update();
     }
 
@@ -26,29 +26,29 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
     void enterEvent(QEvent* event) override {
-        m_baseGlowIntensity = 0.8;
+        base_glow_intensity_ = 0.8;
         QPushButton::enterEvent(event);
     }
 
     void leaveEvent(QEvent* event) override {
-        m_baseGlowIntensity = 0.5;
+        base_glow_intensity_ = 0.5;
         QPushButton::leaveEvent(event);
     }
 
     void mousePressEvent(QMouseEvent* event) override {
-        m_baseGlowIntensity = 1.0;
+        base_glow_intensity_ = 1.0;
         QPushButton::mousePressEvent(event);
     }
 
     void mouseReleaseEvent(QMouseEvent* event) override {
-        m_baseGlowIntensity = 0.8;
+        base_glow_intensity_ = 0.8;
         QPushButton::mouseReleaseEvent(event);
     }
 
 private:
-    double m_glowIntensity;
-    double m_baseGlowIntensity;
-    QTimer* m_pulseTimer;
+    double glow_intensity_;
+    double base_glow_intensity_;
+    QTimer* pulse_timer_;
 };
 
 

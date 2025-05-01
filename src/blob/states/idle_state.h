@@ -10,36 +10,35 @@ class IdleState final : public BlobState {
 public:
     IdleState();
     
-    void apply(std::vector<QPointF>& controlPoints, 
+    void Apply(std::vector<QPointF>& control_points,
               std::vector<QPointF>& velocity,
-              QPointF& blobCenter,
+              QPointF& blob_center,
               const BlobConfig::BlobParameters& params) override;
               
-    void applyForce(const QVector2D& force,
+    void ApplyForce(const QVector2D& force,
                    std::vector<QPointF>& velocity,
-                   QPointF& blobCenter,
-                   const std::vector<QPointF>& controlPoints,
-                   double blobRadius) override;
+                   QPointF& blob_center,
+                   const std::vector<QPointF>& control_points,
+                   double blob_radius) override;
     
-    void updatePhases();
+    void UpdatePhases();
 
-    void resetInitialization();
+    void ResetInitialization();
 
-    // Deklaracja nowej metody
-    void applyHeartbeatEffect(const std::vector<QPointF>& controlPoints,
+    void ApplyHeartbeatEffect(const std::vector<QPointF>& control_points,
                              std::vector<QPointF>& velocity,
-                             const QPointF& blobCenter,
+                             const QPointF& blob_center,
                              const BlobConfig::BlobParameters& params);
     
 private:
-    BlobConfig::IdleParameters m_idleParams;
-    double m_secondPhase = 0.0;
-    double m_rotationPhase = 0.0;
-    double m_mainPhaseOffset = 0.0;
-    bool m_isInitializing = true;
-    int m_heartbeatCount = 0;
-    double m_heartbeatPhase = 0.0;
-    const int REQUIRED_HEARTBEATS = 1;
+    BlobConfig::IdleParameters idle_params_;
+    double second_phase_ = 0.0;
+    double rotation_phase_ = 0.0;
+    double main_phase_offset_ = 0.0;
+    bool is_initializing_ = true;
+    int heartbeat_count_ = 0;
+    double heartbeat_phase_ = 0.0;
+    const int kRequiredHeartbeats = 1;
 };
 
 #endif // IDLESTATE_H

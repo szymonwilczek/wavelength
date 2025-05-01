@@ -14,26 +14,26 @@ public:
     explicit FingerprintLayer(QWidget *parent = nullptr);
     ~FingerprintLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void updateProgress();
-    void processFingerprint(bool completed);
+        void UpdateProgress();
+        void ProcessFingerprint(bool completed);
 
 private:
-    void loadRandomFingerprint();
+    void LoadRandomFingerprint();
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void updateFingerprintScan(int progressValue) const;
+    void UpdateFingerprintScan(int progress_value) const;
 
-    QLabel* m_fingerprintImage;
-    QProgressBar* m_fingerprintProgress;
-    QTimer* m_fingerprintTimer;
+    QLabel* fingerprint_image_;
+    QProgressBar* fingerprint_progress_;
+    QTimer* fingerprint_timer_;
 
-    QSvgRenderer* m_svgRenderer;
-    QImage m_baseFingerprint;
-    QStringList m_fingerprintFiles;
-    QString m_currentFingerprint;
+    QSvgRenderer* svg_renderer_;
+    QImage base_fingerprint_;
+    QStringList fingerprint_files_;
+    QString current_fingerprint_;
 };
 
 #endif // FINGERPRINT_LAYER_H

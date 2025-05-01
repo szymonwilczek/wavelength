@@ -2,7 +2,7 @@
 
 #include <QPropertyAnimation>
 
-CyberCheckBox::CyberCheckBox(const QString &text, QWidget *parent): QCheckBox(text, parent), m_glowIntensity(0.5) {
+CyberCheckBox::CyberCheckBox(const QString &text, QWidget *parent): QCheckBox(text, parent), glow_intensity_(0.5) {
     // Dodaj marginesy, aby zapewnić poprawny rozmiar
     setStyleSheet("QCheckBox { spacing: 8px; background-color: transparent; color: #00ccff; font-family: Consolas; font-size: 9pt; margin-top: 4px; margin-bottom: 4px; }");
 
@@ -16,8 +16,8 @@ QSize CyberCheckBox::sizeHint() const {
     return size;
 }
 
-void CyberCheckBox::setGlowIntensity(const double intensity) {
-    m_glowIntensity = intensity;
+void CyberCheckBox::SetGlowIntensity(const double intensity) {
+    glow_intensity_ = intensity;
     update();
 }
 
@@ -26,60 +26,60 @@ void CyberCheckBox::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     // Nie rysujemy standardowego wyglądu
-    QStyleOptionButton opt;
-    opt.initFrom(this);
+    QStyleOptionButton option_button;
+    option_button.initFrom(this);
 
     // Kolory
-    QColor bgColor(0, 30, 40);
-    QColor borderColor(0, 200, 255);
-    QColor checkColor(0, 220, 255);
-    QColor textColor(0, 200, 255);
+    QColor background_color(0, 30, 40);
+    QColor border_color(0, 200, 255);
+    QColor check_color(0, 220, 255);
+    QColor text_color(0, 200, 255);
 
     // Rysowanie pola wyboru (kwadrat ze ściętymi rogami)
-    constexpr int checkboxSize = 16;
+    constexpr int checkbox_size = 16;
     constexpr int x = 0;
-    const int y = (height() - checkboxSize) / 2;
+    const int y = (height() - checkbox_size) / 2;
 
     // Ścieżka dla pola wyboru ze ściętymi rogami
     QPainterPath path;
-    int clipSize = 3; // rozmiar ścięcia
+    int clip_size = 3; // rozmiar ścięcia
 
-    path.moveTo(x + clipSize, y);
-    path.lineTo(x + checkboxSize - clipSize, y);
-    path.lineTo(x + checkboxSize, y + clipSize);
-    path.lineTo(x + checkboxSize, y + checkboxSize - clipSize);
-    path.lineTo(x + checkboxSize - clipSize, y + checkboxSize);
-    path.lineTo(x + clipSize, y + checkboxSize);
-    path.lineTo(x, y + checkboxSize - clipSize);
-    path.lineTo(x, y + clipSize);
+    path.moveTo(x + clip_size, y);
+    path.lineTo(x + checkbox_size - clip_size, y);
+    path.lineTo(x + checkbox_size, y + clip_size);
+    path.lineTo(x + checkbox_size, y + checkbox_size - clip_size);
+    path.lineTo(x + checkbox_size - clip_size, y + checkbox_size);
+    path.lineTo(x + clip_size, y + checkbox_size);
+    path.lineTo(x, y + checkbox_size - clip_size);
+    path.lineTo(x, y + clip_size);
     path.closeSubpath();
 
     // Tło pola
     painter.setPen(Qt::NoPen);
-    painter.setBrush(bgColor);
+    painter.setBrush(background_color);
     painter.drawPath(path);
 
     // Obramowanie
-    painter.setPen(QPen(borderColor, 1.0));
+    painter.setPen(QPen(border_color, 1.0));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
     // Efekt poświaty
-    if (m_glowIntensity > 0.1) {
-        QColor glowColor = borderColor;
-        glowColor.setAlpha(80 * m_glowIntensity);
+    if (glow_intensity_ > 0.1) {
+        QColor glow_color = border_color;
+        glow_color.setAlpha(80 * glow_intensity_);
 
-        painter.setPen(QPen(glowColor, 2.0));
+        painter.setPen(QPen(glow_color, 2.0));
         painter.drawPath(path);
     }
 
     // Rysowanie znacznika (jeśli zaznaczony)
     if (isChecked()) {
         // Znacznik w postaci "X" w stylu technologicznym
-        painter.setPen(QPen(checkColor, 2.0));
+        painter.setPen(QPen(check_color, 2.0));
         int margin = 3;
-        painter.drawLine(x + margin, y + margin, x + checkboxSize - margin, y + checkboxSize - margin);
-        painter.drawLine(x + checkboxSize - margin, y + margin, x + margin, y + checkboxSize - margin);
+        painter.drawLine(x + margin, y + margin, x + checkbox_size - margin, y + checkbox_size - margin);
+        painter.drawLine(x + checkbox_size - margin, y + margin, x + margin, y + checkbox_size - margin);
     }
 
     // Skalowanie tekstu
@@ -89,25 +89,25 @@ void CyberCheckBox::paintEvent(QPaintEvent *event) {
     painter.setFont(font);
 
     // Rysowanie tekstu
-    QRect textRect(x + checkboxSize + 5, 0, width() - checkboxSize - 5, height());
-    painter.setPen(textColor);
-    painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, text());
+    QRect text_rect(x + checkbox_size + 5, 0, width() - checkbox_size - 5, height());
+    painter.setPen(text_color);
+    painter.drawText(text_rect, Qt::AlignVCenter | Qt::AlignLeft, text());
 }
 
 void CyberCheckBox::enterEvent(QEvent *event) {
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(200);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.9);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(200);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.9);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
     QCheckBox::enterEvent(event);
 }
 
 void CyberCheckBox::leaveEvent(QEvent *event) {
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(200);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.5);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(200);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.5);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
     QCheckBox::leaveEvent(event);
 }

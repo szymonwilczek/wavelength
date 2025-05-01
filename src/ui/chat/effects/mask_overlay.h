@@ -14,22 +14,22 @@ public:
     explicit MaskOverlay(QWidget* parent = nullptr);
 
 public slots:
-    void setRevealProgress(int percentage);
+    void SetRevealProgress(int percentage);
 
-    void startScanning();
+    void StartScanning();
 
-    void stopScanning();
+    void StopScanning();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
 
 private slots:
-    void updateScanLine();
+    void UpdateScanLine();
 
 private:
-    int m_revealPercentage;
-    int m_scanLineY;
-    QTimer* m_scanTimer;
+    int reveal_percentage_;
+    int scanline_y_;
+    QTimer* scan_timer_;
 };
 
 #endif // MASK_OVERLAY_H

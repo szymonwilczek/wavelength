@@ -11,7 +11,7 @@
 #include <QDir>
 #include <qmath.h>
 
-auto vertexShaderSource = R"(
+auto vertex_shader_source = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
 
@@ -155,7 +155,7 @@ auto vertexShaderSource = R"(
 )";
 
 // Fragment Shader: Bez zmian
-auto fragmentShaderSource = R"(
+auto fragment_shader_source = R"(
     #version 330 core
     out vec4 FragColor;
 
@@ -196,44 +196,43 @@ auto fragmentShaderSource = R"(
 // --- Koniec Shaders ---
 
 
-FloatingEnergySphereWidget::FloatingEnergySphereWidget(const bool isFirstTime, QWidget *parent)
+FloatingEnergySphereWidget::FloatingEnergySphereWidget(const bool is_first_time, QWidget *parent)
     : QOpenGLWidget(parent),
-      QOpenGLFunctions_3_3_Core(),
-      m_isFirstTime(isFirstTime),
-      m_timeValue(0.0f),
-      m_program(nullptr),
-      m_vbo(QOpenGLBuffer::VertexBuffer),
-      m_cameraPosition(0.0f, 0.0f, 3.5f),
-      m_cameraDistance(3.5f),
-      m_mousePressed(false),
-      m_vertexCount(0),
-      m_closable(true),
-      m_angularVelocity(0.0f, 0.0f, 0.0f),
-      m_dampingFactor(0.96f),
-      m_lastFrameTimeSecs(0.0f), // <<< Inicjalizacja
-      m_player(nullptr), // <<< Inicjalizacja
-      m_decoder(nullptr), // <<< Inicjalizacja
-      m_audioBufferDurationMs(0), // <<< Inicjalizacja
-      m_currentAudioAmplitude(0.0f), // <<< Inicjalizacja
-      m_audioReady(false),
-      m_nextImpactIndex(0),
-m_hintTimer(new QTimer(this)),
-m_isDestroying(false),
-m_destructionProgress(0.0f),
-m_clickSimulationTimer(new QTimer(this))
+      is_first_time_(is_first_time),
+      time_value_(0.0f),
+      shader_program_(nullptr),
+      vbo_(QOpenGLBuffer::VertexBuffer),
+      camera_position_(0.0f, 0.0f, 3.5f),
+      camera_distance_(3.5f),
+      mouse_pressed_(false),
+      vertex_count_(0),
+      closable_(true),
+      angular_velocity_(0.0f, 0.0f, 0.0f),
+      damping_factor_(0.96f),
+      last_frame_time_secs_(0.0f), // <<< Inicjalizacja
+      media_player_(nullptr), // <<< Inicjalizacja
+      audio_decoder_(nullptr), // <<< Inicjalizacja
+      audio_buffer_duration_ms_(0), // <<< Inicjalizacja
+      current_audio_amplitude_(0.0f), // <<< Inicjalizacja
+      audio_ready_(false),
+      next_impact_index_(0),
+      hint_timer_(new QTimer(this)),
+      is_destroying_(false),
+      destruction_progress_(0.0f),
+      click_simulation_timer_(new QTimer(this))
 {
     if (MAX_IMPACTS > 0) { // Upewnij się, że MAX_IMPACTS jest dodatnie
-        m_impacts.resize(MAX_IMPACTS); // <<< DODAJ ZMIANĘ ROZMIARU
+        impacts_.resize(MAX_IMPACTS); // <<< DODAJ ZMIANĘ ROZMIARU
     } else {
         qWarning() << "MAX_IMPACTS is not positive, impacts will not work.";
     }
-    for(auto& impact : m_impacts) {
+    for(auto& impact : impacts_) {
         impact.active = false;
-        impact.startTime = -1.0f; // Oznacz jako nieaktywne
+        impact.start_time = -1.0f; // Oznacz jako nieaktywne
     }
 
-    m_player = new QMediaPlayer(this);
-    m_decoder = new QAudioDecoder(this);
+    media_player_ = new QMediaPlayer(this);
+    audio_decoder_ = new QAudioDecoder(this);
 
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -242,44 +241,44 @@ m_clickSimulationTimer(new QTimer(this))
     setMouseTracking(true);
     resize(600, 600);
 
-    m_elapsedTimer.start();
-    m_lastFrameTimeSecs = m_elapsedTimer.elapsed() / 1000.0f;
+    elapsed_timer_.start();
+    last_frame_time_secs_ = elapsed_timer_.elapsed() / 1000.0f;
 
-    connect(&m_timer, &QTimer::timeout, this, &FloatingEnergySphereWidget::updateAnimation);
-    m_timer.start(16);
+    connect(&timer_, &QTimer::timeout, this, &FloatingEnergySphereWidget::UpdateAnimation);
+    timer_.start(16);
 
     QSurfaceFormat fmt = format();
     fmt.setAlphaBufferSize(8);
     setFormat(fmt);
 
-    connect(&m_timer, &QTimer::timeout, this, &FloatingEnergySphereWidget::updateAnimation);
-    connect(m_hintTimer, &QTimer::timeout, this, &FloatingEnergySphereWidget::playKonamiHint);
-    connect(m_player, &QMediaPlayer::stateChanged, this, &FloatingEnergySphereWidget::handlePlayerStateChanged);
+    connect(&timer_, &QTimer::timeout, this, &FloatingEnergySphereWidget::UpdateAnimation);
+    connect(hint_timer_, &QTimer::timeout, this, &FloatingEnergySphereWidget::PlayKonamiHint);
+    connect(media_player_, &QMediaPlayer::stateChanged, this, &FloatingEnergySphereWidget::HandlePlayerStateChanged);
 
-    connect(m_clickSimulationTimer, &QTimer::timeout, this, &FloatingEnergySphereWidget::simulateClick);
-    m_clickSimulationTimer->setInterval(1000);
+    connect(click_simulation_timer_, &QTimer::timeout, this, &FloatingEnergySphereWidget::SimulateClick);
+    click_simulation_timer_->setInterval(1000);
 
-    m_timer.start(16);
-    m_clickSimulationTimer->start();
+    timer_.start(16);
+    click_simulation_timer_->start();
 }
 
 FloatingEnergySphereWidget::~FloatingEnergySphereWidget()
 {
     makeCurrent();
-    m_timer.stop();
-    m_clickSimulationTimer->stop();
-    if (m_hintTimer) m_hintTimer->stop();
-    if (m_player) m_player->stop();
-    if (m_decoder) m_decoder->stop();
+    timer_.stop();
+    click_simulation_timer_->stop();
+    if (hint_timer_) hint_timer_->stop();
+    if (media_player_) media_player_->stop();
+    if (audio_decoder_) audio_decoder_->stop();
 
-    m_vbo.destroy();
-    m_vao.destroy();
-    delete m_program;
+    vbo_.destroy();
+    vao_.destroy();
+    delete shader_program_;
     doneCurrent();
 }
 
-void FloatingEnergySphereWidget::setClosable(const bool closable) {
-    m_closable = closable;
+void FloatingEnergySphereWidget::SetClosable(const bool closable) {
+    closable_ = closable;
 }
 
 void FloatingEnergySphereWidget::initializeGL()
@@ -298,154 +297,154 @@ void FloatingEnergySphereWidget::initializeGL()
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     qDebug() << "Setting up shaders...";
-    setupShaders();
-    if (!m_program || !m_program->isLinked()) {
+    SetupShaders();
+    if (!shader_program_ || !shader_program_->isLinked()) {
         qCritical() << "Shader program not linked after setupShaders()!";
-        if(m_program) qCritical() << "Shader Log:" << m_program->log();
+        if(shader_program_) qCritical() << "Shader Log:" << shader_program_->log();
         return;
     }
     qDebug() << "Shaders set up successfully.";
 
     qDebug() << "Setting up sphere geometry (points)...";
-    setupSphereGeometry(128, 256);
-    qDebug() << "Sphere geometry set up with" << m_vertexCount << "vertices.";
+    SetupSphereGeometry(128, 256);
+    qDebug() << "Sphere geometry set up with" << vertex_count_ << "vertices.";
 
-    m_vao.create();
-    m_vao.bind();
+    vao_.create();
+    vao_.bind();
 
-    m_vbo.create();
-    m_vbo.bind();
-    m_vbo.allocate(m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
+    vbo_.create();
+    vbo_.bind();
+    vbo_.allocate(vertices_.data(), vertices_.size() * sizeof(GLfloat));
 
-    m_program->enableAttributeArray(0);
-    m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+    shader_program_->enableAttributeArray(0);
+    shader_program_->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
-    m_vao.release();
-    m_vbo.release();
-    m_program->release();
+    vao_.release();
+    vbo_.release();
+    shader_program_->release();
 
     qDebug() << "VAO/VBO configured for points.";
 
     // --- Konfiguracja Audio ---
-    setupAudio(); // <<< Wywołanie konfiguracji audio
+    SetupAudio(); // <<< Wywołanie konfiguracji audio
 
     qDebug() << "FloatingEnergySphereWidget::initializeGL() finished successfully.";
 }
 
 // <<< Nowa funkcja do konfiguracji audio >>>
-void FloatingEnergySphereWidget::setupAudio()
+void FloatingEnergySphereWidget::SetupAudio()
 {
-    qDebug() << "Setting up audio. Is first time:" << m_isFirstTime;
+    qDebug() << "Setting up audio. Is first time:" << is_first_time_;
 
-    if (!m_player || !m_decoder) {
+    if (!media_player_ || !audio_decoder_) {
         qCritical() << "Audio objects (player/decoder) are null!";
         return;
     }
 
-    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &FloatingEnergySphereWidget::handleMediaPlayerError);
-    connect(m_decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, &FloatingEnergySphereWidget::handleAudioDecoderError);
-    connect(m_decoder, &QAudioDecoder::bufferReady, this, &FloatingEnergySphereWidget::processAudioBuffer);
-    connect(m_decoder, &QAudioDecoder::finished, this, &FloatingEnergySphereWidget::audioDecodingFinished);
+    connect(media_player_, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &FloatingEnergySphereWidget::HandleMediaPlayerError);
+    connect(audio_decoder_, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, &FloatingEnergySphereWidget::HandleAudioDecoderError);
+    connect(audio_decoder_, &QAudioDecoder::bufferReady, this, &FloatingEnergySphereWidget::ProcessAudioBuffer);
+    connect(audio_decoder_, &QAudioDecoder::finished, this, &FloatingEnergySphereWidget::AudioDecodingFinished);
 
-    const QString appDirPath = QCoreApplication::applicationDirPath();
-    const QString audioSubDir = "/assets/audio/";
+    const QString app_dir_path = QCoreApplication::applicationDirPath();
+    const QString audio_sub_dir = "/assets/audio/";
 
     // <<< Wybór nazwy pliku na podstawie flagi >>>
-    QString audioFileName;
-    if (m_isFirstTime) {
-        audioFileName = "JOI.wav"; // Plik dla pierwszego uruchomienia
-        qDebug() << "Playing initial audio file:" << audioFileName;
+    QString audio_file_name;
+    if (is_first_time_) {
+        audio_file_name = "JOI.wav"; // Plik dla pierwszego uruchomienia
+        qDebug() << "Playing initial audio file:" << audio_file_name;
     } else {
-        audioFileName = "hello_again.wav"; // Plik dla kolejnych uruchomień
-        qDebug() << "Playing subsequent audio file:" << audioFileName;
+        audio_file_name = "hello_again.wav"; // Plik dla kolejnych uruchomień
+        qDebug() << "Playing subsequent audio file:" << audio_file_name;
     }
     // <<< Koniec wyboru nazwy pliku >>>
 
-    QString chosenFilePath = QDir::cleanPath(appDirPath + audioSubDir + audioFileName);
-    QUrl chosenFileUrl;
+    QString chosen_file_path = QDir::cleanPath(app_dir_path + audio_sub_dir + audio_file_name);
+    QUrl chosen_file_url;
 
-    if (QFile::exists(chosenFilePath)) {
-        chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
-        qDebug() << "Using audio file:" << chosenFilePath;
+    if (QFile::exists(chosen_file_path)) {
+        chosen_file_url = QUrl::fromLocalFile(chosen_file_path);
+        qDebug() << "Using audio file:" << chosen_file_path;
     } else {
         // Spróbuj alternatywnego pliku (np. MP3), jeśli główny nie istnieje
         // LUB zgłoś krytyczny błąd, jeśli wybrany plik jest wymagany
-        const QString fallbackFileName = m_isFirstTime ? "JOImp3.mp3" : ""; // Można dodać fallback dla hello_again
-        if (!fallbackFileName.isEmpty()) {
-             const QString fallbackFilePath = QDir::cleanPath(appDirPath + audioSubDir + fallbackFileName);
-             if (QFile::exists(fallbackFilePath)) {
-                 chosenFilePath = fallbackFilePath;
-                 chosenFileUrl = QUrl::fromLocalFile(chosenFilePath);
-                 qWarning() << "Primary audio file not found, using fallback:" << chosenFilePath;
+        const QString fallback_file_name = is_first_time_ ? "JOImp3.mp3" : ""; // Można dodać fallback dla hello_again
+        if (!fallback_file_name.isEmpty()) {
+             const QString fallback_file_path = QDir::cleanPath(app_dir_path + audio_sub_dir + fallback_file_name);
+             if (QFile::exists(fallback_file_path)) {
+                 chosen_file_path = fallback_file_path;
+                 chosen_file_url = QUrl::fromLocalFile(chosen_file_path);
+                 qWarning() << "Primary audio file not found, using fallback:" << chosen_file_path;
              } else {
-                 qCritical() << "Chosen audio file AND fallback not found:" << chosenFilePath << "and" << fallbackFilePath;
+                 qCritical() << "Chosen audio file AND fallback not found:" << chosen_file_path << "and" << fallback_file_path;
                  return;
              }
         } else {
-             qCritical() << "Chosen audio file not found:" << chosenFilePath;
-             qCritical() << "Ensure the 'assets/audio' folder with '" << audioFileName << "' is copied next to the executable.";
+             qCritical() << "Chosen audio file not found:" << chosen_file_path;
+             qCritical() << "Ensure the 'assets/audio' folder with '" << audio_file_name << "' is copied next to the executable.";
              return;
         }
     }
 
-    m_decoder->setSourceFilename(chosenFilePath);
-    m_decoder->start();
-    qDebug() << "Audio decoder started for:" << chosenFilePath;
+    audio_decoder_->setSourceFilename(chosen_file_path);
+    audio_decoder_->start();
+    qDebug() << "Audio decoder started for:" << chosen_file_path;
 
-    m_player->setMedia(chosenFileUrl);
-    m_player->setVolume(75);
-    m_player->play();
-    qDebug() << "Audio player started for:" << chosenFileUrl.toString();
+    media_player_->setMedia(chosen_file_url);
+    media_player_->setVolume(75);
+    media_player_->play();
+    qDebug() << "Audio player started for:" << chosen_file_url.toString();
 
-    if (m_player->state() == QMediaPlayer::StoppedState && m_player->error() != QMediaPlayer::NoError) {
-         qWarning() << "Player entered StoppedState immediately after play() call. Error:" << m_player->errorString();
+    if (media_player_->state() == QMediaPlayer::StoppedState && media_player_->error() != QMediaPlayer::NoError) {
+         qWarning() << "Player entered StoppedState immediately after play() call. Error:" << media_player_->errorString();
     }
 }
 
 
-void FloatingEnergySphereWidget::setupShaders()
+void FloatingEnergySphereWidget::SetupShaders()
 {
-    m_program = new QOpenGLShaderProgram(this);
+    shader_program_ = new QOpenGLShaderProgram(this);
 
-    if (!m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource)) {
-        qCritical() << "Vertex shader compilation failed:" << m_program->log();
-        delete m_program; m_program = nullptr;
+    if (!shader_program_->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_shader_source)) {
+        qCritical() << "Vertex shader compilation failed:" << shader_program_->log();
+        delete shader_program_; shader_program_ = nullptr;
         return;
     }
 
-    if (!m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource)) {
-        qCritical() << "Fragment shader compilation failed:" << m_program->log();
-        delete m_program; m_program = nullptr;
+    if (!shader_program_->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment_shader_source)) {
+        qCritical() << "Fragment shader compilation failed:" << shader_program_->log();
+        delete shader_program_; shader_program_ = nullptr;
         return;
     }
 
-    if (!m_program->link()) {
-        qCritical() << "Shader program linking failed:" << m_program->log();
-        delete m_program; m_program = nullptr;
+    if (!shader_program_->link()) {
+        qCritical() << "Shader program linking failed:" << shader_program_->log();
+        delete shader_program_; shader_program_ = nullptr;
         return;
     }
 }
 
-void FloatingEnergySphereWidget::setupSphereGeometry(const int rings, const int sectors)
+void FloatingEnergySphereWidget::SetupSphereGeometry(const int rings, const int sectors)
 {
-    m_vertices.clear();
-    float const R = 1. / static_cast<float>(rings - 1);
-    float const S = 1. / static_cast<float>(sectors - 1);
-    m_vertices.resize(rings * sectors * 3);
-    auto v = m_vertices.begin();
+    vertices_.clear();
+    float const ring_factor = 1. / static_cast<float>(rings - 1);
+    float const sector_factor = 1. / static_cast<float>(sectors - 1);
+    vertices_.resize(rings * sectors * 3);
+    auto v = vertices_.begin();
     for (int r = 0; r < rings; ++r) {
         for (int s = 0; s < sectors; ++s) {
             constexpr float radius = 1.0f;
             constexpr float PI = 3.14159265359f;
-            float const y = sin(-PI / 2 + PI * r * R);
-            float const x = cos(2 * PI * s * S) * sin(PI * r * R);
-            float const z = sin(2 * PI * s * S) * sin(PI * r * R);
+            float const y = sin(-PI / 2 + PI * r * ring_factor);
+            float const x = cos(2 * PI * s * sector_factor) * sin(PI * r * ring_factor);
+            float const z = sin(2 * PI * s * sector_factor) * sin(PI * r * ring_factor);
             *v++ = x * radius;
             *v++ = y * radius;
             *v++ = z * radius;
         }
     }
-    m_vertexCount = rings * sectors;
+    vertex_count_ = rings * sectors;
 }
 
 
@@ -457,32 +456,32 @@ void FloatingEnergySphereWidget::resizeGL(const int w, int h)
     glViewport(0, 0, w, h);
 
     // --- Dynamiczne obliczanie FOV dla stałego rozmiaru sfery ---
-    const float aspectRatio = static_cast<float>(w) / static_cast<float>(h);
-    constexpr float sphereRadius = 1.0f; // Promień sfery w przestrzeni modelu
+    const float aspect_ratio = static_cast<float>(w) / static_cast<float>(h);
+    constexpr float sphere_radius = 1.0f; // Promień sfery w przestrzeni modelu
     // Współczynnik określający, jaką część mniejszego wymiaru widgetu ma zajmować sfera
     // Np. 1.1 oznacza, że sfera zajmie ok. 91% mniejszego wymiaru, dając mały margines.
     // Zwiększ tę wartość, aby sfera była mniejsza (większy margines).
     // Zmniejsz (bliżej 1.0), aby była większa (mniejszy margines).
-    constexpr float paddingFactor = 2.0f;
+    constexpr float padding_factor = 2.0f;
 
     // Oblicz tangens połowy wymaganego kąta widzenia, aby zmieścić sferę z marginesem
     // Musimy zapewnić, że zmieści się zarówno w pionie, jak i w poziomie.
     // Wybieramy większy z wymaganych kątów (co odpowiada mniejszemu wymiarowi).
-    const float requiredTanHalfFovVertical = (sphereRadius * paddingFactor) / m_cameraDistance;
-    const float requiredTanHalfFovHorizontal = (sphereRadius * paddingFactor) / m_cameraDistance; // Dla sfery to to samo
+    const float required_tan_half_fov_vertical = (sphere_radius * padding_factor) / camera_distance_;
+    const float required_tan_half_fov_horizontal = (sphere_radius * padding_factor) / camera_distance_; // Dla sfery to to samo
 
     // Oblicz tangens połowy pionowego FOV, który zapewni dopasowanie w obu osiach
-    const float tanHalfFovY = qMax(requiredTanHalfFovVertical, requiredTanHalfFovHorizontal / aspectRatio);
+    const float tan_half_fov_y = qMax(required_tan_half_fov_vertical, required_tan_half_fov_horizontal / aspect_ratio);
 
     // Oblicz pionowy FOV w radianach, a następnie przekonwertuj na stopnie
-    const float fovYRadians = 2.0f * atan(tanHalfFovY);
-    const float fovYDegrees = qRadiansToDegrees(fovYRadians);
+    const float fov_y_radians = 2.0f * atan(tan_half_fov_y);
+    const float fov_y_degrees = qRadiansToDegrees(fov_y_radians);
 
     // Ustawienie macierzy projekcji perspektywicznej z obliczonym FOV
-    m_projectionMatrix.setToIdentity();
-    m_projectionMatrix.perspective(fovYDegrees, aspectRatio, 0.1f, 100.0f); // Bliska i daleka płaszczyzna odcięcia
+    projection_matrix_.setToIdentity();
+    projection_matrix_.perspective(fov_y_degrees, aspect_ratio, 0.1f, 100.0f); // Bliska i daleka płaszczyzna odcięcia
 
-    qDebug() << "Resized to" << w << "x" << h << "Aspect:" << aspectRatio << "Calculated FOVy:" << fovYDegrees;
+    qDebug() << "Resized to" << w << "x" << h << "Aspect:" << aspect_ratio << "Calculated FOVy:" << fov_y_degrees;
     // ---------------------------------------------------------
 }
 
@@ -490,87 +489,87 @@ void FloatingEnergySphereWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (!m_program || !m_program->isLinked()) {
+    if (!shader_program_ || !shader_program_->isLinked()) {
         return;
     }
 
-    m_program->bind();
-    m_vao.bind();
+    shader_program_->bind();
+    vao_.bind();
 
-    m_viewMatrix.setToIdentity();
+    view_matrix_.setToIdentity();
     // Kamera jest już ustawiona w world space, nie musimy jej transformować
-    m_viewMatrix.lookAt(m_cameraPosition, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    view_matrix_.lookAt(camera_position_, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
 
-    m_modelMatrix.setToIdentity();
-    m_modelMatrix.rotate(m_rotation);
+    model_matrix_.setToIdentity();
+    model_matrix_.rotate(rotation_);
 
-    m_program->setUniformValue("projection", m_projectionMatrix);
-    m_program->setUniformValue("view", m_viewMatrix);
-    m_program->setUniformValue("model", m_modelMatrix);
-    m_program->setUniformValue("time", m_timeValue);
-    m_program->setUniformValue("audioAmplitude", m_currentAudioAmplitude);
-    m_program->setUniformValue("u_destructionFactor", m_destructionProgress);
+    shader_program_->setUniformValue("projection", projection_matrix_);
+    shader_program_->setUniformValue("view", view_matrix_);
+    shader_program_->setUniformValue("model", model_matrix_);
+    shader_program_->setUniformValue("time", time_value_);
+    shader_program_->setUniformValue("audioAmplitude", current_audio_amplitude_);
+    shader_program_->setUniformValue("u_destructionFactor", destruction_progress_);
 
     // --- Przekaż dane uderzeń do shadera ---
-    QVector3D impactPointsGL[MAX_IMPACTS];
-    float impactStartTimesGL[MAX_IMPACTS];
+    QVector3D impact_points_gl[MAX_IMPACTS];
+    float impact_start_times_gl[MAX_IMPACTS];
     for (int i = 0; i < MAX_IMPACTS; ++i) {
-        if (m_impacts[i].active) {
+        if (impacts_[i].active) {
             // Sprawdź, czy uderzenie nie jest za stare (opcjonalne czyszczenie tutaj)
-            if (m_timeValue - m_impacts[i].startTime < 3.0f) { // Użyj wartości nieco większej niż impactDuration
-                 impactPointsGL[i] = m_impacts[i].point;
-                 impactStartTimesGL[i] = m_impacts[i].startTime;
+            if (time_value_ - impacts_[i].start_time < 3.0f) { // Użyj wartości nieco większej niż impactDuration
+                 impact_points_gl[i] = impacts_[i].point;
+                 impact_start_times_gl[i] = impacts_[i].start_time;
             } else {
                  // Oznacz jako nieaktywne, jeśli czas minął
-                 m_impacts[i].active = false;
-                 impactPointsGL[i] = QVector3D(0,0,0); // Wyzeruj dane
-                 impactStartTimesGL[i] = -1.0f;
+                 impacts_[i].active = false;
+                 impact_points_gl[i] = QVector3D(0,0,0); // Wyzeruj dane
+                 impact_start_times_gl[i] = -1.0f;
             }
         } else {
-            impactPointsGL[i] = QVector3D(0,0,0); // Wyzeruj dane dla nieaktywnych
-            impactStartTimesGL[i] = -1.0f;
+            impact_points_gl[i] = QVector3D(0,0,0); // Wyzeruj dane dla nieaktywnych
+            impact_start_times_gl[i] = -1.0f;
         }
     }
     // Użyj setUniformValueArray dla tablic (wymaga Qt 5.6+)
     // lub ustawiaj pojedynczo w pętli dla starszych wersji
-    m_program->setUniformValueArray("u_impactPoints", impactPointsGL, MAX_IMPACTS);
-    m_program->setUniformValueArray("u_impactStartTimes", impactStartTimesGL, MAX_IMPACTS, 1);
+    shader_program_->setUniformValueArray("u_impactPoints", impact_points_gl, MAX_IMPACTS);
+    shader_program_->setUniformValueArray("u_impactStartTimes", impact_start_times_gl, MAX_IMPACTS, 1);
     // ------------------------------------
 
-    glDrawArrays(GL_POINTS, 0, m_vertexCount);
+    glDrawArrays(GL_POINTS, 0, vertex_count_);
 
-    m_vao.release();
-    m_program->release();
+    vao_.release();
+    shader_program_->release();
 }
 
-void FloatingEnergySphereWidget::updateAnimation()
+void FloatingEnergySphereWidget::UpdateAnimation()
 {
-    const float currentTimeSecs = m_elapsedTimer.elapsed() / 1000.0f;
-    float deltaTime = currentTimeSecs - m_lastFrameTimeSecs;
-    m_lastFrameTimeSecs = currentTimeSecs;
-    deltaTime = qMin(deltaTime, 0.05f);
+    const float current_time_secs = elapsed_timer_.elapsed() / 1000.0f;
+    float delta_time = current_time_secs - last_frame_time_secs_;
+    last_frame_time_secs_ = current_time_secs;
+    delta_time = qMin(delta_time, 0.05f);
 
-    m_timeValue += deltaTime;
-    if (m_timeValue > 3600.0f) m_timeValue -= 3600.0f;
+    time_value_ += delta_time;
+    if (time_value_ > 3600.0f) time_value_ -= 3600.0f;
 
-    if (m_isDestroying) {
+    if (is_destroying_) {
         // Zwiększaj postęp zniszczenia
         // Dostosuj czas trwania do długości dźwięku "goodbye.wav" lub własnych preferencji
-        constexpr float destructionDuration = 8.0f;
-        m_destructionProgress += deltaTime / destructionDuration;
-        m_destructionProgress = qBound(0.0f, m_destructionProgress, 1.0f);
+        constexpr float destruction_duration = 8.0f;
+        destruction_progress_ += delta_time / destruction_duration;
+        destruction_progress_ = qBound(0.0f, destruction_progress_, 1.0f);
 
         // Zatrzymaj obrót i reakcję na audio podczas niszczenia
-        m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
-        m_currentAudioAmplitude = 0.0f; // Płynnie wyzeruj amplitudę
-        m_targetAudioAmplitude = 0.0f;
+        angular_velocity_ = QVector3D(0.0f, 0.0f, 0.0f);
+        current_audio_amplitude_ = 0.0f; // Płynnie wyzeruj amplitudę
+        target_audio_amplitude_ = 0.0f;
 
         // Nie aktualizuj normalnej animacji/obrotu
         update();
         return; // Zakończ updateAnimation tutaj dla stanu niszczenia
     }
 
-    const bool isPlaying = (m_player && m_player->state() == QMediaPlayer::PlayingState);
+    const bool is_playing = (media_player_ && media_player_->state() == QMediaPlayer::PlayingState);
 
     // --- Usunięto logikę blend factor ---
     // float targetBlendFactor = isPlaying ? 0.0f : 1.0f;
@@ -579,38 +578,38 @@ void FloatingEnergySphereWidget::updateAnimation()
     // m_animationBlendFactor = qBound(0.0f, m_animationBlendFactor, 1.0f);
 
     // --- Aktualizacja docelowej amplitudy (pozostaje bez zmian) ---
-    if (isPlaying && m_audioReady && m_audioBufferDurationMs > 0) {
-        const qint64 currentPositionMs = m_player->position();
-        const int bufferIndex = static_cast<int>(currentPositionMs / m_audioBufferDurationMs);
-        if (bufferIndex >= 0 && bufferIndex < m_audioAmplitudes.size()) {
-            m_targetAudioAmplitude = m_audioAmplitudes[bufferIndex];
+    if (is_playing && audio_ready_ && audio_buffer_duration_ms_ > 0) {
+        const qint64 current_position_ms = media_player_->position();
+        const int buffer_index = static_cast<int>(current_position_ms / audio_buffer_duration_ms_);
+        if (buffer_index >= 0 && buffer_index < audio_amplitudes_.size()) {
+            target_audio_amplitude_ = audio_amplitudes_[buffer_index];
         } else {
-            m_targetAudioAmplitude = 0.0f;
+            target_audio_amplitude_ = 0.0f;
         }
     } else {
-        m_targetAudioAmplitude = 0.0f;
+        target_audio_amplitude_ = 0.0f;
     }
 
     // --- Płynne przejście dla aktualnej amplitudy (pozostaje bez zmian) ---
-    constexpr float amplitudeSmoothingFactor = 10.0f;
-    m_currentAudioAmplitude += (m_targetAudioAmplitude - m_currentAudioAmplitude) * amplitudeSmoothingFactor * deltaTime;
+    constexpr float amplitude_smoothing_factor = 10.0f;
+    current_audio_amplitude_ += (target_audio_amplitude_ - current_audio_amplitude_) * amplitude_smoothing_factor * delta_time;
 
     // --- Przywrócono oryginalną logikę obrotu (zawsze aktywna) ---
-    if (!m_mousePressed && m_angularVelocity.lengthSquared() > 0.0001f) {
-        const float rotationAngle = m_angularVelocity.length() * deltaTime;
-        const QQuaternion deltaRotation = QQuaternion::fromAxisAndAngle(m_angularVelocity.normalized(), rotationAngle);
-        m_rotation = deltaRotation * m_rotation;
-        m_rotation.normalize();
+    if (!mouse_pressed_ && angular_velocity_.lengthSquared() > 0.0001f) {
+        const float rotation_angle = angular_velocity_.length() * delta_time;
+        const QQuaternion delta_rotation = QQuaternion::fromAxisAndAngle(angular_velocity_.normalized(), rotation_angle);
+        rotation_ = delta_rotation * rotation_;
+        rotation_.normalize();
         // Oryginalne tłumienie
-        m_angularVelocity *= pow(m_dampingFactor, deltaTime * 60.0f);
-        if (m_angularVelocity.lengthSquared() < 0.0001f) {
-            m_angularVelocity = QVector3D(0.0f, 0.0f, 0.0f);
+        angular_velocity_ *= pow(damping_factor_, delta_time * 60.0f);
+        if (angular_velocity_.lengthSquared() < 0.0001f) {
+            angular_velocity_ = QVector3D(0.0f, 0.0f, 0.0f);
         }
-    } else if (!m_mousePressed) {
+    } else if (!mouse_pressed_) {
         // Oryginalny stały obrót
-        const QQuaternion slowSpin = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 2.0f * deltaTime);
-        m_rotation = slowSpin * m_rotation;
-        m_rotation.normalize();
+        const QQuaternion slow_spin = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 2.0f * delta_time);
+        rotation_ = slow_spin * rotation_;
+        rotation_.normalize();
     }
     // --- Koniec przywróconej logiki obrotu ---
 
@@ -618,134 +617,133 @@ void FloatingEnergySphereWidget::updateAnimation()
 }
 
 // <<< Nowy slot do przetwarzania buforów audio >>>
-void FloatingEnergySphereWidget::processAudioBuffer()
+void FloatingEnergySphereWidget::ProcessAudioBuffer()
 {
-    if (!m_decoder) return;
+    if (!audio_decoder_) return;
 
-    const QAudioBuffer buffer = m_decoder->read();
+    const QAudioBuffer buffer = audio_decoder_->read();
     if (!buffer.isValid()) {
         qWarning() << "Invalid audio buffer received from decoder.";
         return;
     }
 
-    if (!m_audioReady) { // Przy pierwszym buforze zapisz format i oblicz czas trwania
-        m_audioFormat = buffer.format();
-        if (m_audioFormat.isValid() && m_audioFormat.sampleRate() > 0 && m_audioFormat.bytesPerFrame() > 0) {
-            m_audioBufferDurationMs = buffer.duration() / 1000; // duration() jest w mikrosekundach
-            qDebug() << "Audio format set:" << m_audioFormat << "Buffer duration (ms):" << m_audioBufferDurationMs;
+    if (!audio_ready_) { // Przy pierwszym buforze zapisz format i oblicz czas trwania
+        audio_format_ = buffer.format();
+        if (audio_format_.isValid() && audio_format_.sampleRate() > 0 && audio_format_.bytesPerFrame() > 0) {
+            audio_buffer_duration_ms_ = buffer.duration() / 1000; // duration() jest w mikrosekundach
+            qDebug() << "Audio format set:" << audio_format_ << "Buffer duration (ms):" << audio_buffer_duration_ms_;
             // Oszacuj całkowitą liczbę buforów, jeśli dekoder podaje czas trwania
-            const qint64 totalDurationMs = m_decoder->duration() / 1000;
-             if (totalDurationMs > 0 && m_audioBufferDurationMs > 0) {
-                 const int estimatedBuffers = static_cast<int>(totalDurationMs / m_audioBufferDurationMs) + 1;
-                 m_audioAmplitudes.reserve(estimatedBuffers);
-                 qDebug() << "Reserved space for approx." << estimatedBuffers << "amplitude values.";
+            const qint64 total_duration_ms = audio_decoder_->duration() / 1000;
+             if (total_duration_ms > 0 && audio_buffer_duration_ms_ > 0) {
+                 const int estimated_buffers = static_cast<int>(total_duration_ms / audio_buffer_duration_ms_) + 1;
+                 audio_amplitudes_.reserve(estimated_buffers);
+                 qDebug() << "Reserved space for approx." << estimated_buffers << "amplitude values.";
              }
         } else {
              qWarning() << "Decoder provided invalid audio format initially.";
              // Ustaw domyślny czas trwania, aby uniknąć dzielenia przez zero, ale wizualizacja może nie działać
-             m_audioBufferDurationMs = 50; // np. 50 ms
+             audio_buffer_duration_ms_ = 50; // np. 50 ms
         }
     }
 
     // Oblicz i zapisz amplitudę RMS dla tego bufora
-    const float amplitude = calculateRMSAmplitude(buffer);
-    m_targetAudioAmplitude = amplitude;
-    m_audioAmplitudes.push_back(amplitude);
+    const float amplitude = CalculateRMSAmplitude(buffer);
+    target_audio_amplitude_ = amplitude;
+    audio_amplitudes_.push_back(amplitude);
 
     // Oznacz, że mamy już jakieś dane audio
-    if (!m_audioReady && !m_audioAmplitudes.empty()) {
-        m_audioReady = true;
+    if (!audio_ready_ && !audio_amplitudes_.empty()) {
+        audio_ready_ = true;
         qDebug() << "First audio buffer processed, audio is ready.";
     }
 }
 
 // <<< Nowa funkcja do obliczania amplitudy RMS >>>
-float FloatingEnergySphereWidget::calculateRMSAmplitude(const QAudioBuffer& buffer) const {
-    if (!buffer.isValid() || buffer.frameCount() == 0 || !m_audioFormat.isValid()) {
+float FloatingEnergySphereWidget::CalculateRMSAmplitude(const QAudioBuffer& buffer) const {
+    if (!buffer.isValid() || buffer.frameCount() == 0 || !audio_format_.isValid()) {
         return 0.0f;
     }
 
-    const qint64 frameCount = buffer.frameCount();
-    const int channelCount = m_audioFormat.channelCount();
-    const int bytesPerSample = m_audioFormat.bytesPerFrame();
+    const qint64 frame_count = buffer.frameCount();
+    const int channel_count = audio_format_.channelCount();
+    const int bytes_per_sample = audio_format_.bytesPerFrame();
 
-    if (channelCount <= 0 || bytesPerSample <= 0) return 0.0f;
+    if (channel_count <= 0 || bytes_per_sample <= 0) return 0.0f;
 
-    double sumOfSquares = 0.0;
-    const auto dataPtr = static_cast<const unsigned char*>(buffer.constData());
+    double sum_of_squares = 0.0;
+    const auto data_ptr = static_cast<const unsigned char*>(buffer.constData());
 
     // Przetwarzaj tylko pierwszy kanał dla uproszczenia
-    for (qint64 i = 0; i < frameCount; ++i) {
-        float sampleValue = 0.0f;
+    for (qint64 i = 0; i < frame_count; ++i) {
+        float sample_value = 0.0f;
 
         // Wskaźnik na początek próbki dla pierwszego kanału w bieżącej ramce
-        const unsigned char* samplePtr = dataPtr + i * m_audioFormat.bytesPerFrame();
+        const unsigned char* sample_ptr = data_ptr + i * audio_format_.bytesPerFrame();
 
         // Dekodowanie próbki w zależności od formatu
-        if (m_audioFormat.sampleType() == QAudioFormat::SignedInt) {
-            if (bytesPerSample == 1) { // 8-bit Signed Int
-                sampleValue = static_cast<float>(*reinterpret_cast<const qint8*>(samplePtr)) / std::numeric_limits<qint8>::max();
-            } else if (bytesPerSample == 2) { // 16-bit Signed Int
-                sampleValue = static_cast<float>(*reinterpret_cast<const qint16*>(samplePtr)) / std::numeric_limits<qint16>::max();
-            } else if (bytesPerSample == 4) { // 32-bit Signed Int
-                 sampleValue = static_cast<float>(*reinterpret_cast<const qint32*>(samplePtr)) / std::numeric_limits<qint32>::max();
+        if (audio_format_.sampleType() == QAudioFormat::SignedInt) {
+            if (bytes_per_sample == 1) { // 8-bit Signed Int
+                sample_value = static_cast<float>(*reinterpret_cast<const qint8*>(sample_ptr)) / std::numeric_limits<qint8>::max();
+            } else if (bytes_per_sample == 2) { // 16-bit Signed Int
+                sample_value = static_cast<float>(*reinterpret_cast<const qint16*>(sample_ptr)) / std::numeric_limits<qint16>::max();
+            } else if (bytes_per_sample == 4) { // 32-bit Signed Int
+                 sample_value = static_cast<float>(*reinterpret_cast<const qint32*>(sample_ptr)) / std::numeric_limits<qint32>::max();
             }
-        } else if (m_audioFormat.sampleType() == QAudioFormat::UnSignedInt) {
-             if (bytesPerSample == 1) { // 8-bit Unsigned Int
-                sampleValue = (static_cast<float>(*reinterpret_cast<const quint8*>(samplePtr)) - 128.0f) / 128.0f;
-            } else if (bytesPerSample == 2) { // 16-bit Unsigned Int
-                 sampleValue = (static_cast<float>(*reinterpret_cast<const quint16*>(samplePtr)) - std::numeric_limits<quint16>::max()/2.0f) / (std::numeric_limits<quint16>::max()/2.0f);
-            } else if (bytesPerSample == 4) { // 32-bit Unsigned Int
-                 sampleValue = (static_cast<double>(*reinterpret_cast<const quint32*>(samplePtr)) - std::numeric_limits<quint32>::max()/2.0) / (std::numeric_limits<quint32>::max()/2.0);
+        } else if (audio_format_.sampleType() == QAudioFormat::UnSignedInt) {
+             if (bytes_per_sample == 1) { // 8-bit Unsigned Int
+                sample_value = (static_cast<float>(*reinterpret_cast<const quint8*>(sample_ptr)) - 128.0f) / 128.0f;
+            } else if (bytes_per_sample == 2) { // 16-bit Unsigned Int
+                 sample_value = (static_cast<float>(*reinterpret_cast<const quint16*>(sample_ptr)) - std::numeric_limits<quint16>::max()/2.0f) / (std::numeric_limits<quint16>::max()/2.0f);
+            } else if (bytes_per_sample == 4) { // 32-bit Unsigned Int
+                 sample_value = (static_cast<double>(*reinterpret_cast<const quint32*>(sample_ptr)) - std::numeric_limits<quint32>::max()/2.0) / (std::numeric_limits<quint32>::max()/2.0);
             }
-        } else if (m_audioFormat.sampleType() == QAudioFormat::Float) {
-            if (bytesPerSample == 4) { // 32-bit Float
-                sampleValue = *reinterpret_cast<const float*>(samplePtr);
+        } else if (audio_format_.sampleType() == QAudioFormat::Float) {
+            if (bytes_per_sample == 4) { // 32-bit Float
+                sample_value = *reinterpret_cast<const float*>(sample_ptr);
             }
-             else if (bytesPerSample == 8) { // 64-bit Float (Double)
-                 sampleValue = static_cast<float>(*reinterpret_cast<const double*>(samplePtr));
+             else if (bytes_per_sample == 8) { // 64-bit Float (Double)
+                 sample_value = static_cast<float>(*reinterpret_cast<const double*>(sample_ptr));
              }
         }
-        // Inne formaty nie są obsługiwane w tym przykładzie
 
-        sumOfSquares += static_cast<double>(sampleValue * sampleValue);
+        sum_of_squares += static_cast<double>(sample_value * sample_value);
     }
 
     // Oblicz RMS i znormalizuj (bardzo prosta normalizacja, może wymagać dostosowania)
-    const double meanSquare = sumOfSquares / frameCount;
-    const float rms = static_cast<float>(sqrt(meanSquare));
+    const double mean_square = sum_of_squares / frame_count;
+    const float rms = static_cast<float>(sqrt(mean_square));
 
     // Prosta normalizacja - zakładamy, że maksymalna amplituda RMS to ok. 0.707 dla pełnej fali sinusoidalnej
     // Można dostosować ten współczynnik lub wprowadzić dynamiczną normalizację
-    const float normalizedRms = qBound(0.0f, rms / 0.707f, 1.0f);
+    const float normalized_rms = qBound(0.0f, rms / 0.707f, 1.0f);
 
-    return normalizedRms;
+    return normalized_rms;
 }
 
 
 // <<< Nowy slot wywoływany po zakończeniu dekodowania >>>
-void FloatingEnergySphereWidget::audioDecodingFinished() const {
-    qDebug() << "Audio decoding finished. Total amplitude values stored:" << m_audioAmplitudes.size();
+void FloatingEnergySphereWidget::AudioDecodingFinished() const {
+    qDebug() << "Audio decoding finished. Total amplitude values stored:" << audio_amplitudes_.size();
     // Można tu zwolnić dekoder, jeśli nie jest już potrzebny
     // delete m_decoder;
     // m_decoder = nullptr;
 }
 
 // <<< Nowy slot do obsługi błędów odtwarzacza >>>
-void FloatingEnergySphereWidget::handleMediaPlayerError() const {
-     if(m_player) {
-        qCritical() << "Media Player Error:" << m_player->errorString();
+void FloatingEnergySphereWidget::HandleMediaPlayerError() const {
+     if(media_player_) {
+        qCritical() << "Media Player Error:" << media_player_->errorString();
      } else {
         qCritical() << "Media Player Error: Player object is null.";
      }
 }
 
 // <<< Nowy slot do obsługi błędów dekodera >>>
-void FloatingEnergySphereWidget::handleAudioDecoderError()
+void FloatingEnergySphereWidget::HandleAudioDecoderError()
 {
-    if(m_decoder) {
-        qCritical() << "Audio Decoder Error:" << m_decoder->errorString();
-        m_audioReady = false; // Zaznacz, że dane audio nie są wiarygodne
+    if(audio_decoder_) {
+        qCritical() << "Audio Decoder Error:" << audio_decoder_->errorString();
+        audio_ready_ = false; // Zaznacz, że dane audio nie są wiarygodne
     } else {
         qCritical() << "Audio Decoder Error: Decoder object is null.";
     }
@@ -761,23 +759,23 @@ void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event)
 
 void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_mousePressed && (event->buttons() & Qt::LeftButton)) {
-        const QPoint delta = event->pos() - m_lastMousePos;
-        m_lastMousePos = event->pos();
+    if (mouse_pressed_ && (event->buttons() & Qt::LeftButton)) {
+        const QPoint delta = event->pos() - last_mouse_position_;
+        last_mouse_position_ = event->pos();
 
         constexpr float sensitivity = 0.2f; // Dostosuj czułość obrotu
-        const float angularSpeedX = static_cast<float>(-delta.y()) * sensitivity;
-        const float angularSpeedY = static_cast<float>(-delta.x()) * sensitivity;
+        const float angular_speed_x = static_cast<float>(-delta.y()) * sensitivity;
+        const float angular_speed_y = static_cast<float>(-delta.x()) * sensitivity;
 
         // Ustawiamy prędkość kątową (teraz w stopniach/klatkę, skalowanie w updateAnimation)
-        m_angularVelocity = QVector3D(angularSpeedX, angularSpeedY, 0.0f);
+        angular_velocity_ = QVector3D(angular_speed_x, angular_speed_y, 0.0f);
 
 
         // Natychmiastowy obrót podczas przeciągania dla responsywności
-        const QQuaternion rotationX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angularSpeedX);
-        const QQuaternion rotationY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angularSpeedY);
-        m_rotation = rotationY * rotationX * m_rotation;
-        m_rotation.normalize();
+        const QQuaternion rotation_x = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, angular_speed_x);
+        const QQuaternion rotation_y = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angular_speed_y);
+        rotation_ = rotation_y * rotation_x * rotation_;
+        rotation_.normalize();
 
 
         event->accept();
@@ -791,7 +789,7 @@ void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event)
 void FloatingEnergySphereWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_mousePressed = false;
+        mouse_pressed_ = false;
         // Prędkość kątowa została ustawiona w mouseMoveEvent, bezwładność zadziała w updateAnimation
         event->accept();
     } else {
@@ -803,11 +801,11 @@ void FloatingEnergySphereWidget::wheelEvent(QWheelEvent *event)
 {
     const int delta = event->angleDelta().y();
     if (delta > 0) {
-        m_cameraDistance *= 0.95f;
+        camera_distance_ *= 0.95f;
     } else if (delta < 0) {
-        m_cameraDistance *= 1.05f;
+        camera_distance_ *= 1.05f;
     }
-    m_cameraDistance = qBound(1.5f, m_cameraDistance, 15.0f);
+    camera_distance_ = qBound(1.5f, camera_distance_, 15.0f);
 
     event->accept();
     update();
@@ -820,18 +818,18 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
     qDebug() << "Key pressed:" << QKeySequence(key).toString();
 
     // Dodaj klawisz do sekwencji
-    m_keySequence.push_back(key);
+    key_sequence_.push_back(key);
 
     // Utrzymaj rozmiar sekwencji równy długości kodu Konami
-    while (m_keySequence.size() > m_konamiCode.size()) {
-        m_keySequence.pop_front();
+    while (key_sequence_.size() > konami_code_.size()) {
+        key_sequence_.pop_front();
     }
 
     // Sprawdź, czy sekwencja pasuje do kodu Konami
-    if (m_keySequence.size() == m_konamiCode.size()) {
+    if (key_sequence_.size() == konami_code_.size()) {
         bool match = true;
-        for (size_t i = 0; i < m_konamiCode.size(); ++i) {
-            if (m_keySequence[i] != m_konamiCode[i]) {
+        for (size_t i = 0; i < konami_code_.size(); ++i) {
+            if (key_sequence_[i] != konami_code_[i]) {
                 match = false;
                 break;
             }
@@ -840,10 +838,10 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
         if (match) {
             qDebug() << "KONAMI CODE ENTERED! Starting destruction sequence.";
             // Wywołaj nową funkcję zamiast emitować sygnał od razu
-            startDestructionSequence(); // <<< ZMIANA TUTAJ
-            m_keySequence.clear();
-            if (m_hintTimer->isActive()) {
-                m_hintTimer->stop();
+            StartDestructionSequence(); // <<< ZMIANA TUTAJ
+            key_sequence_.clear();
+            if (hint_timer_->isActive()) {
+                hint_timer_->stop();
             }
             // Nie emituj już konamiCodeEntered tutaj
             // emit konamiCodeEntered();
@@ -855,60 +853,60 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
     event->accept(); // Akceptuj zdarzenie, aby nie było przekazywane wyżej
 }
 
-void FloatingEnergySphereWidget::startDestructionSequence()
+void FloatingEnergySphereWidget::StartDestructionSequence()
 {
-    if (m_isDestroying) return; // Już w trakcie niszczenia
+    if (is_destroying_) return; // Już w trakcie niszczenia
 
     qDebug() << "Starting destruction sequence...";
-    m_isDestroying = true;
-    m_destructionProgress = 0.0f;
-    setClosable(false); // Zapobiegaj zamknięciu przez użytkownika podczas animacji
-    m_clickSimulationTimer->stop();
+    is_destroying_ = true;
+    destruction_progress_ = 0.0f;
+    SetClosable(false); // Zapobiegaj zamknięciu przez użytkownika podczas animacji
+    click_simulation_timer_->stop();
 
     // Zatrzymaj obecne audio (np. podpowiedź), jeśli gra
-    if (m_player->state() == QMediaPlayer::PlayingState) {
-        m_player->stop();
+    if (media_player_->state() == QMediaPlayer::PlayingState) {
+        media_player_->stop();
     }
-    if (m_decoder && m_decoder->state() != QAudioDecoder::StoppedState) {
-        m_decoder->stop(); // Zatrzymaj też dekoder, jeśli działał
+    if (audio_decoder_ && audio_decoder_->state() != QAudioDecoder::StoppedState) {
+        audio_decoder_->stop(); // Zatrzymaj też dekoder, jeśli działał
     }
 
     // Znajdź i odtwórz dźwięk "goodbye.wav"
-    const QString appDirPath = QCoreApplication::applicationDirPath();
-    const QString audioSubDir = "/assets/audio/";
-    const QString goodbyeFilePath = QDir::cleanPath(appDirPath + audioSubDir + GOODBYE_SOUND_FILENAME);
+    const QString app_dir_path = QCoreApplication::applicationDirPath();
+    const QString audio_sub_dir = "/assets/audio/";
+    const QString goodbye_file_path = QDir::cleanPath(app_dir_path + audio_sub_dir + kGoodbyeSoundFilename);
 
-    if (QFile::exists(goodbyeFilePath)) {
-        const QUrl goodbyeFileUrl = QUrl::fromLocalFile(goodbyeFilePath);
-        qDebug() << "Playing destruction audio:" << goodbyeFilePath;
-        m_player->setMedia(goodbyeFileUrl);
-        m_player->setVolume(80); // Ustaw głośność
-        m_player->play();
+    if (QFile::exists(goodbye_file_path)) {
+        const QUrl goodbye_file_url = QUrl::fromLocalFile(goodbye_file_path);
+        qDebug() << "Playing destruction audio:" << goodbye_file_path;
+        media_player_->setMedia(goodbye_file_url);
+        media_player_->setVolume(80); // Ustaw głośność
+        media_player_->play();
     } else {
-        qCritical() << "Destruction audio file not found:" << goodbyeFilePath;
+        qCritical() << "Destruction audio file not found:" << goodbye_file_path;
         // Co zrobić, jeśli plik nie istnieje? Można od razu emitować sygnał zakończenia
         // lub kontynuować bez dźwięku. Dla bezpieczeństwa emitujmy od razu.
         emit destructionSequenceFinished();
-        m_closable = true;
+        closable_ = true;
         close();
     }
 }
 
 // --- Nowy slot do obsługi zmiany stanu odtwarzacza ---
-void FloatingEnergySphereWidget::handlePlayerStateChanged(const QMediaPlayer::State state)
+void FloatingEnergySphereWidget::HandlePlayerStateChanged(const QMediaPlayer::State state)
 {
     qDebug() << "Player state changed to:" << state;
 
     // --- Logika dla zakończenia dźwięku zniszczenia ---
-    if (m_isDestroying && state == QMediaPlayer::StoppedState) {
+    if (is_destroying_ && state == QMediaPlayer::StoppedState) {
         // Sprawdź, czy zakończony plik to rzeczywiście dźwięk zniszczenia
-        if (m_player->media().canonicalUrl().fileName() == GOODBYE_SOUND_FILENAME) {
+        if (media_player_->media().canonicalUrl().fileName() == kGoodbyeSoundFilename) {
             qDebug() << "Destruction audio finished.";
             // Upewnij się, że animacja wizualnie dobiegła końca (opcjonalne opóźnienie lub sprawdzenie progress)
             // Dla uproszczenia emitujemy od razu
             emit destructionSequenceFinished();
             // Pozwól na zamknięcie i zamknij widget
-            m_closable = true;
+            closable_ = true;
             close(); // Wywołaj closeEvent
             return; // Zakończ obsługę dla tego stanu
         }
@@ -916,32 +914,32 @@ void FloatingEnergySphereWidget::handlePlayerStateChanged(const QMediaPlayer::St
     // --- Koniec logiki dla zniszczenia ---
 
     // Sprawdź, czy audio się zakończyło i czy timer podpowiedzi jeszcze nie działa
-    if (!m_isDestroying && state == QMediaPlayer::StoppedState && !m_hintTimer->isActive()) {
+    if (!is_destroying_ && state == QMediaPlayer::StoppedState && !hint_timer_->isActive()) {
         // Sprawdź, czy pozycja jest bliska końca (unikaj uruchomienia timera przy błędach na starcie)
-        if (m_player->position() > 0 && m_player->duration() > 0 &&
-            m_player->position() >= m_player->duration() - 100) // Mały margines na końcu
+        if (media_player_->position() > 0 && media_player_->duration() > 0 &&
+            media_player_->position() >= media_player_->duration() - 100) // Mały margines na końcu
         {
             qDebug() << "Initial audio finished. Starting 30s hint timer.";
-            m_hintTimer->setSingleShot(true); // Upewnij się, że jest jednorazowy
-            m_hintTimer->start(30000); // 30 sekund
-        } else if (m_player->position() == 0 && m_player->error() == QMediaPlayer::NoError) {
+            hint_timer_->setSingleShot(true); // Upewnij się, że jest jednorazowy
+            hint_timer_->start(30000); // 30 sekund
+        } else if (media_player_->position() == 0 && media_player_->error() == QMediaPlayer::NoError) {
              // Jeśli stan to Stopped, ale pozycja 0 (np. po ręcznym stop()), nie startuj timera
              qDebug() << "Player stopped manually or before starting, not starting hint timer.";
-        } else if (m_player->error() != QMediaPlayer::NoError) {
+        } else if (media_player_->error() != QMediaPlayer::NoError) {
              qDebug() << "Player stopped due to error, not starting hint timer.";
         }
-    } else if (!m_isDestroying && state == QMediaPlayer::PlayingState) {
+    } else if (!is_destroying_ && state == QMediaPlayer::PlayingState) {
         // Jeśli odtwarzanie się wznowi (np. hint), zatrzymaj timer
-        if (m_hintTimer->isActive()) {
+        if (hint_timer_->isActive()) {
             qDebug() << "Player started playing, stopping hint timer.";
-            m_hintTimer->stop();
+            hint_timer_->stop();
         }
     }
 }
 
 
 // --- Nowy slot do odtwarzania podpowiedzi ---
-void FloatingEnergySphereWidget::playKonamiHint() const {
+void FloatingEnergySphereWidget::PlayKonamiHint() const {
     qDebug() << "Hint timer timed out. Attempting to play Konami hint.";
 
     // Sprawdź, czy widget jest nadal widoczny/aktywny
@@ -950,46 +948,46 @@ void FloatingEnergySphereWidget::playKonamiHint() const {
         return;
     }
 
-    const QString appDirPath = QCoreApplication::applicationDirPath();
-    const QString audioSubDir = "/assets/audio/";
-    const QString hintFileName = "konami.wav"; // Nazwa pliku podpowiedzi
-    const QString hintFilePath = QDir::cleanPath(appDirPath + audioSubDir + hintFileName);
+    const QString app_dir_path = QCoreApplication::applicationDirPath();
+    const QString audio_sub_dir = "/assets/audio/";
+    const QString hint_file_name = "konami.wav"; // Nazwa pliku podpowiedzi
+    const QString file_name = QDir::cleanPath(app_dir_path + audio_sub_dir + hint_file_name);
 
-    if (QFile::exists(hintFilePath)) {
-        const QUrl hintFileUrl = QUrl::fromLocalFile(hintFilePath);
-        qDebug() << "Playing Konami hint audio:" << hintFilePath;
+    if (QFile::exists(file_name)) {
+        const QUrl hintFileUrl = QUrl::fromLocalFile(file_name);
+        qDebug() << "Playing Konami hint audio:" << file_name;
 
         // Zatrzymaj dekoder, jeśli działał (nie powinien, ale na wszelki wypadek)
-        if (m_decoder && m_decoder->state() != QAudioDecoder::StoppedState) {
-            m_decoder->stop();
+        if (audio_decoder_ && audio_decoder_->state() != QAudioDecoder::StoppedState) {
+            audio_decoder_->stop();
         }
         // Zatrzymaj odtwarzacz, jeśli grał coś innego
-        if (m_player->state() != QMediaPlayer::StoppedState) {
-            m_player->stop();
+        if (media_player_->state() != QMediaPlayer::StoppedState) {
+            media_player_->stop();
         }
 
         // Ustaw nowe źródło i odtwórz
-        m_player->setMedia(hintFileUrl);
-        m_player->setVolume(85); // Można ustawić inną głośność dla podpowiedzi
-        m_player->play();
+        media_player_->setMedia(hintFileUrl);
+        media_player_->setVolume(85); // Można ustawić inną głośność dla podpowiedzi
+        media_player_->play();
 
     } else {
-        qCritical() << "Konami hint audio file not found:" << hintFilePath;
-        qCritical() << "Ensure the 'assets/audio' folder with '" << hintFileName << "' is copied next to the executable.";
+        qCritical() << "Konami hint audio file not found:" << file_name;
+        qCritical() << "Ensure the 'assets/audio' folder with '" << hint_file_name << "' is copied next to the executable.";
     }
 }
 
 void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 {
-    qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << m_closable << "Destroying:" << m_isDestroying;
-    if (m_closable) {
-        m_timer.stop();
-        m_clickSimulationTimer->stop();
-        if(m_player) m_player->stop();
-        if(m_decoder) m_decoder->stop();
-        if(m_hintTimer && m_hintTimer->isActive()) m_hintTimer->stop();
+    qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << closable_ << "Destroying:" << is_destroying_;
+    if (closable_) {
+        timer_.stop();
+        click_simulation_timer_->stop();
+        if(media_player_) media_player_->stop();
+        if(audio_decoder_) audio_decoder_->stop();
+        if(hint_timer_ && hint_timer_->isActive()) hint_timer_->stop();
 
-        if (!m_isDestroying) {
+        if (!is_destroying_) {
             emit widgetClosed();
         }
         QWidget::closeEvent(event);
@@ -1000,23 +998,23 @@ void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 }
 
 
-void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPos)
+void FloatingEnergySphereWidget::TriggerImpactAtScreenPos(const QPoint& screen_position)
 {
-    if (m_isDestroying || !isVisible()) return; // Nie rób nic, jeśli niszczymy lub widget jest niewidoczny
+    if (is_destroying_ || !isVisible()) return; // Nie rób nic, jeśli niszczymy lub widget jest niewidoczny
 
     makeCurrent(); // Upewnij się, że kontekst GL jest aktywny
 
     // --- Logika Ray Casting (przeniesiona z mousePressEvent) ---
-    const float winX = screenPos.x();
-    const float winY = height() - screenPos.y(); // Odwróć Y dla OpenGL
+    const float win_x = screen_position.x();
+    const float win_y = height() - screen_position.y(); // Odwróć Y dla OpenGL
 
     // Potrzebujemy aktualnych macierzy widoku i projekcji
     // Jeśli nie są one składowymi klasy, trzeba je będzie uzyskać/obliczyć tutaj
     // Zakładając, że m_viewMatrix i m_projectionMatrix są aktualne:
-    const QMatrix4x4 viewProj = m_projectionMatrix * m_viewMatrix * m_modelMatrix; // Połączone macierze
+    const QMatrix4x4 view_projection = projection_matrix_ * view_matrix_ * model_matrix_; // Połączone macierze
 
     bool invertible;
-    const QMatrix4x4 inverseViewProj = viewProj.inverted(&invertible);
+    const QMatrix4x4 inverse_view_projection = view_projection.inverted(&invertible);
 
     if (!invertible) {
         qWarning() << "Cannot invert view-projection matrix for ray casting.";
@@ -1025,36 +1023,36 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
     }
 
     // Normalizowane współrzędne urządzenia (NDC)
-    const float ndcX = (2.0f * winX) / width() - 1.0f;
-    const float ndcY = (2.0f * winY) / height() - 1.0f; // Y już odwrócone wcześniej
+    const float ndc_x = (2.0f * win_x) / width() - 1.0f;
+    const float ndc_y = (2.0f * win_y) / height() - 1.0f; // Y już odwrócone wcześniej
 
     // Współrzędne w przestrzeni świata (lub oka, zależnie od macierzy)
-    const QVector4D nearPointH = inverseViewProj * QVector4D(ndcX, ndcY, -1.0f, 1.0f); // Bliska płaszczyzna
-    const QVector4D farPointH  = inverseViewProj * QVector4D(ndcX, ndcY,  1.0f, 1.0f); // Daleka płaszczyzna
+    const QVector4D near_point_h = inverse_view_projection * QVector4D(ndc_x, ndc_y, -1.0f, 1.0f); // Bliska płaszczyzna
+    const QVector4D far_point_h  = inverse_view_projection * QVector4D(ndc_x, ndc_y,  1.0f, 1.0f); // Daleka płaszczyzna
 
-    if (qAbs(nearPointH.w()) < 1e-6 || qAbs(farPointH.w()) < 1e-6) {
+    if (qAbs(near_point_h.w()) < 1e-6 || qAbs(far_point_h.w()) < 1e-6) {
          qWarning() << "W component is zero during unprojection.";
          doneCurrent();
          return;
     }
 
     // Podziel przez W, aby uzyskać współrzędne 3D
-    const QVector3D nearPoint = nearPointH.toVector3DAffine(); // nearPointH.toVector3D() / nearPointH.w();
-    const QVector3D farPoint  = farPointH.toVector3DAffine(); // farPointH.toVector3D() / farPointH.w();
+    const QVector3D near_point = near_point_h.toVector3DAffine(); // nearPointH.toVector3D() / nearPointH.w();
+    const QVector3D far_point  = far_point_h.toVector3DAffine(); // farPointH.toVector3D() / farPointH.w();
 
 
     // Kierunek promienia (z punktu widzenia kamery)
-    const QVector3D rayDir = (farPoint - nearPoint).normalized();
+    const QVector3D ray_direction = (far_point - near_point).normalized();
     // Początek promienia (pozycja kamery w przestrzeni modelu)
     // Można użyć nearPoint lub pozycji kamery, jeśli jest znana
-    const QVector3D rayOrigin = nearPoint; // Użycie nearPoint jest często wystarczające
+    const QVector3D ray_origin = near_point; // Użycie nearPoint jest często wystarczające
 
 
     // Przecięcie Promień-Sfera (centrum w 0,0,0, promień ~1.0)
-    constexpr float R = 1.0f; // Załóżmy promień 1.0
-    const float a = QVector3D::dotProduct(rayDir, rayDir); // Powinno być 1.0, jeśli znormalizowany
-    const float b = 2.0f * QVector3D::dotProduct(rayOrigin, rayDir);
-    const float c = QVector3D::dotProduct(rayOrigin, rayOrigin) - R * R;
+    constexpr float radius = 1.0f; // Załóżmy promień 1.0
+    const float a = QVector3D::dotProduct(ray_direction, ray_direction); // Powinno być 1.0, jeśli znormalizowany
+    const float b = 2.0f * QVector3D::dotProduct(ray_origin, ray_direction);
+    const float c = QVector3D::dotProduct(ray_origin, ray_origin) - radius * radius;
 
     const float discriminant = b * b - 4.0f * a * c;
 
@@ -1064,20 +1062,20 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
         const float t = t1; // Bierzemy bliższy punkt
 
         if (t > 0.001f) { // Sprawdź, czy przecięcie jest przed kamerą
-            const QVector3D intersectionPoint = rayOrigin + t * rayDir;
-            const QVector3D normalizedImpactPoint = intersectionPoint.normalized(); // Punkt na sferze jednostkowej
+            const QVector3D intersection_point = ray_origin + t * ray_direction;
+            const QVector3D normalized_impact_point = intersection_point.normalized(); // Punkt na sferze jednostkowej
 
             // --- Dodaj efekt uderzenia ---
             if (MAX_IMPACTS > 0) { // Sprawdź, czy tablica/wektor może istnieć
                 // Modulo zapewni, że indeks jest w zakresie [0, MAX_IMPACTS-1]
-                const int indexToUse = m_nextImpactIndex % MAX_IMPACTS;
+                const int index_to_use = next_impact_index_ % MAX_IMPACTS;
 
                 // Dodatkowe sprawdzenie (jeśli używasz wektora i nie masz pewności co do rozmiaru)
                 // if (indexToUse >= 0 && indexToUse < m_impacts.size()) {
-                m_impacts[indexToUse].point = normalizedImpactPoint;
-                m_impacts[indexToUse].startTime = m_timeValue;
-                m_impacts[indexToUse].active = true;
-                m_nextImpactIndex = (indexToUse + 1) % MAX_IMPACTS; // Aktualizuj używając poprawnego indeksu
+                impacts_[index_to_use].point = normalized_impact_point;
+                impacts_[index_to_use].start_time = time_value_;
+                impacts_[index_to_use].active = true;
+                next_impact_index_ = (index_to_use + 1) % MAX_IMPACTS; // Aktualizuj używając poprawnego indeksu
                 // } else {
                 //     qWarning() << "Invalid index or impacts container size for simulated impact.";
                 // }
@@ -1092,8 +1090,8 @@ void FloatingEnergySphereWidget::triggerImpactAtScreenPos(const QPoint& screenPo
     doneCurrent(); // Zwolnij kontekst GL
 }
 
-void FloatingEnergySphereWidget::simulateClick() {
-    if (m_isDestroying || !isVisible() || width() <= 0 || height() <= 0) {
+void FloatingEnergySphereWidget::SimulateClick() {
+    if (is_destroying_ || !isVisible() || width() <= 0 || height() <= 0) {
         return; // Nie symuluj, jeśli niszczymy, niewidoczny lub rozmiar jest nieprawidłowy
     }
 
@@ -1102,11 +1100,11 @@ void FloatingEnergySphereWidget::simulateClick() {
     static std::mt19937 gen(rd());
 
     // Wygeneruj losowe współrzędne X, Y w obrębie widgetu
-    std::uniform_int_distribution<> distribX(0, width() - 1);
-    std::uniform_int_distribution<> distribY(0, height() - 1);
+    std::uniform_int_distribution<> distrib_x(0, width() - 1);
+    std::uniform_int_distribution<> distrib_y(0, height() - 1);
 
-    const QPoint randomScreenPos(distribX(gen), distribY(gen));
+    const QPoint screen_position(distrib_x(gen), distrib_y(gen));
 
     // Wywołaj logikę uderzenia dla wylosowanego punktu
-    triggerImpactAtScreenPos(randomScreenPos);
+    TriggerImpactAtScreenPos(screen_position);
 }

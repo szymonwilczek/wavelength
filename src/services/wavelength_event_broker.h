@@ -10,49 +10,48 @@ class WavelengthEventBroker final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthEventBroker* getInstance() {
+    static WavelengthEventBroker* GetInstance() {
         static WavelengthEventBroker instance;
         return &instance;
     }
     
     // Publikuj zdarzenie
-    void publishEvent(const QString& eventType, const QVariantMap& data = QVariantMap()) {
-        qDebug() << "Publishing event:" << eventType;
-        emit eventPublished(eventType, data);
+    void PublishEvent(const QString& event_type, const QVariantMap& data = QVariantMap()) {
+        qDebug() << "Publishing event:" << event_type;
+        emit eventPublished(event_type, data);
     }
     
     // Podłączanie odbiorników zdarzeń
     template<typename Receiver, typename Func>
     requires std::derived_from<Receiver, QObject> &&
              std::invocable<Func, const QVariantMap&>
-    void subscribeToEvent(const QString& eventType, Receiver* receiver, Func slot);
+    void SubscribeToEvent(const QString& event_type, Receiver* receiver, Func slot);
 
-    // Zdarzenia związane z wavelength
-    void wavelengthCreated(const QString &frequency);
+    void WavelengthCreated(const QString &frequency);
 
-    void wavelengthJoined(const QString &frequency);
+    void WavelengthJoined(const QString &frequency);
 
-    void wavelengthLeft(const QString &frequency);
+    void WavelengthLeft(const QString &frequency);
 
-    void wavelengthClosed(const QString &frequency);
+    void WavelengthClosed(const QString &frequency);
 
-    void messageReceived(const QString &frequency, const QString& message);
+    void MessageReceived(const QString &frequency, const QString& message);
 
-    void messageSent(const QString &frequency, const QString& message);
+    void MessageSent(const QString &frequency, const QString& message);
 
-    void connectionError(const QString& errorMessage);
+    void ConnectionError(const QString& error_message);
 
-    void authenticationFailed(const QString &frequency);
+    void AuthenticationFailed(const QString &frequency);
 
-    void userKicked(const QString &frequency, const QString& reason);
+    void UserKicked(const QString &frequency, const QString& reason);
 
     // Zdarzenia związane ze stanem UI
-    void uiStateChanged(const QString& component, const QVariant& state);
+    void UiStateChanged(const QString& component, const QVariant& state);
 
     // Generyczne zdarzenia systemowe
-    void systemMessage(const QString &frequency, const QString& message);
+    void SystemMessage(const QString &frequency, const QString& message);
 
-    void activeWavelengthChanged(const QString &frequency);
+    void ActiveWavelengthChanged(const QString &frequency);
 
 signals:
     void eventPublished(const QString& eventType, const QVariantMap& data);

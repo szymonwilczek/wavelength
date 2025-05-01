@@ -4,121 +4,112 @@ extern "C" {
     #include <libavutil/opt.h>
 }
 
-
-
-AudioDecoder::AudioDecoder(const QByteArray &audioData, QObject *parent): QThread(parent), m_audioData(audioData), m_stopped(false) {
-    // Zainicjuj domyślne wartości
-    m_formatContext = nullptr;
-    m_audioCodecContext = nullptr;
-    m_swrContext = nullptr;
-    m_audioFrame = nullptr;
-    m_audioStream = -1;
-    m_readPosition = 0;
-    m_audioOutput = nullptr;
-    m_audioDevice = nullptr;
-    m_paused = true;
-    m_reachedEndOfStream = false;
-    m_seeking = false;
-    m_currentPosition = 0;
-    m_initialized = false;
+AudioDecoder::AudioDecoder(const QByteArray &audio_data, QObject *parent): QThread(parent), audio_data_(audio_data), stopped_(false) {
+    format_context_ = nullptr;
+    audio_codec_context_ = nullptr;
+    swr_context_ = nullptr;
+    audio_frame_ = nullptr;
+    audio_stream_ = -1;
+    read_position_ = 0;
+    audio_output_ = nullptr;
+    audio_device_ = nullptr;
+    paused_ = true;
+    reached_end_of_stream_ = false;
+    seeking_ = false;
+    current_position_ = 0;
+    initialized_ = false;
 
     // Zainicjuj bufor z danymi audio
-    m_ioBuffer = static_cast<unsigned char *>(av_malloc(m_audioData.size() + AV_INPUT_BUFFER_PADDING_SIZE));
-    if (!m_ioBuffer) {
+    io_buffer_ = static_cast<unsigned char *>(av_malloc(audio_data_.size() + AV_INPUT_BUFFER_PADDING_SIZE));
+    if (!io_buffer_) {
         emit error("Nie można zaalokować pamięci dla danych audio");
         return;
     }
-    memcpy(m_ioBuffer, m_audioData.constData(), m_audioData.size());
+    memcpy(io_buffer_, audio_data_.constData(), audio_data_.size());
 
-    m_ioContext = avio_alloc_context(
-        m_ioBuffer, m_audioData.size(), 0, this,
-        &AudioDecoder::readPacket, nullptr, &AudioDecoder::seekPacket
+    io_context_ = avio_alloc_context(
+        io_buffer_, audio_data_.size(), 0, this,
+        &AudioDecoder::ReadPacket, nullptr, &AudioDecoder::SeekPacket
     );
-    if (!m_ioContext) {
-        av_free(m_ioBuffer);
-        m_ioBuffer = nullptr;
+    if (!io_context_) {
+        av_free(io_buffer_);
+        io_buffer_ = nullptr;
         emit error("Nie można utworzyć kontekstu I/O");
         return;
     }
 }
 
 AudioDecoder::~AudioDecoder() {
-    // Upewnij się, że wszystkie zasoby są zwolnione
-    stop();
-    wait(); // Poczekaj aż wątek się zakończy przed zwolnieniem zasobów
-    releaseResources();
+    Stop();
+    wait();
+    ReleaseResources();
 }
 
-void AudioDecoder::releaseResources() {
-    QMutexLocker locker(&m_mutex);
+void AudioDecoder::ReleaseResources() {
+    QMutexLocker locker(&mutex_);
 
-    // Zatrzymaj odtwarzanie audio
-    if (m_audioOutput) {
-        m_audioOutput->stop();
-        delete m_audioOutput;
-        m_audioOutput = nullptr;
-        m_audioDevice = nullptr;
+    if (audio_output_) {
+        audio_output_->stop();
+        delete audio_output_;
+        audio_output_ = nullptr;
+        audio_device_ = nullptr;
     }
 
-    if (m_audioFrame) {
-        av_frame_free(&m_audioFrame);
-        m_audioFrame = nullptr;
+    if (audio_frame_) {
+        av_frame_free(&audio_frame_);
+        audio_frame_ = nullptr;
     }
 
-    if (m_audioCodecContext) {
-        avcodec_close(m_audioCodecContext);
-        avcodec_free_context(&m_audioCodecContext);
-        m_audioCodecContext = nullptr;
+    if (audio_codec_context_) {
+        avcodec_close(audio_codec_context_);
+        avcodec_free_context(&audio_codec_context_);
+        audio_codec_context_ = nullptr;
     }
 
-    if (m_swrContext) {
-        swr_free(&m_swrContext);
-        m_swrContext = nullptr;
+    if (swr_context_) {
+        swr_free(&swr_context_);
+        swr_context_ = nullptr;
     }
 
-    if (m_formatContext) {
-        if (m_formatContext->pb == m_ioContext)
-            m_formatContext->pb = nullptr;
-        avformat_close_input(&m_formatContext);
-        m_formatContext = nullptr;
+    if (format_context_) {
+        if (format_context_->pb == io_context_)
+            format_context_->pb = nullptr;
+        avformat_close_input(&format_context_);
+        format_context_ = nullptr;
     }
 
-    // Nie zwalniamy bufora IO od razu, tylko przy zniszczeniu dekodera lub reinicjalizacji
-    m_initialized = false;
+    initialized_ = false;
 }
 
-bool AudioDecoder::reinitialize() {
-    QMutexLocker locker(&m_mutex);
+bool AudioDecoder::Reinitialize() {
+    QMutexLocker locker(&mutex_);
 
-    // Najpierw uwolnij istniejące zasoby
-    releaseResources();
+    ReleaseResources();
 
-    // Zresetuj stany
-    m_stopped = false;
-    m_paused = true;
-    m_reachedEndOfStream = false;
-    m_seeking = false;
-    m_currentPosition = 0;
-    m_readPosition = 0;
+    stopped_ = false;
+    paused_ = true;
+    reached_end_of_stream_ = false;
+    seeking_ = false;
+    current_position_ = 0;
+    read_position_ = 0;
 
-    // Ponownie utwórz bufor IO jeśli został zwolniony
-    if (!m_ioBuffer) {
-        m_ioBuffer = static_cast<unsigned char *>(av_malloc(m_audioData.size() + AV_INPUT_BUFFER_PADDING_SIZE));
-        if (!m_ioBuffer) {
+    if (!io_buffer_) {
+        io_buffer_ = static_cast<unsigned char *>(av_malloc(audio_data_.size() + AV_INPUT_BUFFER_PADDING_SIZE));
+        if (!io_buffer_) {
             emit error("Nie można zaalokować pamięci dla danych audio");
             return false;
         }
-        memcpy(m_ioBuffer, m_audioData.constData(), m_audioData.size());
+        memcpy(io_buffer_, audio_data_.constData(), audio_data_.size());
     }
 
-    if (!m_ioContext) {
-        m_ioContext = avio_alloc_context(
-            m_ioBuffer, m_audioData.size(), 0, this,
-            &AudioDecoder::readPacket, nullptr, &AudioDecoder::seekPacket
+    if (!io_context_) {
+        io_context_ = avio_alloc_context(
+            io_buffer_, audio_data_.size(), 0, this,
+            &AudioDecoder::ReadPacket, nullptr, &AudioDecoder::SeekPacket
         );
-        if (!m_ioContext) {
-            av_free(m_ioBuffer);
-            m_ioBuffer = nullptr;
+        if (!io_context_) {
+            av_free(io_buffer_);
+            io_buffer_ = nullptr;
             emit error("Nie można utworzyć kontekstu I/O");
             return false;
         }
@@ -127,233 +118,227 @@ bool AudioDecoder::reinitialize() {
     return true;
 }
 
-void AudioDecoder::setVolume(const float volume) const {
-    QMutexLocker locker(&m_mutex);
-    if (m_audioOutput) {
-        m_audioOutput->setVolume(volume);
+void AudioDecoder::SetVolume(const float volume) const {
+    QMutexLocker locker(&mutex_);
+    if (audio_output_) {
+        audio_output_->setVolume(volume);
     }
 }
 
-float AudioDecoder::getVolume() const {
-    QMutexLocker locker(&m_mutex);
-    return m_audioOutput ? m_audioOutput->volume() : 0.0f;
+float AudioDecoder::GetVolume() const {
+    QMutexLocker locker(&mutex_);
+    return audio_output_ ? audio_output_->volume() : 0.0f;
 }
 
-bool AudioDecoder::initialize() {
-    QMutexLocker locker(&m_mutex);
+bool AudioDecoder::Initialize() {
+    QMutexLocker locker(&mutex_);
 
-    if (m_initialized) return true;  // Nie inicjalizuj ponownie, jeśli już zainicjalizowano
+    if (initialized_) return true;
 
-    // Utwórz kontekst formatu
-    m_formatContext = avformat_alloc_context();
-    if (!m_formatContext) {
+    format_context_ = avformat_alloc_context();
+    if (!format_context_) {
         emit error("Nie można utworzyć kontekstu formatu");
         return false;
     }
 
-    m_formatContext->pb = m_ioContext;
+    format_context_->pb = io_context_;
 
-    // Otwórz strumień audio
-    if (avformat_open_input(&m_formatContext, "", nullptr, nullptr) < 0) {
+    if (avformat_open_input(&format_context_, "", nullptr, nullptr) < 0) {
         emit error("Nie można otworzyć strumienia audio");
         return false;
     }
 
-    // Znajdź informacje o strumieniu
-    if (avformat_find_stream_info(m_formatContext, nullptr) < 0) {
+    if (avformat_find_stream_info(format_context_, nullptr) < 0) {
         emit error("Nie można znaleźć informacji o strumieniu");
         return false;
     }
 
-    // Znajdź pierwszy strumień audio
-    m_audioStream = -1;
-    for (unsigned int i = 0; i < m_formatContext->nb_streams; i++) {
-        if (m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            m_audioStream = i;
+    audio_stream_ = -1;
+    for (unsigned int i = 0; i < format_context_->nb_streams; i++) {
+        if (format_context_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio_stream_ = i;
             break;
         }
     }
 
-    if (m_audioStream == -1) {
+    if (audio_stream_ == -1) {
         emit error("Nie znaleziono strumienia audio");
         return false;
     }
 
-    // Znajdź dekoder audio
-    const AVCodec* audioCodec = avcodec_find_decoder(
-        m_formatContext->streams[m_audioStream]->codecpar->codec_id
+    const AVCodec* audio_codec = avcodec_find_decoder(
+        format_context_->streams[audio_stream_]->codecpar->codec_id
     );
-    if (!audioCodec) {
+    if (!audio_codec) {
         emit error("Nie znaleziono dekodera dla tego formatu audio");
         return false;
     }
 
-    // Utwórz kontekst kodeka audio
-    m_audioCodecContext = avcodec_alloc_context3(audioCodec);
-    if (!m_audioCodecContext) {
+    audio_codec_context_ = avcodec_alloc_context3(audio_codec);
+    if (!audio_codec_context_) {
         emit error("Nie można utworzyć kontekstu kodeka audio");
         return false;
     }
 
     // Skopiuj parametry kodeka audio
     if (avcodec_parameters_to_context(
-            m_audioCodecContext,
-            m_formatContext->streams[m_audioStream]->codecpar
+            audio_codec_context_,
+            format_context_->streams[audio_stream_]->codecpar
         ) < 0) {
         emit error("Nie można skopiować parametrów kodeka audio");
         return false;
     }
 
     // Otwórz kodek audio
-    if (avcodec_open2(m_audioCodecContext, audioCodec, nullptr) < 0) {
+    if (avcodec_open2(audio_codec_context_, audio_codec, nullptr) < 0) {
         emit error("Nie można otworzyć kodeka audio");
         return false;
     }
 
     // Alokuj ramkę audio
-    m_audioFrame = av_frame_alloc();
-    if (!m_audioFrame) {
+    audio_frame_ = av_frame_alloc();
+    if (!audio_frame_) {
         emit error("Nie można zaalokować ramki audio");
         return false;
     }
 
     // Utwórz kontekst resamplingu
-    m_swrContext = swr_alloc();
-    if (!m_swrContext) {
+    swr_context_ = swr_alloc();
+    if (!swr_context_) {
         emit error("Nie można utworzyć kontekstu resamplingu audio");
         return false;
     }
 
     // Inicjalizacja layoutu kanałów wyjściowych (stereo)
-    AVChannelLayout outLayout;
-    av_channel_layout_default(&outLayout, 2); // 2 kanały (stereo)
+    AVChannelLayout out_layout;
+    av_channel_layout_default(&out_layout, 2); // 2 kanały (stereo)
 
     // Konfiguracja resamplingu do formatu PCM S16LE stereo 44.1kHz
-    av_opt_set_chlayout(m_swrContext, "in_chlayout", &m_audioCodecContext->ch_layout, 0);
-    av_opt_set_chlayout(m_swrContext, "out_chlayout", &outLayout, 0);
-    av_opt_set_int(m_swrContext, "in_sample_rate", m_audioCodecContext->sample_rate, 0);
-    av_opt_set_int(m_swrContext, "out_sample_rate", 44100, 0);
-    av_opt_set_sample_fmt(m_swrContext, "in_sample_fmt", m_audioCodecContext->sample_fmt, 0);
-    av_opt_set_sample_fmt(m_swrContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
-    av_opt_set_int(m_swrContext, "resampler_quality", 7, 0);
+    av_opt_set_chlayout(swr_context_, "in_chlayout", &audio_codec_context_->ch_layout, 0);
+    av_opt_set_chlayout(swr_context_, "out_chlayout", &out_layout, 0);
+    av_opt_set_int(swr_context_, "in_sample_rate", audio_codec_context_->sample_rate, 0);
+    av_opt_set_int(swr_context_, "out_sample_rate", 44100, 0);
+    av_opt_set_sample_fmt(swr_context_, "in_sample_fmt", audio_codec_context_->sample_fmt, 0);
+    av_opt_set_sample_fmt(swr_context_, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+    av_opt_set_int(swr_context_, "resampler_quality", 7, 0);
 
-    if (swr_init(m_swrContext) < 0) {
+    if (swr_init(swr_context_) < 0) {
         emit error("Nie można zainicjalizować kontekstu resamplingu audio");
-        av_channel_layout_uninit(&outLayout);
+        av_channel_layout_uninit(&out_layout);
         return false;
     }
 
     // Zwolnij pamięć layoutu kanałów wyjściowych
-    av_channel_layout_uninit(&outLayout);
+    av_channel_layout_uninit(&out_layout);
 
     // Konfiguracja formatu audio dla Qt
-    m_audioFormat.setSampleRate(44100);
-    m_audioFormat.setChannelCount(2);
-    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
-    m_audioFormat.setSampleSize(16);
-    m_audioFormat.setCodec("audio/pcm");
+    audio_format_.setSampleRate(44100);
+    audio_format_.setChannelCount(2);
+    audio_format_.setSampleType(QAudioFormat::SignedInt);
+    audio_format_.setSampleSize(16);
+    audio_format_.setCodec("audio/pcm");
 
     // Inicjalizacja wyjścia audio
-    m_audioOutput = new QAudioOutput(m_audioFormat, nullptr);
-    m_audioOutput->setVolume(1.0);
-    constexpr int suggestedBufferSize = 44100 * 2 * 2 / 2;
-    m_audioOutput->setBufferSize(qMax(suggestedBufferSize, m_audioOutput->bufferSize()));
-    m_audioDevice = m_audioOutput->start();
+    audio_output_ = new QAudioOutput(audio_format_, nullptr);
+    audio_output_->setVolume(1.0);
+    constexpr int suggested_buffer_size = 44100 * 2 * 2 / 2;
+    audio_output_->setBufferSize(qMax(suggested_buffer_size, audio_output_->bufferSize()));
+    audio_device_ = audio_output_->start();
 
-    if (!m_audioDevice || !m_audioDevice->isOpen()) {
+    if (!audio_device_ || !audio_device_->isOpen()) {
         emit error("Nie można otworzyć urządzenia audio");
         return false;
     }
 
     // Wyemituj informacje o audio
-    const double duration = m_formatContext->duration / static_cast<double>(AV_TIME_BASE);
-    emit audioInfo(m_audioCodecContext->sample_rate, m_audioCodecContext->ch_layout.nb_channels, duration);
+    const double duration = format_context_->duration / static_cast<double>(AV_TIME_BASE);
+    emit audioInfo(audio_codec_context_->sample_rate, audio_codec_context_->ch_layout.nb_channels, duration);
 
-    m_initialized = true;
+    initialized_ = true;
     return true;
 }
 
-void AudioDecoder::stop() {
-    QMutexLocker locker(&m_mutex);
-    m_stopped = true;
+void AudioDecoder::Stop() {
+    QMutexLocker locker(&mutex_);
+    stopped_ = true;
     locker.unlock();
-    m_waitCondition.wakeOne();
+    wait_condition_.wakeOne();
 }
 
-void AudioDecoder::pause() {
-    QMutexLocker locker(&m_mutex);
-    m_paused = !m_paused;
+void AudioDecoder::Pause() {
+    QMutexLocker locker(&mutex_);
+    paused_ = !paused_;
     locker.unlock();
 
-    if (!m_paused)
-        m_waitCondition.wakeOne();
+    if (!paused_)
+        wait_condition_.wakeOne();
 }
 
-bool AudioDecoder::isPaused() const {
-    QMutexLocker locker(&m_mutex);
-    return m_paused;
+bool AudioDecoder::IsPaused() const {
+    QMutexLocker locker(&mutex_);
+    return paused_;
 }
 
-void AudioDecoder::seek(const double position) {
-    QMutexLocker locker(&m_mutex);
+void AudioDecoder::Seek(const double position) {
+    QMutexLocker locker(&mutex_);
 
-    if (!m_formatContext || m_audioStream < 0) return;
+    if (!format_context_ || audio_stream_ < 0) return;
 
     int64_t timestamp = position * AV_TIME_BASE;
 
     // Bezpieczne ograniczenie pozycji
     if (timestamp < 0) timestamp = 0;
-    if (timestamp > m_formatContext->duration)
-        timestamp = m_formatContext->duration > 0 ? m_formatContext->duration - 1 : 0;
+    if (timestamp > format_context_->duration)
+        timestamp = format_context_->duration > 0 ? format_context_->duration - 1 : 0;
 
     timestamp = av_rescale_q(timestamp, AV_TIME_BASE_Q,
-                             m_formatContext->streams[m_audioStream]->time_base);
+                             format_context_->streams[audio_stream_]->time_base);
 
-    m_seekPosition = timestamp;
-    m_seeking = true;
+    seek_position_ = timestamp;
+    seeking_ = true;
     locker.unlock();
 
-    if (m_paused)
-        m_waitCondition.wakeOne();
+    if (paused_)
+        wait_condition_.wakeOne();
 }
 
-void AudioDecoder::reset() {
-    QMutexLocker locker(&m_mutex);
+void AudioDecoder::Reset() {
+    QMutexLocker locker(&mutex_);
 
     // Resetuj pozycję strumienia na początek
-    if (m_formatContext && m_audioStream >= 0) {
-        av_seek_frame(m_formatContext, m_audioStream, 0, AVSEEK_FLAG_BACKWARD);
-        if (m_audioCodecContext) {
-            avcodec_flush_buffers(m_audioCodecContext);
+    if (format_context_ && audio_stream_ >= 0) {
+        av_seek_frame(format_context_, audio_stream_, 0, AVSEEK_FLAG_BACKWARD);
+        if (audio_codec_context_) {
+            avcodec_flush_buffers(audio_codec_context_);
         }
-        m_currentPosition = 0;
+        current_position_ = 0;
         emit positionChanged(0);
 
         // Upewniamy się, że urządzenie audio jest gotowe
-        if (m_audioOutput) {
-            m_audioOutput->reset();
-            m_audioDevice = m_audioOutput->start();
+        if (audio_output_) {
+            audio_output_->reset();
+            audio_device_ = audio_output_->start();
         }
     }
 
     // Resetuj flagi stanu
-    m_seeking = false;
-    m_seekPosition = 0;
-    m_reachedEndOfStream = false;
+    seeking_ = false;
+    seek_position_ = 0;
+    reached_end_of_stream_ = false;
 }
 
 void AudioDecoder::run() {
-    if (!initialize()) {
+    if (!Initialize()) {
         return;
     }
 
     AVPacket packet;
-    QElapsedTimer positionTimer;
-    positionTimer.start();
+    QElapsedTimer position_timer;
+    position_timer.start();
 
     // Potrzebna zmienna do śledzenia poprzedniej pozycji
-    double lastEmittedPosition = 0;
-    constexpr int positionUpdateInterval = 250; // ms
+    double last_emitted_position = 0;
+    constexpr int position_update_interval = 250; // ms
 
     // Limiter tempa odtwarzania
     // QElapsedTimer playbackTimer;
@@ -363,73 +348,73 @@ void AudioDecoder::run() {
     // int64_t samplesProcessed = 0;
     // int64_t lastReportedSamples = 0;
 
-    while (!m_stopped) {
-        QMutexLocker locker(&m_mutex);
+    while (!stopped_) {
+        QMutexLocker locker(&mutex_);
 
-        if (m_paused) {
-            m_waitCondition.wait(&m_mutex);
+        if (paused_) {
+            wait_condition_.wait(&mutex_);
             locker.unlock();
 
             continue;
         }
 
-        if (m_seeking) {
-            if (m_formatContext && m_audioStream >= 0) {
-                av_seek_frame(m_formatContext, m_audioStream, m_seekPosition, AVSEEK_FLAG_BACKWARD);
-                if (m_audioCodecContext) {
-                    avcodec_flush_buffers(m_audioCodecContext);
+        if (seeking_) {
+            if (format_context_ && audio_stream_ >= 0) {
+                av_seek_frame(format_context_, audio_stream_, seek_position_, AVSEEK_FLAG_BACKWARD);
+                if (audio_codec_context_) {
+                    avcodec_flush_buffers(audio_codec_context_);
                 }
-                m_seeking = false;
-                positionTimer.restart();
+                seeking_ = false;
+                position_timer.restart();
                 // playbackTimer.restart();
 
                 // Aktualizacja pozycji po przeszukiwaniu
-                m_currentPosition = m_seekPosition * av_q2d(m_formatContext->streams[m_audioStream]->time_base);
-                emit positionChanged(m_currentPosition);
+                current_position_ = seek_position_ * av_q2d(format_context_->streams[audio_stream_]->time_base);
+                emit positionChanged(current_position_);
 
-                lastEmittedPosition = m_currentPosition;
+                last_emitted_position = current_position_;
                 // samplesProcessed = 0;
                 // lastReportedSamples = 0;
 
                 // Reset bufora audio
-                if (m_audioOutput) {
-                    m_audioOutput->reset();
-                    m_audioDevice = m_audioOutput->start();
+                if (audio_output_) {
+                    audio_output_->reset();
+                    audio_device_ = audio_output_->start();
                 }
             }
         }
         locker.unlock();
 
         // Sprawdź czy kontekst formatu jest nadal ważny
-        if (!m_formatContext) break;
+        if (!format_context_) break;
 
         // Czytaj kolejny pakiet
-        const int readResult = av_read_frame(m_formatContext, &packet);
-        if (readResult < 0) {
+        const int read_result = av_read_frame(format_context_, &packet);
+        if (read_result < 0) {
             // Koniec strumienia
             emit playbackFinished();
-            QMutexLocker locker2(&m_mutex);
-            m_paused = true;
-            m_reachedEndOfStream = true;
+            QMutexLocker locker2(&mutex_);
+            paused_ = true;
+            reached_end_of_stream_ = true;
             continue;
         }
 
-        if (packet.stream_index == m_audioStream && m_audioCodecContext) {
-            avcodec_send_packet(m_audioCodecContext, &packet);
-            while (avcodec_receive_frame(m_audioCodecContext, m_audioFrame) == 0) {
+        if (packet.stream_index == audio_stream_ && audio_codec_context_) {
+            avcodec_send_packet(audio_codec_context_, &packet);
+            while (avcodec_receive_frame(audio_codec_context_, audio_frame_) == 0) {
                 // Aktualizacja pozycji odtwarzania
-                if (m_audioFrame->pts != AV_NOPTS_VALUE) {
-                    QMutexLocker posLocker(&m_mutex);
-                    m_currentPosition = m_audioFrame->pts *
-                                        av_q2d(m_formatContext->streams[m_audioStream]->time_base);
-                    posLocker.unlock();
+                if (audio_frame_->pts != AV_NOPTS_VALUE) {
+                    QMutexLocker position_locker(&mutex_);
+                    current_position_ = audio_frame_->pts *
+                                        av_q2d(format_context_->streams[audio_stream_]->time_base);
+                    position_locker.unlock();
 
                     // Wysyłamy powiadomienia o zmianie pozycji w kontrolowanych odstępach czasu
-                    if (abs(m_currentPosition - lastEmittedPosition) > 0.25 ||
-                        positionTimer.elapsed() > positionUpdateInterval) {
-                        emit positionChanged(m_currentPosition);
-                        lastEmittedPosition = m_currentPosition;
-                        positionTimer.restart();
+                    if (abs(current_position_ - last_emitted_position) > 0.25 ||
+                        position_timer.elapsed() > position_update_interval) {
+                        emit positionChanged(current_position_);
+                        last_emitted_position = current_position_;
+                        position_timer.restart();
                     }
                 }
 
@@ -445,7 +430,7 @@ void AudioDecoder::run() {
                 // }
 
                 // Dekodujemy i wysyłamy ramkę audio
-                decodeAudioFrame(m_audioFrame);
+                DecodeAudioFrame(audio_frame_);
 
                 // Aktualizujemy licznik i timer
                 // if (samplesProcessed - lastReportedSamples > 44100) {  // co około 1 sekundę
@@ -454,13 +439,13 @@ void AudioDecoder::run() {
                 // }
 
                 {
-                    QMutexLocker mutex_locker(&m_mutex);
-                    if (m_audioOutput && m_audioDevice && m_audioDevice->isOpen()) {
+                    QMutexLocker mutex_locker(&mutex_);
+                    if (audio_output_ && audio_device_ && audio_device_->isOpen()) {
                         // Poczekaj, jeśli mniej niż np. 1/4 bufora jest wolna
-                        const int threshold = m_audioOutput->bufferSize() / 4;
-                        while (m_audioOutput->bytesFree() < threshold && !m_paused && !m_stopped && !m_seeking) {
+                        const int threshold = audio_output_->bufferSize() / 4;
+                        while (audio_output_->bytesFree() < threshold && !paused_ && !stopped_ && !seeking_) {
                             mutex_locker.unlock(); // Zwolnij mutex na czas czekania
-                            QThread::msleep(10); // Krótka pauza, aby nie obciążać CPU
+                            msleep(10); // Krótka pauza, aby nie obciążać CPU
                             mutex_locker.relock();   // Zablokuj ponownie przed sprawdzeniem warunku
 
                         }
@@ -473,79 +458,79 @@ void AudioDecoder::run() {
     }
 }
 
-void AudioDecoder::decodeAudioFrame(const AVFrame *audioFrame) const {
+void AudioDecoder::DecodeAudioFrame(const AVFrame *audio_frame) const {
     // <<< ZMIANA: Przeniesiono deklaracje na zewnątrz bloku mutexa >>>
-    QByteArray bufferToWrite; { // <<< Początek bloku dla mutexa >>>
-        QMutexLocker locker(&m_mutex);
-        if (!m_audioDevice || !m_audioDevice->isOpen() || m_paused) {
+    QByteArray buffer_to_write; { // <<< Początek bloku dla mutexa >>>
+        QMutexLocker locker(&mutex_);
+        if (!audio_device_ || !audio_device_->isOpen() || paused_) {
             // Jeśli nie powinniśmy pisać, wyjdź (mutex zostanie zwolniony)
             return;
         }
 
         // Oblicz rozmiar bufora wyjściowego
-        const int outSamples = audioFrame->nb_samples;
-        const int outBufferSize = outSamples * 2 * 2;
-        auto outBuffer = static_cast<uint8_t *>(av_malloc(outBufferSize));
-        if (!outBuffer) return; // Wyjdź, jeśli alokacja się nie powiedzie
+        const int out_samples = audio_frame->nb_samples;
+        const int out_buffer_size = out_samples * 2 * 2;
+        auto out_buffer = static_cast<uint8_t *>(av_malloc(out_buffer_size));
+        if (!out_buffer) return; // Wyjdź, jeśli alokacja się nie powiedzie
 
-        const int convertedSamples = swr_convert(
-            m_swrContext,
-            &outBuffer, outSamples,
-            audioFrame->extended_data, audioFrame->nb_samples
+        const int converted_samples = swr_convert(
+            swr_context_,
+            &out_buffer, out_samples,
+            audio_frame->extended_data, audio_frame->nb_samples
         );
 
-        if (convertedSamples > 0) {
-            const int actualSize = convertedSamples * 2 * 2;
+        if (converted_samples > 0) {
+            const int actual_size = converted_samples * 2 * 2;
             // <<< ZMIANA: Skopiuj dane do lokalnej QByteArray ZANIM zwolnisz mutex >>>
-            bufferToWrite = QByteArray(reinterpret_cast<char *>(outBuffer), actualSize);
+            buffer_to_write = QByteArray(reinterpret_cast<char *>(out_buffer), actual_size);
         }
 
-        av_freep(&outBuffer);
+        av_freep(&out_buffer);
     } // <<< Koniec bloku dla mutexa - mutex jest zwalniany >>>
 
 
         // Dodatkowe sprawdzenie, czy nie jesteśmy w pauzie, która mogła zostać ustawiona
         // między zwolnieniem mutexa a tym miejscem (choć mało prawdopodobne)
-        QMutexLocker pauseCheckLocker(&m_mutex);
-        pauseCheckLocker.unlock();
+        QMutexLocker pause_check_locker(&mutex_);
+        pause_check_locker.unlock();
 
 
-            m_audioDevice->write(bufferToWrite);
+            audio_device_->write(buffer_to_write);
 
 
 }
 
-int AudioDecoder::readPacket(void *opaque, uint8_t *buf, const int buf_size) {
+int AudioDecoder::ReadPacket(void *opaque, uint8_t *buf, const int buf_size) {
     const auto decoder = static_cast<AudioDecoder*>(opaque);
-    const int size = qMin(buf_size, decoder->m_readPosition >= decoder->m_audioData.size() ?
-                                  0 : decoder->m_audioData.size() - decoder->m_readPosition);
+    const int size = qMin(buf_size, decoder->read_position_ >= decoder->audio_data_.size() ?
+                                  0 : decoder->audio_data_.size() - decoder->read_position_);
 
     if (size <= 0)
         return AVERROR_EOF;
 
-    memcpy(buf, decoder->m_audioData.constData() + decoder->m_readPosition, size);
-    decoder->m_readPosition += size;
+    memcpy(buf, decoder->audio_data_.constData() + decoder->read_position_, size);
+    decoder->read_position_ += size;
     return size;
 }
 
-int64_t AudioDecoder::seekPacket(void *opaque, const int64_t offset, const int whence) {
+int64_t AudioDecoder::SeekPacket(void *opaque, const int64_t offset, const int whence) {
     const auto decoder = static_cast<AudioDecoder*>(opaque);
 
     switch (whence) {
         case SEEK_SET:
-            decoder->m_readPosition = offset;
+            decoder->read_position_ = offset;
             break;
         case SEEK_CUR:
-            decoder->m_readPosition += offset;
+            decoder->read_position_ += offset;
             break;
         case SEEK_END:
-            decoder->m_readPosition = decoder->m_audioData.size() + offset;
+            decoder->read_position_ = decoder->audio_data_.size() + offset;
             break;
         case AVSEEK_SIZE:
-            return decoder->m_audioData.size();
+            return decoder->audio_data_.size();
         default:
             return -1;
     }
 
-    return decoder->m_readPosition;
+    return decoder->read_position_;
 }

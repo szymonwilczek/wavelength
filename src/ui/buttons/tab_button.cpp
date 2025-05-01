@@ -1,6 +1,6 @@
 #include "tab_button.h"
 
-TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), m_underlineOffset(0), m_isActive(false) {
+TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), underline_offset_(0), is_active_(false) {
 
     setFlat(true);
     setCursor(Qt::PointingHandCursor);
@@ -27,36 +27,36 @@ TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, pa
     );
 }
 
-void TabButton::setUnderlineOffset(const double offset) {
-    m_underlineOffset = offset;
+void TabButton::SetUnderlineOffset(const double offset) {
+    underline_offset_ = offset;
     update();
 }
 
-void TabButton::setActive(const bool active) {
-    m_isActive = active;
+void TabButton::SetActive(const bool active) {
+    is_active_ = active;
     update();
 }
 
 void TabButton::enterEvent(QEvent *event) {
-    if (!m_isActive) {
-        const auto anim = new QPropertyAnimation(this, "underlineOffset");
-        anim->setDuration(300);
-        anim->setStartValue(0.0);
-        anim->setEndValue(5.0);
-        anim->setEasingCurve(QEasingCurve::InOutQuad);
-        anim->start(QPropertyAnimation::DeleteWhenStopped);
+    if (!is_active_) {
+        const auto animation = new QPropertyAnimation(this, "underlineOffset");
+        animation->setDuration(300);
+        animation->setStartValue(0.0);
+        animation->setEndValue(5.0);
+        animation->setEasingCurve(QEasingCurve::InOutQuad);
+        animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
     QPushButton::enterEvent(event);
 }
 
 void TabButton::leaveEvent(QEvent *event) {
-    if (!m_isActive) {
-        const auto anim = new QPropertyAnimation(this, "underlineOffset");
-        anim->setDuration(300);
-        anim->setStartValue(m_underlineOffset);
-        anim->setEndValue(0.0);
-        anim->setEasingCurve(QEasingCurve::InOutQuad);
-        anim->start(QPropertyAnimation::DeleteWhenStopped);
+    if (!is_active_) {
+        const auto animation = new QPropertyAnimation(this, "underlineOffset");
+        animation->setDuration(300);
+        animation->setStartValue(underline_offset_);
+        animation->setEndValue(0.0);
+        animation->setEasingCurve(QEasingCurve::InOutQuad);
+        animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
     QPushButton::leaveEvent(event);
 }
@@ -67,25 +67,25 @@ void TabButton::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    const QColor underlineColor = m_isActive ? QColor(0, 220, 255) : QColor(0, 180, 220, 180);
+    const QColor underline_color = is_active_ ? QColor(0, 220, 255) : QColor(0, 180, 220, 180);
 
     // Rysowanie podkreślenia
-    const int lineY = height() - 5;
+    const int line_y = height() - 5;
 
-    if (m_isActive) {
+    if (is_active_) {
         // Aktywna zakładka ma pełne podkreślenie
-        painter.setPen(QPen(underlineColor, 2));
-        painter.drawLine(5, lineY, width() - 5, lineY);
-    } else if (m_underlineOffset > 0) {
+        painter.setPen(QPen(underline_color, 2));
+        painter.drawLine(5, line_y, width() - 5, line_y);
+    } else if (underline_offset_ > 0) {
         // Zakładka z animującym się podkreśleniem przy najechaniu
-        painter.setPen(QPen(underlineColor, 1.5));
+        painter.setPen(QPen(underline_color, 1.5));
 
         // Animowane podkreślenie porusza się lekko w poziomie
-        const double offset = sin(m_underlineOffset) * 2.0;
-        const int centerX = width() / 2;
-        const int lineWidth = width() * 0.6 * (m_underlineOffset / 5.0);
+        const double offset = sin(underline_offset_) * 2.0;
+        const int center_x = width() / 2;
+        const int line_width = width() * 0.6 * (underline_offset_ / 5.0);
 
-        painter.drawLine(centerX - lineWidth/2 + offset, lineY,
-                         centerX + lineWidth/2 + offset, lineY);
+        painter.drawLine(center_x - line_width/2 + offset, line_y,
+                         center_x + line_width/2 + offset, line_y);
     }
 }

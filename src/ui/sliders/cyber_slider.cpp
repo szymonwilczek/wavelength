@@ -2,12 +2,12 @@
 
 #include <QStyle>
 
-CyberSlider::CyberSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), m_glowIntensity(0.5) {
+CyberSlider::CyberSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), glow_intensity_(0.5) {
     setStyleSheet("background: transparent; border: none;");
 }
 
-void CyberSlider::setGlowIntensity(const double intensity) {
-    m_glowIntensity = intensity;
+void CyberSlider::SetGlowIntensity(const double intensity) {
+    glow_intensity_ = intensity;
     update();
 }
 
@@ -18,103 +18,103 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Paleta kolorów cyberpunkowych
-    QColor trackColor(0, 60, 80);            // ciemny niebieski
-    QColor progressColor(0, 200, 255);       // neonowy niebieski
-    QColor handleColor(0, 240, 255);         // jaśniejszy neon
-    QColor glowColor(0, 220, 255, 80);       // poświata
+    QColor track_color(0, 60, 80);            // ciemny niebieski
+    QColor progress_color(0, 200, 255);       // neonowy niebieski
+    QColor handle_color(0, 240, 255);         // jaśniejszy neon
+    QColor glow_color(0, 220, 255, 80);       // poświata
 
-    constexpr int handleWidth = 14;
-    constexpr int handleHeight = 20;
-    constexpr int trackHeight = 4;
+    constexpr int handle_width = 14;
+    constexpr int handle_height = 20;
+    constexpr int track_height = 4;
 
     // Rysowanie ścieżki
-    QRect trackRect = rect().adjusted(5, (height() - trackHeight) / 2, -5, -(height() - trackHeight) / 2);
+    QRect track_rect = rect().adjusted(5, (height() - track_height) / 2, -5, -(height() - track_height) / 2);
 
     // Tworzymy ścieżkę z zaokrągleniem
-    QPainterPath trackPath;
-    trackPath.addRoundedRect(trackRect, 2, 2);
+    QPainterPath track_path;
+    track_path.addRoundedRect(track_rect, 2, 2);
 
     // Cieniowanie dla ścieżki
     painter.setPen(Qt::NoPen);
-    painter.setBrush(trackColor);
-    painter.drawPath(trackPath);
+    painter.setBrush(track_color);
+    painter.drawPath(track_path);
 
     // Oblicz pozycję wskaźnika
-    int handlePos = QStyle::sliderPositionFromValue(minimum(), maximum(), value(), width() - handleWidth);
+    int handle_position = QStyle::sliderPositionFromValue(minimum(), maximum(), value(), width() - handle_width);
 
     // Rysowanie wypełnionej części
     if (value() > minimum()) {
-        QRect progressRect = trackRect;
-        progressRect.setWidth(handlePos + handleWidth/2);
+        QRect progress_rect = track_rect;
+        progress_rect.setWidth(handle_position + handle_width/2);
 
-        QPainterPath progressPath;
-        progressPath.addRoundedRect(progressRect, 2, 2);
+        QPainterPath progress_path;
+        progress_path.addRoundedRect(progress_rect, 2, 2);
 
-        painter.setBrush(progressColor);
-        painter.drawPath(progressPath);
+        painter.setBrush(progress_color);
+        painter.drawPath(progress_path);
 
         // Dodajemy linie skanujące w wypełnionej części
         painter.setOpacity(0.4);
         painter.setPen(QPen(QColor(255, 255, 255, 40), 1));
 
-        for (int i = 0; i < progressRect.width(); i += 15) {
-            painter.drawLine(i, progressRect.top(), i, progressRect.bottom());
+        for (int i = 0; i < progress_rect.width(); i += 15) {
+            painter.drawLine(i, progress_rect.top(), i, progress_rect.bottom());
         }
         painter.setOpacity(1.0);
     }
 
     // Rysowanie uchwytu z efektem świecenia
-    QRect handleRect(handlePos, (height() - handleHeight) / 2, handleWidth, handleHeight);
+    QRect handle_rect(handle_position, (height() - handle_height) / 2, handle_width, handle_height);
 
     // Poświata neonu
-    if (m_glowIntensity > 0.2) {
+    if (glow_intensity_ > 0.2) {
         painter.setPen(Qt::NoPen);
-        painter.setBrush(glowColor);
+        painter.setBrush(glow_color);
 
         for (int i = 4; i > 0; i--) {
-            double glowSize = i * 2.5 * m_glowIntensity;
-            QRect glowRect = handleRect.adjusted(-glowSize, -glowSize, glowSize, glowSize);
-            painter.setOpacity(0.15 * m_glowIntensity);
-            painter.drawRoundedRect(glowRect, 5, 5);
+            double glow_size = i * 2.5 * glow_intensity_;
+            QRect glow_rect = handle_rect.adjusted(-glow_size, -glow_size, glow_size, glow_size);
+            painter.setOpacity(0.15 * glow_intensity_);
+            painter.drawRoundedRect(glow_rect, 5, 5);
         }
 
         painter.setOpacity(1.0);
     }
 
     // Rysowanie uchwytu
-    QPainterPath handlePath;
-    handlePath.addRoundedRect(handleRect, 3, 3);
+    QPainterPath handle_path;
+    handle_path.addRoundedRect(handle_rect, 3, 3);
 
-    painter.setPen(QPen(handleColor, 1));
+    painter.setPen(QPen(handle_color, 1));
     painter.setBrush(QColor(0, 50, 70));
-    painter.drawPath(handlePath);
+    painter.drawPath(handle_path);
 
     // Dodajemy wewnętrzne linie dla efektu technologicznego
-    painter.setPen(QPen(handleColor.lighter(), 1));
-    painter.drawLine(handleRect.left() + 4, handleRect.top() + 4,
-                     handleRect.right() - 4, handleRect.top() + 4);
-    painter.drawLine(handleRect.left() + 4, handleRect.bottom() - 4,
-                     handleRect.right() - 4, handleRect.bottom() - 4);
+    painter.setPen(QPen(handle_color.lighter(), 1));
+    painter.drawLine(handle_rect.left() + 4, handle_rect.top() + 4,
+                     handle_rect.right() - 4, handle_rect.top() + 4);
+    painter.drawLine(handle_rect.left() + 4, handle_rect.bottom() - 4,
+                     handle_rect.right() - 4, handle_rect.bottom() - 4);
 }
 
 void CyberSlider::enterEvent(QEvent *event) {
     // Animowana poświata przy najechaniu
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(300);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.9);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(300);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.9);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
 
     QSlider::enterEvent(event);
 }
 
 void CyberSlider::leaveEvent(QEvent *event) {
     // Wygaszenie poświaty przy opuszczeniu
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(300);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.5);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(300);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.5);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
 
     QSlider::leaveEvent(event);
 }

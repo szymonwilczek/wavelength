@@ -1,12 +1,14 @@
 #include "cyber_button.h"
 
-CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent), m_glowIntensity(0.5), m_isPrimary(isPrimary) {
+#include <QPainter>
+
+CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent), glow_intensity_(0.5), is_primary_(isPrimary) {
     setCursor(Qt::PointingHandCursor);
     setStyleSheet("background-color: transparent; border: none; font-family: Consolas; font-size: 9pt; font-weight: bold;");
 }
 
-void CyberButton::setGlowIntensity(const double intensity) {
-    m_glowIntensity = intensity;
+void CyberButton::SetGlowIntensity(const double intensity) {
+    glow_intensity_ = intensity;
     update();
 }
 
@@ -15,86 +17,86 @@ void CyberButton::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     // Paleta kolorów zależna od typu przycisku
-    QColor bgColor, borderColor, textColor, glowColor;
+    QColor background_color, border_color, text_color, glow_color;
 
-    if (m_isPrimary) {
-        bgColor = QColor(0, 40, 60);
-        borderColor = QColor(0, 200, 255);
-        textColor = QColor(0, 220, 255);
-        glowColor = QColor(0, 150, 255, 50);
+    if (is_primary_) {
+        background_color = QColor(0, 40, 60);
+        border_color = QColor(0, 200, 255);
+        text_color = QColor(0, 220, 255);
+        glow_color = QColor(0, 150, 255, 50);
     } else {
-        bgColor = QColor(40, 23, 41);
-        borderColor = QColor(207, 56, 110);
-        textColor = QColor(230, 70, 120);
-        glowColor = QColor(200, 50, 100, 50);
+        background_color = QColor(40, 23, 41);
+        border_color = QColor(207, 56, 110);
+        text_color = QColor(230, 70, 120);
+        glow_color = QColor(200, 50, 100, 50);
     }
 
     // Ścieżka przycisku ze ściętymi rogami
     QPainterPath path;
-    int clipSize = 5; // rozmiar ścięcia
+    int clip_size = 5; // rozmiar ścięcia
 
-    path.moveTo(clipSize, 0);
-    path.lineTo(width() - clipSize, 0);
-    path.lineTo(width(), clipSize);
-    path.lineTo(width(), height() - clipSize);
-    path.lineTo(width() - clipSize, height());
-    path.lineTo(clipSize, height());
-    path.lineTo(0, height() - clipSize);
-    path.lineTo(0, clipSize);
+    path.moveTo(clip_size, 0);
+    path.lineTo(width() - clip_size, 0);
+    path.lineTo(width(), clip_size);
+    path.lineTo(width(), height() - clip_size);
+    path.lineTo(width() - clip_size, height());
+    path.lineTo(clip_size, height());
+    path.lineTo(0, height() - clip_size);
+    path.lineTo(0, clip_size);
     path.closeSubpath();
 
     // Efekt poświaty
-    if (m_glowIntensity > 0.2) {
+    if (glow_intensity_ > 0.2) {
         painter.setPen(Qt::NoPen);
-        painter.setBrush(glowColor);
+        painter.setBrush(glow_color);
 
         for (int i = 3; i > 0; i--) {
-            double glowSize = i * 2.0 * m_glowIntensity;
-            QPainterPath glowPath;
-            glowPath.addRoundedRect(rect().adjusted(-glowSize, -glowSize, glowSize, glowSize), 4, 4);
-            painter.setOpacity(0.15 * m_glowIntensity);
-            painter.drawPath(glowPath);
+            double glow_size = i * 2.0 * glow_intensity_;
+            QPainterPath glow_path;
+            glow_path.addRoundedRect(rect().adjusted(-glow_size, -glow_size, glow_size, glow_size), 4, 4);
+            painter.setOpacity(0.15 * glow_intensity_);
+            painter.drawPath(glow_path);
         }
         painter.setOpacity(1.0);
     }
 
     // Tło przycisku
     painter.setPen(Qt::NoPen);
-    painter.setBrush(bgColor);
+    painter.setBrush(background_color);
     painter.drawPath(path);
 
     // Obramowanie
-    painter.setPen(QPen(borderColor, 1.5));
+    painter.setPen(QPen(border_color, 1.5));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
     // Ozdobne linie wewnętrzne
-    painter.setPen(QPen(borderColor.darker(150), 1, Qt::DotLine));
+    painter.setPen(QPen(border_color.darker(150), 1, Qt::DotLine));
     painter.drawLine(5, 5, width() - 5, 5);
     painter.drawLine(5, height() - 5, width() - 5, height() - 5);
 
     // Znaczniki w rogach
-    int markerSize = 3;
-    painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
+    int marker_size = 3;
+    painter.setPen(QPen(border_color, 1, Qt::SolidLine));
 
     // Lewy górny
-    painter.drawLine(clipSize + 2, 3, clipSize + 2 + markerSize, 3);
-    painter.drawLine(clipSize + 2, 3, clipSize + 2, 3 + markerSize);
+    painter.drawLine(clip_size + 2, 3, clip_size + 2 + marker_size, 3);
+    painter.drawLine(clip_size + 2, 3, clip_size + 2, 3 + marker_size);
 
     // Prawy górny
-    painter.drawLine(width() - clipSize - 2 - markerSize, 3, width() - clipSize - 2, 3);
-    painter.drawLine(width() - clipSize - 2, 3, width() - clipSize - 2, 3 + markerSize);
+    painter.drawLine(width() - clip_size - 2 - marker_size, 3, width() - clip_size - 2, 3);
+    painter.drawLine(width() - clip_size - 2, 3, width() - clip_size - 2, 3 + marker_size);
 
     // Prawy dolny
-    painter.drawLine(width() - clipSize - 2 - markerSize, height() - 3, width() - clipSize - 2, height() - 3);
-    painter.drawLine(width() - clipSize - 2, height() - 3, width() - clipSize - 2, height() - 3 - markerSize);
+    painter.drawLine(width() - clip_size - 2 - marker_size, height() - 3, width() - clip_size - 2, height() - 3);
+    painter.drawLine(width() - clip_size - 2, height() - 3, width() - clip_size - 2, height() - 3 - marker_size);
 
     // Lewy dolny
-    painter.drawLine(clipSize + 2, height() - 3, clipSize + 2 + markerSize, height() - 3);
-    painter.drawLine(clipSize + 2, height() - 3, clipSize + 2, height() - 3 - markerSize);
+    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2 + marker_size, height() - 3);
+    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2, height() - 3 - marker_size);
 
     // Tekst przycisku
-    painter.setPen(QPen(textColor, 1));
+    painter.setPen(QPen(text_color, 1));
     painter.setFont(font());
 
     // Efekt przesunięcia dla stanu wciśniętego
@@ -119,31 +121,31 @@ void CyberButton::paintEvent(QPaintEvent *event) {
 }
 
 void CyberButton::enterEvent(QEvent *event) {
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(200);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.9);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(200);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.9);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
     QPushButton::enterEvent(event);
 }
 
 void CyberButton::leaveEvent(QEvent *event) {
-    const auto anim = new QPropertyAnimation(this, "glowIntensity");
-    anim->setDuration(200);
-    anim->setStartValue(m_glowIntensity);
-    anim->setEndValue(0.5);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    const auto animation = new QPropertyAnimation(this, "glowIntensity");
+    animation->setDuration(200);
+    animation->setStartValue(glow_intensity_);
+    animation->setEndValue(0.5);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
     QPushButton::leaveEvent(event);
 }
 
 void CyberButton::mousePressEvent(QMouseEvent *event) {
-    m_glowIntensity = 1.0;
+    glow_intensity_ = 1.0;
     update();
     QPushButton::mousePressEvent(event);
 }
 
 void CyberButton::mouseReleaseEvent(QMouseEvent *event) {
-    m_glowIntensity = 0.9;
+    glow_intensity_ = 0.9;
     update();
     QPushButton::mouseReleaseEvent(event);
 }

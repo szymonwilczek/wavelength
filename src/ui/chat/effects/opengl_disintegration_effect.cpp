@@ -1,12 +1,12 @@
 #include "opengl_disintegration_effect.h"
 
-OpenGLDisintegration::OpenGLDisintegration(QWidget *parent): QOpenGLWidget(parent), m_progress(0.0), m_texture(nullptr), m_program(nullptr) {
+OpenGLDisintegration::OpenGLDisintegration(QWidget *parent): QOpenGLWidget(parent), progress_(0.0), texture_(nullptr), shader_program_(nullptr) {
     // Zastosuj przezroczyste tło
     setAttribute(Qt::WA_TranslucentBackground);
 
     // Timer animacji
-    m_timer = new QTimer(this);
-    connect(m_timer, &QTimer::timeout, this, &OpenGLDisintegration::updateAnimation);
+    timer_ = new QTimer(this);
+    connect(timer_, &QTimer::timeout, this, &OpenGLDisintegration::UpdateAnimation);
 
     // Format dla OpenGL
     QSurfaceFormat format;
@@ -17,41 +17,41 @@ OpenGLDisintegration::OpenGLDisintegration(QWidget *parent): QOpenGLWidget(paren
 
 OpenGLDisintegration::~OpenGLDisintegration() {
     makeCurrent();
-    m_vao.destroy();
-    m_vbo.destroy();
-    delete m_texture;
-    delete m_program;
+    vao_.destroy();
+    vbo_.destroy();
+    delete texture_;
+    delete shader_program_;
     doneCurrent();
 }
 
-void OpenGLDisintegration::setSourcePixmap(const QPixmap &pixmap) {
-    m_sourcePixmap = pixmap;
+void OpenGLDisintegration::SetSourcePixmap(const QPixmap &pixmap) {
+    source_pixmap_ = pixmap;
 
     // Ponownie utwórz teksturę przy następdym renderowaniu
-    if (m_texture) {
+    if (texture_) {
         makeCurrent();
-        delete m_texture;
-        m_texture = nullptr;
+        delete texture_;
+        texture_ = nullptr;
         doneCurrent();
     }
 
     update();
 }
 
-void OpenGLDisintegration::setProgress(const qreal progress) {
-    m_progress = qBound(0.0, progress, 1.0);
+void OpenGLDisintegration::SetProgress(const qreal progress) {
+    progress_ = qBound(0.0, progress, 1.0);
     update();
 }
 
-void OpenGLDisintegration::startAnimation(const int duration) {
-    m_progress = 0.0;
-    m_animationDuration = duration;
-    m_animationStart = QTime::currentTime();
-    m_timer->start(16); // ~60 FPS
+void OpenGLDisintegration::StartAnimation(const int duration) {
+    progress_ = 0.0;
+    animation_duration_ = duration;
+    animation_start_ = QTime::currentTime();
+    timer_->start(16); // ~60 FPS
 }
 
-void OpenGLDisintegration::stopAnimation() const {
-    m_timer->stop();
+void OpenGLDisintegration::StopAnimation() const {
+    timer_->stop();
 }
 
 void OpenGLDisintegration::initializeGL() {
@@ -59,10 +59,10 @@ void OpenGLDisintegration::initializeGL() {
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-    m_program = new QOpenGLShaderProgram();
+    shader_program_ = new QOpenGLShaderProgram();
 
     // Vertex shader
-    const auto vertexShaderSource = R"(
+    const auto vertex_shader_source = R"(
             #version 330 core
             layout (location = 0) in vec3 aPos;
             layout (location = 1) in vec2 aTexCoord;
@@ -102,7 +102,7 @@ void OpenGLDisintegration::initializeGL() {
         )";
 
     // Fragment shader
-    const auto fragmentShaderSource = R"(
+    const auto fragment_shader_source = R"(
             #version 330 core
             out vec4 FragColor;
 
@@ -124,22 +124,22 @@ void OpenGLDisintegration::initializeGL() {
             }
         )";
 
-    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
-    m_program->link();
+    shader_program_->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_shader_source);
+    shader_program_->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment_shader_source);
+    shader_program_->link();
 
     // Utwórz VAO i VBO
-    m_vao.create();
-    m_vao.bind();
+    vao_.create();
+    vao_.bind();
 
-    m_vbo.create();
-    m_vbo.bind();
+    vbo_.create();
+    vbo_.bind();
 
     // Przygotuj dane wierzchołków dla siatki cząstek
-    createParticleGrid(20, 20); // 20x20 cząstek
+    CreateParticleGrid(20, 20); // 20x20 cząstek
 
-    m_vbo.release();
-    m_vao.release();
+    vbo_.release();
+    vao_.release();
 }
 
 void OpenGLDisintegration::resizeGL(const int w, const int h) {
@@ -149,57 +149,57 @@ void OpenGLDisintegration::resizeGL(const int w, const int h) {
 void OpenGLDisintegration::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (m_sourcePixmap.isNull() || m_vertices.isEmpty())
+    if (source_pixmap_.isNull() || vertices_.isEmpty())
         return;
 
     // Stwórz teksturę jeśli nie istnieje
-    if (!m_texture) {
-        m_texture = new QOpenGLTexture(m_sourcePixmap.toImage());
-        m_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-        m_texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    if (!texture_) {
+        texture_ = new QOpenGLTexture(source_pixmap_.toImage());
+        texture_->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        texture_->setMagnificationFilter(QOpenGLTexture::Linear);
     }
 
-    m_program->bind();
+    shader_program_->bind();
 
     // Macierz modelu (tożsamościowa)
     const QMatrix4x4 model;
-    m_program->setUniformValue("model", model);
-    m_program->setUniformValue("progress", static_cast<float>(m_progress));
-    m_program->setUniformValue("resolution", QVector2D(width(), height()));
+    shader_program_->setUniformValue("model", model);
+    shader_program_->setUniformValue("progress", static_cast<float>(progress_));
+    shader_program_->setUniformValue("resolution", QVector2D(width(), height()));
 
-    m_vao.bind();
-    m_texture->bind(0);
-    m_program->setUniformValue("texture1", 0);
+    vao_.bind();
+    texture_->bind(0);
+    shader_program_->setUniformValue("texture1", 0);
 
     // Włącz blending dla przezroczystości
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Rysuj cząstki jako punkty
-    glDrawArrays(GL_POINTS, 0, m_vertices.size() / 5);
+    glDrawArrays(GL_POINTS, 0, vertices_.size() / 5);
 
-    m_texture->release();
-    m_vao.release();
-    m_program->release();
+    texture_->release();
+    vao_.release();
+    shader_program_->release();
 }
 
-void OpenGLDisintegration::updateAnimation() {
-    const int elapsed = m_animationStart.msecsTo(QTime::currentTime());
-    const qreal newProgress = static_cast<qreal>(elapsed) / m_animationDuration;
+void OpenGLDisintegration::UpdateAnimation() {
+    const int elapsed = animation_start_.msecsTo(QTime::currentTime());
+    const qreal new_progress = static_cast<qreal>(elapsed) / animation_duration_;
 
-    if (newProgress >= 1.0) {
-        m_progress = 1.0;
-        m_timer->stop();
+    if (new_progress >= 1.0) {
+        progress_ = 1.0;
+        timer_->stop();
         emit animationFinished();
     } else {
-        m_progress = newProgress;
+        progress_ = new_progress;
     }
 
     update();
 }
 
-void OpenGLDisintegration::createParticleGrid(const int cols, const int rows) {
-    m_vertices.clear();
+void OpenGLDisintegration::CreateParticleGrid(const int cols, const int rows) {
+    vertices_.clear();
 
     // Tworzymy siatkę cząstek
     for (int y = 0; y < rows; ++y) {
@@ -208,17 +208,17 @@ void OpenGLDisintegration::createParticleGrid(const int cols, const int rows) {
             float yPos = -1.0f + (y / static_cast<float>(rows - 1)) * 2.0f;
 
             // Pozycja (x, y, z) i koordynaty tekstury (u, v)
-            m_vertices.append(xPos);
-            m_vertices.append(yPos);
-            m_vertices.append(0.0f);
-            m_vertices.append(x / static_cast<float>(cols - 1));
-            m_vertices.append(y / static_cast<float>(rows - 1));
+            vertices_.append(xPos);
+            vertices_.append(yPos);
+            vertices_.append(0.0f);
+            vertices_.append(x / static_cast<float>(cols - 1));
+            vertices_.append(y / static_cast<float>(rows - 1));
         }
     }
 
     // Załaduj dane do bufora
-    m_vbo.bind();
-    m_vbo.allocate(m_vertices.data(), m_vertices.size() * sizeof(float));
+    vbo_.bind();
+    vbo_.allocate(vertices_.data(), vertices_.size() * sizeof(float));
 
     // Pozycja
     glEnableVertexAttribArray(0);

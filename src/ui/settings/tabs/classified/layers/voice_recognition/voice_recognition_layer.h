@@ -17,38 +17,38 @@ public:
     explicit VoiceRecognitionLayer(QWidget *parent = nullptr);
     ~VoiceRecognitionLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void processAudioInput();
-    void updateProgress();
-    void finishRecognition();
+        void ProcessAudioInput();
+        void UpdateProgress();
+        void FinishRecognition();
 
 private:
-    void startRecording();
-    void stopRecording();
-    void updateAudioVisualizer(const QByteArray &data);
-    bool isSpeaking(float audioLevel) const;
+    void StartRecording();
+    void StopRecording();
+    void UpdateAudioVisualizer(const QByteArray &data);
+    bool IsSpeaking(float audio_level) const;
 
-    QLabel* m_audioVisualizerLabel;
-    QProgressBar* m_recognitionProgress;
-    QTimer* m_progressTimer;
-    QTimer* m_recognitionTimer;
-    QTimer* m_audioProcessTimer;
+    QLabel* audio_visualizer_label_;
+    QProgressBar* recognition_progress_;
+    QTimer* progress_timer_;
+    QTimer* recognition_timer_;
+    QTimer* audio_process_timer_;
 
-    QAudioInput* m_audioInput;
-    QIODevice* m_audioDevice;
+    QAudioInput* audio_input_;
+    QIODevice* audio_device_;
 
-    QByteArray m_audioBuffer;
-    QVector<float> m_visualizerData;
-    bool m_isRecording;
+    QByteArray audio_buffer_;
+    QVector<float> visualizer_data_;
+    bool is_recording_;
 
     // Zmienne do wykrywania mowy i zarządzania postępem
-    float m_noiseThreshold;   // Próg powyżej którego uznajemy, że użytkownik mówi
-    bool m_isSpeaking;        // Czy użytkownik aktualnie mówi
-    int m_silenceCounter;     // Licznik ciszy (w milisekundach)
-    float m_currentAudioLevel; // Bieżący poziom dźwięku
+    float noise_threshold_;   // Próg powyżej którego uznajemy, że użytkownik mówi
+    bool is_speaking_;        // Czy użytkownik aktualnie mówi
+    int silence_counter_;     // Licznik ciszy (w milisekundach)
+    float current_audio_level_; // Bieżący poziom dźwięku
 };
 
 #endif // VOICE_RECOGNITION_LAYER_H

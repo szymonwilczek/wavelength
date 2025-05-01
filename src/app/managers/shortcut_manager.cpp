@@ -10,39 +10,39 @@
 #include "../../ui/navigation/navbar.h"
 #include <concepts>
 
-ShortcutManager* ShortcutManager::getInstance() {
+ShortcutManager* ShortcutManager::GetInstance() {
     static ShortcutManager instance;
     return &instance;
 }
 
 ShortcutManager::ShortcutManager(QObject *parent)
-    : QObject(parent), m_config(WavelengthConfig::getInstance())
+    : QObject(parent), config_(WavelengthConfig::GetInstance())
 {}
 
-void ShortcutManager::registerShortcuts(QWidget* parent) {
+void ShortcutManager::RegisterShortcuts(QWidget* parent) {
     if (!parent) {
         qWarning() << "ShortcutManager::registerShortcuts: Parent widget is null.";
         return;
     }
 
-    if (m_registeredShortcuts.contains(parent)) {
+    if (registered_shortcuts_.contains(parent)) {
         qDebug() << "[ShortcutMgr] Clearing old shortcuts for widget:" << parent->objectName();
-        QMap<QString, QShortcut*>& shortcutsMap = m_registeredShortcuts[parent];
-        qDeleteAll(shortcutsMap.values());
-        shortcutsMap.clear();
+        QMap<QString, QShortcut*>& shortcuts_map = registered_shortcuts_[parent];
+        qDeleteAll(shortcuts_map.values());
+        shortcuts_map.clear();
     } else {
-        m_registeredShortcuts.insert(parent, QMap<QString, QShortcut*>());
+        registered_shortcuts_.insert(parent, QMap<QString, QShortcut*>());
     }
 
     // Zidentyfikuj typ widgetu i zarejestruj odpowiednie skróty
-    if (auto* mainWindow = qobject_cast<QMainWindow*>(parent)) {
-        if (const auto navbar = mainWindow->findChild<Navbar*>()) {
-            registerMainWindowShortcuts(mainWindow, navbar);
+    if (auto* main_window = qobject_cast<QMainWindow*>(parent)) {
+        if (const auto navbar = main_window->findChild<Navbar*>()) {
+            RegisterMainWindowShortcuts(main_window, navbar);
         } else { qWarning() << "[ShortcutMgr] Could not find Navbar in QMainWindow."; }
-    } else if (auto* chatView = qobject_cast<WavelengthChatView*>(parent)) {
-        registerChatViewShortcuts(chatView);
-    } else if (auto* settingsView = qobject_cast<SettingsView*>(parent)) {
-        registerSettingsViewShortcuts(settingsView);
+    } else if (auto* chat_view = qobject_cast<WavelengthChatView*>(parent)) {
+        RegisterChatViewShortcuts(chat_view);
+    } else if (auto* settings_view = qobject_cast<SettingsView*>(parent)) {
+        RegisterSettingsViewShortcuts(settings_view);
     } else {
         qWarning() << "[ShortcutMgr] Unsupported parent widget type:" << parent->metaObject()->className();
     }
@@ -50,15 +50,15 @@ void ShortcutManager::registerShortcuts(QWidget* parent) {
 
 template<typename Func>
 requires std::invocable<Func>
-void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda) {
-    const QKeySequence sequence = m_config->getShortcut(actionId); // Pobierz sekwencję (powinna być już załadowana z pliku)
+void ShortcutManager::CreateAndConnectShortcut(const QString& action_id, QWidget* parent, Func lambda) {
+    const QKeySequence sequence = config_->GetShortcut(action_id); // Pobierz sekwencję (powinna być już załadowana z pliku)
 
     // <<< Dodane logowanie >>>
-    qDebug() << "[ShortcutMgr] createAndConnectShortcut(" << actionId << "): Using sequence" << sequence.toString();
+    qDebug() << "[ShortcutMgr] createAndConnectShortcut(" << action_id << "): Using sequence" << sequence.toString();
     // <<< Koniec logowania >>>
 
     if (sequence.isEmpty()) {
-        qDebug() << "[ShortcutMgr] No key sequence defined or loaded for action:" << actionId;
+        qDebug() << "[ShortcutMgr] No key sequence defined or loaded for action:" << action_id;
         return;
     }
 
@@ -68,46 +68,43 @@ void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget*
 
     // <<< ZMIANA: Dodaj do nowej struktury mapy >>>
     // Upewnij się, że klucz 'parent' istnieje (powinien po registerShortcuts)
-    if (!m_registeredShortcuts.contains(parent)) {
-        m_registeredShortcuts.insert(parent, QMap<QString, QShortcut*>());
+    if (!registered_shortcuts_.contains(parent)) {
+        registered_shortcuts_.insert(parent, QMap<QString, QShortcut*>());
     }
-    m_registeredShortcuts[parent].insert(actionId, shortcut);
-    qDebug() << "[ShortcutMgr] Registered" << sequence.toString() << "for" << actionId << "on" << parent->objectName();
+    registered_shortcuts_[parent].insert(action_id, shortcut);
+    qDebug() << "[ShortcutMgr] Registered" << sequence.toString() << "for" << action_id << "on" << parent->objectName();
 }
 
 void ShortcutManager::updateRegisteredShortcuts() {
     qDebug() << "[ShortcutMgr] Updating registered shortcuts...";
     // Iteruj po wszystkich zarejestrowanych widgetach
-    for (auto widgetIt = m_registeredShortcuts.begin(); widgetIt != m_registeredShortcuts.end(); ++widgetIt) {
-        const QWidget* parentWidget = widgetIt.key();
-        QMap<QString, QShortcut*>& shortcutsMap = widgetIt.value(); // Mapa ActionID -> QShortcut* dla danego widgetu
-        qDebug() << "[ShortcutMgr] Updating shortcuts for widget:" << (parentWidget ? parentWidget->objectName() : "NULL");
+    for (auto widget_iterator = registered_shortcuts_.begin(); widget_iterator != registered_shortcuts_.end(); ++widget_iterator) {
+        const QWidget* parent_widget = widget_iterator.key();
+        QMap<QString, QShortcut*>& shortcuts_map = widget_iterator.value(); // Mapa ActionID -> QShortcut* dla danego widgetu
+        qDebug() << "[ShortcutMgr] Updating shortcuts for widget:" << (parent_widget ? parent_widget->objectName() : "NULL");
 
         // Iteruj po wszystkich skrótach zarejestrowanych dla tego widgetu
-        for (auto shortcutIt = shortcutsMap.begin(); shortcutIt != shortcutsMap.end(); ++shortcutIt) {
-            const QString& actionId = shortcutIt.key();
-            QShortcut* shortcut = shortcutIt.value();
+        for (auto shortcut_iterator = shortcuts_map.begin(); shortcut_iterator != shortcuts_map.end(); ++shortcut_iterator) {
+            const QString& action_id = shortcut_iterator.key();
+            QShortcut* shortcut = shortcut_iterator.value();
 
             if (!shortcut) {
-                qWarning() << "[ShortcutMgr] Found null shortcut pointer for action:" << actionId;
+                qWarning() << "[ShortcutMgr] Found null shortcut pointer for action:" << action_id;
                 continue;
             }
 
-            // Pobierz potencjalnie zaktualizowaną sekwencję klawiszy z konfiguracji
-
-            // Jeśli nowa sekwencja różni się od obecnej w QShortcut, zaktualizuj ją
-            if (QKeySequence newSequence = m_config->getShortcut(actionId); shortcut->key() != newSequence) {
-                qDebug() << "[ShortcutMgr] Updating key for" << actionId << "from" << shortcut->key().toString() << "to" << newSequence.toString();
-                shortcut->setKey(newSequence);
+            if (QKeySequence new_sequence = config_->GetShortcut(action_id); shortcut->key() != new_sequence) {
+                qDebug() << "[ShortcutMgr] Updating key for" << action_id << "from" << shortcut->key().toString() << "to" << new_sequence.toString();
+                shortcut->setKey(new_sequence);
             }
         }
     }
     qDebug() << "[ShortcutMgr] Finished updating registered shortcuts.";
 }
 
-void ShortcutManager::registerMainWindowShortcuts(QMainWindow* window, Navbar* navbar) {
+void ShortcutManager::RegisterMainWindowShortcuts(QMainWindow* window, Navbar* navbar) {
 
-    createAndConnectShortcut("MainWindow.CreateWavelength", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.CreateWavelength", window, [navbar]() {
         qDebug() << "Shortcut activated: CreateWavelength";
         // Bezpieczne sprawdzenie wskaźników przed użyciem
         if (navbar && navbar->findChild<CyberpunkButton*>("createWavelengthButton")) { // Zakładając, że przyciski mają nazwy obiektów
@@ -119,41 +116,41 @@ void ShortcutManager::registerMainWindowShortcuts(QMainWindow* window, Navbar* n
         }
     });
 
-    createAndConnectShortcut("MainWindow.JoinWavelength", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.JoinWavelength", window, [navbar]() {
         qDebug() << "Shortcut activated: JoinWavelength";
         if (navbar) emit navbar->joinWavelengthClicked();
     });
 
-    createAndConnectShortcut("MainWindow.OpenSettings", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.OpenSettings", window, [navbar]() {
         qDebug() << "Shortcut activated: OpenSettings";
         if (navbar) emit navbar->settingsClicked();
     });
 }
 
-void ShortcutManager::registerChatViewShortcuts(WavelengthChatView* chatView) {
+void ShortcutManager::RegisterChatViewShortcuts(WavelengthChatView* chat_view) {
     // Skróty dla widoku czatu
 
-    createAndConnectShortcut("ChatView.AbortConnection", chatView, [chatView]() {
+    CreateAndConnectShortcut("ChatView.AbortConnection", chat_view, [chat_view]() {
         qDebug() << "Shortcut activated: AbortConnection";
         // Potrzebujemy dostępu do przycisku lub metody publicznej
         // Zakładając, że przycisk abortButton jest dostępny lub mamy metodę publiczną
-        if (auto* button = chatView->findChild<QPushButton*>("abortButton")) { // Jeśli ma nazwę obiektu
+        if (auto* button = chat_view->findChild<QPushButton*>("abortButton")) { // Jeśli ma nazwę obiektu
             button->click();
         } else {
              // Wywołaj slot publiczny, jeśli istnieje
-             QMetaObject::invokeMethod(chatView, "abortWavelength", Qt::QueuedConnection);
+             QMetaObject::invokeMethod(chat_view, "abortWavelength", Qt::QueuedConnection);
         }
     });
 
-    createAndConnectShortcut("ChatView.FocusInput", chatView, [chatView]() {
+    CreateAndConnectShortcut("ChatView.FocusInput", chat_view, [chat_view]() {
         qDebug() << "Shortcut activated: FocusInput";
         // Znajdź pole po objectName
-        if (auto* input = chatView->findChild<QLineEdit*>("chatInputField")) {
+        if (auto* input = chat_view->findChild<QLineEdit*>("chatInputField")) {
             input->setFocus(Qt::ShortcutFocusReason); // Użyj odpowiedniego powodu
             input->selectAll(); // Opcjonalnie zaznacz tekst
             // Spróbuj aktywować okno nadrzędne, aby upewnić się, że ma fokus systemowy
-            if (chatView->window()) {
-                chatView->window()->activateWindow();
+            if (chat_view->window()) {
+                chat_view->window()->activateWindow();
             }
              qDebug() << "Focus set on chatInputField";
         } else {
@@ -161,57 +158,57 @@ void ShortcutManager::registerChatViewShortcuts(WavelengthChatView* chatView) {
         }
     });
 
-    createAndConnectShortcut("ChatView.AttachFile", chatView, [chatView]() {
+    CreateAndConnectShortcut("ChatView.AttachFile", chat_view, [chat_view]() {
         qDebug() << "Shortcut activated: AttachFile";
-        chatView->attachFile();
+        chat_view->AttachFile();
     });
 
-    createAndConnectShortcut("ChatView.SendMessage", chatView, [chatView]() {
+    CreateAndConnectShortcut("ChatView.SendMessage", chat_view, [chat_view]() {
         qDebug() << "Shortcut activated: SendMessage";
-        if (auto* button = chatView->findChild<QPushButton*>("sendButton")) {
+        if (auto* button = chat_view->findChild<QPushButton*>("sendButton")) {
             button->click();
         } else {
-             QMetaObject::invokeMethod(chatView, "sendMessage", Qt::QueuedConnection);
+             QMetaObject::invokeMethod(chat_view, "sendMessage", Qt::QueuedConnection);
         }
     });
 }
 
-void ShortcutManager::registerSettingsViewShortcuts(SettingsView* settingsView) {
+void ShortcutManager::RegisterSettingsViewShortcuts(SettingsView* settings_view) {
     // Skróty dla widoku ustawień
 
-    createAndConnectShortcut("SettingsView.SwitchTab0", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab0", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: SwitchTab0";
-        QMetaObject::invokeMethod(settingsView, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 0));
+        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 0));
     });
-    createAndConnectShortcut("SettingsView.SwitchTab1", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab1", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: SwitchTab1";
-        QMetaObject::invokeMethod(settingsView, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 1));
+        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 1));
     });
-    createAndConnectShortcut("SettingsView.SwitchTab2", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab2", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: SwitchTab2";
-        QMetaObject::invokeMethod(settingsView, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 2));
+        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 2));
     });
-    createAndConnectShortcut("SettingsView.SwitchTab3", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab3", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: SwitchTab3";
-        QMetaObject::invokeMethod(settingsView, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 3));
+        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 3));
     });
-     createAndConnectShortcut("SettingsView.SwitchTab4", settingsView, [settingsView]() { // Dla nowej zakładki
+     CreateAndConnectShortcut("SettingsView.SwitchTab4", settings_view, [settings_view]() { // Dla nowej zakładki
         qDebug() << "Shortcut activated: SwitchTab4";
-        QMetaObject::invokeMethod(settingsView, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 4));
+        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 4));
     });
 
-    createAndConnectShortcut("SettingsView.Save", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.Save", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: Save Settings";
-        QMetaObject::invokeMethod(settingsView, "saveSettings", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "saveSettings", Qt::QueuedConnection);
     });
 
-    createAndConnectShortcut("SettingsView.Defaults", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.Defaults", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: Restore Defaults";
-        QMetaObject::invokeMethod(settingsView, "restoreDefaults", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "restoreDefaults", Qt::QueuedConnection);
     });
 
-    createAndConnectShortcut("SettingsView.Back", settingsView, [settingsView]() {
+    CreateAndConnectShortcut("SettingsView.Back", settings_view, [settings_view]() {
         qDebug() << "Shortcut activated: Back";
-        QMetaObject::invokeMethod(settingsView, "handleBackButton", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "handleBackButton", Qt::QueuedConnection);
     });
 }

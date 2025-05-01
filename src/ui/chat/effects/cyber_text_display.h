@@ -20,26 +20,26 @@ class CyberTextDisplay final : public QWidget {
 public:
 
     enum TypingSoundType {
-        SystemSound, // terminal_typing1.wav
-        UserSound    // terminal_typing2.wav
+        kSystemSound, // terminal_typing1.wav
+        kUserSound    // terminal_typing2.wav
     };
     Q_ENUM(TypingSoundType)
 
-    explicit CyberTextDisplay(const QString& text, TypingSoundType soundType = UserSound, QWidget* parent = nullptr);
+    explicit CyberTextDisplay(const QString& text, TypingSoundType sound_type = kUserSound, QWidget* parent = nullptr);
 
     ~CyberTextDisplay() override;
 
-    void startReveal();
+    void StartReveal();
 
-    void setText(const QString& newText);
+    void SetText(const QString& new_text);
 
-    int revealedChars() const { return m_revealedChars; }
-    void setRevealedChars(int chars);
+    int GetRevealedChars() const { return revealed_chars_; }
+    void SetRevealedChars(int chars);
 
-    qreal glitchIntensity() const { return m_glitchIntensity; }
-    void setGlitchIntensity(qreal intensity);
+    qreal GetGlitchIntensity() const { return glitch_intensity_; }
+    void SetGlitchIntensity(qreal intensity);
 
-    void setGlitchEffectEnabled(bool enabled);
+    void SetGlitchEffectEnabled(bool enabled);
 
     QSize sizeHint() const override;
 
@@ -55,32 +55,32 @@ protected:
 
 private slots:
 
-    void handleFullTextRevealed() const;
+    void HandleFullTextRevealed() const;
 
-    void revealNextChar();
+    void RevealNextChar();
 
-    void randomGlitch();
+    void RandomGlitch();
 
-    void triggerGlitch();
+    void TriggerGlitch();
 
 private:
-    static QString removeHtml(const QString& html);
+    static QString RemoveHtml(const QString& html);
 
-    void recalculateHeight();
+    void RecalculateHeight();
 
-    QString m_fullText;      // Oryginalny tekst z HTML
-    QString m_plainText;     // Tekst bez tagów HTML
-    int m_revealedChars;     // Liczba widocznych znaków
-    qreal m_glitchIntensity; // Intensywność efektu glitch
-    bool m_isFullyRevealed;  // Czy cały tekst jest już wyświetlony
-    QFont m_font;            // Czcionka tekstu
-    QTimer* m_textTimer;     // Timer animacji tekstu
-    QTimer* m_glitchTimer;   // Timer dla efektów glitch
-    bool m_hasBeenFullyRevealedOnce;
-    QMediaPlayer* m_mediaPlayer;   // Dodane
-    QAudioOutput* m_audioOutput;   // Dodane
-    QMediaPlaylist* m_playlist;
-    TypingSoundType m_soundType;
+    QString full_text_;      // Oryginalny tekst z HTML
+    QString plain_text_;     // Tekst bez tagów HTML
+    int revealed_chars_;     // Liczba widocznych znaków
+    qreal glitch_intensity_; // Intensywność efektu glitch
+    bool is_fully_revealed_;  // Czy cały tekst jest już wyświetlony
+    QFont font_;            // Czcionka tekstu
+    QTimer* text_timer_;     // Timer animacji tekstu
+    QTimer* glitch_timer_;   // Timer dla efektów glitch
+    bool has_been_fully_revealed_once_;
+    QMediaPlayer* media_player_;   // Dodane
+    QAudioOutput* audio_output_;   // Dodane
+    QMediaPlaylist* playlist_;
+    TypingSoundType sound_type_;
 };
 
 #endif // CYBER_TEXT_DISPLAY_H

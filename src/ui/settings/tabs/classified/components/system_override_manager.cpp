@@ -19,16 +19,16 @@
 
 #ifdef Q_OS_WIN
 // --- DEFINICJA STATYCZNEGO POLA ---
-HHOOK SystemOverrideManager::m_keyboardHook = nullptr;
-HHOOK SystemOverrideManager::m_mouseHook = nullptr;
+HHOOK SystemOverrideManager::keyboard_hook_ = nullptr;
+HHOOK SystemOverrideManager::mouse_hook_ = nullptr;
 // ---------------------------------
 #endif
 
 // --- Stałe ---
-constexpr int MOUSE_LOCK_INTERVAL_MS = 10;
-constexpr int RESTORE_DELAY_MS = 500;
+constexpr int kMouseLockIntervalMs = 10;
+constexpr int kRestoreDelayMs = 500;
 
-const std::set<DWORD> ALLOWED_KEYS = {
+const std::set<DWORD> kAllowedKeys = {
     VK_UP,       // Strzałka w górę
     VK_DOWN,     // Strzałka w dół
     VK_LEFT,     // Strzałka w lewo
@@ -43,25 +43,25 @@ const std::set<DWORD> ALLOWED_KEYS = {
 SystemOverrideManager::SystemOverrideManager(QObject *parent)
     : QObject(parent),
       // m_mouseTargetTimer nie jest już inicjalizowany
-      m_trayIcon(nullptr),
-      m_floatingWidget(nullptr),
-      m_mediaPlayer(nullptr),
-      m_audioOutput(nullptr),
-      m_originalWallpaperPath(""),
-      m_tempBlackWallpaperPath(""),
-      m_overrideActive(false)
+      tray_icon_(nullptr),
+      floating_widget_(nullptr),
+      media_player_(nullptr),
+      audio_output_(nullptr),
+      original_wallpaper_path_(""),
+      temp_black_wallpaper_path_(""),
+      override_active_(false)
 {
 
 #ifdef Q_OS_WIN
     // Upewnij się, że hak jest NULL na starcie
-    m_keyboardHook = nullptr;
-    m_mouseHook = nullptr;
+    keyboard_hook_ = nullptr;
+    mouse_hook_ = nullptr;
 #endif
 
 
     // Inicjalizacja powiadomień
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
-        m_trayIcon = new QSystemTrayIcon(this);
+        tray_icon_ = new QSystemTrayIcon(this);
         // Można ustawić ikonę, jeśli jest potrzebna
         // m_trayIcon->setIcon(QIcon(":/assets/icons/wavelength_logo_upscaled.png"));
         // Nie pokazujemy ikony w zasobniku, tylko używamy do powiadomień
@@ -70,7 +70,7 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
     }
 
     // Inicjalizacja dźwięku
-    m_mediaPlayer = new QMediaPlayer(this);
+    media_player_ = new QMediaPlayer(this);
     // m_audioOutput = new QAudioOutput(this);
     // m_mediaPlayer->setAudioOutput(m_audioOutput);
     // m_mediaPlayer->setSource(QUrl(OVERRIDE_SOUND_RESOURCE));
@@ -84,36 +84,36 @@ SystemOverrideManager::SystemOverrideManager(QObject *parent)
 
 SystemOverrideManager::~SystemOverrideManager()
 {
-    if (m_overrideActive) {
-        restoreSystemState();
+    if (override_active_) {
+        RestoreSystemState();
     }
-    if (m_floatingWidget) {
-        m_floatingWidget->close();
-        m_floatingWidget = nullptr;
+    if (floating_widget_) {
+        floating_widget_->close();
+        floating_widget_ = nullptr;
     }
 
-    if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
-        QFile::remove(m_tempBlackWallpaperPath);
-        qDebug() << "Removed temporary black wallpaper on destruction:" << m_tempBlackWallpaperPath;
+    if (!temp_black_wallpaper_path_.isEmpty() && QFile::exists(temp_black_wallpaper_path_)) {
+        QFile::remove(temp_black_wallpaper_path_);
+        qDebug() << "Removed temporary black wallpaper on destruction:" << temp_black_wallpaper_path_;
     }
 
 #ifdef Q_OS_WIN
-    uninstallKeyboardHook();
-    uninstallMouseHook();
+    UninstallKeyboardHook();
+    UninstallMouseHook();
     CoUninitialize();
 #endif
 }
 
-void SystemOverrideManager::initiateOverrideSequence(const bool isFirstTime)
+void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time)
 {
-    if (m_overrideActive) {
+    if (override_active_) {
         qWarning() << "System Override sequence already active.";
         return;
     }
 
 #ifdef Q_OS_WIN
     // --- Zainstaluj Hak Klawiatury ---
-    if (!installKeyboardHook()) {
+    if (!InstallKeyboardHook()) {
         // Co zrobić, jeśli hak się nie zainstaluje?
         // Można przerwać, wyświetlić ostrzeżenie lub kontynuować bez blokady klawiatury
         qWarning() << "Keyboard hook installation failed. Input filtering will not work.";
@@ -123,116 +123,115 @@ void SystemOverrideManager::initiateOverrideSequence(const bool isFirstTime)
         // return;
     }
 
-    if (!installMouseHook()) { // <<< NOWE
+    if (!InstallMouseHook()) { // <<< NOWE
         qWarning() << "Mouse hook installation failed. Mouse input will not be blocked.";
         // Rozważ przerwanie
     }
     // ---------------------------------
 #endif
 
-    m_overrideActive = true;
+    override_active_ = true;
     qDebug() << "Initiating System Override Sequence...";
 
     // --- Kolejne kroki ---
     qDebug() << "Changing wallpaper...";
-    if (!changeWallpaper()) {
+    if (!ChangeWallpaper()) {
         qWarning() << "Failed to change wallpaper.";
     }
 
     qDebug() << "Minimizing windows...";
-    if (!minimizeAllWindows()) {
+    if (!MinimizeAllWindows()) {
         qWarning() << "Failed to minimize all windows.";
     }
 
     // Opóźnienie przed pokazaniem powiadomienia, aby użytkownik zdążył zobaczyć pulpit
     QTimer::singleShot(500, [this]() {
         qDebug() << "Sending notification...";
-        if (!sendWindowsNotification("Wavelength Override", "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
+        if (!SendWindowsNotification("Wavelength Override", "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
             qWarning() << "Failed to send notification.";
         }
     });
 
     qDebug() << "Showing floating animation widget...";
-    showFloatingAnimationWidget(isFirstTime); // Pokazuje widget i uruchamia dźwięk wewnątrz
+    ShowFloatingAnimationWidget(is_first_time); // Pokazuje widget i uruchamia dźwięk wewnątrz
 }
 
-bool SystemOverrideManager::changeWallpaper()
+bool SystemOverrideManager::ChangeWallpaper()
 {
 #ifdef Q_OS_WIN
     // 1. Zapisz ścieżkę do obecnej tapety
-    WCHAR currentPath[MAX_PATH];
-    if (SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, currentPath, 0)) {
-        m_originalWallpaperPath = QString::fromWCharArray(currentPath);
-        qDebug() << "Original wallpaper path saved:" << m_originalWallpaperPath;
+    WCHAR current_path[MAX_PATH];
+    if (SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, current_path, 0)) {
+        original_wallpaper_path_ = QString::fromWCharArray(current_path);
+        qDebug() << "Original wallpaper path saved:" << original_wallpaper_path_;
     } else {
         qWarning() << "Could not get current wallpaper path.";
-        m_originalWallpaperPath = "";
+        original_wallpaper_path_ = "";
     }
 
     // 2. Utwórz ścieżkę do pliku tymczasowego
-    m_tempBlackWallpaperPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/wavelength_black_temp.bmp";
-    qDebug() << "Temporary black wallpaper path:" << m_tempBlackWallpaperPath;
+    temp_black_wallpaper_path_ = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/wavelength_black_temp.bmp";
+    qDebug() << "Temporary black wallpaper path:" << temp_black_wallpaper_path_;
 
     // Usuń stary plik tymczasowy, jeśli istnieje
-    if (QFile::exists(m_tempBlackWallpaperPath)) {
-        if (!QFile::remove(m_tempBlackWallpaperPath)) {
-             qWarning() << "Could not remove existing temporary wallpaper file:" << m_tempBlackWallpaperPath;
+    if (QFile::exists(temp_black_wallpaper_path_)) {
+        if (!QFile::remove(temp_black_wallpaper_path_)) {
+             qWarning() << "Could not remove existing temporary wallpaper file:" << temp_black_wallpaper_path_;
              // Kontynuuj mimo wszystko, save() powinien nadpisać
         }
     }
 
     // 3. Utwórz czarny obraz o rozmiarze ekranu
-    const QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    QImage blackImage(screenGeometry.size(), QImage::Format_RGB32);
-    if (blackImage.isNull()) {
+    const QRect screen_geometry = QGuiApplication::primaryScreen()->geometry();
+    QImage black_image(screen_geometry.size(), QImage::Format_RGB32);
+    if (black_image.isNull()) {
         qCritical() << "Failed to create QImage for black wallpaper.";
-        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę w razie błędu
+        temp_black_wallpaper_path_ = ""; // Wyczyść ścieżkę w razie błędu
         return false;
     }
-    blackImage.fill(Qt::black);
+    black_image.fill(Qt::black);
 
     // 4. Zapisz obraz jako plik BMP
-    if (!blackImage.save(m_tempBlackWallpaperPath, "BMP")) {
-        qCritical() << "Failed to save black wallpaper image to:" << m_tempBlackWallpaperPath;
-        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę w razie błędu
+    if (!black_image.save(temp_black_wallpaper_path_, "BMP")) {
+        qCritical() << "Failed to save black wallpaper image to:" << temp_black_wallpaper_path_;
+        temp_black_wallpaper_path_ = ""; // Wyczyść ścieżkę w razie błędu
         return false;
     }
     qDebug() << "Black wallpaper image saved successfully.";
 
     // 5. Ustaw nową tapetę
-    const std::wstring pathW = m_tempBlackWallpaperPath.toStdWString();
+    const std::wstring path_w = temp_black_wallpaper_path_.toStdWString();
     // ReSharper disable once CppFunctionalStyleCast
-    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(pathW.c_str()), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
+    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(path_w.c_str()), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
         qDebug() << "Black wallpaper set successfully.";
         return true;
-    } else {
-        qWarning() << "SystemParametersInfoW failed to set black wallpaper. Error code:" << GetLastError();
-        // Usuń plik tymczasowy w razie błędu ustawiania
-        QFile::remove(m_tempBlackWallpaperPath);
-        m_tempBlackWallpaperPath = "";
-        return false;
     }
+    qWarning() << "SystemParametersInfoW failed to set black wallpaper. Error code:" << GetLastError();
+    // Usuń plik tymczasowy w razie błędu ustawiania
+    QFile::remove(temp_black_wallpaper_path_);
+    temp_black_wallpaper_path_ = "";
+    return false;
 #else
     qWarning() << "Wallpaper change not implemented for this OS.";
     return false;
 #endif
 }
 
-bool SystemOverrideManager::restoreWallpaper()
+bool SystemOverrideManager::RestoreWallpaper()
 {
 #ifdef Q_OS_WIN
     bool success = false;
-    if (m_originalWallpaperPath.isEmpty()) {
+    if (original_wallpaper_path_.isEmpty()) {
         qWarning() << "No original wallpaper path saved to restore.";
         // Mimo to spróbuj usunąć czarną tapetę, jeśli istnieje
     } else {
-        qDebug() << "Restoring original wallpaper:" << m_originalWallpaperPath;
-        const std::wstring pathW = m_originalWallpaperPath.toStdWString();
+        qDebug() << "Restoring original wallpaper:" << original_wallpaper_path_;
+        const std::wstring path_w = original_wallpaper_path_.toStdWString();
         // ReSharper disable once CppFunctionalStyleCast
-        if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(pathW.c_str()),
+        if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PVOID(path_w.c_str()),
                                   SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
             qDebug() << "Original wallpaper restored successfully.";
-            m_originalWallpaperPath = ""; // Wyczyść po przywróceniu
+            original_wallpaper_path_ = ""; // Wyczyść po przywróceniu
             success = true; // Oznacz sukces przywracania
         } else {
             qWarning() << "SystemParametersInfoW failed to restore wallpaper. Error code:" << GetLastError();
@@ -242,14 +241,14 @@ bool SystemOverrideManager::restoreWallpaper()
     }
 
     // Zawsze próbuj usunąć tymczasowy plik czarnej tapety po próbie przywrócenia
-    if (!m_tempBlackWallpaperPath.isEmpty() && QFile::exists(m_tempBlackWallpaperPath)) {
-        if(QFile::remove(m_tempBlackWallpaperPath)) {
-            qDebug() << "Temporary black wallpaper file removed:" << m_tempBlackWallpaperPath;
+    if (!temp_black_wallpaper_path_.isEmpty() && QFile::exists(temp_black_wallpaper_path_)) {
+        if(QFile::remove(temp_black_wallpaper_path_)) {
+            qDebug() << "Temporary black wallpaper file removed:" << temp_black_wallpaper_path_;
         } else {
-            qWarning() << "Could not remove temporary black wallpaper file:" << m_tempBlackWallpaperPath;
+            qWarning() << "Could not remove temporary black wallpaper file:" << temp_black_wallpaper_path_;
             // To nie jest krytyczne, ale warto zalogować
         }
-        m_tempBlackWallpaperPath = ""; // Wyczyść ścieżkę niezależnie od sukcesu usunięcia
+        temp_black_wallpaper_path_ = ""; // Wyczyść ścieżkę niezależnie od sukcesu usunięcia
     }
 
     return success; // Zwróć sukces *przywracania* oryginalnej tapety
@@ -259,26 +258,26 @@ bool SystemOverrideManager::restoreWallpaper()
 #endif
 }
 
-bool SystemOverrideManager::sendWindowsNotification(const QString& title, const QString& message) const {
-    if (m_trayIcon) {
-        if (!m_trayIcon->isVisible()) {
+bool SystemOverrideManager::SendWindowsNotification(const QString& title, const QString& message) const {
+    if (tray_icon_) {
+        if (!tray_icon_->isVisible()) {
             qDebug() << "Tray icon is not visible, attempting to show it...";
             // --- USTAW IKONĘ TUTAJ ---
             // Użyj ikony z zasobów, jeśli masz odpowiednią
             // Pamiętaj, aby dodać ikonę do pliku .qrc
-            m_trayIcon->setIcon(QIcon(":/assets/icons/wavelength_logo_upscaled.png")); // Przykładowa ścieżka
+            tray_icon_->setIcon(QIcon(":/assets/icons/wavelength_logo_upscaled.png")); // Przykładowa ścieżka
             // -------------------------
 
             // Sprawdź, czy ikona została ustawiona
-            if (m_trayIcon->icon().isNull()) {
+            if (tray_icon_->icon().isNull()) {
                 qWarning() << "Failed to set tray icon! Check resource path.";
             } else {
-                m_trayIcon->show(); // Pokaż ikonę dopiero po jej ustawieniu
+                tray_icon_->show(); // Pokaż ikonę dopiero po jej ustawieniu
             }
         }
 
         qDebug() << "Sending notification via QSystemTrayIcon:" << title;
-        m_trayIcon->showMessage(title, message, QSystemTrayIcon::Information, 10000);
+        tray_icon_->showMessage(title, message, QSystemTrayIcon::Information, 10000);
 
         // Opcjonalnie: ukryj ikonę po chwili
         // QTimer::singleShot(11000, this, [this](){ if(m_trayIcon && m_trayIcon->isVisible()) m_trayIcon->hide(); });
@@ -290,80 +289,78 @@ bool SystemOverrideManager::sendWindowsNotification(const QString& title, const 
     }
 }
 
-bool SystemOverrideManager::minimizeAllWindows()
+bool SystemOverrideManager::MinimizeAllWindows()
 {
 #ifdef Q_OS_WIN
     // Użycie COM jest bardziej niezawodne
-    IShellDispatch *pShellDispatch = nullptr;
-    const HRESULT hr = CoCreateInstance(CLSID_Shell, nullptr, CLSCTX_INPROC_SERVER, IID_IShellDispatch, reinterpret_cast<void **>(&pShellDispatch));
+    IShellDispatch *shell_dispatch = nullptr;
+    const HRESULT hr = CoCreateInstance(CLSID_Shell, nullptr, CLSCTX_INPROC_SERVER, IID_IShellDispatch, reinterpret_cast<void **>(&shell_dispatch));
     if (SUCCEEDED(hr)) {
-        pShellDispatch->MinimizeAll();
-        pShellDispatch->Release();
+        shell_dispatch->MinimizeAll();
+        shell_dispatch->Release();
         qDebug() << "MinimizeAllWindows called via COM.";
         return true;
-    } else {
-        qWarning() << "Failed to create IShellDispatch instance. HRESULT:" << hr;
-        // Fallback na starszą metodę
-        if (const HWND hwnd = FindWindowW(L"Shell_TrayWnd", nullptr)) {
-            SendMessageW(hwnd, WM_COMMAND, 419, 0);
-            qDebug() << "Sent WM_COMMAND 419 to Shell_TrayWnd as fallback.";
-            return true;
-        } else {
-            qWarning() << "Could not find Shell_TrayWnd for fallback.";
-            return false;
-        }
     }
+    qWarning() << "Failed to create IShellDispatch instance. HRESULT:" << hr;
+    // Fallback na starszą metodę
+    if (const HWND hwnd = FindWindowW(L"Shell_TrayWnd", nullptr)) {
+        SendMessageW(hwnd, WM_COMMAND, 419, 0);
+        qDebug() << "Sent WM_COMMAND 419 to Shell_TrayWnd as fallback.";
+        return true;
+    }
+    qWarning() << "Could not find Shell_TrayWnd for fallback.";
+    return false;
 #else
     qWarning() << "Minimize all windows not implemented for this OS.";
     return false;
 #endif
 }
 
-void SystemOverrideManager::showFloatingAnimationWidget(const bool isFirstTime)
+void SystemOverrideManager::ShowFloatingAnimationWidget(const bool is_first_time)
 {
-    if (m_floatingWidget) {
+    if (floating_widget_) {
         qWarning() << "Floating widget already exists.";
-        m_floatingWidget->show();
-        m_floatingWidget->activateWindow();
-        qDebug() << "Existing Floating widget shown. Visible:" << m_floatingWidget->isVisible();
+        floating_widget_->show();
+        floating_widget_->activateWindow();
+        qDebug() << "Existing Floating widget shown. Visible:" << floating_widget_->isVisible();
         return;
     }
 
-    qDebug() << "Creating and showing FloatingEnergySphereWidget. Is first time:" << isFirstTime; // Dodaj log
+    qDebug() << "Creating and showing FloatingEnergySphereWidget. Is first time:" << is_first_time; // Dodaj log
     // Przekaż flagę isFirstTime do konstruktora widgetu
-    m_floatingWidget = new FloatingEnergySphereWidget(isFirstTime); // <<< ZMIANA TUTAJ
-    if (!m_floatingWidget) {
+    floating_widget_ = new FloatingEnergySphereWidget(is_first_time); // <<< ZMIANA TUTAJ
+    if (!floating_widget_) {
         qCritical() << "Failed to create FloatingEnergySphereWidget instance!";
         return;
     }
     qDebug() << "FloatingEnergySphereWidget instance created.";
 
-    m_floatingWidget->setClosable(false);
+    floating_widget_->SetClosable(false);
 
-    connect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed,
-            this, &SystemOverrideManager::handleFloatingWidgetClosed);
+    connect(floating_widget_, &FloatingEnergySphereWidget::widgetClosed,
+            this, &SystemOverrideManager::HandleFloatingWidgetClosed);
 
     // Zamiast konamiCodeEntered, połącz nowy sygnał zakończenia sekwencji niszczenia
     // connect(m_floatingWidget, &FloatingEnergySphereWidget::konamiCodeEntered,
     //         this, &SystemOverrideManager::restoreSystemState); // <<< STARE POŁĄCZENIE
-    connect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished,
-            this, &SystemOverrideManager::restoreSystemState); // <<< NOWE POŁĄCZENIE
+    connect(floating_widget_, &FloatingEnergySphereWidget::destructionSequenceFinished,
+            this, &SystemOverrideManager::RestoreSystemState); // <<< NOWE POŁĄCZENIE
 
-    const QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    const int x = (screenGeometry.width() - m_floatingWidget->width()) / 2;
-    const int y = (screenGeometry.height() - m_floatingWidget->height()) / 2;
-    m_floatingWidget->move(x, y);
+    const QRect screen_geometry = QGuiApplication::primaryScreen()->geometry();
+    const int x = (screen_geometry.width() - floating_widget_->width()) / 2;
+    const int y = (screen_geometry.height() - floating_widget_->height()) / 2;
+    floating_widget_->move(x, y);
 
-    m_floatingWidget->show();
-    m_floatingWidget->activateWindow();
-    m_floatingWidget->setFocus();
+    floating_widget_->show();
+    floating_widget_->activateWindow();
+    floating_widget_->setFocus();
 
 }
 
-void SystemOverrideManager::handleFloatingWidgetClosed()
+void SystemOverrideManager::HandleFloatingWidgetClosed()
 {
     qDebug() << "Floating widget closed signal received.";
-    m_floatingWidget = nullptr; // Widget sam się usuwa
+    floating_widget_ = nullptr; // Widget sam się usuwa
 
     // Zatrzymaj dźwięk
     // if (m_mediaPlayer && m_mediaPlayer->playbackState() == QMediaPlayer::PlayingState) {
@@ -371,40 +368,40 @@ void SystemOverrideManager::handleFloatingWidgetClosed()
     // }
 
     // Rozpocznij przywracanie stanu (w tym odblokowanie wejścia)
-    QTimer::singleShot(RESTORE_DELAY_MS, this, &SystemOverrideManager::restoreSystemState);
+    QTimer::singleShot(kRestoreDelayMs, this, &SystemOverrideManager::RestoreSystemState);
 }
 
-void SystemOverrideManager::restoreSystemState()
+void SystemOverrideManager::RestoreSystemState()
 {
-    if (!m_overrideActive) { /* ... */ return; }
+    if (!override_active_) { /* ... */ return; }
     qDebug() << "Restoring system state...";
 
 #ifdef Q_OS_WIN
     // --- Odinstaluj Haki ---
-    uninstallKeyboardHook();
-    uninstallMouseHook();
+    UninstallKeyboardHook();
+    UninstallMouseHook();
     // -----------------------
 #endif
 
     // Zatrzymaj i zamknij widget animacji, jeśli nadal istnieje
-    if (m_floatingWidget) {
+    if (floating_widget_) {
         qDebug() << "Closing existing floating widget during restore.";
         // Rozłącz sygnały, aby uniknąć ponownego wywołania restoreSystemState
-        disconnect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::handleFloatingWidgetClosed);
-        disconnect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::restoreSystemState);
-        m_floatingWidget->setClosable(true);
-        m_floatingWidget->close();
-        m_floatingWidget = nullptr;
+        disconnect(floating_widget_, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::HandleFloatingWidgetClosed);
+        disconnect(floating_widget_, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::RestoreSystemState);
+        floating_widget_->SetClosable(true);
+        floating_widget_->close();
+        floating_widget_ = nullptr;
     }
 
     // Przywróć tapetę
-    if (!restoreWallpaper()) {
+    if (!RestoreWallpaper()) {
         qWarning() << "Failed to restore original wallpaper.";
     }
 
     // Oznacz jako nieaktywny i wyemituj sygnał (jeśli był aktywny)
-    if(m_overrideActive) {
-        m_overrideActive = false;
+    if(override_active_) {
+        override_active_ = false;
         qDebug() << "System state restoration complete. Override deactivated.";
         emit overrideFinished(); // Emituj sygnał *przed* próbą relaunchu
     } else {
@@ -414,7 +411,7 @@ void SystemOverrideManager::restoreSystemState()
     // --- NOWE: Relaunch normalnej instancji i zamknij bieżącą (podwyższoną) ---
     qDebug() << "Attempting to relaunch the application normally...";
 #ifdef Q_OS_WIN
-    if (relaunchNormally()) { // Wywołaj nową funkcję pomocniczą
+    if (RelaunchNormally()) { // Wywołaj nową funkcję pomocniczą
         qDebug() << "Normal relaunch initiated. Quitting elevated instance shortly.";
         // Użyj QTimer::singleShot, aby dać nowemu procesowi chwilę na start
         QTimer::singleShot(500, [](){ QApplication::quit(); });
@@ -433,72 +430,68 @@ void SystemOverrideManager::restoreSystemState()
 #ifdef Q_OS_WIN
 // --- Implementacja funkcji pomocniczych ---
 
-bool SystemOverrideManager::isRunningAsAdmin()
+bool SystemOverrideManager::IsRunningAsAdmin()
 {
-    BOOL isAdmin = FALSE;
-    HANDLE hToken = nullptr;
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+    BOOL is_admin = FALSE;
+    HANDLE token_handle = nullptr;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token_handle)) {
         TOKEN_ELEVATION elevation;
-        DWORD cbSize = sizeof(TOKEN_ELEVATION);
-        if (GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &cbSize)) {
-            isAdmin = elevation.TokenIsElevated;
+        DWORD cb_size = sizeof(TOKEN_ELEVATION);
+        if (GetTokenInformation(token_handle, TokenElevation, &elevation, sizeof(elevation), &cb_size)) {
+            is_admin = elevation.TokenIsElevated;
         }
     }
-    if (hToken) {
-        CloseHandle(hToken);
+    if (token_handle) {
+        CloseHandle(token_handle);
     }
-    return isAdmin;
-
-    // Alternatywna, prostsza metoda (wymaga linkowania z Shell32.lib)
-    // return IsUserAnAdmin(); // Zwraca TRUE jeśli użytkownik jest adminem, ale niekoniecznie proces jest podwyższony
+    return is_admin;
 }
 
-bool SystemOverrideManager::relaunchAsAdmin(const QStringList& arguments)
+bool SystemOverrideManager::RelaunchAsAdmin(const QStringList& arguments)
 {
     const QStringList args = arguments;
-    const QString appPath = QApplication::applicationFilePath();
+    const QString app_path = QApplication::applicationFilePath();
 
     SHELLEXECUTEINFOW sei = { sizeof(sei) };
     sei.lpVerb = L"runas"; // Kluczowe: żądanie podwyższenia uprawnień
-    sei.lpFile = reinterpret_cast<LPCWSTR>(appPath.utf16());
+    sei.lpFile = reinterpret_cast<LPCWSTR>(app_path.utf16());
     // Konwertuj argumenty na pojedynczy string rozdzielony spacjami
-    const QString argsString = args.join(' ');
-    sei.lpParameters = argsString.isEmpty() ? nullptr : reinterpret_cast<LPCWSTR>(argsString.utf16());
+    const QString args_string = args.join(' ');
+    sei.lpParameters = args_string.isEmpty() ? nullptr : reinterpret_cast<LPCWSTR>(args_string.utf16());
     sei.hwnd = nullptr;
     sei.nShow = SW_SHOWNORMAL;
     sei.fMask = SEE_MASK_DEFAULT; // Można dodać SEE_MASK_NOCLOSEPROCESS jeśli potrzebujesz uchwytu
 
-    qDebug() << "Attempting to relaunch" << appPath << "with args:" << argsString << "as admin...";
+    qDebug() << "Attempting to relaunch" << app_path << "with args:" << args_string << "as admin...";
 
     if (ShellExecuteExW(&sei)) {
         qDebug() << "Relaunch successful (UAC prompt should appear).";
         return true;
-    } else {
-        const DWORD error = GetLastError();
-        qWarning() << "ShellExecuteExW failed with error code:" << error;
-        // ERROR_CANCELLED (1223) oznacza, że użytkownik anulował UAC
-        if (error == ERROR_CANCELLED) {
-             qDebug() << "User cancelled the UAC prompt.";
-        } else {
-             qWarning() << "Failed to request elevation.";
-        }
-        return false;
     }
+    const DWORD error = GetLastError();
+    qWarning() << "ShellExecuteExW failed with error code:" << error;
+    // ERROR_CANCELLED (1223) oznacza, że użytkownik anulował UAC
+    if (error == ERROR_CANCELLED) {
+        qDebug() << "User cancelled the UAC prompt.";
+    } else {
+        qWarning() << "Failed to request elevation.";
+    }
+    return false;
 }
 
 
-LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(const int nCode, const WPARAM wParam, const LPARAM lParam)
+LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(const int n_code, const WPARAM w_param, const LPARAM l_param)
 {
-    if (nCode == HC_ACTION)
+    if (n_code == HC_ACTION)
     {
         // Sprawdź tylko zdarzenia wciśnięcia klawisza
-        if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
+        if (w_param == WM_KEYDOWN || w_param == WM_SYSKEYDOWN)
         {
-            const auto pkhs = reinterpret_cast<KBDLLHOOKSTRUCT *>(lParam);
+            const auto pkhs = reinterpret_cast<KBDLLHOOKSTRUCT *>(l_param);
             const DWORD vkCode = pkhs->vkCode;
 
             // Sprawdź, czy klawisz jest na liście dozwolonych
-            if (ALLOWED_KEYS.find(vkCode) == ALLOWED_KEYS.end())
+            if (!kAllowedKeys.contains(vkCode))
             {
                 // Klawisz NIE jest dozwolony - zablokuj go
                 // qDebug() << "Blocking key:" << vkCode; // Opcjonalny debug
@@ -511,12 +504,12 @@ LRESULT CALLBACK SystemOverrideManager::LowLevelKeyboardProc(const int nCode, co
 
     // Przekaż zdarzenie do następnego haka w łańcuchu
     // Ważne: Przekazuj m_keyboardHook, a nie twórz nowego uchwytu!
-    return CallNextHookEx(m_keyboardHook, nCode, wParam, lParam);
+    return CallNextHookEx(keyboard_hook_, n_code, w_param, l_param);
 }
 
-bool SystemOverrideManager::installKeyboardHook()
+bool SystemOverrideManager::InstallKeyboardHook()
 {
-    if (m_keyboardHook != nullptr) {
+    if (keyboard_hook_ != nullptr) {
         qWarning() << "Keyboard hook already installed.";
         return true; // Już zainstalowany
     }
@@ -524,11 +517,11 @@ bool SystemOverrideManager::installKeyboardHook()
     // Pobierz uchwyt do bieżącego modułu (DLL lub EXE)
     //HINSTANCE hInstance = GetModuleHandle(NULL); // Można użyć NULL dla bieżącego procesu
     // LUB jeśli SystemOverrideManager jest w DLL:
-    HINSTANCE hInstance = GetModuleHandleW(L"wavelength.dll"); // Zastąp poprawną nazwą DLL jeśli dotyczy
-    if (!hInstance) {
+    HINSTANCE h_instance = GetModuleHandleW(L"wavelength.dll"); // Zastąp poprawną nazwą DLL jeśli dotyczy
+    if (!h_instance) {
          // Jeśli powyższe zawiedzie, spróbuj z NULL
-         hInstance = GetModuleHandle(nullptr);
-         if (!hInstance) {
+         h_instance = GetModuleHandle(nullptr);
+         if (!h_instance) {
             qCritical() << "Failed to get module handle for keyboard hook. Error:" << GetLastError();
             return false;
          }
@@ -536,44 +529,44 @@ bool SystemOverrideManager::installKeyboardHook()
 
 
     qDebug() << "Attempting to install low-level keyboard hook...";
-    m_keyboardHook = SetWindowsHookEx(
+    keyboard_hook_ = SetWindowsHookEx(
         WH_KEYBOARD_LL,             // Typ haka: nisko-poziomowy klawiatury
         LowLevelKeyboardProc,       // Wskaźnik do procedury haka
-        hInstance,                  // Uchwyt do modułu zawierającego procedurę haka
+        h_instance,                  // Uchwyt do modułu zawierającego procedurę haka
         0                           // ID wątku (0 dla globalnego haka)
     );
 
-    if (m_keyboardHook == nullptr) {
+    if (keyboard_hook_ == nullptr) {
         qCritical() << "Failed to install keyboard hook! Error code:" << GetLastError()
                    << ". Konami code might not work, and input won't be fully blocked.";
         return false;
     }
 
-    qDebug() << "Low-level keyboard hook installed successfully. Handle:" << m_keyboardHook;
+    qDebug() << "Low-level keyboard hook installed successfully. Handle:" << keyboard_hook_;
     return true;
 }
 
-void SystemOverrideManager::uninstallKeyboardHook()
+void SystemOverrideManager::UninstallKeyboardHook()
 {
-    if (m_keyboardHook != nullptr) {
-        qDebug() << "Uninstalling low-level keyboard hook. Handle:" << m_keyboardHook;
-        if (UnhookWindowsHookEx(m_keyboardHook)) {
+    if (keyboard_hook_ != nullptr) {
+        qDebug() << "Uninstalling low-level keyboard hook. Handle:" << keyboard_hook_;
+        if (UnhookWindowsHookEx(keyboard_hook_)) {
             qDebug() << "Keyboard hook uninstalled successfully.";
         } else {
             qWarning() << "Failed to uninstall keyboard hook! Error code:" << GetLastError();
         }
-        m_keyboardHook = nullptr; // Zawsze resetuj uchwyt
+        keyboard_hook_ = nullptr; // Zawsze resetuj uchwyt
     }
 }
 
-LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(const int nCode, const WPARAM wParam, const LPARAM lParam)
+LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(const int n_code, const WPARAM w_param, const LPARAM l_param)
 {
-    if (nCode == HC_ACTION)
+    if (n_code == HC_ACTION)
     {
         // Blokuj wszystkie zdarzenia myszy (kliknięcia, ruch, kółko)
         // Można by ewentualnie przepuszczać WM_MOUSEMOVE, jeśli chcemy tylko blokować kliknięcia,
         // ale pełna blokada jest bezpieczniejsza dla utrzymania fokusu.
-        switch (wParam)
+        switch (w_param)
         {
             case WM_LBUTTONDOWN:
             case WM_LBUTTONUP:
@@ -598,67 +591,66 @@ LRESULT CALLBACK SystemOverrideManager::LowLevelMouseProc(const int nCode, const
     }
 
     // Przekaż zdarzenie do następnego haka w łańcuchu
-    return CallNextHookEx(m_mouseHook, nCode, wParam, lParam);
+    return CallNextHookEx(mouse_hook_, n_code, w_param, l_param);
 }
 
-bool SystemOverrideManager::installMouseHook()
+bool SystemOverrideManager::InstallMouseHook()
 {
-    if (m_mouseHook != nullptr) {
+    if (mouse_hook_ != nullptr) {
         qWarning() << "Mouse hook already installed.";
         return true;
     }
 
-    const HINSTANCE hInstance = GetModuleHandle(nullptr);
-    if (!hInstance) {
+    const HINSTANCE h_instance = GetModuleHandle(nullptr);
+    if (!h_instance) {
         qCritical() << "Failed to get module handle for mouse hook. Error:" << GetLastError();
         return false;
     }
 
     qDebug() << "Attempting to install low-level mouse hook...";
-    m_mouseHook = SetWindowsHookEx(
+    mouse_hook_ = SetWindowsHookEx(
         WH_MOUSE_LL,            // Typ haka: nisko-poziomowy myszy
         LowLevelMouseProc,      // Wskaźnik do procedury haka
-        hInstance,              // Uchwyt do modułu
+        h_instance,              // Uchwyt do modułu
         0                       // ID wątku (0 dla globalnego)
     );
 
-    if (m_mouseHook == nullptr) {
+    if (mouse_hook_ == nullptr) {
         qCritical() << "Failed to install mouse hook! Error code:" << GetLastError();
         return false;
     }
 
-    qDebug() << "Low-level mouse hook installed successfully. Handle:" << m_mouseHook;
+    qDebug() << "Low-level mouse hook installed successfully. Handle:" << mouse_hook_;
     return true;
 }
 
-void SystemOverrideManager::uninstallMouseHook()
+void SystemOverrideManager::UninstallMouseHook()
 {
-    if (m_mouseHook != nullptr) {
-        qDebug() << "Uninstalling low-level mouse hook. Handle:" << m_mouseHook;
-        if (UnhookWindowsHookEx(m_mouseHook)) {
+    if (mouse_hook_ != nullptr) {
+        qDebug() << "Uninstalling low-level mouse hook. Handle:" << mouse_hook_;
+        if (UnhookWindowsHookEx(mouse_hook_)) {
             qDebug() << "Mouse hook uninstalled successfully.";
         } else {
             qWarning() << "Failed to uninstall mouse hook! Error code:" << GetLastError();
         }
-        m_mouseHook = nullptr;
+        mouse_hook_ = nullptr;
     }
 }
 
-bool SystemOverrideManager::relaunchNormally(const QStringList& arguments)
+bool SystemOverrideManager::RelaunchNormally(const QStringList& arguments)
 {
-    const QString appPath = QApplication::applicationFilePath();
+    const QString app_path = QApplication::applicationFilePath();
     const QStringList args = arguments; // Przekaż argumenty, jeśli są potrzebne
 
-    qDebug() << "Relaunching normally:" << appPath << "with args:" << args.join(' ');
+    qDebug() << "Relaunching normally:" << app_path << "with args:" << args.join(' ');
 
     // Użyj QProcess::startDetached - jest prostsze i powinno wystarczyć
-    if (QProcess::startDetached(appPath, args)) {
+    if (QProcess::startDetached(app_path, args)) {
         qDebug() << "QProcess::startDetached successful for normal relaunch.";
         return true;
-    } else {
-        qWarning() << "QProcess::startDetached failed for normal relaunch.";
-        // Można dodać fallback na ShellExecuteEx z 'open', ale startDetached jest preferowane
-        return false;
     }
+    qWarning() << "QProcess::startDetached failed for normal relaunch.";
+    // Można dodać fallback na ShellExecuteEx z 'open', ale startDetached jest preferowane
+    return false;
 }
 #endif

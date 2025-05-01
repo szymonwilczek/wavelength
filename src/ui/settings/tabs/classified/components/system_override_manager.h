@@ -12,7 +12,6 @@
 #include <windows.h>
 #endif
 
-// Forward declaration
 class FloatingEnergySphereWidget;
 
 class SystemOverrideManager final : public QObject
@@ -24,57 +23,56 @@ public:
     ~SystemOverrideManager() override;
 
 #ifdef Q_OS_WIN
-    static bool isRunningAsAdmin();
-    static bool relaunchAsAdmin(const QStringList& arguments = QStringList());
+    static bool IsRunningAsAdmin();
+    static bool RelaunchAsAdmin(const QStringList& arguments = QStringList());
 #endif
 
     signals:
-        void overrideFinished(); // Sygnał informujący o zakończeniu sekwencji
+        void overrideFinished();
 
     public slots:
-        void initiateOverrideSequence(bool isFirstTime);
-    void restoreSystemState(); // Upubliczniamy, aby można było wywołać z zewnątrz
+        void InitiateOverrideSequence(bool is_first_time);
+        void RestoreSystemState();
 
     private slots:
-    void handleFloatingWidgetClosed();
+        void HandleFloatingWidgetClosed();
 
 private:
-    bool changeWallpaper();
-    bool restoreWallpaper();
-    bool sendWindowsNotification(const QString& title, const QString& message) const;
+    bool ChangeWallpaper();
+    bool RestoreWallpaper();
+    bool SendWindowsNotification(const QString& title, const QString& message) const;
 
-    static bool minimizeAllWindows();
-    void showFloatingAnimationWidget(bool isFirstTime);
+    static bool MinimizeAllWindows();
+    void ShowFloatingAnimationWidget(bool is_first_time);
 
-    QSystemTrayIcon* m_trayIcon;
-    FloatingEnergySphereWidget* m_floatingWidget;
+    QSystemTrayIcon* tray_icon_;
+    FloatingEnergySphereWidget* floating_widget_;
 
-    // Dźwięk
-    QMediaPlayer* m_mediaPlayer;
-    QAudioOutput* m_audioOutput; // Wymagane w Qt6
+    QMediaPlayer* media_player_;
+    QAudioOutput* audio_output_;
 
-    QString m_originalWallpaperPath;
-    QString m_tempBlackWallpaperPath;
-    bool m_overrideActive;
+    QString original_wallpaper_path_;
+    QString temp_black_wallpaper_path_;
+    bool override_active_;
 
 #ifdef Q_OS_WIN
 
-    static bool relaunchNormally(const QStringList& arguments = QStringList());
+    static bool RelaunchNormally(const QStringList& arguments = QStringList());
 
     // --- Hooks ---
-    static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK LowLevelKeyboardProc(int n_code, WPARAM w_param, LPARAM l_param);
 
-    static bool installKeyboardHook();
+    static bool InstallKeyboardHook();
 
-    static void uninstallKeyboardHook();
-    static HHOOK m_keyboardHook;
+    static void UninstallKeyboardHook();
+    static HHOOK keyboard_hook_;
 
-    static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK LowLevelMouseProc(int n_code, WPARAM w_param, LPARAM l_param);
 
-    static bool installMouseHook();
+    static bool InstallMouseHook();
 
-    static void uninstallMouseHook();
-    static HHOOK m_mouseHook;
+    static void UninstallMouseHook();
+    static HHOOK mouse_hook_;
     // --------------------------------------------
 #endif
 };

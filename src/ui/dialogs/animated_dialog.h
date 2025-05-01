@@ -4,8 +4,6 @@
 #include <QDialog>
 #include <QWidget>
 #include <QCloseEvent>
-#include <QRandomGenerator>
-
 
 class OverlayWidget;
 
@@ -14,41 +12,39 @@ class AnimatedDialog : public QDialog {
 
 public:
     enum AnimationType {
-        SlideFromBottom,
-        FadeIn,
-        ScaleFromCenter,
-        DigitalMaterialization  // Nowy typ animacji
+        kSlideFromBottom,
+        kFadeIn,
+        kScaleFromCenter,
+        kDigitalMaterialization
     };
 
-    explicit AnimatedDialog(QWidget *parent = nullptr, AnimationType type = SlideFromBottom);
+    explicit AnimatedDialog(QWidget *parent = nullptr, AnimationType type = kSlideFromBottom);
     ~AnimatedDialog() override;
 
-    void setAnimationDuration(const int duration) { m_duration = duration; }
-    int animationDuration() const { return m_duration; }
+    void SetAnimationDuration(const int duration) { duration_ = duration; }
+    int GetAnimationDuration() const { return duration_; }
 
     signals:
-        void showAnimationFinished(); // Nowy sygnał informujący o zakończeniu animacji
-
-
+        void showAnimationFinished();
 
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-    double m_digitalizationProgress = 0.0;
-    double m_cornerGlowProgress = 0.0;
+    double digitalization_progress_ = 0.0;
+    double corner_glow_progress_ = 0.0;
 
 private:
-    void animateShow();
-    void animateClose();
+    void AnimateShow();
+    void AnimateClose();
 
-    AnimationType m_animationType;
-    int m_duration;
-    bool m_closing;
-    OverlayWidget *m_overlay;
+    AnimationType animation_type_;
+    int duration_;
+    bool closing_;
+    OverlayWidget *overlay_;
 
-    QPixmap m_scanlineBuffer;
-    QLinearGradient m_scanGradient;
-    bool m_scanlineInitialized = false;
+    QPixmap scanline_buffer_;
+    QLinearGradient scan_gradient_;
+    bool scanline_initialized_ = false;
 
 
 };

@@ -1,50 +1,50 @@
 #ifndef AUTHENTICATION_MANAGER_H
 #define AUTHENTICATION_MANAGER_H
 
+#include <QDateTime>
+#include <QMap>
 #include <QObject>
 #include <QString>
-#include <QCryptographicHash>
-#include <QJsonDocument>
 
 class AuthenticationManager final : public QObject {
     Q_OBJECT
 
 public:
-    static AuthenticationManager* getInstance() {
+    static AuthenticationManager* GetInstance() {
         static AuthenticationManager instance;
         return &instance;
     }
 
-    static QString generateClientId();
+    static QString GenerateClientId();
     
-    static QString generateSessionToken();
+    static QString GenerateSessionToken();
 
-    bool verifyPassword(const QString &frequency, const QString& providedPassword);
+    bool VerifyPassword(const QString &frequency, const QString& provided_password);
 
-    void registerPassword(const QString &frequency, const QString& password);
+    void RegisterPassword(const QString &frequency, const QString& password);
 
-    void removePassword(const QString &frequency);
+    void RemovePassword(const QString &frequency);
 
-    static QString createAuthResponse(bool success, const QString& errorMessage = QString());
+    static QString CreateAuthResponse(bool success, const QString& error_message = QString());
 
-    bool storeSession(const QString &frequency, const QString& clientId, const QString& sessionToken);
+    bool StoreSession(const QString &frequency, const QString& client_id, const QString& session_token);
 
-    bool validateSession(const QString& sessionToken, const QString &frequency);
+    bool ValidateSession(const QString& session_token, const QString &frequency);
 
-    void deactivateSession(const QString& sessionToken);
+    void DeactivateSession(const QString& session_token);
 
-    void deactivateClientSessions(const QString& clientId);
+    void DeactivateClientSessions(const QString& client_id);
 
-    void deactivateFrequencySessions(const QString &frequency);
+    void DeactivateFrequencySessions(const QString &frequency);
 
-    void cleanupExpiredSessions();
+    void CleanupExpiredSessions();
 
 private:
     struct SessionInfo {
-        QString clientId;
+        QString client_id;
         QString frequency;
         QDateTime timestamp;
-        bool isActive;
+        bool is_active;
     };
 
     explicit AuthenticationManager(QObject* parent = nullptr) : QObject(parent) {}
@@ -53,9 +53,8 @@ private:
     AuthenticationManager(const AuthenticationManager&) = delete;
     AuthenticationManager& operator=(const AuthenticationManager&) = delete;
 
-    // ReSharper disable once CppDFANotInitializedField
-    QMap<QString, QString> m_wavelengthPasswords;
-    QMap<QString, SessionInfo> m_sessions;
+    QMap<QString, QString> wavelength_passwords_;
+    QMap<QString, SessionInfo> sessions_;
 };
 
 #endif // AUTHENTICATION_MANAGER_H

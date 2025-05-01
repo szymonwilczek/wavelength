@@ -4,57 +4,54 @@
 #include <QDirIterator>
 #include <QCoreApplication>
 
-FontManager* FontManager::instance = nullptr;
+FontManager* FontManager::instance_ = nullptr;
 
-FontManager* FontManager::getInstance() {
-    if (instance == nullptr) {
-        instance = new FontManager();
+FontManager* FontManager::GetInstance() {
+    if (instance_ == nullptr) {
+        instance_ = new FontManager();
     }
-    return instance;
+    return instance_;
 }
 
 FontManager::FontManager(QObject* parent) : QObject(parent) {
 }
 
-bool FontManager::initialize() {
+bool FontManager::Initialize() {
     bool success = true;
     
-    // Podstawowe ścieżki do sprawdzenia
-    QStringList basePaths = {
-        ":/resources/fonts/",                                   // ścieżka do czcionek w zasobach
-        QCoreApplication::applicationDirPath() + "/../resources/fonts/",  // względna ścieżka dla trybu release
-        QCoreApplication::applicationDirPath() + "/../../resources/fonts/" // względna ścieżka dla trybu debug
+    QStringList base_paths = {
+        ":/resources/fonts/",
+        QCoreApplication::applicationDirPath() + "/../resources/fonts/",
+        QCoreApplication::applicationDirPath() + "/../../resources/fonts/"
     };
     
-    // Lista czcionek do załadowania z ich katalogami
-    QMap<QString, QString> fontDirs = {
+    QMap<QString, QString> font_directories = {
         {"BlenderPro", "BlenderPro"},
         {"Lato", "Lato"},
         {"Poppins", "Poppins"}
     };
     
-    for (const auto& fontName : fontDirs.keys()) {
-        bool fontLoaded = false;
-        QString dirName = fontDirs[fontName];
+    for (const auto& fontName : font_directories.keys()) {
+        bool font_loaded = false;
+        QString directory_name = font_directories[fontName];
         
-        for (const QString& basePath : basePaths) {
-            QString fontDir = basePath + dirName + "/";
-            QDirIterator it(fontDir, QStringList() << "*.ttf", QDir::Files);
+        for (const QString& base_path : base_paths) {
+            QString font_directory = base_path + directory_name + "/";
+            QDirIterator it(font_directory, QStringList() << "*.ttf", QDir::Files);
             
             while (it.hasNext()) {
-                if (QString fontPath = it.next(); loadFont(fontName, fontPath)) {
-                    qDebug() << "Załadowano czcionkę:" << fontPath;
-                    fontLoaded = true;
-                    // Nie przerywamy, żeby załadować wszystkie warianty (.ttf) danej czcionki
+                if (QString font_path = it.next(); LoadFont(fontName, font_path)) {
+                    qDebug() << "Załadowano czcionkę:" << font_path;
+                    font_loaded = true;
                 }
             }
             
-            if (fontLoaded) {
-                break; // Jeśli znaleźliśmy i załadowaliśmy czcionkę w tej ścieżce, nie sprawdzamy pozostałych
+            if (font_loaded) {
+                break;
             }
         }
         
-        if (!fontLoaded) {
+        if (!font_loaded) {
             qWarning() << "Nie udało się załadować czcionki:" << fontName;
             success = false;
         }
@@ -63,37 +60,37 @@ bool FontManager::initialize() {
     return success;
 }
 
-bool FontManager::loadFont(const QString& fontName, const QString& fontPath) {
-    const int fontId = QFontDatabase::addApplicationFont(fontPath);
-    if (fontId == -1) {
-        qWarning() << "Błąd ładowania czcionki:" << fontPath;
+bool FontManager::LoadFont(const QString& font_name, const QString& font_path) {
+    const int font_id = QFontDatabase::addApplicationFont(font_path);
+    if (font_id == -1) {
+        qWarning() << "Błąd ładowania czcionki:" << font_path;
         return false;
     }
     
-    QStringList families = QFontDatabase::applicationFontFamilies(fontId);
+    QStringList families = QFontDatabase::applicationFontFamilies(font_id);
     if (families.isEmpty()) {
-        qWarning() << "Brak dostępnych rodzin czcionek dla:" << fontPath;
+        qWarning() << "Brak dostępnych rodzin czcionek dla:" << font_path;
         return false;
     }
 
-    const QString family = families.first();
-    fontFamilies[fontName] = family;
-    qDebug() << "Załadowana rodzina czcionki:" << fontName << "jako" << family;
+    const QString& family = families.first();
+    font_families_[font_name] = family;
+    qDebug() << "Załadowana rodzina czcionki:" << font_name << "jako" << family;
     return true;
 }
 
-QString FontManager::getFontFamily(const QString& fontName) {
-    if (fontFamilies.contains(fontName)) {
-        return fontFamilies[fontName];
+QString FontManager::GetFontFamily(const QString& font_name) {
+    if (font_families_.contains(font_name)) {
+        return font_families_[font_name];
     }
     
-    qWarning() << "Nie znaleziono rodziny czcionki:" << fontName << "- używam domyślnej";
-    return QFont().family(); // Zwróć domyślną czcionkę systemową
+    qWarning() << "Nie znaleziono rodziny czcionki:" << font_name << "- używam domyślnej";
+    return QFont().family();
 }
 
-QFont FontManager::getFont(const QString& fontName, int pointSize, int weight) {
-    const QString family = getFontFamily(fontName);
-    QFont font(family, pointSize);
+QFont FontManager::GetFont(const QString& font_name, const int point_size, const int weight) {
+    const QString family = GetFontFamily(font_name);
+    QFont font(family, point_size);
     font.setWeight(weight);
     return font;
 }

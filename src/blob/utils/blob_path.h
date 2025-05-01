@@ -7,7 +7,7 @@
 
 class BlobPath {
 public:
-    static QPainterPath createBlobPath(const std::vector<QPointF>& controlPoints, int numPoints);
+    static QPainterPath CreateBlobPath(const std::vector<QPointF>& control_points, int num_of_points);
 };
 
 #endif // BLOBPATH_H

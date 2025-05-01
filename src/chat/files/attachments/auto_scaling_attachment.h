@@ -12,16 +12,16 @@ class AutoScalingAttachment final : public QWidget {
 public:
     explicit AutoScalingAttachment(QWidget* content, QWidget* parent = nullptr);
 
-    void setMaxAllowedSize(const QSize& maxSize);
+    void SetMaxAllowedSize(const QSize& max_size);
 
-    QSize contentOriginalSize() const;
+    QSize ContentOriginalSize() const;
 
-    bool isScaled() const {
-        return m_isScaled;
+    bool IsScaled() const {
+        return is_scaled_;
     }
 
-    QWidget* content() const {
-        return m_content;
+    QWidget* Content() const {
+        return content_;
     }
 
     QSize sizeHint() const override;
@@ -39,17 +39,17 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-    void checkAndScaleContent();
+    void CheckAndScaleContent();
 
 private:
-    void updateInfoLabelPosition() const;
+    void UpdateInfoLabelPosition() const;
 
-    QWidget* m_content;
-    QWidget* m_contentContainer;
-    QLabel* m_infoLabel;
-    bool m_isScaled;
-    QSize m_scaledSize; // Przechowuje obliczony rozmiar po skalowaniu
-    QSize m_maxAllowedSize;
+    QWidget* content_;
+    QWidget* content_container_;
+    QLabel* info_label_;
+    bool is_scaled_;
+    QSize scaled_size_;
+    QSize max_allowed_size_;
 };
 
 #endif // AUTO_SCALING_ATTACHMENT_H

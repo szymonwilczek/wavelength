@@ -26,109 +26,100 @@ public:
 
     ~WavelengthChatView() override;
 
-    double scanlineOpacity() const { return m_scanlineOpacity; }
+    double GetScanlineOpacity() const { return scanline_opacity_; }
 
-    void setScanlineOpacity(double opacity);
+    void SetScanlineOpacity(double opacity);
 
 
-    void setWavelength(const QString &frequency, const QString &name = QString());
+    void SetWavelength(const QString &frequency, const QString &name = QString());
 
-    void onMessageReceived(const QString &frequency, const QString &message);
+    void OnMessageReceived(const QString &frequency, const QString &message);
 
-    void onMessageSent(const QString &frequency, const QString &message) const;
+    void OnMessageSent(const QString &frequency, const QString &message) const;
 
-    void onWavelengthClosed(const QString &frequency);
+    void OnWavelengthClosed(const QString &frequency);
 
-    void clear();
+    void Clear();
 
 public slots:
-    void attachFile();
+    void AttachFile();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private slots:
 
-    void onPttButtonPressed();
+    void OnPttButtonPressed();
 
-    void onPttButtonReleased();
+    void OnPttButtonReleased();
 
-    void onPttGranted(const QString &frequency);
+    void OnPttGranted(const QString &frequency);
 
-    void onPttDenied(const QString &frequency, const QString &reason);
+    void OnPttDenied(const QString &frequency, const QString &reason);
 
-    void onPttStartReceiving(const QString &frequency, const QString &senderId);
+    void OnPttStartReceiving(const QString &frequency, const QString &sender_id);
 
-    void onPttStopReceiving(const QString &frequency);
+    void OnPttStopReceiving(const QString &frequency);
 
     // Slot do obsługi przychodzących danych audio (binarnych)
-    void onAudioDataReceived(const QString &frequency, const QByteArray& audioData) const;
+    void OnAudioDataReceived(const QString &frequency, const QByteArray& audio_data) const;
 
     // Slot do obsługi danych z mikrofonu
-    void onReadyReadInput() const;
+    void OnReadyReadInput() const;
 
+    void UpdateProgressMessage(const QString &message_id, const QString &message) const;
 
-    void updateProgressMessage(const QString &messageId, const QString &message) const;
+    void SendMessage() const;
 
+    void AbortWavelength();
 
-    void sendMessage() const;
+    void TriggerVisualEffect();
 
-    void abortWavelength();
+    void TriggerConnectionEffect();
 
-    void triggerVisualEffect();
-
-    void triggerConnectionEffect();
-
-    void triggerActivityEffect();
+    void TriggerActivityEffect();
 
 signals:
     void wavelengthAborted();
 
 private:
-    QLabel *headerLabel;
-    QLabel *m_statusIndicator;
-    WavelengthStreamDisplay *messageArea;
-    QLineEdit *inputField;
-    QPushButton *attachButton;
-    QPushButton *sendButton;
-    QPushButton *abortButton;
-    QString currentFrequency = "-1.0";
-    double m_scanlineOpacity;
-    bool m_isAborting = false;
-    QPushButton *pttButton; // <-- Nowy przycisk
-    QString m_currentTransmitterId;
+    QLabel *header_label_;
+    QLabel *status_indicator_;
+    WavelengthStreamDisplay *message_area_;
+    QLineEdit *input_field_;
+    QPushButton *attach_button_;
+    QPushButton *send_button_;
+    QPushButton *abort_button_;
+    QString current_frequency_ = "-1.0";
+    double scanline_opacity_;
+    bool is_aborting_ = false;
+    QPushButton *ptt_button_;
+    QString current_transmitter_id_;
 
-    // --- NOWE POLA AUDIO ---
-    PttState m_pttState;
-    QAudioInput *m_audioInput;
-    QAudioOutput *m_audioOutput;
-    QIODevice *m_inputDevice;
-    QIODevice *m_outputDevice;
-    QAudioFormat m_audioFormat;
-    QSoundEffect *m_pttOnSound;
-    QSoundEffect *m_pttOffSound;
-    // --- KONIEC NOWYCH PÓL AUDIO ---
+    PttState ptt_state_;
+    QAudioInput *audio_input_;
+    QAudioOutput *audio_output_;
+    QIODevice *input_device_;
+    QIODevice *output_device_;
+    QAudioFormat audio_format_;
+    QSoundEffect *ptt_on_sound_;
+    QSoundEffect *ptt_off_sound_;
 
-    // --- NOWE METODY PRYWATNE ---
-    void initializeAudio();
+    void InitializeAudio();
 
-    void startAudioInput();
+    void StartAudioInput();
 
-    void stopAudioInput();
+    void StopAudioInput();
 
-    void startAudioOutput();
+    void StartAudioOutput();
 
-    void stopAudioOutput();
+    void StopAudioOutput();
 
-    // Obliczanie amplitudy RMS z danych PCM 16-bit
-    qreal calculateAmplitude(const QByteArray& buffer) const;
+    qreal CalculateAmplitude(const QByteArray& buffer) const;
 
-    // Aktualizacja stanu przycisku PTT i innych kontrolek
-    void updatePttButtonState() const;
+    void UpdatePttButtonState() const;
 
-    // --- KONIEC NOWYCH METOD PRYWATNYCH ---
-
-    void resetStatusIndicator() const;
+    void ResetStatusIndicator() const;
 };
 
 #endif // WAVELENGTH_CHAT_VIEW_H

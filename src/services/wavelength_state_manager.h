@@ -11,54 +11,52 @@ class WavelengthStateManager final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthStateManager* getInstance() {
+    static WavelengthStateManager* GetInstance() {
         static WavelengthStateManager instance;
         return &instance;
     }
 
-    static WavelengthInfo getWavelengthInfo(const QString &frequency, bool* isHost = nullptr);
+    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool* is_host = nullptr);
 
-    static QString getActiveWavelength();
+    static QString GetActiveWavelength();
 
-    void setActiveWavelength(const QString &frequency);
+    void SetActiveWavelength(const QString &frequency);
 
-    static bool isActiveWavelengthHost();
+    static bool IsActiveWavelengthHost();
 
     // Pobiera listę częstotliwości do których użytkownik jest dołączony
-    QList<QString> getJoinedWavelengths();
+    QList<QString> GetJoinedWavelengths();
 
     // Rejestruje dołączenie do wavelength
-    void registerJoinedWavelength(const QString &frequency);
+    void RegisterJoinedWavelength(const QString &frequency);
 
     // Wyrejestrowuje opuszczenie wavelength
-    void unregisterJoinedWavelength(const QString &frequency);
+    void UnregisterJoinedWavelength(const QString &frequency);
 
     // Zwraca liczbę dołączonych wavelength
-    int getJoinedWavelengthCount();
+    int GetJoinedWavelengthCount();
 
-    static bool isWavelengthPasswordProtected(const QString &frequency);
+    static bool IsWavelengthPasswordProtected(const QString &frequency);
 
-    static bool isWavelengthHost(const QString &frequency);
+    static bool IsWavelengthHost(const QString &frequency);
 
+    static QDateTime GetWavelengthCreationTime(const QString &frequency);
 
-    static QDateTime getWavelengthCreationTime(const QString &frequency);
+    static bool IsWavelengthJoined(const QString &frequency);
 
-    static bool isWavelengthJoined(const QString &frequency);
+    static bool IsWavelengthConnected(const QString &frequency);
 
-    static bool isWavelengthConnected(const QString &frequency);
+    void AddActiveSessionData(const QString &frequency, const QString& key, const QVariant& value);
 
-    void addActiveSessionData(const QString &frequency, const QString& key, const QVariant& value);
+    QVariant GetActiveSessionData(const QString &frequency, const QString& key, const QVariant& default_value = QVariant());
 
-    QVariant getActiveSessionData(const QString &frequency, const QString& key, const QVariant& defaultValue = QVariant());
+    void ClearSessionData(const QString &frequency);
 
-    void clearSessionData(const QString &frequency);
+    void ClearAllSessionData();
 
-    void clearAllSessionData();
+    bool IsConnecting(const QString &frequency) const;
 
-    // Obsługa stanu połączenia
-    bool isConnecting(const QString &frequency) const;
-
-    void setConnecting(const QString &frequency, bool connecting);
+    void SetConnecting(const QString &frequency, bool connecting);
 
 signals:
     void activeWavelengthChanged(QString frequency);
@@ -70,9 +68,9 @@ private:
     WavelengthStateManager(const WavelengthStateManager&) = delete;
     WavelengthStateManager& operator=(const WavelengthStateManager&) = delete;
 
-    QMap<QString, QMap<QString, QVariant>> m_sessionData;
-    QList<QString> m_connectingWavelengths;
-    QList<QString> m_joinedWavelengths; // Lista dołączonych wavelength
+    QMap<QString, QMap<QString, QVariant>> session_data_;
+    QList<QString> connecting_wavelengths_;
+    QList<QString> joined_wavelengths_;
 };
 
 #endif // WAVELENGTH_STATE_MANAGER_H

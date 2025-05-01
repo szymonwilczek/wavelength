@@ -1,64 +1,63 @@
-
 #include "image_viewer.h"
 
 #include <QVBoxLayout>
 
-InlineImageViewer::InlineImageViewer(const QByteArray &imageData, QWidget *parent): QFrame(parent), m_imageData(imageData) { // Usunięto m_isZoomed
+InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent), image_data_(image_data) { // Usunięto m_isZoomed
 
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     // Obszar wyświetlania obrazu
-    m_imageLabel = new QLabel(this);
-    m_imageLabel->setAlignment(Qt::AlignCenter);
-    m_imageLabel->setStyleSheet("background-color: transparent; color: #ffffff;"); // Ustawiamy przezroczyste tło
-    m_imageLabel->setText("Ładowanie obrazu...");
-    m_imageLabel->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
-    layout->addWidget(m_imageLabel);
+    image_label_ = new QLabel(this);
+    image_label_->setAlignment(Qt::AlignCenter);
+    image_label_->setStyleSheet("background-color: transparent; color: #ffffff;"); // Ustawiamy przezroczyste tło
+    image_label_->setText("Ładowanie obrazu...");
+    image_label_->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
+    layout->addWidget(image_label_);
 
     // Dekoder obrazu
-    m_decoder = std::make_shared<ImageDecoder>(imageData, this);
+    decoder_ = std::make_shared<ImageDecoder>(image_data, this);
 
     // Połącz sygnały
-    connect(m_decoder.get(), &ImageDecoder::imageReady, this, &InlineImageViewer::handleImageReady);
-    connect(m_decoder.get(), &ImageDecoder::error, this, &InlineImageViewer::handleError);
-    connect(m_decoder.get(), &ImageDecoder::imageInfo, this, &InlineImageViewer::handleImageInfo);
+    connect(decoder_.get(), &ImageDecoder::imageReady, this, &InlineImageViewer::HandleImageReady);
+    connect(decoder_.get(), &ImageDecoder::error, this, &InlineImageViewer::HandleError);
+    connect(decoder_.get(), &ImageDecoder::imageInfo, this, &InlineImageViewer::HandleImageInfo);
 
     // Usunięto instalację filtra zdarzeń dla zoomu
     // Usunięto setCursor
 
     // Obsługa zamykania aplikacji
-    connect(qApp, &QApplication::aboutToQuit, this, &InlineImageViewer::releaseResources);
+    connect(qApp, &QApplication::aboutToQuit, this, &InlineImageViewer::ReleaseResources);
 
     // Dekoduj obraz
-    QTimer::singleShot(0, this, &InlineImageViewer::loadImage);
+    QTimer::singleShot(0, this, &InlineImageViewer::LoadImage);
 }
 
-void InlineImageViewer::releaseResources() {
-    if (m_decoder) {
-        m_decoder->releaseResources();
-        m_decoder.reset(); // Zwalniamy wskaźnik
+void InlineImageViewer::ReleaseResources() {
+    if (decoder_) {
+        decoder_->ReleaseResources();
+        decoder_.reset(); // Zwalniamy wskaźnik
     }
 }
 
 QSize InlineImageViewer::sizeHint() const {
-    if (!m_originalImage.isNull()) {
-        return m_originalImage.size();
+    if (!original_image_.isNull()) {
+        return original_image_.size();
     }
     return QFrame::sizeHint(); // Zwróć domyślny, jeśli obraz nie jest załadowany
 }
 
-void InlineImageViewer::handleImageReady(const QImage &image) {
+void InlineImageViewer::HandleImageReady(const QImage &image) {
     if (image.isNull()) {
-        handleError("Otrzymano pusty obraz z dekodera.");
+        HandleError("Otrzymano pusty obraz z dekodera.");
         return;
     }
-    m_originalImage = image;
-    qDebug() << "InlineImageViewer::handleImageReady - Oryginalny rozmiar obrazu:" << m_originalImage.size();
+    original_image_ = image;
+    qDebug() << "InlineImageViewer::handleImageReady - Oryginalny rozmiar obrazu:" << original_image_.size();
 
     // Ustaw pixmapę na QLabel - skalowanie załatwi setScaledContents(true)
-    m_imageLabel->setPixmap(QPixmap::fromImage(m_originalImage));
+    image_label_->setPixmap(QPixmap::fromImage(original_image_));
 
     // Nie ustawiamy już setFixedSize - pozwalamy layoutowi zarządzać rozmiarem
     // m_imageLabel->setFixedSize(m_originalImage.size()); // Usunięto
@@ -68,21 +67,21 @@ void InlineImageViewer::handleImageReady(const QImage &image) {
     emit imageLoaded(); // Sygnalizujemy załadowanie obrazu
 }
 
-void InlineImageViewer::handleError(const QString &message) {
+void InlineImageViewer::HandleError(const QString &message) {
     qDebug() << "Image decoder error:" << message;
-    m_imageLabel->setText("⚠️ " + message);
+    image_label_->setText("⚠️ " + message);
     // Można ustawić minimalny rozmiar, aby tekst błędu był widoczny
     setMinimumSize(100, 50);
     updateGeometry();
 }
 
-void InlineImageViewer::handleImageInfo(const int width, const int height, const bool hasAlpha) {
-    m_imageWidth = width;
-    m_imageHeight = height;
-    m_hasAlpha = hasAlpha;
+void InlineImageViewer::HandleImageInfo(const int width, const int height, const bool has_alpha) {
+    image_width_ = width;
+    image_height_ = height;
+    has_alpha_ = has_alpha;
 
     qDebug() << "Image info - szerokość:" << width << "wysokość:" << height
-            << "kanał alfa:" << (hasAlpha ? "tak" : "nie");
+            << "kanał alfa:" << (has_alpha ? "tak" : "nie");
 
-    emit imageInfoReady(width, height, hasAlpha);
+    emit imageInfoReady(width, height, has_alpha);
 }

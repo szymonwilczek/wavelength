@@ -2,64 +2,64 @@
 
 #include <QDateTime>
 
-BlobEventHandler::BlobEventHandler(QWidget* parentWidget)
-    : QObject(parentWidget),
-      m_parentWidget(parentWidget),
-      m_eventsEnabled(true),
-      m_transitionInProgress(false),
-      m_lastProcessedPosition(0, 0),
-      m_lastProcessedMoveTime(0),
-      m_lastDragEventTime(0)
+BlobEventHandler::BlobEventHandler(QWidget* parent_widget)
+    : QObject(parent_widget),
+      parent_widget_(parent_widget),
+      events_enabled_(true),
+      transition_in_progress_(false),
+      last_processed_position_(0, 0),
+      last_processed_move_time_(0),
+      last_drag_event_time_(0)
 {
-    m_eventReEnableTimer.setSingleShot(true);
-    connect(&m_eventReEnableTimer, &QTimer::timeout, 
+    event_re_enable_timer_.setSingleShot(true);
+    connect(&event_re_enable_timer_, &QTimer::timeout,
             this, &BlobEventHandler::onEventReEnableTimeout);
     
     // Instalacja filtra eventów na oknie nadrzędnym
-    if (m_parentWidget && m_parentWidget->window()) {
-        m_parentWidget->window()->installEventFilter(this);
+    if (parent_widget_ && parent_widget_->window()) {
+        parent_widget_->window()->installEventFilter(this);
     }
 }
 
 BlobEventHandler::~BlobEventHandler() {
     // Usunięcie filtra eventów z okna nadrzędnego przy zniszczeniu
-    if (m_parentWidget && m_parentWidget->window()) {
-        m_parentWidget->window()->removeEventFilter(this);
+    if (parent_widget_ && parent_widget_->window()) {
+        parent_widget_->window()->removeEventFilter(this);
     }
 }
 
-bool BlobEventHandler::processEvent() {
+bool BlobEventHandler::ProcessEvent() {
     // Ta metoda może być używana dla zdarzeń ogólnych
     // obecnie nie jest używana, ale może być przydatna w przyszłości
     return false;  // przekazanie zdarzenia dalej
 }
 
-bool BlobEventHandler::processResizeEvent(const QResizeEvent* event) {
-    if (!m_eventsEnabled) return false;
-    if (!m_eventsEnabled || m_transitionInProgress) {
+bool BlobEventHandler::ProcessResizeEvent(const QResizeEvent* event) {
+    if (!events_enabled_) return false;
+    if (!events_enabled_ || transition_in_progress_) {
         return false;
     }
 
     // Pobierz aktualny rozmiar
-    const QSize currentSize = m_parentWidget->size();
-    const QSize oldSize = event->oldSize();
+    const QSize current_size = parent_widget_->size();
+    const QSize old_size = event->oldSize();
 
     // Sprawdź, czy zmiana rozmiaru jest znacząca
-    constexpr int minDimChange = 3; // minimalna zmiana w pikselach, żeby reagować
-    const bool significantChange =
-        abs(currentSize.width() - oldSize.width()) > minDimChange ||
-        abs(currentSize.height() - oldSize.height()) > minDimChange;
+    constexpr int min_dimension_change = 3; // minimalna zmiana w pikselach, żeby reagować
+    const bool significant_change =
+        abs(current_size.width() - old_size.width()) > min_dimension_change ||
+        abs(current_size.height() - old_size.height()) > min_dimension_change;
 
-    static qint64 lastResizeTime = 0;
+    static qint64 last_resize_time = 0;
 
     // Zastosuj throttling - przetwarzaj resize tylko co 16ms (~60 FPS)
-    if (const qint64 currentTime = QDateTime::currentMSecsSinceEpoch(); significantChange && (currentTime - lastResizeTime >= 16)) {
-        lastResizeTime = currentTime;
+    if (const qint64 current_time = QDateTime::currentMSecsSinceEpoch(); significant_change && (current_time - last_resize_time >= 16)) {
+        last_resize_time = current_time;
 
 
         // Emituj sygnał o wykryciu znaczącej zmiany rozmiaru
         emit resizeStateRequested();
-        emit significantResizeDetected(oldSize, currentSize);
+        emit significantResizeDetected(old_size, current_size);
 
         // Resetuj timer stanu tylko po zakończeniu resize
         emit stateResetTimerRequested();
@@ -70,40 +70,40 @@ bool BlobEventHandler::processResizeEvent(const QResizeEvent* event) {
     return false;
 }
 
-void BlobEventHandler::handleMoveEvent(const QMoveEvent* moveEvent) {
-    if (m_isResizing) {
+void BlobEventHandler::HandleMoveEvent(const QMoveEvent* move_event) {
+    if (is_resizing_) {
         return;
     }
 
-    const QPointF newPos = moveEvent->pos();
-    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    const QPointF new_position = move_event->pos();
+    const qint64 current_time = QDateTime::currentMSecsSinceEpoch();
 
     // Zwiększone progi dla lepszej wydajności
-    const double moveDist = QVector2D(newPos - m_lastProcessedPosition).length();
-    const qint64 timeDelta = currentTime - m_lastProcessedMoveTime;
+    const double move_distance = QVector2D(new_position - last_processed_position_).length();
+    const qint64 delta_time = current_time - last_processed_move_time_;
 
     // Adaptacyjny próg odległości
-    double distThreshold = 5.0;
+    double distance_treshold = 5.0;
 
     // Bardziej agresywne filtrowanie przy szybkim ruchu
-    if (timeDelta < 8) {
+    if (delta_time < 8) {
         return; // Pomijamy zbyt częste zdarzenia
     }
-    if (timeDelta < 16) {
-        distThreshold = 7.0;
+    if (delta_time < 16) {
+        distance_treshold = 7.0;
     }
 
     // Przetwarzaj tylko jeśli ruch jest znaczący lub upłynęło wystarczająco dużo czasu
-    if (moveDist > distThreshold || timeDelta > 16) { // 33ms ~ 30 FPS minimalnie
-        m_lastProcessedPosition = newPos;
-        m_lastProcessedMoveTime = currentTime;
+    if (move_distance > distance_treshold || delta_time > 16) { // 33ms ~ 30 FPS minimalnie
+        last_processed_position_ = new_position;
+        last_processed_move_time_ = current_time;
 
-        if (const QWidget* currentWindow = m_parentWidget->window()) {
-            const QPointF windowPos = currentWindow->pos();
-            emit windowMoved(windowPos, currentTime);
+        if (const QWidget* current_window = parent_widget_->window()) {
+            const QPointF window_position = current_window->pos();
+            emit windowMoved(window_position, current_time);
 
-            if (constexpr int timeThreshold = 16; timeDelta > timeThreshold) {
-                emit movementSampleAdded(windowPos, currentTime);
+            if (constexpr int timeThreshold = 16; delta_time > timeThreshold) {
+                emit movementSampleAdded(window_position, current_time);
             }
         }
     }
@@ -111,30 +111,30 @@ void BlobEventHandler::handleMoveEvent(const QMoveEvent* moveEvent) {
 
 
 bool BlobEventHandler::eventFilter(QObject* watched, QEvent* event) {
-    if (!m_eventsEnabled) return false;
-    if (!m_eventsEnabled || m_transitionInProgress) {
+    if (!events_enabled_) return false;
+    if (!events_enabled_ || transition_in_progress_) {
         return QObject::eventFilter(watched, event);
     }
 
-    if (watched == m_parentWidget->window()) {
+    if (watched == parent_widget_->window()) {
         if (event->type() == QEvent::Move) {
-            handleMoveEvent(dynamic_cast<QMoveEvent*>(event));
+            HandleMoveEvent(dynamic_cast<QMoveEvent*>(event));
         }
     }
 
     return QObject::eventFilter(watched, event);
 }
 
-void BlobEventHandler::enableEvents() {
-    m_eventsEnabled = true;
+void BlobEventHandler::EnableEvents() {
+    events_enabled_ = true;
     emit eventsReEnabled();
 }
 
-void BlobEventHandler::disableEvents() {
-    m_eventsEnabled = false;
+void BlobEventHandler::DisableEvents() {
+    events_enabled_ = false;
 }
 
 void BlobEventHandler::onEventReEnableTimeout() {
-    enableEvents();
+    EnableEvents();
     emit eventsReEnabled();
 }

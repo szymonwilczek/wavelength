@@ -12,11 +12,11 @@ class TabButton final : public QPushButton {
 public:
     explicit TabButton(const QString &text, QWidget *parent = nullptr);
 
-    double underlineOffset() const { return m_underlineOffset; }
+    double UnderlineOffset() const { return underline_offset_; }
 
-    void setUnderlineOffset(double offset);
+    void SetUnderlineOffset(double offset);
 
-    void setActive(bool active);
+    void SetActive(bool active);
 
 protected:
     void enterEvent(QEvent *event) override;
@@ -26,8 +26,8 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    double m_underlineOffset;
-    bool m_isActive;
+    double underline_offset_;
+    bool is_active_;
 };
 
 
