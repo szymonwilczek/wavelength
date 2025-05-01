@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
         qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";
     }
 
-    const QIcon appIcon(":/assets/icons/wavelength_logo_upscaled.png");
+    const QIcon appIcon(":/resources/icons/wavelength_logo_upscaled.png");
     QApplication::setWindowIcon(appIcon);
 
     app.setStyle(QStyleFactory::create("Fusion"));
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
     window.resize(1024, 768);
 
     const auto instanceManager = new AppInstanceManager(&window, animation, &window);
-    // instanceManager->start();
+    // instanceManager->Start();
 
     QObject::connect(instanceManager, &AppInstanceManager::instanceConnected, [&window]() {
     window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    if (!instanceManager->isCreator()) {
+    if (!instanceManager->IsCreator()) {
         window.setWindowTitle("Wavelength - Sub Instance");
     }
 
