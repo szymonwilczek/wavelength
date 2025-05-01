@@ -9,11 +9,9 @@ ClickableColorPreview::ClickableColorPreview(QWidget *parent): QWidget(parent) {
     qDebug() << "ClickableColorPreview created:" << this << " autoFillBackground:" << autoFillBackground();
 }
 
-void ClickableColorPreview::setColor(const QColor &color) {
+void ClickableColorPreview::SetColor(const QColor &color) {
     qDebug() << "ClickableColorPreview::setColor called on" << this << "with color" << color.name();
-    // m_currentColor = color; // Nie potrzebujemy już m_currentColor, jeśli używamy palety
 
-    // Ustaw poprawny kolor w palecie
     QPalette pal = palette();
     if (color.isValid()) {
         pal.setColor(QPalette::Window, color); // <<< Użyj przekazanego koloru!
@@ -38,13 +36,13 @@ void ClickableColorPreview::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
 
     // Pobierz kolor tła z palety (teraz powinien być poprawny)
-    const QColor bgColor = palette().color(QPalette::Window);
+    const QColor background_color = palette().color(QPalette::Window);
 
-    qDebug() << "ClickableColorPreview::paintEvent for" << this << "Drawing background:" << bgColor.name();
+    qDebug() << "ClickableColorPreview::paintEvent for" << this << "Drawing background:" << background_color.name();
 
     // Rysuj tło
-    if (bgColor.isValid() && bgColor.alpha() > 0) {
-        painter.fillRect(rect(), bgColor);
+    if (background_color.isValid() && background_color.alpha() > 0) {
+        painter.fillRect(rect(), background_color);
     } else {
         // Opcjonalnie: Narysuj coś, jeśli tło jest przezroczyste/nieprawidłowe
         // painter.fillRect(rect(), Qt::lightGray); // Np. szare tło

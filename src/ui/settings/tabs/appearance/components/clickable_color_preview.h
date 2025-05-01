@@ -14,14 +14,13 @@ public:
     explicit ClickableColorPreview(QWidget *parent = nullptr);
 
 public slots:
-    void setColor(const QColor& color);
+    void SetColor(const QColor& color);
 
 signals:
     void clicked();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-
     void paintEvent(QPaintEvent *event) override;
 
 };

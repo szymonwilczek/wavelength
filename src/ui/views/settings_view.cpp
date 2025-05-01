@@ -478,7 +478,7 @@ void SettingsView::loadSettingsFromRegistry() const {
     }
     // --- Appearance ---
     if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->loadSettings();
+        m_appearanceTabWidget->LoadSettings();
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
     if (m_advancedTabWidget) { // <<< Dodano ładowanie nowej zakładki
@@ -495,7 +495,7 @@ void SettingsView::saveSettings() {
     }
     // --- Appearance ---
     if (m_appearanceTabWidget) {
-        m_appearanceTabWidget->saveSettings();
+        m_appearanceTabWidget->SaveSettings();
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
     if (m_advancedTabWidget) { // <<< Dodano zapisywanie nowej zakładki

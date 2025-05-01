@@ -338,7 +338,7 @@ void SystemOverrideManager::showFloatingAnimationWidget(const bool isFirstTime)
     }
     qDebug() << "FloatingEnergySphereWidget instance created.";
 
-    m_floatingWidget->setClosable(false);
+    m_floatingWidget->SetClosable(false);
 
     connect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed,
             this, &SystemOverrideManager::handleFloatingWidgetClosed);
@@ -392,7 +392,7 @@ void SystemOverrideManager::restoreSystemState()
         // Rozłącz sygnały, aby uniknąć ponownego wywołania restoreSystemState
         disconnect(m_floatingWidget, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::handleFloatingWidgetClosed);
         disconnect(m_floatingWidget, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::restoreSystemState);
-        m_floatingWidget->setClosable(true);
+        m_floatingWidget->SetClosable(true);
         m_floatingWidget->close();
         m_floatingWidget = nullptr;
     }
