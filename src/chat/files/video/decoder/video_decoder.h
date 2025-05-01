@@ -49,12 +49,12 @@ public:
 
     void setVolume(const float volume) const {
         if (m_audioDecoder) {
-            m_audioDecoder->setVolume(volume);
+            m_audioDecoder->SetVolume(volume);
         }
     }
 
     float getVolume() const {
-        return m_audioDecoder ? m_audioDecoder->getVolume() : 0.0f;
+        return m_audioDecoder ? m_audioDecoder->GetVolume() : 0.0f;
     }
 
     bool isPaused() const {

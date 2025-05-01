@@ -24,75 +24,74 @@ class AudioDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    explicit AudioDecoder(const QByteArray& audioData, QObject* parent = nullptr);
+    explicit AudioDecoder(const QByteArray& audio_data, QObject* parent = nullptr);
 
     ~AudioDecoder() override;
 
-    void releaseResources();
+    void ReleaseResources();
 
-    bool reinitialize();
+    bool Reinitialize();
 
-    void setVolume(float volume) const;
+    void SetVolume(float volume) const;
 
-    float getVolume() const;
+    float GetVolume() const;
 
-    bool initialize();
+    bool Initialize();
 
-    void stop();
+    void Stop();
 
-    void pause();
+    void Pause();
 
-    bool isPaused() const;
+    bool IsPaused() const;
 
-    void seek(double position);
+    void Seek(double position);
 
-    void reset();
+    void Reset();
 
-    bool isDecoderRunning() const {
+    bool IsDecoderRunning() const {
         return isRunning();
     }
 
 signals:
     void error(const QString& message);
-    void audioInfo(int sampleRate, int channels, double duration);
+    void audioInfo(int sample_rate, int channels, double duration);
     void playbackFinished();
     void positionChanged(double position);
 
 protected:
     void run() override;
 
-    void decodeAudioFrame(const AVFrame* audioFrame) const;
+    void DecodeAudioFrame(const AVFrame* audio_frame) const;
 
 private:
-    // Funkcje callback dla custom I/O
-    static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
 
-    static int64_t seekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
 
-    QByteArray m_audioData;
-    int m_readPosition = 0;
+    QByteArray audio_data_;
+    int read_position_ = 0;
 
-    AVFormatContext* m_formatContext;
-    int m_audioStream = -1;
-    AVCodecContext* m_audioCodecContext = nullptr;
-    SwrContext* m_swrContext = nullptr;
-    AVFrame* m_audioFrame = nullptr;
-    AVIOContext* m_ioContext = nullptr;
-    unsigned char* m_ioBuffer = nullptr;
+    AVFormatContext* format_context_;
+    int audio_stream_ = -1;
+    AVCodecContext* audio_codec_context_ = nullptr;
+    SwrContext* swr_context_ = nullptr;
+    AVFrame* audio_frame_ = nullptr;
+    AVIOContext* io_context_ = nullptr;
+    unsigned char* io_buffer_ = nullptr;
 
-    QAudioOutput* m_audioOutput = nullptr;
-    QIODevice* m_audioDevice = nullptr;
-    QAudioFormat m_audioFormat;
+    QAudioOutput* audio_output_ = nullptr;
+    QIODevice* audio_device_ = nullptr;
+    QAudioFormat audio_format_;
 
-    mutable QMutex m_mutex;
-    QWaitCondition m_waitCondition;
-    bool m_stopped;
-    bool m_paused = true;
-    bool m_seeking = false;
-    int64_t m_seekPosition = 0;
-    double m_currentPosition = 0;
-    bool m_reachedEndOfStream = false;
-    bool m_initialized = false;
+    mutable QMutex mutex_;
+    QWaitCondition wait_condition_;
+    bool stopped_;
+    bool paused_ = true;
+    bool seeking_ = false;
+    int64_t seek_position_ = 0;
+    double current_position_ = 0;
+    bool reached_end_of_stream_ = false;
+    bool initialized_ = false;
 };
 
 #endif // AUDIO_DECODER_H

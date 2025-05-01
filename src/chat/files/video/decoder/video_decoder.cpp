@@ -216,10 +216,10 @@ void VideoDecoder::reset() {
 
     // Przewiń zewnętrzny dekoder audio
     if (m_audioDecoder) {
-        m_audioDecoder->seek(0.0);
+        m_audioDecoder->Seek(0.0);
         // Upewnij się, że audio jest spauzowane
-        if (!m_audioDecoder->isPaused()) {
-            m_audioDecoder->pause();
+        if (!m_audioDecoder->IsPaused()) {
+            m_audioDecoder->Pause();
         }
     }
 
@@ -232,7 +232,7 @@ void VideoDecoder::stop() {
     if (m_stopped) return;
     m_stopped = true;
     if (m_audioDecoder) {
-        m_audioDecoder->stop();
+        m_audioDecoder->Stop();
     }
     locker.unlock();
     m_waitCondition.wakeOne();
@@ -242,8 +242,8 @@ void VideoDecoder::pause() {
     m_mutex.lock();
     m_paused = !m_paused;
     if (m_audioDecoder) {
-        if (m_paused != m_audioDecoder->isPaused()) {
-            m_audioDecoder->pause();
+        if (m_paused != m_audioDecoder->IsPaused()) {
+            m_audioDecoder->Pause();
         }
     }
     m_mutex.unlock();
@@ -254,7 +254,7 @@ void VideoDecoder::pause() {
 
 void VideoDecoder::seek(const double position) {
     if (m_audioDecoder) {
-        m_audioDecoder->seek(position);
+        m_audioDecoder->Seek(position);
     }
 
     int64_t timestamp = position * AV_TIME_BASE;
@@ -277,15 +277,15 @@ void VideoDecoder::run() {
     }
 
     if (m_audioDecoder && !m_audioInitialized) {
-        if (!m_audioDecoder->initialize()) {
+        if (!m_audioDecoder->Initialize()) {
             qWarning() << "Nie udało się zainicjalizować zewnętrznego AudioDecoder.";
             delete m_audioDecoder;
             m_audioDecoder = nullptr;
         } else {
             m_audioDecoder->start();
             m_audioInitialized = true;
-            if (!m_audioDecoder->isPaused()) {
-                m_audioDecoder->pause();
+            if (!m_audioDecoder->IsPaused()) {
+                m_audioDecoder->Pause();
             }
         }
     }
@@ -413,7 +413,7 @@ void VideoDecoder::updateAudioPosition(const double position) {
 
 void VideoDecoder::cleanupFFmpegResources() {
     if (m_audioDecoder) {
-        m_audioDecoder->stop();
+        m_audioDecoder->Stop();
         m_audioDecoder->wait(200);
         delete m_audioDecoder;
         m_audioDecoder = nullptr;
