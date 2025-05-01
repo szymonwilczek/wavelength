@@ -457,9 +457,9 @@ int main(int argc, char *argv[]) {
 
         WavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            const QString frequency = dialog.getFrequency();
-            const bool isPasswordProtected = dialog.isPasswordProtected();
-            const QString password = dialog.getPassword();
+            const QString frequency = dialog.GetFrequency();
+            const bool isPasswordProtected = dialog.IsPasswordProtected();
+            const QString password = dialog.GetPassword();
 
             if (coordinator->CreateWavelength(frequency, isPasswordProtected, password)) {
                 qDebug() << "Created and joined wavelength:" << frequency << "Hz";
@@ -480,8 +480,8 @@ int main(int argc, char *argv[]) {
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
-            const QString frequency = dialog.getFrequency();
-            const QString password = dialog.getPassword();
+            const QString frequency = dialog.GetFrequency();
+            const QString password = dialog.GetPassword();
 
             if (coordinator->JoinWavelength(frequency, password)) {
                 qDebug() << "Attempting to join wavelength:" << frequency << "Hz";

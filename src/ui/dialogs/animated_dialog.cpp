@@ -9,10 +9,10 @@
 // Implementacja AnimatedDialog
 AnimatedDialog::AnimatedDialog(QWidget *parent, const AnimationType type)
     : QDialog(parent),
-      m_animationType(type),
-      m_duration(300),
-      m_closing(false),
-      m_overlay(nullptr)
+      animation_type_(type),
+      duration_(300),
+      closing_(false),
+      overlay_(nullptr)
 {
     // Niezbędne dla animacji
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -22,170 +22,167 @@ AnimatedDialog::AnimatedDialog(QWidget *parent, const AnimationType type)
 AnimatedDialog::~AnimatedDialog()
 {
     // Upewniamy się, że overlay zostanie usunięty
-    if (m_overlay) {
-        m_overlay->deleteLater();
+    if (overlay_) {
+        overlay_->deleteLater();
     }
 }
 
 void AnimatedDialog::showEvent(QShowEvent *event)
 {
-    QWidget *parent_widget = QDialog::parentWidget();
+    QWidget *parent_widget = parentWidget();
     if (!parent_widget) {
         parent_widget = QApplication::activeWindow();
     }
 
     if (parent_widget) {
-        if (!m_overlay) {
-            m_overlay = new OverlayWidget(parent_widget);
+        if (!overlay_) {
+            overlay_ = new OverlayWidget(parent_widget);
         }
 
-        // Animacja pokazywania overlay'a
-        const auto overlayAnim = new QPropertyAnimation(m_overlay, "opacity");
-        overlayAnim->setDuration(200);
-        overlayAnim->setStartValue(0.0);
-        overlayAnim->setEndValue(1.0);
-        overlayAnim->setEasingCurve(QEasingCurve::InOutQuad);
+        const auto overlay_animation = new QPropertyAnimation(overlay_, "opacity");
+        overlay_animation->setDuration(200);
+        overlay_animation->setStartValue(0.0);
+        overlay_animation->setEndValue(1.0);
+        overlay_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-        m_overlay->updateGeometry(parent_widget->rect());
-        m_overlay->show();
-        overlayAnim->start(QAbstractAnimation::DeleteWhenStopped);
+        overlay_->updateGeometry(parent_widget->rect());
+        overlay_->show();
+        overlay_animation->start(QAbstractAnimation::DeleteWhenStopped);
 
         raise();
     }
 
     event->accept();
-    animateShow();
+    AnimateShow();
 }
 
 void AnimatedDialog::closeEvent(QCloseEvent *event)
 {
-    if (!m_closing) {
+    if (!closing_) {
         event->ignore();
-        m_closing = true;
+        closing_ = true;
 
-        if (m_overlay) {
-            // Animacja ukrywania overlay'a
-            const auto overlayAnim = new QPropertyAnimation(m_overlay, "opacity");
-            overlayAnim->setDuration(200);
-            overlayAnim->setStartValue(m_overlay->opacity());
-            overlayAnim->setEndValue(0.0);
-            overlayAnim->setEasingCurve(QEasingCurve::InOutQuad);
+        if (overlay_) {
+            const auto overlay_animation = new QPropertyAnimation(overlay_, "opacity");
+            overlay_animation->setDuration(200);
+            overlay_animation->setStartValue(overlay_->opacity());
+            overlay_animation->setEndValue(0.0);
+            overlay_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-            connect(overlayAnim, &QPropertyAnimation::finished, this, [this]() {
-                if (m_overlay) {
-                    m_overlay->deleteLater();
-                    m_overlay = nullptr;
+            connect(overlay_animation, &QPropertyAnimation::finished, this, [this]() {
+                if (overlay_) {
+                    overlay_->deleteLater();
+                    overlay_ = nullptr;
                 }
             });
 
-            overlayAnim->start(QAbstractAnimation::DeleteWhenStopped);
+            overlay_animation->start(QAbstractAnimation::DeleteWhenStopped);
         }
 
-        animateClose();
+        AnimateClose();
     } else {
         event->accept();
     }
 }
 
 
-
-void AnimatedDialog::animateShow()
+void AnimatedDialog::AnimateShow()
 {
-    const QAbstractAnimation* finalAnimation = nullptr;
+    const QAbstractAnimation* final_animation = nullptr;
 
     // Przechowujemy początkową geometrię
     const QRect geometry = this->geometry();
 
-    switch (m_animationType) {
+    switch (animation_type_) {
         // Zmodyfikuj przypadek DigitalMaterialization w funkcji animateShow()
-        case DigitalMaterialization: {
+        case kDigitalMaterialization: {
             // --- ZMIANA: Połączenie animacji pozycji i przezroczystości ---
             // Ustaw początkową pozycję i przezroczystość
-            const int startY = geometry.y() - 100; // Zmniejszono nieco dystans początkowy dla subtelniejszego efektu
-            const int endY = geometry.y();
-            this->move(geometry.x(), startY);
+            const int start_y = geometry.y() - 100; // Zmniejszono nieco dystans początkowy dla subtelniejszego efektu
+            const int end_y = geometry.y();
+            this->move(geometry.x(), start_y);
             this->setWindowOpacity(0.0); // Start fully transparent
 
             // 1a. Animacja pozycji (wjazd z góry)
-            const auto posAnim = new QPropertyAnimation(this, "pos");
-            posAnim->setStartValue(QPoint(geometry.x(), startY));
-            posAnim->setEndValue(QPoint(geometry.x(), endY));
-            posAnim->setEasingCurve(QEasingCurve::OutCubic); // Nieco płynniejsza krzywa niż OutQuad
-            posAnim->setDuration(m_duration); // Czas trwania animacji pozycji
+            const auto position_animation = new QPropertyAnimation(this, "pos");
+            position_animation->setStartValue(QPoint(geometry.x(), start_y));
+            position_animation->setEndValue(QPoint(geometry.x(), end_y));
+            position_animation->setEasingCurve(QEasingCurve::OutCubic); // Nieco płynniejsza krzywa niż OutQuad
+            position_animation->setDuration(duration_); // Czas trwania animacji pozycji
 
             // 1b. Animacja przezroczystości (płynne pojawienie)
-            const auto opacityAnim = new QPropertyAnimation(this, "windowOpacity");
-            opacityAnim->setStartValue(0.0);
-            opacityAnim->setEndValue(1.0);
-            opacityAnim->setEasingCurve(QEasingCurve::OutCubic); // Ta sama krzywa dla spójności
-            opacityAnim->setDuration(m_duration); // Ten sam czas trwania
+            const auto opacity_animation = new QPropertyAnimation(this, "windowOpacity");
+            opacity_animation->setStartValue(0.0);
+            opacity_animation->setEndValue(1.0);
+            opacity_animation->setEasingCurve(QEasingCurve::OutCubic); // Ta sama krzywa dla spójności
+            opacity_animation->setDuration(duration_); // Ten sam czas trwania
 
             // Grupa równoległa dla jednoczesnego wjazdu i pojawienia się
-            const auto showParallelGroup = new QParallelAnimationGroup(this);
-            showParallelGroup->addAnimation(posAnim);
-            showParallelGroup->addAnimation(opacityAnim);
+            const auto show_parallel_group = new QParallelAnimationGroup(this);
+            show_parallel_group->addAnimation(position_animation);
+            show_parallel_group->addAnimation(opacity_animation);
             // --- KONIEC ZMIANY 1 ---
 
             // --- ZMIANA 2: Użycie QSequentialAnimationGroup z grupą równoległą ---
-            const auto sequentialGroup = new QSequentialAnimationGroup(this);
-            sequentialGroup->addAnimation(showParallelGroup); // 1. Animacja wjazdu i pojawienia się (równoległa)
+            const auto sequential_group = new QSequentialAnimationGroup(this);
+            sequential_group->addAnimation(show_parallel_group); // 1. Animacja wjazdu i pojawienia się (równoległa)
 
             // Sprawdzamy typ dialogu i dodajemy animację digitalizacji *po* animacji wjazdu/pojawienia
-            bool isDialogAnimated = false;
-            QPropertyAnimation* digitAnim = nullptr;
+            bool is_dialog_animated = false;
+            QPropertyAnimation* digital_animation = nullptr;
 
             // Obsługa WavelengthDialog
-            if (auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
-                isDialogAnimated = true;
-                digitalDialog->startRefreshTimer();
+            if (auto digital_dialog = qobject_cast<WavelengthDialog*>(this)) {
+                is_dialog_animated = true;
+                digital_dialog->StartRefreshTimer();
 
-                digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress", sequentialGroup);
-                digitAnim->setStartValue(0.0);
-                digitAnim->setEndValue(1.0);
-                digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-                digitAnim->setDuration(m_duration * 1.5);
+                digital_animation = new QPropertyAnimation(digital_dialog, "digitalizationProgress", sequential_group);
+                digital_animation->setStartValue(0.0);
+                digital_animation->setEndValue(1.0);
+                digital_animation->setEasingCurve(QEasingCurve::InOutQuad);
+                digital_animation->setDuration(duration_ * 1.5);
 
-                sequentialGroup->addAnimation(digitAnim); // 2. Animacja digitalizacji
+                sequential_group->addAnimation(digital_animation); // 2. Animacja digitalizacji
 
-                connect(sequentialGroup, &QSequentialAnimationGroup::finished, this, [this, digitalDialog]() {
+                connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, digital_dialog]() {
                     emit showAnimationFinished();
-                    digitalDialog->setRefreshTimerInterval(100);
+                    digital_dialog->SetRefreshTimerInterval(100);
                     qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (WavelengthDialog)";
                 });
             }
             // Obsługa JoinWavelengthDialog
-            else if (auto joinDialog = qobject_cast<JoinWavelengthDialog*>(this)) {
-                isDialogAnimated = true;
-                joinDialog->startRefreshTimer();
+            else if (auto join_dialog = qobject_cast<JoinWavelengthDialog*>(this)) {
+                is_dialog_animated = true;
+                join_dialog->StartRefreshTimer();
 
-                digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress", sequentialGroup);
-                digitAnim->setStartValue(0.0);
-                digitAnim->setEndValue(1.0);
-                digitAnim->setEasingCurve(QEasingCurve::InOutQuad);
-                digitAnim->setDuration(m_duration * 1.5);
+                digital_animation = new QPropertyAnimation(join_dialog, "digitalizationProgress", sequential_group);
+                digital_animation->setStartValue(0.0);
+                digital_animation->setEndValue(1.0);
+                digital_animation->setEasingCurve(QEasingCurve::InOutQuad);
+                digital_animation->setDuration(duration_ * 1.5);
 
-                sequentialGroup->addAnimation(digitAnim); // 2. Animacja digitalizacji
+                sequential_group->addAnimation(digital_animation); // 2. Animacja digitalizacji
 
-                connect(sequentialGroup, &QSequentialAnimationGroup::finished, this, [this, joinDialog]() {
+                connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, join_dialog]() {
                     emit showAnimationFinished();
-                    joinDialog->setRefreshTimerInterval(100);
+                    join_dialog->SetRefreshTimerInterval(100);
                      qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (JoinWavelengthDialog)";
                 });
             }
 
             // Jeśli dialog nie jest specjalnym typem, uruchom tylko animację wjazdu/pojawienia
-            if (!isDialogAnimated) {
+            if (!is_dialog_animated) {
                  qDebug() << "LOG: Uruchamiam tylko animację wjazdu/pojawienia dla DigitalMaterialization";
                 // Połącz koniec grupy równoległej (bo nie ma sekwencji)
-                connect(showParallelGroup, &QParallelAnimationGroup::finished, this, [this]() {
+                connect(show_parallel_group, &QParallelAnimationGroup::finished, this, [this]() {
                     emit showAnimationFinished();
                 });
-                showParallelGroup->start(QAbstractAnimation::DeleteWhenStopped);
-                finalAnimation = showParallelGroup; // Ustaw finalAnimation na grupę równoległą
+                show_parallel_group->start(QAbstractAnimation::DeleteWhenStopped);
+                final_animation = show_parallel_group; // Ustaw finalAnimation na grupę równoległą
             } else {
                  qDebug() << "LOG: Uruchamiam sekwencję animacji DigitalMaterialization";
-                sequentialGroup->start(QAbstractAnimation::DeleteWhenStopped); // Uruchom całą sekwencję
-                finalAnimation = sequentialGroup; // Ustaw finalAnimation na grupę sekwencyjną
+                sequential_group->start(QAbstractAnimation::DeleteWhenStopped); // Uruchom całą sekwencję
+                final_animation = sequential_group; // Ustaw finalAnimation na grupę sekwencyjną
             }
             // --- KONIEC ZMIANY 2 ---
 
@@ -199,32 +196,32 @@ void AnimatedDialog::animateShow()
 
 
     // Jeśli z jakiegoś powodu żadna animacja nie została utworzona/uruchomiona
-    if (!finalAnimation) {
+    if (!final_animation) {
         qDebug() << "OSTRZEŻENIE: Nie utworzono/uruchomiono animacji w animateShow()";
         emit showAnimationFinished(); // Emituj sygnał od razu
     }
 }
 
-void AnimatedDialog::animateClose()
+void AnimatedDialog::AnimateClose()
 {
     QPropertyAnimation *animation = nullptr;
 
     // Przechowujemy końcową geometrię (poza ekranem)
-    QRect endGeometry = this->geometry();
+    QRect geometry = this->geometry();
 
-    switch (m_animationType) {
-        case SlideFromBottom: {
+    switch (animation_type_) {
+        case kSlideFromBottom: {
             // Przesuwamy poza ekran na dole
-            endGeometry.moveTop(QGuiApplication::screenAt(endGeometry.center())->geometry().bottom());
+            geometry.moveTop(QGuiApplication::screenAt(geometry.center())->geometry().bottom());
 
             animation = new QPropertyAnimation(this, "geometry");
             animation->setStartValue(this->geometry());
-            animation->setEndValue(endGeometry);
+            animation->setEndValue(geometry);
             animation->setEasingCurve(QEasingCurve::InQuint);
             break;
         }
 
-        case FadeIn: {
+        case kFadeIn: {
             // Efekt przezroczystości powinien już być ustawiony z animateShow()
             auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect());
             if (!effect) {
@@ -242,7 +239,7 @@ void AnimatedDialog::animateClose()
 
 
         // W animateClose() zmodyfikuj przypadek DigitalMaterialization:
-case DigitalMaterialization: {
+case kDigitalMaterialization: {
     // Animacja wyjazdu do góry
     QRect end_geometry = this->geometry();
     end_geometry.moveTop(end_geometry.top() - 100);
@@ -252,30 +249,30 @@ case DigitalMaterialization: {
     animation->setEndValue(end_geometry);
     animation->setEasingCurve(QEasingCurve::InQuint);
 
-    bool isDialogAnimated = false;
+    bool is_dialog_animated = false;
 
     // Obsługa WavelengthDialog
     if (const auto digitalDialog = qobject_cast<WavelengthDialog*>(this)) {
-        isDialogAnimated = true;
+        is_dialog_animated = true;
 
         // Animacja digitalizacji w odwrotną stronę
-        const auto digitAnim = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
-        digitAnim->setStartValue(digitalDialog->digitalizationProgress());
-        digitAnim->setEndValue(0.0);
-        digitAnim->setDuration(m_duration);
+        const auto digital_animation = new QPropertyAnimation(digitalDialog, "digitalizationProgress");
+        digital_animation->setStartValue(digitalDialog->GetDigitalizationProgress());
+        digital_animation->setEndValue(0.0);
+        digital_animation->setDuration(duration_);
 
         // Końcowy efekt glitch
-        const auto glitchAnim = new QPropertyAnimation(digitalDialog, "glitchIntensity");
-        glitchAnim->setStartValue(0.0);
-        glitchAnim->setEndValue(0.0);
-        glitchAnim->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
-        glitchAnim->setDuration(m_duration);
+        const auto glitch_animation = new QPropertyAnimation(digitalDialog, "glitchIntensity");
+        glitch_animation->setStartValue(0.0);
+        glitch_animation->setEndValue(0.0);
+        glitch_animation->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
+        glitch_animation->setDuration(duration_);
 
         // Grupa animacji
         const auto group = new QParallelAnimationGroup();
         group->addAnimation(animation);
-        group->addAnimation(digitAnim);
-        group->addAnimation(glitchAnim);
+        group->addAnimation(digital_animation);
+        group->addAnimation(glitch_animation);
 
         connect(group, &QAbstractAnimation::finished, this, [this]() {
             QDialog::close();
@@ -284,39 +281,39 @@ case DigitalMaterialization: {
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
     // Obsługa JoinWavelengthDialog
-    else if (const auto joinDialog = qobject_cast<JoinWavelengthDialog*>(this)) {
-        isDialogAnimated = true;
+    else if (const auto join_dialog = qobject_cast<JoinWavelengthDialog*>(this)) {
+        is_dialog_animated = true;
 
         // Animacja digitalizacji w odwrotną stronę
-        const auto digitAnim = new QPropertyAnimation(joinDialog, "digitalizationProgress");
-        digitAnim->setStartValue(joinDialog->digitalizationProgress());
-        digitAnim->setEndValue(0.0);
-        digitAnim->setDuration(m_duration);
+        const auto digital_animation = new QPropertyAnimation(join_dialog, "digitalizationProgress");
+        digital_animation->setStartValue(join_dialog->GetDigitalizationProgress());
+        digital_animation->setEndValue(0.0);
+        digital_animation->setDuration(duration_);
 
         // Końcowy efekt glitch
-        const auto glitchAnim = new QPropertyAnimation(joinDialog, "glitchIntensity");
-        glitchAnim->setStartValue(0.0);
-        glitchAnim->setEndValue(0.0);
-        glitchAnim->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
-        glitchAnim->setDuration(m_duration);
+        const auto glitch_animation = new QPropertyAnimation(join_dialog, "glitchIntensity");
+        glitch_animation->setStartValue(0.0);
+        glitch_animation->setEndValue(0.0);
+        glitch_animation->setKeyValueAt(0.3, 0.8); // Intensywny glitch w trakcie zamykania
+        glitch_animation->setDuration(duration_);
 
         // Grupa animacji
         const auto group = new QParallelAnimationGroup();
         group->addAnimation(animation);
-        group->addAnimation(digitAnim);
-        group->addAnimation(glitchAnim);
+        group->addAnimation(digital_animation);
+        group->addAnimation(glitch_animation);
 
         connect(group, &QAbstractAnimation::finished, this, [this]() {
-            QDialog::close();
+            close();
         });
 
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     // Przypadek awaryjny, gdy nie można rzutować na żaden z typów dialogów
-    if (!isDialogAnimated) {
+    if (!is_dialog_animated) {
         connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            QDialog::close();
+            close();
         });
         animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
@@ -326,9 +323,9 @@ case DigitalMaterialization: {
     }
 
     if (animation) {
-        animation->setDuration(m_duration);
+        animation->setDuration(duration_);
         connect(animation, &QPropertyAnimation::finished, this, [this]() {
-            QDialog::close();
+            close();
         });
         animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
