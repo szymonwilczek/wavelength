@@ -142,7 +142,7 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
         registry->addWavelength(frequency, initialInfo);
 
         qDebug() << "[Joiner] Setting socket message handlers for" << frequency;
-        WavelengthMessageProcessor::getInstance()->setSocketMessageHandlers(socket, frequency);
+        WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
 
         qDebug() << "[Joiner] Connecting temporary handler for join_result";
         connect(socket, &QWebSocket::textMessageReceived, this, joinResultHandler);

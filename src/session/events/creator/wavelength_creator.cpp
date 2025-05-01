@@ -129,7 +129,7 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
                 registry->addWavelength(frequency, initialInfo);
 
                 qDebug() << "[Creator] Setting socket message handlers for" << frequency;
-                WavelengthMessageProcessor::getInstance()->setSocketMessageHandlers(socket, frequency);
+                WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
 
                 qDebug() << "[Creator] Connecting temporary handler for register_result";
                 connect(socket, &QWebSocket::textMessageReceived, this, registerResultHandler);
