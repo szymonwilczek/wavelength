@@ -443,7 +443,7 @@ void BlobPhysics::InitializeBlob(std::vector<QPointF>& control_points,
 
     blob_center = QPointF(width / 2.0, height / 2.0);
 
-    control_points = BlobMath::generateCircularPoints(blob_center, params.blobRadius, params.numPoints);
+    control_points = BlobMath::GenerateCircularPoints(blob_center, params.blobRadius, params.numPoints);
     target_points = control_points;
 
     velocity.resize(params.numPoints);
@@ -509,7 +509,7 @@ void BlobPhysics::ConstrainNeighborDistances(std::vector<QPointF>& control_point
 
         if (distance < min_distance || distance > max_distance) {
             QPointF direction = difference / distance;
-            const double target_distance = BlobMath::clamp(distance, min_distance, max_distance);
+            const double target_distance = BlobMath::Clamp(distance, min_distance, max_distance);
 
             const QPointF correction = direction * (distance - target_distance) * 0.5;
             control_points[i] += correction;
@@ -598,7 +598,7 @@ bool BlobPhysics::ValidateAndRepairControlPoints(std::vector<QPointF>& control_p
     bool has_invalid_points = false;
 
     for (size_t i = 0; i < control_points.size(); ++i) {
-        if (!BlobMath::isValidPoint(control_points[i]) || !BlobMath::isValidPoint(velocity[i])) {
+        if (!BlobMath::IsValidPoint(control_points[i]) || !BlobMath::IsValidPoint(velocity[i])) {
             has_invalid_points = true;
             break;
         }

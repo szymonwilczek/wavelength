@@ -20,8 +20,8 @@ QPainterPath BlobPath::createBlobPath(const std::vector<QPointF>& controlPoints,
         QPointF p2 = controlPoints[next];
         QPointF p3 = controlPoints[nextNext];
 
-        if (!BlobMath::isValidPoint(p0) || !BlobMath::isValidPoint(p1) ||
-            !BlobMath::isValidPoint(p2) || !BlobMath::isValidPoint(p3)) {
+        if (!BlobMath::IsValidPoint(p0) || !BlobMath::IsValidPoint(p1) ||
+            !BlobMath::IsValidPoint(p2) || !BlobMath::IsValidPoint(p3)) {
             continue;
             }
 
