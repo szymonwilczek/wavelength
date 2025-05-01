@@ -16,20 +16,19 @@ public:
     explicit NetworkSettingsWidget(QWidget *parent = nullptr);
     ~NetworkSettingsWidget() override = default;
 
-    void loadSettings() const;
-    void saveSettings() const;
+    void LoadSettings() const;
+    void SaveSettings() const;
 
 private:
-    void setupUi();
+    void SetupUi();
 
-    WavelengthConfig *m_config;
+    WavelengthConfig *config_;
 
-    // Kontrolki UI dla tej zakładki
-    CyberLineEdit *m_serverAddressEdit;
-    QSpinBox *m_serverPortEdit;
-    QSpinBox *m_connectionTimeoutEdit;
-    QSpinBox *m_keepAliveIntervalEdit;
-    QSpinBox *m_maxReconnectAttemptsEdit;
+    CyberLineEdit *server_address_edit_;
+    QSpinBox *server_port_edit_;
+    QSpinBox *connection_timeout_edit_;
+    QSpinBox *keep_alive_interval_edit_;
+    QSpinBox *max_reconnect_attempts_edit_;
 };
 
 #endif // ADVANCED_SETTINGS_WIDGET_H

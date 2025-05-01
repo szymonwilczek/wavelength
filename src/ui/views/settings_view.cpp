@@ -482,7 +482,7 @@ void SettingsView::loadSettingsFromRegistry() const {
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
     if (m_advancedTabWidget) { // <<< Dodano ładowanie nowej zakładki
-        m_advancedTabWidget->loadSettings();
+        m_advancedTabWidget->LoadSettings();
     }
 
     if (m_shortcutsTabWidget) m_shortcutsTabWidget->loadSettings();
@@ -499,7 +499,7 @@ void SettingsView::saveSettings() {
     }
     // --- Network (teraz w AdvancedSettingsWidget) ---
     if (m_advancedTabWidget) { // <<< Dodano zapisywanie nowej zakładki
-        m_advancedTabWidget->saveSettings();
+        m_advancedTabWidget->SaveSettings();
     }
 
     if (m_shortcutsTabWidget) m_shortcutsTabWidget->saveSettings();
