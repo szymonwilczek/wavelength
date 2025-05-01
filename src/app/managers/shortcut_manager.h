@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QKeySequence>
 #include <QMap>
+#include <concepts>
 
 class QWidget;
 class QShortcut;
@@ -39,6 +40,7 @@ private:
     void registerSettingsViewShortcuts(SettingsView* settingsView);
 
     template<typename Func>
+    requires std::invocable<Func>
     void createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda);
 };
 

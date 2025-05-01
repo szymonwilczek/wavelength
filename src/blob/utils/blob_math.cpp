@@ -14,10 +14,6 @@ bool BlobMath::isValidPoint(const QPointF &point) {
     return true;
 }
 
-double BlobMath::clamp(const double value, const double min, const double max) {
-    return qBound(min, value, max);
-}
-
 std::vector<QPointF> BlobMath::generateCircularPoints(const QPointF &center, const double radius, const int numPoints) {
     std::vector<QPointF> points;
     points.reserve(numPoints);

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QDebug>
+#include <concepts>
 
 class WavelengthEventBroker final : public QObject {
     Q_OBJECT
@@ -22,6 +23,8 @@ public:
     
     // Podłączanie odbiorników zdarzeń
     template<typename Receiver, typename Func>
+    requires std::derived_from<Receiver, QObject> &&
+             std::invocable<Func, const QVariantMap&>
     void subscribeToEvent(const QString& eventType, Receiver* receiver, Func slot);
 
     // Zdarzenia związane z wavelength

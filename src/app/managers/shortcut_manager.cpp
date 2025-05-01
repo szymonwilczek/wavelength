@@ -8,6 +8,7 @@
 #include "../../ui/views/settings_view.h"
 #include "../../ui/views/wavelength_chat_view.h"
 #include "../../ui/navigation/navbar.h"
+#include <concepts>
 
 ShortcutManager* ShortcutManager::getInstance() {
     static ShortcutManager instance;
@@ -48,6 +49,7 @@ void ShortcutManager::registerShortcuts(QWidget* parent) {
 }
 
 template<typename Func>
+requires std::invocable<Func>
 void ShortcutManager::createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda) {
     const QKeySequence sequence = m_config->getShortcut(actionId); // Pobierz sekwencję (powinna być już załadowana z pliku)
 
