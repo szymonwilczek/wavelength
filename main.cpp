@@ -498,10 +498,10 @@ int main(int argc, char *argv[]) {
         window.setWindowTitle("Wavelength - Sub Instance");
     }
 
-    ShortcutManager* shortcutMgr = ShortcutManager::getInstance();
-    shortcutMgr->registerShortcuts(&window);    // Rejestruje skróty dla QMainWindow (Create, Join, Settings)
-    shortcutMgr->registerShortcuts(chatView);   // Rejestruje skróty dla WavelengthChatView
-    shortcutMgr->registerShortcuts(settingsView); // Rejestruje skróty dla SettingsVie
+    ShortcutManager* shortcutMgr = ShortcutManager::GetInstance();
+    shortcutMgr->RegisterShortcuts(&window);    // Rejestruje skróty dla QMainWindow (Create, Join, Settings)
+    shortcutMgr->RegisterShortcuts(chatView);   // Rejestruje skróty dla WavelengthChatView
+    shortcutMgr->RegisterShortcuts(settingsView); // Rejestruje skróty dla SettingsVie
 
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {

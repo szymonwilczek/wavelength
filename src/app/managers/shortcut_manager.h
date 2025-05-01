@@ -18,9 +18,11 @@ class ShortcutManager final : public QObject {
     Q_OBJECT
 
 public:
-    static ShortcutManager* getInstance();
+    static ShortcutManager* GetInstance();
+    ShortcutManager(const ShortcutManager&) = delete;
+    ShortcutManager& operator=(const ShortcutManager&) = delete;
 
-    void registerShortcuts(QWidget* parent);
+    void RegisterShortcuts(QWidget* parent);
 
     public slots:
         void updateRegisteredShortcuts();
@@ -28,20 +30,18 @@ public:
 private:
     explicit ShortcutManager(QObject *parent = nullptr);
     ~ShortcutManager() override = default;
-    ShortcutManager(const ShortcutManager&) = delete;
-    ShortcutManager& operator=(const ShortcutManager&) = delete;
 
-    WavelengthConfig* m_config;
+    WavelengthConfig* config_;
 
-    QMap<QWidget*, QMap<QString, QShortcut*>> m_registeredShortcuts;
+    QMap<QWidget*, QMap<QString, QShortcut*>> registered_shortcuts_;
 
-    void registerMainWindowShortcuts(QMainWindow* window, Navbar* navbar);
-    void registerChatViewShortcuts(WavelengthChatView* chatView);
-    void registerSettingsViewShortcuts(SettingsView* settingsView);
+    void RegisterMainWindowShortcuts(QMainWindow* window, Navbar* navbar);
+    void RegisterChatViewShortcuts(WavelengthChatView* chat_view);
+    void RegisterSettingsViewShortcuts(SettingsView* settings_view);
 
     template<typename Func>
     requires std::invocable<Func>
-    void createAndConnectShortcut(const QString& actionId, QWidget* parent, Func lambda);
+    void CreateAndConnectShortcut(const QString& action_id, QWidget* parent, Func lambda);
 };
 
 #endif // SHORTCUT_MANAGER_H

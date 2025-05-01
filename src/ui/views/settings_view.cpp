@@ -507,7 +507,7 @@ void SettingsView::saveSettings() {
     // Zapisanie wszystkich ustawień do pliku/rejestru
     m_config->saveSettings();
 
-    ShortcutManager::getInstance()->updateRegisteredShortcuts();
+    ShortcutManager::GetInstance()->updateRegisteredShortcuts();
 
     QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
     emit settingsChanged(); // Emituj sygnał po zapisaniu
