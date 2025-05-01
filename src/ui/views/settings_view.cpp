@@ -485,7 +485,7 @@ void SettingsView::loadSettingsFromRegistry() const {
         m_advancedTabWidget->LoadSettings();
     }
 
-    if (m_shortcutsTabWidget) m_shortcutsTabWidget->loadSettings();
+    if (m_shortcutsTabWidget) m_shortcutsTabWidget->LoadSettings();
 }
 
 void SettingsView::saveSettings() {
@@ -502,7 +502,7 @@ void SettingsView::saveSettings() {
         m_advancedTabWidget->SaveSettings();
     }
 
-    if (m_shortcutsTabWidget) m_shortcutsTabWidget->saveSettings();
+    if (m_shortcutsTabWidget) m_shortcutsTabWidget->SaveSettings();
 
     // Zapisanie wszystkich ustawień do pliku/rejestru
     m_config->SaveSettings();

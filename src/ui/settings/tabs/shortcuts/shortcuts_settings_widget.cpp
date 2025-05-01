@@ -11,57 +11,57 @@
 #include <QDebug>
 
 ShortcutsSettingsWidget::ShortcutsSettingsWidget(QWidget *parent)
-    : QWidget(parent), m_config(WavelengthConfig::GetInstance()), m_formLayout(nullptr), m_restoreButton(nullptr)
+    : QWidget(parent), config_(WavelengthConfig::GetInstance()), form_layout_(nullptr), restore_button_(nullptr)
 {
-    setupUi();
-    loadSettings(); // Załaduj skróty przy tworzeniu widgetu
+    SetupUi();
+    LoadSettings(); // Załaduj skróty przy tworzeniu widgetu
 }
 
-void ShortcutsSettingsWidget::setupUi() {
-    const auto mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(15, 15, 15, 15);
-    mainLayout->setSpacing(10);
+void ShortcutsSettingsWidget::SetupUi() {
+    const auto main_layout = new QVBoxLayout(this);
+    main_layout->setContentsMargins(15, 15, 15, 15);
+    main_layout->setSpacing(10);
 
-    const auto titleLabel = new QLabel("Keyboard Shortcuts", this);
-    titleLabel->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
-    mainLayout->addWidget(titleLabel);
+    const auto title_label = new QLabel("Keyboard Shortcuts", this);
+    title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
+    main_layout->addWidget(title_label);
 
-    const auto infoLabel = new QLabel("Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application.", this);
-    infoLabel->setStyleSheet("color: #cccccc; background-color: transparent; border: none; font-size: 9pt;");
-    infoLabel->setWordWrap(true);
-    mainLayout->addWidget(infoLabel);
+    const auto info_label = new QLabel("Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application.", this);
+    info_label->setStyleSheet("color: #cccccc; background-color: transparent; border: none; font-size: 9pt;");
+    info_label->setWordWrap(true);
+    main_layout->addWidget(info_label);
 
     // Użyj QScrollArea, aby zmieścić wszystkie skróty
-    const auto scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setStyleSheet("QScrollArea { background-color: transparent; border: none; }"); // Styl dla scroll area
+    const auto scroll_area = new QScrollArea(this);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setStyleSheet("QScrollArea { background-color: transparent; border: none; }"); // Styl dla scroll area
 
-    const auto scrollWidget = new QWidget(); // Widget wewnątrz scroll area
-    scrollWidget->setStyleSheet("background-color: transparent;");
-    m_formLayout = new QFormLayout(scrollWidget);
-    m_formLayout->setContentsMargins(10, 10, 10, 10);
-    m_formLayout->setSpacing(8);
-    m_formLayout->setLabelAlignment(Qt::AlignRight);
+    const auto scroll_widget = new QWidget(); // Widget wewnątrz scroll area
+    scroll_widget->setStyleSheet("background-color: transparent;");
+    form_layout_ = new QFormLayout(scroll_widget);
+    form_layout_->setContentsMargins(10, 10, 10, 10);
+    form_layout_->setSpacing(8);
+    form_layout_->setLabelAlignment(Qt::AlignRight);
 
     // Pobierz wszystkie domyślne akcje, aby utworzyć pola edycji
-    const QMap<QString, QKeySequence> defaultShortcuts = m_config->GetDefaultShortcutsMap();
-    m_shortcutEdits.clear();
+    const QMap<QString, QKeySequence> default_shortcuts = config_->GetDefaultShortcutsMap();
+    shortcut_edits_.clear();
 
 
 
-    for (auto it = defaultShortcuts.constBegin(); it != defaultShortcuts.constEnd(); ++it) {
-        QString actionId = it.key();
-        QString description = getActionDescription(actionId);
+    for (auto it = default_shortcuts.constBegin(); it != default_shortcuts.constEnd(); ++it) {
+        QString action_id = it.key();
+        QString description = GetActionDescription(action_id);
         if (description.isEmpty()) {
-            qWarning() << "No description for shortcut action:" << actionId;
+            qWarning() << "No description for shortcut action:" << action_id;
             continue; // Pomiń, jeśli nie ma opisu
         }
 
-        const auto descLabel = new QLabel(description + ":", scrollWidget);
-        descLabel->setStyleSheet("color: #ddeeff; background-color: transparent; border: none;");
+        const auto desc_label = new QLabel(description + ":", scroll_widget);
+        desc_label->setStyleSheet("color: #ddeeff; background-color: transparent; border: none;");
 
-        auto keyEdit = new QKeySequenceEdit(scrollWidget);
-        keyEdit->setStyleSheet(
+        auto key_edit = new QKeySequenceEdit(scroll_widget);
+        key_edit->setStyleSheet(
             "QKeySequenceEdit {"
             "   background-color: #05101A;"
             "   color: #99ccff;"
@@ -75,68 +75,68 @@ void ShortcutsSettingsWidget::setupUi() {
         );
 
         // --- ZMIANA: Pobierz AKTUALNĄ wartość skrótu (domyślną lub z ustawień) ---
-        keyEdit->setKeySequence(m_config->GetShortcut(actionId)); // Użyj getShortcut
+        key_edit->setKeySequence(config_->GetShortcut(action_id)); // Użyj getShortcut
 
-        m_formLayout->addRow(descLabel, keyEdit);
-        m_shortcutEdits.insert(actionId, keyEdit); // Zapisz wskaźnik do widgetu edycji
+        form_layout_->addRow(desc_label, key_edit);
+        shortcut_edits_.insert(action_id, key_edit); // Zapisz wskaźnik do widgetu edycji
     }
 
-    scrollArea->setWidget(scrollWidget);
-    mainLayout->addWidget(scrollArea, 1); // Rozciągnij scroll area
+    scroll_area->setWidget(scroll_widget);
+    main_layout->addWidget(scroll_area, 1); // Rozciągnij scroll area
 
     // Przycisk przywracania domyślnych
-    m_restoreButton = new QPushButton("Restore Default Shortcuts", this);
-    m_restoreButton->setStyleSheet(
+    restore_button_ = new QPushButton("Restore Default Shortcuts", this);
+    restore_button_->setStyleSheet(
         "QPushButton { background-color: #444; border: 1px solid #666; padding: 8px; border-radius: 4px; color: #ccc; }"
         "QPushButton:hover { background-color: #555; }"
         "QPushButton:pressed { background-color: #333; }"
     );
-    connect(m_restoreButton, &QPushButton::clicked, this, &ShortcutsSettingsWidget::restoreDefaultShortcuts);
-    mainLayout->addWidget(m_restoreButton, 0, Qt::AlignRight);
+    connect(restore_button_, &QPushButton::clicked, this, &ShortcutsSettingsWidget::RestoreDefaultShortcuts);
+    main_layout->addWidget(restore_button_, 0, Qt::AlignRight);
 }
 
-QString ShortcutsSettingsWidget::getActionDescription(const QString& actionId) {
+QString ShortcutsSettingsWidget::GetActionDescription(const QString& action_id) {
     // Zwraca czytelny opis na podstawie ID akcji
-    if (actionId == "MainWindow.CreateWavelength") return "Create Wavelength";
-    if (actionId == "MainWindow.JoinWavelength") return "Join Wavelength";
-    if (actionId == "MainWindow.OpenSettings") return "Open Settings";
-    if (actionId == "ChatView.AbortConnection") return "Abort Connection";
-    if (actionId == "ChatView.FocusInput") return "Focus Message Input";
-    if (actionId == "ChatView.AttachFile") return "Attach File";
-    if (actionId == "ChatView.SendMessage") return "Send Message";
-    if (actionId == "SettingsView.SwitchTab0") return "Switch to Wavelength Tab";
-    if (actionId == "SettingsView.SwitchTab1") return "Switch to Appearance Tab";
-    if (actionId == "SettingsView.SwitchTab2") return "Switch to Network Tab";
-    if (actionId == "SettingsView.SwitchTab3") return "Switch to CLASSIFIED Tab";
-    if (actionId == "SettingsView.SwitchTab4") return "Switch to Shortcuts Tab";
-    if (actionId == "SettingsView.Save") return "Save Settings";
-    if (actionId == "SettingsView.Defaults") return "Restore Defaults";
-    if (actionId == "SettingsView.Back") return "Back / Close Settings";
+    if (action_id == "MainWindow.CreateWavelength") return "Create Wavelength";
+    if (action_id == "MainWindow.JoinWavelength") return "Join Wavelength";
+    if (action_id == "MainWindow.OpenSettings") return "Open Settings";
+    if (action_id == "ChatView.AbortConnection") return "Abort Connection";
+    if (action_id == "ChatView.FocusInput") return "Focus Message Input";
+    if (action_id == "ChatView.AttachFile") return "Attach File";
+    if (action_id == "ChatView.SendMessage") return "Send Message";
+    if (action_id == "SettingsView.SwitchTab0") return "Switch to Wavelength Tab";
+    if (action_id == "SettingsView.SwitchTab1") return "Switch to Appearance Tab";
+    if (action_id == "SettingsView.SwitchTab2") return "Switch to Network Tab";
+    if (action_id == "SettingsView.SwitchTab3") return "Switch to CLASSIFIED Tab";
+    if (action_id == "SettingsView.SwitchTab4") return "Switch to Shortcuts Tab";
+    if (action_id == "SettingsView.Save") return "Save Settings";
+    if (action_id == "SettingsView.Defaults") return "Restore Defaults";
+    if (action_id == "SettingsView.Back") return "Back / Close Settings";
     return QString(); // Zwróć pusty, jeśli ID nieznane
 }
 
-void ShortcutsSettingsWidget::loadSettings() const {
+void ShortcutsSettingsWidget::LoadSettings() const {
     qDebug() << "ShortcutsSettingsWidget: Loading settings...";
-    for (auto it = m_shortcutEdits.constBegin(); it != m_shortcutEdits.constEnd(); ++it) {
-        QString actionId = it.key();
+    for (auto it = shortcut_edits_.constBegin(); it != shortcut_edits_.constEnd(); ++it) {
+        QString action_id = it.key();
         if (QKeySequenceEdit *editWidget = it.value()) {
-            editWidget->setKeySequence(m_config->GetShortcut(actionId));
+            editWidget->setKeySequence(config_->GetShortcut(action_id));
         }
     }
 }
 
-void ShortcutsSettingsWidget::saveSettings() const {
+void ShortcutsSettingsWidget::SaveSettings() const {
     qDebug() << "ShortcutsSettingsWidget: Saving settings...";
     bool changed = false;
-    for (auto it = m_shortcutEdits.constBegin(); it != m_shortcutEdits.constEnd(); ++it) {
-        QString actionId = it.key();
+    for (auto it = shortcut_edits_.constBegin(); it != shortcut_edits_.constEnd(); ++it) {
+        QString action_id = it.key();
         if (const QKeySequenceEdit *editWidget = it.value()) {
-            QKeySequence currentSequence = m_config->GetShortcut(actionId);
-            QKeySequence newSequence = editWidget->keySequence();
-            if (currentSequence != newSequence) {
-                m_config->SetShortcut(actionId, newSequence);
+            QKeySequence current_sequence = config_->GetShortcut(action_id);
+            QKeySequence new_sequence = editWidget->keySequence();
+            if (current_sequence != new_sequence) {
+                config_->SetShortcut(action_id, new_sequence);
                 changed = true;
-                qDebug() << "Shortcut changed for" << actionId << "to" << newSequence.toString();
+                qDebug() << "Shortcut changed for" << action_id << "to" << new_sequence.toString();
             }
         }
     }
@@ -148,20 +148,20 @@ void ShortcutsSettingsWidget::saveSettings() const {
     }
 }
 
-void ShortcutsSettingsWidget::restoreDefaultShortcuts() {
+void ShortcutsSettingsWidget::RestoreDefaultShortcuts() {
     if (QMessageBox::question(this, "Restore Default Shortcuts",
                              "Are you sure you want to restore all keyboard shortcuts to their default values?\nThis action cannot be undone immediately.",
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         // --- ZMIANA: Ustaw domyślne wartości w mapie konfiguracji ---
-        const QMap<QString, QKeySequence> defaultShortcuts = m_config->GetDefaultShortcutsMap(); // Potrzebujemy metody zwracającej m_defaultShortcuts
-        for(auto it = defaultShortcuts.constBegin(); it != defaultShortcuts.constEnd(); ++it) {
-            m_config->SetShortcut(it.key(), it.value()); // Ustaw domyślny w mapie m_shortcuts
+        const QMap<QString, QKeySequence> default_shortcuts = config_->GetDefaultShortcutsMap(); // Potrzebujemy metody zwracającej m_defaultShortcuts
+        for(auto it = default_shortcuts.constBegin(); it != default_shortcuts.constEnd(); ++it) {
+            config_->SetShortcut(it.key(), it.value()); // Ustaw domyślny w mapie m_shortcuts
         }
         // --- KONIEC ZMIANY ---
 
         // Odśwież UI, aby pokazać domyślne wartości
-        loadSettings();
+        LoadSettings();
 
         QMessageBox::information(this, "Defaults Restored", "Default shortcuts have been restored.\nRemember to save settings and restart the application.");
     }
