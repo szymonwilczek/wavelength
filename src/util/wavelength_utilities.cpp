@@ -3,8 +3,7 @@
 #include <QString>
 #include <QDebug>
 
-double WavelengthUtilities::normalizeFrequency(const double frequency) {
-    // Dokładne odwzorowanie algorytmu JavaScript: parseFloat(numFreq.toFixed(1))
+double WavelengthUtilities::NormalizeFrequency(const double frequency) {
     const QString formatted = QString::number(frequency, 'f', 1);
     bool ok;
     const double result = formatted.toDouble(&ok);

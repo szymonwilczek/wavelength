@@ -3,7 +3,7 @@
 
 class WavelengthUtilities {
 public:
-    static double normalizeFrequency(double frequency);
+    static double NormalizeFrequency(double frequency);
 };
 
 #endif // WAVELENGTH_UTILITIES_H
