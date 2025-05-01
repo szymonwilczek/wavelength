@@ -19,8 +19,8 @@ public:
     ~CyberpunkButton() override;
 
     // Gettery i settery dla nowej animacji
-    qreal glowIntensity() const { return m_glowIntensity; }
-    void setGlowIntensity(qreal intensity);
+    qreal GetGlowIntensity() const { return glow_intensity_; }
+    void SetGlowIntensity(qreal intensity);
 
 protected:
     void enterEvent(QEvent *event) override;
@@ -29,15 +29,15 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    QPropertyAnimation *m_animation = nullptr;
-    QPropertyAnimation *m_glowAnimation;
-    QGraphicsDropShadowEffect *m_glowEffect;
+    QPropertyAnimation *animation_ = nullptr;
+    QPropertyAnimation *glow_animation_;
+    QGraphicsDropShadowEffect *glow_effect_;
 
     // Zmienne dla efektu propagacji światła
-    qreal m_glowIntensity;
-    QColor m_frameColor;
-    QColor m_glowColor;
-    int m_frameWidth;
+    qreal glow_intensity_;
+    QColor frame_color_;
+    QColor glow_color_;
+    int frame_width_;
 };
 
 #endif // CYBERPUNK_BUTTON_H

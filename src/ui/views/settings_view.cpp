@@ -202,7 +202,7 @@ void SettingsView::setupUi() {
 
     // Domyślnie aktywna pierwsza zakładka
     if (!m_tabButtons.isEmpty()) {
-        m_tabButtons[0]->setActive(true);
+        m_tabButtons[0]->SetActive(true);
         m_tabButtons[0]->setChecked(true);
     }
     m_tabContent->setCurrentIndex(0);
@@ -528,7 +528,7 @@ void SettingsView::switchToTab(const int tabIndex) {
     if (tabIndex < 0 || tabIndex >= m_tabButtons.size()) return;
 
     for (int i = 0; i < m_tabButtons.size(); ++i) {
-        m_tabButtons[i]->setActive(i == tabIndex);
+        m_tabButtons[i]->SetActive(i == tabIndex);
         m_tabButtons[i]->setChecked(i == tabIndex);
     }
     m_tabContent->setCurrentIndex(tabIndex);
