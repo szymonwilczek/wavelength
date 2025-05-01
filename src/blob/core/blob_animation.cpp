@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QRandomGenerator>
 
 #include "../../app/wavelength_config.h"
 

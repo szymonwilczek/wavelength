@@ -19,6 +19,7 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
+#include <QMutex>
 
 class BlobAnimation final : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
