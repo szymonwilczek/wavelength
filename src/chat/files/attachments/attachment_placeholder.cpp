@@ -131,7 +131,7 @@ void AttachmentPlaceholder::SetContent(QWidget *content) {
     QTimer::singleShot(50, this, [this, content]() {
         // Wymuszamy update layoutu w CyberAttachmentViewer, jeśli to on jest zawartością
         if (const auto viewer = qobject_cast<CyberAttachmentViewer*>(content)) {
-            viewer->updateContentLayout(); // Ta funkcja powinna zadbać o aktualizację w dół
+            viewer->UpdateContentLayout(); // Ta funkcja powinna zadbać o aktualizację w dół
         } else {
             // Jeśli zawartością nie jest viewer, nadal aktualizuj geometrię
             content->updateGeometry();
@@ -500,7 +500,7 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
     });
 
     // Ustawiamy zawartość viewera
-    viewer->setContent(scaling_attachment);
+    viewer->SetContent(scaling_attachment);
     SetContent(viewer);
     SetLoading(false);
     // QTimer::singleShot(50, this, [this](){ updateGeometry(); });
@@ -534,7 +534,7 @@ void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
         ShowFullSizeDialog(data, true); // true oznacza, że to GIF
     });
 
-    viewer->setContent(scaling_attachment);
+    viewer->SetContent(scaling_attachment);
     SetContent(viewer);
     SetLoading(false);
     // QTimer::singleShot(50, this, [this](){ updateGeometry(); });
@@ -548,7 +548,7 @@ void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
 
     // Opakowujemy w AutoScalingAttachment
 
-    viewer->setContent(audio_player);
+    viewer->SetContent(audio_player);
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
@@ -600,7 +600,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 
     // Opakowujemy w AutoScalingAttachment
 
-    viewer->setContent(video_preview);
+    viewer->SetContent(video_preview);
 
     // Po kliknięciu miniaturki lub przycisku, otwórz dialog z odtwarzaczem
     auto open_player = [this, data]() {

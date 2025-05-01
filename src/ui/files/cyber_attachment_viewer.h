@@ -17,13 +17,12 @@ public:
 
     ~CyberAttachmentViewer() override;
 
-    int decryptionCounter() const { return m_decryptionCounter; }
-    void setDecryptionCounter(int counter);
+    int GetDecryptionCounter() const { return decryption_counter_; }
+    void SetDecryptionCounter(int counter);
 
-    void updateContentLayout();
+    void UpdateContentLayout();
 
-
-    void setContent(QWidget* content);
+    void SetContent(QWidget* content);
 
     QSize sizeHint() const override;
 
@@ -34,38 +33,38 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private slots:
-    void onActionButtonClicked();
+    void OnActionButtonClicked();
 
-    void startScanningAnimation();
+    void StartScanningAnimation();
 
-    void startDecryptionAnimation();
+    void StartDecryptionAnimation();
 
-    void updateAnimation() const;
+    void UpdateAnimation() const;
 
-    void updateDecryptionStatus() const;
+    void UpdateDecryptionStatus() const;
 
-    void finishDecryption();
+    void FinishDecryption();
 
-    void closeViewer();
+    void CloseViewer();
 
 signals:
     void decryptionCounterChanged(int value);
     void viewingFinished();
 
 private:
-    int m_decryptionCounter;
-    bool m_isScanning;
-    bool m_isDecrypted;
+    int decryption_counter_;
+    bool is_scanning_;
+    bool is_decrypted_;
 
-    QVBoxLayout* m_layout;
-    QWidget* m_contentContainer;
-    QVBoxLayout* m_contentLayout;
-    QWidget* m_contentWidget = nullptr;
-    QLabel* m_statusLabel;
-    QTimer* m_animTimer;
-    QTimer* m_blinkTimer = nullptr;
-    int m_scanProgress = 0;
-    MaskOverlay* m_maskOverlay;
+    QVBoxLayout* layout_;
+    QWidget* content_container_;
+    QVBoxLayout* content_layout_;
+    QWidget* content_widget_ = nullptr;
+    QLabel* status_label_;
+    QTimer* animation_timer_;
+    QTimer* blink_timer_ = nullptr;
+    int scan_progress_ = 0;
+    MaskOverlay* mask_overlay_;
 };
 
 #endif // CYBER_ATTACHMENT_VIEWER_H
