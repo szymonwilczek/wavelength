@@ -29,13 +29,13 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
         qDebug() << "[Joiner] JoinResultHandler received message:" << message;
 
         bool ok;
-        QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
+        QJsonObject msgObj = MessageHandler::GetInstance()->ParseMessage(message, &ok);
         if (!ok) {
             qDebug() << "[Joiner] Failed to parse message in JoinResultHandler";
             return;
         }
 
-        const QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
+        const QString msgType = MessageHandler::GetInstance()->GetMessageType(msgObj);
         qDebug() << "[Joiner] Message type in JoinResultHandler:" << msgType;
 
         if (msgType == "join_result") {

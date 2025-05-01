@@ -1,77 +1,77 @@
 #include "message_handler.h"
 
-bool MessageHandler::sendSystemCommand(QWebSocket *socket, const QString &command, const QJsonObject &params) {
+bool MessageHandler::SendSystemCommand(QWebSocket *socket, const QString &command, const QJsonObject &params) {
     if (!socket || !socket->isValid()) {
         qDebug() << "Cannot send command - socket is invalid";
         return false;
     }
 
-    QJsonObject commandObj;
-    commandObj["type"] = command;
+    QJsonObject command_object;
+    command_object["type"] = command;
 
     // Add all parameters from the params object
     for (auto it = params.constBegin(); it != params.constEnd(); ++it) {
-        commandObj[it.key()] = it.value();
+        command_object[it.key()] = it.value();
     }
 
-    const QJsonDocument doc(commandObj);
+    const QJsonDocument doc(command_object);
     socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
 
     return true;
 }
 
-void MessageHandler::markMessageAsProcessed(const QString &messageId) {
-    if (!messageId.isEmpty()) {
-        m_processedMessageIds.insert(messageId);
+void MessageHandler::MarkMessageAsProcessed(const QString &message_id) {
+    if (!message_id.isEmpty()) {
+        processed_message_ids_.insert(message_id);
 
         // Keep the processed message cache from growing too large
-        if (m_processedMessageIds.size() > MAX_CACHED_MESSAGE_IDS) {
+        if (processed_message_ids_.size() > kMaxCachedMessageIds) {
             // Remove approximately 20% of the oldest messages
-            constexpr int toRemove = MAX_CACHED_MESSAGE_IDS / 5;
-            auto it = m_processedMessageIds.begin();
-            for (int i = 0; i < toRemove && it != m_processedMessageIds.end(); ++i) {
-                it = m_processedMessageIds.erase(it);
+            constexpr int to_remove = kMaxCachedMessageIds / 5;
+            auto it = processed_message_ids_.begin();
+            for (int i = 0; i < to_remove && it != processed_message_ids_.end(); ++i) {
+                it = processed_message_ids_.erase(it);
             }
         }
     }
 }
 
-QJsonObject MessageHandler::parseMessage(const QString &message, bool *ok) {
-    const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
-    if (doc.isNull() || !doc.isObject()) {
+QJsonObject MessageHandler::ParseMessage(const QString &message, bool *ok) {
+    const QJsonDocument document = QJsonDocument::fromJson(message.toUtf8());
+    if (document.isNull() || !document.isObject()) {
         if (ok) *ok = false;
         qDebug() << "Failed to parse message JSON";
         return QJsonObject();
     }
 
     if (ok) *ok = true;
-    return doc.object();
+    return document.object();
 }
 
-QJsonObject MessageHandler::createAuthRequest(const QString &frequency, const QString &password,
-    const QString &clientId) {
-    QJsonObject authObj;
-    authObj["type"] = "auth";
-    authObj["frequency"] = frequency;
-    authObj["password"] = password;
-    authObj["clientId"] = clientId;
-    return authObj;
+QJsonObject MessageHandler::CreateAuthRequest(const QString &frequency, const QString &password,
+    const QString &client_id) {
+    QJsonObject auth_object;
+    auth_object["type"] = "auth";
+    auth_object["frequency"] = frequency;
+    auth_object["password"] = password;
+    auth_object["clientId"] = client_id;
+    return auth_object;
 }
 
-QJsonObject MessageHandler::createRegisterRequest(const QString &frequency, const bool isPasswordProtected,
-    const QString &password, const QString &hostId) {
-    QJsonObject regObj;
-    regObj["type"] = "register_wavelength";
-    regObj["frequency"] = frequency;
-    regObj["isPasswordProtected"] = isPasswordProtected;
-    regObj["password"] = password;
-    regObj["hostId"] = hostId;
-    return regObj;
+QJsonObject MessageHandler::CreateRegisterRequest(const QString &frequency, const bool is_password_protected,
+    const QString &password, const QString &host_id) {
+    QJsonObject register_object;
+    register_object["type"] = "register_wavelength";
+    register_object["frequency"] = frequency;
+    register_object["isPasswordProtected"] = is_password_protected;
+    register_object["password"] = password;
+    register_object["hostId"] = host_id;
+    return register_object;
 }
 
-QJsonObject MessageHandler::createLeaveRequest(const QString &frequency, const bool isHost) {
-    QJsonObject leaveObj;
-    leaveObj["type"] = isHost ? "close_wavelength" : "leave_wavelength";
-    leaveObj["frequency"] = frequency;
-    return leaveObj;
+QJsonObject MessageHandler::CreateLeaveRequest(const QString &frequency, const bool is_host) {
+    QJsonObject leave_object;
+    leave_object["type"] = is_host ? "close_wavelength" : "leave_wavelength";
+    leave_object["frequency"] = frequency;
+    return leave_object;
 }

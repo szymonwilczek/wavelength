@@ -20,11 +20,11 @@ void WavelengthLeaver::leaveWavelength() {
         if (info.socket->isValid()) {
             if (info.isHost) {
                 qDebug() << "Closing wavelength as host";
-                MessageHandler::getInstance()->sendSystemCommand(info.socket, "close_wavelength",
+                MessageHandler::GetInstance()->SendSystemCommand(info.socket, "close_wavelength",
                                                                  {{"frequency", freq}});
             } else {
                 qDebug() << "Leaving wavelength as client";
-                MessageHandler::getInstance()->sendSystemCommand(info.socket, "leave_wavelength",
+                MessageHandler::GetInstance()->SendSystemCommand(info.socket, "leave_wavelength",
                                                                  {{"frequency", freq}});
             }
 
@@ -64,7 +64,7 @@ void WavelengthLeaver::closeWavelength(QString frequency) {
 
     if (socketToClose && socketToClose->isValid()) {
         qDebug() << "Sending close command to server for wavelength" << frequency;
-        MessageHandler::getInstance()->sendSystemCommand(socketToClose, "close_wavelength",
+        MessageHandler::GetInstance()->SendSystemCommand(socketToClose, "close_wavelength",
                                                          {{"frequency", frequency}});
 
         socketToClose->close();

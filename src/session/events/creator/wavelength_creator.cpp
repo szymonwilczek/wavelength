@@ -27,13 +27,13 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
     auto registerResultHandler = [this, frequency, socket, keepAliveTimer, registry](const QString& message) {
         qDebug() << "[Creator] RegisterResultHandler received message:" << message;
         bool ok = false;
-        QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
+        QJsonObject msgObj = MessageHandler::GetInstance()->ParseMessage(message, &ok);
         if (!ok) {
             qDebug() << "[Creator] Failed to parse JSON message in RegisterResultHandler";
             return;
         }
 
-        const QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
+        const QString msgType = MessageHandler::GetInstance()->GetMessageType(msgObj);
 
         if (msgType == "register_result") {
             disconnect(socket, &QWebSocket::textMessageReceived, this, nullptr);
@@ -140,8 +140,8 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
                     }
                 });
 
-                const MessageHandler* msgHandler = MessageHandler::getInstance();
-                const QJsonObject regRequest = msgHandler->createRegisterRequest(frequency, isPasswordProtected, password, hostId);
+                const MessageHandler* msgHandler = MessageHandler::GetInstance();
+                const QJsonObject regRequest = msgHandler->CreateRegisterRequest(frequency, isPasswordProtected, password, hostId);
                 const QJsonDocument doc(regRequest);
                 socket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
                 qDebug() << "[Creator] Sent register request for wavelength" << frequency;

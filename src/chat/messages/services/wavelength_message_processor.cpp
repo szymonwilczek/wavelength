@@ -6,16 +6,16 @@
 void WavelengthMessageProcessor::processIncomingMessage(const QString &message, const QString &frequency) {
     qDebug() << "Processing message for wavelength" << frequency << ":" << message.left(50) + "...";
     bool ok = false;
-    const QJsonObject msgObj = MessageHandler::getInstance()->parseMessage(message, &ok);
+    const QJsonObject msgObj = MessageHandler::GetInstance()->ParseMessage(message, &ok);
 
     if (!ok) {
         qDebug() << "Failed to parse JSON message";
         return;
     }
 
-    const QString msgType = MessageHandler::getInstance()->getMessageType(msgObj);
-    const QString messageId = MessageHandler::getInstance()->getMessageId(msgObj);
-    const QString msgFrequency = MessageHandler::getInstance()->getMessageFrequency(msgObj);
+    const QString msgType = MessageHandler::GetInstance()->GetMessageType(msgObj);
+    const QString messageId = MessageHandler::GetInstance()->GetMessageId(msgObj);
+    const QString msgFrequency = MessageHandler::GetInstance()->GetMessageFrequency(msgObj);
 
     qDebug() << "Message type:" << msgType << "ID:" << messageId << "Freq:" << msgFrequency;
 
@@ -27,7 +27,7 @@ void WavelengthMessageProcessor::processIncomingMessage(const QString &message, 
     }
 
     // Check if message has been processed already
-    if (MessageHandler::getInstance()->isMessageProcessed(messageId)) {
+    if (MessageHandler::GetInstance()->IsMessageProcessed(messageId)) {
         qDebug() << "Message already processed:" << messageId;
         return;
     }
@@ -127,12 +127,12 @@ void WavelengthMessageProcessor::setSocketMessageHandlers(QWebSocket *socket, QS
 void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj, const QString &frequency,
     const QString &messageId) {
     // Sprawdź czy wiadomość już przetwarzana
-    if (MessageHandler::getInstance()->isMessageProcessed(messageId)) {
+    if (MessageHandler::GetInstance()->IsMessageProcessed(messageId)) {
         qDebug() << "Message already processed, skipping:" << messageId;
         return;
     }
 
-    MessageHandler::getInstance()->markMessageAsProcessed(messageId);
+    MessageHandler::GetInstance()->MarkMessageAsProcessed(messageId);
 
     // Sprawdź, czy wiadomość zawiera załączniki
     const bool hasAttachment = msgObj.contains("hasAttachment") && msgObj["hasAttachment"].toBool();

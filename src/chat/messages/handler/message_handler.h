@@ -13,56 +13,56 @@ class MessageHandler final : public QObject {
     Q_OBJECT
 
 public:
-    static MessageHandler* getInstance() {
+    static MessageHandler* GetInstance() {
         static MessageHandler instance;
         return &instance;
     }
 
-    static QString generateMessageId() {
+    static QString GenerateMessageId() {
         return QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
 
-    static bool sendSystemCommand(QWebSocket* socket, const QString& command, const QJsonObject& params = QJsonObject());
+    static bool SendSystemCommand(QWebSocket* socket, const QString& command, const QJsonObject& params = QJsonObject());
 
-    bool isMessageProcessed(const QString& messageId) const {
-        return !messageId.isEmpty() && m_processedMessageIds.contains(messageId);
+    bool IsMessageProcessed(const QString& message_id) const {
+        return !message_id.isEmpty() && processed_message_ids_.contains(message_id);
     }
 
-    void markMessageAsProcessed(const QString& messageId);
+    void MarkMessageAsProcessed(const QString& message_id);
 
-    static QJsonObject parseMessage(const QString& message, bool* ok = nullptr);
+    static QJsonObject ParseMessage(const QString& message, bool* ok = nullptr);
 
-    static QString getMessageType(const QJsonObject& messageObj) {
-        return messageObj["type"].toString();
+    static QString GetMessageType(const QJsonObject& message_object) {
+        return message_object["type"].toString();
     }
 
-    static QString getMessageContent(const QJsonObject& messageObj) {
-        return messageObj["content"].toString();
+    static QString GetMessageContent(const QJsonObject& message_object) {
+        return message_object["content"].toString();
     }
 
-    static QString getMessageFrequency(const QJsonObject& messageObj) {
-        return messageObj["frequency"].toString();
+    static QString GetMessageFrequency(const QJsonObject& message_object) {
+        return message_object["frequency"].toString();
     }
 
-    static QString getMessageSenderId(const QJsonObject& messageObj) {
-        return messageObj["senderId"].toString();
+    static QString GetMessageSenderId(const QJsonObject& message_object) {
+        return message_object["senderId"].toString();
     }
 
-    static QString getMessageId(const QJsonObject& messageObj) {
-        return messageObj["messageId"].toString();
+    static QString GetMessageId(const QJsonObject& message_object) {
+        return message_object["messageId"].toString();
     }
 
-    static QJsonObject createAuthRequest(const QString& frequency, const QString& password, const QString& clientId);
+    static QJsonObject CreateAuthRequest(const QString& frequency, const QString& password, const QString& client_id);
 
 
-    static QJsonObject createRegisterRequest(const QString &frequency, bool isPasswordProtected,
-                                             const QString& password, const QString& hostId);
+    static QJsonObject CreateRegisterRequest(const QString &frequency, bool is_password_protected,
+                                             const QString& password, const QString& host_id);
 
-    static QJsonObject createLeaveRequest(const QString &frequency, bool isHost);
+    static QJsonObject CreateLeaveRequest(const QString &frequency, bool is_host);
 
-    void clearProcessedMessages() {
-        m_processedMessageIds.clear();
+    void ClearProcessedMessages() {
+        processed_message_ids_.clear();
     }
 
 private:
@@ -72,8 +72,8 @@ private:
     MessageHandler(const MessageHandler&) = delete;
     MessageHandler& operator=(const MessageHandler&) = delete;
 
-    QSet<QString> m_processedMessageIds;
-    static constexpr int MAX_CACHED_MESSAGE_IDS = 200;
+    QSet<QString> processed_message_ids_;
+    static constexpr int kMaxCachedMessageIds = 200;
 };
 
 #endif // MESSAGE_HANDLER_H
