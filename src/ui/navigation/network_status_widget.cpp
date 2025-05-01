@@ -11,7 +11,7 @@
 
 NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     : QWidget(parent)
-    , current_quality_(None)
+    , current_quality_(kNone)
     , ping_value_(0)
 {
     // Zmniejszona wysokość widgetu
@@ -141,16 +141,16 @@ void NetworkStatusWidget::CheckNetworkStatus() {
         timer.stop();
 
         if (response_time < 200) {
-            current_quality_ = Excellent;
+            current_quality_ = kExcellent;
         } else if (response_time < 500) {
-            current_quality_ = Good;
+            current_quality_ = kGood;
         } else if (response_time < 1000) {
-            current_quality_ = Fair;
+            current_quality_ = kFair;
         } else {
-            current_quality_ = Poor;
+            current_quality_ = kPoor;
         }
     } else {
-        current_quality_ = None;
+        current_quality_ = kNone;
         ping_value_ = 0;  // Ping 0 przy braku połączenia
     }
 
@@ -163,19 +163,19 @@ void NetworkStatusWidget::CheckNetworkStatus() {
 void NetworkStatusWidget::UpdateStatusDisplay() {
     // Aktualizacja etykiety statusu
     switch (current_quality_) {
-    case Excellent:
+    case kExcellent:
         status_label_->setText("SYSTEM READY");
         break;
-    case Good:
+    case kGood:
         status_label_->setText("SYSTEM ONLINE");
         break;
-    case Fair:
+    case kFair:
         status_label_->setText("CONNECTION FAIR");
         break;
-    case Poor:
+    case kPoor:
         status_label_->setText("CONNECTION UNSTABLE");
         break;
-    case None:
+    case kNone:
         status_label_->setText("OFFLINE");
         break;
     }
@@ -202,15 +202,15 @@ void NetworkStatusWidget::UpdateStatusDisplay() {
 
 QColor NetworkStatusWidget::GetQualityColor(const NetworkQuality quality) {
     switch (quality) {
-    case Excellent:
+    case kExcellent:
         return QColor(0, 255, 170); // Neonowy cyjan
-    case Good:
+    case kGood:
         return QColor(0, 195, 255); // Niebieski
-    case Fair:
+    case kFair:
         return QColor(255, 165, 0); // Pomarańczowy
-    case Poor:
+    case kPoor:
         return QColor(255, 50, 50); // Czerwony
-    case None:
+    case kNone:
         return QColor(100, 100, 100); // Szary
     }
     return QColor(100, 100, 100);
@@ -235,11 +235,11 @@ void NetworkStatusWidget::CreateNetworkIcon(const NetworkQuality quality) const 
     int active_arcs = 0;
 
     switch(quality) {
-        case Excellent: active_arcs = 4; break;
-        case Good:      active_arcs = 3; break;
-        case Fair:      active_arcs = 2; break;
-        case Poor:      active_arcs = 1; break;
-        case None:      active_arcs = 0; break;
+        case kExcellent: active_arcs = 4; break;
+        case kGood:      active_arcs = 3; break;
+        case kFair:      active_arcs = 2; break;
+        case kPoor:      active_arcs = 1; break;
+        case kNone:      active_arcs = 0; break;
     }
 
     // Rysuj punkt źródłowy - mniejszy punkt
@@ -256,7 +256,7 @@ void NetworkStatusWidget::CreateNetworkIcon(const NetworkQuality quality) const 
         if (i < active_arcs) {
             arc_pen = QPen(signal_color, 1.5);  // Cieńsza linia
             // Dodanie subtelnej poświaty dla aktywnych łuków
-            if (quality != None) {
+            if (quality != kNone) {
                 painter.setPen(QPen(QColor(signal_color.red(), signal_color.green(), signal_color.blue(), 80), 2));
                 painter.drawArc(QRectF(center.x() - arc_radius, center.y() - arc_radius,
                                       arc_radius * 2, arc_radius * 2),
