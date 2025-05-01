@@ -344,37 +344,37 @@ void SettingsView::setupClassifiedTab() {
     connect(m_fingerprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = HandprintIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_handprintLayer->initialize();
+        m_handprintLayer->Initialize();
     });
     connect(m_handprintLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SecurityCodeIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_securityCodeLayer->initialize();
+        m_securityCodeLayer->Initialize();
     });
     connect(m_securityCodeLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SecurityQuestionIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_securityQuestionLayer->initialize();
+        m_securityQuestionLayer->Initialize();
     });
     connect(m_securityQuestionLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = RetinaScanIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_retinaScanLayer->initialize();
+        m_retinaScanLayer->Initialize();
     });
     connect(m_retinaScanLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = VoiceRecognitionIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_voiceRecognitionLayer->initialize();
+        m_voiceRecognitionLayer->Initialize();
     });
     connect(m_voiceRecognitionLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = TypingTestIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_typingTestLayer->initialize();
+        m_typingTestLayer->Initialize();
     });
     connect(m_typingTestLayer, &SecurityLayer::layerCompleted, this, [this]() {
         m_currentLayerIndex = SnakeGameIndex;
         m_securityLayersStack->setCurrentIndex(m_currentLayerIndex);
-        m_snakeGameLayer->initialize();
+        m_snakeGameLayer->Initialize();
     });
     connect(m_snakeGameLayer, &SecurityLayer::layerCompleted, this, [this]() {
         int featuresIndex = m_securityLayersStack->indexOf(m_classifiedFeaturesWidget);
@@ -420,7 +420,7 @@ void SettingsView::setupNextSecurityLayer() {
          // Wywołaj initialize dla odpowiedniej warstwy
          QWidget* currentWidget = m_securityLayersStack->widget(m_currentLayerIndex);
          if (const auto currentLayer = qobject_cast<SecurityLayer*>(currentWidget)) {
-             currentLayer->initialize();
+             currentLayer->Initialize();
          } else {
              qWarning() << "Widget at index" << m_currentLayerIndex << "is not a SecurityLayer!";
          }
@@ -557,14 +557,14 @@ void SettingsView::resetSecurityLayers() {
 
     qDebug() << "Resetting security layers... Debug mode:" << m_debugModeEnabled;
 
-    m_fingerprintLayer->reset();
-    m_handprintLayer->reset();
-    m_securityCodeLayer->reset();
-    m_securityQuestionLayer->reset();
-    m_retinaScanLayer->reset();
-    m_voiceRecognitionLayer->reset();
-    m_typingTestLayer->reset();
-    m_snakeGameLayer->reset();
+    m_fingerprintLayer->Reset();
+    m_handprintLayer->Reset();
+    m_securityCodeLayer->Reset();
+    m_securityQuestionLayer->Reset();
+    m_retinaScanLayer->Reset();
+    m_voiceRecognitionLayer->Reset();
+    m_typingTestLayer->Reset();
+    m_snakeGameLayer->Reset();
 
     if (m_overrideButton) {
         m_overrideButton->setEnabled(true);
@@ -580,12 +580,12 @@ void SettingsView::resetSecurityLayers() {
             qWarning() << "Debug mode error: Could not find ClassifiedFeaturesWidget index!";
             m_securityLayersStack->setCurrentIndex(FingerprintIndex);
             m_currentLayerIndex = FingerprintIndex;
-            m_fingerprintLayer->initialize();
+            m_fingerprintLayer->Initialize();
         }
     } else {
         m_currentLayerIndex = FingerprintIndex;
         m_securityLayersStack->setCurrentIndex(FingerprintIndex);
-        m_fingerprintLayer->initialize();
+        m_fingerprintLayer->Initialize();
         qDebug() << "Normal mode: Starting security layers sequence.";
     }
     qDebug() << "Security layers reset complete. Current index:" << m_securityLayersStack->currentIndex();

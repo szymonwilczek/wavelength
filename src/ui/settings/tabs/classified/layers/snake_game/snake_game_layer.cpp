@@ -7,15 +7,15 @@
 
 SnakeGameLayer::SnakeGameLayer(QWidget *parent) 
     : SecurityLayer(parent),
-      m_gameTimer(nullptr),
-      m_borderAnimationTimer(nullptr),
-      m_direction(Direction::Right),
-      m_lastProcessedDirection(Direction::Right),
-      m_applesCollected(0),
-      m_gameOver(false),
-      m_gameState(GameState::Playing),
-      m_borderAnimationProgress(0),
-      m_snakePartsExited(0)
+      game_timer_(nullptr),
+      border_animation_timer_(nullptr),
+      direction_(Direction::Right),
+      last_processed_direction_(Direction::Right),
+      apples_collected_(0),
+      game_over_(false),
+      game_state_(GameState::Playing),
+      animation_progress_(0),
+      parts_exited_(0)
 {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -30,63 +30,63 @@ SnakeGameLayer::SnakeGameLayer(QWidget *parent)
     instructions->setAlignment(Qt::AlignCenter);
 
     // Plansza gry - usuwamy obramowanie z CSS
-    m_gameBoard = new QLabel(this);
-    m_gameBoard->setFixedSize(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
-    m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Bez bordera
-    m_gameBoard->setAlignment(Qt::AlignCenter);
-    m_gameBoard->installEventFilter(this);
+    game_board_ = new QLabel(this);
+    game_board_->setFixedSize(kGridSize * kCellSize, kGridSize * kCellSize);
+    game_board_->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Bez bordera
+    game_board_->setAlignment(Qt::AlignCenter);
+    game_board_->installEventFilter(this);
 
     // Etykieta wyniku
-    m_scoreLabel = new QLabel("Zebrane jabłka: 0/4", this);
-    m_scoreLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    m_scoreLabel->setAlignment(Qt::AlignCenter);
+    score_label_ = new QLabel("Zebrane jabłka: 0/4", this);
+    score_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    score_label_->setAlignment(Qt::AlignCenter);
 
     layout->addWidget(title);
     layout->addWidget(instructions);
-    layout->addWidget(m_gameBoard, 0, Qt::AlignCenter);
-    layout->addWidget(m_scoreLabel);
+    layout->addWidget(game_board_, 0, Qt::AlignCenter);
+    layout->addWidget(score_label_);
     layout->addStretch();
 
     // Inicjalizacja timera gry - zmniejszamy interwał dla większej płynności
-    m_gameTimer = new QTimer(this);
-    m_gameTimer->setInterval(150); // 150ms dla płynności
-    connect(m_gameTimer, &QTimer::timeout, this, &SnakeGameLayer::updateGame);
+    game_timer_ = new QTimer(this);
+    game_timer_->setInterval(150); // 150ms dla płynności
+    connect(game_timer_, &QTimer::timeout, this, &SnakeGameLayer::UpdateGame);
 
     // Timer animacji otwierania granicy
-    m_borderAnimationTimer = new QTimer(this);
-    m_borderAnimationTimer->setInterval(50); // 50ms dla płynnej animacji
-    connect(m_borderAnimationTimer, &QTimer::timeout, this, &SnakeGameLayer::updateBorderAnimation);
+    border_animation_timer_ = new QTimer(this);
+    border_animation_timer_->setInterval(50); // 50ms dla płynnej animacji
+    connect(border_animation_timer_, &QTimer::timeout, this, &SnakeGameLayer::UpdateBorderAnimation);
 
     // Ustawienie focusu
     setFocusPolicy(Qt::StrongFocus);
 
     // Losowanie strony wyjścia już na początku
-    int exitSideRandom = QRandomGenerator::global()->bounded(2);
-    m_exitSide = static_cast<BorderSide>(exitSideRandom);
+    int exit_side_random = QRandomGenerator::global()->bounded(2);
+    exit_side_ = static_cast<BorderSide>(exit_side_random);
 
     // Losowa pozycja Y dla wyjścia (unikamy narożników)
-    m_exitPosition = QRandomGenerator::global()->bounded(1, GRID_SIZE - 1);
+    exit_position_ = QRandomGenerator::global()->bounded(1, kGridSize - 1);
 }
 
 SnakeGameLayer::~SnakeGameLayer() {
-    if (m_gameTimer) {
-        m_gameTimer->stop();
-        delete m_gameTimer;
-        m_gameTimer = nullptr;
+    if (game_timer_) {
+        game_timer_->stop();
+        delete game_timer_;
+        game_timer_ = nullptr;
     }
 
-    if (m_borderAnimationTimer) {
-        m_borderAnimationTimer->stop();
-        delete m_borderAnimationTimer;
-        m_borderAnimationTimer = nullptr;
+    if (border_animation_timer_) {
+        border_animation_timer_->stop();
+        delete border_animation_timer_;
+        border_animation_timer_ = nullptr;
     }
 }
 
-void SnakeGameLayer::initialize() {
-    reset(); // Reset najpierw
-    initializeGame(); // Inicjalizuj logikę gry
+void SnakeGameLayer::Initialize() {
+    Reset(); // Reset najpierw
+    InitializeGame(); // Inicjalizuj logikę gry
     setFocus(); // Ustaw focus na warstwie
-    m_gameBoard->setFocus(); // Ustaw focus na planszy (ważne dla eventFilter)
+    game_board_->setFocus(); // Ustaw focus na planszy (ważne dla eventFilter)
 
     // Upewnij się, że widget jest widoczny przed startem
     if (graphicsEffect()) {
@@ -95,84 +95,84 @@ void SnakeGameLayer::initialize() {
 
     // Rozpocznij grę po krótkim opóźnieniu
     QTimer::singleShot(200, this, [this]() {
-        if (!m_gameOver) { // Sprawdź, czy gra nie została już zakończona (np. przez szybki reset)
-            m_gameTimer->start();
+        if (!game_over_) { // Sprawdź, czy gra nie została już zakończona (np. przez szybki reset)
+            game_timer_->start();
         }
     });
 }
 
-void SnakeGameLayer::reset() {
+void SnakeGameLayer::Reset() {
     // Zatrzymaj timery
-    if (m_gameTimer && m_gameTimer->isActive()) {
-        m_gameTimer->stop();
+    if (game_timer_ && game_timer_->isActive()) {
+        game_timer_->stop();
     }
-    if (m_borderAnimationTimer && m_borderAnimationTimer->isActive()) {
-        m_borderAnimationTimer->stop();
+    if (border_animation_timer_ && border_animation_timer_->isActive()) {
+        border_animation_timer_->stop();
     }
 
     // Resetuj stan gry
-    m_applesCollected = 0;
-    m_gameOver = false; // Kluczowe - resetuj stan game over
-    m_gameState = GameState::Playing;
-    m_borderAnimationProgress = 0;
-    m_snakePartsExited = 0;
-    m_exitPoints.clear();
-    m_snake.clear(); // Wyczyść węża
-    m_direction = Direction::Right; // Resetuj kierunek
-    m_lastProcessedDirection = Direction::Right;
+    apples_collected_ = 0;
+    game_over_ = false; // Kluczowe - resetuj stan game over
+    game_state_ = GameState::Playing;
+    animation_progress_ = 0;
+    parts_exited_ = 0;
+    exit_points_.clear();
+    snake_.clear(); // Wyczyść węża
+    direction_ = Direction::Right; // Resetuj kierunek
+    last_processed_direction_ = Direction::Right;
 
     // Ponowne losowanie strony wyjścia i pozycji
-    int exitSideRandom = QRandomGenerator::global()->bounded(2);
-    m_exitSide = static_cast<BorderSide>(exitSideRandom);
-    m_exitPosition = QRandomGenerator::global()->bounded(1, GRID_SIZE - 1);
+    int exit_side_random = QRandomGenerator::global()->bounded(2);
+    exit_side_ = static_cast<BorderSide>(exit_side_random);
+    exit_position_ = QRandomGenerator::global()->bounded(1, kGridSize - 1);
 
     // Resetuj UI
-    m_scoreLabel->setText("Zebrane jabłka: 0/4");
-    m_scoreLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;"); // Szary tekst wyniku
-    m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Domyślne tło planszy (bez bordera)
-    m_gameBoard->clear();
+    score_label_->setText("Zebrane jabłka: 0/4");
+    score_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;"); // Szary tekst wyniku
+    game_board_->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Domyślne tło planszy (bez bordera)
+    game_board_->clear();
 
     if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
-void SnakeGameLayer::initializeGame() {
+void SnakeGameLayer::InitializeGame() {
     // Wyczyszczenie planszy
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            m_grid[i][j] = CellType::Empty;
+    for (int i = 0; i < kGridSize; i++) {
+        for (int j = 0; j < kGridSize; j++) {
+            grid_[i][j] = CellType::Empty;
         }
     }
 
     // Inicjalizacja węża
-    m_snake.clear();
+    snake_.clear();
     // Zaczynamy od środka planszy
-    constexpr int startX = GRID_SIZE / 2;
-    constexpr int startY = GRID_SIZE / 2;
+    constexpr int start_x = kGridSize / 2;
+    constexpr int start_y = kGridSize / 2;
 
-    m_snake.append(QPair<int, int>(startX, startY));     // Głowa
-    m_snake.append(QPair<int, int>(startX-1, startY));   // Ciało
-    m_snake.append(QPair<int, int>(startX-2, startY));   // Ogon
+    snake_.append(QPair(start_x, start_y));     // Głowa
+    snake_.append(QPair(start_x-1, start_y));   // Ciało
+    snake_.append(QPair(start_x-2, start_y));   // Ogon
 
-    m_grid[startX][startY] = CellType::SnakeHead;
-    m_grid[startX-1][startY] = CellType::Snake;
-    m_grid[startX-2][startY] = CellType::Snake;
+    grid_[start_x][start_y] = CellType::SnakeHead;
+    grid_[start_x-1][start_y] = CellType::Snake;
+    grid_[start_x-2][start_y] = CellType::Snake;
 
     // Początkowo wąż porusza się w prawo
-    m_direction = Direction::Right;
-    m_lastProcessedDirection = Direction::Right;
+    direction_ = Direction::Right;
+    last_processed_direction_ = Direction::Right;
 
     // Generowanie jabłka
-    generateApple();
+    GenerateApple();
 
     // Renderowanie planszy
-    renderGame();
+    RenderGame();
 }
 
-void SnakeGameLayer::renderGame() const {
+void SnakeGameLayer::RenderGame() const {
     // Rysowanie planszy
-    QImage board(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE, QImage::Format_ARGB32);
+    QImage board(kGridSize * kCellSize, kGridSize * kCellSize, QImage::Format_ARGB32);
     board.fill(QColor(10, 25, 40, 220));
 
     QPainter painter(&board);
@@ -180,131 +180,131 @@ void SnakeGameLayer::renderGame() const {
 
     // Rysowanie siatki
     painter.setPen(QPen(QColor(50, 50, 50, 100), 1, Qt::SolidLine));
-    for (int i = 1; i < GRID_SIZE; i++) {
+    for (int i = 1; i < kGridSize; i++) {
         // Linie poziome
-        painter.drawLine(0, i * CELL_SIZE, GRID_SIZE * CELL_SIZE, i * CELL_SIZE);
+        painter.drawLine(0, i * kCellSize, kGridSize * kCellSize, i * kCellSize);
         // Linie pionowe
-        painter.drawLine(i * CELL_SIZE, 0, i * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+        painter.drawLine(i * kCellSize, 0, i * kCellSize, kGridSize * kCellSize);
     }
 
     // Rysowanie obramowania planszy
-    QPen borderPen(QColor(255, 51, 51), 2, Qt::SolidLine);
-    painter.setPen(borderPen);
+    QPen border_pen(QColor(255, 51, 51), 2, Qt::SolidLine);
+    painter.setPen(border_pen);
 
     // Rysowanie obramowania z uwzględnieniem otwartego wyjścia
     // Górna linia
-    painter.drawLine(0, 0, GRID_SIZE * CELL_SIZE, 0);
+    painter.drawLine(0, 0, kGridSize * kCellSize, 0);
 
     // Dolna linia
-    painter.drawLine(0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+    painter.drawLine(0, kGridSize * kCellSize, kGridSize * kCellSize, kGridSize * kCellSize);
 
     // Jeśli jesteśmy w trybie wyjścia, narysuj specjalne obramowanie z otworem
-    if (m_gameState == GameState::ExitOpen) {
+    if (game_state_ == GameState::ExitOpen) {
         // Rysujemy lewe i prawe obramowanie w zależności od tego, gdzie jest wyjście
 
-        if (m_exitSide == BorderSide::Left) {
+        if (exit_side_ == BorderSide::Left) {
             // Lewa strona ma otwór
             // Górna część lewego obramowania
-            painter.drawLine(0, 0, 0, m_exitPosition * CELL_SIZE);
+            painter.drawLine(0, 0, 0, exit_position_ * kCellSize);
             // Dolna część lewego obramowania
-            painter.drawLine(0, (m_exitPosition + 1) * CELL_SIZE, 0, GRID_SIZE * CELL_SIZE);
+            painter.drawLine(0, (exit_position_ + 1) * kCellSize, 0, kGridSize * kCellSize);
 
             // Otwarta część z animacją
-            QColor openColor(50, 255, 50); // Zielony kolor dla otwartego przejścia
-            painter.setPen(QPen(openColor, 2, Qt::DotLine));
+            QColor open_color(50, 255, 50); // Zielony kolor dla otwartego przejścia
+            painter.setPen(QPen(open_color, 2, Qt::DotLine));
 
             // Stopniowe otwieranie - w zależności od postępu animacji
-            int openPosition = std::min(m_borderAnimationProgress / 2, CELL_SIZE);
-            painter.drawLine(openPosition, m_exitPosition * CELL_SIZE, openPosition, (m_exitPosition + 1) * CELL_SIZE);
+            int open_position = std::min(animation_progress_ / 2, kCellSize);
+            painter.drawLine(open_position, exit_position_ * kCellSize, open_position, (exit_position_ + 1) * kCellSize);
 
             // Prawa strona pełna
-            painter.setPen(borderPen);
-            painter.drawLine(GRID_SIZE * CELL_SIZE, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+            painter.setPen(border_pen);
+            painter.drawLine(kGridSize * kCellSize, 0, kGridSize * kCellSize, kGridSize * kCellSize);
 
             // Narysuj strzałkę wskazującą wyjście
-            QColor arrowColor(50, 255, 50, 150 + (m_borderAnimationProgress % 2) * 50); // Pulsująca zielona strzałka
-            painter.setPen(QPen(arrowColor, 2));
-            painter.setBrush(QBrush(arrowColor));
+            QColor arrow_color(50, 255, 50, 150 + (animation_progress_ % 2) * 50); // Pulsująca zielona strzałka
+            painter.setPen(QPen(arrow_color, 2));
+            painter.setBrush(QBrush(arrow_color));
 
             QPolygonF arrow;
-            int arrowSize = 6;
-            arrow << QPointF(5, m_exitPosition * CELL_SIZE + CELL_SIZE/2)
-                  << QPointF(arrowSize * 1.5, m_exitPosition * CELL_SIZE + CELL_SIZE/2 - arrowSize)
-                  << QPointF(arrowSize * 1.5, m_exitPosition * CELL_SIZE + CELL_SIZE/2 + arrowSize);
+            int arrow_size = 6;
+            arrow << QPointF(5, exit_position_ * kCellSize + kCellSize/2)
+                  << QPointF(arrow_size * 1.5, exit_position_ * kCellSize + kCellSize/2 - arrow_size)
+                  << QPointF(arrow_size * 1.5, exit_position_ * kCellSize + kCellSize/2 + arrow_size);
 
             painter.drawPolygon(arrow);
         }
         else { // m_exitSide == BorderSide::Right
             // Prawa strona ma otwór
             // Górna część prawego obramowania
-            painter.drawLine(GRID_SIZE * CELL_SIZE, 0, GRID_SIZE * CELL_SIZE, m_exitPosition * CELL_SIZE);
+            painter.drawLine(kGridSize * kCellSize, 0, kGridSize * kCellSize, exit_position_ * kCellSize);
             // Dolna część prawego obramowania
-            painter.drawLine(GRID_SIZE * CELL_SIZE, (m_exitPosition + 1) * CELL_SIZE, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
+            painter.drawLine(kGridSize * kCellSize, (exit_position_ + 1) * kCellSize, kGridSize * kCellSize, kGridSize * kCellSize);
 
             // Otwarta część z animacją
-            QColor openColor(50, 255, 50); // Zielony kolor dla otwartego przejścia
-            painter.setPen(QPen(openColor, 2, Qt::DotLine));
+            QColor open_color(50, 255, 50); // Zielony kolor dla otwartego przejścia
+            painter.setPen(QPen(open_color, 2, Qt::DotLine));
 
             // Stopniowe otwieranie - w zależności od postępu animacji
-            int openPosition = GRID_SIZE * CELL_SIZE - std::min(m_borderAnimationProgress / 2, CELL_SIZE);
-            painter.drawLine(openPosition, m_exitPosition * CELL_SIZE, openPosition, (m_exitPosition + 1) * CELL_SIZE);
+            int open_position = kGridSize * kCellSize - std::min(animation_progress_ / 2, kCellSize);
+            painter.drawLine(open_position, exit_position_ * kCellSize, open_position, (exit_position_ + 1) * kCellSize);
 
             // Lewa strona pełna
-            painter.setPen(borderPen);
-            painter.drawLine(0, 0, 0, GRID_SIZE * CELL_SIZE);
+            painter.setPen(border_pen);
+            painter.drawLine(0, 0, 0, kGridSize * kCellSize);
 
             // Narysuj strzałkę wskazującą wyjście
-            QColor arrowColor(50, 255, 50, 150 + (m_borderAnimationProgress % 2) * 50); // Pulsująca zielona strzałka
-            painter.setPen(QPen(arrowColor, 2));
-            painter.setBrush(QBrush(arrowColor));
+            QColor arrow_color(50, 255, 50, 150 + (animation_progress_ % 2) * 50); // Pulsująca zielona strzałka
+            painter.setPen(QPen(arrow_color, 2));
+            painter.setBrush(QBrush(arrow_color));
 
             QPolygonF arrow;
-            int arrowSize = 6;
-            arrow << QPointF(GRID_SIZE * CELL_SIZE - 5, m_exitPosition * CELL_SIZE + CELL_SIZE/2)
-                  << QPointF(GRID_SIZE * CELL_SIZE - arrowSize * 1.5, m_exitPosition * CELL_SIZE + CELL_SIZE/2 - arrowSize)
-                  << QPointF(GRID_SIZE * CELL_SIZE - arrowSize * 1.5, m_exitPosition * CELL_SIZE + CELL_SIZE/2 + arrowSize);
+            int arrow_size = 6;
+            arrow << QPointF(kGridSize * kCellSize - 5, exit_position_ * kCellSize + kCellSize/2)
+                  << QPointF(kGridSize * kCellSize - arrow_size * 1.5, exit_position_ * kCellSize + kCellSize/2 - arrow_size)
+                  << QPointF(kGridSize * kCellSize - arrow_size * 1.5, exit_position_ * kCellSize + kCellSize/2 + arrow_size);
 
             painter.drawPolygon(arrow);
         }
     } else {
         // Standardowe obramowanie bez wyjścia
-        painter.drawLine(0, 0, 0, GRID_SIZE * CELL_SIZE);  // Lewa
-        painter.drawLine(GRID_SIZE * CELL_SIZE, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);  // Prawa
+        painter.drawLine(0, 0, 0, kGridSize * kCellSize);  // Lewa
+        painter.drawLine(kGridSize * kCellSize, 0, kGridSize * kCellSize, kGridSize * kCellSize);  // Prawa
     }
 
     // Rysowanie elementów gry
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            QRect cellRect(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-            QRect stemRect(cellRect.center().x() - 1, cellRect.top() + 2, 2, 4);
-            cellRect.adjust(2, 2, -2, -2); // Margines
+    for (int i = 0; i < kGridSize; i++) {
+        for (int j = 0; j < kGridSize; j++) {
+            QRect cell_rect(i * kCellSize, j * kCellSize, kCellSize, kCellSize);
+            QRect stem_rect(cell_rect.center().x() - 1, cell_rect.top() + 2, 2, 4);
+            cell_rect.adjust(2, 2, -2, -2); // Margines
 
             // Tylko komórki w granicach planszy
-            if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
-                switch (m_grid[i][j]) {
+            if (i >= 0 && j >= 0) {
+                switch (grid_[i][j]) {
                     case CellType::SnakeHead:
                         // Głowa węża - jaśniejszy zielony
                             painter.setPen(Qt::NoPen);
                     painter.setBrush(QColor(50, 240, 50));
-                    painter.drawRoundedRect(cellRect, 5, 5);
+                    painter.drawRoundedRect(cell_rect, 5, 5);
                     break;
 
                     case CellType::Snake:
                         // Ciało węża - zielony
                             painter.setPen(Qt::NoPen);
                     painter.setBrush(QColor(30, 200, 30));
-                    painter.drawRoundedRect(cellRect, 5, 5);
+                    painter.drawRoundedRect(cell_rect, 5, 5);
                     break;
 
                     case CellType::Apple:
                         // Jabłko - czerwone
                             painter.setPen(Qt::NoPen);
                     painter.setBrush(QColor(220, 40, 40));
-                    painter.drawEllipse(cellRect);
+                    painter.drawEllipse(cell_rect);
 
                     // Szypułka jabłka
                     painter.setBrush(QColor(100, 70, 20));
-                    painter.drawRect(stemRect);
+                    painter.drawRect(stem_rect);
                     break;
 
                     default:
@@ -316,257 +316,257 @@ void SnakeGameLayer::renderGame() const {
 
     painter.end();
 
-    m_gameBoard->setPixmap(QPixmap::fromImage(board));
+    game_board_->setPixmap(QPixmap::fromImage(board));
 }
 
-void SnakeGameLayer::moveSnake() {
-    if (m_gameOver) {
+void SnakeGameLayer::MoveSnake() {
+    if (game_over_) {
         return;
     }
 
     // Zapamiętanie ostatniego przetwarzanego kierunku
-    m_lastProcessedDirection = m_direction;
+    last_processed_direction_ = direction_;
 
     // Pobranie pozycji głowy węża
-    const int headX = m_snake.first().first;
-    const int headY = m_snake.first().second;
+    const int head_x = snake_.first().first;
+    const int head_y = snake_.first().second;
 
     // Obliczenie nowej pozycji głowy
-    int newHeadX = headX;
-    int newHeadY = headY;
+    int new_head_x = head_x;
+    int new_head_y = head_y;
 
-    switch (m_direction) {
+    switch (direction_) {
         case Direction::Up:
-            newHeadY--;
+            new_head_y--;
             break;
         case Direction::Right:
-            newHeadX++;
+            new_head_x++;
             break;
         case Direction::Down:
-            newHeadY++;
+            new_head_y++;
             break;
         case Direction::Left:
-            newHeadX--;
+            new_head_x--;
             break;
     }
 
     // W trybie wyjścia sprawdzamy, czy wąż wychodzi przez otwarte wyjście
-    if (m_gameState == GameState::ExitOpen && isExitPoint(newHeadX, newHeadY)) {
+    if (game_state_ == GameState::ExitOpen && IsExitPoint(new_head_x, new_head_y)) {
         // Rejestrujemy, że segment węża opuścił planszę
-        m_snakePartsExited++;
+        parts_exited_++;
 
         // Sprawdzamy, czy cały wąż opuścił planszę
-        if (m_snakePartsExited >= m_snake.size()) {
+        if (parts_exited_ >= snake_.size()) {
             // Zamiast finishGame(true), najpierw zabezpieczamy stan gry
-            m_gameOver = true;
+            game_over_ = true;
             QTimer::singleShot(10, this, [this]() {
-                finishGame(true);
+                FinishGame(true);
             });
             return;
         }
 
         // Bezpieczne usunięcie typu komórki dla starej głowy (tylko jeśli jest w granicach planszy)
-        if (headX >= 0 && headX < GRID_SIZE && headY >= 0 && headY < GRID_SIZE) {
-            m_grid[headX][headY] = CellType::Snake;
+        if (head_x >= 0 && head_x < kGridSize && head_y >= 0 && head_y < kGridSize) {
+            grid_[head_x][head_y] = CellType::Snake;
         }
 
         // W przypadku wychodzenia poza planszę, usuwamy ostatni segment bez względu na jabłko
-        const QPair<int, int> tail = m_snake.last();
+        const QPair<int, int> tail = snake_.last();
         // Bezpieczne usunięcie ostatniego segmentu (tylko jeśli jest w granicach planszy)
-        if (tail.first >= 0 && tail.first < GRID_SIZE && tail.second >= 0 && tail.second < GRID_SIZE) {
-            m_grid[tail.first][tail.second] = CellType::Empty;
+        if (tail.first >= 0 && tail.first < kGridSize && tail.second >= 0 && tail.second < kGridSize) {
+            grid_[tail.first][tail.second] = CellType::Empty;
         }
-        m_snake.removeLast();
+        snake_.removeLast();
 
         // Dodajemy nową głowę poza planszą
-        m_snake.prepend(QPair<int, int>(newHeadX, newHeadY));
+        snake_.prepend(QPair(new_head_x, new_head_y));
 
         // Aktualizacja widoku
-        renderGame();
+        RenderGame();
         return;
     }
 
     // Sprawdzenie kolizji w normalnej grze
-    if (isCollision(newHeadX, newHeadY)) {
+    if (IsCollision(new_head_x, new_head_y)) {
         // W trybie wyjścia, jeśli jest to kolizja ze ścianą, sprawdzamy czy to punkt wyjścia
-        if (m_gameState == GameState::ExitOpen &&
-           ((newHeadX < 0 && m_exitSide == BorderSide::Left) ||
-            (newHeadX >= GRID_SIZE && m_exitSide == BorderSide::Right))) {
+        if (game_state_ == GameState::ExitOpen &&
+           ((new_head_x < 0 && exit_side_ == BorderSide::Left) ||
+            (new_head_x >= kGridSize && exit_side_ == BorderSide::Right))) {
 
             // Sprawdzamy, czy kolizja jest na wysokości wyjścia
-            if (newHeadY == m_exitPosition) {
+            if (new_head_y == exit_position_) {
                 // To jest punkt wyjścia - dodajemy segment i kontynuujemy
-                m_snake.prepend(QPair<int, int>(newHeadX, newHeadY));
-                m_snakePartsExited++;
+                snake_.prepend(QPair(new_head_x, new_head_y));
+                parts_exited_++;
 
                 // Usunięcie ogona
-                const QPair<int, int> tail = m_snake.last();
-                m_grid[tail.first][tail.second] = CellType::Empty;
-                m_snake.removeLast();
+                const QPair<int, int> tail = snake_.last();
+                grid_[tail.first][tail.second] = CellType::Empty;
+                snake_.removeLast();
 
                 // Sprawdzamy, czy połowa węża opuściła planszę
-                if (m_snakePartsExited >= m_snake.size()) {
-                    finishGame(true);
+                if (parts_exited_ >= snake_.size()) {
+                    FinishGame(true);
                 }
                 return;
             }
         }
 
         // Standardowa kolizja
-        m_gameOver = true;
-        finishGame(false);
+        game_over_ = true;
+        FinishGame(false);
         return;
     }
 
     // Sprawdzenie, czy wąż zebrał jabłko
-    const bool appleCollected = (newHeadX == m_apple.first && newHeadY == m_apple.second);
+    const bool apple_collected = (new_head_x == apple_.first && new_head_y == apple_.second);
 
     // Aktualizacja pozycji węża
     // Usunięcie typu komórki dla starej głowy
-    m_grid[headX][headY] = CellType::Snake;
+    grid_[head_x][head_y] = CellType::Snake;
 
     // Dodanie nowej głowy
-    m_snake.prepend(QPair<int, int>(newHeadX, newHeadY));
+    snake_.prepend(QPair(new_head_x, new_head_y));
 
     // Jeśli nowa głowa jest w granicach planszy, aktualizujemy grid
-    if (newHeadX >= 0 && newHeadX < GRID_SIZE && newHeadY >= 0 && newHeadY < GRID_SIZE) {
-        m_grid[newHeadX][newHeadY] = CellType::SnakeHead;
+    if (new_head_x >= 0 && new_head_x < kGridSize && new_head_y >= 0 && new_head_y < kGridSize) {
+        grid_[new_head_x][new_head_y] = CellType::SnakeHead;
     }
 
     // Jeśli nie zebrano jabłka, usunięcie ostatniego segmentu
-    if (!appleCollected) {
-        const QPair<int, int> tail = m_snake.last();
-        m_snake.removeLast();
+    if (!apple_collected) {
+        const QPair<int, int> tail = snake_.last();
+        snake_.removeLast();
 
         // Jeśli ogon jest w granicach planszy, aktualizujemy grid
-        if (tail.first >= 0 && tail.first < GRID_SIZE && tail.second >= 0 && tail.second < GRID_SIZE) {
-            m_grid[tail.first][tail.second] = CellType::Empty;
+        if (tail.first >= 0 && tail.first < kGridSize && tail.second >= 0 && tail.second < kGridSize) {
+            grid_[tail.first][tail.second] = CellType::Empty;
         }
     } else {
         // Jeśli zebrano jabłko
-        m_applesCollected++;
-        m_scoreLabel->setText(QString("Zebrane jabłka: %1/4").arg(m_applesCollected));
+        apples_collected_++;
+        score_label_->setText(QString("Zebrane jabłka: %1/4").arg(apples_collected_));
 
         // Generowanie nowego jabłka (jeśli nie zebrano jeszcze 4)
-        if (m_applesCollected < 4) {
-            generateApple();
+        if (apples_collected_ < 4) {
+            GenerateApple();
         } else {
             // Po zebraniu 4 jabłka - otwórz wyjście
-            openBorder();
+            OpenBorder();
         }
     }
 
     // Aktualizacja widoku
-    renderGame();
+    RenderGame();
 }
 
-void SnakeGameLayer::generateApple() {
+void SnakeGameLayer::GenerateApple() {
     // Znajdowanie wolnych komórek
-    QVector<QPair<int, int>> emptyCells;
+    QVector<QPair<int, int>> empty_cells;
 
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            if (m_grid[i][j] == CellType::Empty) {
-                emptyCells.append(QPair<int, int>(i, j));
+    for (int i = 0; i < kGridSize; i++) {
+        for (int j = 0; j < kGridSize; j++) {
+            if (grid_[i][j] == CellType::Empty) {
+                empty_cells.append(QPair(i, j));
             }
         }
     }
 
-    if (emptyCells.isEmpty()) {
+    if (empty_cells.isEmpty()) {
         return; // Brak wolnych komórek
     }
 
     // Wybór losowej pustej komórki
-    const int randomIndex = QRandomGenerator::global()->bounded(emptyCells.size());
-    m_apple = emptyCells.at(randomIndex);
+    const int random_index = QRandomGenerator::global()->bounded(empty_cells.size());
+    apple_ = empty_cells.at(random_index);
 
     // Ustawienie jabłka na planszy
-    m_grid[m_apple.first][m_apple.second] = CellType::Apple;
+    grid_[apple_.first][apple_.second] = CellType::Apple;
 }
 
-bool SnakeGameLayer::isCollision(const int x, const int y) const {
+bool SnakeGameLayer::IsCollision(const int x, const int y) const {
     // Kolizja ze ścianą - w trybie wyjścia sprawdzamy czy to punkt wyjścia
-    if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
-        if (m_gameState == GameState::ExitOpen) {
+    if (x < 0 || x >= kGridSize || y < 0 || y >= kGridSize) {
+        if (game_state_ == GameState::ExitOpen) {
             // Jeśli to wyjście po lewej i x < 0 lub wyjście po prawej i x >= GRID_SIZE
-            if ((x < 0 && m_exitSide == BorderSide::Left) ||
-                (x >= GRID_SIZE && m_exitSide == BorderSide::Right)) {
+            if ((x < 0 && exit_side_ == BorderSide::Left) ||
+                (x >= kGridSize && exit_side_ == BorderSide::Right)) {
                 // Sprawdzamy, czy y jest na wysokości wyjścia
-                return y != m_exitPosition;
+                return y != exit_position_;
             }
         }
         return true; // Kolizja ze ścianą w innych przypadkach
     }
 
     // Kolizja z wężem
-    return m_grid[x][y] == CellType::Snake || m_grid[x][y] == CellType::SnakeHead;
+    return grid_[x][y] == CellType::Snake || grid_[x][y] == CellType::SnakeHead;
 }
 
-void SnakeGameLayer::handleInput(const int key) {
-    Direction newDirection = m_direction;
+void SnakeGameLayer::HandleInput(const int key) {
+    Direction new_direction = direction_;
 
     switch (key) {
         case Qt::Key_Up:
-            newDirection = Direction::Up;
+            new_direction = Direction::Up;
             break;
         case Qt::Key_Right:
-            newDirection = Direction::Right;
+            new_direction = Direction::Right;
             break;
         case Qt::Key_Down:
-            newDirection = Direction::Down;
+            new_direction = Direction::Down;
             break;
         case Qt::Key_Left:
-            newDirection = Direction::Left;
+            new_direction = Direction::Left;
             break;
         default:
             return; // Ignorowanie innych klawiszy
     }
 
     // Zapobieganie zawracaniu o 180 stopni
-    if ((newDirection == Direction::Up && m_lastProcessedDirection == Direction::Down) ||
-        (newDirection == Direction::Down && m_lastProcessedDirection == Direction::Up) ||
-        (newDirection == Direction::Left && m_lastProcessedDirection == Direction::Right) ||
-        (newDirection == Direction::Right && m_lastProcessedDirection == Direction::Left)) {
+    if ((new_direction == Direction::Up && last_processed_direction_ == Direction::Down) ||
+        (new_direction == Direction::Down && last_processed_direction_ == Direction::Up) ||
+        (new_direction == Direction::Left && last_processed_direction_ == Direction::Right) ||
+        (new_direction == Direction::Right && last_processed_direction_ == Direction::Left)) {
         return;
     }
 
-    m_direction = newDirection;
+    direction_ = new_direction;
 }
 
 void SnakeGameLayer::keyPressEvent(QKeyEvent* event) {
-    handleInput(event->key());
+    HandleInput(event->key());
     event->accept();
 }
 
 bool SnakeGameLayer::eventFilter(QObject* watched, QEvent* event) {
-    if (watched == m_gameBoard && event->type() == QEvent::KeyPress) {
-        const auto keyEvent = static_cast<QKeyEvent*>(event);
-        handleInput(keyEvent->key());
+    if (watched == game_board_ && event->type() == QEvent::KeyPress) {
+        const auto key_event = static_cast<QKeyEvent*>(event);
+        HandleInput(key_event->key());
         return true;
     }
     return SecurityLayer::eventFilter(watched, event);
 }
 
-void SnakeGameLayer::updateGame() {
-    if (!m_gameOver) {
-        moveSnake();
+void SnakeGameLayer::UpdateGame() {
+    if (!game_over_) {
+        MoveSnake();
     }
 }
 
-void SnakeGameLayer::finishGame(const bool success) {
-    m_gameTimer->stop();
-    m_borderAnimationTimer->stop();
+void SnakeGameLayer::FinishGame(const bool success) {
+    game_timer_->stop();
+    border_animation_timer_->stop();
 
     if (success) {
         // Ustawienie stanu gry na zakończony sukcesem
-        m_gameState = GameState::Completed;
+        game_state_ = GameState::Completed;
 
         // Zakończenie powodzeniem - zielone obramowanie
-        m_gameBoard->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33;");
+        game_board_->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33;");
 
         // Aktualizacja etykiety wyniku
-        m_scoreLabel->setText("Wąż opuścił planszę! Poziom zaliczony.");
-        m_scoreLabel->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
+        score_label_->setText("Wąż opuścił planszę! Poziom zaliczony.");
+        score_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
 
         // Krótkie opóźnienie przed zakończeniem warstwy
         QTimer::singleShot(1000, this, [this]() {
@@ -587,73 +587,73 @@ void SnakeGameLayer::finishGame(const bool success) {
         });
     } else {
         // Ustawienie stanu gry na zakończony niepowodzeniem
-        m_gameState = GameState::Failed;
+        game_state_ = GameState::Failed;
 
         // Niepowodzenie - czerwone tło i restart gry
-        m_gameBoard->setStyleSheet("background-color: rgba(40, 10, 10, 220);");
+        game_board_->setStyleSheet("background-color: rgba(40, 10, 10, 220);");
 
         // Krótkie opóźnienie przed restartem
         QTimer::singleShot(500, this, [this]() {
-            reset();
-            initializeGame();
-            m_gameTimer->start();
+            Reset();
+            InitializeGame();
+            game_timer_->start();
         });
     }
 }
 
-void SnakeGameLayer::openBorder() {
+void SnakeGameLayer::OpenBorder() {
     // Zmiana stanu gry
-    m_gameState = GameState::ExitOpen;
+    game_state_ = GameState::ExitOpen;
 
     // Czyszczenie poprzednich punktów wyjścia
-    m_exitPoints.clear();
+    exit_points_.clear();
 
     // Określenie punktu wyjścia w zależności od wybranej strony
-    if (m_exitSide == BorderSide::Left) {
+    if (exit_side_ == BorderSide::Left) {
         // Lewe wyjście
-        m_exitPoints.append(QPair<int, int>(-1, m_exitPosition));
+        exit_points_.append(QPair<int, int>(-1, exit_position_));
     } else {
         // Prawe wyjście
-        m_exitPoints.append(QPair<int, int>(GRID_SIZE, m_exitPosition));
+        exit_points_.append(QPair<int, int>(kGridSize, exit_position_));
     }
 
     // Aktualizacja etykiety wyniku
-    m_scoreLabel->setText("Wyjście otwarte! Wyprowadź węża z planszy.");
-    m_scoreLabel->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
+    score_label_->setText("Wyjście otwarte! Wyprowadź węża z planszy.");
+    score_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
 
     // Inicjalizacja licznika animacji
-    m_borderAnimationProgress = 0;
+    animation_progress_ = 0;
 
     // Start timera animacji
-    m_borderAnimationTimer->start();
+    border_animation_timer_->start();
 
     // Renderowanie planszy z otwartym wyjściem
-    renderGame();
+    RenderGame();
 }
 
-void SnakeGameLayer::updateBorderAnimation() {
+void SnakeGameLayer::UpdateBorderAnimation() {
     // Inkrementacja licznika animacji
-    m_borderAnimationProgress++;
+    animation_progress_++;
 
     // Odświeżenie planszy co określoną liczbę kroków
-    if (m_borderAnimationProgress % 3 == 0) {
-        renderGame();
+    if (animation_progress_ % 3 == 0) {
+        RenderGame();
     }
 }
 
-bool SnakeGameLayer::isExitPoint(const int x, const int y) const {
+bool SnakeGameLayer::IsExitPoint(const int x, const int y) const {
     // Sprawdzenie, czy punkt (x, y) jest punktem wyjścia
-    if (m_exitSide == BorderSide::Left && x < 0 && y == m_exitPosition) {
+    if (exit_side_ == BorderSide::Left && x < 0 && y == exit_position_) {
         return true;
     }
 
-    if (m_exitSide == BorderSide::Right && x >= GRID_SIZE && y == m_exitPosition) {
+    if (exit_side_ == BorderSide::Right && x >= kGridSize && y == exit_position_) {
         return true;
     }
 
     return false;
 }
 
-void SnakeGameLayer::checkForExitProgress() {
+void SnakeGameLayer::CheckForExitProgress() {
     // Ten kod jest teraz obsługiwany w moveSnake()
 }

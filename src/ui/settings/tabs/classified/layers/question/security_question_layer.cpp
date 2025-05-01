@@ -4,7 +4,7 @@
 #include <QPropertyAnimation>
 
 SecurityQuestionLayer::SecurityQuestionLayer(QWidget *parent) 
-    : SecurityLayer(parent), m_securityQuestionTimer(nullptr)
+    : SecurityLayer(parent), security_question_timer_(nullptr)
 {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -17,15 +17,15 @@ SecurityQuestionLayer::SecurityQuestionLayer(QWidget *parent)
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
-    m_securityQuestionLabel = new QLabel("", this);
-    m_securityQuestionLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    m_securityQuestionLabel->setAlignment(Qt::AlignCenter);
-    m_securityQuestionLabel->setWordWrap(true);
-    m_securityQuestionLabel->setFixedWidth(400);
+    security_question_label_ = new QLabel("", this);
+    security_question_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    security_question_label_->setAlignment(Qt::AlignCenter);
+    security_question_label_->setWordWrap(true);
+    security_question_label_->setFixedWidth(400);
 
-    m_securityQuestionInput = new QLineEdit(this);
-    m_securityQuestionInput->setFixedWidth(300);
-    m_securityQuestionInput->setStyleSheet(
+    security_question_input_ = new QLineEdit(this);
+    security_question_input_->setFixedWidth(300);
+    security_question_input_->setStyleSheet(
         "QLineEdit {"
         "  color: #ff3333;"
         "  background-color: rgba(10, 25, 40, 220);"
@@ -41,47 +41,47 @@ SecurityQuestionLayer::SecurityQuestionLayer(QWidget *parent)
     layout->addSpacing(20);
     layout->addWidget(instructions);
     layout->addSpacing(10);
-    layout->addWidget(m_securityQuestionLabel);
+    layout->addWidget(security_question_label_);
     layout->addSpacing(20);
-    layout->addWidget(m_securityQuestionInput, 0, Qt::AlignCenter);
+    layout->addWidget(security_question_input_, 0, Qt::AlignCenter);
     layout->addStretch();
 
-    m_securityQuestionTimer = new QTimer(this);
-    m_securityQuestionTimer->setSingleShot(true);
-    m_securityQuestionTimer->setInterval(10000);
-    connect(m_securityQuestionTimer, &QTimer::timeout, this, &SecurityQuestionLayer::securityQuestionTimeout);
+    security_question_timer_ = new QTimer(this);
+    security_question_timer_->setSingleShot(true);
+    security_question_timer_->setInterval(10000);
+    connect(security_question_timer_, &QTimer::timeout, this, &SecurityQuestionLayer::SecurityQuestionTimeout);
 
-    connect(m_securityQuestionInput, &QLineEdit::returnPressed, this, &SecurityQuestionLayer::checkSecurityAnswer);
+    connect(security_question_input_, &QLineEdit::returnPressed, this, &SecurityQuestionLayer::CheckSecurityAnswer);
 }
 
 SecurityQuestionLayer::~SecurityQuestionLayer() {
-    if (m_securityQuestionTimer) {
-        m_securityQuestionTimer->stop();
-        delete m_securityQuestionTimer;
-        m_securityQuestionTimer = nullptr;
+    if (security_question_timer_) {
+        security_question_timer_->stop();
+        delete security_question_timer_;
+        security_question_timer_ = nullptr;
     }
 }
 
-void SecurityQuestionLayer::initialize() {
-    reset();
+void SecurityQuestionLayer::Initialize() {
+    Reset();
 
-    m_securityQuestionLabel->setText("What is your top secret security question?");
-    m_securityQuestionInput->setFocus();
-    m_securityQuestionTimer->start();
+    security_question_label_->setText("What is your top secret security question?");
+    security_question_input_->setFocus();
+    security_question_timer_->start();
 
     if (graphicsEffect()) {
         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
     }
 }
 
-void SecurityQuestionLayer::reset() {
-    if (m_securityQuestionTimer && m_securityQuestionTimer->isActive()) {
-        m_securityQuestionTimer->stop();
+void SecurityQuestionLayer::Reset() {
+    if (security_question_timer_ && security_question_timer_->isActive()) {
+        security_question_timer_->stop();
     }
-    m_securityQuestionInput->clear();
-    m_securityQuestionLabel->setText("");
+    security_question_input_->clear();
+    security_question_label_->setText("");
 
-    m_securityQuestionInput->setStyleSheet(
+    security_question_input_->setStyleSheet(
         "QLineEdit {"
         "  color: #ff3333;" // Czerwony tekst
         "  background-color: rgba(10, 25, 40, 220);"
@@ -92,20 +92,20 @@ void SecurityQuestionLayer::reset() {
         "  font-size: 11pt;"
         "}"
     );
-    m_securityQuestionLabel->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
-    m_securityQuestionInput->setReadOnly(false);
+    security_question_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
+    security_question_input_->setReadOnly(false);
 
     if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
-void SecurityQuestionLayer::checkSecurityAnswer() {
+void SecurityQuestionLayer::CheckSecurityAnswer() {
     // W tej implementacji każda odpowiedź jest prawidłowa - to część żartu
     // W prawdziwym systemie bezpieczeństwa byłoby to inaczej zaimplementowane
     
     // Zmiana kolorów na zielony po pomyślnym przejściu
-    m_securityQuestionInput->setStyleSheet(
+    security_question_input_->setStyleSheet(
         "QLineEdit {"
         "  color: #33ff33;"
         "  background-color: rgba(10, 25, 40, 220);"
@@ -117,8 +117,8 @@ void SecurityQuestionLayer::checkSecurityAnswer() {
         "}"
     );
 
-    m_securityQuestionLabel->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
-    m_securityQuestionLabel->setText("✓ AUTHENTICATION VERIFIED");
+    security_question_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
+    security_question_label_->setText("✓ AUTHENTICATION VERIFIED");
 
     // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
     QTimer::singleShot(800, this, [this]() {
@@ -140,7 +140,7 @@ void SecurityQuestionLayer::checkSecurityAnswer() {
     });
 }
 
-void SecurityQuestionLayer::securityQuestionTimeout() const {
+void SecurityQuestionLayer::SecurityQuestionTimeout() const {
     // Po 10 sekundach pokazujemy podpowiedź
-    m_securityQuestionLabel->setText("If this was really you, you would know the answer.\nYou don't need a question.");
+    security_question_label_->setText("If this was really you, you would know the answer.\nYou don't need a question.");
 }

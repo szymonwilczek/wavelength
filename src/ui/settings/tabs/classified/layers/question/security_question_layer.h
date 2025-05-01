@@ -13,17 +13,17 @@ public:
     explicit SecurityQuestionLayer(QWidget *parent = nullptr);
     ~SecurityQuestionLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void checkSecurityAnswer();
-    void securityQuestionTimeout() const;
+        void CheckSecurityAnswer();
+        void SecurityQuestionTimeout() const;
 
 private:
-    QLabel* m_securityQuestionLabel;
-    QLineEdit* m_securityQuestionInput;
-    QTimer* m_securityQuestionTimer;
+    QLabel* security_question_label_;
+    QLineEdit* security_question_input_;
+    QTimer* security_question_timer_;
 };
 
 #endif // SECURITY_QUESTION_LAYER_H

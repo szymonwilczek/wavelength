@@ -15,18 +15,18 @@ public:
     explicit SnakeGameLayer(QWidget *parent = nullptr);
     ~SnakeGameLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-    void updateGame();
-    void finishGame(bool success);
-    void openBorder();
-    void updateBorderAnimation();
+    void UpdateGame();
+    void FinishGame(bool success);
+    void OpenBorder();
+    void UpdateBorderAnimation();
 
 private:
     enum class Direction {
@@ -56,40 +56,40 @@ private:
         Right
     };
 
-    void initializeGame();
-    void renderGame() const;
-    void moveSnake();
-    void generateApple();
-    bool isCollision(int x, int y) const;
-    void handleInput(int key);
-    bool isExitPoint(int x, int y) const;
+    void InitializeGame();
+    void RenderGame() const;
+    void MoveSnake();
+    void GenerateApple();
+    bool IsCollision(int x, int y) const;
+    void HandleInput(int key);
+    bool IsExitPoint(int x, int y) const;
 
-    static void checkForExitProgress();
+    static void CheckForExitProgress();
 
-    QLabel* m_gameBoard;
-    QLabel* m_scoreLabel;
-    QTimer* m_gameTimer;
-    QTimer* m_borderAnimationTimer;
+    QLabel* game_board_;
+    QLabel* score_label_;
+    QTimer* game_timer_;
+    QTimer* border_animation_timer_;
 
-    static constexpr int GRID_SIZE = 12; // Zwiększony rozmiar siatki
-    static constexpr int CELL_SIZE = 20; // Zmniejszony rozmiar komórki, by całość zmieściła się na ekranie
+    static constexpr int kGridSize = 12; // Zwiększony rozmiar siatki
+    static constexpr int kCellSize = 20; // Zmniejszony rozmiar komórki, by całość zmieściła się na ekranie
 
-    CellType m_grid[GRID_SIZE][GRID_SIZE];
-    QVector<QPair<int, int>> m_snake;
-    QPair<int, int> m_apple;
-    Direction m_direction;
-    Direction m_lastProcessedDirection;
-    int m_applesCollected;
-    bool m_gameOver;
+    CellType grid_[kGridSize][kGridSize];
+    QVector<QPair<int, int>> snake_;
+    QPair<int, int> apple_;
+    Direction direction_;
+    Direction last_processed_direction_;
+    int apples_collected_;
+    bool game_over_;
 
     // Zmienne dla trybu wyjścia
-    GameState m_gameState;
-    BorderSide m_exitSide;     // Lewa lub prawa strona
-    int m_exitPosition;        // Współrzędna Y wybranego kwadratu
-    int m_borderAnimationProgress;
-    int m_snakePartsExited;
+    GameState game_state_;
+    BorderSide exit_side_;     // Lewa lub prawa strona
+    int exit_position_;        // Współrzędna Y wybranego kwadratu
+    int animation_progress_;
+    int parts_exited_;
 
-    QVector<QPair<int, int>> m_exitPoints; // Punkty wyjściowe
+    QVector<QPair<int, int>> exit_points_; // Punkty wyjściowe
 };
 
 #endif // SNAKE_GAME_LAYER_H

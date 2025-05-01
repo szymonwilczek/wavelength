@@ -8,7 +8,7 @@
 #include <QRegularExpressionValidator>
 
 SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
-    : SecurityLayer(parent), m_isCurrentCodeNumeric(true)
+    : SecurityLayer(parent), is_current_code_numeric_(true)
 {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -22,21 +22,21 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     instructions->setAlignment(Qt::AlignCenter);
 
     // Kontener dla inputów
-    const auto codeInputContainer = new QWidget(this);
-    const auto codeLayout = new QHBoxLayout(codeInputContainer);
-    codeLayout->setSpacing(12); // Odstęp między polami
-    codeLayout->setContentsMargins(0, 0, 0, 0);
-    codeLayout->setAlignment(Qt::AlignCenter);
+    const auto code_input_container = new QWidget(this);
+    const auto code_layout = new QHBoxLayout(code_input_container);
+    code_layout->setSpacing(12); // Odstęp między polami
+    code_layout->setContentsMargins(0, 0, 0, 0);
+    code_layout->setAlignment(Qt::AlignCenter);
 
     // Tworzenie 4 pól na znaki
     for (int i = 0; i < 4; i++) {
-        auto digitInput = new QLineEdit(this);
-        digitInput->setFixedSize(60, 70);
-        digitInput->setAlignment(Qt::AlignCenter);
-        digitInput->setMaxLength(1);
-        digitInput->setProperty("index", i); // Zapamiętujemy indeks pola
+        auto digit_input = new QLineEdit(this);
+        digit_input->setFixedSize(60, 70);
+        digit_input->setAlignment(Qt::AlignCenter);
+        digit_input->setMaxLength(1);
+        digit_input->setProperty("index", i); // Zapamiętujemy indeks pola
 
-        digitInput->setStyleSheet(
+        digit_input->setStyleSheet(
             "QLineEdit {"
             "  color: #ff3333;"
             "  background-color: rgba(10, 25, 40, 220);"
@@ -54,32 +54,32 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
         );
 
         // Obsługa zmian w polu
-        connect(digitInput, &QLineEdit::textChanged, this, &SecurityCodeLayer::onDigitEntered);
+        connect(digit_input, &QLineEdit::textChanged, this, &SecurityCodeLayer::OnDigitEntered);
 
         // Instalujemy filtr zdarzeń do obsługi klawiszy nawigacji
-        digitInput->installEventFilter(this);
+        digit_input->installEventFilter(this);
 
-        m_codeInputs.append(digitInput);
-        codeLayout->addWidget(digitInput);
+        code_inputs_.append(digit_input);
+        code_layout->addWidget(digit_input);
     }
 
-    m_securityCodeHint = new QLabel("", this);
-    m_securityCodeHint->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt; font-style: italic;");
-    m_securityCodeHint->setAlignment(Qt::AlignCenter);
-    m_securityCodeHint->setWordWrap(true);
-    m_securityCodeHint->setFixedWidth(350);
+    security_code_hint_ = new QLabel("", this);
+    security_code_hint_->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt; font-style: italic;");
+    security_code_hint_->setAlignment(Qt::AlignCenter);
+    security_code_hint_->setWordWrap(true);
+    security_code_hint_->setFixedWidth(350);
 
     layout->addWidget(title);
     layout->addSpacing(20);
     layout->addWidget(instructions);
     layout->addSpacing(10);
-    layout->addWidget(codeInputContainer, 0, Qt::AlignCenter);
+    layout->addWidget(code_input_container, 0, Qt::AlignCenter);
     layout->addSpacing(20);
-    layout->addWidget(m_securityCodeHint);
+    layout->addWidget(security_code_hint_);
     layout->addStretch();
 
     // Inicjalizacja bazy kodów bezpieczeństwa
-    m_securityCodes = {
+    security_codes_ = {
         // Cyberpunk & technologiczne kody
         SecurityCode("2077", "Night City's most notorious year"),
         SecurityCode("1337", "Elite hacker language code"),
@@ -119,37 +119,37 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
 SecurityCodeLayer::~SecurityCodeLayer() {
 }
 
-void SecurityCodeLayer::initialize() {
-    reset();
+void SecurityCodeLayer::Initialize() {
+    Reset();
 
-    bool isNumeric;
+    bool is_numeric;
     QString hint;
-    m_currentSecurityCode = getRandomSecurityCode(hint, isNumeric);
-    m_isCurrentCodeNumeric = isNumeric;
-    setInputValidators(isNumeric);
-    m_securityCodeHint->setText("HINT: " + hint);
+    current_security_code_ = GetRandomSecurityCode(hint, is_numeric);
+    is_current_code_numeric_ = is_numeric;
+    SetInputValidators(is_numeric);
+    security_code_hint_->setText("HINT: " + hint);
 
     if (graphicsEffect()) {
         dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
     }
 
-    if (!m_codeInputs.isEmpty()) {
-        m_codeInputs.first()->setFocus();
+    if (!code_inputs_.isEmpty()) {
+        code_inputs_.first()->setFocus();
     }
 }
 
-void SecurityCodeLayer::reset() {
-    resetInputs();
-    m_securityCodeHint->setText("");
+void SecurityCodeLayer::Reset() {
+    ResetInputs();
+    security_code_hint_->setText("");
 
     if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
-void SecurityCodeLayer::resetInputs() {
+void SecurityCodeLayer::ResetInputs() {
     // Resetujemy wszystkie pola
-    for (QLineEdit* input : m_codeInputs) {
+    for (QLineEdit* input : code_inputs_) {
         input->clear();
         // Przywróć domyślny styl (czerwony)
         input->setStyleSheet(
@@ -171,14 +171,14 @@ void SecurityCodeLayer::resetInputs() {
     }
 
     // Ustawiamy fokus na pierwszym polu
-    if (!m_codeInputs.isEmpty()) {
-        m_codeInputs.first()->setFocus();
+    if (!code_inputs_.isEmpty()) {
+        code_inputs_.first()->setFocus();
     }
 }
 
-void SecurityCodeLayer::setInputValidators(const bool numericOnly) {
-    for (QLineEdit* input : m_codeInputs) {
-        if (numericOnly) {
+void SecurityCodeLayer::SetInputValidators(const bool numeric_only) {
+    for (QLineEdit* input : code_inputs_) {
+        if (numeric_only) {
             // Tylko cyfry
             const auto validator = new QRegularExpressionValidator(QRegularExpression("[0-9]"), input);
             input->setValidator(validator);
@@ -190,69 +190,69 @@ void SecurityCodeLayer::setInputValidators(const bool numericOnly) {
     }
 }
 
-void SecurityCodeLayer::onDigitEntered() {
+void SecurityCodeLayer::OnDigitEntered() {
     // Sprawdzamy, które pole zostało zmienione
-    const auto currentInput = qobject_cast<QLineEdit*>(sender());
-    if (!currentInput)
+    const auto current_input = qobject_cast<QLineEdit*>(sender());
+    if (!current_input)
         return;
 
-    const int currentIndex = currentInput->property("index").toInt();
+    const int current_index = current_input->property("index").toInt();
 
     // Automatyczna konwersja na wielkie litery dla kodów alfanumerycznych
-    if (!m_isCurrentCodeNumeric && !currentInput->text().isEmpty()) {
-        const QString text = currentInput->text().toUpper();
-        if (text != currentInput->text()) {
-            currentInput->setText(text);
+    if (!is_current_code_numeric_ && !current_input->text().isEmpty()) {
+        const QString text = current_input->text().toUpper();
+        if (text != current_input->text()) {
+            current_input->setText(text);
             return; // Zapobiega nieskończonej pętli
         }
     }
 
     // Jeśli pole jest wypełnione, przechodzimy do następnego
-    if (currentInput->text().length() == 1 && currentIndex < m_codeInputs.size() - 1) {
-        m_codeInputs[currentIndex + 1]->setFocus();
+    if (current_input->text().length() == 1 && current_index < code_inputs_.size() - 1) {
+        code_inputs_[current_index + 1]->setFocus();
     }
 
     // Sprawdzamy, czy wszystkie pola są wypełnione
-    bool allFilled = true;
-    for (const QLineEdit* input : m_codeInputs) {
+    bool all_filled = true;
+    for (const QLineEdit* input : code_inputs_) {
         if (input->text().isEmpty()) {
-            allFilled = false;
+            all_filled = false;
             break;
         }
     }
 
     // Jeśli wszystkie pola są wypełnione, sprawdzamy kod
-    if (allFilled) {
-        checkSecurityCode();
+    if (all_filled) {
+        CheckSecurityCode();
     }
 }
 
 bool SecurityCodeLayer::eventFilter(QObject *obj, QEvent *event) {
     // Obsługa klawiszy w inputach
     if (event->type() == QEvent::KeyPress) {
-        const auto keyEvent = static_cast<QKeyEvent*>(event);
+        const auto key_event = static_cast<QKeyEvent*>(event);
         const auto input = qobject_cast<QLineEdit*>(obj);
 
-        if (input && m_codeInputs.contains(input)) {
-            const int key = keyEvent->key();
-            const int currentIndex = input->property("index").toInt();
+        if (input && code_inputs_.contains(input)) {
+            const int key = key_event->key();
+            const int current_index = input->property("index").toInt();
 
             // Obsługa klawisza Backspace
-            if (key == Qt::Key_Backspace && input->text().isEmpty() && currentIndex > 0) {
+            if (key == Qt::Key_Backspace && input->text().isEmpty() && current_index > 0) {
                 // Jeśli pole jest puste i naciśnięto Backspace, przechodzimy do poprzedniego pola
-                m_codeInputs[currentIndex - 1]->setFocus();
-                m_codeInputs[currentIndex - 1]->setText("");
+                code_inputs_[current_index - 1]->setFocus();
+                code_inputs_[current_index - 1]->setText("");
                 return true;
             }
 
             // Obsługa strzałek
-            if (key == Qt::Key_Left && currentIndex > 0) {
-                m_codeInputs[currentIndex - 1]->setFocus();
+            if (key == Qt::Key_Left && current_index > 0) {
+                code_inputs_[current_index - 1]->setFocus();
                 return true;
             }
 
-            if (key == Qt::Key_Right && currentIndex < m_codeInputs.size() - 1) {
-                m_codeInputs[currentIndex + 1]->setFocus();
+            if (key == Qt::Key_Right && current_index < code_inputs_.size() - 1) {
+                code_inputs_[current_index + 1]->setFocus();
                 return true;
             }
         }
@@ -261,14 +261,14 @@ bool SecurityCodeLayer::eventFilter(QObject *obj, QEvent *event) {
     return SecurityLayer::eventFilter(obj, event);
 }
 
-void SecurityCodeLayer::checkSecurityCode() {
+void SecurityCodeLayer::CheckSecurityCode() {
     // Pobieramy wprowadzony kod
-    const QString enteredCode = getEnteredCode();
+    const QString entered_code = GetEnteredCode();
 
     // Sprawdzamy, czy wprowadzony kod zgadza się z wylosowanym
-    if (enteredCode == m_currentSecurityCode) {
+    if (entered_code == current_security_code_) {
         // Zmiana kolorów na zielony po pomyślnym przejściu
-        for (QLineEdit* input : m_codeInputs) {
+        for (QLineEdit* input : code_inputs_) {
             input->setStyleSheet(
                 "QLineEdit {"
                 "  color: #33ff33;"
@@ -303,21 +303,21 @@ void SecurityCodeLayer::checkSecurityCode() {
         });
     } else {
         // Efekt błędu
-        showErrorEffect();
+        ShowErrorEffect();
     }
 }
 
-QString SecurityCodeLayer::getEnteredCode() const {
+QString SecurityCodeLayer::GetEnteredCode() const {
     QString code;
-    for (const QLineEdit* input : m_codeInputs) {
+    for (const QLineEdit* input : code_inputs_) {
         code += input->text();
     }
     return code;
 }
 
-void SecurityCodeLayer::showErrorEffect() {
+void SecurityCodeLayer::ShowErrorEffect() {
     // Zapisujemy oryginalny styl
-    QString originalStyle =
+    QString original_style =
         "QLineEdit {"
         "  color: #ff3333;"
         "  background-color: rgba(10, 25, 40, 220);"
@@ -334,7 +334,7 @@ void SecurityCodeLayer::showErrorEffect() {
         "}";
 
     // Styl błędu
-    const QString errorStyle =
+    const QString error_style =
         "QLineEdit {"
         "  color: #ffffff;"
         "  background-color: rgba(255, 0, 0, 100);"
@@ -347,25 +347,25 @@ void SecurityCodeLayer::showErrorEffect() {
         "}";
 
     // Ustawiamy styl błędu dla wszystkich pól
-    for (QLineEdit* input : m_codeInputs) {
-        input->setStyleSheet(errorStyle);
+    for (QLineEdit* input : code_inputs_) {
+        input->setStyleSheet(error_style);
     }
 
     // Przywracamy oryginalny styl po krótkim czasie i resetujemy inputy
-    QTimer::singleShot(300, this, [this, originalStyle]() {
-        for (QLineEdit* input : m_codeInputs) {
-            input->setStyleSheet(originalStyle);
+    QTimer::singleShot(300, this, [this, original_style]() {
+        for (QLineEdit* input : code_inputs_) {
+            input->setStyleSheet(original_style);
         }
-        resetInputs();
+        ResetInputs();
 
         // Po resecie przywracamy właściwe walidatory
-        setInputValidators(m_isCurrentCodeNumeric);
+        SetInputValidators(is_current_code_numeric_);
     });
 }
 
-QString SecurityCodeLayer::getRandomSecurityCode(QString& hint, bool& isNumeric) {
-    const int index = QRandomGenerator::global()->bounded(m_securityCodes.size());
-    hint = m_securityCodes[index].hint;
-    isNumeric = m_securityCodes[index].isNumeric;
-    return m_securityCodes[index].code;
+QString SecurityCodeLayer::GetRandomSecurityCode(QString& hint, bool& is_numeric) {
+    const int index = QRandomGenerator::global()->bounded(security_codes_.size());
+    hint = security_codes_[index].hint;
+    is_numeric = security_codes_[index].is_numeric;
+    return security_codes_[index].code;
 }

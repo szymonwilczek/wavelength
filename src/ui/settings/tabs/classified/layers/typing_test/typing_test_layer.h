@@ -14,27 +14,27 @@ public:
     explicit TypingTestLayer(QWidget *parent = nullptr);
     ~TypingTestLayer() override;
 
-    void initialize() override;
-    void reset() override;
+    void Initialize() override;
+    void Reset() override;
 
     private slots:
-        void onTextChanged(const QString& text);
-        void updateHighlight() const;
+        void OnTextChanged(const QString& text);
+        void UpdateHighlight() const;
 
 private:
-    void generateWords();
-    void updateDisplayText() const;
+    void GenerateWords();
+    void UpdateDisplayText() const;
 
-    QLabel* m_titleLabel;
-    QLabel* m_instructionsLabel;
-    QLabel* m_displayTextLabel;
-    QLineEdit* m_hiddenInput;
+    QLabel* title_label_;
+    QLabel* instructions_label_;
+    QLabel* display_text_label_;
+    QLineEdit* hidden_input_;
 
-    QStringList m_words;
-    QString m_fullText;
-    int m_currentPosition;
-    bool m_testStarted;
-    bool m_testCompleted;
+    QStringList words_;
+    QString full_text_;
+    int current_position_;
+    bool test_started_;
+    bool test_completed_;
 };
 
 #endif // TYPING_TEST_LAYER_H
