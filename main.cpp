@@ -396,12 +396,12 @@ int main(int argc, char *argv[]) {
 
         navbar->setChatMode(false);
         animation->hideAnimation();
-        animation->resetLifeColor();
+        animation->ResetLifeColor();
         stackedWidget->slideToWidget(animationWidget);
 
         QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
             animation->showAnimation();
-            animation->resetVisualization();
+            animation->ResetVisualization();
             titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
             // Dodaj minimalne opóźnienie przed centrowaniem
             QTimer::singleShot(0, [titleLabel, animation]() {
@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
 
     animation->hideAnimation();
 
-    animation->pauseAllEventTracking();
+    animation->PauseAllEventTracking();
 
     stackedWidget->slideToWidget(settingsView);
 });
@@ -433,12 +433,12 @@ int main(int argc, char *argv[]) {
     qDebug() << "Back from settings, switching to animation view";
 
     animation->hideAnimation();
-    animation->resetLifeColor();
+    animation->ResetLifeColor();
     stackedWidget->slideToWidget(animationWidget);
 
     QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
         animation->showAnimation();
-        animation->resetVisualization();
+        animation->ResetVisualization();
         titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
         // Dodaj minimalne opóźnienie przed centrowaniem
         QTimer::singleShot(0, [titleLabel, animation]() {
@@ -453,7 +453,7 @@ int main(int argc, char *argv[]) {
 
         navbar->playClickSound();
 
-        animation->setLifeColor(QColor(0, 200, 0));
+        animation->SetLifeColor(QColor(0, 200, 0));
 
         WavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
@@ -465,10 +465,10 @@ int main(int argc, char *argv[]) {
                 qDebug() << "Created and joined wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to create wavelength";
-                animation->resetLifeColor();
+                animation->ResetLifeColor();
             }
         } else {
-            animation->resetLifeColor();
+            animation->ResetLifeColor();
         }
     });
 
@@ -476,7 +476,7 @@ int main(int argc, char *argv[]) {
         qDebug() << "Join wavelength button clicked";
         navbar->playClickSound();
 
-        animation->setLifeColor(QColor(0, 0, 200));
+        animation->SetLifeColor(QColor(0, 0, 200));
 
         JoinWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
@@ -487,10 +487,10 @@ int main(int argc, char *argv[]) {
                 qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to join wavelength";
-                animation->resetLifeColor();
+                animation->ResetLifeColor();
             }
         } else {
-            animation->resetLifeColor();
+            animation->ResetLifeColor();
         }
     });
 

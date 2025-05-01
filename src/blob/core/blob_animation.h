@@ -24,44 +24,35 @@
 class BlobAnimation final : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
-public:
-    explicit BlobAnimation(QWidget *parent = nullptr);
+    public:
+        explicit BlobAnimation(QWidget *parent = nullptr);
+        void HandleResizeTimeout();
+        void CheckWindowPosition();
+        ~BlobAnimation() override;
 
-    void handleResizeTimeout();
+        QPointF GetBlobCenter() const {
+            if (control_points_.empty()) {
+               return QPointF(width() / 2.0, height() / 2.0);
+            }
 
-    void checkWindowPosition();
-
-    ~BlobAnimation() override;
-
-    QPointF getBlobCenter() const {
-        if (m_controlPoints.empty()) {
-            return QPointF(width() / 2.0, height() / 2.0);
+            return blob_center_;
         }
 
-        return m_blobCenter;
-    }
+        void SetLifeColor(const QColor& color);
+        void ResetLifeColor();
 
-    void setLifeColor(const QColor& color);
-    void resetLifeColor();
+        void PauseAllEventTracking();
+        void ResumeAllEventTracking();
 
-    void pauseAllEventTracking();
-    void resumeAllEventTracking();
+        void ResetVisualization();
 
-    void resetVisualization();
-
-    public slots:
+public slots:
     void showAnimation();
-
     void hideAnimation();
-
     void setBackgroundColor(const QColor &color);
-
     void setBlobColor(const QColor &color);
-
     void setGridColor(const QColor &color);
-
     void setGridSpacing(int spacing);
-
     signals:
     void visualizationReset();
 
@@ -69,7 +60,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 
-    QRectF calculateBlobBoundingRect();
+    QRectF CalculateBlobBoundingRect();
 
     void resizeEvent(QResizeEvent *event) override;
     bool event(QEvent *event) override;
@@ -79,98 +70,90 @@ protected:
     void paintGL() override;
     void resizeGL(int w, int h) override;
 
-    void updateBlobGeometry();
+    void UpdateBlobGeometry();
 
-    void drawGrid();
+    void DrawGrid();
 
 private slots:
     void updateAnimation();
-
     void processMovementBuffer();
-
     void updatePhysics();
-
-
     void onStateResetTimeout();
 
 private:
-    void initializeBlob();
+    void InitializeBlob();
 
-    void switchToState(BlobConfig::AnimationState newState);
+    void SwitchToState(BlobConfig::AnimationState new_state);
 
-    void applyForces(const QVector2D &force);
+    void ApplyForces(const QVector2D &force);
 
-    void applyIdleEffect();
+    void ApplyIdleEffect();
 
-    void resetBlobToCenter();
+    void ResetBlobToCenter();
 
-    static std::vector<QPointF> generateOrganicShape(const QPointF& center, double baseRadius, int numPoints);
+    static std::vector<QPointF> GenerateOrganicShape(const QPointF& center, double base_radius, int num_of_points);
 
-    BlobEventHandler m_eventHandler;
-    BlobTransitionManager m_transitionManager;
+    BlobEventHandler event_handler_;
+    BlobTransitionManager transition_manager_;
 
-    QTimer m_windowPositionTimer;
-    QPointF m_lastWindowPosForTimer;
-    QTimer m_resizeDebounceTimer;
-    QSize m_lastSize;
-    QColor m_defaultLifeColor;
-    bool m_originalBorderColorSet = false;
+    QTimer window_position_timer_;
+    QPointF last_window_position_timer_;
+    QTimer resize_debounce_timer_;
+    QSize last_size_;
+    QColor default_life_color_;
+    bool original_border_color_set_ = false;
 
-    BlobConfig::BlobParameters m_params;
-    BlobConfig::PhysicsParameters m_physicsParams;
-    BlobConfig::IdleParameters m_idleParams;
+    BlobConfig::BlobParameters params_;
+    BlobConfig::PhysicsParameters physics_params_;
+    BlobConfig::IdleParameters idle_params_;
 
-    std::vector<QPointF> m_controlPoints;
-    std::vector<QPointF> m_targetPoints;
-    std::vector<QPointF> m_velocity;
+    std::vector<QPointF> control_points_;
+    std::vector<QPointF> target_points_;
+    std::vector<QPointF> velocity_;
 
-    QPointF m_blobCenter;
+    QPointF blob_center_;
 
-    BlobConfig::AnimationState m_currentState = BlobConfig::IDLE;
+    BlobConfig::AnimationState current_state_ = BlobConfig::IDLE;
 
+    QTimer animation_timer_;
+    QTimer idle_timer_;
+    QTimer state_reset_timer_;
+    QTimer* transition_to_idle_timer_ = nullptr;
 
+    BlobPhysics physics_;
+    BlobRenderer renderer_;
 
-    QTimer m_animationTimer;
-    QTimer m_idleTimer;
-    QTimer m_stateResetTimer;
-    QTimer* m_transitionToIdleTimer = nullptr;
+    std::unique_ptr<IdleState> idle_state_;
+    std::unique_ptr<MovingState> moving_state_;
+    std::unique_ptr<ResizingState> resizing_state_;
+    BlobState* current_blob_state_;
 
-    BlobPhysics m_physics;
-    BlobRenderer m_renderer;
+    QPointF last_window_position_;
 
-    std::unique_ptr<IdleState> m_idleState;
-    std::unique_ptr<MovingState> m_movingState;
-    std::unique_ptr<ResizingState> m_resizingState;
-    BlobState* m_currentBlobState;
+    double precalc_min_distance_ = 0.0;
+    double precalc_max_distance_ = 0.0;
 
-    QPointF m_lastWindowPos;
+    QMutex data_mutex_;
+    std::atomic<bool> is_physics_running_{true};
+    std::vector<QPointF> safe_control_points_;
 
+    bool events_enabled_ = true;
+    QTimer event_re_enable_timer_;
+    bool needs_redraw_ = false;
 
-    double m_precalcMinDistance = 0.0;
-    double m_precalcMaxDistance = 0.0;
+    std::thread physics_thread_;
+    std::atomic<bool> physics_active_{true};
+    std::mutex points_mutex_;
+    std::condition_variable physics_condition_;
+    bool needs_update_{false};
 
-    QMutex m_dataMutex;
-    std::atomic<bool> m_physicsRunning{true};
-    std::vector<QPointF> m_safeControlPoints;
+    void PhysicsThreadFunction();
 
-    bool m_eventsEnabled = true;
-    QTimer m_eventReEnableTimer;
-    bool m_needsRedraw = false;
+    QOpenGLShaderProgram* shader_program_ = nullptr;
+    QOpenGLBuffer vbo_;
+    QOpenGLVertexArrayObject vao_;
 
-    std::thread m_physicsThread;
-    std::atomic<bool> m_physicsActive{true};
-    std::mutex m_pointsMutex;
-    std::condition_variable m_physicsCondition;
-    bool m_needsUpdate{false};
-
-    void physicsThreadFunction();
-
-    QOpenGLShaderProgram* m_shaderProgram = nullptr;
-    QOpenGLBuffer m_vbo;
-    QOpenGLVertexArrayObject m_vao;
-
-    // Bufor dla geometrii bloba
-    std::vector<GLfloat> m_glVertices;
+    std::vector<GLfloat> gl_vertices_;
 };
 
 #endif // BLOBANIMATION_H

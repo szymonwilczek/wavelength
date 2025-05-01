@@ -283,7 +283,7 @@ QByteArray AppInstanceManager::CreatePositionMessage() const {
     QByteArray message;
     QDataStream stream(&message, QIODevice::WriteOnly);
 
-    const QPointF blobCenter = blob_->getBlobCenter();
+    const QPointF blobCenter = blob_->GetBlobCenter();
     const QPoint windowPos = main_window_->pos();
     const QSize windowSize = main_window_->size();
 
@@ -323,7 +323,7 @@ void AppInstanceManager::InitAttractionThread() {
             if (!is_creator_) {
                 for (const auto& instance : instances_copy) {
                     if (instance.is_creator) {
-                        QPointF blob_center = blob_->getBlobCenter();
+                        QPointF blob_center = blob_->GetBlobCenter();
                         QPoint window_position = main_window_->pos();
                         QPointF global_position(window_position.x() + blob_center.x(),
                                           window_position.y() + blob_center.y());
