@@ -548,7 +548,7 @@ void WavelengthChatView::SendMessage() const {
     input_field_->clear();
 
     WavelengthMessageService *manager = WavelengthMessageService::GetInstance();
-    manager->SendMessage(message);
+    manager->SendTextMessage(message);
 }
 
 void WavelengthChatView::AbortWavelength() {
