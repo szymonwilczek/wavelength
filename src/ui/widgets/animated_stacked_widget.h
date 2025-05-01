@@ -24,35 +24,35 @@ public:
     ~AnimatedStackedWidget() override;
 
     // Ustawienia
-    void setDuration(const int duration) { m_duration = duration; }
-    int duration() const { return m_duration; }
-    void setAnimationType(const AnimationType type) { m_animationType = type; }
-    AnimationType animationType() const { return m_animationType; }
-    bool isAnimating() const { return m_animationRunning; }
+    void SetDuration(const int duration) { duration_ = duration; }
+    int GetDuration() const { return duration_; }
+    void SetAnimationType(const AnimationType type) { animation_type_ = type; }
+    AnimationType GetAnimationType() const { return animation_type_; }
+    bool IsAnimating() const { return animation_running_; }
 
 public slots:
-    void slideToIndex(int index);
-    void slideToWidget(QWidget *widget);
-    void slideToNextIndex();  // Nowa metoda dla karuzelowego przewijania
+    void SlideToIndex(int index);
+    void SlideToWidget(QWidget *widget);
+    void SlideToNextIndex();  // Nowa metoda dla karuzelowego przewijania
 
 protected:
-    void animateFade(int nextIndex) const;
-    void animateSlide(int nextIndex) const;
-    void animateSlideAndFade(int nextIndex) const;
-    void animatePush(int nextIndex) const;
+    void AnimateFade(int next_index) const;
+    void AnimateSlide(int next_index) const;
+    void AnimateSlideAndFade(int next_index) const;
+    void AnimatePush(int next_index) const;
 
 private:
-    void prepareAnimation(int nextIndex) const;
-    void cleanupAfterAnimation() const;
-    void onGLTransitionFinished();
+    void PrepareAnimation(int next_index) const;
+    void CleanupAfterAnimation() const;
+    void OnGLTransitionFinished();
 
-    int m_duration;
-    AnimationType m_animationType;
-    QParallelAnimationGroup *m_animationGroup;
-    bool m_animationRunning;
-    int m_targetIndex;  // Nowe pole dla przechowywanego indeksu docelowego
-    GLTransitionWidget *m_glTransitionWidget = nullptr;
-    QSoundEffect *m_swooshSound; // Dodaj pole dla efektu dźwiękowego
+    int duration_;
+    AnimationType animation_type_;
+    QParallelAnimationGroup *animation_group_;
+    bool animation_running_;
+    int target_index_;  // Nowe pole dla przechowywanego indeksu docelowego
+    GLTransitionWidget *gl_transition_widget_ = nullptr;
+    QSoundEffect *swoosh_sound_; // Dodaj pole dla efektu dźwiękowego
 };
 
 #endif // ANIMATED_STACKED_WIDGET_H

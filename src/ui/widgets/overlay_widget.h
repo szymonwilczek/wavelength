@@ -9,13 +9,13 @@ class OverlayWidget final : public QWidget {
 
 public:
     explicit OverlayWidget(QWidget *parent = nullptr);
-    void updateGeometry(const QRect& rect);
-    qreal opacity() const { return m_opacity; }
-    void setOpacity(qreal opacity);
+    void UpdateGeometry(const QRect& rect);
+    qreal GetOpacity() const { return opacity_; }
+    void SetOpacity(qreal opacity);
 
 private:
-    qreal m_opacity;
-    QRect m_excludeRect;
+    qreal opacity_;
+    QRect exclude_rect_;
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

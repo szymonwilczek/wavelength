@@ -45,7 +45,7 @@ void AnimatedDialog::showEvent(QShowEvent *event)
         overlay_animation->setEndValue(1.0);
         overlay_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-        overlay_->updateGeometry(parent_widget->rect());
+        overlay_->UpdateGeometry(parent_widget->rect());
         overlay_->show();
         overlay_animation->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -65,7 +65,7 @@ void AnimatedDialog::closeEvent(QCloseEvent *event)
         if (overlay_) {
             const auto overlay_animation = new QPropertyAnimation(overlay_, "opacity");
             overlay_animation->setDuration(200);
-            overlay_animation->setStartValue(overlay_->opacity());
+            overlay_animation->setStartValue(overlay_->GetOpacity());
             overlay_animation->setEndValue(0.0);
             overlay_animation->setEasingCurve(QEasingCurve::InOutQuad);
 

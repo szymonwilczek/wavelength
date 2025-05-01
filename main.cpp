@@ -201,8 +201,8 @@ int main(int argc, char *argv[]) {
     mainLayout->setSpacing(0);
 
     auto stackedWidget = new AnimatedStackedWidget(centralWidget);
-    stackedWidget->setDuration(600);
-    stackedWidget->setAnimationType(AnimatedStackedWidget::Slide);
+    stackedWidget->SetDuration(600);
+    stackedWidget->SetAnimationType(AnimatedStackedWidget::Slide);
     mainLayout->addWidget(stackedWidget);
 
     auto animationWidget = new QWidget(stackedWidget);
@@ -356,7 +356,7 @@ int main(int argc, char *argv[]) {
         const QWidget *currentWidget = stackedWidget->widget(index);
         if (currentWidget == animationWidget) {
             // Pokazujemy bloba tylko gdy przechodzimy DO widoku animacji
-            QTimer::singleShot(stackedWidget->duration(), [animation]() {
+            QTimer::singleShot(stackedWidget->GetDuration(), [animation]() {
                 animation->showAnimation();
             });
         }
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]) {
         animation->hideAnimation();
         navbar->SetChatMode(true);
         chatView->SetWavelength(frequency, "");
-        stackedWidget->slideToWidget(chatView);
+        stackedWidget->SlideToWidget(chatView);
     };
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
@@ -397,9 +397,9 @@ int main(int argc, char *argv[]) {
         navbar->SetChatMode(false);
         animation->hideAnimation();
         animation->ResetLifeColor();
-        stackedWidget->slideToWidget(animationWidget);
+        stackedWidget->SlideToWidget(animationWidget);
 
-        QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
+        QTimer::singleShot(stackedWidget->GetDuration(), [animation, textEffect, titleLabel]() {
             animation->showAnimation();
             animation->ResetVisualization();
             titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
@@ -425,7 +425,7 @@ int main(int argc, char *argv[]) {
 
     animation->PauseAllEventTracking();
 
-    stackedWidget->slideToWidget(settingsView);
+    stackedWidget->SlideToWidget(settingsView);
 });
 
     QObject::connect(settingsView, &SettingsView::backToMainView,
@@ -434,9 +434,9 @@ int main(int argc, char *argv[]) {
 
     animation->hideAnimation();
     animation->ResetLifeColor();
-    stackedWidget->slideToWidget(animationWidget);
+    stackedWidget->SlideToWidget(animationWidget);
 
-    QTimer::singleShot(stackedWidget->duration(), [animation, textEffect, titleLabel]() {
+    QTimer::singleShot(stackedWidget->GetDuration(), [animation, textEffect, titleLabel]() {
         animation->showAnimation();
         animation->ResetVisualization();
         titleLabel->adjustSize(); // Wymuś przeliczenie rozmiaru
