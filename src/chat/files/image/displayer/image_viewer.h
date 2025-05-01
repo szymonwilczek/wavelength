@@ -15,50 +15,42 @@ class InlineImageViewer final : public QFrame {
     Q_OBJECT
 
 public:
-    explicit InlineImageViewer(const QByteArray& imageData, QWidget* parent = nullptr);
+    explicit InlineImageViewer(const QByteArray& image_data, QWidget* parent = nullptr);
 
     ~InlineImageViewer() override {
-        releaseResources();
+        ReleaseResources();
     }
 
-    void releaseResources();
+    void ReleaseResources();
 
     // Zwraca oryginalny rozmiar obrazu jako wskazówkę
     QSize sizeHint() const override;
 
-    // Usunięto eventFilter
-
 private slots:
-    void loadImage() const {
-        if (!m_decoder) return;
-        m_decoder->decode();
+    void LoadImage() const {
+        if (!decoder_) return;
+        decoder_->Decode();
     }
 
-    // Usunięto toggleZoom
-    // Usunięto displayFullSizeImage
+    void HandleImageReady(const QImage& image);
 
-    void handleImageReady(const QImage& image);
+    void HandleError(const QString& message);
 
-    // Usunięto displayScaledImage
-
-    void handleError(const QString& message);
-
-    void handleImageInfo(int width, int height, bool hasAlpha);
+    void HandleImageInfo(int width, int height, bool has_alpha);
 
 signals:
-    void imageInfoReady(int width, int height, bool hasAlpha);
-    void imageLoaded(); // Nowy sygnał informujący o załadowaniu
+    void imageInfoReady(int width, int height, bool has_alpha);
+    void imageLoaded();
 
 private:
-    QLabel* m_imageLabel;
-    std::shared_ptr<ImageDecoder> m_decoder;
-    QByteArray m_imageData;
-    QImage m_originalImage;
+    QLabel* image_label_;
+    std::shared_ptr<ImageDecoder> decoder_;
+    QByteArray image_data_;
+    QImage original_image_;
 
-    int m_imageWidth = 0;
-    int m_imageHeight = 0;
-    bool m_hasAlpha = false;
-    // Usunięto m_isZoomed
+    int image_width_ = 0;
+    int image_height_ = 0;
+    bool has_alpha_ = false;
 };
 
 #endif // INLINE_IMAGE_VIEWER_H
