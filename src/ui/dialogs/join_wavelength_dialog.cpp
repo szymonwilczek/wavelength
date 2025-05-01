@@ -1,5 +1,6 @@
 #include "join_wavelength_dialog.h"
 
+#include <QApplication>
 #include <QFormLayout>
 #include <QVBoxLayout>
 

@@ -1,4 +1,6 @@
 #include "animated_dialog.h"
+
+#include <QApplication>
 #include <QScreen>
 
 #include "../../ui/dialogs/join_wavelength_dialog.h"
