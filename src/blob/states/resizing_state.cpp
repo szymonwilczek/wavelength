@@ -5,59 +5,59 @@
 
 ResizingState::ResizingState() {}
 
-void ResizingState::apply(std::vector<QPointF>& controlPoints, 
+void ResizingState::Apply(std::vector<QPointF>& control_points,
                          std::vector<QPointF>& velocity,
-                         QPointF& blobCenter,
+                         QPointF& blob_center,
                          const BlobConfig::BlobParameters& params) {
 }
 
-void ResizingState::handleResize(std::vector<QPointF>& controlPoints,
-                               std::vector<QPointF>& targetPoints,
+void ResizingState::HandleResize(std::vector<QPointF>& control_points,
+                               std::vector<QPointF>& target_points,
                                std::vector<QPointF>& velocity,
-                               QPointF& blobCenter,
-                               const QSize& oldSize,
-                               const QSize& newSize) {
+                               QPointF& blob_center,
+                               const QSize& old_size,
+                               const QSize& new_size) {
 
-    const QPointF oldCenter = blobCenter;
+    const QPointF old_center = blob_center;
 
-    blobCenter = QPointF(newSize.width() / 2.0, newSize.height() / 2.0);
+    blob_center = QPointF(new_size.width() / 2.0, new_size.height() / 2.0);
 
-    const QPointF delta = blobCenter - oldCenter;
+    const QPointF delta = blob_center - old_center;
 
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
-        controlPoints[i] += delta;
-        targetPoints[i] += delta;
+    for (size_t i = 0; i < control_points.size(); ++i) {
+        control_points[i] += delta;
+        target_points[i] += delta;
     }
 
-    if (oldSize.isValid()) {
-        const QVector2D resizeForce(
-            (newSize.width() - oldSize.width()) * 0.05,
-            (newSize.height() - oldSize.height()) * 0.05
+    if (old_size.isValid()) {
+        const QVector2D resize_force(
+            (new_size.width() - old_size.width()) * 0.05,
+            (new_size.height() - old_size.height()) * 0.05
         );
 
-        applyForce(resizeForce, velocity, blobCenter, controlPoints, oldSize.width() / 2.0);
+        ApplyForce(resize_force, velocity, blob_center, control_points, old_size.width() / 2.0);
     }
 }
 
-void ResizingState::applyForce(const QVector2D& force,
+void ResizingState::ApplyForce(const QVector2D& force,
                              std::vector<QPointF>& velocity,
-                             QPointF& blobCenter,
-                             const std::vector<QPointF>& controlPoints,
-                             const double blobRadius) {
+                             QPointF& blob_center,
+                             const std::vector<QPointF>& control_points,
+                             const double blob_radius) {
     
-    for (size_t i = 0; i < controlPoints.size(); ++i) {
-        QPointF vectorFromCenter = controlPoints[i] - blobCenter;
-        const double distanceFromCenter = QVector2D(vectorFromCenter).length();
+    for (size_t i = 0; i < control_points.size(); ++i) {
+        QPointF vector_from_center = control_points[i] - blob_center;
+        const double distance_from_center = QVector2D(vector_from_center).length();
         
-        double forceScale = distanceFromCenter / blobRadius;
+        double force_scale = distance_from_center / blob_radius;
         
-        if (forceScale > 1.0) forceScale = 1.0;
+        if (force_scale > 1.0) force_scale = 1.0;
         
         velocity[i] += QPointF(
-            force.x() * forceScale * 0.8,
-            force.y() * forceScale * 0.8
+            force.x() * force_scale * 0.8,
+            force.y() * force_scale * 0.8
         );
     }
     
-    blobCenter += QPointF(force.x() * 0.2, force.y() * 0.2);
+    blob_center += QPointF(force.x() * 0.2, force.y() * 0.2);
 }

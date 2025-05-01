@@ -87,7 +87,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     connect(&event_handler_, &BlobEventHandler::significantResizeDetected, this,
             [this](const QSize &oldSize, const QSize &newSize) {
-                resizing_state_->handleResize(control_points_, target_points_, velocity_,
+                resizing_state_->HandleResize(control_points_, target_points_, velocity_,
                                               blob_center_, oldSize, newSize);
 
                 // Resetuj bufor siatki tylko gdy zmiana rozmiaru jest znacząca
@@ -305,11 +305,11 @@ void BlobAnimation::updateAnimation() {
         // Stany IDLE/MOVING/RESIZING mogą modyfikować wektory w metodzie apply
         if (current_state_ == BlobConfig::IDLE) {
             if (current_blob_state_) {
-                current_blob_state_->apply(control_points_, velocity_, blob_center_, params_);
+                current_blob_state_->Apply(control_points_, velocity_, blob_center_, params_);
             }
         } else if (current_state_ == BlobConfig::MOVING || current_state_ == BlobConfig::RESIZING) {
             if (current_blob_state_) {
-                current_blob_state_->apply(control_points_, velocity_, blob_center_, params_);
+                current_blob_state_->Apply(control_points_, velocity_, blob_center_, params_);
                 needs_redraw_ = true;
             }
         }
@@ -330,7 +330,7 @@ void BlobAnimation::processMovementBuffer() {
         params_.blobRadius,
         [this](std::vector<QPointF> &vel, QPointF &center, const std::vector<QPointF> &points, const float radius,
                const QVector2D force) {
-            moving_state_->applyInertiaForce(vel, center, points, radius, force);
+            moving_state_->ApplyInertiaForce(vel, center, points, radius, force);
         },
         [this](const QPointF &pos) {
             physics_.SetLastWindowPos(pos);
@@ -396,7 +396,7 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
         current_blob_state_ = idle_state_.get();
 
         // Reset inicjalizacji dla efektu bicia serca
-        static_cast<IdleState *>(current_blob_state_)->resetInitialization();
+        static_cast<IdleState *>(current_blob_state_)->ResetInitialization();
 
         // Wygaszamy prędkości, ale nie do zera - zostawiamy trochę dynamiki
         for (auto &vel: velocity_) {
@@ -412,7 +412,7 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
         case BlobConfig::IDLE:
             current_blob_state_ = idle_state_.get();
         // Reset inicjalizacji również tutaj
-            static_cast<IdleState *>(current_blob_state_)->resetInitialization();
+            static_cast<IdleState *>(current_blob_state_)->ResetInitialization();
             break;
         case BlobConfig::MOVING:
             current_blob_state_ = moving_state_.get();
@@ -428,12 +428,12 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
 }
 
 void BlobAnimation::ApplyForces(const QVector2D &force) {
-    current_blob_state_->applyForce(force, velocity_, blob_center_,
+    current_blob_state_->ApplyForce(force, velocity_, blob_center_,
                                    control_points_, params_.blobRadius);
 }
 
 void BlobAnimation::ApplyIdleEffect() {
-    idle_state_->apply(control_points_, velocity_, blob_center_, params_);
+    idle_state_->Apply(control_points_, velocity_, blob_center_, params_);
 }
 
 void BlobAnimation::setBackgroundColor(const QColor &color) {
@@ -851,7 +851,7 @@ void BlobAnimation::ResetBlobToCenter() {
 
     // Przełącz na stan IDLE i zresetuj zachowanie
     if (idle_state_) {
-        idle_state_.get()->resetInitialization();
+        idle_state_.get()->ResetInitialization();
     }
     SwitchToState(BlobConfig::IDLE);
 }

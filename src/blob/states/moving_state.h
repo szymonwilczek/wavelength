@@ -9,22 +9,22 @@ class MovingState final : public BlobState {
 public:
     MovingState();
     
-    void apply(std::vector<QPointF>& controlPoints, 
+    void Apply(std::vector<QPointF>& control_points,
               std::vector<QPointF>& velocity,
-              QPointF& blobCenter,
+              QPointF& blob_center,
               const BlobConfig::BlobParameters& params) override;
               
-    void applyForce(const QVector2D& force,
+    void ApplyForce(const QVector2D& force,
                    std::vector<QPointF>& velocity,
-                   QPointF& blobCenter,
-                   const std::vector<QPointF>& controlPoints,
-                   double blobRadius) override;
+                   QPointF& blob_center,
+                   const std::vector<QPointF>& control_points,
+                   double blob_radius) override;
 
-    static void applyInertiaForce(std::vector<QPointF>& velocity,
-                                  QPointF& blobCenter,
-                                  const std::vector<QPointF>& controlPoints,
-                                  double blobRadius,
-                                  const QVector2D& windowVelocity);
+    static void ApplyInertiaForce(std::vector<QPointF>& velocity,
+                                  QPointF& blob_center,
+                                  const std::vector<QPointF>& control_points,
+                                  double blob_radius,
+                                  const QVector2D& window_velocity);
 };
 
 #endif // MOVINGSTATE_H

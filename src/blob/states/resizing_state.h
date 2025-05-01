@@ -9,23 +9,23 @@ class ResizingState final : public BlobState {
 public:
     ResizingState();
     
-    void apply(std::vector<QPointF>& controlPoints, 
+    void Apply(std::vector<QPointF>& control_points,
               std::vector<QPointF>& velocity,
-              QPointF& blobCenter,
+              QPointF& blob_center,
               const BlobConfig::BlobParameters& params) override;
               
-    void applyForce(const QVector2D& force,
+    void ApplyForce(const QVector2D& force,
                    std::vector<QPointF>& velocity,
-                   QPointF& blobCenter,
-                   const std::vector<QPointF>& controlPoints,
-                   double blobRadius) override;
+                   QPointF& blob_center,
+                   const std::vector<QPointF>& control_points,
+                   double blob_radius) override;
                    
-    void handleResize(std::vector<QPointF>& controlPoints,
-                     std::vector<QPointF>& targetPoints,
+    void HandleResize(std::vector<QPointF>& control_points,
+                     std::vector<QPointF>& target_points,
                      std::vector<QPointF>& velocity,
-                     QPointF& blobCenter,
-                     const QSize& oldSize, 
-                     const QSize& newSize);
+                     QPointF& blob_center,
+                     const QSize& old_size,
+                     const QSize& new_size);
 };
 
 #endif // RESIZINGSTATE_H

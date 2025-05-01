@@ -10,16 +10,16 @@ class BlobState {
 public:
     virtual ~BlobState() {}
     
-    virtual void apply(std::vector<QPointF>& controlPoints,
+    virtual void Apply(std::vector<QPointF>& control_points,
                       std::vector<QPointF>& velocity,
-                      QPointF& blobCenter,
+                      QPointF& blob_center,
                       const BlobConfig::BlobParameters& params) = 0;
                       
-    virtual void applyForce(const QVector2D& force,
+    virtual void ApplyForce(const QVector2D& force,
                            std::vector<QPointF>& velocity,
-                           QPointF& blobCenter,
-                           const std::vector<QPointF>& controlPoints,
-                           double blobRadius) = 0;
+                           QPointF& blob_center,
+                           const std::vector<QPointF>& control_points,
+                           double blob_radius) = 0;
 };
 
 #endif // BLOBSTATE_H
