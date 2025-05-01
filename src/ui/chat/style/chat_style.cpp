@@ -3,7 +3,7 @@
 #include "../../../app/style/cyberpunk_style.h"
 
 
-QString ChatStyle::getChatStyleSheet() {
+QString ChatStyle::GetChatStyleSheet() {
     return QString(
                 "QWidget#chatViewContainer {"
                 "  background-color: %1;"
@@ -29,7 +29,7 @@ QString ChatStyle::getChatStyleSheet() {
             .arg(CyberpunkStyle::GetPrimaryColor().name());
 }
 
-QString ChatStyle::getSentMessageStyle() {
+QString ChatStyle::GetSentMessageStyle() {
     return QString(
                 "background-color: rgba(0, 60, 80, 180);"
                 "border: 1px solid %1;"
@@ -42,7 +42,7 @@ QString ChatStyle::getSentMessageStyle() {
             .arg(CyberpunkStyle::GetPrimaryColor().name());
 }
 
-QString ChatStyle::getReceivedMessageStyle() {
+QString ChatStyle::GetReceivedMessageStyle() {
     return QString(
                 "background-color: rgba(40, 20, 60, 180);"
                 "border: 1px solid %1;"
@@ -55,7 +55,7 @@ QString ChatStyle::getReceivedMessageStyle() {
             .arg(CyberpunkStyle::GetAccentColor().name());
 }
 
-QString ChatStyle::getSystemMessageStyle() {
+QString ChatStyle::GetSystemMessageStyle() {
     return QString(
                 "background-color: rgba(40, 40, 10, 180);"
                 "border: 1px solid %1;"
@@ -69,7 +69,7 @@ QString ChatStyle::getSystemMessageStyle() {
             .arg(CyberpunkStyle::GetWarningColor().name());
 }
 
-QString ChatStyle::getInputFieldStyle() {
+QString ChatStyle::GetInputFieldStyle() {
     return QString(
                 "QLineEdit {"
                 "  background-color: rgba(0, 30, 40, 200);"
@@ -90,7 +90,7 @@ QString ChatStyle::getInputFieldStyle() {
             .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
-QString ChatStyle::getSendButtonStyle() {
+QString ChatStyle::GetSendButtonStyle() {
     return QString(
                 "QPushButton {"
                 "  background-color: #004466;"
@@ -114,7 +114,7 @@ QString ChatStyle::getSendButtonStyle() {
             .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
-QString ChatStyle::getAttachButtonStyle() {
+QString ChatStyle::GetAttachButtonStyle() {
     return QString(
                 "QPushButton {"
                 "  background-color: #004466;"
@@ -138,7 +138,7 @@ QString ChatStyle::getAttachButtonStyle() {
             .arg(CyberpunkStyle::GetSecondaryColor().name());
 }
 
-QString ChatStyle::getScrollBarStyle() {
+QString ChatStyle::GetScrollBarStyle() {
     return QString(
         "QScrollBar:vertical {"
         "  background: rgba(0, 20, 30, 100);"

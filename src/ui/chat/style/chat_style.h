@@ -6,20 +6,20 @@
 class ChatStyle {
 public:
     // Style dla całego widoku czatu
-    static QString getChatStyleSheet();
+    static QString GetChatStyleSheet();
 
     // Style dla dymków wiadomości
-    static QString getSentMessageStyle();
-    static QString getReceivedMessageStyle();
-    static QString getSystemMessageStyle();
+    static QString GetSentMessageStyle();
+    static QString GetReceivedMessageStyle();
+    static QString GetSystemMessageStyle();
 
     // Style dla komponentów interfejsu czatu
-    static QString getInputFieldStyle();
-    static QString getSendButtonStyle();
-    static QString getAttachButtonStyle();
+    static QString GetInputFieldStyle();
+    static QString GetSendButtonStyle();
+    static QString GetAttachButtonStyle();
 
     // Style dla scrollbara
-    static QString getScrollBarStyle();
+    static QString GetScrollBarStyle();
 };
 
 #endif // CHAT_STYLE_H

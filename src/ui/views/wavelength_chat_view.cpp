@@ -36,7 +36,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
 
     // Obszar wiadomości
     messageArea = new WavelengthStreamDisplay(this);
-    messageArea->setStyleSheet(ChatStyle::getScrollBarStyle());
+    messageArea->setStyleSheet(ChatStyle::GetScrollBarStyle());
     mainLayout->addWidget(messageArea, 1);
 
     // Panel informacji technicznych
@@ -89,7 +89,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     inputField = new QLineEdit(this);
     inputField->setObjectName("chatInputField");
     inputField->setPlaceholderText("Wpisz wiadomość...");
-    inputField->setStyleSheet(ChatStyle::getInputFieldStyle());
+    inputField->setStyleSheet(ChatStyle::GetInputFieldStyle());
     inputLayout->addWidget(inputField, 1);
 
     // Przycisk wysyłania - niestandardowy wygląd
