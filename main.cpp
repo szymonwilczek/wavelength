@@ -407,7 +407,7 @@ int main(int argc, char *argv[]) {
             QTimer::singleShot(0, [titleLabel, animation]() {
                 centerLabel(titleLabel, animation);
             });
-            textEffect->startAnimation(); // Rozpocznij animację tekstu od razu
+            textEffect->StartAnimation(); // Rozpocznij animację tekstu od razu
         });
     });
 
@@ -444,7 +444,7 @@ int main(int argc, char *argv[]) {
         QTimer::singleShot(0, [titleLabel, animation]() {
             centerLabel(titleLabel, animation);
         });
-        textEffect->startAnimation(); // Rozpocznij animację tekstu od razu
+        textEffect->StartAnimation(); // Rozpocznij animację tekstu od razu
     });
 });
 
@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
         titleLabel->show();
 
         QTimer::singleShot(300, [textEffect]() {
-            textEffect->startAnimation();
+            textEffect->StartAnimation();
         });
     });
 

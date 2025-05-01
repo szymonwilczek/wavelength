@@ -2,101 +2,101 @@
 
 #include <QTimer>
 
-CyberpunkTextEffect::CyberpunkTextEffect(QLabel *label, QWidget *parent): QObject(parent), m_label(label), m_originalText(label->text()) {
+CyberpunkTextEffect::CyberpunkTextEffect(QLabel *label, QWidget *parent): QObject(parent), label_(label), original_text_(label->text()) {
     // Ukryj etykietę na początku
-    m_label->setText("");
-    m_label->show();
+    label_->setText("");
+    label_->show();
 
     // Utwórz timer dla efektów animacji
-    m_timer = new QTimer(this);
-    connect(m_timer, &QTimer::timeout, this, &CyberpunkTextEffect::nextAnimationStep);
+    timer_ = new QTimer(this);
+    connect(timer_, &QTimer::timeout, this, &CyberpunkTextEffect::NextAnimationStep);
 }
 
-void CyberpunkTextEffect::startAnimation() {
-    m_phase = 0;
-    m_charIndex = 0;
-    m_glitchCount = 0;
-    m_timer->start(50); // 50ms pomiędzy krokami animacji
+void CyberpunkTextEffect::StartAnimation() {
+    phase_ = 0;
+    char_index_ = 0;
+    glitch_count_ = 0;
+    timer_->start(50); // 50ms pomiędzy krokami animacji
 }
 
-void CyberpunkTextEffect::animateScanning() {
+void CyberpunkTextEffect::AnimateScanning() {
     // Symulacja skanowania - pionowa linia
-    if (m_charIndex < m_originalText.length() * 2) {
-        const int scanPos = m_charIndex / 2;
+    if (char_index_ < original_text_.length() * 2) {
+        const int scanPos = char_index_ / 2;
 
         // Przygotuj tekst ze spacjami i znakiem |
-        QString scanText;
-        for (int i = 0; i < m_originalText.length(); i++) {
+        QString scan_text;
+        for (int i = 0; i < original_text_.length(); i++) {
             if (i == scanPos) {
-                scanText += "|";
+                scan_text += "|";
             } else {
-                scanText += " ";
+                scan_text += " ";
             }
         }
 
-        m_label->setText(scanText);
-        m_charIndex++;
+        label_->setText(scan_text);
+        char_index_++;
     } else {
-        m_phase = 1;
-        m_charIndex = 0;
-        m_label->setText("");
+        phase_ = 1;
+        char_index_ = 0;
+        label_->setText("");
     }
 }
 
-void CyberpunkTextEffect::animateTyping() {
+void CyberpunkTextEffect::AnimateTyping() {
     // Pisanie tekstu znak po znaku z glitchem
-    if (m_charIndex < m_originalText.length()) {
-        QString displayText = m_originalText.left(m_charIndex + 1);
+    if (char_index_ < original_text_.length()) {
+        QString display_text = original_text_.left(char_index_ + 1);
 
         // Dodaj losowy glitch
         if (QRandomGenerator::global()->bounded(100) < 30) {
             const auto glitchChar = QString(QChar(QRandomGenerator::global()->bounded(33, 126)));
-            displayText += glitchChar;
+            display_text += glitchChar;
         }
 
-        m_label->setText(displayText);
-        m_charIndex++;
+        label_->setText(display_text);
+        char_index_++;
     } else {
-        m_phase = 2;
-        m_glitchCount = 0;
+        phase_ = 2;
+        glitch_count_ = 0;
     }
 }
 
-void CyberpunkTextEffect::animateGlitching() {
+void CyberpunkTextEffect::AnimateGlitching() {
     // Końcowe glitche
-    if (m_glitchCount < 5) {
-        if (m_glitchCount % 2 == 0) {
+    if (glitch_count_ < 5) {
+        if (glitch_count_ % 2 == 0) {
             // Dodaj losowe znaki glitchujące
-            QString glitchText = m_originalText;
+            QString glitch_text = original_text_;
             for (int i = 0; i < 3; i++) {
-                const int pos = QRandomGenerator::global()->bounded(glitchText.length());
-                glitchText.insert(pos, QString(QChar(QRandomGenerator::global()->bounded(33, 126))));
+                const int pos = QRandomGenerator::global()->bounded(glitch_text.length());
+                glitch_text.insert(pos, QString(QChar(QRandomGenerator::global()->bounded(33, 126))));
             }
-            m_label->setText(glitchText);
+            label_->setText(glitch_text);
         } else {
-            m_label->setText(m_originalText);
+            label_->setText(original_text_);
         }
-        m_glitchCount++;
+        glitch_count_++;
     } else {
-        m_phase = 3;
+        phase_ = 3;
     }
 }
 
 
-void CyberpunkTextEffect::nextAnimationStep() {
-    switch (m_phase) {
+void CyberpunkTextEffect::NextAnimationStep() {
+    switch (phase_) {
         case 0: // Faza skanowania - pionowa linia przesuwająca się
-            animateScanning();
+            AnimateScanning();
             break;
         case 1: // Faza wypełniania tekstu
-            animateTyping();
+            AnimateTyping();
             break;
         case 2: // Faza glitchowania ostateczna
-            animateGlitching();
+            AnimateGlitching();
             break;
         case 3: // Koniec animacji
-            m_timer->stop();
-            m_label->setText(m_originalText);
+            timer_->stop();
+            label_->setText(original_text_);
             break;
     }
 }

@@ -8,24 +8,24 @@ class CyberpunkTextEffect final : public QObject {
 public:
     explicit CyberpunkTextEffect(QLabel *label, QWidget *parent = nullptr);
 
-    void startAnimation();
+    void StartAnimation();
 
 private slots:
-    void nextAnimationStep();
+    void NextAnimationStep();
 
 private:
-    void animateScanning();
+    void AnimateScanning();
 
-    void animateTyping();
+    void AnimateTyping();
 
-    void animateGlitching();
+    void AnimateGlitching();
 
-    QLabel *m_label;
-    QString m_originalText;
-    QTimer *m_timer;
-    int m_phase = 0;
-    int m_charIndex = 0;
-    int m_glitchCount = 0;
+    QLabel *label_;
+    QString original_text_;
+    QTimer *timer_;
+    int phase_ = 0;
+    int char_index_ = 0;
+    int glitch_count_ = 0;
 };
 
 #endif //CYBERPUNK_TEXT_EFFECT_H
