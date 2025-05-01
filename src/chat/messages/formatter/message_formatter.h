@@ -4,14 +4,13 @@
 #include "../../../storage/wavelength_registry.h"
 #include "../../files/attachments/attachment_data_store.h"
 
-
 class MessageFormatter {
 public:
-    static QString formatMessage(const QJsonObject& msgObj, const QString &frequency);
+    static QString FormatMessage(const QJsonObject& message_object, const QString &frequency);
 
-    static QString formatFileSize(qint64 sizeInBytes);
+    static QString FormatFileSize(qint64 size_in_bytes);
 
-    static QString formatSystemMessage(const QString& message);
+    static QString FormatSystemMessage(const QString& message);
 };
 
 #endif // MESSAGE_FORMATTER_H

@@ -149,11 +149,11 @@ void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj
         lightMsg["attachmentData"] = attachmentId;
 
         // Formatujemy i emitujemy placeholder
-        const QString placeholderMsg = MessageFormatter::formatMessage(lightMsg, frequency);
+        const QString placeholderMsg = MessageFormatter::FormatMessage(lightMsg, frequency);
         emit messageReceived(frequency, placeholderMsg);
     } else {
         // Dla zwykłych wiadomości tekstowych lub już z referencjami
-        const QString formattedMsg = MessageFormatter::formatMessage(msgObj, frequency);
+        const QString formattedMsg = MessageFormatter::FormatMessage(msgObj, frequency);
         emit messageReceived(frequency, formattedMsg);
     }
 }
@@ -190,14 +190,14 @@ void WavelengthMessageProcessor::processSystemCommand(const QJsonObject &msgObj,
 
 void WavelengthMessageProcessor::processUserJoined(const QJsonObject &msgObj, const QString &frequency) {
     const QString userId = msgObj["userId"].toString();
-    const QString formattedMsg = MessageFormatter::formatSystemMessage(
+    const QString formattedMsg = MessageFormatter::FormatSystemMessage(
         QString("User %1 joined the wavelength").arg(userId.left(5)));
     emit systemMessage(frequency, formattedMsg);
 }
 
 void WavelengthMessageProcessor::processUserLeft(const QJsonObject &msgObj, const QString &frequency) {
     const QString userId = msgObj["userId"].toString();
-    const QString formattedMsg = MessageFormatter::formatSystemMessage(
+    const QString formattedMsg = MessageFormatter::FormatSystemMessage(
         QString("User %1 left the wavelength").arg(userId.left(5)));
     emit systemMessage(frequency, formattedMsg);
 }
