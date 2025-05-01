@@ -2,6 +2,7 @@
 
 #include <QOperatingSystemVersion>
 #include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QVBoxLayout>
 
 VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QString &mime_type, QWidget *parent): QDialog(parent), video_data_(video_data), mime_type_(mime_type),

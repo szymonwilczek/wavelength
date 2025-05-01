@@ -1,7 +1,9 @@
 #include "inline_audio_player.h"
 
+#include <QApplication>
+
 InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
-    scanline_opacity_(0.15), spectrum_intensity_(0.6) {
+                                                                                                               scanline_opacity_(0.15), spectrum_intensity_(0.6) {
 
     // Ustawiamy styl i rozmiar - nadal zachowujemy mały rozmiar
     setFixedSize(480, 120);

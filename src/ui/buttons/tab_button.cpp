@@ -1,5 +1,7 @@
 #include "tab_button.h"
 
+#include <QPropertyAnimation>
+
 TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), underline_offset_(0), is_active_(false) {
 
     setFlat(true);

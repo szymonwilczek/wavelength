@@ -1,5 +1,7 @@
 #include "cyber_audio_slider.h"
 
+#include <QPropertyAnimation>
+
 CyberAudioSlider::CyberAudioSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), glow_intensity_(0.5) {
     setStyleSheet("background: transparent; border: none;");
 }

@@ -1,5 +1,6 @@
 #include "cyber_slider.h"
 
+#include <QPropertyAnimation>
 #include <QStyle>
 
 CyberSlider::CyberSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent), glow_intensity_(0.5) {

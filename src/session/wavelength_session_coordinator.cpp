@@ -1,6 +1,7 @@
 #include "wavelength_session_coordinator.h"
 
 #include "events/creator/wavelength_creator.h"
+#include "events/joiner/wavelength_joiner.h"
 #include "events/leaver/wavelength_leaver.h"
 
 void WavelengthSessionCoordinator::Initialize() {
@@ -58,7 +59,7 @@ void WavelengthSessionCoordinator::CloseWavelength(const QString &frequency) {
 
 bool WavelengthSessionCoordinator::SendMessage(const QString &message) {
     qDebug() << "Coordinator: Sending message to active wavelength";
-    return WavelengthMessageService::GetInstance()->SendMessage(message);
+    return WavelengthMessageService::GetInstance()->SendTextMessage(message);
 }
 
 bool WavelengthSessionCoordinator::IsWavelengthJoined(const QString &frequency) {

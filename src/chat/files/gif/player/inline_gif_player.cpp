@@ -1,5 +1,9 @@
 #include "inline_gif_player.h"
 
+#include <QApplication>
+#include <QTimer>
+#include <QVBoxLayout>
+
 InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent), gif_data_(gif_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

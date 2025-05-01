@@ -1,5 +1,7 @@
 #include "wavelength_stream_display.h"
 
+#include <QRegularExpression>
+
 WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(parent) {
     // Konfigurujemy główny układ
     const auto main_layout = new QVBoxLayout(this);
