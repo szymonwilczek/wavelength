@@ -10,7 +10,6 @@ GifDecoder::GifDecoder(const QByteArray &gif_data, QObject *parent): QThread(par
     buffer_ = nullptr;
     buffer_size_ = 0;
     paused_ = true;
-    seeking_ = false;
     current_position_ = 0;
     reached_end_of_stream_ = false;
     initialized_ = false;
@@ -114,7 +113,6 @@ bool GifDecoder::Reinitialize() {
     // Zresetuj stany
     stopped_ = false;
     paused_ = true;
-    seeking_ = false;
     current_position_ = 0;
     read_position_ = 0;
     reached_end_of_stream_ = false;
@@ -301,29 +299,6 @@ void GifDecoder::Pause() {
     }
 }
 
-void GifDecoder::Seek(const double position) {
-    QMutexLocker locker(&mutex_);
-
-    if (!format_context_ || gif_stream_ < 0) return;
-
-    int64_t timestamp = position * AV_TIME_BASE;
-
-    // Bezpieczne ograniczenie pozycji
-    if (timestamp < 0) timestamp = 0;
-    if (timestamp > format_context_->duration)
-        timestamp = format_context_->duration > 0 ? format_context_->duration - 1 : 0;
-
-    timestamp = av_rescale_q(timestamp, AV_TIME_BASE_Q,
-                             format_context_->streams[gif_stream_]->time_base);
-
-    seek_position_ = timestamp;
-    seeking_ = true;
-    locker.unlock();
-
-    if (paused_)
-        wait_condition_.wakeOne();
-}
-
 void GifDecoder::Reset() {
     QMutexLocker locker(&mutex_);
 
@@ -338,7 +313,6 @@ void GifDecoder::Reset() {
     }
 
     // Resetuj flagi stanu
-    seeking_ = false;
     seek_position_ = 0;
     reached_end_of_stream_ = false;
 }
@@ -389,35 +363,6 @@ void GifDecoder::run() {
                 wait_condition_.wait(&mutex_);
                 qDebug() << "GifDecoder::run() - Woken up.";
                 continue; // Wróć na początek pętli
-            }
-            // Jeśli nie jest zatrzymany i nie jest spauzowany, kontynuuj dekodowanie
-            if (seeking_) {
-                qDebug() << "GifDecoder::run() - Seeking to position:" << seek_position_;
-                if (format_context_ && gif_stream_ >= 0) {
-                    // Użyj AVSEEK_FLAG_ANY dla GIFów, może być bardziej niezawodne
-                    const int seek_ret = av_seek_frame(format_context_, gif_stream_, seek_position_, AVSEEK_FLAG_BACKWARD); // lub AVSEEK_FLAG_ANY
-                    if (seek_ret < 0) {
-                        qDebug() << "GifDecoder::run() - Seek failed:" << seek_ret;
-                    } else {
-                        qDebug() << "GifDecoder::run() - Seek successful.";
-                        if (codec_context_) {
-                            avcodec_flush_buffers(codec_context_); // Wyczyszczenie buforów po szukaniu
-                            qDebug() << "GifDecoder::run() - Codec buffers flushed.";
-                        }
-                    }
-                    seeking_ = false;
-                    frame_timer_.restart();
-                    is_first_frame_after_resume = true;
-
-                    // Aktualizacja pozycji po przeszukiwaniu
-                    current_position_ = seek_position_ * av_q2d(format_context_->streams[gif_stream_]->time_base);
-                    locker.unlock(); // Odblokuj przed emisją sygnału
-                    emit positionChanged(current_position_);
-                    locker.relock(); // Zablokuj ponownie (chociaż nie jest to ściśle konieczne przed continue)
-                } else {
-                    seeking_ = false; // Nie można szukać, zresetuj flagę
-                }
-                continue; // Wróć na początek pętli po seek
             }
         } // Koniec zakresu lockera
 

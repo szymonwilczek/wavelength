@@ -25,7 +25,7 @@ extern "C" {
  * This class takes raw GIF data as a QByteArray, uses FFmpeg (libavformat, libavcodec, libswscale)
  * to decode it frame by frame, and emits each decoded frame as a QImage (Format_RGBA8888).
  * It runs the decoding loop in a separate QThread to avoid blocking the main UI thread.
- * It supports pausing, resuming, seeking (approximate for GIF), looping, and provides signals
+ * It supports pausing, resuming, looping, and provides signals
  * for status updates (errors, info, position, frames). It uses a custom AVIOContext to read
  * data directly from the QByteArray in memory.
  */
@@ -58,7 +58,7 @@ public:
     /**
      * @brief Reinitializes the decoder after it has been stopped or encountered an error.
      * Stops the thread if running, releases existing FFmpeg resources, resets state flags
-     * (paused, stopped, seeking, position), and reallocates I/O context if necessary.
+     * (paused, stopped, position), and reallocates I/O context if necessary.
      * Does not automatically start playback. This operation is thread-safe.
      * @return True if reinitialization setup was successful, false otherwise.
      */
@@ -97,15 +97,6 @@ public:
         QMutexLocker locker(&mutex_); // Ensure thread safety when reading paused_
         return paused_;
     }
-
-    /**
-     * @brief Seeks to an approximate position in the GIF stream.
-     * GIF seeking is often imprecise. Sets the seeking_ flag and target position.
-     * The actual seek operation happens within the run() loop.
-     * This operation is thread-safe.
-     * @param position The target position in seconds from the beginning of the GIF.
-     */
-    void Seek(double position);
 
     /**
      * @brief Resets the playback position to the beginning of the GIF.
@@ -187,7 +178,7 @@ signals:
 protected:
      /**
       * @brief The main function executed by the QThread.
-      * Contains the loop that reads packets, decodes frames, handles seeking/pausing/looping,
+      * Contains the loop that reads packets, decodes frames, handles pausing/looping,
       * calculates frame delays, and emits decoded frames via the frameReady signal.
       */
      void run() override;
@@ -255,8 +246,6 @@ private:
     bool stopped_ = false;
     /** @brief Flag indicating if playback is currently paused. Access protected by mutex_. */
     bool paused_ = true;
-    /** @brief Flag indicating if a seek operation is pending. Access protected by mutex_. */
-    bool seeking_ = false;
     /** @brief Target timestamp for the pending seek operation (in stream timebase). Access protected by mutex_. */
     int64_t seek_position_ = 0;
     /** @brief Current playback position in seconds. Access protected by mutex_. */
