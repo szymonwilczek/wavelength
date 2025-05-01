@@ -23,46 +23,46 @@ class GifDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    explicit GifDecoder(const QByteArray& gifData, QObject* parent = nullptr);
+    explicit GifDecoder(const QByteArray& gif_data, QObject* parent = nullptr);
 
     ~GifDecoder() override;
 
-    void releaseResources();
+    void ReleaseResources();
 
-    bool reinitialize();
+    bool Reinitialize();
 
-    bool initialize();
+    bool Initialize();
 
-    void stop();
+    void Stop();
 
-    void pause();
+    void Pause();
 
-    bool isPaused() const {
-        return m_paused;
+    bool IsPaused() const {
+        return paused_;
     }
 
-    void seek(double position);
+    void Seek(double position);
 
-    void reset();
+    void Reset();
 
-    bool isDecoderRunning() const {
-        return QThread::isRunning();
+    bool IsDecoderRunning() const {
+        return isRunning();
     }
 
-    double getDuration() const {
-        if (m_formatContext && m_formatContext->duration != AV_NOPTS_VALUE) {
-            return m_formatContext->duration / static_cast<double>(AV_TIME_BASE);
+    double GetDuration() const {
+        if (format_context_ && format_context_->duration != AV_NOPTS_VALUE) {
+            return format_context_->duration / static_cast<double>(AV_TIME_BASE);
         }
         return 0.0;
     }
 
-    void resume();
+    void Resume();
 
 signals:
     void frameReady(const QImage& frame);
     void firstFrameReady(const QImage& frame);
     void error(const QString& message);
-    void gifInfo(int width, int height, double duration, double frameRate, int numStreams);
+    void gifInfo(int width, int height, double duration, double frame_rate, int num_of_streams);
     void playbackFinished();
     void positionChanged(double position);
 
@@ -70,40 +70,39 @@ protected:
      void run() override;
 
 private:
-    // Funkcje callback dla custom I/O
-    static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
 
-    static int64_t seekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
 
-    void extractAndEmitFirstFrameInternal();
+    void ExtractAndEmitFirstFrameInternal();
 
-    QByteArray m_gifData;
-    int m_readPosition = 0;
+    QByteArray gif_data_;
+    int read_position_ = 0;
 
-    AVFormatContext* m_formatContext = nullptr;
-    AVCodecContext* m_codecContext = nullptr;
-    SwsContext* m_swsContext = nullptr;
-    AVFrame* m_frame = nullptr;
-    AVFrame* m_frameRGB = nullptr;
-    AVIOContext* m_ioContext = nullptr;
-    unsigned char* m_ioBuffer = nullptr;
-    int m_gifStream = -1;
-    uint8_t* m_buffer = nullptr;
-    int m_bufferSize = 0;
+    AVFormatContext* format_context_ = nullptr;
+    AVCodecContext* codec_context_ = nullptr;
+    SwsContext* sws_context_ = nullptr;
+    AVFrame* frame_ = nullptr;
+    AVFrame* frame_rgb_ = nullptr;
+    AVIOContext* io_context_ = nullptr;
+    unsigned char* io_buffer_ = nullptr;
+    int gif_stream_ = -1;
+    uint8_t* buffer_ = nullptr;
+    int buffer_size_ = 0;
 
-    QMutex m_mutex;
-    QWaitCondition m_waitCondition;
-    bool m_stopped = false;
-    bool m_paused = true;
-    bool m_seeking = false;
-    int64_t m_seekPosition = 0;
-    double m_currentPosition = 0;
-    bool m_reachedEndOfStream = false;
-    bool m_initialized = false;
+    QMutex mutex_;
+    QWaitCondition wait_condition_;
+    bool stopped_ = false;
+    bool paused_ = true;
+    bool seeking_ = false;
+    int64_t seek_position_ = 0;
+    double current_position_ = 0;
+    bool reached_end_of_stream_ = false;
+    bool initialized_ = false;
 
-    double m_frameRate = 0.0;
-    double m_frameDelay = 100.0; // ms
-    QElapsedTimer m_frameTimer;
+    double frame_rate_ = 0.0;
+    double frame_delay_ = 100.0; // ms
+    QElapsedTimer frame_timer_;
 };
 
 #endif // GIF_DECODER_H

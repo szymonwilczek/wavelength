@@ -12,23 +12,23 @@ class InlineGifPlayer final : public QFrame {
     Q_OBJECT
 
 public:
-    explicit InlineGifPlayer(const QByteArray& gifData, QWidget* parent = nullptr);
+    explicit InlineGifPlayer(const QByteArray& gif_data, QWidget* parent = nullptr);
 
     // Usunięto getActivePlayer i logikę s_activePlayer
 
     ~InlineGifPlayer() override {
-        releaseResources();
+        ReleaseResources();
     }
 
-    void releaseResources();
+    void ReleaseResources();
 
     // Zwraca oryginalny rozmiar GIF-a jako wskazówkę
     QSize sizeHint() const override;
 
-    void startPlayback();
+    void StartPlayback();
 
     // Metoda do jawnego zatrzymania/pauzowania odtwarzania (np. dla dialogu)
-    void stopPlayback();
+    void StopPlayback();
 
 protected:
     // Przechwytywanie zdarzeń najechania i opuszczenia myszy
@@ -37,39 +37,36 @@ protected:
     void leaveEvent(QEvent *event) override;
 
 private slots:
-    void displayThumbnail(const QImage& frame);
+    void DisplayThumbnail(const QImage& frame);
 
-    void updateFrame(const QImage& frame) const;
+    void UpdateFrame(const QImage& frame) const;
 
 
-    void updatePosition(const double position) {
-        m_currentPosition = position;
+    void UpdatePosition(const double position) {
+        current_position_ = position;
     }
 
-    void handleError(const QString& message);
+    void HandleError(const QString& message);
 
-    void handleGifInfo(int width, int height, double duration, double frameRate, int numStreams);
+    void HandleGifInfo(int width, int height, double duration, double frame_rate, int num_of_streams);
 
 signals:
     void gifLoaded(); // Nowy sygnał
 
 private:
-    QLabel* m_gifLabel;
-    std::shared_ptr<GifDecoder> m_decoder;
+    QLabel* gif_label_;
+    std::shared_ptr<GifDecoder> decoder_;
 
-    QByteArray m_gifData;
+    QByteArray gif_data_;
 
-    int m_gifWidth = 0;
-    int m_gifHeight = 0;
-    double m_gifDuration = 0;
-    double m_frameRate = 0;
-    double m_currentPosition = 0;
-    // Usunięto m_isActive
-    QImage m_thumbnailFrame;
-    bool m_isPlaying; // Flaga śledząca, czy aktywnie odtwarzamy
-    QPixmap m_thumbnailPixmap;
-
-    // Usunięto s_activePlayer
+    int gif_width_ = 0;
+    int gif_height_ = 0;
+    double gif_duration_ = 0;
+    double frame_rate_ = 0;
+    double current_position_ = 0;
+    QImage thumbnail_frame_;
+    bool is_playing_;
+    QPixmap thumbnail_pixmap_;
 };
 
 #endif //INLINE_GIF_PLAYER_H

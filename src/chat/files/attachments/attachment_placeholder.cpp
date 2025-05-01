@@ -324,7 +324,7 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
                         show_with_size_check(full_gif, full_gif->sizeHint());
                         // Rozpocznij odtwarzanie *po* pokazaniu dialogu
                         if (full_gif) { // Sprawdź czy wskaźnik jest nadal ważny
-                            full_gif->startPlayback();
+                            full_gif->StartPlayback();
                         }
                     });
                 });
