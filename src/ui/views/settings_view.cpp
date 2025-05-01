@@ -29,7 +29,7 @@
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
-m_config(WavelengthConfig::getInstance()),
+m_config(WavelengthConfig::GetInstance()),
 m_tabContent(nullptr),
 m_titleLabel(nullptr),
 m_sessionLabel(nullptr),
@@ -505,7 +505,7 @@ void SettingsView::saveSettings() {
     if (m_shortcutsTabWidget) m_shortcutsTabWidget->saveSettings();
 
     // Zapisanie wszystkich ustawień do pliku/rejestru
-    m_config->saveSettings();
+    m_config->SaveSettings();
 
     ShortcutManager::GetInstance()->updateRegisteredShortcuts();
 
@@ -517,7 +517,7 @@ void SettingsView::restoreDefaults() {
     if (QMessageBox::question(this, "Restore Defaults",
                              "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings.", // Zaktualizowano komunikat
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        m_config->restoreDefaults();
+        m_config->RestoreDefaults();
         loadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie
         QMessageBox::information(this, "Defaults Restored", "Settings have been restored to their default values.");
         emit settingsChanged(); // Emituj sygnał również po przywróceniu domyślnych

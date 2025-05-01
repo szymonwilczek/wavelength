@@ -11,7 +11,7 @@
 #include <QDebug>
 
 ShortcutsSettingsWidget::ShortcutsSettingsWidget(QWidget *parent)
-    : QWidget(parent), m_config(WavelengthConfig::getInstance()), m_formLayout(nullptr), m_restoreButton(nullptr)
+    : QWidget(parent), m_config(WavelengthConfig::GetInstance()), m_formLayout(nullptr), m_restoreButton(nullptr)
 {
     setupUi();
     loadSettings(); // Załaduj skróty przy tworzeniu widgetu
@@ -44,7 +44,7 @@ void ShortcutsSettingsWidget::setupUi() {
     m_formLayout->setLabelAlignment(Qt::AlignRight);
 
     // Pobierz wszystkie domyślne akcje, aby utworzyć pola edycji
-    const QMap<QString, QKeySequence> defaultShortcuts = m_config->getDefaultShortcutsMap();
+    const QMap<QString, QKeySequence> defaultShortcuts = m_config->GetDefaultShortcutsMap();
     m_shortcutEdits.clear();
 
 
@@ -75,7 +75,7 @@ void ShortcutsSettingsWidget::setupUi() {
         );
 
         // --- ZMIANA: Pobierz AKTUALNĄ wartość skrótu (domyślną lub z ustawień) ---
-        keyEdit->setKeySequence(m_config->getShortcut(actionId)); // Użyj getShortcut
+        keyEdit->setKeySequence(m_config->GetShortcut(actionId)); // Użyj getShortcut
 
         m_formLayout->addRow(descLabel, keyEdit);
         m_shortcutEdits.insert(actionId, keyEdit); // Zapisz wskaźnik do widgetu edycji
@@ -120,7 +120,7 @@ void ShortcutsSettingsWidget::loadSettings() const {
     for (auto it = m_shortcutEdits.constBegin(); it != m_shortcutEdits.constEnd(); ++it) {
         QString actionId = it.key();
         if (QKeySequenceEdit *editWidget = it.value()) {
-            editWidget->setKeySequence(m_config->getShortcut(actionId));
+            editWidget->setKeySequence(m_config->GetShortcut(actionId));
         }
     }
 }
@@ -131,10 +131,10 @@ void ShortcutsSettingsWidget::saveSettings() const {
     for (auto it = m_shortcutEdits.constBegin(); it != m_shortcutEdits.constEnd(); ++it) {
         QString actionId = it.key();
         if (const QKeySequenceEdit *editWidget = it.value()) {
-            QKeySequence currentSequence = m_config->getShortcut(actionId);
+            QKeySequence currentSequence = m_config->GetShortcut(actionId);
             QKeySequence newSequence = editWidget->keySequence();
             if (currentSequence != newSequence) {
-                m_config->setShortcut(actionId, newSequence);
+                m_config->SetShortcut(actionId, newSequence);
                 changed = true;
                 qDebug() << "Shortcut changed for" << actionId << "to" << newSequence.toString();
             }
@@ -154,9 +154,9 @@ void ShortcutsSettingsWidget::restoreDefaultShortcuts() {
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         // --- ZMIANA: Ustaw domyślne wartości w mapie konfiguracji ---
-        const QMap<QString, QKeySequence> defaultShortcuts = m_config->getDefaultShortcutsMap(); // Potrzebujemy metody zwracającej m_defaultShortcuts
+        const QMap<QString, QKeySequence> defaultShortcuts = m_config->GetDefaultShortcutsMap(); // Potrzebujemy metody zwracającej m_defaultShortcuts
         for(auto it = defaultShortcuts.constBegin(); it != defaultShortcuts.constEnd(); ++it) {
-            m_config->setShortcut(it.key(), it.value()); // Ustaw domyślny w mapie m_shortcuts
+            m_config->SetShortcut(it.key(), it.value()); // Ustaw domyślny w mapie m_shortcuts
         }
         // --- KONIEC ZMIANY ---
 

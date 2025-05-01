@@ -481,15 +481,15 @@ QString WavelengthDialog::findLowestAvailableFrequency() {
     qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
     // Pobierz preferowaną częstotliwość startową z konfiguracji
-    const WavelengthConfig* config = WavelengthConfig::getInstance();
-    const QString preferredFreq = config->getPreferredStartFrequency();
+    const WavelengthConfig* config = WavelengthConfig::GetInstance();
+    const QString preferredFreq = config->GetPreferredStartFrequency();
     qDebug() << "LOG: Używam preferowanej częstotliwości startowej:" << preferredFreq << "Hz";
 
     QNetworkAccessManager manager;
     QEventLoop loop;
 
-    const QString serverAddress = config->getRelayServerAddress();
-    const int serverPort = config->getRelayServerPort();
+    const QString serverAddress = config->GetRelayServerAddress();
+    const int serverPort = config->GetRelayServerPort();
 
     const QString baseUrlString = QString("http://%1:%2/api/next-available-frequency").arg(serverAddress).arg(serverPort);
     QUrl url(baseUrlString);

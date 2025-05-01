@@ -16,7 +16,7 @@ ShortcutManager* ShortcutManager::GetInstance() {
 }
 
 ShortcutManager::ShortcutManager(QObject *parent)
-    : QObject(parent), config_(WavelengthConfig::getInstance())
+    : QObject(parent), config_(WavelengthConfig::GetInstance())
 {}
 
 void ShortcutManager::RegisterShortcuts(QWidget* parent) {
@@ -51,7 +51,7 @@ void ShortcutManager::RegisterShortcuts(QWidget* parent) {
 template<typename Func>
 requires std::invocable<Func>
 void ShortcutManager::CreateAndConnectShortcut(const QString& action_id, QWidget* parent, Func lambda) {
-    const QKeySequence sequence = config_->getShortcut(action_id); // Pobierz sekwencję (powinna być już załadowana z pliku)
+    const QKeySequence sequence = config_->GetShortcut(action_id); // Pobierz sekwencję (powinna być już załadowana z pliku)
 
     // <<< Dodane logowanie >>>
     qDebug() << "[ShortcutMgr] createAndConnectShortcut(" << action_id << "): Using sequence" << sequence.toString();
@@ -93,7 +93,7 @@ void ShortcutManager::updateRegisteredShortcuts() {
                 continue;
             }
 
-            if (QKeySequence new_sequence = config_->getShortcut(action_id); shortcut->key() != new_sequence) {
+            if (QKeySequence new_sequence = config_->GetShortcut(action_id); shortcut->key() != new_sequence) {
                 qDebug() << "[ShortcutMgr] Updating key for" << action_id << "from" << shortcut->key().toString() << "to" << new_sequence.toString();
                 shortcut->setKey(new_sequence);
             }

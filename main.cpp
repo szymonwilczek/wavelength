@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
 
 
-    WavelengthConfig *config = WavelengthConfig::getInstance();
+    WavelengthConfig *config = WavelengthConfig::GetInstance();
 
     // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;
@@ -253,7 +253,7 @@ int main(int argc, char *argv[]) {
         "}"
     );
 
-    updateTitleLabelStyle(titleLabel, config->getTitleTextColor(), config->getTitleBorderColor());
+    updateTitleLabelStyle(titleLabel, config->GetTitleTextColor(), config->GetTitleBorderColor());
 
     // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
     auto glowEffect = new QGraphicsDropShadowEffect(titleLabel);
@@ -303,31 +303,31 @@ int main(int argc, char *argv[]) {
                      [animation, config, titleLabel, glowEffect](const QString& key) { // <<< Dodaj titleLabel, glowEffect
         qDebug() << "Lambda for configChanged executed with key:" << key;
         if (key == "background_color" || key == "all") {
-            QColor newColor = config->getBackgroundColor();
+            QColor newColor = config->GetBackgroundColor();
             qDebug() << "Config changed: background_color to" << newColor.name();
             QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
         }
         else if (key == "blob_color" || key == "all") {
-            QColor newColor = config->getBlobColor();
+            QColor newColor = config->GetBlobColor();
             qDebug() << "Config changed: blob_color to" << newColor.name();
             QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
         }
         // --- NOWE: Obsługa siatki ---
         else if (key == "grid_color" || key == "all") {
-            QColor newColor = config->getGridColor();
+            QColor newColor = config->GetGridColor();
             qDebug() << "Config changed: grid_color to" << newColor.name(QColor::HexArgb);
             QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection, Q_ARG(QColor, newColor));
         }
         else if (key == "grid_spacing" || key == "all") {
-            int newSpacing = config->getGridSpacing();
+            int newSpacing = config->GetGridSpacing();
             qDebug() << "Config changed: grid_spacing to" << newSpacing;
             QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection, Q_ARG(int, newSpacing));
         }
         // --- NOWE: Obsługa tytułu ---
         else if (key == "title_text_color" || key == "title_border_color" || key == "all") {
              // Aktualizuj styl, jeśli zmienił się kolor tekstu lub ramki
-             QColor textColor = config->getTitleTextColor();
-             QColor borderColor = config->getTitleBorderColor();
+             QColor textColor = config->GetTitleTextColor();
+             QColor borderColor = config->GetTitleBorderColor();
              qDebug() << "Config changed: Updating title style (Text:" << textColor.name() << ", Border:" << borderColor.name() << ")";
              // Wywołaj w głównym wątku dla bezpieczeństwa UI
              QMetaObject::invokeMethod(qApp, [titleLabel, textColor, borderColor](){ // Użyj qApp lub innego QObject z głównego wątku
@@ -335,7 +335,7 @@ int main(int argc, char *argv[]) {
              }, Qt::QueuedConnection);
         }
         else if (key == "title_glow_color" || key == "all") {
-            QColor newColor = config->getTitleGlowColor();
+            QColor newColor = config->GetTitleGlowColor();
             qDebug() << "Config changed: title_glow_color to" << newColor.name();
             if (glowEffect) {
                 // Wywołaj w głównym wątku dla bezpieczeństwa UI

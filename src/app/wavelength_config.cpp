@@ -5,417 +5,408 @@
 #include <QCoreApplication>
 #include <qkeysequence.h>
 
-const QString SHORTCUTS_PREFIX = "Shortcuts/";
-
 namespace DefaultConfig {
-    const QString RELAY_SERVER_ADDRESS = "127.0.0.1";
-    constexpr int RELAY_SERVER_PORT = 8080;
-    constexpr int MAX_CHAT_HISTORY_SIZE = 1000;
-    constexpr int MAX_PROCESSED_MESSAGE_IDS = 5000;
-    constexpr int MAX_SENT_MESSAGE_CACHE_SIZE = 100;
-    constexpr int MAX_RECENT_WAVELENGTH = 10;
-    constexpr int CONNECTION_TIMEOUT = 5000; // ms
-    constexpr int KEEP_ALIVE_INTERVAL = 30000; // ms
-    constexpr int MAX_RECONNECT_ATTEMPTS = 5;
-    constexpr bool DEBUG_MODE = false;
-    const auto BACKGROUND_COLOR = QColor(0x101820); // Ciemny niebiesko-szary
-    const auto BLOB_COLOR = QColor(0x4682B4); // Steel Blue
-    const auto MESSAGE_COLOR = QColor(0xE0E0E0); // Jasnoszary
-    const auto STREAM_COLOR = QColor(0x00FF00); // Zielony (placeholder)
+    const QString kRelayServerAddress = "127.0.0.1";
+    constexpr int kRelayServerPort = 8080;
+    constexpr int kMaxChatHistorySize = 1000;
+    constexpr int kMaxProcessedMessageIds = 5000;
+    constexpr int kMaxSentMessageCacheSize = 100;
+    constexpr int kMaxRecentWavelength = 10;
+    constexpr int kConnectionTimeout = 5000; // ms
+    constexpr int kKeepAliveInterval = 30000; // ms
+    constexpr int kMaxReconnectAttempts = 5;
+    constexpr bool kIsDebugMode = false;
+    const auto kBackgroundColor = QColor(0x101820); // Ciemny niebiesko-szary
+    const auto kBlobColor = QColor(0x4682B4); // Steel Blue
+    const auto kMessageColor = QColor(0xE0E0E0); // Jasnoszary
+    const auto kStreamColor = QColor(0x00FF00); // Zielony (placeholder)
     // NOWE domyślne
-    constexpr auto GRID_COLOR = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
-    constexpr int GRID_SPACING = 35;
-    const auto TITLE_TEXT_COLOR = QColor(0xFFFFFF); // Biały
-    const auto TITLE_BORDER_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
-    const auto TITLE_GLOW_COLOR = QColor(0xE0B0FF); // Lawendowy fiolet
+    constexpr auto kGridColor = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
+    constexpr int kGridSpacing = 35;
+    const auto kTitleTextColor = QColor(0xFFFFFF); // Biały
+    const auto kTitleBorderColor = QColor(0xE0B0FF); // Lawendowy fiolet
+    const auto kTitleGlowColor = QColor(0xE0B0FF); // Lawendowy fiolet
 }
 
-WavelengthConfig* WavelengthConfig::m_instance = nullptr;
+WavelengthConfig* WavelengthConfig::instance_ = nullptr;
 
-WavelengthConfig* WavelengthConfig::getInstance() {
-    if (!m_instance) {
-        m_instance = new WavelengthConfig();
+WavelengthConfig* WavelengthConfig::GetInstance() {
+    if (!instance_) {
+        instance_ = new WavelengthConfig();
     }
-    return m_instance;
+    return instance_;
 }
 
 WavelengthConfig::WavelengthConfig(QObject *parent)
     : QObject(parent),
-    m_settings(QSettings::UserScope,
+    settings_(QSettings::UserScope,
      QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
-    qDebug() << "[Config] Initializing... Settings file:" << m_settings.fileName();
+    qDebug() << "[Config] Initializing... Settings file:" << settings_.fileName();
     // 1. Załaduj definicje domyślnych skrótów
-    loadDefaultShortcuts();
+    LoadDefaultShortcuts();
     // 2. Ustaw domyślne wartości dla wszystkich ustawień (w tym skopiuj domyślne skróty do m_shortcuts)
-    loadDefaults();
+    LoadDefaults();
     // 3. Załaduj zapisane ustawienia, nadpisując domyślne (w tym w m_shortcuts)
-    loadSettings();
+    LoadSettings();
     qDebug() << "[Config] Initialization complete.";
 }
 
-void WavelengthConfig::loadDefaults() {
-    m_relayServerAddress = DefaultConfig::RELAY_SERVER_ADDRESS;
-    m_relayServerPort = DefaultConfig::RELAY_SERVER_PORT;
-    m_maxChatHistorySize = DefaultConfig::MAX_CHAT_HISTORY_SIZE;
-    m_maxProcessedMessageIds = DefaultConfig::MAX_PROCESSED_MESSAGE_IDS;
-    m_maxSentMessageCacheSize = DefaultConfig::MAX_SENT_MESSAGE_CACHE_SIZE;
-    m_maxRecentWavelength = DefaultConfig::MAX_RECENT_WAVELENGTH;
-    m_connectionTimeout = DefaultConfig::CONNECTION_TIMEOUT;
-    m_keepAliveInterval = DefaultConfig::KEEP_ALIVE_INTERVAL;
-    m_maxReconnectAttempts = DefaultConfig::MAX_RECONNECT_ATTEMPTS;
-    m_debugMode = DefaultConfig::DEBUG_MODE;
-    m_backgroundColor = DefaultConfig::BACKGROUND_COLOR;
-    m_blobColor = DefaultConfig::BLOB_COLOR;
-    m_streamColor = DefaultConfig::STREAM_COLOR;
-    m_recentColors.clear(); // Domyślnie brak ostatnich kolorów
+void WavelengthConfig::LoadDefaults() {
+    relay_server_address_ = DefaultConfig::kRelayServerAddress;
+    relay_server_port_ = DefaultConfig::kRelayServerPort;
+    max_chat_history_size_ = DefaultConfig::kMaxChatHistorySize;
+    max_processed_message_ids_ = DefaultConfig::kMaxProcessedMessageIds;
+    max_sent_message_cache_size_ = DefaultConfig::kMaxSentMessageCacheSize;
+    max_recent_wavelength_ = DefaultConfig::kMaxRecentWavelength;
+    connection_timeout_ = DefaultConfig::kConnectionTimeout;
+    keep_alive_interval_ = DefaultConfig::kKeepAliveInterval;
+    max_reconnect_attempts_ = DefaultConfig::kMaxReconnectAttempts;
+    debug_mode_ = DefaultConfig::kIsDebugMode;
+    background_color_ = DefaultConfig::kBackgroundColor;
+    blob_color_ = DefaultConfig::kBlobColor;
+    stream_color_ = DefaultConfig::kStreamColor;
+    recent_colors_.clear();
 
-    // NOWE domyślne
-    m_gridColor = DefaultConfig::GRID_COLOR;
-    m_gridSpacing = DefaultConfig::GRID_SPACING;
-    m_titleTextColor = DefaultConfig::TITLE_TEXT_COLOR;
-    m_titleBorderColor = DefaultConfig::TITLE_BORDER_COLOR;
-    m_titleGlowColor = DefaultConfig::TITLE_GLOW_COLOR;
-    m_preferredStartFrequency = "130.0";
-    m_shortcuts = m_defaultShortcuts;
+    grid_color_ = DefaultConfig::kGridColor;
+    grid_spacing_ = DefaultConfig::kGridSpacing;
+    title_text_color_ = DefaultConfig::kTitleTextColor;
+    title_border_color_ = DefaultConfig::kTitleBorderColor;
+    title_glow_color_ = DefaultConfig::kTitleGlowColor;
+    preferred_start_frequency_ = "130.0";
+    shortcuts_ = default_shortcuts_;
 }
 
-void WavelengthConfig::loadDefaultShortcuts() {
-    m_defaultShortcuts.clear();
+void WavelengthConfig::LoadDefaultShortcuts() {
+    default_shortcuts_.clear();
     // Okno główne
-    m_defaultShortcuts["MainWindow.CreateWavelength"] = QKeySequence("Ctrl+N");
-    m_defaultShortcuts["MainWindow.JoinWavelength"] = QKeySequence("Ctrl+J");
-    m_defaultShortcuts["MainWindow.OpenSettings"] = QKeySequence("Ctrl+,");
+    default_shortcuts_["MainWindow.CreateWavelength"] = QKeySequence("Ctrl+N");
+    default_shortcuts_["MainWindow.JoinWavelength"] = QKeySequence("Ctrl+J");
+    default_shortcuts_["MainWindow.OpenSettings"] = QKeySequence("Ctrl+,");
     // Widok czatu
-    m_defaultShortcuts["ChatView.AbortConnection"] = QKeySequence("Ctrl+Q");
-    m_defaultShortcuts["ChatView.FocusInput"] = QKeySequence("Ctrl+L");
-    m_defaultShortcuts["ChatView.AttachFile"] = QKeySequence("Ctrl+O");
-    m_defaultShortcuts["ChatView.SendMessage"] = QKeySequence("Ctrl+Enter");
-    m_defaultShortcuts["ChatView.TogglePTT"] = QKeySequence("Space"); // Użyjemy spacji
+    default_shortcuts_["ChatView.AbortConnection"] = QKeySequence("Ctrl+Q");
+    default_shortcuts_["ChatView.FocusInput"] = QKeySequence("Ctrl+L");
+    default_shortcuts_["ChatView.AttachFile"] = QKeySequence("Ctrl+O");
+    default_shortcuts_["ChatView.SendMessage"] = QKeySequence("Ctrl+Enter");
+    default_shortcuts_["ChatView.TogglePTT"] = QKeySequence("Space"); // Użyjemy spacji
     // Widok ustawień
-    m_defaultShortcuts["SettingsView.SwitchTab0"] = QKeySequence("Ctrl+1");
-    m_defaultShortcuts["SettingsView.SwitchTab1"] = QKeySequence("Ctrl+2");
-    m_defaultShortcuts["SettingsView.SwitchTab2"] = QKeySequence("Ctrl+3");
-    m_defaultShortcuts["SettingsView.SwitchTab3"] = QKeySequence("Ctrl+4");
-    m_defaultShortcuts["SettingsView.SwitchTab4"] = QKeySequence("Ctrl+5"); // Dla nowej zakładki skrótów
-    m_defaultShortcuts["SettingsView.Save"] = QKeySequence("Ctrl+S");
-    m_defaultShortcuts["SettingsView.Defaults"] = QKeySequence("Ctrl+D");
-    m_defaultShortcuts["SettingsView.Back"] = QKeySequence(Qt::Key_Escape);
+    default_shortcuts_["SettingsView.SwitchTab0"] = QKeySequence("Ctrl+1");
+    default_shortcuts_["SettingsView.SwitchTab1"] = QKeySequence("Ctrl+2");
+    default_shortcuts_["SettingsView.SwitchTab2"] = QKeySequence("Ctrl+3");
+    default_shortcuts_["SettingsView.SwitchTab3"] = QKeySequence("Ctrl+4");
+    default_shortcuts_["SettingsView.SwitchTab4"] = QKeySequence("Ctrl+5"); // Dla nowej zakładki skrótów
+    default_shortcuts_["SettingsView.Save"] = QKeySequence("Ctrl+S");
+    default_shortcuts_["SettingsView.Defaults"] = QKeySequence("Ctrl+D");
+    default_shortcuts_["SettingsView.Back"] = QKeySequence(Qt::Key_Escape);
 }
 
-void WavelengthConfig::loadSettings() {
-    m_settings.beginGroup("Wavelength");
-    m_preferredStartFrequency = m_settings.value("preferredStartFrequency", m_preferredStartFrequency).toDouble();
-    m_settings.endGroup();
+void WavelengthConfig::LoadSettings() {
+    settings_.beginGroup("Wavelength");
+    preferred_start_frequency_ = settings_.value("preferredStartFrequency", preferred_start_frequency_).toDouble();
+    settings_.endGroup();
 
-    m_settings.beginGroup("Application");
-    m_maxChatHistorySize = m_settings.value("maxChatHistorySize", m_maxChatHistorySize).toInt();
-    m_maxProcessedMessageIds = m_settings.value("maxProcessedMessageIds", m_maxProcessedMessageIds).toInt();
-    m_maxSentMessageCacheSize = m_settings.value("maxSentMessageCacheSize", m_maxSentMessageCacheSize).toInt();
-    m_maxRecentWavelength = m_settings.value("maxRecentWavelength", m_maxRecentWavelength).toInt();
-    m_debugMode = m_settings.value("debugMode", m_debugMode).toBool();
-    m_settings.endGroup();
+    settings_.beginGroup("Application");
+    max_chat_history_size_ = settings_.value("maxChatHistorySize", max_chat_history_size_).toInt();
+    max_processed_message_ids_ = settings_.value("maxProcessedMessageIds", max_processed_message_ids_).toInt();
+    max_sent_message_cache_size_ = settings_.value("maxSentMessageCacheSize", max_sent_message_cache_size_).toInt();
+    max_recent_wavelength_ = settings_.value("maxRecentWavelength", max_recent_wavelength_).toInt();
+    debug_mode_ = settings_.value("debugMode", debug_mode_).toBool();
+    settings_.endGroup();
 
-    m_settings.beginGroup("Appearance");
-    m_backgroundColor = m_settings.value("backgroundColor", m_backgroundColor).value<QColor>();
-    m_blobColor = m_settings.value("blobColor", m_blobColor).value<QColor>();
-    m_streamColor = m_settings.value("streamColor", m_streamColor).value<QColor>();
-    m_recentColors = m_settings.value("recentColors", QStringList()).toStringList();
-    m_gridColor = m_settings.value("gridColor", m_gridColor).value<QColor>();
-    m_gridSpacing = m_settings.value("gridSpacing", m_gridSpacing).toInt();
-    m_titleTextColor = m_settings.value("titleTextColor", m_titleTextColor).value<QColor>();
-    m_titleBorderColor = m_settings.value("titleBorderColor", m_titleBorderColor).value<QColor>();
-    m_titleGlowColor = m_settings.value("titleGlowColor", m_titleGlowColor).value<QColor>();
-    m_settings.endGroup();
+    settings_.beginGroup("Appearance");
+    background_color_ = settings_.value("backgroundColor", background_color_).value<QColor>();
+    blob_color_ = settings_.value("blobColor", blob_color_).value<QColor>();
+    stream_color_ = settings_.value("streamColor", stream_color_).value<QColor>();
+    recent_colors_ = settings_.value("recentColors", QStringList()).toStringList();
+    grid_color_ = settings_.value("gridColor", grid_color_).value<QColor>();
+    grid_spacing_ = settings_.value("gridSpacing", grid_spacing_).toInt();
+    title_text_color_ = settings_.value("titleTextColor", title_text_color_).value<QColor>();
+    title_border_color_ = settings_.value("titleBorderColor", title_border_color_).value<QColor>();
+    title_glow_color_ = settings_.value("titleGlowColor", title_glow_color_).value<QColor>();
+    settings_.endGroup();
 
-    m_settings.beginGroup("Network");
-    m_relayServerAddress = m_settings.value("relayServerAddress", m_relayServerAddress).toString();
-    m_relayServerPort = m_settings.value("relayServerPort", m_relayServerPort).toInt();
-    m_connectionTimeout = m_settings.value("connectionTimeout", m_connectionTimeout).toInt();
-    m_keepAliveInterval = m_settings.value("keepAliveInterval", m_keepAliveInterval).toInt();
-    m_maxReconnectAttempts = m_settings.value("maxReconnectAttempts", m_maxReconnectAttempts).toInt();
-    m_settings.endGroup();
+    settings_.beginGroup("Network");
+    relay_server_address_ = settings_.value("relayServerAddress", relay_server_address_).toString();
+    relay_server_port_ = settings_.value("relayServerPort", relay_server_port_).toInt();
+    connection_timeout_ = settings_.value("connectionTimeout", connection_timeout_).toInt();
+    keep_alive_interval_ = settings_.value("keepAliveInterval", keep_alive_interval_).toInt();
+    max_reconnect_attempts_ = settings_.value("maxReconnectAttempts", max_reconnect_attempts_).toInt();
+    settings_.endGroup();
 
-    m_settings.beginGroup(SHORTCUTS_PREFIX); // Użyj grupy dla skrótów
-    QStringList shortcutKeys = m_settings.childKeys();
-    for (const QString& key : shortcutKeys) {
-        QKeySequence sequence = m_settings.value(key).value<QKeySequence>();
+    settings_.beginGroup(kShortcutsPrefix); // Użyj grupy dla skrótów
+    QStringList shortcut_keys = settings_.childKeys();
+    for (const QString& key : shortcut_keys) {
+        auto sequence = settings_.value(key).value<QKeySequence>();
         if (!sequence.isEmpty()) {
-            QString actionId = key;
-            m_shortcuts[actionId] = sequence;
-            qDebug() << "[Config] Loaded shortcut from settings:" << actionId << "=" << sequence.toString();
+            QString action_id = key;
+            shortcuts_[action_id] = sequence;
+            qDebug() << "[Config] Loaded shortcut from settings:" << action_id << "=" << sequence.toString();
         } else {
             qDebug() << "[Config] Warning: Empty shortcut found in settings for key:" << key;
-            if (m_defaultShortcuts.contains(key) && !m_shortcuts.contains(key)) {
-                m_shortcuts[key] = m_defaultShortcuts.value(key);
+            if (default_shortcuts_.contains(key) && !shortcuts_.contains(key)) {
+                shortcuts_[key] = default_shortcuts_.value(key);
             }
         }
     }
-    m_settings.endGroup(); // Koniec grupy Shortcuts
+    settings_.endGroup(); // Koniec grupy Shortcuts
 }
 
-void WavelengthConfig::saveSettings() {
-    m_settings.beginGroup("Wavelength");
-    m_settings.setValue("preferredStartFrequency", m_preferredStartFrequency);
-    m_settings.endGroup();
+void WavelengthConfig::SaveSettings() {
+    settings_.beginGroup("Wavelength");
+    settings_.setValue("preferredStartFrequency", preferred_start_frequency_);
+    settings_.endGroup();
 
-    m_settings.beginGroup("Application");
-    m_settings.setValue("maxChatHistorySize", m_maxChatHistorySize);
-    m_settings.setValue("maxProcessedMessageIds", m_maxProcessedMessageIds);
-    m_settings.setValue("maxSentMessageCacheSize", m_maxSentMessageCacheSize);
-    m_settings.setValue("maxRecentWavelength", m_maxRecentWavelength);
-    m_settings.setValue("debugMode", m_debugMode);
-    m_settings.endGroup();
+    settings_.beginGroup("Application");
+    settings_.setValue("maxChatHistorySize", max_chat_history_size_);
+    settings_.setValue("maxProcessedMessageIds", max_processed_message_ids_);
+    settings_.setValue("maxSentMessageCacheSize", max_sent_message_cache_size_);
+    settings_.setValue("maxRecentWavelength", max_recent_wavelength_);
+    settings_.setValue("debugMode", debug_mode_);
+    settings_.endGroup();
 
-    m_settings.beginGroup("Appearance");
-    m_settings.setValue("backgroundColor", m_backgroundColor);
-    m_settings.setValue("blobColor", m_blobColor);
-    m_settings.setValue("streamColor", m_streamColor);
-    m_settings.setValue("recentColors", m_recentColors);
-    m_settings.setValue("gridColor", m_gridColor);
-    m_settings.setValue("gridSpacing", m_gridSpacing);
-    m_settings.setValue("titleTextColor", m_titleTextColor);
-    m_settings.setValue("titleBorderColor", m_titleBorderColor);
-    m_settings.setValue("titleGlowColor", m_titleGlowColor);
-    m_settings.endGroup();
+    settings_.beginGroup("Appearance");
+    settings_.setValue("backgroundColor", background_color_);
+    settings_.setValue("blobColor", blob_color_);
+    settings_.setValue("streamColor", stream_color_);
+    settings_.setValue("recentColors", recent_colors_);
+    settings_.setValue("gridColor", grid_color_);
+    settings_.setValue("gridSpacing", grid_spacing_);
+    settings_.setValue("titleTextColor", title_text_color_);
+    settings_.setValue("titleBorderColor", title_border_color_);
+    settings_.setValue("titleGlowColor", title_glow_color_);
+    settings_.endGroup();
 
-    m_settings.beginGroup("Network");
-    m_settings.setValue("relayServerAddress", m_relayServerAddress);
-    m_settings.setValue("relayServerPort", m_relayServerPort);
-    m_settings.setValue("connectionTimeout", m_connectionTimeout);
-    m_settings.setValue("keepAliveInterval", m_keepAliveInterval);
-    m_settings.setValue("maxReconnectAttempts", m_maxReconnectAttempts);
-    m_settings.endGroup();
+    settings_.beginGroup("Network");
+    settings_.setValue("relayServerAddress", relay_server_address_);
+    settings_.setValue("relayServerPort", relay_server_port_);
+    settings_.setValue("connectionTimeout", connection_timeout_);
+    settings_.setValue("keepAliveInterval", keep_alive_interval_);
+    settings_.setValue("maxReconnectAttempts", max_reconnect_attempts_);
+    settings_.endGroup();
 
-    // --- NOWE: Zapisywanie skrótów ---
-    m_settings.beginGroup(SHORTCUTS_PREFIX); // Użyj grupy dla skrótów
-    // Wyczyść stare klucze, aby usunąć te, które mogły zostać przywrócone do domyślnych
-    // (alternatywnie, można by zapisywać tylko te, które różnią się od domyślnych)
-    m_settings.remove(""); // Usuwa wszystkie klucze w bieżącej grupie
+    settings_.beginGroup(kShortcutsPrefix);
+    settings_.remove("");
 
-    for (auto it = m_shortcuts.constBegin(); it != m_shortcuts.constEnd(); ++it) {
-        QString actionId = it.key();
+    for (auto it = shortcuts_.constBegin(); it != shortcuts_.constEnd(); ++it) {
+        QString action_id = it.key();
         QKeySequence sequence = it.value();
-        // Opcjonalnie: Zapisuj tylko jeśli różni się od domyślnego
-        // if (sequence != m_defaultShortcuts.value(actionId)) {
-        m_settings.setValue(actionId, sequence); // Zapisz pod ID akcji
-        qDebug() << "[Config] Saving shortcut to settings:" << actionId << "=" << sequence.toString();
+        settings_.setValue(action_id, sequence); // Zapisz pod ID akcji
+        qDebug() << "[Config] Saving shortcut to settings:" << action_id << "=" << sequence.toString();
         // }
     }
-    m_settings.endGroup(); // Koniec grupy Shortcuts
+    settings_.endGroup(); // Koniec grupy Shortcuts
     // --- KONIEC NOWE ---
 
-    m_settings.sync(); // Wymuś zapis na dysk
-    qDebug() << "Settings saved to:" << m_settings.fileName();
+    settings_.sync(); // Wymuś zapis na dysk
+    qDebug() << "Settings saved to:" << settings_.fileName();
 }
 
-void WavelengthConfig::restoreDefaults() {
-    loadDefaults();
-    m_settings.beginGroup(SHORTCUTS_PREFIX);
-    m_settings.remove(""); // Usuń wszystkie klucze w grupie skrótów
-    m_settings.endGroup();
-    saveSettings(); // Zapisz domyślne wartości
+void WavelengthConfig::RestoreDefaults() {
+    LoadDefaults();
+    settings_.beginGroup(kShortcutsPrefix);
+    settings_.remove(""); // Usuń wszystkie klucze w grupie skrótów
+    settings_.endGroup();
+    SaveSettings(); // Zapisz domyślne wartości
     emit configChanged("all"); // Sygnalizuj zmianę wszystkich ustawień
     emit recentColorsChanged(); // Zaktualizuj też ostatnie kolory (wyczyszczone)
     qDebug() << "Restored default settings.";
 }
 
-QString WavelengthConfig::getRelayServerAddress() const { return m_relayServerAddress; }
-int WavelengthConfig::getRelayServerPort() const { return m_relayServerPort; }
-QColor WavelengthConfig::getBackgroundColor() const { return m_backgroundColor; }
-QColor WavelengthConfig::getBlobColor() const { return m_blobColor; }
-QColor WavelengthConfig::getStreamColor() const { return m_streamColor; }
-QStringList WavelengthConfig::getRecentColors() const { return m_recentColors; }
-QColor WavelengthConfig::getGridColor() const { return m_gridColor; }
-int WavelengthConfig::getGridSpacing() const { return m_gridSpacing; }
-QColor WavelengthConfig::getTitleTextColor() const { return m_titleTextColor; }
-QColor WavelengthConfig::getTitleBorderColor() const { return m_titleBorderColor; }
-QColor WavelengthConfig::getTitleGlowColor() const { return m_titleGlowColor; }
+QString WavelengthConfig::GetRelayServerAddress() const { return relay_server_address_; }
+int WavelengthConfig::GetRelayServerPort() const { return relay_server_port_; }
+QColor WavelengthConfig::GetBackgroundColor() const { return background_color_; }
+QColor WavelengthConfig::GetBlobColor() const { return blob_color_; }
+QColor WavelengthConfig::GetStreamColor() const { return stream_color_; }
+QStringList WavelengthConfig::GetRecentColors() const { return recent_colors_; }
+QColor WavelengthConfig::GetGridColor() const { return grid_color_; }
+int WavelengthConfig::GetGridSpacing() const { return grid_spacing_; }
+QColor WavelengthConfig::GetTitleTextColor() const { return title_text_color_; }
+QColor WavelengthConfig::GetTitleBorderColor() const { return title_border_color_; }
+QColor WavelengthConfig::GetTitleGlowColor() const { return title_glow_color_; }
 
-void WavelengthConfig::setRelayServerAddress(const QString& address) {
-    if (m_relayServerAddress != address) {
-        m_relayServerAddress = address;
+void WavelengthConfig::SetRelayServerAddress(const QString& address) {
+    if (relay_server_address_ != address) {
+        relay_server_address_ = address;
         emit configChanged("relayServerAddress");
     }
 }
-void WavelengthConfig::setRelayServerPort(int port) {
-    if (m_relayServerPort != port) {
-        m_relayServerPort = port;
+void WavelengthConfig::SetRelayServerPort(const int port) {
+    if (relay_server_port_ != port) {
+        relay_server_port_ = port;
         emit configChanged("relayServerPort");
     }
 }
-void WavelengthConfig::setBackgroundColor(const QColor& color) {
-    if (m_backgroundColor != color && color.isValid()) {
-        m_backgroundColor = color;
-        addRecentColor(color); // Dodaj do ostatnich
+void WavelengthConfig::SetBackgroundColor(const QColor& color) {
+    if (background_color_ != color && color.isValid()) {
+        background_color_ = color;
+        AddRecentColor(color); // Dodaj do ostatnich
         emit configChanged("background_color");
         qDebug() << "Configuration changed: \"background_color\"";
     }
 }
-void WavelengthConfig::setBlobColor(const QColor& color) {
-    if (m_blobColor != color && color.isValid()) {
-        m_blobColor = color;
-        addRecentColor(color);
+void WavelengthConfig::SetBlobColor(const QColor& color) {
+    if (blob_color_ != color && color.isValid()) {
+        blob_color_ = color;
+        AddRecentColor(color);
         emit configChanged("blob_color");
         qDebug() << "Configuration changed: \"blob_color\"";
     }
 }
 
-void WavelengthConfig::setStreamColor(const QColor& color) {
-    if (m_streamColor != color && color.isValid()) {
-        m_streamColor = color;
-        addRecentColor(color);
+void WavelengthConfig::SetStreamColor(const QColor& color) {
+    if (stream_color_ != color && color.isValid()) {
+        stream_color_ = color;
+        AddRecentColor(color);
         emit configChanged("stream_color");
         qDebug() << "Configuration changed: \"stream_color\"";
     }
 }
 
 // --- NOWE settery ---
-void WavelengthConfig::setGridColor(const QColor& color) {
-    if (m_gridColor != color && color.isValid()) {
-        m_gridColor = color;
-        addRecentColor(color); // Kolor siatki też może być ostatnim
+void WavelengthConfig::SetGridColor(const QColor& color) {
+    if (grid_color_ != color && color.isValid()) {
+        grid_color_ = color;
+        AddRecentColor(color); // Kolor siatki też może być ostatnim
         emit configChanged("grid_color");
         qDebug() << "Configuration changed: \"grid_color\"";
     }
 }
 
-void WavelengthConfig::setGridSpacing(int spacing) {
-    if (m_gridSpacing != spacing && spacing > 0) { // Dodaj walidację (np. > 0)
-        m_gridSpacing = spacing;
+void WavelengthConfig::SetGridSpacing(int spacing) {
+    if (grid_spacing_ != spacing && spacing > 0) { // Dodaj walidację (np. > 0)
+        grid_spacing_ = spacing;
         emit configChanged("grid_spacing");
         qDebug() << "Configuration changed: \"grid_spacing\"";
     }
 }
 
-void WavelengthConfig::setTitleTextColor(const QColor& color) {
-    if (m_titleTextColor != color && color.isValid()) {
-        m_titleTextColor = color;
-        addRecentColor(color);
+void WavelengthConfig::SetTitleTextColor(const QColor& color) {
+    if (title_text_color_ != color && color.isValid()) {
+        title_text_color_ = color;
+        AddRecentColor(color);
         emit configChanged("title_text_color");
         qDebug() << "Configuration changed: \"title_text_color\"";
     }
 }
 
-void WavelengthConfig::setTitleBorderColor(const QColor& color) {
-    if (m_titleBorderColor != color && color.isValid()) {
-        m_titleBorderColor = color;
-        addRecentColor(color);
+void WavelengthConfig::SetTitleBorderColor(const QColor& color) {
+    if (title_border_color_ != color && color.isValid()) {
+        title_border_color_ = color;
+        AddRecentColor(color);
         emit configChanged("title_border_color");
         qDebug() << "Configuration changed: \"title_border_color\"";
     }
 }
 
-void WavelengthConfig::setTitleGlowColor(const QColor& color) {
-    if (m_titleGlowColor != color && color.isValid()) {
-        m_titleGlowColor = color;
-        addRecentColor(color);
+void WavelengthConfig::SetTitleGlowColor(const QColor& color) {
+    if (title_glow_color_ != color && color.isValid()) {
+        title_glow_color_ = color;
+        AddRecentColor(color);
         emit configChanged("title_glow_color");
         qDebug() << "Configuration changed: \"title_glow_color\"";
     }
 }
 // --------------------
 
-void WavelengthConfig::addRecentColor(const QColor& color) {
+void WavelengthConfig::AddRecentColor(const QColor& color) {
     if (!color.isValid()) return;
-    QString hex = color.name(QColor::HexRgb); // Użyj HexRgb dla spójności
-    m_recentColors.removeAll(hex); // Usuń, jeśli już istnieje
-    m_recentColors.prepend(hex); // Dodaj na początek
-    while (m_recentColors.size() > MAX_RECENT_COLORS) {
-        m_recentColors.removeLast(); // Usuń najstarsze, jeśli przekroczono limit
+    const QString hex = color.name(QColor::HexRgb); // Użyj HexRgb dla spójności
+    recent_colors_.removeAll(hex); // Usuń, jeśli już istnieje
+    recent_colors_.prepend(hex); // Dodaj na początek
+    while (recent_colors_.size() > kMaxRecentColors) {
+        recent_colors_.removeLast(); // Usuń najstarsze, jeśli przekroczono limit
     }
     emit recentColorsChanged(); // Sygnalizuj zmianę listy
 }
 
-QString WavelengthConfig::getRelayServerUrl() const {
-    return QString("ws://%1:%2").arg(m_relayServerAddress).arg(m_relayServerPort);
+QString WavelengthConfig::GetRelayServerUrl() const {
+    return QString("ws://%1:%2").arg(relay_server_address_).arg(relay_server_port_);
 }
-int WavelengthConfig::getMaxChatHistorySize() const { return m_maxChatHistorySize; }
-void WavelengthConfig::setMaxChatHistorySize(const int size) { if(m_maxChatHistorySize != size && size > 0) { m_maxChatHistorySize = size; emit configChanged("maxChatHistorySize"); } }
-int WavelengthConfig::getMaxProcessedMessageIds() const { return m_maxProcessedMessageIds; }
-void WavelengthConfig::setMaxProcessedMessageIds(const int size) { if(m_maxProcessedMessageIds != size && size > 0) { m_maxProcessedMessageIds = size; emit configChanged("maxProcessedMessageIds"); } }
-int WavelengthConfig::getMaxSentMessageCacheSize() const { return m_maxSentMessageCacheSize; }
-void WavelengthConfig::setMaxSentMessageCacheSize(const int size) { if(m_maxSentMessageCacheSize != size && size > 0) { m_maxSentMessageCacheSize = size; emit configChanged("maxSentMessageCacheSize"); } }
-int WavelengthConfig::getMaxRecentWavelength() const { return m_maxRecentWavelength; }
-void WavelengthConfig::setMaxRecentWavelength(const int size) { if(m_maxRecentWavelength != size && size > 0) { m_maxRecentWavelength = size; emit configChanged("maxRecentWavelength"); } }
-int WavelengthConfig::getConnectionTimeout() const { return m_connectionTimeout; }
-void WavelengthConfig::setConnectionTimeout(const int timeout) { if(m_connectionTimeout != timeout && timeout > 0) { m_connectionTimeout = timeout; emit configChanged("connectionTimeout"); } }
-int WavelengthConfig::getKeepAliveInterval() const { return m_keepAliveInterval; }
-void WavelengthConfig::setKeepAliveInterval(const int interval) { if(m_keepAliveInterval != interval && interval > 0) { m_keepAliveInterval = interval; emit configChanged("keepAliveInterval"); } }
-int WavelengthConfig::getMaxReconnectAttempts() const { return m_maxReconnectAttempts; }
-void WavelengthConfig::setMaxReconnectAttempts(const int attempts) { if(m_maxReconnectAttempts != attempts && attempts >= 0) { m_maxReconnectAttempts = attempts; emit configChanged("maxReconnectAttempts"); } }
-bool WavelengthConfig::isDebugMode() const { return m_debugMode; }
-void WavelengthConfig::setDebugMode(const bool enabled) { if(m_debugMode != enabled) { m_debugMode = enabled; emit configChanged("debugMode"); } }
+int WavelengthConfig::GetMaxChatHistorySize() const { return max_chat_history_size_; }
+void WavelengthConfig::SetMaxChatHistorySize(const int size) { if(max_chat_history_size_ != size && size > 0) { max_chat_history_size_ = size; emit configChanged("maxChatHistorySize"); } }
+int WavelengthConfig::GetMaxProcessedMessageIds() const { return max_processed_message_ids_; }
+void WavelengthConfig::SetMaxProcessedMessageIds(const int size) { if(max_processed_message_ids_ != size && size > 0) { max_processed_message_ids_ = size; emit configChanged("maxProcessedMessageIds"); } }
+int WavelengthConfig::GetMaxSentMessageCacheSize() const { return max_sent_message_cache_size_; }
+void WavelengthConfig::SetMaxSentMessageCacheSize(const int size) { if(max_sent_message_cache_size_ != size && size > 0) { max_sent_message_cache_size_ = size; emit configChanged("maxSentMessageCacheSize"); } }
+int WavelengthConfig::GetMaxRecentWavelength() const { return max_recent_wavelength_; }
+void WavelengthConfig::SetMaxRecentWavelength(const int size) { if(max_recent_wavelength_ != size && size > 0) { max_recent_wavelength_ = size; emit configChanged("maxRecentWavelength"); } }
+int WavelengthConfig::GetConnectionTimeout() const { return connection_timeout_; }
+void WavelengthConfig::SetConnectionTimeout(const int timeout) { if(connection_timeout_ != timeout && timeout > 0) { connection_timeout_ = timeout; emit configChanged("connectionTimeout"); } }
+int WavelengthConfig::GetKeepAliveInterval() const { return keep_alive_interval_; }
+void WavelengthConfig::SetKeepAliveInterval(const int interval) { if(keep_alive_interval_ != interval && interval > 0) { keep_alive_interval_ = interval; emit configChanged("keepAliveInterval"); } }
+int WavelengthConfig::GetMaxReconnectAttempts() const { return max_reconnect_attempts_; }
+void WavelengthConfig::SetMaxReconnectAttempts(const int attempts) { if(max_reconnect_attempts_ != attempts && attempts >= 0) { max_reconnect_attempts_ = attempts; emit configChanged("maxReconnectAttempts"); } }
+bool WavelengthConfig::IsDebugMode() const { return debug_mode_; }
+void WavelengthConfig::SetDebugMode(const bool enabled) { if(debug_mode_ != enabled) { debug_mode_ = enabled; emit configChanged("debugMode"); } }
 
-QKeySequence WavelengthConfig::getShortcut(const QString& actionId, const QKeySequence& defaultSequence) const {
-    // Odczytaj z mapy m_shortcuts, używając domyślnego jako fallback
-    const QKeySequence actualDefault = defaultSequence.isEmpty() ? m_defaultShortcuts.value(actionId) : defaultSequence;
-    QKeySequence result = m_shortcuts.value(actionId, actualDefault);
-    qDebug() << "[Config] getShortcut(" << actionId << "): Returning from map:" << result.toString();
+QKeySequence WavelengthConfig::GetShortcut(const QString& action_id, const QKeySequence& default_sequence) const {
+    const QKeySequence actual_default = default_sequence.isEmpty() ? default_shortcuts_.value(action_id) : default_sequence;
+    QKeySequence result = shortcuts_.value(action_id, actual_default);
+    qDebug() << "[Config] getShortcut(" << action_id << "): Returning from map:" << result.toString();
     return result;
 }
 
-void WavelengthConfig::setShortcut(const QString& actionId, const QKeySequence& sequence) {
+void WavelengthConfig::SetShortcut(const QString& action_id, const QKeySequence& sequence) {
     // Zaktualizuj mapę m_shortcuts
-    if (m_shortcuts.value(actionId) != sequence) {
-        qDebug() << "[Config] setShortcut(" << actionId << "): Updating map to" << sequence.toString();
-        m_shortcuts[actionId] = sequence;
+    if (shortcuts_.value(action_id) != sequence) {
+        qDebug() << "[Config] setShortcut(" << action_id << "): Updating map to" << sequence.toString();
+        shortcuts_[action_id] = sequence;
         // Zapis do QSettings nastąpi podczas saveSettings()
     }
 }
 
-QMap<QString, QKeySequence> WavelengthConfig::getAllShortcuts() const {
+QMap<QString, QKeySequence> WavelengthConfig::GetAllShortcuts() const {
     // Zwróć kopię mapy m_shortcuts
-    return m_shortcuts;
+    return shortcuts_;
 }
 
-QMap<QString, QKeySequence> WavelengthConfig::getDefaultShortcutsMap() const {
-    return m_defaultShortcuts; // Zwróć kopię mapy domyślnych
+QMap<QString, QKeySequence> WavelengthConfig::GetDefaultShortcutsMap() const {
+    return default_shortcuts_; // Zwróć kopię mapy domyślnych
 }
 
-QVariant WavelengthConfig::getSetting(const QString& key) const {
-    if (key == "relayServerAddress") return m_relayServerAddress;
-    if (key == "relayServerPort") return m_relayServerPort;
-    if (key == "maxChatHistorySize") return m_maxChatHistorySize;
-    if (key == "maxProcessedMessageIds") return m_maxProcessedMessageIds;
-    if (key == "maxSentMessageCacheSize") return m_maxSentMessageCacheSize;
-    if (key == "maxRecentWavelength") return m_maxRecentWavelength;
-    if (key == "connectionTimeout") return m_connectionTimeout;
-    if (key == "keepAliveInterval") return m_keepAliveInterval;
-    if (key == "maxReconnectAttempts") return m_maxReconnectAttempts;
-    if (key == "debugMode") return m_debugMode;
-    if (key == "background_color") return m_backgroundColor; // QColor jest automatycznie obsługiwany przez QVariant
-    if (key == "blob_color") return m_blobColor;
-    if (key == "stream_color") return m_streamColor;
-    if (key == "grid_color") return m_gridColor;
-    if (key == "grid_spacing") return m_gridSpacing;
-    if (key == "title_text_color") return m_titleTextColor;
-    if (key == "title_border_color") return m_titleBorderColor;
-    if (key == "title_glow_color") return m_titleGlowColor;
-    if (key == "recentColors") return m_recentColors; // QStringList jest obsługiwany przez QVariant
+QVariant WavelengthConfig::GetSetting(const QString& key) const {
+    if (key == "relayServerAddress") return relay_server_address_;
+    if (key == "relayServerPort") return relay_server_port_;
+    if (key == "maxChatHistorySize") return max_chat_history_size_;
+    if (key == "maxProcessedMessageIds") return max_processed_message_ids_;
+    if (key == "maxSentMessageCacheSize") return max_sent_message_cache_size_;
+    if (key == "maxRecentWavelength") return max_recent_wavelength_;
+    if (key == "connectionTimeout") return connection_timeout_;
+    if (key == "keepAliveInterval") return keep_alive_interval_;
+    if (key == "maxReconnectAttempts") return max_reconnect_attempts_;
+    if (key == "debugMode") return debug_mode_;
+    if (key == "background_color") return background_color_; // QColor jest automatycznie obsługiwany przez QVariant
+    if (key == "blob_color") return blob_color_;
+    if (key == "stream_color") return stream_color_;
+    if (key == "grid_color") return grid_color_;
+    if (key == "grid_spacing") return grid_spacing_;
+    if (key == "title_text_color") return title_text_color_;
+    if (key == "title_border_color") return title_border_color_;
+    if (key == "title_glow_color") return title_glow_color_;
+    if (key == "recentColors") return recent_colors_; // QStringList jest obsługiwany przez QVariant
 
     // Jeśli klucz nie pasuje do żadnego znanego ustawienia
     qWarning() << "WavelengthConfig::getSetting - Unknown key:" << key;
     return {}; // Zwróć nieprawidłowy QVariant
 }
 
-QString WavelengthConfig::getPreferredStartFrequency() const {
-    return m_preferredStartFrequency;
+QString WavelengthConfig::GetPreferredStartFrequency() const {
+    return preferred_start_frequency_;
 }
 
-void WavelengthConfig::setPreferredStartFrequency(const QString &frequency) {
+void WavelengthConfig::SetPreferredStartFrequency(const QString &frequency) {
     bool ok;
 
-    if (const double freqValue = frequency.toDouble(&ok); ok && freqValue >= 130.0) {
-        if (const QString normalizedFrequency = QString::number(freqValue, 'f', 1); m_preferredStartFrequency != normalizedFrequency) {
-            m_preferredStartFrequency = normalizedFrequency;
+    if (const double frequency_value = frequency.toDouble(&ok); ok && frequency_value >= 130.0) {
+        if (const QString normalized_frequency = QString::number(frequency_value, 'f', 1); preferred_start_frequency_ != normalized_frequency) {
+            preferred_start_frequency_ = normalized_frequency;
             emit configChanged("preferredStartFrequency");
-            qDebug() << "Config: Preferred start frequency set to" << m_preferredStartFrequency;
+            qDebug() << "Config: Preferred start frequency set to" << preferred_start_frequency_;
         }
     } else {
-        qWarning() << "Config: Invalid preferred start frequency provided:" << frequency << ". Keeping previous value:" << m_preferredStartFrequency;
-        if (m_preferredStartFrequency.toDouble(&ok) < 130.0 || !ok) {
-        m_preferredStartFrequency = QString::number(130.0, 'f', 1);
+        qWarning() << "Config: Invalid preferred start frequency provided:" << frequency << ". Keeping previous value:" << preferred_start_frequency_;
+        if (preferred_start_frequency_.toDouble(&ok) < 130.0 || !ok) {
+        preferred_start_frequency_ = QString::number(130.0, 'f', 1);
         emit configChanged("preferredStartFrequency");
         }
     }

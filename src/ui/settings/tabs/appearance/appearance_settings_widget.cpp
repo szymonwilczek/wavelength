@@ -13,7 +13,7 @@
 
 AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::getInstance()),
+      m_config(WavelengthConfig::GetInstance()),
       // Inicjalizacja wskaźników
       m_bgColorPreview(nullptr), m_blobColorPreview(nullptr), m_streamColorPreview(nullptr),
       m_gridColorPreview(nullptr), m_gridSpacingSpinBox(nullptr), // NOWE
@@ -118,19 +118,19 @@ void AppearanceSettingsWidget::setupUi() {
 
 void AppearanceSettingsWidget::loadSettings() {
     // Istniejące
-    m_selectedBgColor = m_config->getBackgroundColor();
-    m_selectedBlobColor = m_config->getBlobColor();
-    m_selectedStreamColor = m_config->getStreamColor();
+    m_selectedBgColor = m_config->GetBackgroundColor();
+    m_selectedBlobColor = m_config->GetBlobColor();
+    m_selectedStreamColor = m_config->GetStreamColor();
     updateColorPreview(m_bgColorPreview, m_selectedBgColor);
     updateColorPreview(m_blobColorPreview, m_selectedBlobColor);
     updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
 
     // NOWE
-    m_selectedGridColor = m_config->getGridColor();
-    m_selectedGridSpacing = m_config->getGridSpacing();
-    m_selectedTitleTextColor = m_config->getTitleTextColor();
-    m_selectedTitleBorderColor = m_config->getTitleBorderColor();
-    m_selectedTitleGlowColor = m_config->getTitleGlowColor();
+    m_selectedGridColor = m_config->GetGridColor();
+    m_selectedGridSpacing = m_config->GetGridSpacing();
+    m_selectedTitleTextColor = m_config->GetTitleTextColor();
+    m_selectedTitleBorderColor = m_config->GetTitleBorderColor();
+    m_selectedTitleGlowColor = m_config->GetTitleGlowColor();
 
     updateColorPreview(m_gridColorPreview, m_selectedGridColor);
     m_gridSpacingSpinBox->setValue(m_selectedGridSpacing);
@@ -145,15 +145,15 @@ void AppearanceSettingsWidget::loadSettings() {
 void AppearanceSettingsWidget::saveSettings() const {
     // Wywołaj settery w config - chociaż zmiany są natychmiastowe,
     // to zapewnia spójność, jeśli użytkownik zmienił coś w innych zakładkach
-    m_config->setBackgroundColor(m_selectedBgColor);
-    m_config->setBlobColor(m_selectedBlobColor);
-    m_config->setStreamColor(m_selectedStreamColor);
+    m_config->SetBackgroundColor(m_selectedBgColor);
+    m_config->SetBlobColor(m_selectedBlobColor);
+    m_config->SetStreamColor(m_selectedStreamColor);
     // NOWE
-    m_config->setGridColor(m_selectedGridColor);
-    m_config->setGridSpacing(m_selectedGridSpacing);
-    m_config->setTitleTextColor(m_selectedTitleTextColor);
-    m_config->setTitleBorderColor(m_selectedTitleBorderColor);
-    m_config->setTitleGlowColor(m_selectedTitleGlowColor);
+    m_config->SetGridColor(m_selectedGridColor);
+    m_config->SetGridSpacing(m_selectedGridSpacing);
+    m_config->SetTitleTextColor(m_selectedTitleTextColor);
+    m_config->SetTitleBorderColor(m_selectedTitleBorderColor);
+    m_config->SetTitleGlowColor(m_selectedTitleGlowColor);
     // ---
     // Nie trzeba wywoływać m_config->saveSettings() tutaj, zrobi to główny przycisk Save
 }
@@ -178,7 +178,7 @@ void AppearanceSettingsWidget::chooseBackgroundColor() {
         // --- Natychmiast zastosuj zmianę w konfiguracji ---
         // To spowoduje emisję sygnału configChanged("background_color")
         qDebug() << "Immediately setting background color in config to:" << color.name();
-        m_config->setBackgroundColor(color);
+        m_config->SetBackgroundColor(color);
         // -------------------------------------------------
 
         // m_config->addRecentColor(color); // Niepotrzebne, bo setBackgroundColor już to robi
@@ -200,7 +200,7 @@ void AppearanceSettingsWidget::chooseBlobColor() {
 
         // --- Natychmiast zastosuj zmianę w konfiguracji ---
         qDebug() << "Immediately setting blob color in config to:" << color.name();
-        m_config->setBlobColor(color); // To wyemituje configChanged("blob_color")
+        m_config->SetBlobColor(color); // To wyemituje configChanged("blob_color")
         // -------------------------------------------------
 
         // m_config->addRecentColor(color); // Niepotrzebne, setBlobColor to robi
@@ -221,7 +221,7 @@ void AppearanceSettingsWidget::chooseStreamColor() {
         updateColorPreview(m_streamColorPreview, m_selectedStreamColor);
         // --- Natychmiast zastosuj zmianę (jeśli chcesz) ---
         qDebug() << "Immediately setting stream color in config to:" << color.name();
-        m_config->setStreamColor(color); // Zakładając, że chcesz natychmiastowej zmiany
+        m_config->SetStreamColor(color); // Zakładając, że chcesz natychmiastowej zmiany
         // -------------------------------------------------
     }
 }
@@ -233,7 +233,7 @@ void AppearanceSettingsWidget::chooseGridColor() {
         m_selectedGridColor = color;
         updateColorPreview(m_gridColorPreview, m_selectedGridColor);
         qDebug() << "Immediately setting grid color in config to:" << color.name(QColor::HexArgb);
-        m_config->setGridColor(color);
+        m_config->SetGridColor(color);
     }
 }
 
@@ -241,7 +241,7 @@ void AppearanceSettingsWidget::gridSpacingChanged(const int value) {
     if (m_selectedGridSpacing != value) {
         m_selectedGridSpacing = value;
         qDebug() << "Immediately setting grid spacing in config to:" << value;
-        m_config->setGridSpacing(value);
+        m_config->SetGridSpacing(value);
         // Nie ma podglądu do aktualizacji, SpinBox sam się aktualizuje
     }
 }
@@ -253,7 +253,7 @@ void AppearanceSettingsWidget::chooseTitleTextColor() {
         m_selectedTitleTextColor = color;
         updateColorPreview(m_titleTextColorPreview, m_selectedTitleTextColor);
         qDebug() << "Immediately setting title text color in config to:" << color.name();
-        m_config->setTitleTextColor(color);
+        m_config->SetTitleTextColor(color);
     }
 }
 
@@ -264,7 +264,7 @@ void AppearanceSettingsWidget::chooseTitleBorderColor() {
         m_selectedTitleBorderColor = color;
         updateColorPreview(m_titleBorderColorPreview, m_selectedTitleBorderColor);
         qDebug() << "Immediately setting title border color in config to:" << color.name();
-        m_config->setTitleBorderColor(color);
+        m_config->SetTitleBorderColor(color);
     }
 }
 
@@ -275,7 +275,7 @@ void AppearanceSettingsWidget::chooseTitleGlowColor() {
         m_selectedTitleGlowColor = color;
         updateColorPreview(m_titleGlowColorPreview, m_selectedTitleGlowColor);
         qDebug() << "Immediately setting title glow color in config to:" << color.name();
-        m_config->setTitleGlowColor(color);
+        m_config->SetTitleGlowColor(color);
     }
 }
 // --------------------
@@ -284,7 +284,7 @@ void AppearanceSettingsWidget::selectRecentColor(const QColor& color) const {
     qDebug() << "Recent color selected:" << color.name();
     // Tutaj można by dodać logikę, który podgląd ma być zaktualizowany
     // na podstawie jakiegoś stanu, ale na razie samo dodanie do listy wystarczy.
-    m_config->addRecentColor(color);
+    m_config->AddRecentColor(color);
 }
 
 void AppearanceSettingsWidget::updateRecentColorsUI() {
@@ -310,7 +310,7 @@ void AppearanceSettingsWidget::updateRecentColorsUI() {
     }
 
 
-    QStringList recentHexColors = m_config->getRecentColors();
+    QStringList recentHexColors = m_config->GetRecentColors();
 
     for (const QString& hexColor : recentHexColors) {
         QColor color(hexColor);

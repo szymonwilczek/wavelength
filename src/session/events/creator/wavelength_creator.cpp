@@ -4,7 +4,7 @@
 
 bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProtected, const QString &password) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    const WavelengthConfig* config = WavelengthConfig::getInstance();
+    const WavelengthConfig* config = WavelengthConfig::GetInstance();
 
     if (registry->hasWavelength(frequency)) {
         qDebug() << "Wavelength" << frequency << "already exists locally";
@@ -58,7 +58,7 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
                 }
 
                 registry->setActiveWavelength(frequency);
-                keepAliveTimer->start(WavelengthConfig::getInstance()->getKeepAliveInterval());
+                keepAliveTimer->start(WavelengthConfig::GetInstance()->GetKeepAliveInterval());
                 qDebug() << "[Creator] Keep-alive timer started for" << frequency;
                 emit wavelengthCreated(frequency);
             } else {
@@ -147,8 +147,8 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
                 qDebug() << "[Creator] Sent register request for wavelength" << frequency;
             });
 
-    const QString address = config->getRelayServerAddress();
-    const int port = config->getRelayServerPort();
+    const QString address = config->GetRelayServerAddress();
+    const int port = config->GetRelayServerPort();
     const QUrl url(QString("ws://%1:%2").arg(address).arg(port));
     qDebug() << "[Creator] Opening WebSocket connection to URL:" << url.toString();
     socket->open(url);

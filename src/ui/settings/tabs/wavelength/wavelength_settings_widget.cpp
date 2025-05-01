@@ -20,7 +20,7 @@ namespace FreqLimits {
 
 WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::getInstance()),
+      m_config(WavelengthConfig::GetInstance()),
       m_frequencyValueEdit(nullptr),
       m_frequencyUnitCombo(nullptr)
 {
@@ -84,7 +84,7 @@ void WavelengthSettingsWidget::loadSettings() const {
         return;
     }
 
-    const QString freqStringHz = m_config->getPreferredStartFrequency();
+    const QString freqStringHz = m_config->GetPreferredStartFrequency();
     bool ok;
     double freqValueHz = freqStringHz.toDouble(&ok);
 
@@ -176,7 +176,7 @@ void WavelengthSettingsWidget::saveSettings() {
     }
 
     const QString frequencyStringHz = QString::number(frequencyValueHz, 'f', 1);
-    m_config->setPreferredStartFrequency(frequencyStringHz);
+    m_config->SetPreferredStartFrequency(frequencyStringHz);
 
     // Usunięto zapis m_config->setRelayServerAddress(...)
     // Usunięto zapis m_config->setRelayServerPort(...)

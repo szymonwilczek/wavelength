@@ -11,75 +11,75 @@
 
 class WavelengthConfig final : public QObject {
     Q_OBJECT
-    static constexpr int MAX_RECENT_COLORS = 5;
+    static constexpr int kMaxRecentColors = 5;
+    const QString kShortcutsPrefix = "Shortcuts/";
 public:
-    static WavelengthConfig* getInstance();
+    static WavelengthConfig* GetInstance();
     ~WavelengthConfig() override = default;
 
-    // --- Istniejące metody ---
-    QString getRelayServerAddress() const;
-    void setRelayServerAddress(const QString& address);
-    int getRelayServerPort() const;
-    void setRelayServerPort(int port);
-    QString getRelayServerUrl() const;
-    int getMaxChatHistorySize() const;
-    void setMaxChatHistorySize(int size);
-    int getMaxProcessedMessageIds() const;
-    void setMaxProcessedMessageIds(int size);
-    int getMaxSentMessageCacheSize() const;
-    void setMaxSentMessageCacheSize(int size);
-    int getMaxRecentWavelength() const;
-    void setMaxRecentWavelength(int size);
-    int getConnectionTimeout() const;
-    void setConnectionTimeout(int timeout);
-    int getKeepAliveInterval() const;
-    void setKeepAliveInterval(int interval);
-    int getMaxReconnectAttempts() const;
-    void setMaxReconnectAttempts(int attempts);
-    bool isDebugMode() const;
-    void setDebugMode(bool enabled);
+    QString GetRelayServerAddress() const;
+    void SetRelayServerAddress(const QString& address);
+    int GetRelayServerPort() const;
+    void SetRelayServerPort(int port);
+    QString GetRelayServerUrl() const;
+    int GetMaxChatHistorySize() const;
+    void SetMaxChatHistorySize(int size);
+    int GetMaxProcessedMessageIds() const;
+    void SetMaxProcessedMessageIds(int size);
+    int GetMaxSentMessageCacheSize() const;
+    void SetMaxSentMessageCacheSize(int size);
+    int GetMaxRecentWavelength() const;
+    void SetMaxRecentWavelength(int size);
+    int GetConnectionTimeout() const;
+    void SetConnectionTimeout(int timeout);
+    int GetKeepAliveInterval() const;
+    void SetKeepAliveInterval(int interval);
+    int GetMaxReconnectAttempts() const;
+    void SetMaxReconnectAttempts(int attempts);
+    bool IsDebugMode() const;
+    void SetDebugMode(bool enabled);
 
-    QString getPreferredStartFrequency() const;
-    void setPreferredStartFrequency(const QString &frequency);
+    QString GetPreferredStartFrequency() const;
+    void SetPreferredStartFrequency(const QString &frequency);
 
     // --- Kolory wyglądu ---
-    QColor getBackgroundColor() const;
-    void setBackgroundColor(const QColor& color);
-    QColor getBlobColor() const;
-    void setBlobColor(const QColor& color);
-    QColor getStreamColor() const;
-    void setStreamColor(const QColor& color);
+    QColor GetBackgroundColor() const;
+    void SetBackgroundColor(const QColor& color);
+    QColor GetBlobColor() const;
+    void SetBlobColor(const QColor& color);
+    QColor GetStreamColor() const;
+    void SetStreamColor(const QColor& color);
 
     // --- NOWE: Ustawienia siatki ---
-    QColor getGridColor() const;
-    void setGridColor(const QColor& color);
-    int getGridSpacing() const;
-    void setGridSpacing(int spacing);
+    QColor GetGridColor() const;
+    void SetGridColor(const QColor& color);
+    int GetGridSpacing() const;
+    void SetGridSpacing(int spacing);
     // -----------------------------
 
     // --- NOWE: Ustawienia etykiety tytułowej ---
-    QColor getTitleTextColor() const;
-    void setTitleTextColor(const QColor& color);
-    QColor getTitleBorderColor() const;
-    void setTitleBorderColor(const QColor& color);
-    QColor getTitleGlowColor() const;
-    void setTitleGlowColor(const QColor& color);
+    QColor GetTitleTextColor() const;
+    void SetTitleTextColor(const QColor& color);
+    QColor GetTitleBorderColor() const;
+    void SetTitleBorderColor(const QColor& color);
+    QColor GetTitleGlowColor() const;
+    void SetTitleGlowColor(const QColor& color);
     // -----------------------------------------
 
     // --- Ostatnie kolory ---
-    QStringList getRecentColors() const;
-    void addRecentColor(const QColor& color);
+    QStringList GetRecentColors() const;
+    void AddRecentColor(const QColor& color);
     // -----------------------
 
-    QKeySequence getShortcut(const QString& actionId, const QKeySequence& defaultSequence = QKeySequence()) const;
-    void setShortcut(const QString& actionId, const QKeySequence& sequence);
-    QMap<QString, QKeySequence> getAllShortcuts() const;
-    QMap<QString, QKeySequence> getDefaultShortcutsMap() const; // <<< NOWA METODA
+    QKeySequence GetShortcut(const QString& action_id, const QKeySequence& default_sequence = QKeySequence()) const;
+    void SetShortcut(const QString& action_id, const QKeySequence& sequence);
+    QMap<QString, QKeySequence> GetAllShortcuts() const;
+    QMap<QString, QKeySequence> GetDefaultShortcutsMap() const; // <<< NOWA METODA
 
-    void saveSettings(); // Zapisuje wszystkie bieżące wartości
-    void restoreDefaults(); // Przywraca wartości domyślne
+    void SaveSettings(); // Zapisuje wszystkie bieżące wartości
+    void RestoreDefaults(); // Przywraca wartości domyślne
 
-    QVariant getSetting(const QString& key) const;
+    QVariant GetSetting(const QString& key) const;
 
 signals:
     void configChanged(const QString& key);
@@ -90,40 +90,40 @@ private:
     WavelengthConfig(const WavelengthConfig&) = delete;
     WavelengthConfig& operator=(const WavelengthConfig&) = delete;
 
-    void loadDefaults();
-    void loadSettings(); // Ładuje z QSettings
+    void LoadDefaults();
+    void LoadSettings(); // Ładuje z QSettings
 
-    static WavelengthConfig* m_instance;
-    QSettings m_settings;
+    static WavelengthConfig* instance_;
+    QSettings settings_;
 
-    void loadDefaultShortcuts();
-    QMap<QString, QKeySequence> m_defaultShortcuts;
-    QMap<QString, QKeySequence> m_shortcuts;
+    void LoadDefaultShortcuts();
+    QMap<QString, QKeySequence> default_shortcuts_;
+    QMap<QString, QKeySequence> shortcuts_;
 
     // Zmienne przechowujące wartości
-    QString m_relayServerAddress;
-    int m_relayServerPort;
-    int m_maxChatHistorySize;
-    int m_maxProcessedMessageIds;
-    int m_maxSentMessageCacheSize;
-    int m_maxRecentWavelength;
-    int m_connectionTimeout;
-    int m_keepAliveInterval;
-    int m_maxReconnectAttempts;
-    bool m_debugMode;
-    QColor m_backgroundColor;
-    QColor m_blobColor;
-    QColor m_streamColor;
-    QStringList m_recentColors;
+    QString relay_server_address_;
+    int relay_server_port_;
+    int max_chat_history_size_;
+    int max_processed_message_ids_;
+    int max_sent_message_cache_size_;
+    int max_recent_wavelength_;
+    int connection_timeout_;
+    int keep_alive_interval_;
+    int max_reconnect_attempts_;
+    bool debug_mode_;
+    QColor background_color_;
+    QColor blob_color_;
+    QColor stream_color_;
+    QStringList recent_colors_;
 
     // NOWE zmienne
-    QColor m_gridColor;
-    int m_gridSpacing;
-    QColor m_titleTextColor;
-    QColor m_titleBorderColor;
-    QColor m_titleGlowColor;
+    QColor grid_color_;
+    int grid_spacing_;
+    QColor title_text_color_;
+    QColor title_border_color_;
+    QColor title_glow_color_;
 
-    QString m_preferredStartFrequency;
+    QString preferred_start_frequency_;
 };
 
 #endif // WAVELENGTH_CONFIG_H

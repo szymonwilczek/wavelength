@@ -10,7 +10,7 @@
 
 NetworkSettingsWidget::NetworkSettingsWidget(QWidget *parent)
     : QWidget(parent),
-      m_config(WavelengthConfig::getInstance()),
+      m_config(WavelengthConfig::GetInstance()),
       m_serverAddressEdit(nullptr),
       m_serverPortEdit(nullptr),
       m_connectionTimeoutEdit(nullptr),
@@ -112,11 +112,11 @@ void NetworkSettingsWidget::loadSettings() const {
         qWarning() << "AdvancedSettingsWidget::loadSettings - UI elements not initialized.";
         return;
     }
-    m_serverAddressEdit->setText(m_config->getRelayServerAddress());
-    m_serverPortEdit->setValue(m_config->getRelayServerPort());
-    m_connectionTimeoutEdit->setValue(m_config->getConnectionTimeout());
-    m_keepAliveIntervalEdit->setValue(m_config->getKeepAliveInterval());
-    m_maxReconnectAttemptsEdit->setValue(m_config->getMaxReconnectAttempts());
+    m_serverAddressEdit->setText(m_config->GetRelayServerAddress());
+    m_serverPortEdit->setValue(m_config->GetRelayServerPort());
+    m_connectionTimeoutEdit->setValue(m_config->GetConnectionTimeout());
+    m_keepAliveIntervalEdit->setValue(m_config->GetKeepAliveInterval());
+    m_maxReconnectAttemptsEdit->setValue(m_config->GetMaxReconnectAttempts());
     qDebug() << "AdvancedSettingsWidget settings loaded.";
 }
 
@@ -125,10 +125,10 @@ void NetworkSettingsWidget::saveSettings() const {
         qWarning() << "AdvancedSettingsWidget::saveSettings - UI elements not initialized.";
         return;
     }
-    m_config->setRelayServerAddress(m_serverAddressEdit->text());
-    m_config->setRelayServerPort(m_serverPortEdit->value());
-    m_config->setConnectionTimeout(m_connectionTimeoutEdit->value());
-    m_config->setKeepAliveInterval(m_keepAliveIntervalEdit->value());
-    m_config->setMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
+    m_config->SetRelayServerAddress(m_serverAddressEdit->text());
+    m_config->SetRelayServerPort(m_serverPortEdit->value());
+    m_config->SetConnectionTimeout(m_connectionTimeoutEdit->value());
+    m_config->SetKeepAliveInterval(m_keepAliveIntervalEdit->value());
+    m_config->SetMaxReconnectAttempts(m_maxReconnectAttemptsEdit->value());
     qDebug() << "AdvancedSettingsWidget settings prepared for saving.";
 }

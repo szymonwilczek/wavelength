@@ -11,13 +11,13 @@ BlobAnimation::BlobAnimation(QWidget *parent)
       m_eventHandler(this),
       m_transitionManager(this) {
 
-    const WavelengthConfig *config = WavelengthConfig::getInstance();
+    const WavelengthConfig *config = WavelengthConfig::GetInstance();
 
     // --- Zainicjuj parametry bloba z konfiguracji ---
-    m_params.backgroundColor = config->getBackgroundColor();
-    m_params.borderColor = config->getBlobColor(); // Zakładamy, że borderColor to główny kolor bloba
-    m_params.gridColor = config->getGridColor();
-    m_params.gridSpacing = config->getGridSpacing();
+    m_params.backgroundColor = config->GetBackgroundColor();
+    m_params.borderColor = config->GetBlobColor(); // Zakładamy, że borderColor to główny kolor bloba
+    m_params.gridColor = config->GetGridColor();
+    m_params.gridSpacing = config->GetGridSpacing();
 
     m_params.blobRadius = 250.0f;
     m_params.numPoints = 32;

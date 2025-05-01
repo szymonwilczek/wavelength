@@ -4,7 +4,7 @@
 
 JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &password) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    const WavelengthConfig* config = WavelengthConfig::getInstance();
+    const WavelengthConfig* config = WavelengthConfig::GetInstance();
 
     if (registry->hasWavelength(frequency)) {
         qDebug() << "Already joined wavelength" << frequency;
@@ -76,7 +76,7 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
                 }
 
                 registry->setActiveWavelength(frequency);
-                keepAliveTimer->start(WavelengthConfig::getInstance()->getKeepAliveInterval());
+                keepAliveTimer->start(WavelengthConfig::GetInstance()->GetKeepAliveInterval());
                 qDebug() << "[Joiner] Keep-alive timer started for" << frequency;
                 emit wavelengthJoined(frequency);
             }
@@ -166,8 +166,8 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
         socket->sendTextMessage(message);
     });
 
-    const QString address = config->getRelayServerAddress();
-    const int port = config->getRelayServerPort();
+    const QString address = config->GetRelayServerAddress();
+    const int port = config->GetRelayServerPort();
     const QUrl url(QString("ws://%1:%2").arg(address).arg(port));
     qDebug() << "[Joiner] Opening WebSocket connection to URL for joining:" << url.toString();
     socket->open(url);

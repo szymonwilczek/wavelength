@@ -121,20 +121,20 @@ void WavelengthSessionCoordinator::connectSignals() {
             this, &WavelengthSessionCoordinator::onActiveWavelengthChanged, Qt::DirectConnection);
 
     // WavelengthConfig
-    connect(WavelengthConfig::getInstance(), &WavelengthConfig::configChanged,
+    connect(WavelengthConfig::GetInstance(), &WavelengthConfig::configChanged,
             this, &WavelengthSessionCoordinator::onConfigChanged, Qt::DirectConnection);
 }
 
 void WavelengthSessionCoordinator::loadConfig() {
-    WavelengthConfig* config = WavelengthConfig::getInstance();
+    WavelengthConfig* config = WavelengthConfig::GetInstance();
 
-    if (!QFile::exists(config->getSetting("configFilePath").toString())) {
+    if (!QFile::exists(config->GetSetting("configFilePath").toString())) {
         qDebug() << "Setting default configuration";
 
-        config->setRelayServerAddress("localhost");
-        config->setRelayServerPort(3000);
+        config->SetRelayServerAddress("localhost");
+        config->SetRelayServerPort(3000);
 
         // Zapisz konfigurację
-        config->saveSettings();
+        config->SaveSettings();
     }
 }

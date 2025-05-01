@@ -96,16 +96,16 @@ public:
 
     // Adres serwera relay
     static QString getRelayServerAddress() {
-        return WavelengthConfig::getInstance()->getRelayServerAddress();
+        return WavelengthConfig::GetInstance()->GetRelayServerAddress();
     }
 
     static void setRelayServerAddress(const QString& address) {
-        WavelengthConfig::getInstance()->setRelayServerAddress(address);
+        WavelengthConfig::GetInstance()->SetRelayServerAddress(address);
     }
 
     // Pełny URL serwera relay
     static QString getRelayServerUrl() {
-        return WavelengthConfig::getInstance()->getRelayServerUrl();
+        return WavelengthConfig::GetInstance()->GetRelayServerUrl();
     }
 
 signals:
