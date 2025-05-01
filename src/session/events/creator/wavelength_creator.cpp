@@ -17,7 +17,7 @@ bool WavelengthCreator::createWavelength(QString frequency, bool isPasswordProte
     }
 
     registry->addPendingRegistration(frequency);
-    QString hostId = AuthenticationManager::getInstance()->generateClientId();
+    QString hostId = AuthenticationManager::GetInstance()->GenerateClientId();
     auto connectedCallbackExecuted = new bool(false);
     auto keepAliveTimer = new QTimer(this);
 

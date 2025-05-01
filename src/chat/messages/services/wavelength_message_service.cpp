@@ -74,7 +74,7 @@ bool WavelengthMessageService::sendMessage(const QString &message) {
 
     // Generate a sender ID (use host ID if we're host, or client ID otherwise)
     const QString senderId = info.isHost ? info.hostId :
-                           AuthenticationManager::getInstance()->generateClientId();
+                           AuthenticationManager::GetInstance()->GenerateClientId();
 
     const QString messageId = MessageHandler::getInstance()->generateMessageId();
 
@@ -206,7 +206,7 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
             // Pobieramy dane potrzebne do wysłania
             const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
             const QString frequency = registry->getActiveWavelength();
-            const QString senderId = AuthenticationManager::getInstance()->generateClientId();
+            const QString senderId = AuthenticationManager::GetInstance()->GenerateClientId();
             const QString messageId = MessageHandler::getInstance()->generateMessageId();
 
             // Tworzymy obiekt wiadomości

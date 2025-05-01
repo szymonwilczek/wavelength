@@ -19,7 +19,7 @@ JoinResult WavelengthJoiner::joinWavelength(QString frequency, const QString &pa
     }
 
     registry->addPendingRegistration(frequency);
-    QString clientId = AuthenticationManager::getInstance()->generateClientId();
+    QString clientId = AuthenticationManager::GetInstance()->GenerateClientId();
     auto connectedCallbackExecuted = new bool(false);
     auto keepAliveTimer = new QTimer(this);
 
