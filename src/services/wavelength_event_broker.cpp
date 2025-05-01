@@ -1,6 +1,9 @@
 #include "wavelength_event_broker.h"
+#include <concepts>
 
 template<typename Receiver, typename Func>
+requires std::derived_from<Receiver, QObject> &&
+         std::invocable<Func, const QVariantMap&>
 void WavelengthEventBroker::subscribeToEvent(const QString &eventType, Receiver *receiver, Func slot) {
     connect(this, &WavelengthEventBroker::eventPublished,
             receiver, [eventType, slot](const QString& type, const QVariantMap& data) {
