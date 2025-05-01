@@ -84,7 +84,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     connect(&m_eventHandler, &BlobEventHandler::movementSampleAdded, this,
             [this](const QPointF &pos, const qint64 timestamp) {
-                m_transitionManager.addMovementSample(pos, timestamp);
+                m_transitionManager.AddMovementSample(pos, timestamp);
             });
 
     connect(&m_eventHandler, &BlobEventHandler::resizeStateRequested, this, [this]() {
@@ -165,12 +165,12 @@ void BlobAnimation::checkWindowPosition() {
     lastCheckTime = currentTimestamp;
 
     std::pmr::deque<BlobTransitionManager::WindowMovementSample> movementBuffer = m_transitionManager.
-            getMovementBuffer();
+            GetMovementBuffer();
 
     if (movementBuffer.empty() ||
-        (currentTimestamp - m_transitionManager.getLastMovementTime()) > 100) {
+        (currentTimestamp - m_transitionManager.GetLastMovementTime()) > 100) {
         if (const QPointF currentWindowPos = currentWindow->pos(); movementBuffer.empty() || currentWindowPos != movementBuffer.back().position) {
-            m_transitionManager.addMovementSample(currentWindowPos, currentTimestamp);
+            m_transitionManager.AddMovementSample(currentWindowPos, currentTimestamp);
         }
     }
 }
@@ -329,7 +329,7 @@ void BlobAnimation::updateAnimation() {
 }
 
 void BlobAnimation::processMovementBuffer() {
-    m_transitionManager.processMovementBuffer(
+    m_transitionManager.ProcessMovementBuffer(
         m_velocity,
         m_blobCenter,
         m_controlPoints,
@@ -727,7 +727,7 @@ void BlobAnimation::pauseAllEventTracking() {
     m_stateResetTimer.stop();
 
     // Wyczyść wszystkie bufory ruchu
-    m_transitionManager.clearAllMovementBuffers();
+    m_transitionManager.ClearAllMovementBuffers();
 
     // Poinformuj handler eventów o zatrzymaniu śledzenia
     m_eventHandler.DisableEvents();
