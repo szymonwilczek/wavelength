@@ -14,7 +14,7 @@ void BlobRenderer::RenderBlob(QPainter &painter,
                               const BlobConfig::AnimationState animation_state) {  // Dodany parametr
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    const QPainterPath blob_path = BlobPath::createBlobPath(control_points, control_points.size());
+    const QPainterPath blob_path = BlobPath::CreateBlobPath(control_points, control_points.size());
 
     DrawGlowEffect(painter, blob_path, params.borderColor, params.glowRadius);
 

@@ -1,24 +1,24 @@
 #include "blob_path.h"
 
-QPainterPath BlobPath::createBlobPath(const std::vector<QPointF>& controlPoints, const int numPoints) {
+QPainterPath BlobPath::CreateBlobPath(const std::vector<QPointF>& control_points, const int num_of_points) {
     QPainterPath path;
 
-    if (controlPoints.empty()) return path;
+    if (control_points.empty()) return path;
 
 
-    path.moveTo(controlPoints[0]);
+    path.moveTo(control_points[0]);
 
-    for (int i = 0; i < numPoints; ++i) {
+    for (int i = 0; i < num_of_points; ++i) {
         constexpr float tension = 0.25f;
-        const int prev = (i + numPoints - 1) % numPoints;
+        const int prev = (i + num_of_points - 1) % num_of_points;
         const int curr = i;
-        const int next = (i + 1) % numPoints;
-        const int nextNext = (i + 2) % numPoints;
+        const int next = (i + 1) % num_of_points;
+        const int next_next = (i + 2) % num_of_points;
 
-        QPointF p0 = controlPoints[prev];
-        QPointF p1 = controlPoints[curr];
-        QPointF p2 = controlPoints[next];
-        QPointF p3 = controlPoints[nextNext];
+        QPointF p0 = control_points[prev];
+        QPointF p1 = control_points[curr];
+        QPointF p2 = control_points[next];
+        QPointF p3 = control_points[next_next];
 
         if (!BlobMath::IsValidPoint(p0) || !BlobMath::IsValidPoint(p1) ||
             !BlobMath::IsValidPoint(p2) || !BlobMath::IsValidPoint(p3)) {
