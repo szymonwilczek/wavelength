@@ -689,18 +689,18 @@ void AttachmentPlaceholder::GenerateThumbnail(const QByteArray &video_data, QLab
                                                            Q_ARG(QPixmap, QPixmap::fromImage(overlay_image)));
 
                                  // Zatrzymujemy dekoder
-                                 temp_decoder->stop();
+                                 temp_decoder->Stop();
                              },
                              Qt::QueuedConnection);
 
             // Wyekstrahuj pierwszą klatkę
-            temp_decoder->extractFirstFrame();
+            temp_decoder->ExtractFirstFrame();
 
             // Dajemy czas na przetworzenie klatki
             QThread::msleep(500);
 
             // Zatrzymujemy dekoder
-            temp_decoder->stop();
+            temp_decoder->Stop();
             temp_decoder->wait(300);
 
         } catch (...) {}

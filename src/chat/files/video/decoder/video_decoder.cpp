@@ -1,189 +1,189 @@
 #include "video_decoder.h"
 
-VideoDecoder::VideoDecoder(const QByteArray &videoData, QObject *parent): QThread(parent), m_videoData(videoData), m_paused(true) {
-    m_buffer.setData(m_videoData);
-    m_buffer.open(QIODevice::ReadOnly);
-    m_ioContext = avio_alloc_context(
-        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &m_buffer,
-        &VideoDecoder::readPacket, nullptr, &VideoDecoder::seekPacket
+VideoDecoder::VideoDecoder(const QByteArray &video_data, QObject *parent): QThread(parent), video_data_(video_data), paused_(true) {
+    buffer_.setData(video_data_);
+    buffer_.open(QIODevice::ReadOnly);
+    io_context_ = avio_alloc_context(
+        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &buffer_,
+        &VideoDecoder::ReadPacket, nullptr, &VideoDecoder::SeekPacket
     );
 }
 
 VideoDecoder::~VideoDecoder() {
-    stop();
+    Stop();
     wait();
-    cleanupFFmpegResources();
-    if (m_ioContext) {
-        av_freep(&m_ioContext->buffer);
-        avio_context_free(&m_ioContext);
-        m_ioContext = nullptr;
+    CleanupFFmpegResources();
+    if (io_context_) {
+        av_freep(&io_context_->buffer);
+        avio_context_free(&io_context_);
+        io_context_ = nullptr;
     }
 }
 
-bool VideoDecoder::initialize() {
-    m_formatContext = avformat_alloc_context();
-    if (!m_formatContext) return false;
-    m_formatContext->pb = m_ioContext;
-    m_formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
+bool VideoDecoder::Initialize() {
+    format_context_ = avformat_alloc_context();
+    if (!format_context_) return false;
+    format_context_->pb = io_context_;
+    format_context_->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-    if (avformat_open_input(&m_formatContext, nullptr, nullptr, nullptr) != 0) {
+    if (avformat_open_input(&format_context_, nullptr, nullptr, nullptr) != 0) {
         emit error("Nie można otworzyć strumienia wideo (avformat_open_input)");
         return false;
     }
 
-    if (avformat_find_stream_info(m_formatContext, nullptr) < 0) {
+    if (avformat_find_stream_info(format_context_, nullptr) < 0) {
         emit error("Nie można znaleźć informacji o strumieniu (avformat_find_stream_info)");
         return false;
     }
 
-    m_videoStream = -1;
-    m_audioStreamIndex = -1;
-    for (unsigned int i = 0; i < m_formatContext->nb_streams; i++) {
-        if (m_videoStream == -1 && m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            m_videoStream = i;
-        } else if (m_audioStreamIndex == -1 && m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            m_audioStreamIndex = i;
+    video_stream_ = -1;
+    audio_stream_index_ = -1;
+    for (unsigned int i = 0; i < format_context_->nb_streams; i++) {
+        if (video_stream_ == -1 && format_context_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video_stream_ = i;
+        } else if (audio_stream_index_ == -1 && format_context_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio_stream_index_ = i;
         }
     }
 
-    if (m_videoStream == -1) {
+    if (video_stream_ == -1) {
         emit error("Nie znaleziono strumienia wideo");
         return false;
     }
 
-    const AVCodecParameters* codecParams = m_formatContext->streams[m_videoStream]->codecpar;
-    const AVCodec* codec = avcodec_find_decoder(codecParams->codec_id);
+    const AVCodecParameters* codec_params = format_context_->streams[video_stream_]->codecpar;
+    const AVCodec* codec = avcodec_find_decoder(codec_params->codec_id);
     if (!codec) {
         emit error("Nie znaleziono kodeka wideo");
         return false;
     }
 
-    m_codecContext = avcodec_alloc_context3(codec);
-    if (!m_codecContext) return false;
-    if (avcodec_parameters_to_context(m_codecContext, codecParams) < 0) return false;
-    if (avcodec_open2(m_codecContext, codec, nullptr) < 0) {
+    codec_context_ = avcodec_alloc_context3(codec);
+    if (!codec_context_) return false;
+    if (avcodec_parameters_to_context(codec_context_, codec_params) < 0) return false;
+    if (avcodec_open2(codec_context_, codec, nullptr) < 0) {
         emit error("Nie można otworzyć kodeka wideo");
         return false;
     }
 
-    m_frame = av_frame_alloc();
-    if (!m_frame) return false;
+    frame_ = av_frame_alloc();
+    if (!frame_) return false;
 
-    m_swsContext = sws_getContext(
-        m_codecContext->width, m_codecContext->height, m_codecContext->pix_fmt,
-        m_codecContext->width, m_codecContext->height, AV_PIX_FMT_RGB24,
+    sws_context_ = sws_getContext(
+        codec_context_->width, codec_context_->height, codec_context_->pix_fmt,
+        codec_context_->width, codec_context_->height, AV_PIX_FMT_RGB24,
         SWS_LANCZOS, nullptr, nullptr, nullptr
     );
-    if (!m_swsContext) {
+    if (!sws_context_) {
         emit error("Nie można utworzyć kontekstu konwersji wideo (sws_getContext)");
         return false;
     }
 
-    const AVRational frameRateRational = av_guess_frame_rate(m_formatContext, m_formatContext->streams[m_videoStream], nullptr);
-    m_frameRate = frameRateRational.num > 0 && frameRateRational.den > 0 ? av_q2d(frameRateRational) : 30.0;
-    m_duration = m_formatContext->duration > 0 ? static_cast<double>(m_formatContext->duration) / AV_TIME_BASE : 0.0;
+    const AVRational frame_rate_rational = av_guess_frame_rate(format_context_, format_context_->streams[video_stream_], nullptr);
+    frame_rate_ = frame_rate_rational.num > 0 && frame_rate_rational.den > 0 ? av_q2d(frame_rate_rational) : 30.0;
+    duration_ = format_context_->duration > 0 ? static_cast<double>(format_context_->duration) / AV_TIME_BASE : 0.0;
 
-    if (m_audioStreamIndex != -1) {
-        m_audioDecoder = new AudioDecoder(m_videoData, nullptr);
-        connect(m_audioDecoder, &AudioDecoder::error, this, &VideoDecoder::handleAudioError);
-        connect(m_audioDecoder, &AudioDecoder::playbackFinished, this, &VideoDecoder::handleAudioFinished);
-        connect(m_audioDecoder, &AudioDecoder::positionChanged, this, &VideoDecoder::updateAudioPosition);
-        m_audioInitialized = false;
+    if (audio_stream_index_ != -1) {
+        audio_decoder_ = new AudioDecoder(video_data_, nullptr);
+        connect(audio_decoder_, &AudioDecoder::error, this, &VideoDecoder::HandleAudioError);
+        connect(audio_decoder_, &AudioDecoder::playbackFinished, this, &VideoDecoder::HandleAudioFinished);
+        connect(audio_decoder_, &AudioDecoder::positionChanged, this, &VideoDecoder::UpdateAudioPosition);
+        audio_initialized_ = false;
     } else {
         qDebug() << "Nie znaleziono strumienia audio w pliku.";
     }
 
-    emit videoInfo(m_codecContext->width, m_codecContext->height, m_frameRate, m_duration, hasAudio());
+    emit videoInfo(codec_context_->width, codec_context_->height, frame_rate_, duration_, HasAudio());
     return true;
 }
 
-void VideoDecoder::extractFirstFrame() {
+void VideoDecoder::ExtractFirstFrame() {
     // Ta metoda działa synchronicznie i nie używa głównej pętli run()
     // ani zewnętrznego AudioDecoder.
 
     // 1. Podstawowa inicjalizacja FFmpeg (podobna do initialize(), ale bez audio)
-    AVFormatContext* tempFormatCtx = avformat_alloc_context();
-    if (!tempFormatCtx) return;
+    AVFormatContext* format_context = avformat_alloc_context();
+    if (!format_context) return;
 
     // Użyj kopii bufora, aby nie zakłócać głównego odtwarzania
-    QBuffer tempBuffer;
-    tempBuffer.setData(m_videoData);
-    tempBuffer.open(QIODevice::ReadOnly);
+    QBuffer temp_buffer;
+    temp_buffer.setData(video_data_);
+    temp_buffer.open(QIODevice::ReadOnly);
 
-    AVIOContext* tempIoCtx = avio_alloc_context(
-        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &tempBuffer,
-        &VideoDecoder::readPacket, nullptr, &VideoDecoder::seekPacket
+    AVIOContext* io_ctx = avio_alloc_context(
+        static_cast<unsigned char *>(av_malloc(8192)), 8192, 0, &temp_buffer,
+        &VideoDecoder::ReadPacket, nullptr, &VideoDecoder::SeekPacket
     );
-    if (!tempIoCtx) {
-        avformat_free_context(tempFormatCtx);
+    if (!io_ctx) {
+        avformat_free_context(format_context);
         return;
     }
-    tempFormatCtx->pb = tempIoCtx;
-    tempFormatCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
+    format_context->pb = io_ctx;
+    format_context->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-    if (avformat_open_input(&tempFormatCtx, nullptr, nullptr, nullptr) != 0) {
-        av_freep(&tempIoCtx->buffer);
-        avio_context_free(&tempIoCtx);
-        avformat_free_context(tempFormatCtx);
+    if (avformat_open_input(&format_context, nullptr, nullptr, nullptr) != 0) {
+        av_freep(&io_ctx->buffer);
+        avio_context_free(&io_ctx);
+        avformat_free_context(format_context);
         return;
     }
-    if (avformat_find_stream_info(tempFormatCtx, nullptr) < 0) {
-        avformat_close_input(&tempFormatCtx); // Zamknij przed zwolnieniem IO
-        av_freep(&tempIoCtx->buffer);
-        avio_context_free(&tempIoCtx);
+    if (avformat_find_stream_info(format_context, nullptr) < 0) {
+        avformat_close_input(&format_context); // Zamknij przed zwolnieniem IO
+        av_freep(&io_ctx->buffer);
+        avio_context_free(&io_ctx);
         return;
     }
 
     // 2. Znajdź strumień wideo
-    int videoStreamIdx = -1;
-    for (unsigned int i = 0; i < tempFormatCtx->nb_streams; i++) {
-        if (tempFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIdx = i;
+    int video_stream_idx = -1;
+    for (unsigned int i = 0; i < format_context->nb_streams; i++) {
+        if (format_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video_stream_idx = i;
             break;
         }
     }
-    if (videoStreamIdx == -1) {
-        avformat_close_input(&tempFormatCtx);
-        av_freep(&tempIoCtx->buffer);
-        avio_context_free(&tempIoCtx);
+    if (video_stream_idx == -1) {
+        avformat_close_input(&format_context);
+        av_freep(&io_ctx->buffer);
+        avio_context_free(&io_ctx);
         return;
     }
 
     // 3. Otwórz kodek wideo
-    const AVCodecParameters* codecParams = tempFormatCtx->streams[videoStreamIdx]->codecpar;
-    const AVCodec* codec = avcodec_find_decoder(codecParams->codec_id);
+    const AVCodecParameters* codec_params = format_context->streams[video_stream_idx]->codecpar;
+    const AVCodec* codec = avcodec_find_decoder(codec_params->codec_id);
     if (!codec) { /* cleanup */ return; }
-    AVCodecContext* tempCodecCtx = avcodec_alloc_context3(codec);
-    if (!tempCodecCtx) { /* cleanup */ return; }
-    if (avcodec_parameters_to_context(tempCodecCtx, codecParams) < 0) { /* cleanup */ return; }
-    if (avcodec_open2(tempCodecCtx, codec, nullptr) < 0) { /* cleanup */ return; }
+    AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
+    if (!codec_ctx) { /* cleanup */ return; }
+    if (avcodec_parameters_to_context(codec_ctx, codec_params) < 0) { /* cleanup */ return; }
+    if (avcodec_open2(codec_ctx, codec, nullptr) < 0) { /* cleanup */ return; }
 
     // 4. Przygotuj ramkę i kontekst konwersji
-    AVFrame* tempFrame = av_frame_alloc();
-    if (!tempFrame) { /* cleanup */ return; }
-    SwsContext* tempSwsCtx = sws_getContext(
-        tempCodecCtx->width, tempCodecCtx->height, tempCodecCtx->pix_fmt,
-        tempCodecCtx->width, tempCodecCtx->height, AV_PIX_FMT_RGB24,
+    AVFrame* frame = av_frame_alloc();
+    if (!frame) { /* cleanup */ return; }
+    SwsContext* sws_context = sws_getContext(
+        codec_ctx->width, codec_ctx->height, codec_ctx->pix_fmt,
+        codec_ctx->width, codec_ctx->height, AV_PIX_FMT_RGB24,
         SWS_LANCZOS, nullptr, nullptr, nullptr
     );
-    if (!tempSwsCtx) { /* cleanup */ return; }
+    if (!sws_context) { /* cleanup */ return; }
 
     // 5. Dekoduj aż do pierwszej klatki wideo
     AVPacket packet;
-    bool frameDecoded = false;
-    while (av_read_frame(tempFormatCtx, &packet) >= 0 && !frameDecoded) {
-        if (packet.stream_index == videoStreamIdx) {
-            if (avcodec_send_packet(tempCodecCtx, &packet) == 0) {
-                if (avcodec_receive_frame(tempCodecCtx, tempFrame) == 0) {
+    bool frame_decoded = false;
+    while (av_read_frame(format_context, &packet) >= 0 && !frame_decoded) {
+        if (packet.stream_index == video_stream_idx) {
+            if (avcodec_send_packet(codec_ctx, &packet) == 0) {
+                if (avcodec_receive_frame(codec_ctx, frame) == 0) {
                     // Mamy klatkę! Konwertuj i emituj.
-                    QImage frameImage(tempCodecCtx->width, tempCodecCtx->height, QImage::Format_RGB888);
-                    uint8_t* dstData[4] = { frameImage.bits(), nullptr, nullptr, nullptr };
-                    const int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
-                    sws_scale(tempSwsCtx, (const uint8_t* const*)tempFrame->data, tempFrame->linesize, 0,
-                              tempCodecCtx->height, dstData, dstLinesize);
+                    QImage frame_image(codec_ctx->width, codec_ctx->height, QImage::Format_RGB888);
+                    uint8_t* dst_data[4] = { frame_image.bits(), nullptr, nullptr, nullptr };
+                    const int dst_linesize[4] = { frame_image.bytesPerLine(), 0, 0, 0 };
+                    sws_scale(sws_context, (const uint8_t* const*)frame->data, frame->linesize, 0,
+                              codec_ctx->height, dst_data, dst_linesize);
 
-                    emit frameReady(frameImage); // Emituj sygnał
-                    frameDecoded = true;
+                    emit frameReady(frame_image); // Emituj sygnał
+                    frame_decoded = true;
                 }
             }
         }
@@ -191,201 +191,201 @@ void VideoDecoder::extractFirstFrame() {
     }
 
     // 6. Cleanup
-    sws_freeContext(tempSwsCtx);
-    av_frame_free(&tempFrame);
-    avcodec_free_context(&tempCodecCtx);
-    avformat_close_input(&tempFormatCtx);
-    av_freep(&tempIoCtx->buffer);
-    avio_context_free(&tempIoCtx);
+    sws_freeContext(sws_context);
+    av_frame_free(&frame);
+    avcodec_free_context(&codec_ctx);
+    avformat_close_input(&format_context);
+    av_freep(&io_ctx->buffer);
+    avio_context_free(&io_ctx);
 }
 
-void VideoDecoder::reset() {
-    QMutexLocker locker(&m_mutex);
-    m_paused = true; // Zatrzymaj na czas resetu
-    m_videoFinished = false;
-    m_audioFinished = !hasAudio(); // Resetuj flagę audio
-    m_firstFrame = true;
-    m_lastFramePts = AV_NOPTS_VALUE;
-    m_currentAudioPosition = 0.0; // Resetuj pozycję audio
+void VideoDecoder::Reset() {
+    QMutexLocker locker(&mutex_);
+    paused_ = true; // Zatrzymaj na czas resetu
+    video_finished_ = false;
+    audio_finished_ = !HasAudio(); // Resetuj flagę audio
+    first_frame_ = true;
+    last_frame_pts_ = AV_NOPTS_VALUE;
+    current_audio_position_ = 0.0; // Resetuj pozycję audio
 
     // Przewiń strumień wideo do początku
-    m_seekPosition = 0;
-    m_seeking = true; // Ustaw flagę seek, pętla run() to obsłuży
+    seek_position_ = 0;
+    seeking_ = true; // Ustaw flagę seek, pętla run() to obsłuży
 
     locker.unlock();
 
     // Przewiń zewnętrzny dekoder audio
-    if (m_audioDecoder) {
-        m_audioDecoder->Seek(0.0);
+    if (audio_decoder_) {
+        audio_decoder_->Seek(0.0);
         // Upewnij się, że audio jest spauzowane
-        if (!m_audioDecoder->IsPaused()) {
-            m_audioDecoder->Pause();
+        if (!audio_decoder_->IsPaused()) {
+            audio_decoder_->Pause();
         }
     }
 
     // Obudź wątek, jeśli czekał
-    m_waitCondition.wakeOne();
+    wait_condition_.wakeOne();
 }
 
-void VideoDecoder::stop() {
-    QMutexLocker locker(&m_mutex);
-    if (m_stopped) return;
-    m_stopped = true;
-    if (m_audioDecoder) {
-        m_audioDecoder->Stop();
+void VideoDecoder::Stop() {
+    QMutexLocker locker(&mutex_);
+    if (stopped_) return;
+    stopped_ = true;
+    if (audio_decoder_) {
+        audio_decoder_->Stop();
     }
     locker.unlock();
-    m_waitCondition.wakeOne();
+    wait_condition_.wakeOne();
 }
 
-void VideoDecoder::pause() {
-    m_mutex.lock();
-    m_paused = !m_paused;
-    if (m_audioDecoder) {
-        if (m_paused != m_audioDecoder->IsPaused()) {
-            m_audioDecoder->Pause();
+void VideoDecoder::Pause() {
+    mutex_.lock();
+    paused_ = !paused_;
+    if (audio_decoder_) {
+        if (paused_ != audio_decoder_->IsPaused()) {
+            audio_decoder_->Pause();
         }
     }
-    m_mutex.unlock();
+    mutex_.unlock();
 
-    if (!m_paused)
-        m_waitCondition.wakeOne();
+    if (!paused_)
+        wait_condition_.wakeOne();
 }
 
-void VideoDecoder::seek(const double position) {
-    if (m_audioDecoder) {
-        m_audioDecoder->Seek(position);
+void VideoDecoder::Seek(const double position) {
+    if (audio_decoder_) {
+        audio_decoder_->Seek(position);
     }
 
     int64_t timestamp = position * AV_TIME_BASE;
-    timestamp = av_rescale_q(timestamp, AV_TIME_BASE_Q, m_formatContext->streams[m_videoStream]->time_base);
+    timestamp = av_rescale_q(timestamp, AV_TIME_BASE_Q, format_context_->streams[video_stream_]->time_base);
 
-    m_mutex.lock();
-    m_seekPosition = timestamp;
-    m_seeking = true;
-    m_videoFinished = false;
-    m_audioFinished = !hasAudio(); // Reset audio finished only if audio exists
-    m_mutex.unlock();
+    mutex_.lock();
+    seek_position_ = timestamp;
+    seeking_ = true;
+    video_finished_ = false;
+    audio_finished_ = !HasAudio(); // Reset audio finished only if audio exists
+    mutex_.unlock();
 
-    if (m_paused)
-        m_waitCondition.wakeOne();
+    if (paused_)
+        wait_condition_.wakeOne();
 }
 
 void VideoDecoder::run() {
-    if (!m_formatContext && !initialize()) {
+    if (!format_context_ && !Initialize()) {
         return;
     }
 
-    if (m_audioDecoder && !m_audioInitialized) {
-        if (!m_audioDecoder->Initialize()) {
+    if (audio_decoder_ && !audio_initialized_) {
+        if (!audio_decoder_->Initialize()) {
             qWarning() << "Nie udało się zainicjalizować zewnętrznego AudioDecoder.";
-            delete m_audioDecoder;
-            m_audioDecoder = nullptr;
+            delete audio_decoder_;
+            audio_decoder_ = nullptr;
         } else {
-            m_audioDecoder->start();
-            m_audioInitialized = true;
-            if (!m_audioDecoder->IsPaused()) {
-                m_audioDecoder->Pause();
+            audio_decoder_->start();
+            audio_initialized_ = true;
+            if (!audio_decoder_->IsPaused()) {
+                audio_decoder_->Pause();
             }
         }
     }
 
     AVPacket packet;
-    const double frameDuration = m_frameRate > 0 ? 1000.0 / m_frameRate : 33.3;
+    const double frame_duration = frame_rate_ > 0 ? 1000.0 / frame_rate_ : 33.3;
 
-    m_frameTimer.start();
-    m_firstFrame = true;
-    m_videoFinished = false;
-    m_audioFinished = !hasAudio();
+    frame_timer_.start();
+    first_frame_ = true;
+    video_finished_ = false;
+    audio_finished_ = !HasAudio();
 
-    while (!m_stopped) {
-        m_mutex.lock();
-        while (m_paused && !m_stopped && !m_seeking) {
-            m_waitCondition.wait(&m_mutex);
+    while (!stopped_) {
+        mutex_.lock();
+        while (paused_ && !stopped_ && !seeking_) {
+            wait_condition_.wait(&mutex_);
         }
 
-        if (m_seeking) {
-            avcodec_flush_buffers(m_codecContext);
-            av_seek_frame(m_formatContext, m_videoStream, m_seekPosition, AVSEEK_FLAG_BACKWARD);
-            m_seeking = false;
-            m_firstFrame = true;
-            m_lastFramePts = AV_NOPTS_VALUE;
-            m_frameTimer.restart();
+        if (seeking_) {
+            avcodec_flush_buffers(codec_context_);
+            av_seek_frame(format_context_, video_stream_, seek_position_, AVSEEK_FLAG_BACKWARD);
+            seeking_ = false;
+            first_frame_ = true;
+            last_frame_pts_ = AV_NOPTS_VALUE;
+            frame_timer_.restart();
         }
-        m_mutex.unlock();
+        mutex_.unlock();
 
-        if (m_stopped) break;
+        if (stopped_) break;
 
-        if (av_read_frame(m_formatContext, &packet) < 0) {
+        if (av_read_frame(format_context_, &packet) < 0) {
             qDebug() << "Koniec strumienia wideo (av_read_frame < 0)";
-            QMutexLocker lock(&m_mutex);
-            m_videoFinished = true;
-            if (m_audioFinished) {
+            QMutexLocker lock(&mutex_);
+            video_finished_ = true;
+            if (audio_finished_) {
                 lock.unlock();
                 emit playbackFinished();
                 lock.relock();
             }
-            m_paused = true;
+            paused_ = true;
             lock.unlock();
-            QThread::msleep(50);
+            msleep(50);
             continue;
         }
 
-        if (packet.stream_index == m_videoStream) {
-            avcodec_send_packet(m_codecContext, &packet);
+        if (packet.stream_index == video_stream_) {
+            avcodec_send_packet(codec_context_, &packet);
 
-            if (avcodec_receive_frame(m_codecContext, m_frame) == 0) {
-                double videoPts = -1.0;
-                if (m_frame->pts != AV_NOPTS_VALUE) {
-                    videoPts = m_frame->pts * av_q2d(m_formatContext->streams[m_videoStream]->time_base);
+            if (avcodec_receive_frame(codec_context_, frame_) == 0) {
+                double video_pts = -1.0;
+                if (frame_->pts != AV_NOPTS_VALUE) {
+                    video_pts = frame_->pts * av_q2d(format_context_->streams[video_stream_]->time_base);
                 }
 
-                if (m_audioDecoder && videoPts >= 0) {
-                    QMutexLocker syncLocker(&m_mutex);
-                    const double audioPts = m_currentAudioPosition;
-                    syncLocker.unlock();
+                if (audio_decoder_ && video_pts >= 0) {
+                    QMutexLocker sync_locker(&mutex_);
+                    const double audio_pts = current_audio_position_;
+                    sync_locker.unlock();
 
-                    const double diff = videoPts - audioPts;
-                    constexpr double syncThreshold = 0.05;
+                    const double difference = video_pts - audio_pts;
+                    constexpr double sync_threshold = 0.05;
 
-                    if (diff > syncThreshold) {
-                        constexpr double maxSleep = 100.0;
-                        int sleepTime = qRound((diff - syncThreshold / 2.0) * 1000.0);
-                        msleep(qMin(static_cast<int>(maxSleep), qMax(0, sleepTime)));
-                    } else if (diff < -syncThreshold * 2.0) {
+                    if (difference > sync_threshold) {
+                        constexpr double max_sleep = 100.0;
+                        int sleep_time = qRound((difference - sync_threshold / 2.0) * 1000.0);
+                        msleep(qMin(static_cast<int>(max_sleep), qMax(0, sleep_time)));
+                    } else if (difference < -sync_threshold * 2.0) {
                         av_packet_unref(&packet);
-                        av_frame_unref(m_frame);
+                        av_frame_unref(frame_);
                         continue;
                     }
-                } else if (!m_audioDecoder) {
-                    if (!m_firstFrame) {
-                        const int64_t currentPts = m_frame->pts;
-                        double ptsDiff = (currentPts - m_lastFramePts) *
-                                         av_q2d(m_formatContext->streams[m_videoStream]->time_base) * 1000.0;
-                        if (ptsDiff <= 0 || ptsDiff > 1000.0) {
-                            ptsDiff = frameDuration;
+                } else if (!audio_decoder_) {
+                    if (!first_frame_) {
+                        const int64_t current_pts = frame_->pts;
+                        double pts_difference = (current_pts - last_frame_pts_) *
+                                         av_q2d(format_context_->streams[video_stream_]->time_base) * 1000.0;
+                        if (pts_difference <= 0 || pts_difference > 1000.0) {
+                            pts_difference = frame_duration;
                         }
-                        const int elapsedTime = m_frameTimer.elapsed();
-                        const int sleepTime = qMax(0, qRound(ptsDiff - elapsedTime));
-                        if (sleepTime > 0) {
-                            QThread::msleep(sleepTime);
+                        const int elapsed_time = frame_timer_.elapsed();
+                        const int sleep_time = qMax(0, qRound(pts_difference - elapsed_time));
+                        if (sleep_time > 0) {
+                            QThread::msleep(sleep_time);
                         }
                     }
-                    m_firstFrame = false;
-                    m_lastFramePts = m_frame->pts;
-                    m_frameTimer.restart();
+                    first_frame_ = false;
+                    last_frame_pts_ = frame_->pts;
+                    frame_timer_.restart();
                 }
 
-                QImage frameImage(m_codecContext->width, m_codecContext->height, QImage::Format_RGB888);
-                uint8_t* dstData[4] = { frameImage.bits(), nullptr, nullptr, nullptr };
-                const int dstLinesize[4] = { frameImage.bytesPerLine(), 0, 0, 0 };
-                sws_scale(m_swsContext, (const uint8_t* const*)m_frame->data, m_frame->linesize, 0,
-                          m_codecContext->height, dstData, dstLinesize);
+                QImage frame_image(codec_context_->width, codec_context_->height, QImage::Format_RGB888);
+                uint8_t* dst_data[4] = { frame_image.bits(), nullptr, nullptr, nullptr };
+                const int dst_linesize[4] = { frame_image.bytesPerLine(), 0, 0, 0 };
+                sws_scale(sws_context_, (const uint8_t* const*)frame_->data, frame_->linesize, 0,
+                          codec_context_->height, dst_data, dst_linesize);
 
-                emit frameReady(frameImage);
-                av_frame_unref(m_frame);
+                emit frameReady(frame_image);
+                av_frame_unref(frame_);
             }
-        } else if (packet.stream_index == m_audioStreamIndex) {
+        } else if (packet.stream_index == audio_stream_index_) {
             // Ignoruj pakiety audio
         }
 
@@ -394,62 +394,62 @@ void VideoDecoder::run() {
     qDebug() << "VideoDecoder::run() zakończył pętlę.";
 }
 
-void VideoDecoder::handleAudioFinished() {
+void VideoDecoder::HandleAudioFinished() {
     qDebug() << "AudioDecoder zakończył odtwarzanie.";
-    QMutexLocker locker(&m_mutex);
-    m_audioFinished = true;
-    if (m_videoFinished) {
+    QMutexLocker locker(&mutex_);
+    audio_finished_ = true;
+    if (video_finished_) {
         locker.unlock();
         emit playbackFinished();
     }
 }
 
-void VideoDecoder::updateAudioPosition(const double position) {
-    QMutexLocker locker(&m_mutex);
-    m_currentAudioPosition = position;
+void VideoDecoder::UpdateAudioPosition(const double position) {
+    QMutexLocker locker(&mutex_);
+    current_audio_position_ = position;
     locker.unlock();
     emit positionChanged(position);
 }
 
-void VideoDecoder::cleanupFFmpegResources() {
-    if (m_audioDecoder) {
-        m_audioDecoder->Stop();
-        m_audioDecoder->wait(200);
-        delete m_audioDecoder;
-        m_audioDecoder = nullptr;
+void VideoDecoder::CleanupFFmpegResources() {
+    if (audio_decoder_) {
+        audio_decoder_->Stop();
+        audio_decoder_->wait(200);
+        delete audio_decoder_;
+        audio_decoder_ = nullptr;
     }
-    m_audioInitialized = false;
-    m_audioFinished = false;
-    m_videoFinished = false;
+    audio_initialized_ = false;
+    audio_finished_ = false;
+    video_finished_ = false;
 
-    if (m_swsContext) {
-        sws_freeContext(m_swsContext);
-        m_swsContext = nullptr;
+    if (sws_context_) {
+        sws_freeContext(sws_context_);
+        sws_context_ = nullptr;
     }
-    if (m_frame) {
-        av_frame_free(&m_frame);
-        m_frame = nullptr;
+    if (frame_) {
+        av_frame_free(&frame_);
+        frame_ = nullptr;
     }
-    if (m_codecContext) {
-        avcodec_close(m_codecContext);
-        avcodec_free_context(&m_codecContext);
-        m_codecContext = nullptr;
+    if (codec_context_) {
+        avcodec_close(codec_context_);
+        avcodec_free_context(&codec_context_);
+        codec_context_ = nullptr;
     }
-    if (m_formatContext) {
-        avformat_close_input(&m_formatContext);
-        m_formatContext = nullptr;
+    if (format_context_) {
+        avformat_close_input(&format_context_);
+        format_context_ = nullptr;
     }
-    m_audioStreamIndex = -1;
-    m_videoStream = -1;
+    audio_stream_index_ = -1;
+    video_stream_ = -1;
 }
 
-int VideoDecoder::readPacket(void *opaque, uint8_t *buf, const int buf_size) {
+int VideoDecoder::ReadPacket(void *opaque, uint8_t *buf, const int buf_size) {
     const auto buffer = static_cast<QBuffer*>(opaque);
-    const qint64 bytesRead = buffer->read(reinterpret_cast<char *>(buf), buf_size);
-    return static_cast<int>(bytesRead);
+    const qint64 bytes_read = buffer->read(reinterpret_cast<char *>(buf), buf_size);
+    return static_cast<int>(bytes_read);
 }
 
-int64_t VideoDecoder::seekPacket(void *opaque, const int64_t offset, const int whence) {
+int64_t VideoDecoder::SeekPacket(void *opaque, const int64_t offset, const int whence) {
     const auto buffer = static_cast<QBuffer*>(opaque);
     if (whence == AVSEEK_SIZE) {
         return buffer->size();

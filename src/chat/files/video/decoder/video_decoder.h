@@ -27,48 +27,48 @@ class VideoDecoder final : public QThread {
     Q_OBJECT
 
 public:
-    explicit VideoDecoder(const QByteArray& videoData, QObject* parent = nullptr);
+    explicit VideoDecoder(const QByteArray& video_data, QObject* parent = nullptr);
 
     ~VideoDecoder() override;
 
-    bool initialize();
+    bool Initialize();
 
-    void extractFirstFrame();
+    void ExtractFirstFrame();
 
-    void releaseResources() {
-        cleanupFFmpegResources();
+    void ReleaseResources() {
+        CleanupFFmpegResources();
     }
 
-    void reset();
+    void Reset();
 
-    void stop();
+    void Stop();
 
-    void pause();
+    void Pause();
 
-    void seek(double position);
+    void Seek(double position);
 
-    void setVolume(const float volume) const {
-        if (m_audioDecoder) {
-            m_audioDecoder->SetVolume(volume);
+    void SetVolume(const float volume) const {
+        if (audio_decoder_) {
+            audio_decoder_->SetVolume(volume);
         }
     }
 
-    float getVolume() const {
-        return m_audioDecoder ? m_audioDecoder->GetVolume() : 0.0f;
+    float GetVolume() const {
+        return audio_decoder_ ? audio_decoder_->GetVolume() : 0.0f;
     }
 
-    bool isPaused() const {
-        QMutexLocker locker(&m_mutex);
-        return m_paused;
+    bool IsPaused() const {
+        QMutexLocker locker(&mutex_);
+        return paused_;
     }
 
-    bool hasAudio() const {
-        return m_audioDecoder != nullptr;
+    bool HasAudio() const {
+        return audio_decoder_ != nullptr;
     }
 
 signals:
     void frameReady(const QImage& frame);
-    void videoInfo(int width, int height, double fps, double duration, bool hasAudio);
+    void videoInfo(int width, int height, double fps, double duration, bool has_audio);
     void positionChanged(double position);
     void playbackFinished();
     void error(const QString& message);
@@ -77,50 +77,50 @@ protected:
     void run() override;
 
 private slots:
-    void handleAudioError(const QString& message) {
+    void HandleAudioError(const QString& message) {
         emit error("Błąd strumienia audio: " + message);
     }
 
-    void handleAudioFinished();
+    void HandleAudioFinished();
 
-    void updateAudioPosition(double position);
+    void UpdateAudioPosition(double position);
 
 private:
-    void cleanupFFmpegResources();
+    void CleanupFFmpegResources();
 
-    static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
 
-    static int64_t seekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
 
-    QByteArray m_videoData;
-    QBuffer m_buffer;
-    AVIOContext* m_ioContext = nullptr;
-    AVFormatContext* m_formatContext = nullptr;
-    AVCodecContext* m_codecContext = nullptr;
-    SwsContext* m_swsContext = nullptr;
-    AVFrame* m_frame = nullptr;
-    int m_videoStream = -1;
-    double m_frameRate = 0.0;
-    double m_duration = 0.0;
-    double m_currentPosition = 0.0;
+    QByteArray video_data_;
+    QBuffer buffer_;
+    AVIOContext* io_context_ = nullptr;
+    AVFormatContext* format_context_ = nullptr;
+    AVCodecContext* codec_context_ = nullptr;
+    SwsContext* sws_context_ = nullptr;
+    AVFrame* frame_ = nullptr;
+    int video_stream_ = -1;
+    double frame_rate_ = 0.0;
+    double duration_ = 0.0;
+    double current_position_ = 0.0;
 
-    mutable QMutex m_mutex;
-    QWaitCondition m_waitCondition;
-    bool m_stopped = false;
-    bool m_paused = false;
-    bool m_seeking = false;
-    int64_t m_seekPosition = -1;
+    mutable QMutex mutex_;
+    QWaitCondition wait_condition_;
+    bool stopped_ = false;
+    bool paused_ = false;
+    bool seeking_ = false;
+    int64_t seek_position_ = -1;
 
-    QElapsedTimer m_frameTimer;
-    bool m_firstFrame = true;
-    int64_t m_lastFramePts = AV_NOPTS_VALUE;
+    QElapsedTimer frame_timer_;
+    bool first_frame_ = true;
+    int64_t last_frame_pts_ = AV_NOPTS_VALUE;
 
-    AudioDecoder* m_audioDecoder = nullptr;
-    int m_audioStreamIndex = -1;
-    double m_currentAudioPosition = 0.0;
-    bool m_audioInitialized = false;
-    bool m_audioFinished = false;
-    bool m_videoFinished = false;
+    AudioDecoder* audio_decoder_ = nullptr;
+    int audio_stream_index_ = -1;
+    double current_audio_position_ = 0.0;
+    bool audio_initialized_ = false;
+    bool audio_finished_ = false;
+    bool video_finished_ = false;
 };
 
 #endif // VIDEO_DECODER_H

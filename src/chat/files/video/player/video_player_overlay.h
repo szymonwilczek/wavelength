@@ -22,22 +22,22 @@ class VideoPlayerOverlay final : public QDialog {
     Q_PROPERTY(double gridOpacity READ gridOpacity WRITE setGridOpacity)
 
 public:
-    VideoPlayerOverlay(const QByteArray& videoData, const QString& mimeType, QWidget* parent = nullptr);
+    VideoPlayerOverlay(const QByteArray& video_data, const QString& mime_type, QWidget* parent = nullptr);
 
     ~VideoPlayerOverlay() override;
 
-    void releaseResources();
+    void ReleaseResources();
 
     // Akcesory dla właściwości animacji
-    double scanlineOpacity() const { return m_scanlineOpacity; }
-    void setScanlineOpacity(const double opacity) {
-        m_scanlineOpacity = opacity;
+    double GetScanlineOpacity() const { return scanline_opacity_; }
+    void SetScanlineOpacity(const double opacity) {
+        scanline_opacity_ = opacity;
         update();
     }
 
-    double gridOpacity() const { return m_gridOpacity; }
-    void setGridOpacity(const double opacity) {
-        m_gridOpacity = opacity;
+    double GetGridOpacity() const { return grid_opacity_; }
+    void SetGridOpacity(const double opacity) {
+        grid_opacity_ = opacity;
         update();
     }
 
@@ -47,73 +47,72 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-    void initializePlayer();
+    void InitializePlayer();
 
-    void togglePlayback();
+    void TogglePlayback();
 
-    void onSliderPressed();
+    void OnSliderPressed();
 
-    void onSliderReleased();
+    void OnSliderReleased();
 
-    void updateTimeLabel(int position) const;
+    void UpdateTimeLabel(int position) const;
 
-    void updateSliderPosition(double position) const;
+    void UpdateSliderPosition(double position) const;
 
-    void seekVideo(int position) const;
+    void SeekVideo(int position) const;
 
-    void updateFrame(const QImage& frame);
+    void UpdateFrame(const QImage& frame);
 
-    void updateUI();
+    void UpdateUI();
 
-    void handleError(const QString& message) const;
+    void HandleError(const QString& message) const;
 
-    void handleVideoInfo(int width, int height, double fps, double duration);
+    void HandleVideoInfo(int width, int height, double fps, double duration);
 
-    void adjustVolume(int volume) const;
+    void AdjustVolume(int volume) const;
 
-    void toggleMute();
+    void ToggleMute();
 
-    void updateVolumeIcon(float volume) const;
+    void UpdateVolumeIcon(float volume) const;
 
-    void triggerGlitch();
+    void TriggerGlitch();
 
 private:
-    QLabel* m_videoLabel;
-    CyberPushButton* m_playButton;
-    CyberSlider* m_progressSlider;
-    QLabel* m_timeLabel;
-    CyberPushButton* m_volumeButton;
-    CyberSlider* m_volumeSlider;
-    QLabel* m_statusLabel;
-    QLabel* m_codecLabel;
-    QLabel* m_resolutionLabel;
-    QLabel* m_bitrateLabel;
-    QLabel* m_fpsLabel;
+    QLabel* video_label_;
+    CyberPushButton* play_button_;
+    CyberSlider* progress_slider_;
+    QLabel* time_label_;
+    CyberPushButton* volume_button_;
+    CyberSlider* volume_slider_;
+    QLabel* status_label_;
+    QLabel* codec_label_;
+    QLabel* resolution_label_;
+    QLabel* bitrate_label_;
+    QLabel* fps_label_;
 
-    std::shared_ptr<VideoDecoder> m_decoder;
-    QTimer* m_updateTimer;
-    QTimer* m_glitchTimer;
+    std::shared_ptr<VideoDecoder> decoder_;
+    QTimer* update_timer_;
+    QTimer* glitch_timer_;
 
-    QByteArray m_videoData;
-    QString m_mimeType;
+    QByteArray video_data_;
+    QString mime_type_;
 
-    int m_videoWidth = 0;
-    int m_videoHeight = 0;
-    double m_videoDuration = 0;
-    bool m_sliderDragging = false;
-    int m_lastVolume = 100;
-    bool m_playbackFinished = false;
-    bool m_wasPlaying = false;
-    QImage m_thumbnailFrame;
+    int video_width_ = 0;
+    int video_height_ = 0;
+    double video_duration_ = 0;
+    bool slider_dragging_ = false;
+    int last_volume_ = 100;
+    bool playback_finished_ = false;
+    bool was_playing_ = false;
+    QImage thumbnail_frame_;
 
-    // Właściwości animacji
-    double m_scanlineOpacity;
-    double m_gridOpacity;
-    bool m_showHUD = false;
-    int m_frameCounter = 0;
-    bool m_playbackStarted = false;
-    double m_currentGlitchIntensity = 0.0;
-    double m_videoFps = 60.0;
+    double scanline_opacity_;
+    double grid_opacity_;
+    bool show_hud_ = false;
+    int frame_counter_ = 0;
+    bool playback_started_ = false;
+    double current_glitch_intensity_ = 0.0;
+    double video_fps_ = 60.0;
 };
 
 #endif //VIDEO_PLAYER_OVERLAY_H
