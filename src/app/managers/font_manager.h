@@ -10,23 +10,23 @@ class FontManager final : public QObject {
     Q_OBJECT
 
 public:
-    static FontManager* getInstance();
+    static FontManager* GetInstance();
 
-    bool initialize();
+    bool Initialize();
 
-    QString getFontFamily(const QString& fontName);
+    QString GetFontFamily(const QString& font_name);
     
-    QFont getFont(const QString& fontName, int pointSize = 10, int weight = QFont::Normal);
+    QFont GetFont(const QString& font_name, int point_size = 10, int weight = QFont::Normal);
 
 private:
     explicit FontManager(QObject* parent = nullptr);
     ~FontManager() override = default;
 
-    static FontManager* instance;
+    static FontManager* instance_;
 
-    QMap<QString, QString> fontFamilies;
+    QMap<QString, QString> font_families_;
 
-    bool loadFont(const QString& fontName, const QString& fontPath);
+    bool LoadFont(const QString& font_name, const QString& font_path);
 };
 
 #endif // FONT_MANAGER_H
