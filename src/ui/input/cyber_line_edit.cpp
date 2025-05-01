@@ -1,5 +1,7 @@
 #include "cyber_line_edit.h"
 
+#include <QPropertyAnimation>
+
 CyberLineEdit::CyberLineEdit(QWidget *parent): QLineEdit(parent), glow_intensity_(0.0), cursor_visible_(true) {
     // Zwiększ padding oraz ustaw minimalny rozmiar
     setStyleSheet("border: none; background-color: transparent; padding: 6px; font-family: Consolas; font-size: 9pt;");

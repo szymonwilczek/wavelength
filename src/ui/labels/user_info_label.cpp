@@ -1,5 +1,8 @@
 #include "user_info_label.h"
 
+#include <QPainter>
+#include <QStyleOption>
+
 UserInfoLabel::UserInfoLabel(QWidget *parent): QLabel(parent),
                                                circle_diameter_(10), // Średnica głównego okręgu
                                                pen_width_(2.0),      // Grubość linii okręgu
