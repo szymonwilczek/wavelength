@@ -65,7 +65,7 @@ QString MessageFormatter::formatMessage(const QJsonObject &msgObj, const QString
             attachmentId = msgObj["attachmentData"].toString();
         } else if (msgObj.contains("attachmentData") && !msgObj["attachmentData"].toString().isEmpty()) {
             // Zapisz dane base64 w magazynie i uzyskaj ID
-            attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
+            attachmentId = AttachmentDataStore::GetInstance()->StoreAttachmentData(
                 msgObj["attachmentData"].toString());
         } else {
             // Brak danych załącznika

@@ -1,21 +1,21 @@
 #include "auto_scaling_attachment.h"
 
-AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), m_content(content), m_isScaled(false) {
+AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), content_(content), is_scaled_(false) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     // Dodaj kontener zawartości
-    m_contentContainer = new QWidget(this);
-    const auto contentLayout = new QVBoxLayout(m_contentContainer);
-    contentLayout->setContentsMargins(0, 0, 0, 0);
-    contentLayout->setSpacing(0);
-    contentLayout->addWidget(m_content);
-    layout->addWidget(m_contentContainer, 0, Qt::AlignCenter);
+    content_container_ = new QWidget(this);
+    const auto content_layout = new QVBoxLayout(content_container_);
+    content_layout->setContentsMargins(0, 0, 0, 0);
+    content_layout->setSpacing(0);
+    content_layout->addWidget(content_);
+    layout->addWidget(content_container_, 0, Qt::AlignCenter);
 
     // Etykieta informująca o możliwości powiększenia (pokazywana tylko dla przeskalowanych)
-    m_infoLabel = new QLabel("Kliknij, aby powiększyć", this); // Rodzicem jest AutoScalingAttachment
-    m_infoLabel->setStyleSheet(
+    info_label_ = new QLabel("Kliknij, aby powiększyć", this); // Rodzicem jest AutoScalingAttachment
+    info_label_->setStyleSheet(
         "QLabel {"
         "  color: #00ccff;"
         "  background-color: rgba(0, 24, 34, 200);" // Zwiększona nieprzezroczystość tła
@@ -26,48 +26,48 @@ AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent):
         "  border-radius: 3px;" // Zaokrąglenie
         "}"
     );
-    m_infoLabel->setAlignment(Qt::AlignCenter);
-    m_infoLabel->adjustSize(); // Dopasuj rozmiar do tekstu
-    m_infoLabel->hide();       // Ukryj na początku
-    m_infoLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+    info_label_->setAlignment(Qt::AlignCenter);
+    info_label_->adjustSize(); // Dopasuj rozmiar do tekstu
+    info_label_->hide();       // Ukryj na początku
+    info_label_->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     // Włącz obsługę zdarzeń myszy
     setMouseTracking(true);
-    m_contentContainer->setMouseTracking(true);
-    m_contentContainer->installEventFilter(this);
+    content_container_->setMouseTracking(true);
+    content_container_->installEventFilter(this);
 
     // Ustaw odpowiednią politykę rozmiaru
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     // Ustaw politykę rozmiaru dla kontenera, aby mógł się rozszerzać
-    m_contentContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    content_container_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // Ustaw politykę rozmiaru dla zawartości, aby wypełniała kontener
-    m_content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    content_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Ustaw kursor wskazujący dla skalowanych załączników
     setCursor(Qt::PointingHandCursor);
-    m_contentContainer->setCursor(Qt::PointingHandCursor);
+    content_container_->setCursor(Qt::PointingHandCursor);
 
-    const auto imgView = qobject_cast<InlineImageViewer*>(m_content);
-    const auto gifPlay = qobject_cast<InlineGifPlayer*>(m_content);
-    if (imgView) {
-        connect(imgView, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::checkAndScaleContent);
-        connect(imgView, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::checkAndScaleContent);
-    } else if (gifPlay) {
-        connect(gifPlay, &InlineGifPlayer::gifLoaded, this, &AutoScalingAttachment::checkAndScaleContent);
+    const auto image_viewer = qobject_cast<InlineImageViewer*>(content_);
+    const auto gif_player = qobject_cast<InlineGifPlayer*>(content_);
+    if (image_viewer) {
+        connect(image_viewer, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
+        connect(image_viewer, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::CheckAndScaleContent);
+    } else if (gif_player) {
+        connect(gif_player, &InlineGifPlayer::gifLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
     } else {
-        QTimer::singleShot(50, this, &AutoScalingAttachment::checkAndScaleContent);
+        QTimer::singleShot(50, this, &AutoScalingAttachment::CheckAndScaleContent);
     }
 }
 
-void AutoScalingAttachment::setMaxAllowedSize(const QSize &maxSize) {
-    m_maxAllowedSize = maxSize;
-    checkAndScaleContent();
+void AutoScalingAttachment::SetMaxAllowedSize(const QSize &max_size) {
+    max_allowed_size_ = max_size;
+    CheckAndScaleContent();
 }
 
-QSize AutoScalingAttachment::contentOriginalSize() const {
-    if (m_content) {
+QSize AutoScalingAttachment::ContentOriginalSize() const {
+    if (content_) {
         // Używamy sizeHint jako preferowanego oryginalnego rozmiaru
-        const QSize hint = m_content->sizeHint();
+        const QSize hint = content_->sizeHint();
         if (hint.isValid()) {
             return hint;
         }
@@ -77,14 +77,14 @@ QSize AutoScalingAttachment::contentOriginalSize() const {
 
 QSize AutoScalingAttachment::sizeHint() const {
     // sizeHint nie musi uwzględniać etykiety, bo jest pozycjonowana absolutnie
-    QSize currentContentSize = m_contentContainer->size();
-    if (!currentContentSize.isValid() || currentContentSize.width() <= 0 || currentContentSize.height() <= 0) {
-        currentContentSize = m_content ? m_content->sizeHint() : QSize();
+    QSize content_size = content_container_->size();
+    if (!content_size.isValid() || content_size.width() <= 0 || content_size.height() <= 0) {
+        content_size = content_ ? content_->sizeHint() : QSize();
     }
 
-    if (currentContentSize.isValid() && currentContentSize.width() > 0 && currentContentSize.height() > 0) {
+    if (content_size.isValid() && content_size.width() > 0 && content_size.height() > 0) {
         // Zwracamy tylko rozmiar kontenera
-        return currentContentSize;
+        return content_size;
     }
 
     // Zwróć domyślny minimalny rozmiar
@@ -93,7 +93,7 @@ QSize AutoScalingAttachment::sizeHint() const {
 
 bool AutoScalingAttachment::eventFilter(QObject *watched, QEvent *event) {
     // Zmieniamy watched na m_contentContainer
-    if (watched == m_contentContainer && event->type() == QEvent::MouseButtonRelease) {
+    if (watched == content_container_ && event->type() == QEvent::MouseButtonRelease) {
         const auto me = static_cast<QMouseEvent*>(event);
         if (me->button() == Qt::LeftButton) {
             qDebug() << "AutoScalingAttachment: Kliknięto kontener!";
@@ -105,81 +105,80 @@ bool AutoScalingAttachment::eventFilter(QObject *watched, QEvent *event) {
 }
 
 void AutoScalingAttachment::enterEvent(QEvent *event) {
-    if (m_isScaled) {
-        updateInfoLabelPosition(); // Ustaw pozycję
-        m_infoLabel->raise();      // Upewnij się, że jest na wierzchu
-        m_infoLabel->show();       // Pokaż
+    if (is_scaled_) {
+        UpdateInfoLabelPosition(); // Ustaw pozycję
+        info_label_->raise();      // Upewnij się, że jest na wierzchu
+        info_label_->show();       // Pokaż
     }
     QWidget::enterEvent(event);
 }
 
 void AutoScalingAttachment::leaveEvent(QEvent *event) {
-    m_infoLabel->hide(); // Ukryj po zjechaniu
+    info_label_->hide(); // Ukryj po zjechaniu
     QWidget::leaveEvent(event);
 }
 
 void AutoScalingAttachment::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
     // Aktualizuj pozycję etykiety, jeśli jest widoczna
-    if (m_infoLabel->isVisible()) {
-        updateInfoLabelPosition();
+    if (info_label_->isVisible()) {
+        UpdateInfoLabelPosition();
     }
 }
 
-void AutoScalingAttachment::checkAndScaleContent() {
-    if (!m_content) {
+void AutoScalingAttachment::CheckAndScaleContent() {
+    if (!content_) {
         qDebug() << "AutoScalingAttachment::checkAndScaleContent - Brak zawartości.";
         return;
     }
 
     // Pobierz oryginalny rozmiar zawartości z sizeHint
-    QSize originalSize = m_content->sizeHint();
-    if (!originalSize.isValid() || originalSize.width() <= 0 || originalSize.height() <= 0) {
-        qDebug() << "AutoScalingAttachment::checkAndScaleContent - Nieprawidłowy sizeHint zawartości:" << originalSize;
+    QSize original_size = content_->sizeHint();
+    if (!original_size.isValid() || original_size.width() <= 0 || original_size.height() <= 0) {
+        qDebug() << "AutoScalingAttachment::checkAndScaleContent - Nieprawidłowy sizeHint zawartości:" << original_size;
         // Spróbuj wymusić aktualizację sizeHint
-        m_content->updateGeometry();
-        originalSize = m_content->sizeHint();
-        if (!originalSize.isValid() || originalSize.width() <= 0 || originalSize.height() <= 0) {
+        content_->updateGeometry();
+        original_size = content_->sizeHint();
+        if (!original_size.isValid() || original_size.width() <= 0 || original_size.height() <= 0) {
             qDebug() << "AutoScalingAttachment::checkAndScaleContent - Nadal nieprawidłowy sizeHint.";
             // Można spróbować poczekać chwilę i spróbować ponownie
             // QTimer::singleShot(100, this, &AutoScalingAttachment::checkAndScaleContent);
             return;
         }
     }
-    qDebug() << "AutoScalingAttachment::checkAndScaleContent - Oryginalny sizeHint zawartości:" << originalSize;
+    qDebug() << "AutoScalingAttachment::checkAndScaleContent - Oryginalny sizeHint zawartości:" << original_size;
 
 
     // Pobierz maksymalny dostępny rozmiar
-    QSize maxSize = m_maxAllowedSize;
-    if (!maxSize.isValid()) {
-        maxSize = QSize(400, 300);
+    QSize max_size = max_allowed_size_;
+    if (!max_size.isValid()) {
+        max_size = QSize(400, 300);
     }
 
-    const bool needsScaling = originalSize.width() > maxSize.width() ||
-                        originalSize.height() > maxSize.height();
+    const bool needs_scaling = original_size.width() > max_size.width() ||
+                        original_size.height() > max_size.height();
 
-    QSize targetSize;
-    if (needsScaling) {
-        const qreal scaleX = static_cast<qreal>(maxSize.width()) / originalSize.width();
-        const qreal scaleY = static_cast<qreal>(maxSize.height()) / originalSize.height();
-        const qreal scale = qMin(scaleX, scaleY);
-        targetSize = QSize(qMax(1, static_cast<int>(originalSize.width() * scale)),
-                           qMax(1, static_cast<int>(originalSize.height() * scale)));
-        m_isScaled = true;
-        // m_infoLabel->setText("Kliknij, aby powiększyć"); // Tekst jest stały
+    QSize target_size;
+    if (needs_scaling) {
+        const qreal scale_x = static_cast<qreal>(max_size.width()) / original_size.width();
+        const qreal scale_y = static_cast<qreal>(max_size.height()) / original_size.height();
+        const qreal scale = qMin(scale_x, scale_y);
+        target_size = QSize(qMax(1, static_cast<int>(original_size.width() * scale)),
+                           qMax(1, static_cast<int>(original_size.height() * scale)));
+        is_scaled_ = true;
     } else {
-        targetSize = originalSize;
-        m_isScaled = false;
-        m_infoLabel->hide(); // Ukryj, jeśli nie skalujemy
+        target_size = original_size;
+        is_scaled_ = false;
+        info_label_->hide();
     }
 
-    m_contentContainer->setFixedSize(targetSize);
-    m_scaledSize = targetSize;
+    content_container_->setFixedSize(target_size);
+    scaled_size_ = target_size;
     updateGeometry();
 
     // Aktualizuj pozycję etykiety, jeśli jest widoczna (np. po zmianie rozmiaru)
-    if (m_infoLabel->isVisible()) {
-        updateInfoLabelPosition();
+    if (info_label_->isVisible()) {
+        UpdateInfoLabelPosition();
     }
 
     // Wymuś aktualizację layoutu rodzica
@@ -191,13 +190,13 @@ void AutoScalingAttachment::checkAndScaleContent() {
     }
 }
 
-void AutoScalingAttachment::updateInfoLabelPosition() const {
-    if (!m_contentContainer) return;
+void AutoScalingAttachment::UpdateInfoLabelPosition() const {
+    if (!content_container_) return;
     // Pozycjonuj etykietę na dole, na środku kontenera zawartości
-    int labelX = (m_contentContainer->width() - m_infoLabel->width()) / 2;
-    int labelY = m_contentContainer->height() - m_infoLabel->height() - 5; // 5px od dołu
+    int label_x = (content_container_->width() - info_label_->width()) / 2;
+    int label_y = content_container_->height() - info_label_->height() - 5; // 5px od dołu
     // Przesuń względem pozycji kontenera w AutoScalingAttachment
-    labelX += m_contentContainer->pos().x();
-    labelY += m_contentContainer->pos().y();
-    m_infoLabel->move(labelX, labelY);
+    label_x += content_container_->pos().x();
+    label_y += content_container_->pos().y();
+    info_label_->move(label_x, label_y);
 }

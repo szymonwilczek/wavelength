@@ -20,28 +20,28 @@ signals:
     void finished();
 
 private:
-    std::function<void()> m_taskFunc;
+    std::function<void()> TaskFunc_;
 };
 
 class AttachmentQueueManager final : public QObject {
     Q_OBJECT
 public:
-    static AttachmentQueueManager* getInstance() {
+    static AttachmentQueueManager* GetInstance() {
         static AttachmentQueueManager instance;
         return &instance;
     }
 
-    void addTask(const std::function<void()>& taskFunc);
+    void AddTask(const std::function<void()>& TaskFunc);
 
 private:
     explicit AttachmentQueueManager(QObject* parent = nullptr);
 
-    void processQueue();
+    void ProcessQueue();
 
-    QQueue<AttachmentTask*> m_taskQueue;
-    QList<AttachmentTask*> m_activeTasks;
-    QMutex m_mutex;
-    int m_maxActiveTasks;
+    QQueue<AttachmentTask*> task_queue_;
+    QList<AttachmentTask*> active_tasks_;
+    QMutex mutex_;
+    int max_active_tasks_;
 };
 
 #endif // ATTACHMENT_QUEUE_MANAGER_H

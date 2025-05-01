@@ -142,7 +142,7 @@ void WavelengthMessageProcessor::processMessageContent(const QJsonObject &msgObj
         QJsonObject lightMsg = msgObj;
 
         // Zamiast surowych danych base64, zapisujemy dane w magazynie i używamy ID
-        const QString attachmentId = AttachmentDataStore::getInstance()->storeAttachmentData(
+        const QString attachmentId = AttachmentDataStore::GetInstance()->StoreAttachmentData(
             msgObj["attachmentData"].toString());
 
         // Zastępujemy dane załącznika identyfikatorem

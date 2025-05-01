@@ -13,17 +13,17 @@ class AttachmentPlaceholder final : public QWidget {
     Q_OBJECT
 
 public:
-     AttachmentPlaceholder(const QString& filename, const QString& type, QWidget* parent = nullptr, bool autoLoad = true);
+     AttachmentPlaceholder(const QString& filename, const QString& type, QWidget* parent = nullptr);
 
-    void setContent(QWidget* content);
+    void SetContent(QWidget* content);
 
     QSize sizeHint() const override;
 
-    void setAttachmentReference(const QString& attachmentId, const QString& mimeType);
+    void SetAttachmentReference(const QString& attachment_id, const QString& mime_type);
 
-    void setBase64Data(const QString& base64Data, const QString& mimeType);
+    void SetBase64Data(const QString& base64_data, const QString& mime_type);
 
-    void setLoading(bool loading) const;
+    void SetLoading(bool loading) const;
 
 
 signals:
@@ -34,44 +34,41 @@ private slots:
 
 public slots:
 
-    void setError(const QString& errorMsg);
+    void SetError(const QString& error_msg);
 
-    void showFullSizeDialog(const QByteArray& data, bool isGif);
+    void ShowFullSizeDialog(const QByteArray& data, bool is_gif);
 
-    // Funkcja pomocnicza do dostosowania rozmiaru i pokazania dialogu
-    void adjustAndShowDialog(QDialog* dialog, const QScrollArea* scrollArea, QWidget* contentWidget, QSize originalContentSize) const;
+    void AdjustAndShowDialog(QDialog* dialog, const QScrollArea* scroll_area, QWidget* content_widget, QSize original_content_size) const;
 
-    void showCyberImage(const QByteArray& data);
+    void ShowCyberImage(const QByteArray& data);
 
-    void showCyberGif(const QByteArray& data);
+    void ShowCyberGif(const QByteArray& data);
 
-    void showCyberAudio(const QByteArray& data);
+    void ShowCyberAudio(const QByteArray& data);
 
-    void showCyberVideo(const QByteArray& data);
+    void ShowCyberVideo(const QByteArray& data);
 
-    void showVideo(const QByteArray& data);
-
-    void generateThumbnail(const QByteArray& videoData, QLabel* thumbnailLabel);
+    void GenerateThumbnail(const QByteArray& video_data, QLabel* thumbnail_label);
 
 private:
-    QString m_filename;
-    QString m_base64Data;
-    QString m_mimeType;
-    QLabel* m_infoLabel;
-    QLabel* m_progressLabel;
-    QPushButton* m_loadButton;
-    QWidget* m_contentContainer;
-    QVBoxLayout* m_contentLayout;
-    bool m_isLoaded;
-    QByteArray m_videoData; // Do przechowywania danych wideo
-    QLabel* m_thumbnailLabel = nullptr;
-    std::function<void()> m_clickHandler;
-    QString m_attachmentId;
-    bool m_hasReference = false;
+    QString filename_;
+    QString base64_data_;
+    QString mime_type_;
+    QLabel* info_label_;
+    QLabel* progress_label_;
+    QPushButton* load_button_;
+    QWidget* content_container_;
+    QVBoxLayout* content_layout_;
+    bool is_loaded_;
+    QByteArray video_data_;
+    QLabel* thumbnail_label_ = nullptr;
+    std::function<void()> ClickHandler_;
+    QString attachment_id_;
+    bool has_reference_ = false;
 
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void notifyLoaded();
+    void NotifyLoaded();
 };
 
 #endif //ATTACHMENT_PLACEHOLDER_H

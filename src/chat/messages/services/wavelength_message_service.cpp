@@ -121,7 +121,7 @@ bool WavelengthMessageService::sendFileMessage(const QString &filePath, const QS
     QString progressMsgIdCopy = progressMsgId;
 
     // Przeniesienie całego przetwarzania do osobnego wątku przy użyciu AttachmentQueueManager
-    AttachmentQueueManager::getInstance()->addTask([this, filePathCopy, progressMsgIdCopy]() {
+    AttachmentQueueManager::GetInstance()->AddTask([this, filePathCopy, progressMsgIdCopy]() {
         try {
             const QFileInfo fileInfo(filePathCopy);
             if (!fileInfo.exists() || !fileInfo.isReadable()) {

@@ -6,24 +6,24 @@
 
 class AttachmentDataStore {
 public:
-    static AttachmentDataStore* getInstance() {
+    static AttachmentDataStore* GetInstance() {
         static AttachmentDataStore instance;
         return &instance;
     }
 
     // Dodaj dane załącznika i zwróć identyfikator
-    QString storeAttachmentData(const QString& base64Data);
+    QString StoreAttachmentData(const QString& base64_data);
 
     // Pobierz dane załącznika
-    QString getAttachmentData(const QString& attachmentId);
+    QString GetAttachmentData(const QString& attachment_id);
 
     // Usuń dane załącznika (do zwalniania pamięci)
-    void removeAttachmentData(const QString& attachmentId);
+    void RemoveAttachmentData(const QString& attachment_id);
 
 private:
     AttachmentDataStore() = default;
-    QMap<QString, QString> m_attachmentData;
-    QMutex m_mutex;
+    QMap<QString, QString> attachment_data_;
+    QMutex mutex_;
 };
 
 

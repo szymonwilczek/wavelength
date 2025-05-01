@@ -262,7 +262,7 @@ void StreamMessage::addAttachment(const QString &html) {
     // Tworzymy placeholder załącznika i ustawiamy referencję
     const auto attachmentWidget = new AttachmentPlaceholder(
         filename, type, this, false);
-    attachmentWidget->setAttachmentReference(attachmentId, mimeType);
+    attachmentWidget->SetAttachmentReference(attachmentId, mimeType);
 
     // Ustawiamy nowy załącznik
     m_attachmentWidget = attachmentWidget;
@@ -394,7 +394,7 @@ void StreamMessage::adjustSizeToContent() {
                         maxHeight - m_mainLayout->contentsMargins().top() - m_mainLayout->contentsMargins().bottom() - 100
                     );
 
-                    scalers.first()->setMaxAllowedSize(contentMaxSize);
+                    scalers.first()->SetMaxAllowedSize(contentMaxSize);
                 }
 
                 // Wymuszamy aktualizację layoutu rodzica
@@ -915,7 +915,7 @@ void StreamMessage::processImageAttachment(const QString &html) {
     // Tworzymy placeholder załącznika
     const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "image", container, false);
-    placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+    placeholderWidget->SetAttachmentReference(attachmentId, mimeType);
 
     containerLayout->addWidget(placeholderWidget);
 
@@ -940,7 +940,7 @@ void StreamMessage::processGifAttachment(const QString &html) {
     // Tworzymy placeholder załącznika
     const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "gif", container, false);
-    placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+    placeholderWidget->SetAttachmentReference(attachmentId, mimeType);
 
     containerLayout->addWidget(placeholderWidget);
 
@@ -965,7 +965,7 @@ void StreamMessage::processAudioAttachment(const QString &html) {
     // Tworzymy placeholder załącznika
     const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "audio", container, false);
-    placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+    placeholderWidget->SetAttachmentReference(attachmentId, mimeType);
 
     containerLayout->addWidget(placeholderWidget);
 
@@ -990,7 +990,7 @@ void StreamMessage::processVideoAttachment(const QString &html) {
     // Tworzymy placeholder załącznika
     const auto placeholderWidget = new AttachmentPlaceholder(
         filename, "video", container, false);
-    placeholderWidget->setAttachmentReference(attachmentId, mimeType);
+    placeholderWidget->SetAttachmentReference(attachmentId, mimeType);
 
     containerLayout->addWidget(placeholderWidget);
 
