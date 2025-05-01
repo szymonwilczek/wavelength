@@ -218,7 +218,7 @@ void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequenc
 }
 
 WavelengthMessageProcessor::WavelengthMessageProcessor(QObject *parent): QObject(parent) {
-    const WavelengthMessageService* service = WavelengthMessageService::getInstance();
+    const WavelengthMessageService* service = WavelengthMessageService::GetInstance();
     connect(this, &WavelengthMessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
     connect(this, &WavelengthMessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
     connect(this, &WavelengthMessageProcessor::pttStartReceiving, service, &WavelengthMessageService::pttStartReceiving);

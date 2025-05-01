@@ -141,7 +141,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), m_scan
     connect(attachButton, &QPushButton::clicked, this, &WavelengthChatView::attachFile);
     connect(abortButton, &QPushButton::clicked, this, &WavelengthChatView::abortWavelength);
 
-    const WavelengthMessageService *messageService = WavelengthMessageService::getInstance();
+    const WavelengthMessageService *messageService = WavelengthMessageService::GetInstance();
     connect(messageService, &WavelengthMessageService::progressMessageUpdated,
             this, &WavelengthChatView::updateProgressMessage);
     // connect(messageService, &WavelengthMessageService::removeProgressMessage,
@@ -283,8 +283,8 @@ void WavelengthChatView::attachFile() {
     messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
 
     // Uruchamiamy asynchroniczny proces przetwarzania pliku
-    WavelengthMessageService *service = WavelengthMessageService::getInstance();
-    const bool started = service->sendFileMessage(filePath, progressMsgId);
+    WavelengthMessageService *service = WavelengthMessageService::GetInstance();
+    const bool started = service->SendFile(filePath, progressMsgId);
 
     if (!started) {
         messageArea->addMessage(progressMsgId,
@@ -380,7 +380,7 @@ void WavelengthChatView::onPttButtonPressed() {
     qDebug() << "PTT Button Pressed - Requesting PTT for" << currentFrequency;
     m_pttState = Requesting;
     updatePttButtonState();
-    WavelengthMessageService::getInstance()->sendPttRequest(currentFrequency);
+    WavelengthMessageService::GetInstance()->SendPttRequest(currentFrequency);
     pttButton->setStyleSheet("background-color: yellow; color: black;");
 }
 
@@ -397,7 +397,7 @@ void WavelengthChatView::onPttButtonReleased() {
     if (m_pttState == Transmitting) {
         qDebug() << "PTT Button Released - Stopping Transmission for" << currentFrequency;
         stopAudioInput();
-        WavelengthMessageService::getInstance()->sendPttRelease(currentFrequency);
+        WavelengthMessageService::GetInstance()->SendPttRelease(currentFrequency);
         messageArea->clearTransmittingUser();
         messageArea->setAudioAmplitude(0.0);
     } else if (m_pttState == Requesting) {
@@ -522,7 +522,7 @@ void WavelengthChatView::onReadyReadInput() const {
 
     if (!buffer.isEmpty()) {
         // 1. Wyślij dane binarne przez WebSocket
-        const bool sent = WavelengthMessageService::getInstance()->sendAudioData(currentFrequency, buffer);
+        const bool sent = WavelengthMessageService::GetInstance()->SendAudioData(currentFrequency, buffer);
         // --- DODANE LOGOWANIE ---
         qDebug() << "[HOST] onReadyReadInput: Attempted to send audio data. Success:" << sent;
         // --- KONIEC DODANIA ---
@@ -553,8 +553,8 @@ void WavelengthChatView::sendMessage() const {
 
     inputField->clear();
 
-    WavelengthMessageService *manager = WavelengthMessageService::getInstance();
-    manager->sendMessage(message);
+    WavelengthMessageService *manager = WavelengthMessageService::GetInstance();
+    manager->SendMessage(message);
 }
 
 void WavelengthChatView::abortWavelength() {
