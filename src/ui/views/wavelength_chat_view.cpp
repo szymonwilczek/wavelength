@@ -189,12 +189,12 @@ void WavelengthChatView::setWavelength(const QString &frequency, const QString &
     }
     headerLabel->setText(title);
 
-    messageArea->clear();
+    messageArea->Clear();
 
     const QString welcomeMsg = QString("<span style=\"color:#ffcc00;\">Połączono z wavelength %1 Hz o %2</span>")
             .arg(frequency)
             .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
-    messageArea->addMessage(welcomeMsg, "system", StreamMessage::MessageType::System);
+    messageArea->AddMessage(welcomeMsg, "system", StreamMessage::MessageType::kSystem);
 
     // Efekt wizualny przy połączeniu
     triggerConnectionEffect();
@@ -217,14 +217,14 @@ void WavelengthChatView::setWavelength(const QString &frequency, const QString &
 void WavelengthChatView::onMessageReceived(const QString &frequency, const QString &message) {
     if (frequency != currentFrequency) return;
     QTimer::singleShot(0, this, [this, message]() {
-        messageArea->addMessage(message, QString(), StreamMessage::MessageType::Received);
+        messageArea->AddMessage(message, QString(), StreamMessage::MessageType::kReceived);
         triggerActivityEffect();
     });
 }
 
 void WavelengthChatView::onMessageSent(const QString &frequency, const QString &message) const {
     if (frequency != currentFrequency) return;
-    messageArea->addMessage(message, QString(), StreamMessage::MessageType::Transmitted);
+    messageArea->AddMessage(message, QString(), StreamMessage::MessageType::kTransmitted);
 }
 
 void WavelengthChatView::onWavelengthClosed(const QString &frequency) {
@@ -243,7 +243,7 @@ void WavelengthChatView::onWavelengthClosed(const QString &frequency) {
     );
 
     const auto closeMsg = QString("<span style=\"color:#ff5555;\">Wavelength zostało zamknięte przez hosta.</span>");
-    messageArea->addMessage(closeMsg, "system", StreamMessage::MessageType::System);
+    messageArea->AddMessage(closeMsg, "system", StreamMessage::MessageType::kSystem);
 
     QTimer::singleShot(2000, this, [this]() {
         clear();
@@ -253,7 +253,7 @@ void WavelengthChatView::onWavelengthClosed(const QString &frequency) {
 
 void WavelengthChatView::clear() {
     currentFrequency = -1;
-    messageArea->clear();
+    messageArea->Clear();
     headerLabel->clear();
     inputField->clear();
     setVisible(false);
@@ -280,16 +280,16 @@ void WavelengthChatView::attachFile() {
     const QString processingMsg = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
             .arg(fileName);
 
-    messageArea->addMessage(processingMsg, progressMsgId, StreamMessage::MessageType::Transmitted);
+    messageArea->AddMessage(processingMsg, progressMsgId, StreamMessage::MessageType::kTransmitted);
 
     // Uruchamiamy asynchroniczny proces przetwarzania pliku
     WavelengthMessageService *service = WavelengthMessageService::GetInstance();
     const bool started = service->SendFile(filePath, progressMsgId);
 
     if (!started) {
-        messageArea->addMessage(progressMsgId,
+        messageArea->AddMessage(progressMsgId,
                                 "<span style=\"color:#ff5555;\">Failed to start file processing.</span>",
-                                StreamMessage::MessageType::Transmitted);
+                                StreamMessage::MessageType::kTransmitted);
     }
 }
 
@@ -398,8 +398,8 @@ void WavelengthChatView::onPttButtonReleased() {
         qDebug() << "PTT Button Released - Stopping Transmission for" << currentFrequency;
         stopAudioInput();
         WavelengthMessageService::GetInstance()->SendPttRelease(currentFrequency);
-        messageArea->clearTransmittingUser();
-        messageArea->setAudioAmplitude(0.0);
+        messageArea->ClearTransmittingUser();
+        messageArea->SetAudioAmplitude(0.0);
     } else if (m_pttState == Requesting) {
         qDebug() << "PTT Button Released - Cancelling Request for" << currentFrequency;
         // Można dodać wysłanie anulowania żądania, jeśli serwer to obsługuje
@@ -417,7 +417,7 @@ void WavelengthChatView::onPttGranted(const QString &frequency) {
         startAudioInput();
         pttButton->setStyleSheet("background-color: red; color: white;");
         // --- USTAW WSKAŹNIK NADAJĄCEGO (LOKALNIE) ---
-        messageArea->setTransmittingUser("You");
+        messageArea->SetTransmittingUser("You");
         // --- KONIEC USTAWIANIA WSKAŹNIKA ---
     } else if (m_pttState == Requesting) {
         qDebug() << "Received PTT grant for wrong frequency or state:" << frequency << m_pttState;
@@ -430,8 +430,8 @@ void WavelengthChatView::onPttDenied(const QString &frequency, const QString &re
         qDebug() << "PTT Denied for" << frequency << ":" << reason;
         // Wyświetl powód odmowy (opcjonalnie)
         // QMessageBox::warning(this, "PTT Denied", reason);
-        messageArea->addMessage(QString("<span style='color:#ffcc00;'>[SYSTEM] Nie można nadawać: %1</span>").arg(reason),
-                                "", StreamMessage::System);
+        messageArea->AddMessage(QString("<span style='color:#ffcc00;'>[SYSTEM] Nie można nadawać: %1</span>").arg(reason),
+                                "", StreamMessage::kSystem);
 
         m_pttState = Idle;
         updatePttButtonState();
@@ -447,7 +447,7 @@ void WavelengthChatView::onPttStartReceiving(const QString &frequency, const QSt
         startAudioOutput();
         // --- USTAW WSKAŹNIK NADAJĄCEGO (ZDALNIE) ---
         m_currentTransmitterId = senderId; // Zapisz ID na wszelki wypadek
-        messageArea->setTransmittingUser(senderId);
+        messageArea->SetTransmittingUser(senderId);
         // --- KONIEC USTAWIANIA WSKAŹNIKA ---
         if (m_audioOutput) {
             qDebug() << "Audio Output State after start request:" << m_audioOutput->state() << "Error:" << m_audioOutput->error();
@@ -463,9 +463,9 @@ void WavelengthChatView::onPttStopReceiving(const QString &frequency) {
         updatePttButtonState();
         // --- WYCZYŚĆ WSKAŹNIK NADAJĄCEGO ---
         m_currentTransmitterId = "";
-        messageArea->clearTransmittingUser();
+        messageArea->ClearTransmittingUser();
         // --- ZRESETUJ AMPLITUDĘ ---
-        messageArea->setAudioAmplitude(0.0);
+        messageArea->SetAudioAmplitude(0.0);
         // Usunięto reset glitchIntensity
     }
 }
@@ -493,7 +493,7 @@ void WavelengthChatView::onAudioDataReceived(const QString &frequency, const QBy
                 // Używamy danych, które faktycznie zostały zapisane (lub całego bufora, jeśli zapis się powiódł)
                 const qreal amplitude = calculateAmplitude(audioData.left(bytesWritten));
                 if (messageArea) {
-                    messageArea->setAudioAmplitude(amplitude); // Bezpośrednia aktualizacja wizualizacji
+                    messageArea->SetAudioAmplitude(amplitude); // Bezpośrednia aktualizacja wizualizacji
                 }
                 // --- KONIEC AKTUALIZACJI WIZUALIZACJI ODBIORCY ---
 
@@ -534,7 +534,7 @@ void WavelengthChatView::onReadyReadInput() const {
         // 3. Zaktualizuj wizualizację lokalnie
         if (messageArea) {
             // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
-            messageArea->setAudioAmplitude(amplitude * 1.5); // Nowa metoda
+            messageArea->SetAudioAmplitude(amplitude * 1.5); // Nowa metoda
         }
     } else {
         qDebug() << "[HOST] onReadyReadInput: Buffer was empty.";
@@ -542,7 +542,7 @@ void WavelengthChatView::onReadyReadInput() const {
 }
 
 void WavelengthChatView::updateProgressMessage(const QString &messageId, const QString &message) const {
-    messageArea->addMessage(message, messageId, StreamMessage::MessageType::System);
+    messageArea->AddMessage(message, messageId, StreamMessage::MessageType::kSystem);
 }
 
 void WavelengthChatView::sendMessage() const {
@@ -697,7 +697,7 @@ void WavelengthChatView::stopAudioInput() {
     }
     // Resetuj wizualizację po zatrzymaniu nadawania
     if (messageArea && m_pttState != Receiving) { // Nie resetuj jeśli zaraz zaczniemy odbierać
-        messageArea->setGlitchIntensity(0.0);
+        messageArea->SetGlitchIntensity(0.0);
     }
 }
 
@@ -744,7 +744,7 @@ void WavelengthChatView::stopAudioOutput() {
     }
     // Resetuj wizualizację po zatrzymaniu odbierania
     if (messageArea) {
-        messageArea->setGlitchIntensity(0.0);
+        messageArea->SetGlitchIntensity(0.0);
     }
 }
 

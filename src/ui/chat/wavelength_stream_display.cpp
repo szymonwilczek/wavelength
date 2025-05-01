@@ -2,75 +2,74 @@
 
 WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(parent) {
     // Konfigurujemy główny układ
-    const auto mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    const auto main_layout = new QVBoxLayout(this);
+    main_layout->setContentsMargins(0, 0, 0, 0);
 
     // Tworzymy strumień komunikacji (główny element)
-    m_communicationStream = new CommunicationStream(this);
-    m_communicationStream->setMinimumHeight(300);
-    mainLayout->addWidget(m_communicationStream, 1);
+    communication_stream_ = new CommunicationStream(this);
+    communication_stream_->setMinimumHeight(300);
+    main_layout->addWidget(communication_stream_, 1);
 
     // Kolejka wiadomości oczekujących na wyświetlenie
-    m_messageQueue = QQueue<MessageData>();
+    message_queue_ = QQueue<MessageData>();
 
     // Mapa do śledzenia *wyświetlonych* wiadomości progresu po ich ID
-    m_displayedProgressMessages = QMap<QString, StreamMessage*>();
+    displayed_progress_messages_ = QMap<QString, StreamMessage*>();
 
     // Timer dla opóźnionego wyświetlania wiadomości
-    m_messageTimer = new QTimer(this);
-    m_messageTimer->setSingleShot(true);
-    connect(m_messageTimer, &QTimer::timeout, this, &WavelengthStreamDisplay::processNextQueuedMessage);
+    message_timer_ = new QTimer(this);
+    message_timer_->setSingleShot(true);
+    connect(message_timer_, &QTimer::timeout, this, &WavelengthStreamDisplay::ProcessNextQueuedMessage);
 }
 
-void WavelengthStreamDisplay::setFrequency(const QString &frequency, const QString &name) {
+void WavelengthStreamDisplay::SetFrequency(const QString &frequency, const QString &name) {
     // Ustawiamy nazwę strumienia
     if (name.isEmpty()) {
-        m_communicationStream->setStreamName(QString("WAVELENGTH: %1 Hz").arg(frequency));
+        communication_stream_->SetStreamName(QString("WAVELENGTH: %1 Hz").arg(frequency));
     } else {
-        m_communicationStream->setStreamName(QString("%1 (%2 Hz)").arg(name).arg(frequency));
+        communication_stream_->SetStreamName(QString("%1 (%2 Hz)").arg(name).arg(frequency));
     }
 
     // Czyścimy wszystko
-    clear();
+    Clear();
 }
 
-void WavelengthStreamDisplay::addMessage(const QString &message, const QString &messageId,
+void WavelengthStreamDisplay::AddMessage(const QString &message, const QString &message_id,
     const StreamMessage::MessageType type) {
     // --- NOWA LOGIKA AKTUALIZACJI ---
     // Sprawdzamy, czy to wiadomość progresu (ma ID) i czy już jest wyświetlona
-    if (!messageId.isEmpty() && m_displayedProgressMessages.contains(messageId)) {
-        if (StreamMessage* existingMessage = m_displayedProgressMessages.value(messageId)) {
-            qDebug() << "Aktualizowanie istniejącej wiadomości progresu ID:" << messageId;
-            existingMessage->updateContent(message);
+    if (!message_id.isEmpty() && displayed_progress_messages_.contains(message_id)) {
+        if (StreamMessage* existing_message = displayed_progress_messages_.value(message_id)) {
+            qDebug() << "Aktualizowanie istniejącej wiadomości progresu ID:" << message_id;
+            existing_message->UpdateContent(message);
             return; // Zaktualizowano, nie dodajemy do kolejki
-        } else {
-            // Wskaźnik jest null lub nieprawidłowy, usuwamy z mapy
-            qWarning() << "Usuwanie nieprawidłowego wskaźnika z mapy dla ID:" << messageId;
-            m_displayedProgressMessages.remove(messageId);
         }
+        // Wskaźnik jest null lub nieprawidłowy, usuwamy z mapy
+        qWarning() << "Usuwanie nieprawidłowego wskaźnika z mapy dla ID:" << message_id;
+        displayed_progress_messages_.remove(message_id);
     }
     // --- KONIEC LOGIKI AKTUALIZACJI ---
 
     // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do kolejki
-    qDebug() << "Dodawanie nowej wiadomości do kolejki, ID:" << messageId;
+    qDebug() << "Dodawanie nowej wiadomości do kolejki, ID:" << message_id;
     MessageData data;
     data.content = message; // Przekazujemy oryginalny HTML
-    data.id = messageId;    // Zachowujemy ID
+    data.id = message_id;    // Zachowujemy ID
     data.type = type;
 
     // Sprawdzamy, czy wiadomość zawiera załączniki (na podstawie HTML)
-    data.hasAttachment = message.contains("image-placeholder") ||
+    data.has_attachment = message.contains("image-placeholder") ||
                          message.contains("video-placeholder") ||
                          message.contains("audio-placeholder") ||
                          message.contains("gif-placeholder");
 
     // Wyodrębniamy dane nadawcy (prostsza logika dla wiadomości systemowych/progresu)
-    if (type == StreamMessage::Transmitted && messageId.isEmpty()) { // Zwykła wiadomość wysłana
+    if (type == StreamMessage::kTransmitted && message_id.isEmpty()) { // Zwykła wiadomość wysłana
         data.sender = "You";
-    } else if (type == StreamMessage::Received) { // Zwykła wiadomość odebrana
+    } else if (type == StreamMessage::kReceived) { // Zwykła wiadomość odebrana
         // Logika wyciągania nadawcy z HTML (jeśli potrzebna dla odebranych)
-        const QRegularExpression re("<span[^>]*>([^<]+):</span>"); // Szukamy "Nadawca:"
-        const QRegularExpressionMatch match = re.match(message);
+        const QRegularExpression regular_expression("<span[^>]*>([^<]+):</span>"); // Szukamy "Nadawca:"
+        const QRegularExpressionMatch match = regular_expression.match(message);
         if (match.hasMatch()) {
             data.sender = match.captured(1);
         } else {
@@ -82,94 +81,93 @@ void WavelengthStreamDisplay::addMessage(const QString &message, const QString &
 
 
     // Dodajemy do kolejki
-    m_messageQueue.enqueue(data);
+    message_queue_.enqueue(data);
 
     // Jeśli to pierwsza wiadomość w kolejce i timer nie działa, startujemy
-    if (m_messageQueue.size() == 1 && !m_messageTimer->isActive()) {
-        m_messageTimer->start(100); // Krótsze opóźnienie dla szybszej reakcji
+    if (message_queue_.size() == 1 && !message_timer_->isActive()) {
+        message_timer_->start(100); // Krótsze opóźnienie dla szybszej reakcji
     }
 }
 
-void WavelengthStreamDisplay::clear() {
+void WavelengthStreamDisplay::Clear() {
     // CommunicationStream::clearMessages zajmie się usunięciem widgetów
-    m_communicationStream->clearMessages();
-    m_messageQueue.clear();
-    m_displayedProgressMessages.clear(); // Czyścimy mapę wskaźników
-    m_messageTimer->stop();
+    communication_stream_->ClearMessages();
+    message_queue_.clear();
+    displayed_progress_messages_.clear(); // Czyścimy mapę wskaźników
+    message_timer_->stop();
 }
 
-void WavelengthStreamDisplay::processNextQueuedMessage() {
-    if (m_messageQueue.isEmpty()) {
+void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
+    if (message_queue_.isEmpty()) {
         return;
     }
-    const MessageData data = m_messageQueue.dequeue();
-    StreamMessage* displayedMessage = nullptr;
+    const auto [content, sender, id, type, has_attachment] = message_queue_.dequeue();
+    StreamMessage* displayed_message = nullptr;
 
     // Bezpiecznik - nie powinien być potrzebny, jeśli onStreamMessageDestroyed działa
-    if (!data.id.isEmpty() && m_displayedProgressMessages.contains(data.id)) {
-        qWarning() << "Próba dodania wiadomości z ID, które już istnieje w mapie:" << data.id;
-        displayedMessage = m_displayedProgressMessages.value(data.id);
-        if(displayedMessage) {
-            displayedMessage->updateContent(data.content); // Aktualizuj na wszelki wypadek
+    if (!id.isEmpty() && displayed_progress_messages_.contains(id)) {
+        qWarning() << "Próba dodania wiadomości z ID, które już istnieje w mapie:" << id;
+        displayed_message = displayed_progress_messages_.value(id);
+        if(displayed_message) {
+            displayed_message->UpdateContent(content); // Aktualizuj na wszelki wypadek
         } else {
-            m_displayedProgressMessages.remove(data.id); // Usuń zły wpis
-            displayedMessage = nullptr; // Wymuś utworzenie poniżej
+            displayed_progress_messages_.remove(id); // Usuń zły wpis
+            displayed_message = nullptr; // Wymuś utworzenie poniżej
         }
     }
 
     // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do strumienia wizualnego
-    if (!displayedMessage) {
-        qDebug() << "Przetwarzanie wiadomości z kolejki: " << data.content.left(30)
-                << "... ID=" << data.id << " hasAttachment=" << data.hasAttachment;
+    if (!displayed_message) {
+        qDebug() << "Przetwarzanie wiadomości z kolejki: " << content.left(30)
+                << "... ID=" << id << " hasAttachment=" << has_attachment;
 
         // Wywołaj CommunicationStream, aby dodał wiadomość wizualnie, przekazując ID
-        if (data.hasAttachment) {
-            displayedMessage = m_communicationStream->addMessageWithAttachment(
-                data.content, data.sender, data.type, data.id); // Przekaż ID
+        if (has_attachment) {
+            displayed_message = communication_stream_->AddMessageWithAttachment(
+                content, sender, type, id); // Przekaż ID
         } else {
-            displayedMessage = m_communicationStream->addMessage(
-                data.content, data.sender, data.type, data.id); // Przekaż ID
+            displayed_message = communication_stream_->AddMessage(
+                content, sender, type, id); // Przekaż ID
         }
     }
 
     // Jeśli wiadomość została pomyślnie utworzona/wyświetlona przez CommunicationStream
-    if (displayedMessage) {
+    if (displayed_message) {
         // Jeśli to wiadomość progresu (ma ID), dodaj do mapy i podłącz sygnał destroyed
-        if (!data.id.isEmpty()) {
+        if (!id.isEmpty()) {
             // Sprawdźmy jeszcze raz, czy ID nie zostało dodane w międzyczasie
-            if (!m_displayedProgressMessages.contains(data.id)) {
-                qDebug() << "Dodano wiadomość progresu do mapy, ID:" << data.id;
-                m_displayedProgressMessages.insert(data.id, displayedMessage);
+            if (!displayed_progress_messages_.contains(id)) {
+                qDebug() << "Dodano wiadomość progresu do mapy, ID:" << id;
+                displayed_progress_messages_.insert(id, displayed_message);
                 // Podłącz sygnał zniszczenia do slotu czyszczącego mapę
-                connect(displayedMessage, &QObject::destroyed, this, &WavelengthStreamDisplay::onStreamMessageDestroyed);
+                connect(displayed_message, &QObject::destroyed, this, &WavelengthStreamDisplay::OnStreamMessageDestroyed);
             } else {
-                qWarning() << "Wiadomość progresu z ID" << data.id << "już istnieje w mapie podczas dodawania!";
+                qWarning() << "Wiadomość progresu z ID" << id << "już istnieje w mapie podczas dodawania!";
             }
         }
         // Dla zwykłych wiadomości (puste ID) nic nie robimy z mapą ani sygnałem
     } else {
-        qWarning() << "CommunicationStream nie utworzył/zwrócił widgetu wiadomości dla ID:" << data.id;
+        qWarning() << "CommunicationStream nie utworzył/zwrócił widgetu wiadomości dla ID:" << id;
     }
 
     // Uruchom timer dla następnej wiadomości w kolejce
-    if (!m_messageQueue.isEmpty()) {
+    if (!message_queue_.isEmpty()) {
         const int delay = 300 + QRandomGenerator::global()->bounded(500);
-        m_messageTimer->start(delay);
+        message_timer_->start(delay);
     }
 }
 
-void WavelengthStreamDisplay::onStreamMessageDestroyed(const QObject *obj) {
+void WavelengthStreamDisplay::OnStreamMessageDestroyed(const QObject *object) {
     // Iterujemy po mapie, aby znaleźć wpis pasujący do zniszczonego obiektu
     // To jest bezpieczniejsze niż poleganie na ID, jeśli jakimś cudem ID nie zostało ustawione
-    auto it = m_displayedProgressMessages.begin();
-    while (it != m_displayedProgressMessages.end()) {
-        if (it.value() == obj) {
+    auto it = displayed_progress_messages_.begin();
+    while (it != displayed_progress_messages_.end()) {
+        if (it.value() == object) {
             qDebug() << "Usuwanie wiadomości progresu z mapy po zniszczeniu, ID:" << it.key();
-            it = m_displayedProgressMessages.erase(it); // Usuń wpis i przejdź do następnego
+            it = displayed_progress_messages_.erase(it); // Usuń wpis i przejdź do następnego
             return; // Znaleziono i usunięto, kończymy
-        } else {
-            ++it;
         }
+        ++it;
     }
     qWarning() << "Otrzymano sygnał destroyed dla obiektu, którego nie ma w mapie wiadomości progresu.";
 }

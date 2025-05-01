@@ -7,58 +7,53 @@
 class WavelengthStreamDisplay final : public QWidget {
     Q_OBJECT
 
-    // Struktura przechowująca dane wiadomości w kolejce
     struct MessageData {
         QString content;
         QString sender;
-        QString id; // ID jest kluczowe dla aktualizacji
+        QString id;
         StreamMessage::MessageType type;
-        bool hasAttachment = false;
+        bool has_attachment = false;
     };
 
 public:
     explicit WavelengthStreamDisplay(QWidget* parent = nullptr);
 
-    void setFrequency(const QString &frequency, const QString& name = QString());
+    void SetFrequency(const QString &frequency, const QString& name = QString());
 
     // Główna metoda publiczna do dodawania/aktualizowania wiadomości
-    void addMessage(const QString& message, const QString& messageId, StreamMessage::MessageType type);
+    void AddMessage(const QString& message, const QString& message_id, StreamMessage::MessageType type);
 
 
-    void clear();
+    void Clear();
 
 public slots:
-    void setGlitchIntensity(const qreal intensity) const {
-        m_communicationStream->setGlitchIntensity(intensity);
+    void SetGlitchIntensity(const qreal intensity) const {
+        communication_stream_->SetGlitchIntensity(intensity);
     }
 
     // --- NOWE SLOTY PRZEKAZUJĄCE ---
-    void setTransmittingUser(const QString& userId) const {
-        m_communicationStream->setTransmittingUser(userId);
+    void SetTransmittingUser(const QString& userId) const {
+        communication_stream_->SetTransmittingUser(userId);
     }
 
-    void clearTransmittingUser() const {
-        m_communicationStream->clearTransmittingUser();
+    void ClearTransmittingUser() const {
+        communication_stream_->ClearTransmittingUser();
     }
 
-    void setAudioAmplitude(const qreal amplitude) const {
-        m_communicationStream->setAudioAmplitude(amplitude);
+    void SetAudioAmplitude(const qreal amplitude) const {
+        communication_stream_->SetAudioAmplitude(amplitude);
     }
 
 private slots:
-    void processNextQueuedMessage();
+    void ProcessNextQueuedMessage();
 
-    void onStreamMessageDestroyed(const QObject* obj);
+    void OnStreamMessageDestroyed(const QObject* object);
 
 private:
-    CommunicationStream* m_communicationStream;
-    QQueue<MessageData> m_messageQueue;
-    QTimer* m_messageTimer;
-    // Mapa przechowująca wskaźniki do *aktualnie wyświetlonych* wiadomości progresu
-    QMap<QString, StreamMessage*> m_displayedProgressMessages;
-
-    // Usunięta prywatna metoda addMessage, logika przeniesiona do publicznej
-    // void addMessage(const QString& rawHtml, const QString& sender, StreamMessage::MessageType type, const QString& messageId) { ... }
+    CommunicationStream* communication_stream_;
+    QQueue<MessageData> message_queue_;
+    QTimer* message_timer_;
+    QMap<QString, StreamMessage*> displayed_progress_messages_;
 };
 
 #endif // WAVELENGTH_STREAM_DISPLAY_H
