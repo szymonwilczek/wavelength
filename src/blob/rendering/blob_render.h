@@ -14,7 +14,7 @@ struct BlobRenderState {
     bool is_pulse_active = false;
     double opacity = 1.0;
     double scale = 1.0;
-    BlobConfig::AnimationState animation_state = BlobConfig::IDLE;
+    BlobConfig::AnimationState animation_state = BlobConfig::kIdle;
 };
 
 class BlobRenderer {
@@ -25,7 +25,7 @@ public:
                      last_update_time_(0), idle_amplitude_(0),
                      idle_hud_initialized_(false),
                      is_rendering_active_(true),
-                     last_animation_state_(BlobConfig::MOVING), last_glow_radius_(0) {
+                     last_animation_state_(BlobConfig::kMoving), last_glow_radius_(0) {
     }
 
     void RenderBlob(QPainter &painter,

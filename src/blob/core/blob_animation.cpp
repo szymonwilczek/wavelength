@@ -13,27 +13,27 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     const WavelengthConfig *config = WavelengthConfig::GetInstance();
 
-    params_.backgroundColor = config->GetBackgroundColor();
-    params_.borderColor = config->GetBlobColor();
-    params_.gridColor = config->GetGridColor();
-    params_.gridSpacing = config->GetGridSpacing();
+    params_.background_color = config->GetBackgroundColor();
+    params_.border_color = config->GetBlobColor();
+    params_.grid_color = config->GetGridColor();
+    params_.grid_spacing = config->GetGridSpacing();
 
-    params_.blobRadius = 250.0f;
-    params_.numPoints = 32;
-    params_.glowRadius = 10;
-    params_.borderWidth = 3;
+    params_.blob_radius = 250.0f;
+    params_.num_of_points = 32;
+    params_.glow_radius = 10;
+    params_.border_width = 3;
 
-    idle_params_.waveAmplitude = 2.0;
-    idle_params_.waveFrequency = 2.0;
+    idle_params_.wave_amplitude = 2.0;
+    idle_params_.wave_frequency = 2.0;
 
     idle_state_ = std::make_unique<IdleState>();
     moving_state_ = std::make_unique<MovingState>();
     resizing_state_ = std::make_unique<ResizingState>();
     current_blob_state_ = idle_state_.get();
 
-    control_points_.reserve(params_.numPoints);
-    target_points_.reserve(params_.numPoints);
-    velocity_.reserve(params_.numPoints);
+    control_points_.reserve(params_.num_of_points);
+    target_points_.reserve(params_.num_of_points);
+    velocity_.reserve(params_.num_of_points);
 
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -82,7 +82,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
             });
 
     connect(&event_handler_, &BlobEventHandler::resizeStateRequested, this, [this]() {
-        SwitchToState(BlobConfig::RESIZING);
+        SwitchToState(BlobConfig::kResizing);
     });
 
     connect(&event_handler_, &BlobEventHandler::significantResizeDetected, this,
@@ -114,13 +114,13 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     });
 
     connect(&transition_manager_, &BlobTransitionManager::significantMovementDetected, this, [this] {
-        SwitchToState(BlobConfig::MOVING);
+        SwitchToState(BlobConfig::kMoving);
         needs_redraw_ = true;
     });
 
     connect(&transition_manager_, &BlobTransitionManager::movementStopped, this, [this] {
-        if (current_state_ == BlobConfig::MOVING) {
-            SwitchToState(BlobConfig::IDLE);
+        if (current_state_ == BlobConfig::kMoving) {
+            SwitchToState(BlobConfig::kIdle);
         }
     });
 
@@ -223,16 +223,16 @@ void BlobAnimation::InitializeBlob() {
     blob_center_ = QPointF(width() / 2.0, height() / 2.0);
 
     // Generuj punkty kontrolne w nieregularnym, organicznym kształcie
-    control_points_ = GenerateOrganicShape(blob_center_, params_.blobRadius, params_.numPoints);
+    control_points_ = GenerateOrganicShape(blob_center_, params_.blob_radius, params_.num_of_points);
 
     // Ustawiamy punkty docelowe i prędkości
     target_points_ = control_points_;
-    velocity_.resize(params_.numPoints, QPointF(0, 0));
+    velocity_.resize(params_.num_of_points, QPointF(0, 0));
 
     // To zapewni, że nawet jeśli parametry fizyki będą próbować
     // zmienić rozmiar, to my go zawsze resetujemy do określonej wartości
-    precalc_min_distance_ = params_.blobRadius * physics_params_.minNeighborDistance;
-    precalc_max_distance_ = params_.blobRadius * physics_params_.maxNeighborDistance;
+    precalc_min_distance_ = params_.blob_radius * physics_params_.min_neighbor_distance;
+    precalc_max_distance_ = params_.blob_radius * physics_params_.max_neighbor_distance;
 }
 
 void BlobAnimation::paintEvent(QPaintEvent *event) {
@@ -287,7 +287,7 @@ QRectF BlobAnimation::CalculateBlobBoundingRect() {
     const qreal min_y = minYIt->y();
     const qreal max_y = maxYIt->y();
 
-    const int margin = params_.borderWidth + params_.glowRadius + 5;
+    const int margin = params_.border_width + params_.glow_radius + 5;
     return QRectF(min_x - margin, min_y - margin,
                   max_x - min_x + 2 * margin, max_y - min_y + 2 * margin);
 }
@@ -303,11 +303,11 @@ void BlobAnimation::updateAnimation() {
         processMovementBuffer();
 
         // Stany IDLE/MOVING/RESIZING mogą modyfikować wektory w metodzie apply
-        if (current_state_ == BlobConfig::IDLE) {
+        if (current_state_ == BlobConfig::kIdle) {
             if (current_blob_state_) {
                 current_blob_state_->Apply(control_points_, velocity_, blob_center_, params_);
             }
-        } else if (current_state_ == BlobConfig::MOVING || current_state_ == BlobConfig::RESIZING) {
+        } else if (current_state_ == BlobConfig::kMoving || current_state_ == BlobConfig::kResizing) {
             if (current_blob_state_) {
                 current_blob_state_->Apply(control_points_, velocity_, blob_center_, params_);
                 needs_redraw_ = true;
@@ -317,8 +317,8 @@ void BlobAnimation::updateAnimation() {
 
     if (needs_redraw_) {
         update();
-        params_.screenWidth = width();
-        params_.screenHeight = height();
+        params_.screen_width = width();
+        params_.screen_height = height();
     }
 }
 
@@ -327,7 +327,7 @@ void BlobAnimation::processMovementBuffer() {
         velocity_,
         blob_center_,
         control_points_,
-        params_.blobRadius,
+        params_.blob_radius,
         [this](std::vector<QPointF> &vel, QPointF &center, const std::vector<QPointF> &points, const float radius,
                const QVector2D force) {
             moving_state_->ApplyInertiaForce(vel, center, points, radius, force);
@@ -342,14 +342,14 @@ void BlobAnimation::updatePhysics() {
     physics_.UpdatePhysicsParallel(control_points_, target_points_, velocity_,
                                     blob_center_, params_, physics_params_);
 
-    const int padding = params_.borderWidth + params_.glowRadius;
+    const int padding = params_.border_width + params_.glow_radius;
     physics_.HandleBorderCollisions(control_points_, velocity_, blob_center_,
                                      width(), height(), physics_params_.restitution, padding);
 
     physics_.SmoothBlobShape(control_points_);
 
-    const double min_distance = params_.blobRadius * physics_params_.minNeighborDistance;
-    const double max_distance = params_.blobRadius * physics_params_.maxNeighborDistance;
+    const double min_distance = params_.blob_radius * physics_params_.min_neighbor_distance;
+    const double max_distance = params_.blob_radius * physics_params_.max_neighbor_distance;
     physics_.ConstrainNeighborDistances(control_points_, velocity_, min_distance, max_distance);
 }
 
@@ -363,9 +363,9 @@ void BlobAnimation::resizeEvent(QResizeEvent *event) {
 }
 
 void BlobAnimation::onStateResetTimeout() {
-    if (current_state_ != BlobConfig::IDLE) {
+    if (current_state_ != BlobConfig::kIdle) {
         qDebug() << "Auto switching to IDLE state due to inactivity";
-        SwitchToState(BlobConfig::IDLE);
+        SwitchToState(BlobConfig::kIdle);
     }
 }
 
@@ -380,7 +380,7 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
     }
 
     if (current_state_ == new_state) {
-        if (new_state == BlobConfig::MOVING || new_state == BlobConfig::RESIZING) {
+        if (new_state == BlobConfig::kMoving || new_state == BlobConfig::kResizing) {
             state_reset_timer_.stop();
             state_reset_timer_.start(2000);
         }
@@ -390,9 +390,9 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
     qDebug() << "State change from" << current_state_ << "to" << new_state;
 
     // Zmieniona logika przejścia do Idle - bez animacji przejścia
-    if (new_state == BlobConfig::IDLE &&
-        (current_state_ == BlobConfig::MOVING || current_state_ == BlobConfig::RESIZING)) {
-        current_state_ = BlobConfig::IDLE;
+    if (new_state == BlobConfig::kIdle &&
+        (current_state_ == BlobConfig::kMoving || current_state_ == BlobConfig::kResizing)) {
+        current_state_ = BlobConfig::kIdle;
         current_blob_state_ = idle_state_.get();
 
         // Reset inicjalizacji dla efektu bicia serca
@@ -409,17 +409,17 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
     current_state_ = new_state;
 
     switch (current_state_) {
-        case BlobConfig::IDLE:
+        case BlobConfig::kIdle:
             current_blob_state_ = idle_state_.get();
         // Reset inicjalizacji również tutaj
             static_cast<IdleState *>(current_blob_state_)->ResetInitialization();
             break;
-        case BlobConfig::MOVING:
+        case BlobConfig::kMoving:
             current_blob_state_ = moving_state_.get();
             state_reset_timer_.stop();
             state_reset_timer_.start(2000);
             break;
-        case BlobConfig::RESIZING:
+        case BlobConfig::kResizing:
             current_blob_state_ = resizing_state_.get();
             state_reset_timer_.stop();
             state_reset_timer_.start(2000);
@@ -429,7 +429,7 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
 
 void BlobAnimation::ApplyForces(const QVector2D &force) {
     current_blob_state_->ApplyForce(force, velocity_, blob_center_,
-                                   control_points_, params_.blobRadius);
+                                   control_points_, params_.blob_radius);
 }
 
 void BlobAnimation::ApplyIdleEffect() {
@@ -438,30 +438,30 @@ void BlobAnimation::ApplyIdleEffect() {
 
 void BlobAnimation::setBackgroundColor(const QColor &color) {
     qDebug() << "BlobAnimation::setBackgroundColor called with:" << color.name();
-    if (params_.backgroundColor != color) {
-        params_.backgroundColor = color;
+    if (params_.background_color != color) {
+        params_.background_color = color;
         // Czy updateGridBuffer używa tego koloru? Czy trzeba wywołać coś jeszcze?
-        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.background_color, params_.grid_color, params_.grid_spacing, width(), height());
         update(); // Wymuś przemalowanie
     }
 }
 
 void BlobAnimation::setGridColor(const QColor &color) {
     qDebug() << "BlobAnimation::setGridColor called with:" << color.name(QColor::HexArgb);
-    if (params_.gridColor != color) {
-        params_.gridColor = color;
+    if (params_.grid_color != color) {
+        params_.grid_color = color;
         // Aktualizuj bufor siatki
-        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.background_color, params_.grid_color, params_.grid_spacing, width(), height());
         update();
     }
 }
 
 void BlobAnimation::setGridSpacing(const int spacing) {
     qDebug() << "BlobAnimation::setGridSpacing called with:" << spacing;
-    if (params_.gridSpacing != spacing && spacing > 0) {
-        params_.gridSpacing = spacing;
+    if (params_.grid_spacing != spacing && spacing > 0) {
+        params_.grid_spacing = spacing;
         // Aktualizuj bufor siatki
-        renderer_.UpdateGridBuffer(params_.backgroundColor, params_.gridColor, params_.gridSpacing, width(), height());
+        renderer_.UpdateGridBuffer(params_.background_color, params_.grid_color, params_.grid_spacing, width(), height());
         update();
     }
 }
@@ -473,10 +473,10 @@ bool BlobAnimation::eventFilter(QObject *watched, QEvent *event) {
 
 void BlobAnimation::SetLifeColor(const QColor &color) {
     if (default_life_color_.isValid() == false) {
-        default_life_color_ = params_.borderColor;
+        default_life_color_ = params_.border_color;
     }
 
-    params_.borderColor = color;
+    params_.border_color = color;
 
     needs_redraw_ = true;
     update();
@@ -486,7 +486,7 @@ void BlobAnimation::SetLifeColor(const QColor &color) {
 
 void BlobAnimation::ResetLifeColor() {
     if (default_life_color_.isValid()) {
-        params_.borderColor = default_life_color_;
+        params_.border_color = default_life_color_;
 
         needs_redraw_ = true;
         update();
@@ -577,13 +577,13 @@ void BlobAnimation::paintGL() {
     shader_program_->setUniformValue("projection", projection);
 
     // Ustaw parametry bloba
-    const QColor blob_color = params_.borderColor;
+    const QColor blob_color = params_.border_color;
 
     shader_program_->setUniformValue("blobColor", QVector4D(
                                          blob_color.redF(), blob_color.greenF(), blob_color.blueF(), blob_color.alphaF()));
     shader_program_->setUniformValue("blobCenter", QVector2D(blob_center_));
     shader_program_->setUniformValue("blobRadius",
-                                     static_cast<float>(params_.blobRadius));
+                                     static_cast<float>(params_.blob_radius));
 
     // Renderuj bloba
     vao_.bind();
@@ -662,7 +662,7 @@ void BlobAnimation::DrawGrid() {
     grid_shader->setUniformValue("projection", projection);
 
     // Ustaw kolor siatki
-    const QColor grid_color = params_.gridColor;
+    const QColor grid_color = params_.grid_color;
     grid_shader->setUniformValue("gridColor", QVector4D(
                                    grid_color.redF(), grid_color.greenF(), grid_color.blueF(), grid_color.alphaF()));  // Usunięto mnożnik 0.5f
 
@@ -673,7 +673,7 @@ void BlobAnimation::DrawGrid() {
 
     // Generuj wierzchołki dla linii siatki
     std::vector<GLfloat> grid_vertices;
-    const int grid_spacing = params_.gridSpacing;
+    const int grid_spacing = params_.grid_spacing;
 
     // Linie poziome
     for (int y = 0; y < height(); y += grid_spacing) {
@@ -727,7 +727,7 @@ void BlobAnimation::PauseAllEventTracking() {
     event_handler_.DisableEvents();
 
     // Upewnij się, że fizyka bloba jest w stabilnym stanie
-    SwitchToState(BlobConfig::IDLE);
+    SwitchToState(BlobConfig::kIdle);
 }
 
 void BlobAnimation::ResumeAllEventTracking() {
@@ -749,15 +749,15 @@ void BlobAnimation::ResumeAllEventTracking() {
     renderer_.ResetHUD();
 
     // Wymuś odświeżenie animacji
-    SwitchToState(BlobConfig::IDLE);
+    SwitchToState(BlobConfig::kIdle);
     update();
 }
 
 void BlobAnimation::setBlobColor(const QColor &color) {
     qDebug() << "BlobAnimation::setBlobColor called with:" << color.name();
     // Załóżmy, że kolor bloba to 'borderColor' w parametrach
-    if (params_.borderColor != color) {
-        params_.borderColor = color;
+    if (params_.border_color != color) {
+        params_.border_color = color;
         // Nie ma potrzeby aktualizować bufora siatki, tylko przemalować
         update(); // Wymuś przemalowanie (wywoła paintGL)
     }
@@ -834,7 +834,7 @@ std::vector<QPointF> BlobAnimation::GenerateOrganicShape(const QPointF& center, 
 void BlobAnimation::ResetBlobToCenter() {
     std::lock_guard lock(points_mutex_);
     // Zapamiętaj aktualny promień bloba
-    const double original_radius = params_.blobRadius;
+    const double original_radius = params_.blob_radius;
 
     // Całkowicie zresetuj bloba
     control_points_.clear();
@@ -845,15 +845,15 @@ void BlobAnimation::ResetBlobToCenter() {
     blob_center_ = QPointF(width() / 2.0, height() / 2.0);
 
     // Generuj punkty kontrolne w nieregularnym, organicznym kształcie
-    control_points_ = GenerateOrganicShape(blob_center_, original_radius, params_.numPoints);
+    control_points_ = GenerateOrganicShape(blob_center_, original_radius, params_.num_of_points);
     target_points_ = control_points_;
-    velocity_.resize(params_.numPoints, QPointF(0, 0));
+    velocity_.resize(params_.num_of_points, QPointF(0, 0));
 
     // Przełącz na stan IDLE i zresetuj zachowanie
     if (idle_state_) {
         idle_state_.get()->ResetInitialization();
     }
-    SwitchToState(BlobConfig::IDLE);
+    SwitchToState(BlobConfig::kIdle);
 }
 
 void BlobAnimation::ResetVisualization() {
@@ -863,8 +863,8 @@ void BlobAnimation::ResetVisualization() {
 
     // Wymuś reset i reinicjalizację HUD
     renderer_.ResetHUD();
-    renderer_.ForceHUDInitialization(blob_center_, params_.blobRadius,
-                                    params_.borderColor, width(), height());
+    renderer_.ForceHUDInitialization(blob_center_, params_.blob_radius,
+                                    params_.border_color, width(), height());
 
     // Sygnał informujący o konieczności aktualizacji innych elementów UI
     emit visualizationReset();

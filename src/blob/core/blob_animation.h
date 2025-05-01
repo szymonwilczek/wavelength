@@ -113,7 +113,7 @@ private:
 
     QPointF blob_center_;
 
-    BlobConfig::AnimationState current_state_ = BlobConfig::IDLE;
+    BlobConfig::AnimationState current_state_ = BlobConfig::kIdle;
 
     QTimer animation_timer_;
     QTimer idle_timer_;

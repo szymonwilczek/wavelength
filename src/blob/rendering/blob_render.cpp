@@ -16,11 +16,11 @@ void BlobRenderer::RenderBlob(QPainter &painter,
 
     const QPainterPath blob_path = BlobPath::CreateBlobPath(control_points, control_points.size());
 
-    DrawGlowEffect(painter, blob_path, params.borderColor, params.glowRadius);
+    DrawGlowEffect(painter, blob_path, params.border_color, params.glow_radius);
 
-    DrawBorder(painter, blob_path, params.borderColor, params.borderWidth);
+    DrawBorder(painter, blob_path, params.border_color, params.border_width);
 
-    DrawFilling(painter, blob_path, blob_center, params.blobRadius, params.borderColor, animation_state);  // Przekazujemy stan animacji
+    DrawFilling(painter, blob_path, blob_center, params.blob_radius, params.border_color, animation_state);  // Przekazujemy stan animacji
 }
 
 void BlobRenderer::UpdateGridBuffer(const QColor &background_color,
@@ -143,7 +143,7 @@ void BlobRenderer::DrawGlowEffect(QPainter &painter,
                             viewport_size != last_glow_size_;
 
     // W stanie IDLE zawsze używaj zbuforowanego efektu jeśli to możliwe
-    if (last_animation_state_ == BlobConfig::IDLE && !buffer_needs_update && !glow_buffer_.isNull()) {
+    if (last_animation_state_ == BlobConfig::kIdle && !buffer_needs_update && !glow_buffer_.isNull()) {
         painter.drawPixmap(0, 0, glow_buffer_);
         return;
     }
@@ -151,7 +151,7 @@ void BlobRenderer::DrawGlowEffect(QPainter &painter,
     // W stanie animacji buforuj efekt co kilka klatek dla lepszej wydajności
     static int frame_counter = 0;
     const bool should_update_buffer = buffer_needs_update ||
-                             (last_animation_state_ != BlobConfig::IDLE &&
+                             (last_animation_state_ != BlobConfig::kIdle &&
                               frame_counter++ % 5 == 0);  // Aktualizuj co 5 klatek
 
     if (should_update_buffer) {
@@ -319,19 +319,19 @@ void BlobRenderer::RenderScene(QPainter &painter,
                                QColor &last_grid_color,
                                int &last_grid_spacing) {
     // Wykrywamy, czy będzie zmiana stanu
-    const bool state_changing_to_idle = (render_state.animation_state == BlobConfig::IDLE && last_animation_state_ != BlobConfig::IDLE);
+    const bool state_changing_to_idle = (render_state.animation_state == BlobConfig::kIdle && last_animation_state_ != BlobConfig::kIdle);
 
     // Wykrycie przejścia do stanu IDLE - PRZYGOTUJ BUFORY PRZED ZMIANĄ STANU
     if (state_changing_to_idle) {
         // Najpierw inicjalizujemy wartości dla stanu IDLE
-        InitializeIdleState(blob_center, params.blobRadius, params.borderColor, width, height);
+        InitializeIdleState(blob_center, params.blob_radius, params.border_color, width, height);
 
             static_hud_buffer_ = QPixmap(width, height);
             static_hud_buffer_.fill(Qt::transparent);
 
             QPainter hud_painter(&static_hud_buffer_);
             hud_painter.setRenderHint(QPainter::Antialiasing, true);
-            DrawCompleteHUD(hud_painter, blob_center, params.blobRadius, params.borderColor, width, height);
+            DrawCompleteHUD(hud_painter, blob_center, params.blob_radius, params.border_color, width, height);
             hud_painter.end();
 
             idle_hud_initialized_ = true;
@@ -341,7 +341,7 @@ void BlobRenderer::RenderScene(QPainter &painter,
     // Po przygotowaniu buforów możemy aktualizować stan
     if (state_changing_to_idle) {
         is_rendering_active_ = false;
-    } else if (render_state.animation_state != BlobConfig::IDLE) {
+    } else if (render_state.animation_state != BlobConfig::kIdle) {
         is_rendering_active_ = true;
         // Nie resetuj od razu flagi - poczekaj aż nowe bufory będą gotowe
         // m_idleHudInitialized = false;
@@ -354,12 +354,12 @@ void BlobRenderer::RenderScene(QPainter &painter,
     const bool should_update_background_cache =
             background_cache.isNull() ||
             last_background_size != QSize(width, height) ||
-            last_background_color != params.backgroundColor ||
-            last_grid_color != params.gridColor ||
-            last_grid_spacing != params.gridSpacing;
+            last_background_color != params.background_color ||
+            last_grid_color != params.grid_color ||
+            last_grid_spacing != params.grid_spacing;
 
     // W stanie IDLE używamy buforowanego tła
-    if (render_state.animation_state == BlobConfig::IDLE) {
+    if (render_state.animation_state == BlobConfig::kIdle) {
         if (should_update_background_cache) {
             // Aktualizacja bufora tła
             background_cache = QPixmap(width, height);
@@ -367,14 +367,14 @@ void BlobRenderer::RenderScene(QPainter &painter,
 
             QPainter cache_painter(&background_cache);
             cache_painter.setRenderHint(QPainter::Antialiasing, true);
-            DrawBackground(cache_painter, params.backgroundColor,
-                           params.gridColor, params.gridSpacing,
+            DrawBackground(cache_painter, params.background_color,
+                           params.grid_color, params.grid_spacing,
                            width, height);
 
             last_background_size = QSize(width, height);
-            last_background_color = params.backgroundColor;
-            last_grid_color = params.gridColor;
-            last_grid_spacing = params.gridSpacing;
+            last_background_color = params.background_color;
+            last_grid_color = params.grid_color;
+            last_grid_spacing = params.grid_spacing;
         }
 
         // Rysujemy buforowane tło
@@ -394,8 +394,8 @@ void BlobRenderer::RenderScene(QPainter &painter,
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
         // Rysuj dynamiczne tło
-        DrawBackground(painter, params.backgroundColor,
-                       params.gridColor, params.gridSpacing,
+        DrawBackground(painter, params.background_color,
+                       params.grid_color, params.grid_spacing,
                        width, height);
 
         // Renderuj blob

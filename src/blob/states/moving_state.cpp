@@ -25,7 +25,7 @@ void MovingState::Apply(std::vector<QPointF>& control_points,
             QPointF vector_from_center = control_points[i] - blob_center;
             const double distance_from_center = QVector2D(vector_from_center).length();
 
-            double factor = distance_from_center / params.blobRadius;
+            double factor = distance_from_center / params.blob_radius;
             // Zmniejsz współczynnik odkształcenia (z 0.1 na 0.05)
             factor = factor * factor * 0.05;
 
