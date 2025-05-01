@@ -1,31 +1,31 @@
 #include "user_info_label.h"
 
 UserInfoLabel::UserInfoLabel(QWidget *parent): QLabel(parent),
-                                               m_circleDiameter(10), // Średnica głównego okręgu
-                                               m_penWidth(2.0),      // Grubość linii okręgu
-                                               m_glowLayers(4),      // Liczba warstw poświaty
-                                               m_glowSpread(2.0),    // Jak bardzo rozszerza się poświata na warstwę
-                                               m_shapePadding(5) {
+                                               circle_diameter_(10), // Średnica głównego okręgu
+                                               pen_width_(2.0),      // Grubość linii okręgu
+                                               glow_layers_(4),      // Liczba warstw poświaty
+                                               glow_spread_(2.0),    // Jak bardzo rozszerza się poświata na warstwę
+                                               shape_padding_(5) {
     // Oblicz całkowity rozmiar potrzebny na kształt z poświatą
-    m_totalShapeSize = m_circleDiameter + m_glowLayers * m_glowSpread * 2;
+    total_shape_size_ = circle_diameter_ + glow_layers_ * glow_spread_ * 2;
 }
 
-void UserInfoLabel::setShapeColor(const QColor &color) {
-    m_shapeColor = color;
+void UserInfoLabel::SetShapeColor(const QColor &color) {
+    shape_color_ = color;
     update();
 }
 
 QSize UserInfoLabel::sizeHint() const {
     QSize textSize = QLabel::sizeHint();
-    textSize.setWidth(textSize.width() + m_totalShapeSize + m_shapePadding);
-    textSize.setHeight(qMax(textSize.height(), m_totalShapeSize + 2));
+    textSize.setWidth(textSize.width() + total_shape_size_ + shape_padding_);
+    textSize.setHeight(qMax(textSize.height(), total_shape_size_ + 2));
     return textSize;
 }
 
 QSize UserInfoLabel::minimumSizeHint() const {
     QSize textSize = QLabel::minimumSizeHint();
-    textSize.setWidth(textSize.width() + m_totalShapeSize + m_shapePadding);
-    textSize.setHeight(qMax(textSize.height(), m_totalShapeSize + 2));
+    textSize.setWidth(textSize.width() + total_shape_size_ + shape_padding_);
+    textSize.setHeight(qMax(textSize.height(), total_shape_size_ + 2));
     return textSize;
 }
 
@@ -39,32 +39,32 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
     // 2. Narysuj okrąg z poświatą
-    if (m_shapeColor.isValid()) {
+    if (shape_color_.isValid()) {
         painter.save();
 
         // Wyśrodkuj obszar rysowania kształtu pionowo i umieść po lewej
-        qreal totalPadding = m_glowLayers * m_glowSpread; // Dodatkowy padding na poświatę
-        qreal yPos = (height() - m_totalShapeSize) / 2.0;
+        qreal totalPadding = glow_layers_ * glow_spread_; // Dodatkowy padding na poświatę
+        qreal yPos = (height() - total_shape_size_) / 2.0;
         QRectF baseRect(contentsMargins().left() + totalPadding, // Zostaw miejsce na poświatę po lewej
                         yPos + totalPadding,                   // Zostaw miejsce na poświatę na górze
-                        m_circleDiameter, m_circleDiameter);
+                        circle_diameter_, circle_diameter_);
 
         // Rysowanie poświaty (od zewnątrz do wewnątrz)
-        for (int i = m_glowLayers; i >= 1; --i) {
-            qreal currentSpread = i * m_glowSpread;
-            qreal currentDiameter = m_circleDiameter + currentSpread * 2;
+        for (int i = glow_layers_; i >= 1; --i) {
+            qreal currentSpread = i * glow_spread_;
+            qreal currentDiameter = circle_diameter_ + currentSpread * 2;
             QRectF glowRect(baseRect.center().x() - currentDiameter / 2.0,
                             baseRect.center().y() - currentDiameter / 2.0,
                             currentDiameter, currentDiameter);
 
             // Kolor poświaty - ten sam co główny, ale z niską alfą
-            QColor glowColor = m_shapeColor;
+            QColor glowColor = shape_color_;
             // Alfa maleje im dalej od środka (np. liniowo lub potęgowo)
-            int alpha = qMax(0, 50 - i * (50 / m_glowLayers)); // Prosty spadek liniowy
+            int alpha = qMax(0, 50 - i * (50 / glow_layers_)); // Prosty spadek liniowy
             glowColor.setAlpha(alpha);
 
             // Grubość linii poświaty może być większa
-            qreal glowPenWidth = m_penWidth + currentSpread * 0.5; // Grubsza dla większego rozmycia
+            qreal glowPenWidth = pen_width_ + currentSpread * 0.5; // Grubsza dla większego rozmycia
 
             QPen glowPen(glowColor, glowPenWidth);
             glowPen.setCapStyle(Qt::RoundCap); // Zaokrąglone końce dla gładszej poświaty
@@ -74,7 +74,7 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
         }
 
         // Rysowanie głównego okręgu
-        QPen mainPen(m_shapeColor, m_penWidth);
+        QPen mainPen(shape_color_, pen_width_);
         painter.setPen(mainPen);
         painter.setBrush(Qt::NoBrush);
         painter.drawEllipse(baseRect);
@@ -85,7 +85,7 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
     // 3. Narysuj tekst obok kształtu (bez zmian w logice rysowania tekstu)
     QRect textRect = contentsRect();
     // Przesuń tekst w prawo o całkowity rozmiar kształtu i padding
-    textRect.setLeft(textRect.left() + m_totalShapeSize + m_shapePadding);
+    textRect.setLeft(textRect.left() + total_shape_size_ + shape_padding_);
 
     QColor textColor = palette().color(QPalette::WindowText);
     QString styleSheet = this->styleSheet();

@@ -209,7 +209,7 @@ void CommunicationStream::SetTransmittingUser(const QString &user_id) const {
     // --- GENERUJ KOLOR I USTAW LABEL ---
     const auto [color] = GenerateUserVisuals(user_id);
     // m_transmittingUserLabel->setShape(visuals.shape); // USUNIĘTO
-    transmitting_user_label_->setShapeColor(color); // Ustaw tylko kolor
+    transmitting_user_label_->SetShapeColor(color); // Ustaw tylko kolor
     transmitting_user_label_->setText(display_text);
     // --- KONIEC USTAWIANIA ---
 

@@ -2,9 +2,7 @@
 #define USER_INFO_LABEL_H
 
 #include <QLabel>
-#include <QPainter>
 #include <QColor>
-#include <QStyleOption>
 #include <QtMath>
 
 class UserInfoLabel final : public QLabel {
@@ -13,9 +11,7 @@ class UserInfoLabel final : public QLabel {
 public:
     explicit UserInfoLabel(QWidget* parent = nullptr);
 
-    // void setShape(const QPainterPath& path); // USUNIĘTO
-
-    void setShapeColor(const QColor& color);
+    void SetShapeColor(const QColor& color);
 
     QSize sizeHint() const override;
 
@@ -25,14 +21,13 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    // QPainterPath m_shape; // USUNIĘTO
-    QColor m_shapeColor;
-    int m_circleDiameter;   // Średnica głównego okręgu
-    qreal m_penWidth;       // Grubość linii okręgu
-    int m_glowLayers;       // Liczba warstw poświaty
-    qreal m_glowSpread;     // Rozszerzenie poświaty na warstwę
-    int m_shapePadding;     // Odstęp między kształtem a tekstem
-    int m_totalShapeSize;   // Całkowity rozmiar (średnica + poświata)
+    QColor shape_color_;
+    int circle_diameter_;   // Średnica głównego okręgu
+    qreal pen_width_;       // Grubość linii okręgu
+    int glow_layers_;       // Liczba warstw poświaty
+    qreal glow_spread_;     // Rozszerzenie poświaty na warstwę
+    int shape_padding_;     // Odstęp między kształtem a tekstem
+    int total_shape_size_;   // Całkowity rozmiar (średnica + poświata)
 };
 
 #endif // USER_INFO_LABEL_H
