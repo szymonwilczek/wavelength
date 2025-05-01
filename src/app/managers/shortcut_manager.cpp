@@ -160,7 +160,7 @@ void ShortcutManager::RegisterChatViewShortcuts(WavelengthChatView* chat_view) {
 
     CreateAndConnectShortcut("ChatView.AttachFile", chat_view, [chat_view]() {
         qDebug() << "Shortcut activated: AttachFile";
-        chat_view->attachFile();
+        chat_view->AttachFile();
     });
 
     CreateAndConnectShortcut("ChatView.SendMessage", chat_view, [chat_view]() {

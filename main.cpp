@@ -365,18 +365,18 @@ int main(int argc, char *argv[]) {
     auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString &frequency) {
         animation->hideAnimation();
         navbar->SetChatMode(true);
-        chatView->setWavelength(frequency, "");
+        chatView->SetWavelength(frequency, "");
         stackedWidget->slideToWidget(chatView);
     };
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
-                     chatView, &WavelengthChatView::onMessageReceived);
+                     chatView, &WavelengthChatView::OnMessageReceived);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageSent,
-                     chatView, &WavelengthChatView::onMessageSent);
+                     chatView, &WavelengthChatView::OnMessageSent);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
-                     chatView, &WavelengthChatView::onWavelengthClosed);
+                     chatView, &WavelengthChatView::OnWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
                      [switchToChatView](const QString &frequency) {
