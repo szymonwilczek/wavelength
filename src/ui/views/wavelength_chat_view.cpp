@@ -577,7 +577,7 @@ void WavelengthChatView::abortWavelength() {
     const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
 
     bool isHost = false;
-    if (coordinator->GetWavelengthInfo(currentFrequency, &isHost).isHost) {
+    if (coordinator->GetWavelengthInfo(currentFrequency, &isHost).is_host) {
         if (isHost) {
             coordinator->CloseWavelength(currentFrequency);
         } else {

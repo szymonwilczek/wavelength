@@ -9,85 +9,85 @@
 
 struct WavelengthInfo {
     QString frequency;
-    bool isPasswordProtected;
+    bool is_password_protected;
     QString password;
-    QString hostId;
-    bool isHost;
-    int hostPort;
+    QString host_id;
+    bool is_host;
+    int host_port;
     QPointer<QWebSocket> socket = nullptr;
-    bool isClosing = false;
-    QDateTime createdAt = QDateTime::currentDateTime();
+    bool is_closing = false;
+    QDateTime created_at = QDateTime::currentDateTime();
 };
 
 class WavelengthRegistry final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthRegistry* getInstance() {
+    static WavelengthRegistry* GetInstance() {
         static WavelengthRegistry instance;
         return &instance;
     }
 
-    bool addWavelength(const QString &frequency, const WavelengthInfo& info);
+    bool AddWavelength(const QString &frequency, const WavelengthInfo& info);
 
-    bool removeWavelength(const QString &frequency);
+    bool RemoveWavelength(const QString &frequency);
 
-    bool hasWavelength(const QString &frequency) const {
-        return m_wavelengths.contains(frequency);
+    bool HasWavelength(const QString &frequency) const {
+        return wavelengths_.contains(frequency);
     }
 
-    WavelengthInfo getWavelengthInfo(const QString &frequency) const;
+    WavelengthInfo GetWavelengthInfo(const QString &frequency) const;
 
-    QList<QString> getAllWavelengths() const {
-        return m_wavelengths.keys();
+    QList<QString> GetAllWavelengths() const {
+        return wavelengths_.keys();
     }
 
-    bool updateWavelength(const QString &frequency, const WavelengthInfo& info);
+    bool UpdateWavelength(const QString &frequency, const WavelengthInfo& info);
 
-    void setActiveWavelength(const QString &frequency);
+    void SetActiveWavelength(const QString &frequency);
 
-    QString getActiveWavelength() const {
-        return m_activeWavelength;
+    QString GetActiveWavelength() const {
+        return active_wavelength_;
     }
 
-    double isWavelengthActive(const QString &frequency) const {
-        return m_activeWavelength == frequency;
+    double IsWavelengthActive(const QString &frequency) const {
+        return active_wavelength_ == frequency;
     }
 
-    bool addPendingRegistration(const QString &frequency);
+    bool AddPendingRegistration(const QString &frequency);
 
-    bool removePendingRegistration(const QString &frequency);
+    bool RemovePendingRegistration(const QString &frequency);
 
-    bool isPendingRegistration(const QString &frequency) const {
-        return m_pendingRegistrations.contains(frequency);
+    bool IsPendingRegistration(const QString &frequency) const {
+        return pending_registrations_.contains(frequency);
     }
 
-    QPointer<QWebSocket> getWavelengthSocket(const QString &frequency) const;
+    QPointer<QWebSocket> GetWavelengthSocket(const QString &frequency) const;
 
-    void setWavelengthSocket(const QString &frequency, const QPointer<QWebSocket> &socket);
+    void SetWavelengthSocket(const QString &frequency, const QPointer<QWebSocket> &socket);
 
-    bool markWavelengthClosing(const QString &frequency, bool closing = true);
+    bool MarkWavelengthClosing(const QString &frequency, bool closing = true);
 
-    bool isWavelengthClosing(const QString &frequency) const;
+    bool IsWavelengthClosing(const QString &frequency) const;
 
-    void clearAllWavelengths();
+    void ClearAllWavelengths();
 
 signals:
     void wavelengthAdded(QString frequency);
     void wavelengthRemoved(QString frequency);
     void wavelengthUpdated(QString frequency);
-    void activeWavelengthChanged(QString previousFrequency, QString newFrequency);
+    void activeWavelengthChanged(QString previous_frequency, QString new_frequency);
 
 private:
-    explicit WavelengthRegistry(QObject* parent = nullptr) : QObject(parent), m_activeWavelength(-1) {}
+    explicit WavelengthRegistry(QObject* parent = nullptr) : QObject(parent), active_wavelength_(-1) {}
     ~WavelengthRegistry() override {}
 
     WavelengthRegistry(const WavelengthRegistry&) = delete;
     WavelengthRegistry& operator=(const WavelengthRegistry&) = delete;
 
-    QMap<QString, WavelengthInfo> m_wavelengths;
-    QSet<QString> m_pendingRegistrations;
-    QString m_activeWavelength;
+    QMap<QString, WavelengthInfo> wavelengths_;
+    QSet<QString> pending_registrations_;
+    QString active_wavelength_;
 };
 
 #endif // WAVELENGTH_REGISTRY_H

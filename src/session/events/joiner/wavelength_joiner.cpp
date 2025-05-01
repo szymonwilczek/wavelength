@@ -3,22 +3,22 @@
 #include "../../../auth/authentication_manager.h"
 
 JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &password) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
     const WavelengthConfig* config = WavelengthConfig::GetInstance();
 
-    if (registry->hasWavelength(frequency)) {
+    if (registry->HasWavelength(frequency)) {
         qDebug() << "Already joined wavelength" << frequency;
-        registry->setActiveWavelength(frequency);
+        registry->SetActiveWavelength(frequency);
         emit wavelengthJoined(frequency);
         return {true, QString()};
     }
 
-    if (registry->isPendingRegistration(frequency)) {
+    if (registry->IsPendingRegistration(frequency)) {
         qDebug() << "Wavelength" << frequency << "registration is already pending";
         return {false, "WAVELENGTH UNAVAILABLE"};
     }
 
-    registry->addPendingRegistration(frequency);
+    registry->AddPendingRegistration(frequency);
     QString client_id = AuthenticationManager::GetInstance()->GenerateClientId();
     auto connected_callback_executed = new bool(false);
     auto keep_alive_timer = new QTimer(this);
@@ -44,7 +44,7 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
             const bool success = message_object["success"].toBool();
             const QString error_message = message_object["error"].toString();
 
-            registry->removePendingRegistration(frequency);
+            registry->RemovePendingRegistration(frequency);
 
             if (!success) {
                 if (error_message == "Password required" || error_message == "Invalid password") {
@@ -61,20 +61,20 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
             }
 
                 qDebug() << "[Joiner] Join successful for frequency" << frequency;
-                WavelengthInfo info = registry->getWavelengthInfo(frequency);
+                WavelengthInfo info = registry->GetWavelengthInfo(frequency);
                 if (info.frequency.isEmpty()) {
                     qWarning() << "[Joiner] WavelengthInfo not found after successful join for" << frequency;
                     info.frequency = frequency;
-                    info.hostId = message_object["hostId"].toString();
-                    info.isHost = false;
+                    info.host_id = message_object["hostId"].toString();
+                    info.is_host = false;
                     info.socket = socket;
-                    registry->addWavelength(frequency, info);
+                    registry->AddWavelength(frequency, info);
                 } else {
-                    info.hostId = message_object["hostId"].toString();
-                    registry->updateWavelength(frequency, info);
+                    info.host_id = message_object["hostId"].toString();
+                    registry->UpdateWavelength(frequency, info);
                 }
 
-                registry->setActiveWavelength(frequency);
+                registry->SetActiveWavelength(frequency);
                 keep_alive_timer->start(WavelengthConfig::GetInstance()->GetKeepAliveInterval());
                 qDebug() << "[Joiner] Keep-alive timer started for" << frequency;
                 emit wavelengthJoined(frequency);
@@ -88,16 +88,16 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
         qDebug() << "[Joiner] Connection to relay server closed for frequency" << frequency;
         keep_alive_timer->stop();
 
-        if (registry->isPendingRegistration(frequency)) {
-            registry->removePendingRegistration(frequency);
+        if (registry->IsPendingRegistration(frequency)) {
+            registry->RemovePendingRegistration(frequency);
         }
 
-        if (registry->hasWavelength(frequency)) {
+        if (registry->HasWavelength(frequency)) {
             qDebug() << "[Joiner] Removing wavelength" << frequency << "due to socket disconnect";
-            const QString active_frequency = registry->getActiveWavelength();
-            registry->removeWavelength(frequency);
+            const QString active_frequency = registry->GetActiveWavelength();
+            registry->RemoveWavelength(frequency);
             if (active_frequency == frequency) {
-                registry->setActiveWavelength("-1");
+                registry->SetActiveWavelength("-1");
                 emit wavelengthLeft(frequency);
             } else {
                 emit wavelengthClosed(frequency);
@@ -114,8 +114,8 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
                 qDebug() << "[Joiner] WebSocket error:" << socket->errorString() << "(Code:" << error << ")";
                 keep_alive_timer->stop();
 
-                if (registry->isPendingRegistration(frequency)) {
-                    registry->removePendingRegistration(frequency);
+                if (registry->IsPendingRegistration(frequency)) {
+                    registry->RemovePendingRegistration(frequency);
                 }
 
                 emit connectionError("Błąd połączenia: " + socket->errorString());
@@ -134,11 +134,11 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
 
         WavelengthInfo initial_info;
         initial_info.frequency = frequency;
-        initial_info.isPasswordProtected = !password.isEmpty();
-        initial_info.hostId = "";
-        initial_info.isHost = false;
+        initial_info.is_password_protected = !password.isEmpty();
+        initial_info.host_id = "";
+        initial_info.is_host = false;
         initial_info.socket = socket;
-        registry->addWavelength(frequency, initial_info);
+        registry->AddWavelength(frequency, initial_info);
 
         qDebug() << "[Joiner] Setting socket message handlers for" << frequency;
         WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);

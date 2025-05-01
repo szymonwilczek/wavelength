@@ -44,20 +44,20 @@ bool WavelengthMessageService::SendAudioData(const QString &frequency, const QBy
 }
 
 bool WavelengthMessageService::SendMessage(const QString &message) {
-    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    const QString frequency = registry->getActiveWavelength();
+    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    const QString frequency = registry->GetActiveWavelength();
 
     if (frequency == -1) {
         qDebug() << "Cannot send message - no active wavelength";
         return false;
     }
 
-    if (!registry->hasWavelength(frequency)) {
+    if (!registry->HasWavelength(frequency)) {
         qDebug() << "Cannot send message - active wavelength not found";
         return false;
     }
 
-    const WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    const WavelengthInfo info = registry->GetWavelengthInfo(frequency);
     QWebSocket* socket = info.socket;
 
     if (!socket) {
@@ -71,7 +71,7 @@ bool WavelengthMessageService::SendMessage(const QString &message) {
     }
 
     // Generate a sender ID (use host ID if we're host, or client ID otherwise)
-    const QString sender_id = info.isHost ? info.hostId :
+    const QString sender_id = info.is_host ? info.host_id :
                            AuthenticationManager::GetInstance()->GenerateClientId();
 
     const QString message_id = MessageHandler::GetInstance()->GenerateMessageId();
@@ -202,8 +202,8 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
             const QByteArray base64_data = file_data.toBase64();
 
             // Pobieramy dane potrzebne do wysłania
-            const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-            const QString frequency = registry->getActiveWavelength();
+            const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+            const QString frequency = registry->GetActiveWavelength();
             const QString sender_id = AuthenticationManager::GetInstance()->GenerateClientId();
             const QString message_id = MessageHandler::GetInstance()->GenerateMessageId();
 
@@ -243,11 +243,11 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
 
 bool WavelengthMessageService::SendFileToServer(const QString &json_message, const QString &frequency,
     const QString &progress_message_id) {
-    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
     QWebSocket* socket = nullptr;
 
-    if (registry->hasWavelength(frequency)) {
-        const WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    if (registry->HasWavelength(frequency)) {
+        const WavelengthInfo info = registry->GetWavelengthInfo(frequency);
         socket = info.socket;
     }
 
@@ -272,11 +272,11 @@ bool WavelengthMessageService::SendFileToServer(const QString &json_message, con
 
 void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
     const QString &progress_message_id) {
-    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
     QWebSocket* socket = nullptr;
 
-    if (registry->hasWavelength(frequency)) {
-        const WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    if (registry->HasWavelength(frequency)) {
+        const WavelengthInfo info = registry->GetWavelengthInfo(frequency);
         socket = info.socket;
     }
 
@@ -303,12 +303,12 @@ WavelengthMessageService::WavelengthMessageService(QObject *parent): QObject(par
 }
 
 QWebSocket * WavelengthMessageService::GetSocketForFrequency(const QString &frequency) {
-    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    if (!registry->hasWavelength(frequency)) {
+    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    if (!registry->HasWavelength(frequency)) {
         qWarning() << "No wavelength info found for frequency" << frequency << "in getSocketForFrequency";
         return nullptr;
     }
-    WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    WavelengthInfo info = registry->GetWavelengthInfo(frequency);
     if (!info.socket || !info.socket->isValid()) {
         qWarning() << "Invalid socket for frequency" << frequency << "in getSocketForFrequency";
         return nullptr;

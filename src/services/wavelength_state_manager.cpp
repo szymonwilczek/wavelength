@@ -1,22 +1,22 @@
 #include "wavelength_state_manager.h"
 
 WavelengthInfo WavelengthStateManager::GetWavelengthInfo(const QString &frequency, bool *is_host) {
-    const WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    WavelengthInfo info = registry->getWavelengthInfo(frequency);
+    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    WavelengthInfo info = registry->GetWavelengthInfo(frequency);
 
     if (is_host) {
-        *is_host = info.isHost;
+        *is_host = info.is_host;
     }
 
     return info;
 }
 
 QString WavelengthStateManager::GetActiveWavelength() {
-    return WavelengthRegistry::getInstance()->getActiveWavelength();
+    return WavelengthRegistry::GetInstance()->GetActiveWavelength();
 }
 
 void WavelengthStateManager::SetActiveWavelength(const QString &frequency) {
-    WavelengthRegistry::getInstance()->setActiveWavelength(frequency);
+    WavelengthRegistry::GetInstance()->SetActiveWavelength(frequency);
     emit activeWavelengthChanged(frequency);
 }
 
@@ -25,7 +25,7 @@ bool WavelengthStateManager::IsActiveWavelengthHost() {
     if (frequency == "-1") return false;
 
     const WavelengthInfo info = GetWavelengthInfo(frequency);
-    return info.isHost;
+    return info.is_host;
 }
 
 QList<QString> WavelengthStateManager::GetJoinedWavelengths() {
@@ -34,7 +34,7 @@ QList<QString> WavelengthStateManager::GetJoinedWavelengths() {
 
     // Dodaj zarejestrowane wavelength z naszej własnej listy
     for (const auto& frequency : joined_wavelengths_) {
-        if (WavelengthRegistry::getInstance()->hasWavelength(frequency)) {
+        if (WavelengthRegistry::GetInstance()->HasWavelength(frequency)) {
             result.append(frequency);
         }
     }
@@ -58,21 +58,21 @@ int WavelengthStateManager::GetJoinedWavelengthCount() {
 
 bool WavelengthStateManager::IsWavelengthPasswordProtected(const QString &frequency) {
     const WavelengthInfo info = GetWavelengthInfo(frequency);
-    return info.isPasswordProtected;
+    return info.is_password_protected;
 }
 
 bool WavelengthStateManager::IsWavelengthHost(const QString &frequency) {
     const WavelengthInfo info = GetWavelengthInfo(frequency);
-    return info.isHost;
+    return info.is_host;
 }
 
 QDateTime WavelengthStateManager::GetWavelengthCreationTime(const QString &frequency) {
     WavelengthInfo info = GetWavelengthInfo(frequency);
-    return info.createdAt;
+    return info.created_at;
 }
 
 bool WavelengthStateManager::IsWavelengthJoined(const QString &frequency) {
-    return WavelengthRegistry::getInstance()->hasWavelength(frequency);
+    return WavelengthRegistry::GetInstance()->HasWavelength(frequency);
 }
 
 bool WavelengthStateManager::IsWavelengthConnected(const QString &frequency) {

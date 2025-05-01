@@ -3,20 +3,20 @@
 #include "../../../auth/authentication_manager.h"
 
 bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_protected, const QString &password) {
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
+    WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
     const WavelengthConfig* config = WavelengthConfig::GetInstance();
 
-    if (registry->hasWavelength(frequency)) {
+    if (registry->HasWavelength(frequency)) {
         qDebug() << "Wavelength" << frequency << "already exists locally";
         return false;
     }
 
-    if (registry->isPendingRegistration(frequency)) {
+    if (registry->IsPendingRegistration(frequency)) {
         qDebug() << "Wavelength" << frequency << "registration is already pending";
         return false;
     }
 
-    registry->addPendingRegistration(frequency);
+    registry->AddPendingRegistration(frequency);
     QString host_id = AuthenticationManager::GetInstance()->GenerateClientId();
     auto connected_callback_executed = new bool(false);
     auto keep_alive_timer = new QTimer(this);
@@ -41,23 +41,23 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
             const bool success = message_object["success"].toBool();
             qDebug() << "[Creator] Register result received:" << (success ? "success" : "failure");
 
-            registry->removePendingRegistration(frequency);
+            registry->RemovePendingRegistration(frequency);
 
             if (success) {
-                WavelengthInfo info = registry->getWavelengthInfo(frequency);
+                WavelengthInfo info = registry->GetWavelengthInfo(frequency);
                 if (info.frequency.isEmpty()) {
                     qWarning() << "[Creator] WavelengthInfo not found after successful registration for" << frequency;
                     info.frequency = frequency;
-                    info.hostId = message_object["hostId"].toString();
-                    info.isHost = true;
+                    info.host_id = message_object["hostId"].toString();
+                    info.is_host = true;
                     info.socket = socket;
-                    registry->addWavelength(frequency, info);
+                    registry->AddWavelength(frequency, info);
                 } else {
-                    info.hostId = message_object["hostId"].toString();
-                    registry->updateWavelength(frequency, info);
+                    info.host_id = message_object["hostId"].toString();
+                    registry->UpdateWavelength(frequency, info);
                 }
 
-                registry->setActiveWavelength(frequency);
+                registry->SetActiveWavelength(frequency);
                 keep_alive_timer->start(WavelengthConfig::GetInstance()->GetKeepAliveInterval());
                 qDebug() << "[Creator] Keep-alive timer started for" << frequency;
                 emit wavelengthCreated(frequency);
@@ -77,17 +77,17 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
         qDebug() << "[Creator] WebSocket disconnected for wavelength" << frequency;
         keep_alive_timer->stop();
 
-        if (registry->isPendingRegistration(frequency)) {
+        if (registry->IsPendingRegistration(frequency)) {
             qDebug() << "[Creator] Clearing pending registration for frequency" << frequency;
-            registry->removePendingRegistration(frequency);
+            registry->RemovePendingRegistration(frequency);
         }
 
-        if (registry->hasWavelength(frequency)) {
+        if (registry->HasWavelength(frequency)) {
             qDebug() << "[Creator] Removing wavelength" << frequency << "due to socket disconnect";
-            const QString activeFreq = registry->getActiveWavelength();
-            registry->removeWavelength(frequency);
+            const QString activeFreq = registry->GetActiveWavelength();
+            registry->RemoveWavelength(frequency);
             if (activeFreq == frequency) {
-                registry->setActiveWavelength("-1");
+                registry->SetActiveWavelength("-1");
             }
             emit wavelengthClosed(frequency);
         }
@@ -102,8 +102,8 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
             this, [this, socket, frequency, registry](const QAbstractSocket::SocketError error) {
                 qDebug() << "[Creator] WebSocket error for wavelength" << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
 
-                if (registry->isPendingRegistration(frequency)) {
-                    registry->removePendingRegistration(frequency);
+                if (registry->IsPendingRegistration(frequency)) {
+                    registry->RemovePendingRegistration(frequency);
                 }
 
                 const QString errorMsg = socket->errorString();
@@ -121,12 +121,12 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
 
                 WavelengthInfo initial_info;
                 initial_info.frequency = frequency;
-                initial_info.isPasswordProtected = is_password_protected;
+                initial_info.is_password_protected = is_password_protected;
                 initial_info.password = password;
-                initial_info.hostId = host_id;
-                initial_info.isHost = true;
+                initial_info.host_id = host_id;
+                initial_info.is_host = true;
                 initial_info.socket = socket;
-                registry->addWavelength(frequency, initial_info);
+                registry->AddWavelength(frequency, initial_info);
 
                 qDebug() << "[Creator] Setting socket message handlers for" << frequency;
                 WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);

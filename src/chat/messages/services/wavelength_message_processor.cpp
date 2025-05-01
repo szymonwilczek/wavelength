@@ -169,19 +169,19 @@ void WavelengthMessageProcessor::ProcessSystemCommand(const QJsonObject &message
         const QString user_id = message_object["userId"].toString();
         const QString reason = message_object["reason"].toString("You have been kicked");
 
-        const WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
-        const QString client_id = info.hostId; // Uproszczenie - potrzeba poprawić
+        const WavelengthInfo info = WavelengthRegistry::GetInstance()->GetWavelengthInfo(frequency);
+        const QString client_id = info.host_id; // Uproszczenie - potrzeba poprawić
 
         if (user_id == client_id) {
             emit userKicked(frequency, reason);
 
             // Usuń wavelength z rejestru
-            WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-            if (registry->hasWavelength(frequency)) {
-                const QString activeFreq = registry->getActiveWavelength();
-                registry->removeWavelength(frequency);
+            WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+            if (registry->HasWavelength(frequency)) {
+                const QString activeFreq = registry->GetActiveWavelength();
+                registry->RemoveWavelength(frequency);
                 if (activeFreq == frequency) {
-                    registry->setActiveWavelength("-1");
+                    registry->SetActiveWavelength("-1");
                 }
             }
         }
@@ -205,13 +205,13 @@ void WavelengthMessageProcessor::ProcessUserLeft(const QJsonObject &message_obje
 void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequency) {
     qDebug() << "Wavelength" << frequency << "was closed";
 
-    WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    if (registry->hasWavelength(frequency)) {
-        const QString active_frequency = registry->getActiveWavelength();
-        registry->markWavelengthClosing(frequency, true);
-        registry->removeWavelength(frequency);
+    WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    if (registry->HasWavelength(frequency)) {
+        const QString active_frequency = registry->GetActiveWavelength();
+        registry->MarkWavelengthClosing(frequency, true);
+        registry->RemoveWavelength(frequency);
         if (active_frequency == frequency) {
-            registry->setActiveWavelength("-1");
+            registry->SetActiveWavelength("-1");
         }
         emit wavelengthClosed(frequency);
     }

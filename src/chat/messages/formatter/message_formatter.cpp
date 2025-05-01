@@ -13,9 +13,9 @@ QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const
         sender_name = message_object["sender"].toString();
     } else if (message_object.contains("senderId")) {
         const QString sender_id = message_object["senderId"].toString();
-        const WavelengthInfo info = WavelengthRegistry::getInstance()->getWavelengthInfo(frequency);
+        const WavelengthInfo info = WavelengthRegistry::GetInstance()->GetWavelengthInfo(frequency);
 
-        if (sender_id == info.hostId) {
+        if (sender_id == info.host_id) {
             sender_name = "Host";
         } else {
             sender_name = "User " + sender_id.left(5);
