@@ -43,7 +43,7 @@ bool WavelengthMessageService::SendAudioData(const QString &frequency, const QBy
     return bytes_sent == audio_data.size();
 }
 
-bool WavelengthMessageService::SendMessage(const QString &message) {
+bool WavelengthMessageService::SendTextMessage(const QString &message) {
     const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
     const QString frequency = registry->GetActiveWavelength();
 
