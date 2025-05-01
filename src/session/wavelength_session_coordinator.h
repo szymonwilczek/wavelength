@@ -132,55 +132,55 @@ private slots:
     void onWavelengthCreated(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
         emit wavelengthCreated(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->wavelengthCreated(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthCreated(frequency);
     }
 
     void onWavelengthJoined(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthJoined signal for frequency" << frequency;
         emit wavelengthJoined(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->wavelengthJoined(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthJoined(frequency);
     }
 
     void onWavelengthLeft(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthLeft signal for frequency" << frequency;
         emit wavelengthLeft(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->wavelengthLeft(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthLeft(frequency);
     }
 
     void onWavelengthClosed(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthClosed signal for frequency" << frequency;
         emit wavelengthClosed(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->wavelengthClosed(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthClosed(frequency);
     }
 
     void onMessageReceived(const QString &frequency, const QString& message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageReceived signal";
         emit messageReceived(frequency, message);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->messageReceived(frequency, message);
+        WavelengthEventBroker::GetInstance()->MessageReceived(frequency, message);
     }
 
     void onMessageSent(const QString &frequency, const QString& message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageSent signal";
         emit messageSent(frequency, message);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->messageSent(frequency, message);
+        WavelengthEventBroker::GetInstance()->MessageSent(frequency, message);
     }
 
     void onConnectionError(const QString& errorMessage) {
         qDebug() << "WavelengthSessionCoordinator: Propagating connectionError signal:" << errorMessage;
         emit connectionError(errorMessage);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->connectionError(errorMessage);
+        WavelengthEventBroker::GetInstance()->ConnectionError(errorMessage);
     }
 
     void onAuthenticationFailed(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating authenticationFailed signal for frequency" << frequency;
         emit authenticationFailed(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->authenticationFailed(frequency);
+        WavelengthEventBroker::GetInstance()->AuthenticationFailed(frequency);
     }
 
     void onActiveWavelengthChanged(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" << frequency;
         emit activeWavelengthChanged(frequency);  // BEZPOŚREDNIE EMITOWANIE SYGNAŁU
-        WavelengthEventBroker::getInstance()->activeWavelengthChanged(frequency);
+        WavelengthEventBroker::GetInstance()->ActiveWavelengthChanged(frequency);
     }
 
     static void onConfigChanged(const QString& key) {

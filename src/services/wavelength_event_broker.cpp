@@ -4,90 +4,90 @@
 template<typename Receiver, typename Func>
 requires std::derived_from<Receiver, QObject> &&
          std::invocable<Func, const QVariantMap&>
-void WavelengthEventBroker::subscribeToEvent(const QString &eventType, Receiver *receiver, Func slot) {
+void WavelengthEventBroker::SubscribeToEvent(const QString &event_type, Receiver *receiver, Func slot) {
     connect(this, &WavelengthEventBroker::eventPublished,
-            receiver, [eventType, slot](const QString& type, const QVariantMap& data) {
-                if (type == eventType) {
+            receiver, [event_type, slot](const QString& type, const QVariantMap& data) {
+                if (type == event_type) {
                     (*slot)(data);
                 }
             });
 
-    qDebug() << "Subscribed to event:" << eventType;
+    qDebug() << "Subscribed to event:" << event_type;
 }
 
-void WavelengthEventBroker::wavelengthCreated(const QString &frequency) {
+void WavelengthEventBroker::WavelengthCreated(const QString &frequency) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("wavelength_created", data);
+    PublishEvent("wavelength_created", data);
 }
 
-void WavelengthEventBroker::wavelengthJoined(const QString &frequency) {
+void WavelengthEventBroker::WavelengthJoined(const QString &frequency) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("wavelength_joined", data);
+    PublishEvent("wavelength_joined", data);
 }
 
-void WavelengthEventBroker::wavelengthLeft(const QString &frequency) {
+void WavelengthEventBroker::WavelengthLeft(const QString &frequency) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("wavelength_left", data);
+    PublishEvent("wavelength_left", data);
 }
 
-void WavelengthEventBroker::wavelengthClosed(const QString &frequency) {
+void WavelengthEventBroker::WavelengthClosed(const QString &frequency) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("wavelength_closed", data);
+    PublishEvent("wavelength_closed", data);
 }
 
-void WavelengthEventBroker::messageReceived(const QString &frequency, const QString &message) {
-    QVariantMap data;
-    data["frequency"] = frequency;
-    data["message"] = message;
-    publishEvent("message_received", data);
-}
-
-void WavelengthEventBroker::messageSent(const QString &frequency, const QString &message) {
+void WavelengthEventBroker::MessageReceived(const QString &frequency, const QString &message) {
     QVariantMap data;
     data["frequency"] = frequency;
     data["message"] = message;
-    publishEvent("message_sent", data);
+    PublishEvent("message_received", data);
 }
 
-void WavelengthEventBroker::connectionError(const QString &errorMessage) {
-    QVariantMap data;
-    data["error"] = errorMessage;
-    publishEvent("connection_error", data);
-}
-
-void WavelengthEventBroker::authenticationFailed(const QString &frequency) {
+void WavelengthEventBroker::MessageSent(const QString &frequency, const QString &message) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("authentication_failed", data);
+    data["message"] = message;
+    PublishEvent("message_sent", data);
 }
 
-void WavelengthEventBroker::userKicked(const QString &frequency, const QString &reason) {
+void WavelengthEventBroker::ConnectionError(const QString &error_message) {
+    QVariantMap data;
+    data["error"] = error_message;
+    PublishEvent("connection_error", data);
+}
+
+void WavelengthEventBroker::AuthenticationFailed(const QString &frequency) {
+    QVariantMap data;
+    data["frequency"] = frequency;
+    PublishEvent("authentication_failed", data);
+}
+
+void WavelengthEventBroker::UserKicked(const QString &frequency, const QString &reason) {
     QVariantMap data;
     data["frequency"] = frequency;
     data["reason"] = reason;
-    publishEvent("user_kicked", data);
+    PublishEvent("user_kicked", data);
 }
 
-void WavelengthEventBroker::uiStateChanged(const QString &component, const QVariant &state) {
+void WavelengthEventBroker::UiStateChanged(const QString &component, const QVariant &state) {
     QVariantMap data;
     data["component"] = component;
     data["state"] = state;
-    publishEvent("ui_state_changed", data);
+    PublishEvent("ui_state_changed", data);
 }
 
-void WavelengthEventBroker::systemMessage(const QString &frequency, const QString &message) {
+void WavelengthEventBroker::SystemMessage(const QString &frequency, const QString &message) {
     QVariantMap data;
     data["frequency"] = frequency;
     data["message"] = message;
-    publishEvent("system_message", data);
+    PublishEvent("system_message", data);
 }
 
-void WavelengthEventBroker::activeWavelengthChanged(const QString &frequency) {
+void WavelengthEventBroker::ActiveWavelengthChanged(const QString &frequency) {
     QVariantMap data;
     data["frequency"] = frequency;
-    publishEvent("active_wavelength_changed", data);
+    PublishEvent("active_wavelength_changed", data);
 }
