@@ -18,7 +18,7 @@ void WavelengthSessionCoordinator::Initialize() {
 bool WavelengthSessionCoordinator::CreateWavelength(const QString &frequency, const bool is_password_protected,
     const QString &password) {
     qDebug() << "Coordinator: Creating wavelength" << frequency;
-    const bool success = WavelengthCreator::getInstance()->createWavelength(
+    const bool success = WavelengthCreator::GetInstance()->CreateWavelength(
         frequency, is_password_protected, password);
 
     if (success) {
@@ -30,7 +30,7 @@ bool WavelengthSessionCoordinator::CreateWavelength(const QString &frequency, co
 
 bool WavelengthSessionCoordinator::JoinWavelength(const QString &frequency, const QString &password) {
     qDebug() << "Coordinator: Joining wavelength" << frequency;
-    const auto [success, errorReason] = WavelengthJoiner::getInstance()->joinWavelength(frequency, password);
+    const auto [success, errorReason] = WavelengthJoiner::GetInstance()->JoinWavelength(frequency, password);
 
     if (success) {
         WavelengthStateManager::GetInstance()->RegisterJoinedWavelength(frequency);
@@ -47,13 +47,13 @@ void WavelengthSessionCoordinator::LeaveWavelength() {
         WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
     }
 
-    WavelengthLeaver::getInstance()->leaveWavelength();
+    WavelengthLeaver::GetInstance()->LeaveWavelength();
 }
 
 void WavelengthSessionCoordinator::CloseWavelength(const QString &frequency) {
     qDebug() << "Coordinator: Closing wavelength" << frequency;
     WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
-    WavelengthLeaver::getInstance()->closeWavelength(frequency);
+    WavelengthLeaver::GetInstance()->CloseWavelength(frequency);
 }
 
 bool WavelengthSessionCoordinator::SendMessage(const QString &message) {
@@ -73,29 +73,29 @@ void WavelengthSessionCoordinator::ConnectSignals() {
     // BEZPOŚREDNIE POŁĄCZENIA Z SYGNAŁAMI KOMPONENTÓW
 
     // WavelengthCreator
-    connect(WavelengthCreator::getInstance(), &WavelengthCreator::wavelengthCreated,
+    connect(WavelengthCreator::GetInstance(), &WavelengthCreator::wavelengthCreated,
             this, &WavelengthSessionCoordinator::onWavelengthCreated, Qt::DirectConnection);
-    connect(WavelengthCreator::getInstance(), &WavelengthCreator::wavelengthClosed,
+    connect(WavelengthCreator::GetInstance(), &WavelengthCreator::wavelengthClosed,
             this, &WavelengthSessionCoordinator::onWavelengthClosed, Qt::DirectConnection);
-    connect(WavelengthCreator::getInstance(), &WavelengthCreator::connectionError,
+    connect(WavelengthCreator::GetInstance(), &WavelengthCreator::connectionError,
             this, &WavelengthSessionCoordinator::onConnectionError, Qt::DirectConnection);
 
     // WavelengthJoiner
-    connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::wavelengthJoined,
+    connect(WavelengthJoiner::GetInstance(), &WavelengthJoiner::wavelengthJoined,
             this, &WavelengthSessionCoordinator::onWavelengthJoined, Qt::DirectConnection);
-    connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::wavelengthClosed,
+    connect(WavelengthJoiner::GetInstance(), &WavelengthJoiner::wavelengthClosed,
             this, &WavelengthSessionCoordinator::onWavelengthClosed, Qt::DirectConnection);
-    connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::connectionError,
+    connect(WavelengthJoiner::GetInstance(), &WavelengthJoiner::connectionError,
             this, &WavelengthSessionCoordinator::onConnectionError, Qt::DirectConnection);
-    connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::authenticationFailed,
+    connect(WavelengthJoiner::GetInstance(), &WavelengthJoiner::authenticationFailed,
             this, &WavelengthSessionCoordinator::onAuthenticationFailed, Qt::DirectConnection);
-    connect(WavelengthJoiner::getInstance(), &WavelengthJoiner::messageReceived,
+    connect(WavelengthJoiner::GetInstance(), &WavelengthJoiner::messageReceived,
             this, &WavelengthSessionCoordinator::onMessageReceived, Qt::DirectConnection);
 
     // WavelengthLeaver
-    connect(WavelengthLeaver::getInstance(), &WavelengthLeaver::wavelengthLeft,
+    connect(WavelengthLeaver::GetInstance(), &WavelengthLeaver::wavelengthLeft,
             this, &WavelengthSessionCoordinator::onWavelengthLeft, Qt::DirectConnection);
-    connect(WavelengthLeaver::getInstance(), &WavelengthLeaver::wavelengthClosed,
+    connect(WavelengthLeaver::GetInstance(), &WavelengthLeaver::wavelengthClosed,
             this, &WavelengthSessionCoordinator::onWavelengthClosed, Qt::DirectConnection);
 
     // WavelengthMessageService

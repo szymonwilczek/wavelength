@@ -1,45 +1,45 @@
 #include "wavelength_leaver.h"
 
-void WavelengthLeaver::leaveWavelength() {
+void WavelengthLeaver::LeaveWavelength() {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
-    QString freq = registry->getActiveWavelength();
+    QString frequency = registry->getActiveWavelength();
 
-    if (freq == "-1") {
+    if (frequency == "-1") {
         qDebug() << "No active wavelength to leave";
         return;
     }
 
-    if (!registry->hasWavelength(freq)) {
-        qDebug() << "Wavelength" << freq << "not found in registry";
+    if (!registry->hasWavelength(frequency)) {
+        qDebug() << "Wavelength" << frequency << "not found in registry";
         return;
     }
 
-    const WavelengthInfo info = registry->getWavelengthInfo(freq);
+    const WavelengthInfo info = registry->getWavelengthInfo(frequency);
 
     if (info.socket) {
         if (info.socket->isValid()) {
             if (info.isHost) {
                 qDebug() << "Closing wavelength as host";
                 MessageHandler::GetInstance()->SendSystemCommand(info.socket, "close_wavelength",
-                                                                 {{"frequency", freq}});
+                                                                 {{"frequency", frequency}});
             } else {
                 qDebug() << "Leaving wavelength as client";
                 MessageHandler::GetInstance()->SendSystemCommand(info.socket, "leave_wavelength",
-                                                                 {{"frequency", freq}});
+                                                                 {{"frequency", frequency}});
             }
 
             info.socket->close();
         }
     }
 
-    registry->removeWavelength(freq);
+    registry->removeWavelength(frequency);
 
 
     registry->setActiveWavelength("-1");
-    emit wavelengthLeft(freq);
+    emit wavelengthLeft(frequency);
 }
 
-void WavelengthLeaver::closeWavelength(QString frequency) {
+void WavelengthLeaver::CloseWavelength(QString frequency) {
     WavelengthRegistry* registry = WavelengthRegistry::getInstance();
 
     if (!registry->hasWavelength(frequency)) {
@@ -57,25 +57,25 @@ void WavelengthLeaver::closeWavelength(QString frequency) {
     // Mark as closing to prevent disconnect handler from triggering again
     registry->markWavelengthClosing(frequency, true);
 
-    const QString activeFreq = registry->getActiveWavelength();
-    const bool wasActive = (activeFreq == frequency);
+    const QString active_frequency = registry->getActiveWavelength();
+    const bool was_active = active_frequency == frequency;
 
-    QWebSocket* socketToClose = info.socket;
+    QWebSocket* socket_to_close = info.socket;
 
-    if (socketToClose && socketToClose->isValid()) {
+    if (socket_to_close && socket_to_close->isValid()) {
         qDebug() << "Sending close command to server for wavelength" << frequency;
-        MessageHandler::GetInstance()->SendSystemCommand(socketToClose, "close_wavelength",
+        MessageHandler::GetInstance()->SendSystemCommand(socket_to_close, "close_wavelength",
                                                          {{"frequency", frequency}});
 
-        socketToClose->close();
-    } else if (socketToClose) {
-        socketToClose->deleteLater();
+        socket_to_close->close();
+    } else if (socket_to_close) {
+        socket_to_close->deleteLater();
     }
 
     registry->removeWavelength(frequency);
 
 
-    if (wasActive) {
+    if (was_active) {
         registry->setActiveWavelength("-1");
     }
 

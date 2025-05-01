@@ -12,14 +12,14 @@ class WavelengthLeaver final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthLeaver* getInstance() {
+    static WavelengthLeaver* GetInstance() {
         static WavelengthLeaver instance;
         return &instance;
     }
 
-    void leaveWavelength();
+    void LeaveWavelength();
 
-    void closeWavelength(QString frequency);
+    void CloseWavelength(QString frequency);
 
 signals:
     void wavelengthLeft(QString frequency);

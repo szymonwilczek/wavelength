@@ -8,26 +8,26 @@
 
 struct JoinResult {
     bool success;
-    QString errorReason;
+    QString error_reason;
 };
 
 class WavelengthJoiner final : public QObject {
     Q_OBJECT
 
 public:
-    static WavelengthJoiner* getInstance() {
+    static WavelengthJoiner* GetInstance() {
         static WavelengthJoiner instance;
         return &instance;
     }
 
-    JoinResult joinWavelength(QString frequency, const QString& password = QString());
+    JoinResult JoinWavelength(QString frequency, const QString& password = QString());
 
 signals:
     void wavelengthJoined(QString frequency);
     void wavelengthClosed(QString frequency);
     void authenticationFailed(QString frequency);
-    void connectionError(const QString& errorMessage);
-    void messageReceived(QString frequency, const QString& formattedMessage);
+    void connectionError(const QString& error_message);
+    void messageReceived(QString frequency, const QString& formatted_message);
     void wavelengthLeft(QString frequency);
 
 private:

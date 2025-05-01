@@ -374,11 +374,11 @@ void JoinWavelengthDialog::tryJoin() {
     WavelengthJoiner* joiner = WavelengthJoiner::getInstance();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const auto result = joiner->joinWavelength(frequency, password);
+    const auto result = joiner->JoinWavelength(frequency, password);
     QApplication::restoreOverrideCursor();
 
     if (!result.success) {
-        statusLabel->setText(result.errorReason);
+        statusLabel->setText(result.error_reason);
         statusLabel->show();
 
         // Animacja błędu (więcej glitchy)
