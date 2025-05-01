@@ -133,7 +133,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     m_eventReEnableTimer.setSingleShot(true);
     connect(&m_eventReEnableTimer, &QTimer::timeout, this, [this] {
         m_eventsEnabled = true;
-        m_eventHandler.enableEvents();
+        m_eventHandler.EnableEvents();
         qDebug() << "Events re-enabled";
     });
 }
@@ -362,7 +362,7 @@ void BlobAnimation::updatePhysics() {
 
 void BlobAnimation::resizeEvent(QResizeEvent *event) {
     // Deleguj obsługę zdarzenia resize do BlobEventHandler
-    if (m_eventHandler.processResizeEvent(event)) {
+    if (m_eventHandler.ProcessResizeEvent(event)) {
         update();
     }
     QOpenGLWidget::resizeEvent(event);
@@ -730,7 +730,7 @@ void BlobAnimation::pauseAllEventTracking() {
     m_transitionManager.clearAllMovementBuffers();
 
     // Poinformuj handler eventów o zatrzymaniu śledzenia
-    m_eventHandler.disableEvents();
+    m_eventHandler.DisableEvents();
 
     // Upewnij się, że fizyka bloba jest w stabilnym stanie
     switchToState(BlobConfig::IDLE);
@@ -749,7 +749,7 @@ void BlobAnimation::resumeAllEventTracking() {
     m_windowPositionTimer.start();
 
     // Poinformuj handler eventów o wznowieniu śledzenia
-    m_eventHandler.enableEvents();
+    m_eventHandler.EnableEvents();
 
     // Wymuś reset hudu
     m_renderer.resetHUD();
