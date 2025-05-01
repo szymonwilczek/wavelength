@@ -364,7 +364,7 @@ int main(int argc, char *argv[]) {
 
     auto switchToChatView = [chatView, stackedWidget, animation, navbar](const QString &frequency) {
         animation->hideAnimation();
-        navbar->setChatMode(true);
+        navbar->SetChatMode(true);
         chatView->setWavelength(frequency, "");
         stackedWidget->slideToWidget(chatView);
     };
@@ -394,7 +394,7 @@ int main(int argc, char *argv[]) {
     [stackedWidget, animationWidget, animation, titleLabel, textEffect, navbar]() {
         qDebug() << "Wavelength aborted, switching back to animation view";
 
-        navbar->setChatMode(false);
+        navbar->SetChatMode(false);
         animation->hideAnimation();
         animation->ResetLifeColor();
         stackedWidget->slideToWidget(animationWidget);
@@ -451,7 +451,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Create wavelength button clicked";
 
-        navbar->playClickSound();
+        navbar->PlayClickSound();
 
         animation->SetLifeColor(QColor(0, 200, 0));
 
@@ -474,7 +474,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar]() {
         qDebug() << "Join wavelength button clicked";
-        navbar->playClickSound();
+        navbar->PlayClickSound();
 
         animation->SetLifeColor(QColor(0, 0, 200));
 
