@@ -197,6 +197,8 @@ add_executable(
         src/ui/buttons/cyber_chat_button.h
         src/ui/widgets/overlay_widget.cpp
         src/ui/widgets/overlay_widget.h
+        src/util/resize_event_filter.cpp
+        src/util/resize_event_filter.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
