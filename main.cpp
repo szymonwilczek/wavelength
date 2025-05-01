@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
     }
 });
 
-    FontManager* fontManager = FontManager::getInstance();
-    if (!fontManager->initialize()) {
+    FontManager* fontManager = FontManager::GetInstance();
+    if (!fontManager->Initialize()) {
         qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";
     }
 

@@ -17,11 +17,11 @@ class BlobAnimation;
 class QMainWindow;
 
 struct InstanceInfo {
-    QString instanceId;
-    QPointF blobCenter;
-    QPoint windowPosition;
-    QSize windowSize;
-    bool isCreator;
+    QString instance_id;
+    QPointF blob_center;
+    QPoint window_position;
+    QSize window_size;
+    bool is_creator;
 };
 
 class AppInstanceManager final : public QObject {
@@ -85,7 +85,7 @@ private:
     static constexpr double kAttractionForce = 0.5;
     static constexpr double kAbsorptionDistance = 50.0;
 
-    void ApplyAttractionForce(const QPointF& targetPos);
+    void ApplyAttractionForce(const QPointF& target_position);
     void StartAbsorptionAnimation();
     void FinalizeAbsorption();
 
