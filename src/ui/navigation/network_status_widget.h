@@ -2,9 +2,8 @@
 #define NETWORK_STATUS_WIDGET_H
 
 #include <QLabel>
-#include <QTimer>
 #include <QNetworkAccessManager>
-#include <QGraphicsDropShadowEffect>
+#include <QWidget>
 
 class NetworkStatusWidget final : public QWidget {
     Q_OBJECT
@@ -14,33 +13,33 @@ public:
     ~NetworkStatusWidget() override;
 
     public slots:
-        void checkNetworkStatus();
+        void CheckNetworkStatus();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
     enum NetworkQuality {
-        NONE,
-        POOR,
-        FAIR,
-        GOOD,
-        EXCELLENT
+        None,
+        Poor,
+        Fair,
+        Good,
+        Excellent
     };
 
-    QLabel *m_statusLabel;
-    QLabel *m_pingLabel;  // Nowa etykieta dla wartości pingu
-    QLabel *m_iconLabel;
-    QNetworkAccessManager *m_networkManager;
-    QTimer *m_updateTimer;
-    NetworkQuality m_currentQuality;
-    QColor m_borderColor;
-    qint64 m_pingValue;   // Nowe pole do przechowywania pingu w ms
+    QLabel *status_label_;
+    QLabel *ping_label_;  // Nowa etykieta dla wartości pingu
+    QLabel *icon_label_;
+    QNetworkAccessManager *network_manager_;
+    QTimer *update_timer_;
+    NetworkQuality current_quality_;
+    QColor border_color_;
+    qint64 ping_value_;   // Nowe pole do przechowywania pingu w ms
 
-    void updateStatusDisplay();
-    void createNetworkIcon(NetworkQuality quality) const;
+    void UpdateStatusDisplay();
+    void CreateNetworkIcon(NetworkQuality quality) const;
 
-    static QColor getQualityColor(NetworkQuality quality);
+    static QColor GetQualityColor(NetworkQuality quality);
 };
 
 #endif // NETWORK_STATUS_WIDGET_H
