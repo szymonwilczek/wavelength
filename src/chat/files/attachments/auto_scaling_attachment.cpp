@@ -1,5 +1,7 @@
 #include "auto_scaling_attachment.h"
 
+#include <QVBoxLayout>
+
 AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), content_(content), is_scaled_(false) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
