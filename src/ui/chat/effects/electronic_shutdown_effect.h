@@ -14,20 +14,20 @@ class ElectronicShutdownEffect final : public QGraphicsEffect {
 public:
     explicit ElectronicShutdownEffect(QObject* parent = nullptr);
 
-    void setProgress(qreal progress);
+    void SetProgress(qreal progress);
 
-    qreal progress() const { 
-        return m_progress; 
+    qreal GetProgress() const {
+        return progress_;
     }
 
 protected:
     void draw(QPainter* painter) override;
 
 private:
-    qreal m_progress;
-    qreal m_lastProgress;
-    QCache<QString, QPixmap> m_resultCache;
-    quint32 m_randomSeed;
+    qreal progress_;
+    qreal last_progress_;
+    QCache<QString, QPixmap> result_cache_;
+    quint32 random_seed_;
 };
 
 #endif // ELECTRONIC_SHUTDOWN_EFFECT_H

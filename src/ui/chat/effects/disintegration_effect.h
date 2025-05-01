@@ -9,17 +9,17 @@ class DisintegrationEffect final : public QGraphicsEffect {
 public:
     explicit DisintegrationEffect(QObject* parent = nullptr);
 
-    void setProgress(qreal progress);
+    void SetProgress(qreal progress);
 
-    qreal progress() const { return m_progress; }
+    qreal GetProgress() const { return progress_; }
 
 protected:
     void draw(QPainter* painter) override;
 
 private:
-    qreal m_progress;
-    QCache<QString, QPixmap> m_particleCache;
-    QVector<QPoint> m_precomputedOffsets;
+    qreal progress_;
+    QCache<QString, QPixmap> particle_cache_;
+    QVector<QPoint> precomputed_offsets_;
 };
 
 #endif //DISINTEGRATION_EFFECT_H

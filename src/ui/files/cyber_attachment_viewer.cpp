@@ -58,7 +58,7 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
     m_contentContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 
-    connect(this, &CyberAttachmentViewer::decryptionCounterChanged, m_maskOverlay, &MaskOverlay::setRevealProgress);
+    connect(this, &CyberAttachmentViewer::decryptionCounterChanged, m_maskOverlay, &MaskOverlay::SetRevealProgress);
 
     qDebug() << "CyberAttachmentViewer: utworzono z rozmiarem początkowym" << size();
 
@@ -124,7 +124,7 @@ void CyberAttachmentViewer::setContent(QWidget *content) {
     // *** ZMIANA: Maska jest pokazywana zamiast zawartości ***
     m_maskOverlay->setVisible(true);
     m_maskOverlay->raise(); // Upewnij się, że maska jest na wierzchu
-    m_maskOverlay->startScanning(); // Rozpocznij animację skanowania na masce
+    m_maskOverlay->StartScanning(); // Rozpocznij animację skanowania na masce
 
     m_statusLabel->setText("WYKRYTO ZASZYFROWANE DANE");
     m_isDecrypted = false;
@@ -294,7 +294,7 @@ void CyberAttachmentViewer::startScanningAnimation() {
     // *** ZMIANA: Upewnij się, że maska jest widoczna i animowana ***
     m_maskOverlay->setGeometry(m_contentContainer->rect()); // Upewnij się co do rozmiaru
     m_maskOverlay->raise();
-    m_maskOverlay->startScanning(); // Rozpocznij/kontynuuj animację skanowania
+    m_maskOverlay->StartScanning(); // Rozpocznij/kontynuuj animację skanowania
 
     // Używamy timera do symulacji czasu skanowania przed deszyfracją
     QTimer::singleShot(2000, this, [this]() { // Czas trwania "skanowania"
@@ -369,7 +369,7 @@ void CyberAttachmentViewer::finishDecryption() {
     m_statusLabel->setText("DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY");
 
     // *** ZMIANA: Ukryj maskę i pokaż zawartość ***
-    m_maskOverlay->stopScanning(); // Zatrzymuje timer i ukrywa maskę
+    m_maskOverlay->StopScanning(); // Zatrzymuje timer i ukrywa maskę
     if (m_contentWidget) {
         m_contentWidget->setVisible(true); // Pokaż finalną zawartość
     }

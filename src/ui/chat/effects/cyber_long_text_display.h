@@ -12,15 +12,15 @@ class CyberLongTextDisplay final : public QWidget {
     Q_OBJECT
 
 public:
-    CyberLongTextDisplay(const QString& text, const QColor& textColor, QWidget* parent = nullptr);
+    CyberLongTextDisplay(const QString& text, const QColor& text_color, QWidget* parent = nullptr);
 
-    void setText(const QString& text);
+    void SetText(const QString& text);
 
-    void setTextColor(const QColor& color);
+    void SetTextColor(const QColor& color);
 
     QSize sizeHint() const override;
 
-    void setScrollPosition(int position);
+    void SetScrollPosition(int position);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -28,23 +28,23 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-    void processTextDelayed();
+    void ProcessTextDelayed();
 
 private:
-    void processText();
+    void ProcessText();
 
 signals:
-    void contentHeightChanged(int newHeight);
+    void contentHeightChanged(int new_height);
 
 private:
-    QString m_originalText;
-    QStringList m_processedLines;
-    QColor m_textColor;
-    QFont m_font;
-    QSize m_sizeHint;
-    int m_scrollPosition;
-    bool m_cachedTextValid;
-    QTimer *m_updateTimer;
+    QString original_text_;
+    QStringList processed_lines_;
+    QColor text_color_;
+    QFont font_;
+    QSize size_hint_;
+    int scroll_position_;
+    bool cached_text_valid_;
+    QTimer *update_timer_;
 };
 
 #endif // CYBER_LONG_TEXT_DISPLAY_H

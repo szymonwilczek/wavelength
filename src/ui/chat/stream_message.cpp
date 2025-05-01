@@ -66,7 +66,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
 
             // Połącz sygnał przewijania ze slotami
             connect(scrollArea->verticalScrollBar(), &QScrollBar::valueChanged,
-                    longTextDisplay, &CyberLongTextDisplay::setScrollPosition);
+                    longTextDisplay, &CyberLongTextDisplay::SetScrollPosition);
 
             // Połącz sygnał zmiany wysokości z aktualizacją obszaru przewijania
             connect(longTextDisplay, &CyberLongTextDisplay::contentHeightChanged, this,
@@ -80,10 +80,10 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
         } else {
             CyberTextDisplay::TypingSoundType soundType;
             if (m_sender == "SYSTEM") { // Sprawdzamy wartość m_sender
-                soundType = CyberTextDisplay::SystemSound;
+                soundType = CyberTextDisplay::kSystemSound;
                 qDebug() << "System message detected, using SystemSound type.";
             } else {
-                soundType = CyberTextDisplay::UserSound;
+                soundType = CyberTextDisplay::kUserSound;
                 qDebug() << "User message detected, using UserSound type.";
             }
 
@@ -180,7 +180,7 @@ void StreamMessage::updateContent(const QString &newContent) {
 
     if (m_textDisplay) {
         // Wywołaj setText w CyberTextDisplay, co zrestartuje animację
-        m_textDisplay->setText(m_cleanContent);
+        m_textDisplay->SetText(m_cleanContent);
     } else if (m_longTextDisplay) {
         // Podobnie dla długiego tekstu (zakładając, że ma analogiczną metodę setText)
         QMetaObject::invokeMethod(m_longTextDisplay, "setText", Q_ARG(QString, m_cleanContent));
@@ -208,14 +208,14 @@ void StreamMessage::setGlowIntensity(const qreal intensity) {
 void StreamMessage::setDisintegrationProgress(const qreal progress) {
     m_disintegrationProgress = progress;
     if (m_disintegrationEffect) {
-        m_disintegrationEffect->setProgress(progress);
+        m_disintegrationEffect->SetProgress(progress);
     }
 }
 
 void StreamMessage::setShutdownProgress(const qreal progress) {
     m_shutdownProgress = progress;
     if (m_shutdownEffect) {
-        m_shutdownEffect->setProgress(progress);
+        m_shutdownEffect->SetProgress(progress);
     }
 }
 
@@ -486,7 +486,7 @@ void StreamMessage::fadeIn() {
 
         // Uruchamiamy animację wpisywania tekstu dopiero gdy widget jest w pełni widoczny
         if (m_textDisplay) {
-            QTimer::singleShot(50, m_textDisplay, &CyberTextDisplay::startReveal);
+            QTimer::singleShot(50, m_textDisplay, &CyberTextDisplay::StartReveal);
         }
     });
 
@@ -555,7 +555,7 @@ void StreamMessage::startDisintegrationAnimation() {
     }
 
     m_shutdownEffect = new ElectronicShutdownEffect(this);
-    m_shutdownEffect->setProgress(0.0);
+    m_shutdownEffect->SetProgress(0.0);
     setGraphicsEffect(m_shutdownEffect);
 
     const auto shutdownAnim = new QPropertyAnimation(this, "shutdownProgress");
@@ -853,7 +853,7 @@ void StreamMessage::adjustScrollAreaStyle() const {
 
     // Aktualizacja koloru tekstu jeśli istnieje longTextDisplay
     if (m_longTextDisplay) {
-        m_longTextDisplay->setTextColor(textColor);
+        m_longTextDisplay->SetTextColor(textColor);
     }
 }
 
