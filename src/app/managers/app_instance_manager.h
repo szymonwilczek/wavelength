@@ -38,9 +38,9 @@ public:
     static bool IsAnotherInstanceRunning();
 
 signals:
-    void otherInstancePositionHasChanged(QString instanceId, const QPointF& blobCenter, const QPoint& windowPos);
-    void instanceConnected(QString instanceId);
-    void instanceDisconnected(QString instanceId);
+    void otherInstancePositionHasChanged(QString instance_id, const QPointF& blob_center, const QPoint& window_position);
+    void instanceConnected(QString instance_id);
+    void instanceDisconnected(QString instance_id);
 
 
 private slots:
