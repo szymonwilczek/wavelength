@@ -1,5 +1,7 @@
 #include "cyber_audio_button.h"
 
+#include <cmath>
+
 CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent), glow_intensity_(0.5) {
     setCursor(Qt::PointingHandCursor);
     setStyleSheet("background-color: transparent; border: none;");
