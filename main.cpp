@@ -122,10 +122,13 @@ int main(int argc, char *argv[]) {
         qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";
     }
 
+    const QFont defaultFont(font_manager->GetFont("BlenderPro", 10, QFont::Bold));
+    QApplication::setFont(defaultFont);
+
     const QIcon app_icon(":/resources/icons/wavelength_logo_upscaled.png");
     QApplication::setWindowIcon(app_icon);
 
-    app.setStyle(QStyleFactory::create("Fusion"));
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     CyberpunkStyle::ApplyStyle();
 
