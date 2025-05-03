@@ -6,8 +6,8 @@
 #include <qkeysequence.h>
 
 namespace DefaultConfig {
-    const QString kRelayServerAddress = "127.0.0.1";
-    constexpr int kRelayServerPort = 8080;
+    const QString kRelayServerAddress = "localhost";
+    constexpr int kRelayServerPort = 3000;
     constexpr int kMaxChatHistorySize = 1000;
     constexpr int kMaxProcessedMessageIds = 5000;
     constexpr int kMaxSentMessageCacheSize = 100;
@@ -19,7 +19,7 @@ namespace DefaultConfig {
     const auto kBackgroundColor = QColor(0x101820); // Ciemny niebiesko-szary
     const auto kBlobColor = QColor(0x4682B4); // Steel Blue
     const auto kMessageColor = QColor(0xE0E0E0); // Jasnoszary
-    const auto kStreamColor = QColor(0x00FF00); // Zielony (placeholder)
+    const auto kStreamColor = QColor(0x00B3FF); // Neonowy niebieski
     // NOWE domyślne
     constexpr auto kGridColor = QColor(40, 60, 80, 150); // Półprzezroczysty ciemnoniebieski
     constexpr int kGridSpacing = 35;

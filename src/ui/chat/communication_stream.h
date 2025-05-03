@@ -11,6 +11,7 @@
 #include "stream_message.h"
 #include "../labels/user_info_label.h"
 
+class WavelengthConfig;
 /**
  * @brief Structure holding visual properties generated for a user ID.
  * Currently only holds the generated color.
@@ -239,6 +240,13 @@ private slots:
      */
     void HandleMessageHidden();
 
+    /**
+     * @brief Slot called when a configuration setting changes in WavelengthConfig.
+     * Updates the stream color if the relevant key ("stream_color" or "all") is provided.
+     * @param key The key of the changed setting.
+     */
+    void UpdateStreamColor(const QString& key);
+
 private:
     /**
      * @brief Generates visual properties (currently just color) based on a user ID hash.
@@ -310,6 +318,11 @@ private:
     QOpenGLShaderProgram* shader_program_; ///< Compiled shader program for rendering the wave.
     QOpenGLVertexArrayObject vao_;         ///< Vertex Array Object.
     QOpenGLBuffer vertex_buffer_;          ///< Vertex Buffer Object holding the fullscreen quad vertices.
+
+    // Regedit Config
+    WavelengthConfig* config_; ///< Pointer to the RegeditConfig object for accessing configuration settings.
+    QColor stream_color_;      ///< Color used for rendering the stream color chosen from the registry.
+
 };
 
 #endif // COMMUNICATION_STREAM_H

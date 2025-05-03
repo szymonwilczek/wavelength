@@ -2,16 +2,20 @@
 
 #include <QParallelAnimationGroup>
 
+#include "../../app/wavelength_config.h"
+
 CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent),
-                                                           base_wave_amplitude_(0.05), // Bazowa amplituda w stanie Idle
-                                                           amplitude_scale_(0.25),    // Mnożnik dla amplitudy audio (dostosuj wg potrzeb)
+                                                           base_wave_amplitude_(0.05),
+                                                           amplitude_scale_(0.25),
                                                            wave_amplitude_(base_wave_amplitude_),
-                                                           target_wave_amplitude_(base_wave_amplitude_), // Docelowa amplituda
-                                                           wave_frequency_(2.0), wave_speed_(1.0),
+                                                           target_wave_amplitude_(base_wave_amplitude_),
+                                                           wave_frequency_(2.0),
+                                                           wave_speed_(1.0),
                                                            glitch_intensity_(0.0), wave_thickness_(0.008),
                                                            state_(kIdle), current_message_index_(-1),
-                                                           initialized_(false), time_offset_(0.0), shader_program_(nullptr),
-                                                           vertex_buffer_(QOpenGLBuffer::VertexBuffer) {
+                                                           initialized_(false), time_offset_(0.0),
+                                                           shader_program_(nullptr), vertex_buffer_(QOpenGLBuffer::VertexBuffer), config_(WavelengthConfig::GetInstance()),
+                                                           stream_color_(config_->GetStreamColor()) {
     setMinimumSize(600, 200);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -25,6 +29,8 @@ CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent)
     glitch_timer_ = new QTimer(this);
     connect(glitch_timer_, &QTimer::timeout, this, &CommunicationStream::TriggerRandomGlitch);
     glitch_timer_->start(3000 + QRandomGenerator::global()->bounded(2000)); // Częstsze zakłócenia
+
+    connect(config_, &WavelengthConfig::configChanged, this, &CommunicationStream::UpdateStreamColor);
 
     // Etykieta nazwy strumienia
     stream_name_label_ = new QLabel("COMMUNICATION STREAM", this);
@@ -260,6 +266,7 @@ void CommunicationStream::initializeGL() {
     uniform float speed;
     uniform float glitchIntensity;
     uniform float waveThickness;
+    uniform vec3 streamColor;
 
     // Funkcja pseudolosowa
     float random(vec2 st) {
@@ -274,8 +281,8 @@ void CommunicationStream::initializeGL() {
         // Parametry linii
         float lineThickness = waveThickness;
         float glow = 0.03;
-        vec3 lineColor = vec3(0.0, 0.7, 1.0);  // Neonowy niebieski
-        vec3 glowColor = vec3(0.0, 0.4, 0.8);  // Ciemniejszy niebieski dla poświaty
+        vec3 lineColor = streamColor;  // Neonowy niebieski
+        vec3 glowColor = streamColor * 0.6;  // Ciemniejszy niebieski dla poświaty
 
         // Podstawowa fala
         float xFreq = frequency * 3.14159;
@@ -386,6 +393,7 @@ void CommunicationStream::paintGL() {
     shader_program_->setUniformValue("speed", static_cast<float>(wave_speed_));
     shader_program_->setUniformValue("glitchIntensity", static_cast<float>(glitch_intensity_));
     shader_program_->setUniformValue("waveThickness", static_cast<float>(wave_thickness_));
+    shader_program_->setUniformValue("streamColor", QVector3D(stream_color_.redF(), stream_color_.greenF(), stream_color_.blueF()));
 
     // Rysujemy quad
     vao_.bind();
@@ -794,6 +802,15 @@ void CommunicationStream::HandleMessageHidden() {
         }
     }
     update(); // Ogólna aktualizacja na koniec
+}
+
+void CommunicationStream::UpdateStreamColor(const QString& key) {
+    if (key == "stream_color" || key == "all") { // Reaguj na zmianę konkretnego koloru lub reset do domyślnych
+        stream_color_ = config_->GetStreamColor();
+        if (isVisible()) { // Aktualizuj tylko jeśli widget jest widoczny
+            update(); // Wymuś przerysowanie, aby użyć nowego koloru
+        }
+    }
 }
 
 UserVisuals CommunicationStream::GenerateUserVisuals(const QString &user_id) {
