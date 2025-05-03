@@ -9,6 +9,7 @@
 #include <QVector>
 #include <memory>
 #include <atomic>
+#include <QPointF>
 #include <QPropertyAnimation>
 #include <QSizeF>
 #include <thread>

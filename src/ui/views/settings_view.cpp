@@ -303,9 +303,9 @@ void SettingsView::SetupClassifiedTab() {
         }
 #else
         QMessageBox::information(this, "System Override", "System override sequence initiated (OS specific elevation might be required).");
-        m_overrideButton->setEnabled(false);
-        m_overrideButton->setText("OVERRIDE IN PROGRESS...");
-        QMetaObject::invokeMethod(m_systemOverrideManager, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
+        override_button_->setEnabled(false);
+        override_button_->setText("OVERRIDE IN PROGRESS...");
+        QMetaObject::invokeMethod(system_override_manager_, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
 #endif
     });
     button_layout_classified->addWidget(override_button_);

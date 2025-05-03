@@ -212,7 +212,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             const QString base64_data = AttachmentDataStore::GetInstance()->GetAttachmentData(attachment_id_);
 
             if (base64_data.isEmpty()) {
-                QMetaObject::invokeMethod(this, "setError",
+                QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
                                           Q_ARG(QString, "⚠️ Nie można odnaleźć danych załącznika"));
                 return;
@@ -222,7 +222,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             const QByteArray data = QByteArray::fromBase64(base64_data.toUtf8());
 
             if (data.isEmpty()) {
-                QMetaObject::invokeMethod(this, "setError",
+                QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
                                           Q_ARG(QString, "⚠️ Nie można zdekodować danych załącznika"));
                 return;
@@ -231,22 +231,22 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             // Wybieramy odpowiednią metodę wyświetlania na podstawie MIME type
             if (mime_type_.startsWith("image/")) {
                 if (mime_type_ == "image/gif") {
-                    QMetaObject::invokeMethod(this, "showCyberGif",
+                    QMetaObject::invokeMethod(this, "ShowCyberGif",
                                               Qt::QueuedConnection,
                                               Q_ARG(QByteArray, data));
                 } else {
-                    QMetaObject::invokeMethod(this, "showCyberImage",
+                    QMetaObject::invokeMethod(this, "ShowCyberImage",
                                               Qt::QueuedConnection,
                                               Q_ARG(QByteArray, data));
                 }
             }
             else if (mime_type_.startsWith("audio/")) {
-                QMetaObject::invokeMethod(this, "showCyberAudio",
+                QMetaObject::invokeMethod(this, "ShowCyberAudio",
                                           Qt::QueuedConnection,
                                           Q_ARG(QByteArray, data));
             }
             else if (mime_type_.startsWith("video/")) {
-                QMetaObject::invokeMethod(this, "showCyberVideo",
+                QMetaObject::invokeMethod(this, "ShowCyberVideo",
                                           Qt::QueuedConnection,
                                           Q_ARG(QByteArray, data));
             }
@@ -257,13 +257,13 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
                 const QByteArray data = QByteArray::fromBase64(base64_data_.toUtf8());
 
                 if (data.isEmpty()) {
-                    QMetaObject::invokeMethod(this, "setError",
+                    QMetaObject::invokeMethod(this, "SetError",
                                               Qt::QueuedConnection,
                                               Q_ARG(QString, "⚠️ Nie można zdekodować danych załącznika"));
                 }
 
             } catch (const std::exception& e) {
-                QMetaObject::invokeMethod(this, "setError",
+                QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
                                           Q_ARG(QString, QString("⚠️ Błąd przetwarzania: %1").arg(e.what())));
             }
@@ -660,7 +660,7 @@ void AttachmentPlaceholder::GenerateThumbnail(const QByteArray &video_data, QLab
                                  painter.drawPolygon(triangle);
 
                                  // Aktualizacja UI w głównym wątku
-                                 QMetaObject::invokeMethod(thumbnail_label, "setPixmap",
+                                 QMetaObject::invokeMethod(thumbnail_label, "SetPixmap",
                                                            Qt::QueuedConnection,
                                                            Q_ARG(QPixmap, QPixmap::fromImage(overlay_image)));
 
