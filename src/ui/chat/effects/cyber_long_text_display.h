@@ -8,6 +8,7 @@
 #include <QScrollBar>
 #include <QTimer>
 #include <QPaintEvent>
+#include <QWidget>
 
 /**
  * @brief A custom widget for displaying potentially long text with cyberpunk aesthetics and efficient rendering.
@@ -30,7 +31,7 @@ public:
      * @param text_color The color for the displayed text.
      * @param parent Optional parent widget.
      */
-    explicit CyberLongTextDisplay(const QString& text, const QColor& text_color, QWidget* parent = nullptr);
+    explicit CyberLongTextDisplay(QString  text, const QColor& text_color, QWidget* parent = nullptr);
 
     /**
      * @brief Sets the text content to be displayed.
@@ -50,9 +51,12 @@ public:
     /**
      * @brief Returns the recommended size for the widget based on the processed text content.
      * The height is calculated based on the number of processed lines and font metrics.
+     * The width is calculated based on the longest processed line.
      * @return The calculated QSize hint.
      */
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
+
+    [[nodiscard]] QSize minimumSizeHint() const override;
 
     /**
      * @brief Sets the vertical scroll position.
@@ -79,20 +83,13 @@ protected:
      */
     void resizeEvent(QResizeEvent* event) override;
 
-private slots:
-    /**
-     * @brief Slot called by the update_timer_ to perform text processing after a short delay.
-     * Calls ProcessText() and schedules a repaint.
-     */
-    void ProcessTextDelayed();
-
 private:
     /**
      * @brief Processes the original_text_ into wrapped lines based on the current widget width.
      * Splits the text into paragraphs and words, then reconstructs lines ensuring they fit
      * within the available width. Handles word wrapping and breaking long words.
-     * Updates the processed_lines_ cache, calculates the required height, updates the size_hint_,
-     * marks the cache as valid, and emits contentHeightChanged.
+     * Updates the processed_lines_ cache, calculates the required dimensions (width and height),
+     * updates the size_hint_, marks the cache as valid, and emits contentHeightChanged.
      */
     void ProcessText();
 
@@ -120,7 +117,7 @@ private:
     /** @brief Flag indicating if the processed_lines_ cache is up-to-date with the original_text_ and widget width. */
     bool cached_text_valid_;
     /** @brief Timer used to delay text processing after resize or text change events. */
-    QTimer *update_timer_;
+    QTimer *update_timer_{};
 };
 
 #endif // CYBER_LONG_TEXT_DISPLAY_H
