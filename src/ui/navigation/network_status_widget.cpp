@@ -16,7 +16,7 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
 {
     // Zmniejszona wysokość widgetu
     setFixedHeight(30);  // Zmniejszone z 36 na 30
-    setMinimumWidth(200);  // Nieznacznie zmniejszona szerokość
+    setMinimumWidth(150);  // Nieznacznie zmniejszona szerokość
 
     // Układ poziomy dla ikon i tekstu z mniejszymi marginesami
     const auto layout = new QHBoxLayout(this);

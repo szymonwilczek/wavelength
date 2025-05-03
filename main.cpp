@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 
     auto *text_effect = new CyberpunkTextEffect(title_label, animation);
 
-    window.setMinimumSize(800, 600);
+    window.setMinimumSize(1024, 768);
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
 
