@@ -317,7 +317,6 @@ void VideoDecoder::run() {
         if (stopped_) break;
 
         if (av_read_frame(format_context_, &packet) < 0) {
-            qDebug() << "Koniec strumienia wideo (av_read_frame < 0)";
             QMutexLocker lock(&mutex_);
             video_finished_ = true;
             if (audio_finished_) {
@@ -391,11 +390,9 @@ void VideoDecoder::run() {
 
         av_packet_unref(&packet);
     }
-    qDebug() << "VideoDecoder::run() zakończył pętlę.";
 }
 
 void VideoDecoder::HandleAudioFinished() {
-    qDebug() << "AudioDecoder zakończył odtwarzanie.";
     QMutexLocker locker(&mutex_);
     audio_finished_ = true;
     if (video_finished_) {

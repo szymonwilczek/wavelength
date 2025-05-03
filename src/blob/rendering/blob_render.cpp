@@ -410,8 +410,6 @@ void BlobRenderer::InitializeIdleState(const QPointF &blob_center, double blob_r
     idle_amplitude_ = 1.5 + sin(QDateTime::currentMSecsSinceEpoch() * 0.001) * 0.5;
     idle_timestamp_ = QDateTime::currentDateTime().toString("HH:mm:ss");
 
-    qDebug() << "Inicjalizacja stanu IDLE z ID:" << idle_blob_id_ << "i amplitudą:" << idle_amplitude_;
-
     // Resetujemy bufor HUD
     static_hud_buffer_ = QPixmap();
     idle_hud_initialized_ = false;

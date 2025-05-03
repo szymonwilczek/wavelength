@@ -116,7 +116,6 @@ QString ShortcutsSettingsWidget::GetActionDescription(const QString& action_id) 
 }
 
 void ShortcutsSettingsWidget::LoadSettings() const {
-    qDebug() << "ShortcutsSettingsWidget: Loading settings...";
     for (auto it = shortcut_edits_.constBegin(); it != shortcut_edits_.constEnd(); ++it) {
         QString action_id = it.key();
         if (QKeySequenceEdit *editWidget = it.value()) {
@@ -126,7 +125,6 @@ void ShortcutsSettingsWidget::LoadSettings() const {
 }
 
 void ShortcutsSettingsWidget::SaveSettings() const {
-    qDebug() << "ShortcutsSettingsWidget: Saving settings...";
     bool changed = false;
     for (auto it = shortcut_edits_.constBegin(); it != shortcut_edits_.constEnd(); ++it) {
         QString action_id = it.key();
@@ -136,15 +134,8 @@ void ShortcutsSettingsWidget::SaveSettings() const {
             if (current_sequence != new_sequence) {
                 config_->SetShortcut(action_id, new_sequence);
                 changed = true;
-                qDebug() << "Shortcut changed for" << action_id << "to" << new_sequence.toString();
             }
         }
-    }
-    if (changed) {
-        // Informacja dla użytkownika - zmiany wymagają restartu
-        // Zapis do pliku nastąpi globalnie w SettingsView::saveSettings -> m_config->saveSettings()
-        qDebug() << "Shortcuts have been modified. Restart required for changes to take effect.";
-        // Można by tu pokazać QMessageBox, ale saveSettings jest wywoływane przez główny przycisk Zapisz
     }
 }
 

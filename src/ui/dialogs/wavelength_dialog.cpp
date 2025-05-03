@@ -315,7 +315,6 @@ void WavelengthDialog::ValidateInputs() const {
 }
 
 void WavelengthDialog::StartFrequencySearch() {
-    qDebug() << "LOG: Rozpoczynam wyszukiwanie częstotliwości po zakończeniu animacji";
     loading_indicator_->setText("SEARCHING FOR AVAILABLE FREQUENCY...");
 
     const auto timeout_timer = new QTimer(this);
@@ -345,7 +344,6 @@ void WavelengthDialog::TryGenerate() {
     }
 
     is_generating = true;
-    qDebug() << "LOG: tryGenerate - start";
 
     const bool is_password_protected = password_protected_checkbox_->isChecked();
     const QString password = password_edit_->text();
@@ -357,11 +355,9 @@ void WavelengthDialog::TryGenerate() {
         return;
     }
 
-    qDebug() << "LOG: tryGenerate - walidacja pomyślna, akceptacja dialogu";
     QDialog::accept();
 
     is_generating = false;
-    qDebug() << "LOG: tryGenerate - koniec";
 }
 
 void WavelengthDialog::OnFrequencyFound() {
@@ -373,9 +369,7 @@ void WavelengthDialog::OnFrequencyFound() {
 
     if (frequency_watcher_ && frequency_watcher_->isFinished()) {
         frequency_ = frequency_watcher_->result();
-        qDebug() << "LOG: onFrequencyFound otrzymało wartość:" << frequency_;
     } else {
-        qDebug() << "LOG: onFrequencyFound - brak wyniku, używam domyślnego 130 Hz";
         frequency_ = 130.0;
     }
 
@@ -450,11 +444,9 @@ QString WavelengthDialog::FormatFrequencyText(const double frequency) {
 }
 
 QString WavelengthDialog::FindLowestAvailableFrequency() {
-    qDebug() << "LOG: Rozpoczęto szukanie dostępnej częstotliwości";
 
     const WavelengthConfig* config = WavelengthConfig::GetInstance();
     const QString preferred_frequency = config->GetPreferredStartFrequency();
-    qDebug() << "LOG: Używam preferowanej częstotliwości startowej:" << preferred_frequency << "Hz";
 
     QNetworkAccessManager manager;
     QEventLoop loop;
@@ -469,7 +461,6 @@ QString WavelengthDialog::FindLowestAvailableFrequency() {
     query.addQueryItem("preferredStartFrequency", preferred_frequency);
     url.setQuery(query);
 
-    qDebug() << "LOG: Wysyłanie żądania do:" << url.toString();
     const QNetworkRequest request(url);
 
     QNetworkReply *reply = manager.get(request);
@@ -487,19 +478,15 @@ QString WavelengthDialog::FindLowestAvailableFrequency() {
 
         if (obj.contains("frequency") && obj["frequency"].isString()) {
             result_frequency = obj["frequency"].toString();
-            qDebug() << "LOG: Serwer zwrócił dostępną częstotliwość:" << result_frequency << "Hz";
         } else {
             qDebug() << "LOG: Błąd parsowania odpowiedzi JSON lub brak klucza 'frequency'. Odpowiedź:" << response_data;
-            // Użyj domyślnej wartości 130.0
         }
     } else {
         qDebug() << "LOG: Błąd podczas komunikacji z serwerem:" << reply->errorString();
-        // Użyj domyślnej wartości 130.0
     }
 
     reply->deleteLater();
 
-    qDebug() << "LOG: Zakończono szukanie, zwracam częstotliwość:" << result_frequency << "Hz";
     return result_frequency;
 }
 

@@ -149,7 +149,6 @@ void AnimatedDialog::AnimateShow()
                 connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, digital_dialog]() {
                     emit showAnimationFinished();
                     digital_dialog->SetRefreshTimerInterval(100);
-                    qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (WavelengthDialog)";
                 });
             }
             // Obsługa JoinWavelengthDialog
@@ -168,13 +167,11 @@ void AnimatedDialog::AnimateShow()
                 connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, join_dialog]() {
                     emit showAnimationFinished();
                     join_dialog->SetRefreshTimerInterval(100);
-                     qDebug() << "LOG: Sekwencja animacji DigitalMaterialization zakończona (JoinWavelengthDialog)";
                 });
             }
 
             // Jeśli dialog nie jest specjalnym typem, uruchom tylko animację wjazdu/pojawienia
             if (!is_dialog_animated) {
-                 qDebug() << "LOG: Uruchamiam tylko animację wjazdu/pojawienia dla DigitalMaterialization";
                 // Połącz koniec grupy równoległej (bo nie ma sekwencji)
                 connect(show_parallel_group, &QParallelAnimationGroup::finished, this, [this]() {
                     emit showAnimationFinished();
@@ -182,7 +179,6 @@ void AnimatedDialog::AnimateShow()
                 show_parallel_group->start(QAbstractAnimation::DeleteWhenStopped);
                 final_animation = show_parallel_group; // Ustaw finalAnimation na grupę równoległą
             } else {
-                 qDebug() << "LOG: Uruchamiam sekwencję animacji DigitalMaterialization";
                 sequential_group->start(QAbstractAnimation::DeleteWhenStopped); // Uruchom całą sekwencję
                 final_animation = sequential_group; // Ustaw finalAnimation na grupę sekwencyjną
             }

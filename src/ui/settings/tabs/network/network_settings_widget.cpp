@@ -17,14 +17,11 @@ NetworkSettingsWidget::NetworkSettingsWidget(QWidget *parent)
       keep_alive_interval_edit_(nullptr),
       max_reconnect_attempts_edit_(nullptr)
 {
-    qDebug() << "AdvancedSettingsWidget constructor start";
     SetupUi();
     LoadSettings();
-    qDebug() << "AdvancedSettingsWidget constructor end";
 }
 
 void NetworkSettingsWidget::SetupUi() {
-    qDebug() << "AdvancedSettingsWidget setupUi start";
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
@@ -104,7 +101,6 @@ void NetworkSettingsWidget::SetupUi() {
 
     layout->addLayout(form_layout);
     layout->addStretch();
-    qDebug() << "AdvancedSettingsWidget setupUi end";
 }
 
 void NetworkSettingsWidget::LoadSettings() const {
@@ -117,7 +113,6 @@ void NetworkSettingsWidget::LoadSettings() const {
     connection_timeout_edit_->setValue(config_->GetConnectionTimeout());
     keep_alive_interval_edit_->setValue(config_->GetKeepAliveInterval());
     max_reconnect_attempts_edit_->setValue(config_->GetMaxReconnectAttempts());
-    qDebug() << "AdvancedSettingsWidget settings loaded.";
 }
 
 void NetworkSettingsWidget::SaveSettings() const {
@@ -130,5 +125,4 @@ void NetworkSettingsWidget::SaveSettings() const {
     config_->SetConnectionTimeout(connection_timeout_edit_->value());
     config_->SetKeepAliveInterval(keep_alive_interval_edit_->value());
     config_->SetMaxReconnectAttempts(max_reconnect_attempts_edit_->value());
-    qDebug() << "AdvancedSettingsWidget settings prepared for saving.";
 }

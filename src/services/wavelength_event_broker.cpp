@@ -12,7 +12,6 @@ void WavelengthEventBroker::SubscribeToEvent(const QString &event_type, Receiver
                 }
             });
 
-    qDebug() << "Subscribed to event:" << event_type;
 }
 
 void WavelengthEventBroker::WavelengthCreated(const QString &frequency) {

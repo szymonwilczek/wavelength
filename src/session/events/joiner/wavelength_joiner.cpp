@@ -26,17 +26,14 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
     auto socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
     auto result_handler = [this, frequency, socket, keep_alive_timer, registry](const QString& message) {
-        qDebug() << "[Joiner] JoinResultHandler received message:" << message;
 
         bool ok;
         QJsonObject message_object = MessageHandler::GetInstance()->ParseMessage(message, &ok);
         if (!ok) {
-            qDebug() << "[Joiner] Failed to parse message in JoinResultHandler";
             return;
         }
 
         const QString message_type = MessageHandler::GetInstance()->GetMessageType(message_object);
-        qDebug() << "[Joiner] Message type in JoinResultHandler:" << message_type;
 
         if (message_type == "join_result") {
             disconnect(socket, &QWebSocket::textMessageReceived, this, nullptr);
@@ -49,7 +46,6 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
             if (!success) {
                 if (error_message == "Password required" || error_message == "Invalid password") {
                     emit connectionError(error_message == "Password required" ? "Ta częstotliwość wymaga hasła" : "Nieprawidłowe hasło");
-                    qDebug() << "[Joiner]" << (error_message == "Password required" ? "Password required" : "Invalid password") << "for frequency" << frequency;
                     emit authenticationFailed(frequency);
                 } else {
                     emit connectionError("Częstotliwość jest niedostępna lub wystąpił błąd: " + error_message);
@@ -60,7 +56,6 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
                 return;
             }
 
-                qDebug() << "[Joiner] Join successful for frequency" << frequency;
                 WavelengthInfo info = registry->GetWavelengthInfo(frequency);
                 if (info.frequency.isEmpty()) {
                     qWarning() << "[Joiner] WavelengthInfo not found after successful join for" << frequency;
@@ -76,7 +71,6 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
 
                 registry->SetActiveWavelength(frequency);
                 keep_alive_timer->start(WavelengthConfig::GetInstance()->GetKeepAliveInterval());
-                qDebug() << "[Joiner] Keep-alive timer started for" << frequency;
                 emit wavelengthJoined(frequency);
 
         } else {
@@ -85,7 +79,6 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
     };
 
     auto disconnect_handler = [this, frequency, socket, keep_alive_timer, connected_callback_executed, registry]() {
-        qDebug() << "[Joiner] Connection to relay server closed for frequency" << frequency;
         keep_alive_timer->stop();
 
         if (registry->IsPendingRegistration(frequency)) {
@@ -93,7 +86,6 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
         }
 
         if (registry->HasWavelength(frequency)) {
-            qDebug() << "[Joiner] Removing wavelength" << frequency << "due to socket disconnect";
             const QString active_frequency = registry->GetActiveWavelength();
             registry->RemoveWavelength(frequency);
             if (active_frequency == frequency) {
@@ -124,10 +116,8 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
     connect(socket, &QWebSocket::disconnected, this, disconnect_handler);
 
     connect(socket, &QWebSocket::connected, this, [this, socket, frequency, password, client_id, keep_alive_timer, connected_callback_executed, result_handler, registry]() {
-        qDebug() << "[Joiner] Connected to relay server for joining frequency" << frequency;
 
         if (*connected_callback_executed) {
-            qDebug() << "[Joiner] Connected callback already executed, ignoring";
             return;
         }
         *connected_callback_executed = true;
@@ -140,10 +130,8 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
         initial_info.socket = socket;
         registry->AddWavelength(frequency, initial_info);
 
-        qDebug() << "[Joiner] Setting socket message handlers for" << frequency;
         WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
 
-        qDebug() << "[Joiner] Connecting temporary handler for join_result";
         connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 
         connect(keep_alive_timer, &QTimer::timeout, socket, [socket](){
@@ -161,14 +149,12 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
         join_data["clientId"] = client_id;
         const QJsonDocument document(join_data);
         const QString message = document.toJson(QJsonDocument::Compact);
-        qDebug() << "[Joiner] Sending join message:" << message;
         socket->sendTextMessage(message);
     });
 
     const QString address = config->GetRelayServerAddress();
     const int port = config->GetRelayServerPort();
     const QUrl url(QString("ws://%1:%2").arg(address).arg(port));
-    qDebug() << "[Joiner] Opening WebSocket connection to URL for joining:" << url.toString();
     socket->open(url);
 
     return {true, QString()};

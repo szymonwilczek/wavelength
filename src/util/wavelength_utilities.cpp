@@ -14,7 +14,6 @@ double WavelengthUtilities::NormalizeFrequency(const double frequency) {
         return frequency;
     }
 
-    qDebug() << "Normalized frequency:" << frequency << "->" << result;
     return result;
 }
 

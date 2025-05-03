@@ -17,7 +17,6 @@ DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), is_connected
 
         if (connection_->is_open()) {
             is_connected_ = true;
-            qDebug() << "Connected to PostgreSQL successfully";
 
             // Sprawdź czy tabela istnieje, jeśli nie - wyświetl ostrzeżenie
             pqxx::work txn{*connection_};

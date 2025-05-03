@@ -87,8 +87,6 @@ system_override_manager_(nullptr)
 void SettingsView::SetDebugMode(const bool enabled) {
     if (debug_mode_enabled_ != enabled) {
         debug_mode_enabled_ = enabled;
-        qDebug() << "SettingsView Debug Mode:" << (enabled ? "ENABLED" : "DISABLED");
-        // Po zmianie trybu debugowania, zresetuj stan zakładki CLASSIFIED
         ResetSecurityLayers();
     }
 }
@@ -368,7 +366,6 @@ void SettingsView::SetupClassifiedTab() {
              // Lepiej użyć bezpośrednio featuresIndex
              current_layer_index_ = static_cast<SecurityLayerIndex>(features_index); // Lub jakaś wartość specjalna
              security_layers_stack_->setCurrentIndex(features_index);
-             qDebug() << "All security layers passed. Showing classified features.";
         } else {
              qWarning() << "Could not find ClassifiedFeaturesWidget in the stack!";
              security_layers_stack_->setCurrentIndex(security_layers_stack_->count() - 1);
@@ -538,7 +535,6 @@ void SettingsView::ResetSecurityLayers() {
         return;
     }
 
-    qDebug() << "Resetting security layers... Debug mode:" << debug_mode_enabled_;
 
     fingerprint_layer_->Reset();
     handprint_layer_->Reset();
@@ -558,7 +554,6 @@ void SettingsView::ResetSecurityLayers() {
         const int featuresIndex = security_layers_stack_->indexOf(classified_features_widget_);
         if (featuresIndex != -1) {
             security_layers_stack_->setCurrentIndex(featuresIndex);
-            qDebug() << "Debug mode: Bypassed security layers, showing classified features.";
         } else {
             qWarning() << "Debug mode error: Could not find ClassifiedFeaturesWidget index!";
             security_layers_stack_->setCurrentIndex(FingerprintIndex);
@@ -569,7 +564,5 @@ void SettingsView::ResetSecurityLayers() {
         current_layer_index_ = FingerprintIndex;
         security_layers_stack_->setCurrentIndex(FingerprintIndex);
         fingerprint_layer_->Initialize();
-        qDebug() << "Normal mode: Starting security layers sequence.";
     }
-    qDebug() << "Security layers reset complete. Current index:" << security_layers_stack_->currentIndex();
 }

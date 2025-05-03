@@ -92,7 +92,6 @@ StreamMessage * CommunicationStream::AddMessageWithAttachment(const QString &con
     const auto message = new StreamMessage(content, sender, type, message_id, this); // Przekazujemy ID!
     message->hide();
 
-    qDebug() << "Dodawanie załącznika dla wiadomości ID:" << message_id << " Content:" << content.left(30) << "...";
     message->AddAttachment(content);
 
     messages_.append(message);
@@ -175,7 +174,6 @@ StreamMessage * CommunicationStream::AddMessage(const QString &content, const QS
 }
 
 void CommunicationStream::ClearMessages() {
-    qDebug() << "CommunicationStream::clearMessages - Czyszczenie wszystkich wiadomości.";
     // Ukrywamy i rozłączamy sygnały dla aktualnie wyświetlanej wiadomości, jeśli istnieje
     if (current_message_index_ >= 0 && current_message_index_ < messages_.size()) {
         StreamMessage* current_message = messages_[current_message_index_];
@@ -611,7 +609,6 @@ void CommunicationStream::ShowMessageAtIndex(int index) {
 
     // Sprawdź, czy indeks się faktycznie zmienia
     if (index == current_message_index_ && messages_[index]->isVisible()) {
-        qDebug() << "CommunicationStream::showMessageAtIndex - Indeks (" << index << ") jest taki sam jak bieżący i wiadomość jest widoczna. Nic nie robię.";
         // Upewnij się, że ma fokus
         messages_[index]->setFocus();
         return;
@@ -623,7 +620,6 @@ void CommunicationStream::ShowMessageAtIndex(int index) {
         if (current_message_index_ != index) {
             StreamMessage* previous_message_ptr = nullptr;
             previous_message_ptr = messages_[current_message_index_];
-            qDebug() << "CommunicationStream::showMessageAtIndex - Ukrywanie poprzedniej wiadomości (indeks:" << current_message_index_ << ")";
             DisconnectSignalsForMessage(previous_message_ptr);
             previous_message_ptr->hide();
         }
@@ -632,7 +628,6 @@ void CommunicationStream::ShowMessageAtIndex(int index) {
     // Ustaw nowy bieżący indeks
     current_message_index_ = index;
     StreamMessage* message = messages_[current_message_index_];
-    qDebug() << "CommunicationStream::showMessageAtIndex - Pokazywanie wiadomości (indeks:" << current_message_index_ << ")";
 
     // Ponownie podłączamy sygnały dla nowej, bieżącej wiadomości
     ConnectSignalsForMessage(message);
@@ -685,7 +680,6 @@ void CommunicationStream::OnMessageRead() {
     // Ustaw flagę, że chcemy wyczyścić WSZYSTKIE wiadomości.
     // Proces rozpocznie się od zamknięcia bieżącej wiadomości.
     is_clearing_all_messages_ = true;
-    qDebug() << "CommunicationStream::onMessageRead - Inicjowanie czyszczenia wszystkich wiadomości. Zamykanie bieżącej (indeks:" << current_message_index_ << ")";
     // --- KONIEC NOWEJ LOGIKI ---
 
     StreamMessage* message = messages_[current_message_index_];
@@ -700,7 +694,6 @@ void CommunicationStream::HandleMessageHidden() {
         return;
     }
 
-    qDebug() << "CommunicationStream::handleMessageHidden - Wiadomość została ukryta. ID:" << hidden_message->GetMessageId() << "Typ:" << hidden_message->GetType() << "m_isClearingAllMessages:" << is_clearing_all_messages_;
 
     // Znajdź indeks ukrytej wiadomości PRZED potencjalnym usunięciem
     const int hidden_message_index = messages_.indexOf(hidden_message);
@@ -710,7 +703,6 @@ void CommunicationStream::HandleMessageHidden() {
 
     // --- NOWA LOGIKA DLA CZYSZCZENIA WSZYSTKICH WIADOMOŚCI ---
     if (is_clearing_all_messages_) {
-        qDebug() << "CommunicationStream::handleMessageHidden - Tryb czyszczenia wszystkich wiadomości aktywny.";
 
         // Usuń ukrytą wiadomość z listy (jeśli tam jest) i zaplanuj jej usunięcie
         if (hidden_message_index != -1) {
@@ -725,7 +717,6 @@ void CommunicationStream::HandleMessageHidden() {
         QList<StreamMessage*> messages_to_remove = messages_;
         messages_.clear(); // Czyścimy oryginalną listę od razu
 
-        qDebug() << "CommunicationStream::handleMessageHidden [ClearAll] - Usuwanie pozostałych" << messages_to_remove.size() << "wiadomości.";
         for (StreamMessage* message : messages_to_remove) {
             if (message) {
                 DisconnectSignalsForMessage(message); // Rozłącz sygnały na wszelki wypadek
@@ -739,7 +730,6 @@ void CommunicationStream::HandleMessageHidden() {
         is_clearing_all_messages_ = false; // Zresetuj flagę
         ReturnToIdleAnimation();
         update();
-        qDebug() << "CommunicationStream::handleMessageHidden [ClearAll] - Zakończono czyszczenie.";
         return; // Zakończ obsługę w tym trybie
     }
     // --- KONIEC NOWEJ LOGIKI ---
@@ -750,7 +740,6 @@ void CommunicationStream::HandleMessageHidden() {
     // Sprawdzamy, czy to wiadomość progresu (ma niepuste ID)
     if (!hidden_message->GetMessageId().isEmpty()) {
         // ... (istniejąca logika usuwania wiadomości progresu - bez zmian) ...
-        qDebug() << "CommunicationStream::handleMessageHidden - Usuwanie wiadomości progresu ID:" << hidden_message->GetMessageId();
         if (hidden_message_index != -1) {
             messages_.removeAt(hidden_message_index);
             // Dostosuj indeks bieżącej wiadomości, jeśli usunięta była przed nią
@@ -772,11 +761,9 @@ void CommunicationStream::HandleMessageHidden() {
         }
     } else {
         // To jest zwykła wiadomość, która została ukryta (i NIE jesteśmy w trybie czyszczenia).
-        qDebug() << "CommunicationStream::handleMessageHidden - Zwykła wiadomość ukryta (indeks: " << hidden_message_index << ", aktualny: " << current_message_index_ << ")";
 
         if (hidden_message_index == current_message_index_) {
             // Wiadomość była aktualnie wyświetlana i została zamknięta przez użytkownika (nie przez Enter w trybie ClearAll).
-            qDebug() << "CommunicationStream::handleMessageHidden - Ukryta wiadomość była aktualnie wyświetlana (zamknięcie pojedyncze). Usuwanie i pokazywanie następnej.";
 
             // Usuwamy wiadomość z listy
             if (hidden_message_index != -1) {
@@ -788,12 +775,10 @@ void CommunicationStream::HandleMessageHidden() {
 
             // Pokaż następną lub wróć do Idle
             if (messages_.isEmpty()) {
-                qDebug() << "CommunicationStream::handleMessageHidden [SingleClose] - Brak więcej wiadomości, powrót do Idle.";
                 current_message_index_ = -1;
                 ReturnToIdleAnimation();
             } else {
                 int next_index_to_show = qMin(hidden_message_index, messages_.size() - 1);
-                qDebug() << "CommunicationStream::handleMessageHidden [SingleClose] - Są inne wiadomości. Próba pokazania indeksu:" << next_index_to_show;
                 QTimer::singleShot(0, this, [this, next_index_to_show]() {
                     if (next_index_to_show >= 0 && next_index_to_show < messages_.size()) {
                         ShowMessageAtIndex(next_index_to_show);
@@ -806,9 +791,6 @@ void CommunicationStream::HandleMessageHidden() {
                 });
                 current_message_index_ = -1; // Tymczasowo resetuj indeks
             }
-        } else {
-            // Wiadomość ukryta podczas nawigacji. Nic nie robimy.
-            qDebug() << "CommunicationStream::handleMessageHidden - Ukryta wiadomość nie była aktualnie wyświetlana (nawigacja). Nic nie robię.";
         }
     }
     update(); // Ogólna aktualizacja na koniec
@@ -836,7 +818,6 @@ void CommunicationStream::ConnectSignalsForMessage(StreamMessage *message) {
     connect(message->mark_read_button, &QPushButton::clicked, this, &CommunicationStream::OnMessageRead, Qt::UniqueConnection);
     // Podłączamy sygnał ukrycia wiadomości
     connect(message, &StreamMessage::hidden, this, &CommunicationStream::HandleMessageHidden, Qt::UniqueConnection);
-    qDebug() << "CommunicationStream::connectSignalsForMessage - Podłączono sygnały dla wiadomości (indeks: " << messages_.indexOf(message) << ")";
 }
 
 void CommunicationStream::DisconnectSignalsForMessage(StreamMessage *message) const {
@@ -844,7 +825,6 @@ void CommunicationStream::DisconnectSignalsForMessage(StreamMessage *message) co
     // Rozłącz wszystkie sygnały od tej wiadomości do tego obiektu (CommunicationStream)
     // To powinno obejmować sygnał hidden() podłączony w connectSignalsForMessage
     disconnect(message, nullptr, this, nullptr);
-    qDebug() << "CommunicationStream::disconnectSignalsForMessage - Rozłączono sygnały dla wiadomości (indeks: " << messages_.indexOf(message) << ")";
 }
 
 void CommunicationStream::UpdateNavigationButtonsForCurrentMessage() {

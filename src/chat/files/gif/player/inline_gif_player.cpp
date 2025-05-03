@@ -33,8 +33,6 @@ InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): Q
             if (!decoder_->Initialize()) {
                 qDebug() << "InlineGifPlayer: Decoder initialization failed.";
                 // Można tu obsłużyć błąd inicjalizacji
-            } else {
-                qDebug() << "InlineGifPlayer: Decoder initialized successfully.";
             }
         }
     });
@@ -57,7 +55,6 @@ void InlineGifPlayer::ReleaseResources() {
         // m_decoder->releaseResources();
         decoder_.reset();
         is_playing_ = false;
-        qDebug() << "InlineGifPlayer: Resources released.";
     }
 }
 
@@ -69,7 +66,6 @@ QSize InlineGifPlayer::sizeHint() const {
 }
 
 void InlineGifPlayer::StartPlayback() {
-    qDebug() << "InlineGifPlayer: startPlayback called.";
     if (decoder_ && !is_playing_) {
         is_playing_ = true;
         decoder_->Resume();
@@ -77,7 +73,6 @@ void InlineGifPlayer::StartPlayback() {
 }
 
 void InlineGifPlayer::StopPlayback() {
-    qDebug() << "InlineGifPlayer: stopPlayback called.";
     if (decoder_ && is_playing_) {
         is_playing_ = false;
         decoder_->Pause();
@@ -85,20 +80,17 @@ void InlineGifPlayer::StopPlayback() {
 }
 
 void InlineGifPlayer::enterEvent(QEvent *event) {
-    qDebug() << "InlineGifPlayer: Mouse entered.";
     StartPlayback(); // Rozpocznij odtwarzanie przy najechaniu
     QFrame::enterEvent(event);
 }
 
 void InlineGifPlayer::leaveEvent(QEvent *event) {
-    qDebug() << "InlineGifPlayer: Mouse left.";
     StopPlayback(); // Zatrzymaj odtwarzanie przy opuszczeniu
     QFrame::leaveEvent(event);
 }
 
 void InlineGifPlayer::DisplayThumbnail(const QImage &frame) {
     if (!frame.isNull()) {
-        qDebug() << "InlineGifPlayer: Displaying thumbnail.";
         thumbnail_pixmap_ = QPixmap::fromImage(frame); // Zapisz miniaturkę
         gif_label_->setPixmap(thumbnail_pixmap_.scaled(
             gif_label_->size(), // Skaluj do aktualnego rozmiaru labelki
@@ -107,7 +99,6 @@ void InlineGifPlayer::DisplayThumbnail(const QImage &frame) {
         ));
         // Nie aktualizuj geometrii tutaj, poczekaj na gifInfo
     } else {
-        qDebug() << "InlineGifPlayer: Received null thumbnail.";
         gif_label_->setText("⚠️ Błąd ładowania miniatury");
     }
 }
@@ -135,9 +126,6 @@ void InlineGifPlayer::HandleGifInfo(const int width, const int height, const dou
     gif_height_ = height;
     gif_duration_ = duration;
     frame_rate_ = frame_rate;
-
-    qDebug() << "GIF info - szerokość:" << width << "wysokość:" << height
-            << "czas trwania:" << duration << "s, FPS:" << frame_rate;
 
     // Zaktualizuj geometrię po otrzymaniu informacji o rozmiarze
     updateGeometry();

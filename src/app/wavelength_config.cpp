@@ -42,7 +42,6 @@ WavelengthConfig::WavelengthConfig(QObject *parent)
     settings_(QSettings::UserScope,
      QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
-    qDebug() << "[Config] Initializing... Settings file:" << settings_.fileName();
     // 1. Załaduj definicje domyślnych skrótów
     LoadDefaultShortcuts();
     // 2. Ustaw domyślne wartości dla wszystkich ustawień (w tym skopiuj domyślne skróty do m_shortcuts)
@@ -140,7 +139,6 @@ void WavelengthConfig::LoadSettings() {
         if (!sequence.isEmpty()) {
             QString action_id = key;
             shortcuts_[action_id] = sequence;
-            qDebug() << "[Config] Loaded shortcut from settings:" << action_id << "=" << sequence.toString();
         } else {
             qDebug() << "[Config] Warning: Empty shortcut found in settings for key:" << key;
             if (default_shortcuts_.contains(key) && !shortcuts_.contains(key)) {
@@ -191,14 +189,12 @@ void WavelengthConfig::SaveSettings() {
         QString action_id = it.key();
         QKeySequence sequence = it.value();
         settings_.setValue(action_id, sequence); // Zapisz pod ID akcji
-        qDebug() << "[Config] Saving shortcut to settings:" << action_id << "=" << sequence.toString();
         // }
     }
     settings_.endGroup(); // Koniec grupy Shortcuts
     // --- KONIEC NOWE ---
 
     settings_.sync(); // Wymuś zapis na dysk
-    qDebug() << "Settings saved to:" << settings_.fileName();
 }
 
 void WavelengthConfig::RestoreDefaults() {
@@ -241,7 +237,6 @@ void WavelengthConfig::SetBackgroundColor(const QColor& color) {
         background_color_ = color;
         AddRecentColor(color); // Dodaj do ostatnich
         emit configChanged("background_color");
-        qDebug() << "Configuration changed: \"background_color\"";
     }
 }
 void WavelengthConfig::SetBlobColor(const QColor& color) {
@@ -249,7 +244,6 @@ void WavelengthConfig::SetBlobColor(const QColor& color) {
         blob_color_ = color;
         AddRecentColor(color);
         emit configChanged("blob_color");
-        qDebug() << "Configuration changed: \"blob_color\"";
     }
 }
 
@@ -258,7 +252,6 @@ void WavelengthConfig::SetStreamColor(const QColor& color) {
         stream_color_ = color;
         AddRecentColor(color);
         emit configChanged("stream_color");
-        qDebug() << "Configuration changed: \"stream_color\"";
     }
 }
 
@@ -268,7 +261,6 @@ void WavelengthConfig::SetGridColor(const QColor& color) {
         grid_color_ = color;
         AddRecentColor(color); // Kolor siatki też może być ostatnim
         emit configChanged("grid_color");
-        qDebug() << "Configuration changed: \"grid_color\"";
     }
 }
 
@@ -276,7 +268,6 @@ void WavelengthConfig::SetGridSpacing(int spacing) {
     if (grid_spacing_ != spacing && spacing > 0) { // Dodaj walidację (np. > 0)
         grid_spacing_ = spacing;
         emit configChanged("grid_spacing");
-        qDebug() << "Configuration changed: \"grid_spacing\"";
     }
 }
 
@@ -285,7 +276,6 @@ void WavelengthConfig::SetTitleTextColor(const QColor& color) {
         title_text_color_ = color;
         AddRecentColor(color);
         emit configChanged("title_text_color");
-        qDebug() << "Configuration changed: \"title_text_color\"";
     }
 }
 
@@ -294,7 +284,6 @@ void WavelengthConfig::SetTitleBorderColor(const QColor& color) {
         title_border_color_ = color;
         AddRecentColor(color);
         emit configChanged("title_border_color");
-        qDebug() << "Configuration changed: \"title_border_color\"";
     }
 }
 
@@ -303,7 +292,6 @@ void WavelengthConfig::SetTitleGlowColor(const QColor& color) {
         title_glow_color_ = color;
         AddRecentColor(color);
         emit configChanged("title_glow_color");
-        qDebug() << "Configuration changed: \"title_glow_color\"";
     }
 }
 // --------------------
@@ -342,14 +330,12 @@ void WavelengthConfig::SetDebugMode(const bool enabled) { if(debug_mode_ != enab
 QKeySequence WavelengthConfig::GetShortcut(const QString& action_id, const QKeySequence& default_sequence) const {
     const QKeySequence actual_default = default_sequence.isEmpty() ? default_shortcuts_.value(action_id) : default_sequence;
     QKeySequence result = shortcuts_.value(action_id, actual_default);
-    qDebug() << "[Config] getShortcut(" << action_id << "): Returning from map:" << result.toString();
     return result;
 }
 
 void WavelengthConfig::SetShortcut(const QString& action_id, const QKeySequence& sequence) {
     // Zaktualizuj mapę m_shortcuts
     if (shortcuts_.value(action_id) != sequence) {
-        qDebug() << "[Config] setShortcut(" << action_id << "): Updating map to" << sequence.toString();
         shortcuts_[action_id] = sequence;
         // Zapis do QSettings nastąpi podczas saveSettings()
     }
@@ -401,7 +387,6 @@ void WavelengthConfig::SetPreferredStartFrequency(const QString &frequency) {
         if (const QString normalized_frequency = QString::number(frequency_value, 'f', 1); preferred_start_frequency_ != normalized_frequency) {
             preferred_start_frequency_ = normalized_frequency;
             emit configChanged("preferredStartFrequency");
-            qDebug() << "Config: Preferred start frequency set to" << preferred_start_frequency_;
         }
     } else {
         qWarning() << "Config: Invalid preferred start frequency provided:" << frequency << ". Keeping previous value:" << preferred_start_frequency_;

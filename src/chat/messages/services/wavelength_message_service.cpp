@@ -13,7 +13,6 @@ bool WavelengthMessageService::SendPttRequest(const QString &frequency) {
 
     const QJsonDocument document(request_object);
     const QString json_message = document.toJson(QJsonDocument::Compact);
-    qDebug() << "Sending PTT Request:" << json_message;
     socket->sendTextMessage(json_message);
     return true;
 }
@@ -28,7 +27,6 @@ bool WavelengthMessageService::SendPttRelease(const QString &frequency) {
 
     const QJsonDocument document(release_object);
     const QString json_message = document.toJson(QJsonDocument::Compact);
-    qDebug() << "Sending PTT Release:" << json_message;
     socket->sendTextMessage(json_message);
     return true;
 }
@@ -39,7 +37,6 @@ bool WavelengthMessageService::SendAudioData(const QString &frequency, const QBy
 
     // Wysyłamy surowe dane binarne
     const qint64 bytes_sent = socket->sendBinaryMessage(audio_data);
-    // qDebug() << "Sent" << bytesSent << "bytes of audio data for freq" << frequency;
     return bytes_sent == audio_data.size();
 }
 
@@ -99,7 +96,6 @@ bool WavelengthMessageService::SendTextMessage(const QString &message) {
     // qDebug() << "Sending message to server:" << jsonMessage;
     socket->sendTextMessage(json_message);
 
-    qDebug() << "WavelengthMessageService: Message sent:" << message_id;
 
     return true;
 }

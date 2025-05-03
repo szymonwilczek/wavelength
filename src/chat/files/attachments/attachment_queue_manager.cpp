@@ -29,7 +29,6 @@ void AttachmentQueueManager::AddTask(const std::function<void()> &TaskFunc) {
 AttachmentQueueManager::AttachmentQueueManager(QObject *parent): QObject(parent) {
     // Ograniczamy liczbę jednoczesnych zadań do połowy dostępnych wątków
     max_active_tasks_ = qMax(1, QThreadPool::globalInstance()->maxThreadCount() / 2);
-    qDebug() << "AttachmentQueueManager: Max active tasks:" << max_active_tasks_;
 }
 
 void AttachmentQueueManager::ProcessQueue() {

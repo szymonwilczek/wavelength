@@ -5,20 +5,12 @@
 #include "events/leaver/wavelength_leaver.h"
 
 void WavelengthSessionCoordinator::Initialize() {
-    qDebug() << "Initializing WavelengthSessionCoordinator";
-
-    // Połącz sygnały między komponentami
     ConnectSignals();
-
-    // Załaduj konfigurację
     LoadConfig();
-
-    qDebug() << "WavelengthSessionCoordinator initialized successfully";
 }
 
 bool WavelengthSessionCoordinator::CreateWavelength(const QString &frequency, const bool is_password_protected,
     const QString &password) {
-    qDebug() << "Coordinator: Creating wavelength" << frequency;
     const bool success = WavelengthCreator::GetInstance()->CreateWavelength(
         frequency, is_password_protected, password);
 
@@ -30,7 +22,6 @@ bool WavelengthSessionCoordinator::CreateWavelength(const QString &frequency, co
 }
 
 bool WavelengthSessionCoordinator::JoinWavelength(const QString &frequency, const QString &password) {
-    qDebug() << "Coordinator: Joining wavelength" << frequency;
     const auto [success, errorReason] = WavelengthJoiner::GetInstance()->JoinWavelength(frequency, password);
 
     if (success) {
@@ -41,7 +32,6 @@ bool WavelengthSessionCoordinator::JoinWavelength(const QString &frequency, cons
 }
 
 void WavelengthSessionCoordinator::LeaveWavelength() {
-    qDebug() << "Coordinator: Leaving active wavelength";
     const QString frequency = WavelengthStateManager::GetInstance()->GetActiveWavelength();
 
     if (frequency != -1) {
@@ -52,13 +42,11 @@ void WavelengthSessionCoordinator::LeaveWavelength() {
 }
 
 void WavelengthSessionCoordinator::CloseWavelength(const QString &frequency) {
-    qDebug() << "Coordinator: Closing wavelength" << frequency;
     WavelengthStateManager::GetInstance()->UnregisterJoinedWavelength(frequency);
     WavelengthLeaver::GetInstance()->CloseWavelength(frequency);
 }
 
 bool WavelengthSessionCoordinator::SendMessage(const QString &message) {
-    qDebug() << "Coordinator: Sending message to active wavelength";
     return WavelengthMessageService::GetInstance()->SendTextMessage(message);
 }
 
@@ -130,7 +118,6 @@ void WavelengthSessionCoordinator::LoadConfig() {
     WavelengthConfig* config = WavelengthConfig::GetInstance();
 
     if (!QFile::exists(config->GetSetting("configFilePath").toString())) {
-        qDebug() << "Setting default configuration";
 
         config->SetRelayServerAddress("localhost");
         config->SetRelayServerPort(3000);

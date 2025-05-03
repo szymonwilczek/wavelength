@@ -6,7 +6,6 @@
 #include <QUuid>
 #include <QScreen>
 #include <QThread>
-#include <QDebug>
 #include <QRandomGenerator>
 #include <chrono>
 #include <QSequentialAnimationGroup>
@@ -121,7 +120,6 @@ void AppInstanceManager::clientDisconnected() {
 
     if (is_creator_) {
         if (const QString clientId = client_ids_.value(socket, QString()); !clientId.isNull()) {
-            qDebug() << "[INSTANCE MANAGER] Client disconnected:" << clientId;
             {
                 QMutexLocker locker(&instances_mutex_);
                 connected_instances_.erase(
@@ -136,28 +134,22 @@ void AppInstanceManager::clientDisconnected() {
 
             QMetaObject::invokeMethod(main_window_, [this]() {
                 if (main_window_ && !main_window_->isEnabled()) {
-                    qDebug() << "[INSTANCE MANAGER] Re-enabling main window after client disconnect.";
                     main_window_->setEnabled(true);
                 }
                 if (main_window_ && !main_window_->isActiveWindow()) {
-                     qDebug() << "[INSTANCE MANAGER] Activating main window after client disconnect.";
                     main_window_->activateWindow();
                     main_window_->raise();
                 }
                  if (main_window_ && main_window_->testAttribute(Qt::WA_TransparentForMouseEvents)) {
-                    qDebug() << "[INSTANCE MANAGER] Disabling WA_TransparentForMouseEvents on main window.";
                     main_window_->setAttribute(Qt::WA_TransparentForMouseEvents, false);
                  }
 
             }, Qt::QueuedConnection);
 
         } else {
-             qDebug() << "[INSTANCE MANAGER] Client disconnected, but ID not found for socket.";
         }
     } else {
-        qDebug() << "[INSTANCE MANAGER] Disconnected from server.";
         if (!IsAnotherInstanceRunning()) {
-            qDebug() << "[INSTANCE MANAGER] Server not running, becoming creator.";
             is_creator_ = true;
             if (attraction_thread_ && is_thread_running) {
                 is_thread_running = false;

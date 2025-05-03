@@ -81,10 +81,8 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
             CyberTextDisplay::TypingSoundType sound_type;
             if (sender_ == "SYSTEM") { // Sprawdzamy wartość m_sender
                 sound_type = CyberTextDisplay::kSystemSound;
-                qDebug() << "System message detected, using SystemSound type.";
             } else {
                 sound_type = CyberTextDisplay::kUserSound;
-                qDebug() << "User message detected, using UserSound type.";
             }
 
             text_display_ = new CyberTextDisplay(clean_content_, sound_type, this);
@@ -280,24 +278,18 @@ void StreamMessage::AddAttachment(const QString &html) {
     // Bezpośrednie połączenie sygnału zmiany rozmiaru załącznika
     connect(attachment_widget, &AttachmentPlaceholder::attachmentLoaded,
             this, [this]() {
-                qDebug() << "StreamMessage: Załącznik załadowany, dostosowuję rozmiar...";
 
                 // Ustanawiamy timer, aby dać widgetowi czas na pełne renderowanie
                 QTimer::singleShot(200, this, [this]() {
                     if (attachment_widget_) {
                         // Określamy rozmiar widgetu załącznika
                         const QSize attachment_size = attachment_widget_->sizeHint();
-                        qDebug() << "Rozmiar załącznika po załadowaniu:" << attachment_size;
 
                         // Znajdujemy wszystkie widgety CyberAttachmentViewer w hierarchii
                         QList<CyberAttachmentViewer*> viewers =
                                 attachment_widget_->findChildren<CyberAttachmentViewer*>();
 
                         if (!viewers.isEmpty()) {
-                            qDebug() << "Znaleziony CyberAttachmentViewer, rozmiar:"
-                                    << viewers.first()->size()
-                                    << "sizeHint:" << viewers.first()->sizeHint();
-
                             // Wymuszamy prawidłowe obliczenie rozmiarów po całkowitym renderowaniu
                             QTimer::singleShot(100, this, [this, viewers]() {
                                 // Odświeżamy rozmiar widgetu z załącznikiem
@@ -320,13 +312,11 @@ void StreamMessage::AddAttachment(const QString &html) {
             const QSize initial_size = attachment_widget_->sizeHint();
             setMinimumSize(qMax(initial_size.width() + 60, 500),
                            initial_size.height() + 100);
-            qDebug() << "StreamMessage: Początkowy minimalny rozmiar:" << minimumSize();
         }
     });
 }
 
 void StreamMessage::AdjustSizeToContent() {
-    qDebug() << "StreamMessage::adjustSizeToContent - Dostosowywanie rozmiaru wiadomości";
 
     // Wymuszamy recalkulację layoutu
     main_layout_->invalidate();
@@ -344,14 +334,12 @@ void StreamMessage::AdjustSizeToContent() {
     int max_width = available_geometry.width() * 0.8;
     int max_height = available_geometry.height() * 0.35;
 
-    qDebug() << "Maksymalny dozwolony rozmiar wiadomości:" << max_width << "x" << max_height;
 
     // Dajemy czas na poprawne renderowanie zawartości
     QTimer::singleShot(100, this, [this, max_width, max_height]() {
         if (attachment_widget_) {
             // Pobieramy rozmiar załącznika
             const QSize attachment_size = attachment_widget_->sizeHint();
-            qDebug() << "Rozmiar załącznika (sizeHint):" << attachment_size;
 
             // Szukamy wszystkich CyberAttachmentViewer
             QList<CyberAttachmentViewer*> viewers = attachment_widget_->findChildren<CyberAttachmentViewer*>();
@@ -362,7 +350,6 @@ void StreamMessage::AdjustSizeToContent() {
                 viewer->updateGeometry();
                 const QSize viewer_size = viewer->sizeHint();
 
-                qDebug() << "CyberAttachmentViewer sizeHint:" << viewer_size;
 
                 // Obliczamy rozmiar, uwzględniając marginesy i dodatkową przestrzeń
                 const int new_width = qMin(
@@ -380,7 +367,6 @@ void StreamMessage::AdjustSizeToContent() {
                 // Ustawiamy nowy rozmiar minimalny
                 setMinimumSize(new_width, new_height);
 
-                qDebug() << "Ustawiam nowy minimalny rozmiar wiadomości:" << new_width << "x" << new_height;
 
                 // Wymuszamy ponowne obliczenie rozmiaru
                 updateGeometry();

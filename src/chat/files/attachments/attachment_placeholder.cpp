@@ -86,7 +86,6 @@ QWidget(parent), filename_(filename), is_loaded_(false) {
 }
 
 void AttachmentPlaceholder::SetContent(QWidget *content) {
-    qDebug() << "AttachmentPlaceholder::setContent - ustawianie zawartości";
 
     QLayoutItem* item;
     while ((item = content_layout_->takeAt(0)) != nullptr) {
@@ -96,10 +95,6 @@ void AttachmentPlaceholder::SetContent(QWidget *content) {
         delete item;
     }
 
-    // Sprawdzamy rozmiar nowej zawartości
-    if (content->sizeHint().isValid()) {
-        qDebug() << "Rozmiar zawartości (sizeHint):" << content->sizeHint();
-    }
 
     // Dodajemy zawartość do layoutu
     content_layout_->addWidget(content);
@@ -306,10 +301,8 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
     // Lambda do wywołania po uzyskaniu rozmiaru (przeniesiona logika z sizeReadyCallback)
     auto show_with_size_check = [this, full_size_dialog, scroll_area](QWidget* contentWgt, const QSize size) {
         if (size.isValid()) {
-            qDebug() << "Dialog: Content size ready:" << size;
             AdjustAndShowDialog(full_size_dialog, scroll_area, contentWgt, size);
         } else {
-            qDebug() << "Dialog: Content size invalid after load.";
             AdjustAndShowDialog(full_size_dialog, scroll_area, contentWgt, QSize(400, 300)); // Fallback
         }
     };
@@ -328,16 +321,6 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
                         }
                     });
                 });
-        // Połącz finished dialogu, aby zatrzymać odtwarzanie
-        connect(full_size_dialog, &QDialog::finished, this, [full_gif]() mutable {
-            if (full_gif) {
-                // Nie trzeba jawnie stopPlayback(), bo WA_DeleteOnClose wywoła destruktor
-                // fullGif->stopPlayback();
-                // Destruktor InlineGifPlayer wywoła releaseResources(), które zatrzyma dekoder.
-                qDebug() << "Full size GIF dialog finished.";
-                // Można by tu ustawić fullGif = nullptr, ale WA_DeleteOnClose i tak go usunie.
-            }
-        });
     } else {
         const auto full_image = new InlineImageViewer(data, scroll_area);
         content_widget = full_image;
@@ -415,13 +398,11 @@ void AttachmentPlaceholder::AdjustAndShowDialog(QDialog *dialog, const QScrollAr
         screen = QApplication::primaryScreen();
     }
     const QRect available_geometry = screen ? screen->availableGeometry() : QRect(0, 0, 1024, 768);
-    qDebug() << "Dialog: Using Screen geometry:" << available_geometry;
 
     // 2. Marginesy okna dialogowego (bez zmian)
     constexpr int margin = 50;
 
     // 3. Ustaw ROZMIAR ZAWARTOŚCI na ORYGINALNY
-    qDebug() << "Dialog: Setting content widget fixed size to ORIGINAL:" << original_content_size;
     content_widget->setFixedSize(original_content_size); // Kluczowa zmiana!
 
     // 4. Oblicz preferowany rozmiar okna dialogu na podstawie ORYGINALNEGO rozmiaru zawartości
@@ -446,14 +427,12 @@ void AttachmentPlaceholder::AdjustAndShowDialog(QDialog *dialog, const QScrollAr
     if (original_content_size.height() > max_content_area_size.height()) {
         preferred_dialog_size.rwidth() += scroll_area->verticalScrollBar()->sizeHint().width();
     }
-    qDebug() << "Dialog: Preferred dialog size (based on original content):" << preferred_dialog_size;
 
 
     // 5. OGRANICZ rozmiar okna dialogu do dostępnej geometrii ekranu (z marginesami)
     QSize final_dialog_size = preferred_dialog_size;
     final_dialog_size.setWidth(qMin(final_dialog_size.width(), available_geometry.width() - margin * 2));
     final_dialog_size.setHeight(qMin(final_dialog_size.height(), available_geometry.height() - margin * 2));
-    qDebug() << "Dialog: Final dialog size (limited to screen):" << final_dialog_size;
 
     dialog->resize(final_dialog_size);
 
@@ -461,7 +440,6 @@ void AttachmentPlaceholder::AdjustAndShowDialog(QDialog *dialog, const QScrollAr
     const int x = available_geometry.left() + (available_geometry.width() - final_dialog_size.width()) / 2;
     const int y = available_geometry.top() + (available_geometry.height() - final_dialog_size.height()) / 2;
     dialog->move(x, y);
-    qDebug() << "Dialog: Moving to:" << QPoint(x,y);
 
     // 7. Pokaż dialog (bez zmian)
     dialog->show();
@@ -474,7 +452,6 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
     const auto image_viewer = new InlineImageViewer(data, viewer);
     image_viewer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    qDebug() << "showCyberImage - rozmiar obrazu:" << image_viewer->sizeHint();
 
     // Opakowujemy w AutoScalingAttachment
     const auto scaling_attachment = new AutoScalingAttachment(image_viewer, viewer);
@@ -491,7 +468,6 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
             max_size.setHeight(qMin(max_size.height(), screen->availableGeometry().height() / 3));
         }
     }
-    qDebug() << "showCyberImage - Ustawiam maxSize dla miniatury:" << max_size;
     scaling_attachment->SetMaxAllowedSize(max_size);
 
     // Podłączamy obsługę kliknięcia
@@ -718,10 +694,5 @@ bool AttachmentPlaceholder::eventFilter(QObject *watched, QEvent *event) {
 }
 
 void AttachmentPlaceholder::NotifyLoaded() {
-    qDebug() << "AttachmentPlaceholder::notifyLoaded - powiadamianie o załadowaniu załącznika";
-    qDebug() << "Aktualny rozmiar:" << size();
-    qDebug() << "SizeHint:" << sizeHint();
-
-    // Informujemy o załadowaniu załącznika
     emit attachmentLoaded();
 }

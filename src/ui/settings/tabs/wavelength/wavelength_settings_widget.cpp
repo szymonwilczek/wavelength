@@ -24,14 +24,11 @@ WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
       frequency_value_edit_(nullptr),
       frequency_unit_combo_(nullptr)
 {
-    qDebug() << "WavelengthSettingsWidget constructor start";
     setupUi();
     LoadSettings();
-    qDebug() << "WavelengthSettingsWidget constructor end";
 }
 
 void WavelengthSettingsWidget::setupUi() {
-    qDebug() << "WavelengthSettingsWidget setupUi start";
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
@@ -72,7 +69,6 @@ void WavelengthSettingsWidget::setupUi() {
 
     layout->addLayout(form_layout);
     layout->addStretch();
-    qDebug() << "WavelengthSettingsWidget setupUi end";
 }
 
 void WavelengthSettingsWidget::LoadSettings() const {
@@ -103,8 +99,6 @@ void WavelengthSettingsWidget::LoadSettings() const {
 
     frequency_value_edit_->setText(QString::number(display_value, 'f', (unit_index > 0) ? 3 : 1));
     frequency_unit_combo_->setCurrentIndex(unit_index);
-
-    qDebug() << "WavelengthSettingsWidget settings loaded. Displayed:" << display_value << frequency_unit_combo_->currentText();
 }
 
 bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
@@ -171,6 +165,4 @@ void WavelengthSettingsWidget::SaveSettings() {
 
     const QString frequency_string_hz = QString::number(frequency_value_hz, 'f', 1);
     config_->SetPreferredStartFrequency(frequency_string_hz);
-
-    qDebug() << "WavelengthSettingsWidget settings prepared for saving. Preferred Frequency (Hz):" << frequency_string_hz;
 }

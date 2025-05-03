@@ -54,7 +54,6 @@ void InlineImageViewer::HandleImageReady(const QImage &image) {
         return;
     }
     original_image_ = image;
-    qDebug() << "InlineImageViewer::handleImageReady - Oryginalny rozmiar obrazu:" << original_image_.size();
 
     // Ustaw pixmapę na QLabel - skalowanie załatwi setScaledContents(true)
     image_label_->setPixmap(QPixmap::fromImage(original_image_));
@@ -79,9 +78,6 @@ void InlineImageViewer::HandleImageInfo(const int width, const int height, const
     image_width_ = width;
     image_height_ = height;
     has_alpha_ = has_alpha;
-
-    qDebug() << "Image info - szerokość:" << width << "wysokość:" << height
-            << "kanał alfa:" << (has_alpha ? "tak" : "nie");
 
     emit imageInfoReady(width, height, has_alpha);
 }

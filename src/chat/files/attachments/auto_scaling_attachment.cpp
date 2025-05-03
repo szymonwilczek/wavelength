@@ -98,7 +98,6 @@ bool AutoScalingAttachment::eventFilter(QObject *watched, QEvent *event) {
     if (watched == content_container_ && event->type() == QEvent::MouseButtonRelease) {
         const auto me = static_cast<QMouseEvent*>(event);
         if (me->button() == Qt::LeftButton) {
-            qDebug() << "AutoScalingAttachment: Kliknięto kontener!";
             emit clicked(); // Emituj zawsze po kliknięciu
             return true; // Zawsze przechwytuj kliknięcie na kontenerze
         }
@@ -148,7 +147,6 @@ void AutoScalingAttachment::CheckAndScaleContent() {
             return;
         }
     }
-    qDebug() << "AutoScalingAttachment::checkAndScaleContent - Oryginalny sizeHint zawartości:" << original_size;
 
 
     // Pobierz maksymalny dostępny rozmiar

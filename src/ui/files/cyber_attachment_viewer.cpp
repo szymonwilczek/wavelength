@@ -60,7 +60,6 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
 
     connect(this, &CyberAttachmentViewer::decryptionCounterChanged, mask_overlay_, &MaskOverlay::SetRevealProgress);
 
-    qDebug() << "CyberAttachmentViewer: utworzono z rozmiarem początkowym" << size();
 
     QTimer::singleShot(500, this, &CyberAttachmentViewer::OnActionButtonClicked);
 }
@@ -104,7 +103,6 @@ void CyberAttachmentViewer::UpdateContentLayout() {
 }
 
 void CyberAttachmentViewer::SetContent(QWidget *content) {
-    qDebug() << "CyberAttachmentViewer::setContent - ustawianie zawartości";
 
     if (content_widget_) {
         content_layout_->removeWidget(content_widget_);

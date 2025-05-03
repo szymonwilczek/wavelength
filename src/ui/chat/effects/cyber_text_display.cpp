@@ -42,7 +42,6 @@ CyberTextDisplay::CyberTextDisplay(const QString &text, const TypingSoundType so
 
     QUrl sound_url;
     if (sound_type_ == kSystemSound) {
-        qDebug() << "Using system sound for typing effect.";
         sound_url = QUrl("qrc:/resources/sounds/interface/terminal_typing2.wav");
     } else {
         sound_url = QUrl("qrc:/resources/sounds/interface/terminal_typing1.wav");

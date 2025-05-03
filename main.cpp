@@ -42,14 +42,13 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
-    auto boot_sound = new QSoundEffect(&app);
+    auto boot_sound = new QSoundEffect(&app); // Rodzic: app
     boot_sound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
-    boot_sound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
+    boot_sound->setVolume(1.0);
 
-    auto shutdown_sound = new QSoundEffect(&app);
+    auto shutdown_sound = new QSoundEffect(&app); // Rodzic: app
     shutdown_sound->setSource(QUrl("qrc:/resources/sounds/interface/shutdown.wav"));
     shutdown_sound->setVolume(1.0);
-
 
 
     WavelengthConfig *config = WavelengthConfig::GetInstance();
@@ -89,35 +88,34 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    if (boot_sound->isLoaded()) {
+    QObject::connect(boot_sound, &QSoundEffect::statusChanged, [boot_sound]() {
+        if (boot_sound->status() == QSoundEffect::Ready) {
+            boot_sound->play();
+            // Rozłącz sygnał, aby nie reagować na kolejne zmiany (np. po zakończeniu odtwarzania)
+            QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
+        } else if (boot_sound->status() == QSoundEffect::Error) {
+             qDebug() << "Error loading boot sound. Source:" << boot_sound->source();
+             QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
+        }
+    });
+
+    // Sprawdź początkowy status (może już jest błąd lub gotowy synchronicznie?)
+    if (boot_sound->status() == QSoundEffect::Error) {
+        qDebug() << "Initial error loading boot sound. Source:" << boot_sound->source();
+    } else if (boot_sound->status() == QSoundEffect::Ready) {
         boot_sound->play();
-    } else {
-        QTimer::singleShot(100, boot_sound, [boot_sound](){
-            if(boot_sound->isLoaded()) {
-                boot_sound->play();
-            } else {
-                 qWarning() << "Failed to load boot sound after delay:" << boot_sound->source();
-            }
-        });
-        qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << boot_sound->source();
+        QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr); // Rozłącz, bo już odtworzono
     }
     // --- Koniec odtwarzania dźwięku startowego ---
 
     QObject::connect(&app, &QApplication::aboutToQuit, [shutdown_sound]() {
-    qDebug() << "DEBUG: Entering aboutToQuit lambda."; // <<< Log 1
-    if (shutdown_sound->isLoaded()) {
-        qDebug() << "DEBUG: Shutdown sound is loaded. Attempting to play."; // <<< Log 2
-        shutdown_sound->play();
-        // Dajmy BARDZO dużo czasu na próbę
-        QEventLoop loop;
-        QTimer::singleShot(1500, &loop, &QEventLoop::quit); // Czekaj 1 sekundę
-        loop.exec();
-        qDebug() << "DEBUG: Delay finished after playing sound."; // <<< Log 3
-
-    } else {
-        qWarning() << "Shutdown sound not loaded when aboutToQuit emitted:" << shutdown_sound->source();
-    }
-});
+        if (shutdown_sound->isLoaded()) { // Sprawdź, czy jest załadowany
+            shutdown_sound->play();
+            QTimer::singleShot(2500, &QCoreApplication::quit); // Opcjonalne małe opóźnienie
+        } else {
+             qDebug() << "Shutdown sound not loaded when quitting.";
+        }
+    });
 
     FontManager* font_manager = FontManager::GetInstance();
     if (!font_manager->Initialize()) {
@@ -236,11 +234,8 @@ int main(int argc, char *argv[]) {
         if (enable) {
             // Włącz nasłuchiwanie eventów
             animation->installEventFilter(event_filter);
-            qDebug() << "Włączono nasłuchiwanie eventów animacji";
         } else {
-            // Wyłącz nasłuchiwanie eventów
             animation->removeEventFilter(event_filter);
-            qDebug() << "Wyłączono nasłuchiwanie eventów animacji";
         }
     };
 
@@ -249,26 +244,21 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(config, &WavelengthConfig::configChanged,
                      [animation, config, title_label, glow_effect](const QString& key) { // <<< Dodaj titleLabel, glowEffect
-        qDebug() << "Lambda for configChanged executed with key:" << key;
         if (key == "background_color" || key == "all") {
             QColor new_color = config->GetBackgroundColor();
-            qDebug() << "Config changed: background_color to" << new_color.name();
             QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
         }
         else if (key == "blob_color" || key == "all") {
             QColor new_color = config->GetBlobColor();
-            qDebug() << "Config changed: blob_color to" << new_color.name();
             QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
         }
         // --- NOWE: Obsługa siatki ---
         else if (key == "grid_color" || key == "all") {
             QColor new_color = config->GetGridColor();
-            qDebug() << "Config changed: grid_color to" << new_color.name(QColor::HexArgb);
             QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
         }
         else if (key == "grid_spacing" || key == "all") {
             int new_spacing = config->GetGridSpacing();
-            qDebug() << "Config changed: grid_spacing to" << new_spacing;
             QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection, Q_ARG(int, new_spacing));
         }
         // --- NOWE: Obsługa tytułu ---
@@ -276,7 +266,6 @@ int main(int argc, char *argv[]) {
              // Aktualizuj styl, jeśli zmienił się kolor tekstu lub ramki
              QColor text_color = config->GetTitleTextColor();
              QColor border_color = config->GetTitleBorderColor();
-             qDebug() << "Config changed: Updating title style (Text:" << text_color.name() << ", Border:" << border_color.name() << ")";
              // Wywołaj w głównym wątku dla bezpieczeństwa UI
              QMetaObject::invokeMethod(qApp, [title_label, text_color, border_color](){ // Użyj qApp lub innego QObject z głównego wątku
                  WavelengthUtilities::UpdateTitleLabelStyle(title_label, text_color, border_color);
@@ -284,7 +273,6 @@ int main(int argc, char *argv[]) {
         }
         else if (key == "title_glow_color" || key == "all") {
             QColor new_color = config->GetTitleGlowColor();
-            qDebug() << "Config changed: title_glow_color to" << new_color.name();
             if (glow_effect) {
                 // Wywołaj w głównym wątku dla bezpieczeństwa UI
                 QMetaObject::invokeMethod(qApp, [glow_effect, new_color](){
@@ -328,19 +316,16 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
                      [switch_to_chat_view](const QString &frequency) {
-                         qDebug() << "Wavelength created signal received";
                          switch_to_chat_view(frequency);
                      });
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
                      [switch_to_chat_view](const QString &frequency) {
-                         qDebug() << "Wavelength joined signal received";
                          switch_to_chat_view(frequency);
                      });
 
     QObject::connect(chat_view, &WavelengthChatView::wavelengthAborted,
     [stacked_widget, animation_widget, animation, title_label, text_effect, navbar]() {
-        qDebug() << "Wavelength aborted, switching back to animation view";
 
         navbar->SetChatMode(false);
         animation->hideAnimation();
@@ -367,7 +352,6 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(navbar, &Navbar::settingsClicked, [stacked_widget, settings_view, animation]() {
-    qDebug() << "Settings button clicked";
 
     animation->hideAnimation();
 
@@ -378,7 +362,6 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(settings_view, &SettingsView::backToMainView,
 [stacked_widget, animation_widget, animation, title_label, text_effect]() {
-    qDebug() << "Back from settings, switching to animation view";
 
     animation->hideAnimation();
     animation->ResetLifeColor();
@@ -397,7 +380,6 @@ int main(int argc, char *argv[]) {
 });
 
     QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar]() {
-        qDebug() << "Create wavelength button clicked";
 
         navbar->PlayClickSound();
 
@@ -410,7 +392,6 @@ int main(int argc, char *argv[]) {
             const QString password = dialog.GetPassword();
 
             if (coordinator->CreateWavelength(frequency, is_password_protected, password)) {
-                qDebug() << "Created and joined wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to create wavelength";
                 animation->ResetLifeColor();
@@ -421,7 +402,6 @@ int main(int argc, char *argv[]) {
     });
 
     QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar]() {
-        qDebug() << "Join wavelength button clicked";
         navbar->PlayClickSound();
 
         animation->SetLifeColor(QColor(0, 0, 200));
@@ -432,7 +412,6 @@ int main(int argc, char *argv[]) {
             const QString password = dialog.GetPassword();
 
             if (coordinator->JoinWavelength(frequency, password)) {
-                qDebug() << "Attempting to join wavelength:" << frequency << "Hz";
             } else {
                 qDebug() << "Failed to join wavelength";
                 animation->ResetLifeColor();

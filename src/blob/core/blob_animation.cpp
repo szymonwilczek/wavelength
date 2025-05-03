@@ -106,7 +106,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
 
     connect(&event_handler_, &BlobEventHandler::eventsReEnabled, this, [this] {
         events_enabled_ = true;
-        qDebug() << "Events re-enabled via handler";
     });
 
     connect(&transition_manager_, &BlobTransitionManager::transitionCompleted, this, [this] {
@@ -128,7 +127,6 @@ BlobAnimation::BlobAnimation(QWidget *parent)
     connect(&event_re_enable_timer_, &QTimer::timeout, this, [this] {
         events_enabled_ = true;
         event_handler_.EnableEvents();
-        qDebug() << "Events re-enabled";
     });
 }
 
@@ -364,7 +362,6 @@ void BlobAnimation::resizeEvent(QResizeEvent *event) {
 
 void BlobAnimation::onStateResetTimeout() {
     if (current_state_ != BlobConfig::kIdle) {
-        qDebug() << "Auto switching to IDLE state due to inactivity";
         SwitchToState(BlobConfig::kIdle);
     }
 }
@@ -387,7 +384,6 @@ void BlobAnimation::SwitchToState(BlobConfig::AnimationState new_state) {
         return;
     }
 
-    qDebug() << "State change from" << current_state_ << "to" << new_state;
 
     // Zmieniona logika przejścia do Idle - bez animacji przejścia
     if (new_state == BlobConfig::kIdle &&
@@ -437,7 +433,6 @@ void BlobAnimation::ApplyIdleEffect() {
 }
 
 void BlobAnimation::setBackgroundColor(const QColor &color) {
-    qDebug() << "BlobAnimation::setBackgroundColor called with:" << color.name();
     if (params_.background_color != color) {
         params_.background_color = color;
         // Czy updateGridBuffer używa tego koloru? Czy trzeba wywołać coś jeszcze?
@@ -447,7 +442,6 @@ void BlobAnimation::setBackgroundColor(const QColor &color) {
 }
 
 void BlobAnimation::setGridColor(const QColor &color) {
-    qDebug() << "BlobAnimation::setGridColor called with:" << color.name(QColor::HexArgb);
     if (params_.grid_color != color) {
         params_.grid_color = color;
         // Aktualizuj bufor siatki
@@ -457,7 +451,6 @@ void BlobAnimation::setGridColor(const QColor &color) {
 }
 
 void BlobAnimation::setGridSpacing(const int spacing) {
-    qDebug() << "BlobAnimation::setGridSpacing called with:" << spacing;
     if (params_.grid_spacing != spacing && spacing > 0) {
         params_.grid_spacing = spacing;
         // Aktualizuj bufor siatki
@@ -481,7 +474,6 @@ void BlobAnimation::SetLifeColor(const QColor &color) {
     needs_redraw_ = true;
     update();
 
-    qDebug() << "Blob color changed to:" << color.name();
 }
 
 void BlobAnimation::ResetLifeColor() {
@@ -491,7 +483,6 @@ void BlobAnimation::ResetLifeColor() {
         needs_redraw_ = true;
         update();
 
-        qDebug() << "Blob color reset to default:" << default_life_color_.name();
     }
 }
 
@@ -754,7 +745,6 @@ void BlobAnimation::ResumeAllEventTracking() {
 }
 
 void BlobAnimation::setBlobColor(const QColor &color) {
-    qDebug() << "BlobAnimation::setBlobColor called with:" << color.name();
     // Załóżmy, że kolor bloba to 'borderColor' w parametrach
     if (params_.border_color != color) {
         params_.border_color = color;

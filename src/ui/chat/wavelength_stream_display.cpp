@@ -42,7 +42,6 @@ void WavelengthStreamDisplay::AddMessage(const QString &message, const QString &
     // Sprawdzamy, czy to wiadomość progresu (ma ID) i czy już jest wyświetlona
     if (!message_id.isEmpty() && displayed_progress_messages_.contains(message_id)) {
         if (StreamMessage* existing_message = displayed_progress_messages_.value(message_id)) {
-            qDebug() << "Aktualizowanie istniejącej wiadomości progresu ID:" << message_id;
             existing_message->UpdateContent(message);
             return; // Zaktualizowano, nie dodajemy do kolejki
         }
@@ -53,7 +52,6 @@ void WavelengthStreamDisplay::AddMessage(const QString &message, const QString &
     // --- KONIEC LOGIKI AKTUALIZACJI ---
 
     // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do kolejki
-    qDebug() << "Dodawanie nowej wiadomości do kolejki, ID:" << message_id;
     MessageData data;
     data.content = message; // Przekazujemy oryginalny HTML
     data.id = message_id;    // Zachowujemy ID
@@ -120,8 +118,6 @@ void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
 
     // Jeśli nie aktualizowaliśmy, dodajemy nową wiadomość do strumienia wizualnego
     if (!displayed_message) {
-        qDebug() << "Przetwarzanie wiadomości z kolejki: " << content.left(30)
-                << "... ID=" << id << " hasAttachment=" << has_attachment;
 
         // Wywołaj CommunicationStream, aby dodał wiadomość wizualnie, przekazując ID
         if (has_attachment) {
@@ -139,7 +135,6 @@ void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
         if (!id.isEmpty()) {
             // Sprawdźmy jeszcze raz, czy ID nie zostało dodane w międzyczasie
             if (!displayed_progress_messages_.contains(id)) {
-                qDebug() << "Dodano wiadomość progresu do mapy, ID:" << id;
                 displayed_progress_messages_.insert(id, displayed_message);
                 // Podłącz sygnał zniszczenia do slotu czyszczącego mapę
                 connect(displayed_message, &QObject::destroyed, this, &WavelengthStreamDisplay::OnStreamMessageDestroyed);
@@ -165,7 +160,6 @@ void WavelengthStreamDisplay::OnStreamMessageDestroyed(const QObject *object) {
     auto it = displayed_progress_messages_.begin();
     while (it != displayed_progress_messages_.end()) {
         if (it.value() == object) {
-            qDebug() << "Usuwanie wiadomości progresu z mapy po zniszczeniu, ID:" << it.key();
             it = displayed_progress_messages_.erase(it); // Usuń wpis i przejdź do następnego
             return; // Znaleziono i usunięto, kończymy
         }

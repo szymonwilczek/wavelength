@@ -131,7 +131,6 @@ void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time)
 #endif
 
     override_active_ = true;
-    qDebug() << "Initiating System Override Sequence...";
 
     // --- Kolejne kroki ---
     qDebug() << "Changing wallpaper...";

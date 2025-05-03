@@ -41,7 +41,6 @@ bool FontManager::Initialize() {
             
             while (it.hasNext()) {
                 if (QString font_path = it.next(); LoadFont(fontName, font_path)) {
-                    qDebug() << "Załadowano czcionkę:" << font_path;
                     font_loaded = true;
                 }
             }
@@ -75,7 +74,6 @@ bool FontManager::LoadFont(const QString& font_name, const QString& font_path) {
 
     const QString& family = families.first();
     font_families_[font_name] = family;
-    qDebug() << "Załadowana rodzina czcionki:" << font_name << "jako" << family;
     return true;
 }
 

@@ -23,21 +23,16 @@ bool AuthenticationManager::VerifyPassword(const QString &frequency, const QStri
     const QString stored_password = wavelength_passwords_[frequency];
     const bool is_valid = provided_password == stored_password;
 
-    qDebug() << "Password verification for frequency" << frequency << ":"
-            << (is_valid ? "successful" : "failed");
-
     return is_valid;
 }
 
 void AuthenticationManager::RegisterPassword(const QString &frequency, const QString& password) {
     wavelength_passwords_.insert(frequency, password);
-    qDebug() << "Password registered for frequency" << frequency;
 }
 
 void AuthenticationManager::RemovePassword(const QString &frequency) {
     if (wavelength_passwords_.contains(frequency)) {
         wavelength_passwords_.remove(frequency);
-        qDebug() << "Password removed for frequency" << frequency;
     }
 }
 
@@ -65,7 +60,6 @@ bool AuthenticationManager::StoreSession(const QString &frequency, const QString
     info.is_active = true;
 
     sessions_[session_token] = info;
-    qDebug() << "Session stored for client" << client_id << "on frequency" << frequency;
 
     return true;
 }
@@ -103,7 +97,6 @@ bool AuthenticationManager::ValidateSession(const QString& session_token, const 
 void AuthenticationManager::DeactivateSession(const QString& session_token) {
     if (sessions_.contains(session_token)) {
         sessions_[session_token].is_active = false;
-        qDebug() << "Session deactivated:" << session_token;
     }
 }
 
@@ -111,7 +104,6 @@ void AuthenticationManager::DeactivateClientSessions(const QString& client_id) {
     for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
         if (it.value().client_id == client_id) {
             it.value().is_active = false;
-            qDebug() << "Deactivated session for client:" << client_id;
         }
     }
 }
@@ -120,7 +112,6 @@ void AuthenticationManager::DeactivateFrequencySessions(const QString &frequency
     for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
         if (it.value().frequency == frequency) {
             it.value().is_active = false;
-            qDebug() << "Deactivated session for frequency:" << frequency;
         }
     }
 }
@@ -139,9 +130,5 @@ void AuthenticationManager::CleanupExpiredSessions() {
 
     for (const QString& token : tokens_to_remove) {
         sessions_.remove(token);
-    }
-
-    if (!tokens_to_remove.isEmpty()) {
-        qDebug() << "Cleaned up" << tokens_to_remove.size() << "expired sessions";
     }
 }

@@ -283,12 +283,10 @@ void FloatingEnergySphereWidget::SetClosable(const bool closable) {
 
 void FloatingEnergySphereWidget::initializeGL()
 {
-    qDebug() << "FloatingEnergySphereWidget::initializeGL() started.";
     if (!initializeOpenGLFunctions()) {
         qCritical() << "Failed to initialize OpenGL functions!";
         return;
     }
-    qDebug() << "OpenGL functions initialized.";
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
@@ -296,7 +294,6 @@ void FloatingEnergySphereWidget::initializeGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    qDebug() << "Setting up shaders...";
     SetupShaders();
     if (!shader_program_ || !shader_program_->isLinked()) {
         qCritical() << "Shader program not linked after setupShaders()!";
@@ -305,9 +302,7 @@ void FloatingEnergySphereWidget::initializeGL()
     }
     qDebug() << "Shaders set up successfully.";
 
-    qDebug() << "Setting up sphere geometry (points)...";
     SetupSphereGeometry(128, 256);
-    qDebug() << "Sphere geometry set up with" << vertex_count_ << "vertices.";
 
     vao_.create();
     vao_.bind();
@@ -323,7 +318,6 @@ void FloatingEnergySphereWidget::initializeGL()
     vbo_.release();
     shader_program_->release();
 
-    qDebug() << "VAO/VBO configured for points.";
 
     // --- Konfiguracja Audio ---
     SetupAudio(); // <<< Wywołanie konfiguracji audio
@@ -481,7 +475,6 @@ void FloatingEnergySphereWidget::resizeGL(const int w, int h)
     projection_matrix_.setToIdentity();
     projection_matrix_.perspective(fov_y_degrees, aspect_ratio, 0.1f, 100.0f); // Bliska i daleka płaszczyzna odcięcia
 
-    qDebug() << "Resized to" << w << "x" << h << "Aspect:" << aspect_ratio << "Calculated FOVy:" << fov_y_degrees;
     // ---------------------------------------------------------
 }
 
@@ -637,7 +630,6 @@ void FloatingEnergySphereWidget::ProcessAudioBuffer()
              if (total_duration_ms > 0 && audio_buffer_duration_ms_ > 0) {
                  const int estimated_buffers = static_cast<int>(total_duration_ms / audio_buffer_duration_ms_) + 1;
                  audio_amplitudes_.reserve(estimated_buffers);
-                 qDebug() << "Reserved space for approx." << estimated_buffers << "amplitude values.";
              }
         } else {
              qWarning() << "Decoder provided invalid audio format initially.";
@@ -857,7 +849,6 @@ void FloatingEnergySphereWidget::StartDestructionSequence()
 {
     if (is_destroying_) return; // Już w trakcie niszczenia
 
-    qDebug() << "Starting destruction sequence...";
     is_destroying_ = true;
     destruction_progress_ = 0.0f;
     SetClosable(false); // Zapobiegaj zamknięciu przez użytkownika podczas animacji
@@ -895,7 +886,6 @@ void FloatingEnergySphereWidget::StartDestructionSequence()
 // --- Nowy slot do obsługi zmiany stanu odtwarzacza ---
 void FloatingEnergySphereWidget::HandlePlayerStateChanged(const QMediaPlayer::State state)
 {
-    qDebug() << "Player state changed to:" << state;
 
     // --- Logika dla zakończenia dźwięku zniszczenia ---
     if (is_destroying_ && state == QMediaPlayer::StoppedState) {
@@ -979,7 +969,6 @@ void FloatingEnergySphereWidget::PlayKonamiHint() const {
 
 void FloatingEnergySphereWidget::closeEvent(QCloseEvent *event)
 {
-    qDebug() << "FloatingEnergySphereWidget closeEvent triggered. Closable:" << closable_ << "Destroying:" << is_destroying_;
     if (closable_) {
         timer_.stop();
         click_simulation_timer_->stop();

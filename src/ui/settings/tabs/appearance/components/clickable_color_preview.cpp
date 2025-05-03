@@ -6,11 +6,9 @@ ClickableColorPreview::ClickableColorPreview(QWidget *parent): QWidget(parent) {
     setAutoFillBackground(true); // Pozostaw na true
     // Usuwamy setStyleSheet, bo będziemy rysować ręcznie
     // setStyleSheet("border: 1px solid #555;");
-    qDebug() << "ClickableColorPreview created:" << this << " autoFillBackground:" << autoFillBackground();
 }
 
 void ClickableColorPreview::SetColor(const QColor &color) {
-    qDebug() << "ClickableColorPreview::setColor called on" << this << "with color" << color.name();
 
     QPalette pal = palette();
     if (color.isValid()) {
@@ -25,7 +23,6 @@ void ClickableColorPreview::SetColor(const QColor &color) {
 
 void ClickableColorPreview::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
-        qDebug() << "ClickableColorPreview clicked:" << this;
         emit clicked();
     }
     QWidget::mousePressEvent(event);
@@ -37,8 +34,6 @@ void ClickableColorPreview::paintEvent(QPaintEvent *event) {
 
     // Pobierz kolor tła z palety (teraz powinien być poprawny)
     const QColor background_color = palette().color(QPalette::Window);
-
-    qDebug() << "ClickableColorPreview::paintEvent for" << this << "Drawing background:" << background_color.name();
 
     // Rysuj tło
     if (background_color.isValid() && background_color.alpha() > 0) {
