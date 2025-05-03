@@ -7,7 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-base_x64-windows")
+find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED)
 
 add_executable(
         ${PROJECT_NAME}
@@ -202,47 +202,19 @@ add_executable(
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
-find_package(Qt5 COMPONENTS WebSockets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-websockets_x64-windows")
+find_package(Qt5 COMPONENTS WebSockets REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebSockets)
 
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-multimedia_x64-windows")
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia Qt5::MultimediaWidgets)
 
-find_package(Qt5 COMPONENTS Svg REQUIRED HINTS "C:/.vcpkg-clion/packages/qt5-svg_x64-windows")
+find_package(Qt5 COMPONENTS Svg REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
 
-find_package(libpqxx REQUIRED HINTS "C:/.vcpkg-clion/packages/libpqxx_x64-windows")
+find_package(libpqxx REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE libpqxx::pqxx)
 
-list(APPEND CMAKE_PREFIX_PATH "C:/.vcpkg-clion/packages/ffmpeg_x64-windows")
-
-# Bezpośrednie linkowanie bibliotek FFmpeg
-find_library(AVCODEC_LIBRARY avcodec HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
-find_library(AVFORMAT_LIBRARY avformat HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
-find_library(AVUTIL_LIBRARY avutil HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
-find_library(SWSCALE_LIBRARY swscale HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
-find_library(SWRESAMPLE_LIBRARY swresample HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/lib")
-
-# Dodaj ścieżkę do plików nagłówkowych
-find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h HINTS "C:/.vcpkg-clion/packages/ffmpeg_x64-windows/include")
-
-# Wyświetl znalezione ścieżki
-message(STATUS "FFmpeg libraries:")
-message(STATUS "  avcodec: ${AVCODEC_LIBRARY}")
-message(STATUS "  avformat: ${AVFORMAT_LIBRARY}")
-message(STATUS "  avutil: ${AVUTIL_LIBRARY}")
-message(STATUS "  swscale: ${SWSCALE_LIBRARY}")
-message(STATUS "  include: ${FFMPEG_INCLUDE_DIR}")
-message(STATUS "  swresample: ${SWRESAMPLE_LIBRARY}")
-
-# Podlinkuj biblioteki
-target_link_libraries(${PROJECT_NAME} PRIVATE
-        ${AVCODEC_LIBRARY}
-        ${AVFORMAT_LIBRARY}
-        ${AVUTIL_LIBRARY}
-        ${SWSCALE_LIBRARY}
-        ${SWRESAMPLE_LIBRARY}
-)
-
-# Dodaj ścieżki do plików nagłówkowych
-target_include_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_INCLUDE_DIR})
+find_package(FFMPEG REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARIES})

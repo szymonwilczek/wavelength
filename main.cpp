@@ -42,14 +42,13 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
-    auto boot_sound = new QSoundEffect(&app);
+    auto boot_sound = new QSoundEffect(&app); // Rodzic: app
     boot_sound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
-    boot_sound->setVolume(1.0); // Ustaw głośność (0.0 - 1.0)
+    boot_sound->setVolume(1.0);
 
-    auto shutdown_sound = new QSoundEffect(&app);
+    auto shutdown_sound = new QSoundEffect(&app); // Rodzic: app
     shutdown_sound->setSource(QUrl("qrc:/resources/sounds/interface/shutdown.wav"));
     shutdown_sound->setVolume(1.0);
-
 
 
     WavelengthConfig *config = WavelengthConfig::GetInstance();
@@ -89,35 +88,43 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    if (boot_sound->isLoaded()) {
+    QObject::connect(boot_sound, &QSoundEffect::statusChanged, [boot_sound]() {
+        qDebug() << "Boot sound status changed:" << boot_sound->status();
+        if (boot_sound->status() == QSoundEffect::Ready) {
+            boot_sound->play();
+            qDebug() << "Boot sound played after status became Ready.";
+            // Rozłącz sygnał, aby nie reagować na kolejne zmiany (np. po zakończeniu odtwarzania)
+            QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
+        } else if (boot_sound->status() == QSoundEffect::Error) {
+             qDebug() << "Error loading boot sound. Source:" << boot_sound->source();
+             QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
+        }
+    });
+
+    // Sprawdź początkowy status (może już jest błąd lub gotowy synchronicznie?)
+    if (boot_sound->status() == QSoundEffect::Error) {
+        qDebug() << "Initial error loading boot sound. Source:" << boot_sound->source();
+    } else if (boot_sound->status() == QSoundEffect::Ready) {
+        qDebug() << "Boot sound was ready immediately.";
         boot_sound->play();
+        QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr); // Rozłącz, bo już odtworzono
     } else {
-        QTimer::singleShot(100, boot_sound, [boot_sound](){
-            if(boot_sound->isLoaded()) {
-                boot_sound->play();
-            } else {
-                 qWarning() << "Failed to load boot sound after delay:" << boot_sound->source();
-            }
-        });
-        qWarning() << "Boot sound not loaded immediately, attempting delayed play:" << boot_sound->source();
+        qDebug() << "Boot sound is loading asynchronously...";
+        // Ładowanie już trwa, czekamy na sygnał statusChanged
     }
     // --- Koniec odtwarzania dźwięku startowego ---
 
     QObject::connect(&app, &QApplication::aboutToQuit, [shutdown_sound]() {
-    qDebug() << "DEBUG: Entering aboutToQuit lambda."; // <<< Log 1
-    if (shutdown_sound->isLoaded()) {
-        qDebug() << "DEBUG: Shutdown sound is loaded. Attempting to play."; // <<< Log 2
-        shutdown_sound->play();
-        // Dajmy BARDZO dużo czasu na próbę
-        QEventLoop loop;
-        QTimer::singleShot(1500, &loop, &QEventLoop::quit); // Czekaj 1 sekundę
-        loop.exec();
-        qDebug() << "DEBUG: Delay finished after playing sound."; // <<< Log 3
-
-    } else {
-        qWarning() << "Shutdown sound not loaded when aboutToQuit emitted:" << shutdown_sound->source();
-    }
-});
+        if (shutdown_sound->isLoaded()) { // Sprawdź, czy jest załadowany
+            shutdown_sound->play();
+            qDebug() << "Shutdown sound played.";
+            // Dajmy chwilę na odtworzenie przed faktycznym zamknięciem
+            // Uwaga: To może nie zawsze działać idealnie, zależy od systemu
+            QTimer::singleShot(2500, &QCoreApplication::quit); // Opcjonalne małe opóźnienie
+        } else {
+             qDebug() << "Shutdown sound not loaded when quitting.";
+        }
+    });
 
     FontManager* font_manager = FontManager::GetInstance();
     if (!font_manager->Initialize()) {

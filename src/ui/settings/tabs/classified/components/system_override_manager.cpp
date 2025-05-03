@@ -28,6 +28,7 @@ HHOOK SystemOverrideManager::mouse_hook_ = nullptr;
 constexpr int kMouseLockIntervalMs = 10;
 constexpr int kRestoreDelayMs = 500;
 
+#ifdef Q_OS_WIN
 const std::set<DWORD> kAllowedKeys = {
     VK_UP,       // Strzałka w górę
     VK_DOWN,     // Strzałka w dół
@@ -38,7 +39,7 @@ const std::set<DWORD> kAllowedKeys = {
     VK_RETURN,    // Klawisz Enter
     VK_CAPITAL // Klawisz Caps Lock
 };
-
+#endif
 
 SystemOverrideManager::SystemOverrideManager(QObject *parent)
     : QObject(parent),

@@ -4,3 +4,5 @@
 /server/node_modules
 server/.env
 .env
+/CMakeFiles
+/pk4_projekt_autogen
