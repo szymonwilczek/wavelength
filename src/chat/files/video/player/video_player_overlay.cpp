@@ -7,7 +7,7 @@
 
 VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QString &mime_type, QWidget *parent): QDialog(parent), video_data_(video_data), mime_type_(mime_type),
                                                                                                                scanline_opacity_(0.15), grid_opacity_(0.1) {
-    setWindowTitle("SYS> WAVELENGTH_VISUAL_STREAM_DECODER");
+    setWindowTitle("SYS> WVLNGTH-V-STREAM-PLAYER");
     setMinimumSize(900, 630);
     setModal(false);
 
