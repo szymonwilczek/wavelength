@@ -29,7 +29,7 @@ void WavelengthStreamDisplay::SetFrequency(const QString &frequency, const QStri
     if (name.isEmpty()) {
         communication_stream_->SetStreamName(QString("WAVELENGTH: %1 Hz").arg(frequency));
     } else {
-        communication_stream_->SetStreamName(QString("%1 (%2 Hz)").arg(name).arg(frequency));
+        communication_stream_->SetStreamName(QString("%1 (%2 Hz)").arg(name, frequency));
     }
 
     // Czyścimy wszystko
