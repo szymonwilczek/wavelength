@@ -34,7 +34,6 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     QColor bgColor(30, 20, 60);       // ciemny tło
     QColor borderColor(140, 80, 240); // neonowy fioletowy brzeg
     QColor textColor(160, 100, 255);  // tekst fioletowy
-    QColor glowColor(150, 80, 255, 50); // poświata
 
     // Ścieżka przycisku - ścięte rogi dla cyberpunkowego stylu
     QPainterPath path;

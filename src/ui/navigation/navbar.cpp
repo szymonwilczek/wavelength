@@ -1,5 +1,5 @@
 #include "navbar.h"
-#include "../../ui/buttons/cyberpunk_button.h"
+#include "../../ui/buttons/navbar_button.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSpacerItem>

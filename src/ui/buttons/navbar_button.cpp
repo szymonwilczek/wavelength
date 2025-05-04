@@ -1,4 +1,4 @@
-#include "cyberpunk_button.h"
+#include "navbar_button.h"
 #include <QResizeEvent>
 #include <QHBoxLayout>
 #include <QStyleOption>
@@ -55,8 +55,8 @@ CyberpunkButton::CyberpunkButton(const QString &text, QWidget *parent)
 }
 
 CyberpunkButton::~CyberpunkButton() {
-    if (animation_) delete animation_;
-    if (glow_animation_) delete glow_animation_;
+    delete animation_;
+    delete glow_animation_;
 }
 
 void CyberpunkButton::paintEvent(QPaintEvent *event) {

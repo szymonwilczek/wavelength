@@ -6,7 +6,7 @@
 #include <QSoundEffect>
 #include <QSpacerItem>
 
-#include "../../ui/buttons/cyberpunk_button.h"
+#include "../../ui/buttons/navbar_button.h"
 #include "network_status_widget.h"
 
 /**

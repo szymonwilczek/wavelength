@@ -69,31 +69,6 @@ void CyberPushButton::paintEvent(QPaintEvent *event) {
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
-    // Ozdobne linie wewnętrzne
-    painter.setPen(QPen(border_color.darker(150), 1, Qt::DotLine));
-    painter.drawLine(5, 5, width() - 5, 5);
-    painter.drawLine(5, height() - 5, width() - 5, height() - 5);
-
-    // Znaczniki w rogach
-    int marker_size = 3;
-    painter.setPen(QPen(border_color, 1, Qt::SolidLine));
-
-    // Lewy górny marker
-    painter.drawLine(clip_size + 2, 3, clip_size + 2 + marker_size, 3);
-    painter.drawLine(clip_size + 2, 3, clip_size + 2, 3 + marker_size);
-
-    // Prawy górny marker
-    painter.drawLine(width() - clip_size - 2 - marker_size, 3, width() - clip_size - 2, 3);
-    painter.drawLine(width() - clip_size - 2, 3, width() - clip_size - 2, 3 + marker_size);
-
-    // Prawy dolny marker
-    painter.drawLine(width() - clip_size - 2 - marker_size, height() - 3, width() - clip_size - 2, height() - 3);
-    painter.drawLine(width() - clip_size - 2, height() - 3, width() - clip_size - 2, height() - 3 - marker_size);
-
-    // Lewy dolny marker
-    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2 + marker_size, height() - 3);
-    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2, height() - 3 - marker_size);
-
     // Tekst przycisku
     painter.setPen(QPen(text_color, 1));
     painter.setFont(QFont("Consolas", 10, QFont::Bold));
