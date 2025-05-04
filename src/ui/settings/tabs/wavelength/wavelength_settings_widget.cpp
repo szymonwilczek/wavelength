@@ -12,6 +12,8 @@
 #include <QMessageBox>
 #include <QLocale>
 
+#include "../../../../app/managers/translation_manager.h"
+
 namespace FrequencyLimits {
     constexpr double kMinHz = 130.0;
     constexpr double kMaxValuePerUnit = 999.9;
@@ -21,8 +23,10 @@ namespace FrequencyLimits {
 WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
     : QWidget(parent),
       config_(WavelengthConfig::GetInstance()),
+      translator_(TranslationManager::GetInstance()),
       frequency_value_edit_(nullptr),
-      frequency_unit_combo_(nullptr)
+      frequency_unit_combo_(nullptr),
+      language_combo_(nullptr)
 {
     SetupUi();
     LoadSettings();
@@ -72,12 +76,26 @@ void WavelengthSettingsWidget::SetupUi() {
     freq_layout->addWidget(frequency_unit_combo_, 1);
     form_layout->addRow(preferred_frequency_label, freq_layout);
 
+    const auto language_label = new QLabel(translator_->Translate("WavelengthSettingsWidget.LanguageLabel", "Language:"), this);
+    language_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+
+    language_combo_ = new QComboBox(this);
+    // Dodaj języki z tłumaczeniami i danymi (kodami języków)
+    language_combo_->addItem(translator_->Translate("WavelengthSettingsWidget.LanguageEnglish", "English"), "en");
+    language_combo_->addItem(translator_->Translate("WavelengthSettingsWidget.LanguagePolish", "Polski"), "pl");
+    language_combo_->setStyleSheet(
+        "QComboBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; font-family: Consolas; }"
+        "QComboBox::drop-down { border: none; background-color: rgba(0, 150, 220, 100); }"
+        "QComboBox QAbstractItemView { background-color: #0A1928; color: #00eeff; selection-background-color: #4682B4; }"
+    );
+    form_layout->addRow(language_label, language_combo_);
+
     layout->addLayout(form_layout);
     layout->addStretch();
 }
 
 void WavelengthSettingsWidget::LoadSettings() const {
-    if (!frequency_value_edit_ || !frequency_unit_combo_) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
+    if (!frequency_value_edit_ || !frequency_unit_combo_ || !language_combo_) { // Dodano sprawdzenie language_combo_
         qWarning() << "WavelengthSettingsWidget::loadSettings - UI elements not initialized.";
         return;
     }
@@ -104,6 +122,15 @@ void WavelengthSettingsWidget::LoadSettings() const {
 
     frequency_value_edit_->setText(QString::number(display_value, 'f', (unit_index > 0) ? 3 : 1));
     frequency_unit_combo_->setCurrentIndex(unit_index);
+
+    const QString current_lang_code = config_->GetLanguageCode();
+    const int lang_index = language_combo_->findData(current_lang_code);
+    if (lang_index != -1) {
+        language_combo_->setCurrentIndex(lang_index);
+    } else {
+        qWarning() << "WavelengthSettingsWidget::loadSettings - Saved language code not found in combo box:" << current_lang_code << ". Selecting default.";
+        language_combo_->setCurrentIndex(0); // Wybierz pierwszy (domyślnie angielski)
+    }
 }
 
 bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
@@ -157,17 +184,38 @@ bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
 
 
 void WavelengthSettingsWidget::SaveSettings() {
-    if (!frequency_value_edit_ || !frequency_unit_combo_) { // Usunięto sprawdzenie m_serverAddressEdit, m_serverPortEdit
+    if (!frequency_value_edit_ || !frequency_unit_combo_ || !language_combo_) { // Dodano sprawdzenie language_combo_
         qWarning() << "WavelengthSettingsWidget::saveSettings - UI elements not initialized.";
         return;
     }
 
+    // --- Zapis częstotliwości (bez zmian) ---
     double frequency_value_hz = 0.0;
     if (!ValidateFrequencyInput(frequency_value_hz)) {
         qWarning() << "WavelengthSettingsWidget::saveSettings - Invalid frequency input. Settings not saved.";
+        // Nie zapisuj niczego, jeśli częstotliwość jest niepoprawna
         return;
     }
-
     const QString frequency_string_hz = QString::number(frequency_value_hz, 'f', 1);
     config_->SetPreferredStartFrequency(frequency_string_hz);
+
+
+    // --- NOWE: Zapis języka i pokazanie komunikatu o restarcie ---
+    const QString previous_language_code = config_->GetLanguageCode();
+    const QString selected_language_code = language_combo_->currentData().toString();
+
+    if (previous_language_code != selected_language_code) {
+        config_->SetLanguageCode(selected_language_code);
+        // Zapisz wszystkie ustawienia (w tym język i częstotliwość)
+        config_->SaveSettings();
+
+        // Pokaż komunikat o konieczności restartu
+        QMessageBox::information(this,
+                                 translator_->Translate("Global.RestartRequiredTitle", "Restart Required"),
+                                 translator_->Translate("Global.RestartRequiredMessage", "Language settings have been changed..."));
+        qInfo() << "Language setting changed to" << selected_language_code << ". Restart required.";
+    } else {
+        // Język się nie zmienił, zapisz tylko inne ustawienia (częstotliwość)
+        config_->SaveSettings();
+    }
 }

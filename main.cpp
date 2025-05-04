@@ -25,6 +25,7 @@
 #include "src/ui/effects/cyberpunk_text_effect.h"
 #include "src/ui/widgets/animated_stacked_widget.h"
 #include "src/app/managers/shortcut_manager.h"
+#include "src/app/managers/translation_manager.h"
 #include "src/ui/views/settings_view.h"
 #include "src/ui/settings/tabs/classified/components/system_override_manager.h"
 #include "src/util/resize_event_filter.h"
@@ -52,6 +53,11 @@ int main(int argc, char *argv[]) {
 
 
     WavelengthConfig *config = WavelengthConfig::GetInstance();
+
+    TranslationManager* translator = TranslationManager::GetInstance();
+    if (!translator->Initialize(config->GetLanguageCode())) {
+        qCritical() << "Failed to initialize translation manager. Defaulting to English.";
+    }
 
     // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;

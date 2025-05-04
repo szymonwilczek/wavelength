@@ -1,0 +1,46 @@
+{
+  "Global": {
+    "AppName": "Wavelength",
+    "RestartRequiredTitle": "Restart Required",
+    "RestartRequiredMessage": "Language settings have been changed. Please restart the application for the changes to take effect.",
+    "Ok": "OK",
+    "Cancel": "Cancel",
+    "Warning": "Warning",
+    "Error": "Error",
+    "Information": "Information"
+  },
+  "MainWindow": {
+    "Title": "Wavelength",
+    "TitleLabel": "WAVELENGTH"
+  },
+  "Navbar": {
+    "CreateWavelengthActionTooltip": "Create New Wavelength (Ctrl+N)",
+    "JoinWavelengthActionTooltip": "Join Existing Wavelength (Ctrl+J)",
+    "SettingsActionTooltip": "Open Settings (Ctrl+,)"
+  },
+  "WavelengthSettingsWidget": {
+    "Title": "Wavelength Preferences",
+    "Info": "Configure frequency preferences.\nDo you have some idea for some other settings? Open issue on GitHub!",
+    "PreferredFrequencyLabel": "Preferred Start Frequency:",
+    "LanguageLabel": "Language:",
+    "LanguageEnglish": "English",
+    "LanguagePolish": "Polski",
+    "InvalidFrequencyValue": "Please enter a valid positive number for the frequency value.",
+    "InvalidFrequencyUnitMax": "The maximum value for %1 is %2.",
+    "InvalidFrequencyMinHz": "The minimum frequency allowed is %1 Hz.",
+    "InvalidFrequencyMaxMHz": "The maximum frequency allowed is %1 MHz."
+  },
+  "JoinWavelengthDialog": {
+    "Title": "Join Wavelength",
+    "FrequencyLabel": "Frequency:",
+    "PasswordLabel": "Password (optional):",
+    "JoinButton": "Join"
+  },
+  "WavelengthDialog": {
+    "TitleCreate": "Create Wavelength",
+    "FrequencyLabel": "Frequency:",
+    "PasswordProtectLabel": "Password Protect:",
+    "PasswordLabel": "Password:",
+    "CreateButton": "Create"
+  }
+}

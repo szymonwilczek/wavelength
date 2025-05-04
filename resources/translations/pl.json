@@ -1,0 +1,46 @@
+{
+  "Global": {
+    "AppName": "Wavelength",
+    "RestartRequiredTitle": "Wymagane Ponowne Uruchomienie",
+    "RestartRequiredMessage": "Ustawienia języka zostały zmienione. Proszę ponownie uruchomić aplikację, aby zmiany zaczęły obowiązywać.",
+    "Ok": "OK",
+    "Cancel": "Anuluj",
+    "Warning": "Ostrzeżenie",
+    "Error": "Błąd",
+    "Information": "Informacja"
+  },
+  "MainWindow": {
+    "Title": "Wavelength",
+    "TitleLabel": "WAVELENGTH"
+  },
+  "Navbar": {
+    "CreateWavelengthActionTooltip": "Utwórz nową częstotliwość (Ctrl+N)",
+    "JoinWavelengthActionTooltip": "Dołącz do istniejącej częstotliwości (Ctrl+J)",
+    "SettingsActionTooltip": "Otwórz ustawienia (Ctrl+,)"
+  },
+  "WavelengthSettingsWidget": {
+    "Title": "Preferencje Wavelength",
+    "Info": "Skonfiguruj preferencje częstotliwości.\nMasz pomysł na inne ustawienia? Otwórz zgłoszenie na GitHub!",
+    "PreferredFrequencyLabel": "Preferowana częstotliwość startowa:",
+    "LanguageLabel": "Język:",
+    "LanguageEnglish": "English",
+    "LanguagePolish": "Polski",
+    "InvalidFrequencyValue": "Proszę wprowadzić poprawną dodatnią liczbę dla wartości częstotliwości.",
+    "InvalidFrequencyUnitMax": "Maksymalna wartość dla %1 to %2.",
+    "InvalidFrequencyMinHz": "Minimalna dozwolona częstotliwość to %1 Hz.",
+    "InvalidFrequencyMaxMHz": "Maksymalna dozwolona częstotliwość to %1 MHz."
+  },
+  "JoinWavelengthDialog": {
+    "Title": "Dołącz do Częstotliwości",
+    "FrequencyLabel": "Częstotliwość:",
+    "PasswordLabel": "Hasło (opcjonalne):",
+    "JoinButton": "Dołącz"
+  },
+  "WavelengthDialog": {
+    "TitleCreate": "Utwórz Częstotliwość",
+    "FrequencyLabel": "Częstotliwość:",
+    "PasswordProtectLabel": "Zabezpiecz hasłem:",
+    "PasswordLabel": "Hasło:",
+    "CreateButton": "Utwórz"
+  }
+}

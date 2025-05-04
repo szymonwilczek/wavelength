@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class TranslationManager;
 // Forward declarations
 class WavelengthConfig;
 class QLineEdit;
@@ -67,6 +68,12 @@ private:
 
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *config_;
+
+    /** @brief Pointer to the TranslationManager singleton instance. */
+    TranslationManager *translator_;
+
+    /** @brief Combo box for selecting the application language. */
+    QComboBox *language_combo_;
 
     /** @brief Input field for the numerical value of the preferred frequency. */
     QLineEdit *frequency_value_edit_;

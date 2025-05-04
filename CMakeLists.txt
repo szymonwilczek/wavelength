@@ -199,6 +199,8 @@ add_executable(
         src/ui/widgets/overlay_widget.h
         src/util/resize_event_filter.cpp
         src/util/resize_event_filter.h
+        src/app/managers/translation_manager.cpp
+        src/app/managers/translation_manager.h
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::Network Qt5::Concurrent)
 
