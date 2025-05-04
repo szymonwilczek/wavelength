@@ -22,7 +22,6 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
     QColor track_color(0, 60, 80);            // ciemny niebieski
     QColor progress_color(0, 200, 255);       // neonowy niebieski
     QColor handle_color(0, 240, 255);         // jaśniejszy neon
-    QColor glow_color(0, 220, 255, 80);       // poświata
 
     constexpr int handle_width = 14;
     constexpr int handle_height = 20;
@@ -67,21 +66,6 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
     // Rysowanie uchwytu z efektem świecenia
     QRect handle_rect(handle_position, (height() - handle_height) / 2, handle_width, handle_height);
 
-    // Poświata neonu
-    if (glow_intensity_ > 0.2) {
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(glow_color);
-
-        for (int i = 4; i > 0; i--) {
-            double glow_size = i * 2.5 * glow_intensity_;
-            QRect glow_rect = handle_rect.adjusted(-glow_size, -glow_size, glow_size, glow_size);
-            painter.setOpacity(0.15 * glow_intensity_);
-            painter.drawRoundedRect(glow_rect, 5, 5);
-        }
-
-        painter.setOpacity(1.0);
-    }
-
     // Rysowanie uchwytu
     QPainterPath handle_path;
     handle_path.addRoundedRect(handle_rect, 3, 3);
@@ -99,23 +83,9 @@ void CyberSlider::paintEvent(QPaintEvent *event) {
 }
 
 void CyberSlider::enterEvent(QEvent *event) {
-    // Animowana poświata przy najechaniu
-    const auto animation = new QPropertyAnimation(this, "glowIntensity");
-    animation->setDuration(300);
-    animation->setStartValue(glow_intensity_);
-    animation->setEndValue(0.9);
-    animation->start(QPropertyAnimation::DeleteWhenStopped);
-
     QSlider::enterEvent(event);
 }
 
 void CyberSlider::leaveEvent(QEvent *event) {
-    // Wygaszenie poświaty przy opuszczeniu
-    const auto animation = new QPropertyAnimation(this, "glowIntensity");
-    animation->setDuration(300);
-    animation->setStartValue(glow_intensity_);
-    animation->setEndValue(0.5);
-    animation->start(QPropertyAnimation::DeleteWhenStopped);
-
     QSlider::leaveEvent(event);
 }
