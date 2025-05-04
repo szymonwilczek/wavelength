@@ -279,15 +279,15 @@ void VideoPlayerOverlay::InitializePlayer() {
         decoder_ = std::make_shared<VideoDecoder>(video_data_, nullptr);
 
         // Połącz sygnały z użyciem Qt::DirectConnection dla ostatnich aktualizacji
-        connect(decoder_.get(), &VideoDecoder::frameReady, this, &VideoPlayerOverlay::UpdateFrame, Qt::DirectConnection);
-        connect(decoder_.get(), &VideoDecoder::error, this, &VideoPlayerOverlay::HandleError, Qt::DirectConnection);
-        connect(decoder_.get(), &VideoDecoder::videoInfo, this, &VideoPlayerOverlay::HandleVideoInfo, Qt::DirectConnection);
+        connect(decoder_.get(), &VideoDecoder::frameReady, this, &VideoPlayerOverlay::UpdateFrame, Qt::QueuedConnection);
+        connect(decoder_.get(), &VideoDecoder::error, this, &VideoPlayerOverlay::HandleError, Qt::QueuedConnection);
+        connect(decoder_.get(), &VideoDecoder::videoInfo, this, &VideoPlayerOverlay::HandleVideoInfo, Qt::QueuedConnection);
         connect(decoder_.get(), &VideoDecoder::playbackFinished, this, [this]() {
             playback_finished_ = true;
             play_button_->setText("↻");
             status_label_->setText("ODTWARZANIE ZAKOŃCZONE");
-        }, Qt::DirectConnection);
-        connect(decoder_.get(), &VideoDecoder::positionChanged, this, &VideoPlayerOverlay::UpdateSliderPosition, Qt::DirectConnection);
+        }, Qt::QueuedConnection);
+        connect(decoder_.get(), &VideoDecoder::positionChanged, this, &VideoPlayerOverlay::UpdateSliderPosition, Qt::QueuedConnection);
 
         decoder_->start(QThread::HighPriority);
         play_button_->setText("▶");
