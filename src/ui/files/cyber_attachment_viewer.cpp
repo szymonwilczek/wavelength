@@ -227,21 +227,9 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
 
     painter.drawPath(frame);
 
-    // Dodatkowe linie technologiczne
-    painter.setPen(QPen(borderColor, 1, Qt::DotLine));
-    painter.drawLine(2, 30, width() - 2, 30);
-
     // Znaczniki AR w rogach
     painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
     constexpr int marker_size = 8;
-
-    // Lewy górny
-    painter.drawLine(clip_size, 5, clip_size + marker_size, 5);
-    painter.drawLine(clip_size, 5, clip_size, 5 + marker_size);
-
-    // Prawy górny
-    painter.drawLine(width() - clip_size - marker_size, 5, width() - clip_size, 5);
-    painter.drawLine(width() - clip_size, 5, width() - clip_size, 5 + marker_size);
 
     // Prawy dolny
     painter.drawLine(width() - clip_size - marker_size, height() - 5, width() - clip_size, height() - 5);
