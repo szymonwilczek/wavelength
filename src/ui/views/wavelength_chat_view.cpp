@@ -19,17 +19,20 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     header_label_->setObjectName("headerLabel");
     header_layout->addWidget(header_label_);
 
+    header_layout->addStretch(1);
+
     // Wskaźnik status połączenia
-    status_indicator_ = new QLabel("AKTYWNE POŁĄCZENIE", this);
-    status_indicator_->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    status_indicator_ = new QLabel("CONNECTION ACTIVE", this);
+    status_indicator_->setAlignment(Qt::AlignVCenter);
     status_indicator_->setStyleSheet(
         "color: #00ffaa;"
         "background-color: rgba(0, 40, 30, 150);"
         "border: 1px solid #00aa77;"
-        "padding: 4px 8px;"
         "font-family: 'Consolas';"
         "font-size: 9pt;"
+        "padding: 4px 8px;"
     );
+    status_indicator_->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     header_layout->addWidget(status_indicator_);
 
     main_layout->addLayout(header_layout);
@@ -88,19 +91,19 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     // Pole wprowadzania wiadomości
     input_field_ = new QLineEdit(this);
     input_field_->setObjectName("chatInputField");
-    input_field_->setPlaceholderText("Wpisz wiadomość...");
+    input_field_->setPlaceholderText("Aa");
     input_field_->setStyleSheet(ChatStyle::GetInputFieldStyle());
     input_layout->addWidget(input_field_, 1);
 
     // Przycisk wysyłania - niestandardowy wygląd
-    send_button_ = new CyberChatButton("Wyślij", this);
+    send_button_ = new CyberChatButton("Send", this);
     send_button_->setMinimumWidth(80);
     send_button_->setFixedHeight(36);
     input_layout->addWidget(send_button_);
 
     // --- NOWY PRZYCISK PTT ---
-    ptt_button_ = new CyberChatButton("MÓW", this);
-    ptt_button_->setToolTip("Naciśnij i przytrzymaj, aby mówić");
+    ptt_button_ = new CyberChatButton("TALK", this);
+    ptt_button_->setToolTip("Click and press to talk.");
     ptt_button_->setCheckable(false); // Działa na press/release
     connect(ptt_button_, &QPushButton::pressed, this, &WavelengthChatView::OnPttButtonPressed);
     connect(ptt_button_, &QPushButton::released, this, &WavelengthChatView::OnPttButtonReleased);
@@ -178,7 +181,7 @@ void WavelengthChatView::SetWavelength(const QString &frequency, const QString &
 
     QString title;
     if (name.isEmpty()) {
-        title = QString("Wavelength: %1 Hz").arg(frequency);
+        title = QString("WVLNGTH: %1 Hz").arg(frequency);
     } else {
         title = QString("%1 (%2 Hz)").arg(name).arg(frequency);
     }
@@ -186,9 +189,8 @@ void WavelengthChatView::SetWavelength(const QString &frequency, const QString &
 
     message_area_->Clear();
 
-    const QString welcome_message = QString("<span style=\"color:#ffcc00;\">Połączono z wavelength %1 Hz o %2</span>")
-            .arg(frequency)
-            .arg(QDateTime::currentDateTime().toString("HH:mm:ss"));
+    const QString welcome_message = QString("<span style=\"color:#ffcc00;\">Connected to wavelength %1 Hz @ %2</span>")
+            .arg(frequency, QDateTime::currentDateTime().toString("HH:mm:ss"));
     message_area_->AddMessage(welcome_message, "system", StreamMessage::MessageType::kSystem);
 
     TriggerConnectionEffect();
@@ -226,7 +228,7 @@ void WavelengthChatView::OnWavelengthClosed(const QString &frequency) {
         return;
     }
 
-    status_indicator_->setText("POŁĄCZENIE ZAMKNIĘTE");
+    status_indicator_->setText("CONNECTION CLOSED");
     status_indicator_->setStyleSheet(
         "color: #ff5555;"
         "background-color: rgba(40, 0, 0, 150);"
@@ -236,7 +238,7 @@ void WavelengthChatView::OnWavelengthClosed(const QString &frequency) {
         "font-size: 9pt;"
     );
 
-    const auto close_message = QString("<span style=\"color:#ff5555;\">Wavelength zostało zamknięte przez hosta.</span>");
+    const auto close_message = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by host.</span>");
     message_area_->AddMessage(close_message, "system", StreamMessage::MessageType::kSystem);
 
     QTimer::singleShot(2000, this, [this]() {
@@ -493,7 +495,7 @@ void WavelengthChatView::AbortWavelength() {
 
     is_aborting_ = true;
 
-    status_indicator_->setText("ROZŁĄCZANIE...");
+    status_indicator_->setText("ABORTING...");
     status_indicator_->setStyleSheet(
         "color: #ffaa55;"
         "background-color: rgba(40, 20, 0, 150);"
@@ -703,7 +705,7 @@ void WavelengthChatView::UpdatePttButtonState() const {
     switch (ptt_state_) {
         case Idle:
             ptt_button_->setEnabled(true);
-            ptt_button_->setText("MÓW");
+            ptt_button_->setText("TALK");
             input_field_->setEnabled(true); // Włącz inne kontrolki
             send_button_->setEnabled(true);
             attach_button_->setEnabled(true);
@@ -717,14 +719,14 @@ void WavelengthChatView::UpdatePttButtonState() const {
             break;
         case Transmitting:
             ptt_button_->setEnabled(true); // Nadal można go zwolnić
-            ptt_button_->setText("NADAJĘ");
+            ptt_button_->setText("BRDCST");
             input_field_->setEnabled(false);
             send_button_->setEnabled(false);
             attach_button_->setEnabled(false);
             break;
         case Receiving:
             ptt_button_->setEnabled(false); // Nie można nacisnąć podczas odbierania
-            ptt_button_->setText("ODBIÓR");
+            ptt_button_->setText("RCVNG");
             input_field_->setEnabled(false);
             send_button_->setEnabled(false);
             attach_button_->setEnabled(false);
@@ -733,7 +735,7 @@ void WavelengthChatView::UpdatePttButtonState() const {
 }
 
 void WavelengthChatView::ResetStatusIndicator() const {
-    status_indicator_->setText("AKTYWNE POŁĄCZENIE");
+    status_indicator_->setText("CONNECTION ACTIVE");
     status_indicator_->setStyleSheet(
         "color: #00ffaa;"
         "background-color: rgba(0, 40, 30, 150);"
