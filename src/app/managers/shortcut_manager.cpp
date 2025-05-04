@@ -123,7 +123,7 @@ void ShortcutManager::RegisterChatViewShortcuts(WavelengthChatView* chat_view) {
             button->click();
         } else {
              // Wywołaj slot publiczny, jeśli istnieje
-             QMetaObject::invokeMethod(chat_view, "abortWavelength", Qt::QueuedConnection);
+             QMetaObject::invokeMethod(chat_view, "AbortWavelength", Qt::QueuedConnection);
         }
     });
 
@@ -149,7 +149,7 @@ void ShortcutManager::RegisterChatViewShortcuts(WavelengthChatView* chat_view) {
         if (auto* button = chat_view->findChild<QPushButton*>("sendButton")) {
             button->click();
         } else {
-             QMetaObject::invokeMethod(chat_view, "sendMessage", Qt::QueuedConnection);
+             QMetaObject::invokeMethod(chat_view, "SendMessage", Qt::QueuedConnection);
         }
     });
 }
@@ -158,30 +158,30 @@ void ShortcutManager::RegisterSettingsViewShortcuts(SettingsView* settings_view)
     // Skróty dla widoku ustawień
 
     CreateAndConnectShortcut("SettingsView.SwitchTab0", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 0));
+        QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 0));
     });
     CreateAndConnectShortcut("SettingsView.SwitchTab1", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 1));
+        QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 1));
     });
     CreateAndConnectShortcut("SettingsView.SwitchTab2", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 2));
+        QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 2));
     });
     CreateAndConnectShortcut("SettingsView.SwitchTab3", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 3));
+        QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 3));
     });
      CreateAndConnectShortcut("SettingsView.SwitchTab4", settings_view, [settings_view]() { // Dla nowej zakładki
-        QMetaObject::invokeMethod(settings_view, "switchToTab", Qt::QueuedConnection, Q_ARG(int, 4));
+        QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 4));
     });
 
     CreateAndConnectShortcut("SettingsView.Save", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "saveSettings", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "SaveSettings", Qt::QueuedConnection);
     });
 
     CreateAndConnectShortcut("SettingsView.Defaults", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "restoreDefaults", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "RestoreDefaults", Qt::QueuedConnection);
     });
 
     CreateAndConnectShortcut("SettingsView.Back", settings_view, [settings_view]() {
-        QMetaObject::invokeMethod(settings_view, "handleBackButton", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(settings_view, "HandleBackButton", Qt::QueuedConnection);
     });
 }
