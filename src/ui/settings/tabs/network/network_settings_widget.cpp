@@ -26,8 +26,13 @@ void NetworkSettingsWidget::SetupUi() {
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto info_label = new QLabel("Configure network connection parameters", this);
-    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    const auto title_label = new QLabel("Network Connection", this);
+    title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
+    layout->addWidget(title_label);
+
+    const auto info_label = new QLabel("Configure network connection parameters.\nPlease be aware that the changes made here may affect the correct operation of the application.", this);
+    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
+    info_label->setWordWrap(true);
     layout->addWidget(info_label);
 
     const auto form_layout = new QFormLayout();

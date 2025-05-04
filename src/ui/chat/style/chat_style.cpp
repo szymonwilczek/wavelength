@@ -16,7 +16,6 @@ QString ChatStyle::GetChatStyleSheet() {
                 "  font-weight: bold;"
                 "  color: %4;"
                 "  background-color: %5;"
-                "  border: 1px solid %6;"
                 "  padding: 8px 12px;"
                 "  border-radius: 0px;"
                 "}"
