@@ -660,7 +660,7 @@ void AttachmentPlaceholder::GenerateThumbnail(const QByteArray &video_data, QLab
                                  painter.drawPolygon(triangle);
 
                                  // Aktualizacja UI w głównym wątku
-                                 QMetaObject::invokeMethod(thumbnail_label, "SetPixmap",
+                                 QMetaObject::invokeMethod(thumbnail_label, "setPixmap",
                                                            Qt::QueuedConnection,
                                                            Q_ARG(QPixmap, QPixmap::fromImage(overlay_image)));
 
