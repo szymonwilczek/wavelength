@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "../wavelength_config.h"
-#include "../../ui/buttons/cyberpunk_button.h"
+#include "../../ui/buttons/navbar_button.h"
 #include "../../ui/views/settings_view.h"
 #include "../../ui/views/wavelength_chat_view.h"
 #include "../../ui/navigation/navbar.h"

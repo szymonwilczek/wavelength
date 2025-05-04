@@ -126,8 +126,8 @@ add_executable(
         src/app/style/cyberpunk_style.h
         src/ui/effects/cyberpunk_text_effect.cpp
         src/ui/effects/cyberpunk_text_effect.h
-        src/ui/buttons/cyberpunk_button.cpp
-        src/ui/buttons/cyberpunk_button.h
+        src/ui/buttons/navbar_button.cpp
+        src/ui/buttons/navbar_button.h
         src/blob/rendering/path_markers_manager.cpp
         src/blob/rendering/path_markers_manager.h
         src/ui/navigation/network_status_widget.cpp

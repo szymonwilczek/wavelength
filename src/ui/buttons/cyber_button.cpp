@@ -71,31 +71,6 @@ void CyberButton::paintEvent(QPaintEvent *event) {
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
-    // Ozdobne linie wewnętrzne
-    painter.setPen(QPen(border_color.darker(150), 1, Qt::DotLine));
-    painter.drawLine(5, 5, width() - 5, 5);
-    painter.drawLine(5, height() - 5, width() - 5, height() - 5);
-
-    // Znaczniki w rogach
-    int marker_size = 3;
-    painter.setPen(QPen(border_color, 1, Qt::SolidLine));
-
-    // Lewy górny
-    painter.drawLine(clip_size + 2, 3, clip_size + 2 + marker_size, 3);
-    painter.drawLine(clip_size + 2, 3, clip_size + 2, 3 + marker_size);
-
-    // Prawy górny
-    painter.drawLine(width() - clip_size - 2 - marker_size, 3, width() - clip_size - 2, 3);
-    painter.drawLine(width() - clip_size - 2, 3, width() - clip_size - 2, 3 + marker_size);
-
-    // Prawy dolny
-    painter.drawLine(width() - clip_size - 2 - marker_size, height() - 3, width() - clip_size - 2, height() - 3);
-    painter.drawLine(width() - clip_size - 2, height() - 3, width() - clip_size - 2, height() - 3 - marker_size);
-
-    // Lewy dolny
-    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2 + marker_size, height() - 3);
-    painter.drawLine(clip_size + 2, height() - 3, clip_size + 2, height() - 3 - marker_size);
-
     // Tekst przycisku
     painter.setPen(QPen(text_color, 1));
     painter.setFont(font());
