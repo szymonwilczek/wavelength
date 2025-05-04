@@ -692,14 +692,6 @@ void StreamMessage::paintEvent(QPaintEvent *event) {
     painter.drawLine(width() - clip_size - ar_marker_size, 10, width() - clip_size, 10);
     painter.drawLine(width() - clip_size, 10, width() - clip_size, 10 + ar_marker_size);
 
-    // Prawy dolny marker
-    painter.drawLine(width() - clip_size - ar_marker_size, height() - 10, width() - clip_size, height() - 10);
-    painter.drawLine(width() - clip_size, height() - 10, width() - clip_size, height() - 10 - ar_marker_size);
-
-    // Lewy dolny marker
-    painter.drawLine(clip_size, height() - 10, clip_size + ar_marker_size, height() - 10);
-    painter.drawLine(clip_size, height() - 10, clip_size, height() - 10 - ar_marker_size);
-
     // Tekst nagłówka (nadawca)
     painter.setPen(QPen(text_color, 1));
     painter.setFont(QFont("Consolas", 10, QFont::Bold));
