@@ -50,22 +50,6 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     path.lineTo(0, clip_size);
     path.closeSubpath();
 
-    // Efekt poświaty przy hover/pressed
-    if (glow_intensity_ > 0.2) {
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(glowColor);
-
-        for (int i = 3; i > 0; i--) {
-            double glow_size = i * 1.5 * glow_intensity_;
-            QPainterPath glow_path;
-            glow_path.addRoundedRect(rect().adjusted(-glow_size, -glow_size, glow_size, glow_size), 3, 3);
-            painter.setOpacity(0.15 * glow_intensity_);
-            painter.drawPath(glow_path);
-        }
-
-        painter.setOpacity(1.0);
-    }
-
     // Tło przycisku
     painter.setPen(Qt::NoPen);
     painter.setBrush(bgColor);
@@ -75,31 +59,6 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(borderColor, 1.2));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
-
-    // Ozdobne linie wewnętrzne
-    painter.setPen(QPen(borderColor.darker(150), 1, Qt::DotLine));
-    painter.drawLine(4, 4, width() - 4, 4);
-    painter.drawLine(4, height() - 4, width() - 4, height() - 4);
-
-    // Znaczniki w rogach (mniejsze dla audio)
-    int marker_size = 2;
-    painter.setPen(QPen(borderColor, 1, Qt::SolidLine));
-
-    // Lewy górny marker
-    painter.drawLine(clip_size + 1, 2, clip_size + 1 + marker_size, 2);
-    painter.drawLine(clip_size + 1, 2, clip_size + 1, 2 + marker_size);
-
-    // Prawy górny marker
-    painter.drawLine(width() - clip_size - 1 - marker_size, 2, width() - clip_size - 1, 2);
-    painter.drawLine(width() - clip_size - 1, 2, width() - clip_size - 1, 2 + marker_size);
-
-    // Prawy dolny marker
-    painter.drawLine(width() - clip_size - 1 - marker_size, height() - 2, width() - clip_size - 1, height() - 2);
-    painter.drawLine(width() - clip_size - 1, height() - 2, width() - clip_size - 1, height() - 2 - marker_size);
-
-    // Lewy dolny marker
-    painter.drawLine(clip_size + 1, height() - 2, clip_size + 1 + marker_size, height() - 2);
-    painter.drawLine(clip_size + 1, height() - 2, clip_size + 1, height() - 2 - marker_size);
 
     // Tekst przycisku
     painter.setPen(QPen(textColor, 1));
