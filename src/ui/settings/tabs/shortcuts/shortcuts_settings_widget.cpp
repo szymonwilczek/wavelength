@@ -27,7 +27,7 @@ void ShortcutsSettingsWidget::SetupUi() {
     main_layout->addWidget(title_label);
 
     const auto info_label = new QLabel("Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application.", this);
-    info_label->setStyleSheet("color: #cccccc; background-color: transparent; border: none; font-size: 9pt;");
+    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
     info_label->setWordWrap(true);
     main_layout->addWidget(info_label);
 

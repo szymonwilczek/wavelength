@@ -30,8 +30,13 @@ void AppearanceSettingsWidget::SetupUi() {
     main_layout->setContentsMargins(20, 20, 20, 20);
     main_layout->setSpacing(20);
 
-    const auto info_label = new QLabel("Configure application appearance colors (click preview to change)", this);
-    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
+    const auto title_label = new QLabel("Appearance Customization", this);
+    title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
+    main_layout->addWidget(title_label);
+
+    const auto info_label = new QLabel("Configure application appearance colors (click preview to change).", this);
+    info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
+    info_label->setWordWrap(true);
     main_layout->addWidget(info_label);
 
     const auto grid_layout = new QGridLayout();

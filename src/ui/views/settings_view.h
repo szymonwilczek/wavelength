@@ -181,7 +181,7 @@ private:
     /** @brief Widget for configuring network settings (relay server, timeouts). */
     NetworkSettingsWidget* advanced_tab_widget_; // Renamed from performance/network
     /** @brief Widget for configuring keyboard shortcuts. */
-    ShortcutsSettingsWidget* shortcuts_tab_widget_;
+    ShortcutsSettingsWidget* shortcuts_tab_widget_{};
 
     // --- Action Buttons ---
     /** @brief Button to save the current settings. */
