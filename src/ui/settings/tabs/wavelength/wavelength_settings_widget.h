@@ -53,7 +53,7 @@ private:
      * @brief Creates and arranges all the UI elements (labels, inputs, layouts) for the widget.
      * Sets up the frequency value input field with a validator and the unit selection combo box.
      */
-    void setupUi();
+    void SetupUi();
 
     /**
      * @brief Validates the frequency value and unit entered by the user.

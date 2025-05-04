@@ -102,7 +102,6 @@ public:
      */
     static QString GetCyberpunkFrameStyle();
 
-private:
     /**
      * @brief Private constructor to prevent instantiation. This class only provides static members.
      */

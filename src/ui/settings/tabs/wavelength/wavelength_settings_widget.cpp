@@ -24,11 +24,11 @@ WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
       frequency_value_edit_(nullptr),
       frequency_unit_combo_(nullptr)
 {
-    setupUi();
+    SetupUi();
     LoadSettings();
 }
 
-void WavelengthSettingsWidget::setupUi() {
+void WavelengthSettingsWidget::SetupUi() {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
