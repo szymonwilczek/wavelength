@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
                 return 0; // Zakończ bieżącą instancję
             }
             qCritical() << "Failed to relaunch as administrator. Override aborted.";
-            QMessageBox::critical(nullptr, "Admin Privileges Required", "Failed to relaunch with administrator privileges. The override sequence cannot continue.");
+            QMessageBox::critical(nullptr, translator->Translate("MainWindow.IsNotRunningAdminTitle", "Admin Privileges Required"), translator->Translate("MainWindow.IsNotRunningAdminMessage", "Failed to relaunch with administrator privileges. The override sequence cannot continue."));
             return 1; // Zakończ z błędem
         }
         qDebug() << "Running with administrator privileges.";
@@ -431,7 +431,7 @@ int main(int argc, char *argv[]) {
     });
 
     if (!instance_manager->IsCreator()) {
-        window.setWindowTitle("Wavelength - Sub Instance");
+        window.setWindowTitle(translator->Translate("InstanceManager.NotCreatorTitle", "Wavelength - Sub Instance"));
     }
 
     ShortcutManager* shortcut_manager = ShortcutManager::GetInstance();
