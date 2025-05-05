@@ -8,6 +8,7 @@
 #include "../../ui/dialogs/animated_dialog.h"
 #include "../buttons/cyber_button.h"
 
+class TranslationManager;
 /**
  * @brief A dialog window for joining an existing Wavelength frequency.
  *
@@ -176,6 +177,8 @@ private:
     int last_scanline_y_ = -1;
     /** @brief Stores the previous height to detect resize events for buffer reinitialization. */
     int previous_height_ = 0;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // JOIN_WAVELENGTH_DIALOG_H

@@ -11,6 +11,7 @@
 #include "../../ui/checkbox/cyber_checkbox.h"
 #include "../input/cyber_line_edit.h"
 
+class TranslationManager;
 /**
  * @brief A dialog window for creating a new Wavelength frequency.
  *
@@ -207,6 +208,8 @@ private:
     int last_scanline_y_ = -1;
     /** @brief Stores the previous height to detect resize events for buffer reinitialization. */
     int previous_height_ = 0;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // WAVELENGTH_DIALOG_H

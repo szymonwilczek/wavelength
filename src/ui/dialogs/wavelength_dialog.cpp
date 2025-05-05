@@ -5,6 +5,8 @@
 #include <QNetworkReply>
 #include <QVBoxLayout>
 
+#include "../../app/managers/translation_manager.h"
+
 WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, AnimatedDialog::kDigitalMaterialization),
                                                      shadow_size_(10), scanline_opacity_(0.08) {
 
@@ -18,8 +20,9 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
 
     digitalization_progress_ = 0.0;
     animation_started_ = false;
+    translator_ = TranslationManager::GetInstance();
 
-    setWindowTitle("CREATE_WAVELENGTH::NEW_INSTANCE");
+    setWindowTitle(translator_->Translate("CreateWavelengthDialog.Title", "CREATE_WAVELENGTH::NEW_INSTANCE"));
     setModal(true);
     setFixedSize(450, 350);
 
@@ -30,7 +33,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     main_layout->setSpacing(12);
 
     // Nagłówek z tytułem
-    auto title_label = new QLabel("GENERATE WAVELENGTH", this);
+    auto title_label = new QLabel(translator_->Translate("CreateWavelengthDialog.Header", "CREATE WAVELENGTH"), this);
     title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     title_label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     title_label->setContentsMargins(0, 0, 0, 3);
@@ -58,7 +61,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     main_layout->addWidget(info_panel);
 
     // Panel instrukcji - poprawka dla responsywności
-    auto info_label = new QLabel("System automatically assigns the lowest available frequency", this);
+    auto info_label = new QLabel(translator_->Translate("CreateWavelengthDialog.InfoLabel", "System automatically assigns the lowest available frequency"), this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     info_label->setAlignment(Qt::AlignLeft);
     info_label->setWordWrap(true); // Włącz zawijanie tekstu
@@ -73,7 +76,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     form_layout->setContentsMargins(0, 15, 0, 15); // Dodaj więcej przestrzeni w pionie
 
     // Etykiety w formularzu
-    auto frequency_title_label = new QLabel("ASSIGNED FREQUENCY:", this);
+    auto frequency_title_label = new QLabel(translator_->Translate("CreateWavelengthDialog.FrequencyLabel", "ASSIGNED FREQUENCY:"), this);
     frequency_title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Pole wyświetlające częstotliwość
@@ -82,23 +85,23 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     form_layout->addRow(frequency_title_label, frequency_label_);
 
     // Wskaźnik ładowania przy wyszukiwaniu częstotliwości
-    loading_indicator_ = new QLabel("SEARCHING FOR AVAILABLE FREQUENCY...", this);
+    loading_indicator_ = new QLabel(translator_->Translate("CreateWavelengthDialog.LoadingIndicator", "SEARCHING FOR AVAILABLE FREQUENCY..."), this);
     loading_indicator_->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     form_layout->addRow("", loading_indicator_);
 
     // Checkbox zabezpieczenia hasłem
-    password_protected_checkbox_ = new CyberCheckBox("PASSWORD PROTECTED", this);
+    password_protected_checkbox_ = new CyberCheckBox(translator_->Translate("CreateWavelengthDialog.PasswordCheckbox", "PASSWORD PROTECTED"), this);
     // Aktualizacja stylów dla checkboxa
     form_layout->addRow("", password_protected_checkbox_);
 
     // Etykieta i pole hasła
-    auto password_label = new QLabel("PASSWORD:", this);
+    auto password_label = new QLabel(translator_->Translate("CreateWavelengthDialog.PasswordLabel", "PASSWORD:"), this);
     password_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     password_edit_ = new CyberLineEdit(this);
     password_edit_->setEchoMode(QLineEdit::Password);
     password_edit_->setEnabled(false);
-    password_edit_->setPlaceholderText("ENTER WAVELENGTH PASSWORD");
+    password_edit_->setPlaceholderText(translator_->Translate("CreateWavelengthDialog.PasswordEdit", "ENTER WAVELENGTH PASSWORD"));
     password_edit_->setStyleSheet("font-family: Consolas; font-size: 9pt;");
     password_edit_->setFixedHeight(30); // Wymuszenie wysokości 30px
     password_edit_->setVisible(true);   // Upewnij się, że jest widoczne
@@ -120,11 +123,11 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, Anim
     auto button_layout = new QHBoxLayout();
     button_layout->setSpacing(15);
 
-    generate_button_ = new CyberButton("CREATE WAVELENGTH", this, true);
+    generate_button_ = new CyberButton(translator_->Translate("CreateWavelengthDialog.CreateButton", "CREATE WAVELENGTH"), this, true);
     generate_button_->setFixedHeight(35);
     generate_button_->setEnabled(false); // Disable until frequency is found
 
-    cancel_button_ = new CyberButton("CANCEL", this, false);
+    cancel_button_ = new CyberButton(translator_->Translate("CreateWavelengthDialog.CancelButton", "CANCEL"), this, false);
     cancel_button_->setFixedHeight(35);
 
     button_layout->addWidget(generate_button_, 2);
@@ -315,14 +318,14 @@ void WavelengthDialog::ValidateInputs() const {
 }
 
 void WavelengthDialog::StartFrequencySearch() {
-    loading_indicator_->setText("SEARCHING FOR AVAILABLE FREQUENCY...");
+    loading_indicator_->setText(translator_->Translate("CreateWavelengthDialog.LoadingIndicator", "SEARCHING FOR AVAILABLE FREQUENCY..."));
 
     const auto timeout_timer = new QTimer(this);
     timeout_timer->setSingleShot(true);
     timeout_timer->setInterval(5000); // 5 sekund limitu na szukanie
     connect(timeout_timer, &QTimer::timeout, [this]() {
         if (frequency_watcher_ && frequency_watcher_->isRunning()) {
-            loading_indicator_->setText("USING DEFAULT FREQUENCY...");
+            loading_indicator_->setText(translator_->Translate("CreateWavelengthDialog.DefaultIndicator", "USING DEFAULT FREQUENCY..."));
             frequency_ = 130.0;
             frequency_found_ = true;
             OnFrequencyFound();
@@ -349,7 +352,7 @@ void WavelengthDialog::TryGenerate() {
     const QString password = password_edit_->text();
 
     if (is_password_protected && password.isEmpty()) {
-        status_label_->setText("PASSWORD REQUIRED");
+        status_label_->setText(translator_->Translate("CreateWavelengthDialog.PasswordRequired", "PASSSWORD REQUIRED"));
         status_label_->show();
         is_generating = false;
         return;

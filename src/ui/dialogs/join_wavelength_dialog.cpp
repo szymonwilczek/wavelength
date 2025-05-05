@@ -4,6 +4,8 @@
 #include <QFormLayout>
 #include <QVBoxLayout>
 
+#include "../../app/managers/translation_manager.h"
+
 JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
                                                              shadow_size_(10), scanline_opacity_(0.08) {
     // Dodaj flagi optymalizacyjne
@@ -13,10 +15,11 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     setAttribute(Qt::WA_StaticContents, true);
     setAttribute(Qt::WA_ContentsPropagated, false);
 
+    translator_ = TranslationManager::GetInstance();
     digitalization_progress_ = 0.0;
     animation_started_ = false;
 
-    setWindowTitle("JOIN_WAVELENGTH::CONNECT");
+    setWindowTitle(translator_->Translate("JoinWavelengthDialog.Title", "JOIN_WAVELENGTH::CONNECT"));
     setModal(true);
     setFixedSize(450, 350);
     SetAnimationDuration(400);
@@ -26,7 +29,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     main_layout->setSpacing(12);
 
     // Nagłówek z tytułem
-    auto title_label = new QLabel("JOIN WAVELENGTH", this);
+    auto title_label = new QLabel(translator_->Translate("JoinWavelengthDialog.Header", "JOIN WAVELENGTH"), this);
     title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     title_label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     title_label->setContentsMargins(0, 0, 0, 3);
@@ -54,7 +57,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     main_layout->addWidget(info_panel);
 
     // Panel instrukcji
-    auto info_label = new QLabel("Enter the wavelength frequency (130Hz - 180MHz)", this);
+    auto info_label = new QLabel(translator_->Translate("JoinWavelengthDialog.InfoLabel", "Enter the wavelength frequency (130Hz - 180MHz)"), this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     info_label->setAlignment(Qt::AlignLeft);
     info_label->setWordWrap(true);
@@ -69,7 +72,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     form_layout->setContentsMargins(0, 15, 0, 15);
 
     // Etykieta częstotliwości
-    auto frequency_title_label = new QLabel("FREQUENCY:", this);
+    auto frequency_title_label = new QLabel(translator_->Translate("JoinWavelengthDialog.FrequencyLabel", "FREQUENCY:"), this);
     frequency_title_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Kontener dla pola częstotliwości i selecta jednostki
@@ -85,7 +88,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     locale.setNumberOptions(QLocale::RejectGroupSeparator);
     validator->setLocale(locale);
     frequency_edit_->setValidator(validator);
-    frequency_edit_->setPlaceholderText("ENTER FREQUENCY");
+    frequency_edit_->setPlaceholderText(translator_->Translate("JoinWavelengthDialog.FrequencyEdit","ENTER FREQUENCY"));
     freq_layout->addWidget(frequency_edit_, 3);
 
     // ComboBox z jednostkami
@@ -115,18 +118,18 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     form_layout->addRow(frequency_title_label, freq_container);
 
     // Etykieta informacji o separatorze dziesiętnym
-    auto decimal_hint_label = new QLabel("Use dot (.) as decimal separator (e.g. 98.7)", this);
+    auto decimal_hint_label = new QLabel(translator_->Translate("JoinWavelengthDialog.DecimalHintLabel", "Use dot (.) as decimal separator (e.g. 98.7)"), this);
     decimal_hint_label->setStyleSheet("color: #008888; background-color: transparent; font-family: Consolas; font-size: 8pt;");
     form_layout->addRow("", decimal_hint_label);
 
     // Etykieta hasła
-    auto password_label = new QLabel("PASSWORD:", this);
+    auto password_label = new QLabel(translator_->Translate("JoinWavelengthDialog.PasswordLabel", "PASSWORD:"), this);
     password_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
 
     // Pole hasła
     password_edit_ = new CyberLineEdit(this);
     password_edit_->setEchoMode(QLineEdit::Password);
-    password_edit_->setPlaceholderText("WAVELENGTH PASSWORD (IF REQUIRED)");
+    password_edit_->setPlaceholderText(translator_->Translate("JoinWavelengthDialog.PasswordEdit", "WAVELENGTH PASSWORD (IF REQUIRED))");
     form_layout->addRow(password_label, password_edit_);
 
     main_layout->addLayout(form_layout);
@@ -141,10 +144,10 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     auto button_layout = new QHBoxLayout();
     button_layout->setSpacing(15);
 
-    join_button_ = new CyberButton("JOIN WAVELENGTH", this, true);
+    join_button_ = new CyberButton(translator_->Translate("JoinWavelengthDialog.JoinButton", "JOIN WAVELENGTH"), this, true);
     join_button_->setFixedHeight(35);
 
-    cancel_button_ = new CyberButton("CANCEL", this, false);
+    cancel_button_ = new CyberButton(translator_->Translate("JoinWavelengthDialog.CancelButton", "CANCEL"), this, false);
     cancel_button_->setFixedHeight(35);
 
     button_layout->addWidget(join_button_, 2);
@@ -369,7 +372,7 @@ void JoinWavelengthDialog::TryJoin() {
 }
 
 void JoinWavelengthDialog::OnAuthFailed() {
-    status_label_->setText("AUTHENTICATION FAILED: INCORRECT PASSWORD");
+    status_label_->setText(translator_->Translate("JoinWavelengthDialog.IncorrectPassword", "INCORRECT PASSWORD"));
     status_label_->show();
 
     const auto error_glitch_animation = new QPropertyAnimation(this, "glitchIntensity");
@@ -384,11 +387,11 @@ void JoinWavelengthDialog::OnConnectionError(const QString &error_message) {
     QString display_message;
 
     if (error_message.contains("Password required")) {
-        display_message = "WAVELENGTH PASSWORD PROTECTED";
+        display_message = translator_->Translate("JoinWavelengthDialog.PasswordRequired","WAVELENGTH PASSWORD PROTECTED");
     } else if (error_message.contains("Invalid password")) {
-        display_message = "INCORRECT PASSWORD";
+        display_message = translator_->Translate("JoinWavelengthDialog.IncorrectPassword","INCORRECT PASSWORD");
     } else {
-        display_message = "WAVELENGTH UNAVAILABLE";
+        display_message = translator_->Translate("JoinWavelengthDialog.WavelengthUnavailable","WAVELENGTH UNAVAILABLE");
     }
 
     status_label_->setText(display_message);
