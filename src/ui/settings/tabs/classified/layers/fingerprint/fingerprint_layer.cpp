@@ -8,13 +8,17 @@
 #include <QDir>
 #include <QCoreApplication>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 FingerprintLayer::FingerprintLayer(QWidget *parent)
     : SecurityLayer(parent), fingerprint_timer_(nullptr), svg_renderer_(nullptr)
 {
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    auto *title = new QLabel("FINGERPRINT AUTHENTICATION", this);
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
+    auto *title = new QLabel(translator->Translate("ClassifiedSettingsWidget.Fingerprint.Title", "FINGERPRINT AUTHENTICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -25,7 +29,7 @@ FingerprintLayer::FingerprintLayer(QWidget *parent)
     fingerprint_image_->setAlignment(Qt::AlignCenter);
     fingerprint_image_->installEventFilter(this);
 
-    auto *instructions = new QLabel("Press and hold on fingerprint to scan", this);
+    auto *instructions = new QLabel(translator->Translate("ClassifiedSettingsWidget.Fingerprint.Info", "Press and hold on fingerprint to scan"), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
