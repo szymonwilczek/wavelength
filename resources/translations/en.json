@@ -7,40 +7,306 @@
     "Cancel": "Cancel",
     "Warning": "Warning",
     "Error": "Error",
-    "Information": "Information"
+    "Information": "Information",
+    "Close": "Close"
   },
   "MainWindow": {
     "Title": "Wavelength",
-    "TitleLabel": "WAVELENGTH"
+    "TitleLabel": "WAVELENGTH",
+    "IsNotRunningAdminTitle": "Admin Privileges Required",
+    "IsNotRunningAdminMessage": "Failed to relaunch with administrator privileges. The override sequence cannot continue."
+  },
+  "InstanceManager" : {
+    "NotCreatorTitle": "Wavelength - Sub Instance"
   },
   "Navbar": {
-    "CreateWavelengthActionTooltip": "Create New Wavelength (Ctrl+N)",
-    "JoinWavelengthActionTooltip": "Join Existing Wavelength (Ctrl+J)",
-    "SettingsActionTooltip": "Open Settings (Ctrl+,)"
+    "GenerateWavelength": "Generate Wavelength",
+    "MergeWavelength": "Merge Wavelength",
+    "Settings": "Settings"
+  },
+  "Attachments" : {
+    "Redecode": "REDECODE",
+    "InitializingDecode": "Initializing decode sequence...",
+    "Decoding": "Decoding...",
+    "InitDecode": "Init Decode Sequence",
+    "DataNotFound": "There was an error trying to find attachment data",
+    "DecodeError": "There was an error trying to decode the attachment",
+    "ProcessingError": "There was an error trying to process the attachment",
+    "FullSizeDialog": "Show full size",
+    "LoadAgain": "Load again",
+    "PlayVideo": "PLAY VIDEO",
+    "Expand": "EXPAND"
+  },
+  "AudioPlayer" : {
+    "Title": "NEURAL AUDIO DECODER",
+    "Initialization": "INITIALIZING...",
+    "PlaybackFinished": "PLAYBACK FINISHED",
+    "Seeking": "SEEKING...",
+    "Playing": "PLAYING...",
+    "Paused": "PAUSED",
+    "Ready": "READY"
+  },
+  "GifPlayer" : {
+    "Loading": "LOADING GIF...",
+    "ThumbnailError": "⚠️ THUMBNAIL LOADING ERROR..."
+  },
+  "ImageViewer" : {
+    "Loading": "LOADING IMAGE...",
+    "EmptyImage": "⚠️ Viewer got an empty image from decoder.",
+    "DecoderError": "⚠️ IMAGE DECODER ERROR..."
+  },
+  "VideoPlayer" : {
+    "Title": "VISUAL STREAM DECODER v2.5",
+    "Initializing": "INITIALIZING...",
+    "BufferLoading": "BUFFER LOADING...",
+    "CodecAnalyzing": "CODEC ANALYZING...",
+    "DecoderInitializing": "DECODER INITIALIZING...",
+    "PlaybackFinished": "PLAYBACK FINISHED",
+    "Ready": "READY",
+    "Finished": "FINISHED (READY)",
+    "Paused": "PAUSED",
+    "Playing": "PLAYING...",
+    "Seeking": "SEEKING...",
+    "Frame": "FRAME",
+    "FrameBuffer": "FRAME BUFFER",
+    "SignalStrength": "SIGNAL STRENGTH",
+    "DecoderError": "⚠️ VIDEO DECODER ERROR..."
+  },
+  "MessageFormatter" : {
+    "EmptyMessage": "[Empty Message]"
+  },
+  "MessageService" : {
+    "SendFileEmpty": "ERORR: Empty file path",
+    "SendFilePrepare": "Preparing file...",
+    "SendFileNotAccessible": "ERORR: File not accessible",
+    "SendFileCannotOpen": "ERORR: Cannot open file",
+    "SendFileProcessing": "Processing: ",
+    "SendFileEncoding": "Encoding: ",
+    "SendFileSending": "Sending: ",
+    "SendFileError": "ERORR: ",
+    "SendFileNotConnectedToServer": "ERORR: Not connected to server",
+    "SendFileSuccess": "File sent successfully!"
+  },
+  "WavelengthJoiner" : {
+    "Unavailable": "WAVELENGTH UNAVAILABLE",
+    "ConnectionError": "⚠️ CONNECTION ERROR"
+  },
+  "CommunicationStream" : {
+    "Title": "COMMUNICATION STREAM"
+  },
+  "JoinWavelengthDialog": {
+    "Title": "JOIN_WAVELENGTH::CONNECT",
+    "Header": "JOIN WAVELENGTH",
+    "InfoLabel": "Enter the wavelength frequency (130Hz - 180MHz)",
+    "FrequencyLabel": "FREQUENCY:",
+    "FrequencyEdit": "ENTER FREQUENCY",
+    "DecimalHintLabel": "Use dot (.) as decimal separator (e.g. 98.7)",
+    "PasswordLabel": "PASSWORD:",
+    "PasswordEdit": "WAVELENGTH PASSWORD (IF REQUIRED)",
+    "JoinButton": "JOIN WAVELENGTH",
+    "CancelButton": "CANCEL",
+    "PasswordRequired": "WAVELENGTH PASSWORD PROTECTED",
+    "IncorrectPassword": "INCORRECT PASSWORD",
+    "WavelengthUnavailable": "WAVELENGTH UNAVAILABLE"
+  },
+  "CreateWavelengthDialog": {
+    "Title": "CREATE_WAVELENGTH::NEW_INSTANCE",
+    "Header": "GENERATE WAVELENGTH",
+    "InfoLabel": "System automatically assigns the lowest available frequency",
+    "FrequencyLabel": "ASSIGNED FREQUENCY:",
+    "LoadingIndicator": "SEARCHING FOR AVAILABLE FREQUENCY...",
+    "DefaultIndicator": "USING DEFAULT FREQUENCY...",
+    "PasswordCheckbox": "PASSWORD PROTECTED",
+    "PasswordLabel": "PASSWORD:",
+    "PasswordEdit": "ENTER WAVELENGTH PASSWORD",
+    "CreateButton": "CREATE WAVELENGTH",
+    "CancelButton": "CANCEL",
+    "PasswordRequired": "PASSWORD REQUIRED"
+  },
+  "CyberAttachmentViewer" : {
+    "Initializing": "INITIALIZING DECYPHERING SEQUENCE...",
+    "EncryptedDataDetected": "ENCRYPTED DATA DETECTED",
+    "Unlocked": "UNLOCKED",
+    "Locked": "LOCKED",
+    "Scanning": "SECURITY SCANNING...",
+    "ScanningCompleted": "SECURITY SCAN COMPLETED. DECRYPTING...",
+    "StartDecrypting": "STARTING DECRYPTION... 0%",
+    "Decrypting": "DECRYPTING... %1%",
+    "DecryptingCompleted": "DECRYPTION COMPLETED - ACCESS GRANTED"
+  },
+  "NetworkStatusWidget" : {
+    "SystemReady": "SYSTEM READY",
+    "SystemOnline": "SYSTEM ONLINE",
+    "ConnectionFair": "CONNECTION FAIR",
+    "ConnectionUnstable": "CONNECTION UNSTABLE",
+    "Offline": "OFFLINE"
+  },
+  "AppearanceSettingsWidget": {
+    "Title": "Appearance Customization",
+    "Info": "Configure application appearance colors (click preview to change).",
+    "BackgroundColor": "Background Color",
+    "BlobColor": "Blob Color",
+    "StreamColor": "Stream Color",
+    "GridColor": "Grid Color",
+    "GridSpacing": "Grid Spacing",
+    "TitleTextColor": "Title Text Color",
+    "TitleGlowColor": "Title Glow Color",
+    "RecentlyUsedColor": "Recently Used Color"
+  },
+  "ClassifiedSettingsWidget": {
+    "SecurityCode": {
+      "Title": "SECURITY CODE VERIFICATION",
+      "Info": "Enter the security code",
+      "2077": "Night City's most notorious year",
+      "1337": "Elite hacker language code",
+      "CODE": "Base representation of what you're entering",
+      "HACK": "What hackers do best",
+      "GHOS": "In the machine (famous cyberpunk concept)",
+      "D3CK": "Cyberdeck connection interface (leet)",
+      "3141": "First digits of π (pi)",
+      "1618": "Golden ratio φ (phi) first digits",
+      "2718": "Euler's number (e) first digits",
+      "1729": "Hardy-Ramanujan number (taxicab)",
+      "6174": "Kaprekar's constant",
+      "2048": "2^11, popular game",
+      "1984": "Orwell's dystopian surveillance society",
+      "2001": "Kubrick's space odyssey with HAL",
+      "1982": "Blade Runner release year",
+      "1999": "The Matrix release year",
+      "1969": "ARPANET created (Internet precursor)",
+      "1989": "World Wide Web invented",
+      "BOOK": "Digital knowledge container",
+      "EV1L": "C0RP - Cyberpunk antagonist trope",
+      "LOCK": "Security metaphor",
+      "RICK": "Never gonna give you up...",
+      "8080": "Classic Intel processor",
+      "6502": "CPU used in Apple II and Commodore 64",
+      "HINT": "HINT: "
+    },
+    "Fingerprint": {
+        "Title": "FINGERPRINT AUTHENTICATION",
+        "Info": "Press and hold on fingerprint to scan"
+    },
+    "Handprint": {
+        "Title": "HANDPRINT AUTHENTICATION",
+        "Info": "Press and hold on handprint to scan"
+    },
+    "SecurityQuestion": {
+        "Title": "SECURITY QUESTION VERIFICATION",
+        "Label": "What is your top secret security question?",
+        "Verified": "✓ AUTHENTICATION VERIFIED",
+        "Timeout": "If this was really you, you would know the answer.\\nYou don't need a question."
+    },
+    "RetinaScan": {
+        "Title": "RETINA SCAN VERIFICATION",
+        "Info": "Please look directly at the scanner\\nDo not move during scan process"
+    },
+    "SnakeGame": {
+      "Title": "SECURITY VERIFICATION: SNAKE GAME",
+      "Info": "Collect 4 apples to open exit\\nControls: Arrrows",
+      "CollectedApples0": "Collected apples: 0/4",
+      "CollectedApples": "Collected apples: %1/4",
+      "SnakeExited": "Snake exited the screen! Level completed."
+    },
+    "TypingTest": {
+      "Title": "TYPING VERIFICATION TEST",
+      "Info": "Type the following text to continue"
+    },
+    "VoiceRecognition": {
+      "Title": "VOICE RECOGNITION VERIFICATION",
+      "Info": "Please speak into the microphone\\nVoice pattern verification in progress...",
+      "TalkingDetected": "Talking detected",
+      "SilenceDetected": "Silence detected",
+      "VoicePatternVerified": "Voice pattern verified"
+    }
+  },
+  "NetworkSettingsWidget": {
+    "Title": "Network Connection",
+    "Info": "Configure network connection parameters.\\nPlease be aware that the changes made here may affect the correct operation of the application.",
+    "ServerAddress": "Server Address",
+    "ServerAddressEdit": "Enter server address",
+    "ServerAddressInfo": "Leave unchanged unless using a custom server.",
+    "ServerPort": "Server Port",
+    "ServerPortInfo": "Mainly for debugging. Default server ignores this if address is unchanged.",
+    "ConnectionTimeout": "Connection Timeout",
+    "KeepAliveInterval": "Keep Alive Interval",
+    "MaxReconnectAttempts": "Max Reconnect Attempts"
+  },
+  "ShortcutSettingsWidget": {
+    "Title": "Keyboard Shortcuts",
+    "Info": "Customize the keyboard shortcuts for various actions.\\nChanges will take effect after restarting the application.",
+    "RestoreDefaultShortcuts": "Restore Default Shortcuts",
+    "CreateWavelength": "Create Wavelength",
+    "JoinWavelength": "Join Wavelength",
+    "OpenSettings": "Open Settings",
+    "AbortConnection": "Abort Connection",
+    "FocusMessageInput": "Focus Message Input",
+    "AttachFile": "Attach File",
+    "SendMessage": "Send Message",
+    "SwitchToWavelengthTab": "Switch to Wavelength Tab",
+    "SwitchToAppearanceTab": "Switch to Appearance Tab",
+    "SwitchToNetworkTab": "Switch to Network Tab",
+    "SwitchToClassifiedTab": "Switch to Classified Tab",
+    "SwitchToShortcutsTab": "Switch to Shortcuts Tab",
+    "SaveSettings": "Save Settings",
+    "RestoreDefaults": "Restore Defaults",
+    "BackCloseSettings": "Back / Close Settings",
+    "RestoreDefaultMessage": "Are you sure you want to restore all keyboard shortcuts to their default values?\\nThis action cannot be undone immediately.",
+    "RestoreDefaultTitle": "Restore Default Shortcuts",
+    "RestoreDefaultSuccessTitle": "Defaults Restored.",
+    "RestoreDefaultSuccessMessage": "Default shortcuts have been restored successfully."
   },
   "WavelengthSettingsWidget": {
     "Title": "Wavelength Preferences",
-    "Info": "Configure frequency preferences.\nDo you have some idea for some other settings? Open issue on GitHub!",
-    "PreferredFrequencyLabel": "Preferred Start Frequency:",
+    "Info": "Configure frequency preferences.\\nDo you have some idea for some other settings? Open issue on GitHub!",
+    "WavelengthFrequency": "Preferred Start Frequency:",
     "LanguageLabel": "Language:",
     "LanguageEnglish": "English",
     "LanguagePolish": "Polski",
-    "InvalidFrequencyValue": "Please enter a valid positive number for the frequency value.",
-    "InvalidFrequencyUnitMax": "The maximum value for %1 is %2.",
-    "InvalidFrequencyMinHz": "The minimum frequency allowed is %1 Hz.",
-    "InvalidFrequencyMaxMHz": "The maximum frequency allowed is %1 MHz."
+    "InvalidInput": "Invalid Input!\\nPlease enter a valid frequency between 130Hz and 180MHz."
   },
-  "JoinWavelengthDialog": {
-    "Title": "Join Wavelength",
-    "FrequencyLabel": "Frequency:",
-    "PasswordLabel": "Password (optional):",
-    "JoinButton": "Join"
+  "SettingsView": {
+    "WavelengthTab": "Wavelength",
+    "AppearanceTab": "Appearance",
+    "NetworkTab": "Network",
+    "ClassifiedTab": "Classified",
+    "ShortcutsTab": "Shortcuts",
+    "BackButton": "BACK",
+    "SaveButton": "SAVE SETTINGS",
+    "RestoreButton": "RESTORE DEFAULTS",
+    "ClassifiedInfo": "CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED",
+    "ClassifiedSubtitle": "Authorization required to access classified settings.\\nMultiple security layers will be enforced.",
+    "ClassifiedUnlocked": "CLASSIFIED FEATURES UNLOCKED",
+    "ClassifiedUnlockedSubtitle": "You have bypassed all security layers.\\nThe true potential is now available.",
+    "SystemOverride": "CAUTION: SYSTEM OVERRIDE",
+    "ElevationFailedTitle": "⚠️ Elevation failed.",
+    "ElevationFailedMessage": "Could not request administrator privileges.\\nThe override sequence cannot start.",
+    "SystemSettings": "SYSTEM SETTINGS",
+    "SessionId": "SESSION_ID",
+    "SettingsSavedTitle": "Settings Saved",
+    "SettingsSavedMessage": "Settings have been successfully saved.",
+    "RestoreDefaultsTitle": "Restore Defaults",
+    "RestoreDefaultsMessage": "Are you sure you want to restore all settings to default values?\\nThis includes appearance colors and network settings.",
+    "RestoreDefaultsSuccessTitle": "Defaults Restored",
+    "RestoreDefaultsSuccessMessage": "Settings have been restored to their default values successfully."
   },
-  "WavelengthDialog": {
-    "TitleCreate": "Create Wavelength",
-    "FrequencyLabel": "Frequency:",
-    "PasswordProtectLabel": "Password Protect:",
-    "PasswordLabel": "Password:",
-    "CreateButton": "Create"
+  "ChatView": {
+    "ConnectionActive": "CONNECTION ACTIVE",
+    "Buffer100": "BUFFER:100%",
+    "AttachFile": "Attach file",
+    "SendButton": "SEND",
+    "AbortConnection": "ABORT CONNECTION",
+    "TalkButton": "TALK",
+    "TalkTooltip": "Press and hold to talk",
+    "ConnectedToWavelength": "Connected to wavelength ",
+    "ConnectionClosed": "CONNECTION CLOSED",
+    "SelectFileToAttach": "Select File to Attach",
+    "SendingFile": "Sending file...",
+    "FailedToStartFileProcessing": "Failed to start file processing.",
+    "PttYou": "You",
+    "PttDenied": "[SYSTEM] Cannot start broadcasting:",
+    "Aborting": "ABORTING...",
+    "PttTransmitting": "BRDCST",
+    "PttReceiving": "RCVNG"
   }
 }
