@@ -77,18 +77,14 @@
   "MessageService" : {
     "SendFileEmpty": "ERORR: Empty file path",
     "SendFilePrepare": "Preparing file...",
-    "SendFileNotAccessible": "ERORR: File not accessible",
-    "SendFileCannotOpen": "ERORR: Cannot open file",
-    "SendFileProcessing": "Processing: ",
-    "SendFileEncoding": "Encoding: ",
-    "SendFileSending": "Sending: ",
-    "SendFileError": "ERORR: ",
-    "SendFileNotConnectedToServer": "ERORR: Not connected to server",
+    "SendFileNotAccessible": "ERROR: File not accessible",
+    "SendFileCannotOpen": "ERROR: Cannot open file",
+    "SendFileProcessing": "Processing ",
+    "SendFileEncoding": "Encoding ",
+    "SendFileSending": "Sending ",
+    "SendFileError": "ERROR: ",
+    "SendFileNotConnectedToServer": "ERROR: Not connected to server",
     "SendFileSuccess": "File sent successfully!"
-  },
-  "WavelengthJoiner" : {
-    "Unavailable": "WAVELENGTH UNAVAILABLE",
-    "ConnectionError": "⚠️ CONNECTION ERROR"
   },
   "CommunicationStream" : {
     "Title": "COMMUNICATION STREAM"
@@ -130,7 +126,7 @@
     "Scanning": "SECURITY SCANNING...",
     "ScanningCompleted": "SECURITY SCAN COMPLETED. DECRYPTING...",
     "StartDecrypting": "STARTING DECRYPTION... 0%",
-    "Decrypting": "DECRYPTING... %1%",
+    "Decrypting": "DECRYPTING...",
     "DecryptingCompleted": "DECRYPTION COMPLETED - ACCESS GRANTED"
   },
   "NetworkStatusWidget" : {
@@ -148,7 +144,7 @@
     "StreamColor": "Stream Color",
     "GridColor": "Grid Color",
     "GridSpacing": "Grid Spacing",
-    "TitleTextColor": "Title Text Color",
+    "TitleBorderColor": "Title Text Color",
     "TitleGlowColor": "Title Glow Color",
     "RecentlyUsedColor": "Recently Used Color"
   },

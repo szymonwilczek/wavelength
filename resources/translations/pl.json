@@ -75,20 +75,16 @@
     "EmptyMessage": "[Pusta Wiadomość]"
   },
   "MessageService" : {
-    "SendFileEmpty": "ERORR: Pusta Ścieżka Pliku",
+    "SendFileEmpty": "ERROR: Pusta Ścieżka Pliku",
     "SendFilePrepare": "Przygotowywanie pliku...",
-    "SendFileNotAccessible": "ERORR: Plik jest niedostępny",
-    "SendFileCannotOpen": "ERORR: Nie można otworzyć pliku",
-    "SendFileProcessing": "Przetwarzanie: ",
-    "SendFileEncoding": "Kodowanie: ",
-    "SendFileSending": "Wysyłanie: ",
-    "SendFileError": "ERORR: ",
-    "SendFileNotConnectedToServer": "ERORR: Nie połączono z serwerem",
+    "SendFileNotAccessible": "ERROR: Plik jest niedostępny",
+    "SendFileCannotOpen": "ERROR: Nie można otworzyć pliku",
+    "SendFileProcessing": "Przetwarzanie ",
+    "SendFileEncoding": "Kodowanie ",
+    "SendFileSending": "Wysyłanie ",
+    "SendFileError": "ERROR: ",
+    "SendFileNotConnectedToServer": "ERROR: Nie połączono z serwerem",
     "SendFileSuccess": "Plik pomyślnie wysłany!"
-  },
-  "WavelengthJoiner" : {
-    "Unavailable": "WAVELENGTH NIEDOSTĘPNE",
-    "ConnectionError": "⚠️ ERROR POŁĄCZENIA"
   },
   "CommunicationStream" : {
     "Title": "STRUMIEŃ KOMUNIKACJI"
@@ -130,7 +126,7 @@
     "Scanning": "SKANOWANIE ZABEZPIECZEŃ...",
     "ScanningCompleted": "SKANOWANIE ZABEZPIECZEŃ ZAKOŃCZONE. DESZYFROWANIE...",
     "StartDecrypting": "DESZYFROWANIE ROZPOCZĘTE... 0%",
-    "Decrypting": "DESZYFROWANIE... %1%",
+    "Decrypting": "DESZYFROWANIE...",
     "DecryptingCompleted": "DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY"
   },
   "NetworkStatusWidget" : {
@@ -148,7 +144,7 @@
     "StreamColor": "Kolor Strumienia",
     "GridColor": "Kolor Siatki",
     "GridSpacing": "Odstępy Siatki",
-    "TitleTextColor": "Kolor Tekstu Tytułowego",
+    "TitleBorderColor": "Kolor Tekstu Tytułowego",
     "TitleGlowColor": "Kolor Poświaty Tytułowej",
     "RecentlyUsedColor": "Niedawno Używane Kolory"
   },
