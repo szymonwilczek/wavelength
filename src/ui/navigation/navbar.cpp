@@ -11,12 +11,14 @@
 
 #include "network_status_widget.h"
 #include "../../app/managers/font_manager.h"
+#include "../../app/managers/translation_manager.h"
 
 Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     setMovable(false);
     setFloatable(false);
     setAllowedAreas(Qt::TopToolBarArea);
     setContextMenuPolicy(Qt::PreventContextMenu);
+    const TranslationManager* translator = TranslationManager::GetInstance();
 
     // Stylizacja (bez zmian)
     setStyleSheet(
@@ -82,9 +84,9 @@ Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     buttons_layout->setSpacing(40);
 
     // Przyciski akcji (bez zmian)
-    create_button_ = new CyberpunkButton("Generate Wavelength", buttons_container_);
-    join_button_ = new CyberpunkButton("Merge Wavelength", buttons_container_);
-    settings_button_ = new CyberpunkButton("Settings", buttons_container_);
+    create_button_ = new CyberpunkButton(translator->Translate("Navbar.GenerateWavelength", "Generate Wavelength"), buttons_container_);
+    join_button_ = new CyberpunkButton(translator->Translate("Navbar.MergeWavelength", "Merge Wavelength"), buttons_container_);
+    settings_button_ = new CyberpunkButton(translator->Translate("Navbar.Settings", "Settings"), buttons_container_);
 
     buttons_layout->addWidget(create_button_);
     buttons_layout->addWidget(join_button_);
