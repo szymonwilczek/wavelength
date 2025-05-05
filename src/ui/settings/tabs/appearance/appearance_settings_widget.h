@@ -5,6 +5,7 @@
 #include <QColor>
 #include <QStringList>
 
+class TranslationManager;
 class WavelengthConfig;
 class QLabel;
 class QPushButton;
@@ -174,6 +175,8 @@ private:
     /** @brief Currently selected title glow color. */
     QColor selected_title_glow_color_;
     // --- End Selected Values ---
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // APPEARANCE_SETTINGS_WIDGET_H

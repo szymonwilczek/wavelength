@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QSpinBox>
 
+#include "../../../../app/managers/translation_manager.h"
 #include "components/clickable_color_preview.h"
 
 AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
@@ -20,6 +21,7 @@ AppearanceSettingsWidget::AppearanceSettingsWidget(QWidget *parent)
       title_text_color_preview_(nullptr), title_border_color_preview_(nullptr), title_glow_color_preview_(nullptr), // NOWE
       recent_colors_layout_(nullptr)
 {
+    translator_ = TranslationManager::GetInstance();
     SetupUi();
     LoadSettings();
     connect(m_config, &WavelengthConfig::recentColorsChanged, this, &AppearanceSettingsWidget::UpdateRecentColorsUI);
@@ -30,11 +32,11 @@ void AppearanceSettingsWidget::SetupUi() {
     main_layout->setContentsMargins(20, 20, 20, 20);
     main_layout->setSpacing(20);
 
-    const auto title_label = new QLabel("Appearance Customization", this);
+    const auto title_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.Title", "Appearance Customization"), this);
     title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
     main_layout->addWidget(title_label);
 
-    const auto info_label = new QLabel("Configure application appearance colors (click preview to change).", this);
+    const auto info_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.Info", "Configure application appearance colors (click preview to change)."), this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
     info_label->setWordWrap(true);
     main_layout->addWidget(info_label);
@@ -54,29 +56,29 @@ void AppearanceSettingsWidget::SetupUi() {
 
     // --- Istniejące kolory ---
     // Background Color
-    const auto background_label = new QLabel("Background Color:", this); background_label->setStyleSheet(label_style);
+    const auto background_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.BackgroundColor", "Background Color"), this); background_label->setStyleSheet(label_style);
     bg_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(bg_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseBackgroundColor);
     grid_layout->addWidget(background_label, row, 0, Qt::AlignRight); grid_layout->addWidget(bg_color_preview_, row, 1); row++;
     // Blob Color
-    const auto blob_label = new QLabel("Blob Color:", this); blob_label->setStyleSheet(label_style);
+    const auto blob_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.BlobColor", "Blob Color"), this); blob_label->setStyleSheet(label_style);
     blob_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(blob_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseBlobColor);
     grid_layout->addWidget(blob_label, row, 0, Qt::AlignRight); grid_layout->addWidget(blob_color_preview_, row, 1); row++;
     // Stream Color
-    const auto stream_label = new QLabel("Stream Color:", this); stream_label->setStyleSheet(label_style);
+    const auto stream_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.StreamColor", "Stream Color"), this); stream_label->setStyleSheet(label_style);
     stream_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(stream_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseStreamColor);
     grid_layout->addWidget(stream_label, row, 0, Qt::AlignRight); grid_layout->addWidget(stream_color_preview_, row, 1); row++;
 
     // --- NOWE: Ustawienia siatki ---
     // Grid Color
-    const auto grid_color_label = new QLabel("Grid Color:", this); grid_color_label->setStyleSheet(label_style);
+    const auto grid_color_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.GridColor", "Grid Color"), this); grid_color_label->setStyleSheet(label_style);
     grid_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(grid_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseGridColor);
     grid_layout->addWidget(grid_color_label, row, 0, Qt::AlignRight); grid_layout->addWidget(grid_color_preview_, row, 1); row++;
     // Grid Spacing
-    const auto grid_spacing_label = new QLabel("Grid Spacing:", this); grid_spacing_label->setStyleSheet(label_style);
+    const auto grid_spacing_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.GridSpacing", "Grid Spacing"), this); grid_spacing_label->setStyleSheet(label_style);
     grid_spacing_spin_box_ = new QSpinBox(this);
     grid_spacing_spin_box_->setRange(5, 200); // Ustaw sensowny zakres
     grid_spacing_spin_box_->setSuffix(" px");
@@ -87,17 +89,17 @@ void AppearanceSettingsWidget::SetupUi() {
 
     // --- NOWE: Ustawienia tytułu ---
     // Title Text Color
-    const auto title_text_label = new QLabel("Title Text Color:", this); title_text_label->setStyleSheet(label_style);
+    const auto title_text_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.TitleTextColor", "Title Text Color"), this); title_text_label->setStyleSheet(label_style);
     title_text_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(title_text_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseTitleTextColor);
     grid_layout->addWidget(title_text_label, row, 0, Qt::AlignRight); grid_layout->addWidget(title_text_color_preview_, row, 1); row++;
     // Title Border Color
-    const auto title_border_label = new QLabel("Title Border Color:", this); title_border_label->setStyleSheet(label_style);
+    const auto title_border_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.TitleBorderColor", "Title Border Color"), this); title_border_label->setStyleSheet(label_style);
     title_border_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(title_border_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseTitleBorderColor);
     grid_layout->addWidget(title_border_label, row, 0, Qt::AlignRight); grid_layout->addWidget(title_border_color_preview_, row, 1); row++;
     // Title Glow Color
-    const auto title_glow_label = new QLabel("Title Glow Color:", this); title_glow_label->setStyleSheet(label_style);
+    const auto title_glow_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.TitleGlowColor", "Title Glow Color"), this); title_glow_label->setStyleSheet(label_style);
     title_glow_color_preview_ = new ClickableColorPreview(this);
     connect(qobject_cast<ClickableColorPreview*>(title_glow_color_preview_), &ClickableColorPreview::clicked, this, &AppearanceSettingsWidget::ChooseTitleGlowColor);
     grid_layout->addWidget(title_glow_label, row, 0, Qt::AlignRight); grid_layout->addWidget(title_glow_color_preview_, row, 1);
@@ -106,7 +108,7 @@ void AppearanceSettingsWidget::SetupUi() {
     main_layout->addLayout(grid_layout);
 
     // Sekcja ostatnich kolorów (bez zmian)
-    const auto recent_label = new QLabel("Recently Used Colors:", this);
+    const auto recent_label = new QLabel(translator_->Translate("AppearanceSettingsWidget.RecentlyUsedColors", "Recently Used Colors"), this);
     recent_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt; margin-top: 15px;");
     main_layout->addWidget(recent_label);
     const auto recent_colors_container = new QWidget(this);
