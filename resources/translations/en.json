@@ -56,7 +56,6 @@
     "DecoderError": "⚠️ IMAGE DECODER ERROR..."
   },
   "VideoPlayer" : {
-    "Title": "VISUAL STREAM DECODER v2.5",
     "Initializing": "INITIALIZING...",
     "BufferLoading": "BUFFER LOADING...",
     "CodecAnalyzing": "CODEC ANALYZING...",
@@ -69,8 +68,7 @@
     "Seeking": "SEEKING...",
     "Frame": "FRAME",
     "FrameBuffer": "FRAME BUFFER",
-    "SignalStrength": "SIGNAL STRENGTH",
-    "DecoderError": "⚠️ VIDEO DECODER ERROR..."
+    "SignalStrength": "SIGNAL STRENGTH"
   },
   "MessageFormatter" : {
     "EmptyMessage": "[Empty Message]"

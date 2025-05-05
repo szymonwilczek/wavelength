@@ -5,8 +5,11 @@
 #include <QPropertyAnimation>
 #include <QVBoxLayout>
 
+#include "../../../../app/managers/translation_manager.h"
+
 VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QString &mime_type, QWidget *parent): QDialog(parent), video_data_(video_data), mime_type_(mime_type),
-                                                                                                               scanline_opacity_(0.15), grid_opacity_(0.1) {
+                                                                                                                 scanline_opacity_(0.15), grid_opacity_(0.1) {
+    translator_ = TranslationManager::GetInstance();
     setWindowTitle("SYS> WVLNGTH-V-STREAM-PLAYER");
     setMinimumSize(900, 630);
     setModal(false);
@@ -53,7 +56,7 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QStri
     );
 
     // Prawy panel ze statusem
-    status_label_ = new QLabel("INITIALIZING...", this);
+    status_label_ = new QLabel(translator_->Translate("VideoPlayer.Initializing", "INITIALIZING..."), this);
     status_label_->setStyleSheet(
         "color: #ffcc00;"
         "background-color: #221800;"
@@ -82,7 +85,7 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QStri
     video_label_ = new QLabel(this);
     video_label_->setAlignment(Qt::AlignCenter);
     video_label_->setMinimumSize(828, 466);
-    video_label_->setText("BUFFER LOADING...");
+    video_label_->setText(translator_->Translate("VideoPlayer.BufferLoading", "BUFFER LOADING..."));
     video_label_->setStyleSheet(
         "color: #00ffff;"
         "background-color: #000000;"
@@ -142,7 +145,7 @@ VideoPlayerOverlay::VideoPlayerOverlay(const QByteArray &video_data, const QStri
     info_layout->setContentsMargins(2, 2, 2, 2);
 
     // Neonowe etykiety z danymi technicznymi
-    codec_label_ = new QLabel("CODEC: ANALYZING", this);
+    codec_label_ = new QLabel(translator_->Translate("VideoPlayer.CodecAnalyzing", "CODEC ANALYZING..."), this);
     resolution_label_ = new QLabel("RES: --x--", this);
     bitrate_label_ = new QLabel("BITRATE: --", this);
     fps_label_ = new QLabel("FPS: --", this);
@@ -274,7 +277,7 @@ void VideoPlayerOverlay::closeEvent(QCloseEvent *event) {
 
 void VideoPlayerOverlay::InitializePlayer() {
     if (!decoder_) {
-        status_label_->setText("INICJALIZACJA DEKODERA...");
+        status_label_->setText(translator_->Translate("VideoPlayer.DecoderInitializing", "DECODER INITIALIZING..."));
 
         decoder_ = std::make_shared<VideoDecoder>(video_data_, nullptr);
 
@@ -285,13 +288,13 @@ void VideoPlayerOverlay::InitializePlayer() {
         connect(decoder_.get(), &VideoDecoder::playbackFinished, this, [this]() {
             playback_finished_ = true;
             play_button_->setText("↻");
-            status_label_->setText("ODTWARZANIE ZAKOŃCZONE");
+            status_label_->setText(translator_->Translate("VideoPlayer.PlaybackFinished", "PLAYBACK FINISHED"));
         }, Qt::QueuedConnection);
         connect(decoder_.get(), &VideoDecoder::positionChanged, this, &VideoPlayerOverlay::UpdateSliderPosition, Qt::QueuedConnection);
 
         decoder_->start(QThread::HighPriority);
         play_button_->setText("▶");
-        status_label_->setText("READY");
+        status_label_->setText(translator_->Translate("VideoPlayer.Ready", "READY"));
     }
 }
 
@@ -305,7 +308,7 @@ void VideoPlayerOverlay::TogglePlayback() {
         decoder_->Reset(); // Reset przewija do 0 i pauzuje
         playback_finished_ = false;
         play_button_->setText("▶"); // Gotowy do startu
-        status_label_->setText("GOTOWY / PAUZA");
+        status_label_->setText(translator_->Translate("VideoPlayer.Finished", "FINISHED (READY)"));
         // Nie wznawiamy automatycznie po resecie.
         return; // Czekaj na kliknięcie, aby odtworzyć ponownie.
     }
@@ -314,10 +317,10 @@ void VideoPlayerOverlay::TogglePlayback() {
 
     if (decoder_->IsPaused()) {
         play_button_->setText("▶");
-        status_label_->setText("PAUZA");
+        status_label_->setText(translator_->Translate("VideoPlayer.Paused", "PAUSED"));
     } else { // Jeśli teraz odtwarza
         play_button_->setText("❚❚");
-        status_label_->setText("ODTWARZANIE");
+        status_label_->setText(translator_->Translate("VideoPlayer.Playing", "PLAYING..."));
     }
 
 
@@ -346,7 +349,7 @@ void VideoPlayerOverlay::OnSliderPressed() {
         decoder_->Pause();
     }
     slider_dragging_ = true;
-    status_label_->setText("WYSZUKIWANIE...");
+    status_label_->setText(translator_->Translate("VideoPlayer.Seeking", "SEEKING..."));
 }
 
 void VideoPlayerOverlay::OnSliderReleased() {
@@ -355,9 +358,9 @@ void VideoPlayerOverlay::OnSliderReleased() {
     if (was_playing_) {
         decoder_->Pause();
         play_button_->setText("❚❚");
-        status_label_->setText("ODTWARZANIE");
+        status_label_->setText(translator_->Translate("VideoPlayer.Playing", "PLAYING..."));
     } else {
-        status_label_->setText("PAUZA");
+        status_label_->setText(translator_->Translate("VideoPlayer.Paused", "PAUSED"));
     }
 }
 
@@ -482,7 +485,7 @@ void VideoPlayerOverlay::UpdateFrame(const QImage &frame) {
         // Wskaźnik klatki w lewym dolnym rogu
         const int frame_number = frame_counter_ % 10000;
         painter.drawText(10, container_image.height() - 10,
-                         QString("FRAME: %1").arg(frame_number, 4, 10, QChar('0')));
+                         QString("%1: %2").arg(translator_->Translate("VideoPlayer.Frame", "FRAME")).arg(frame_number, 4, 10, QChar('0')));
 
         // Wskaźnik rozmiaru w prawym dolnym rogu
         painter.drawText(container_image.width() - 120, container_image.height() - 10,
@@ -542,9 +545,9 @@ void VideoPlayerOverlay::UpdateUI() {
         const int random_update = QRandomGenerator::global()->bounded(100);
 
         if (random_update < 2 && !decoder_->IsPaused()) {
-            status_label_->setText(QString("FRAME BUFFER: %1%").arg(QRandomGenerator::global()->bounded(90, 100)));
+            status_label_->setText(QString("%1: %2%").arg(translator_->Translate("VideoPlayer.FrameBuffer", "FRAME BUFFER")).arg(QRandomGenerator::global()->bounded(90, 100)));
         } else if (random_update < 4 && !decoder_->IsPaused()) {
-            status_label_->setText(QString("SIGNAL STRENGTH: %1%").arg(QRandomGenerator::global()->bounded(85, 99)));
+            status_label_->setText(QString("%1: %2%").arg(translator_->Translate("VideoPlayer.SignalStrength", "SIGNAL STRENGTH")).arg(QRandomGenerator::global()->bounded(85, 99)));
         }
     }
 
@@ -587,7 +590,7 @@ void VideoPlayerOverlay::HandleVideoInfo(const int width, const int height, cons
     }
 
     // Aktualizujemy status
-    status_label_->setText("READY");
+    status_label_->setText(translator_->Translate("VideoPlayer.Ready", "READY"));
 
     // Włączamy HUD po potwierdzeniu informacji o wideo
     show_hud_ = true;

@@ -17,6 +17,7 @@
 #include "../../../../ui/sliders/cyber_slider.h"
 #include "../decoder/video_decoder.h"
 
+class TranslationManager;
 /**
  * @brief A QDialog overlay for playing videos with a cyberpunk aesthetic.
  *
@@ -282,6 +283,8 @@ private:
     double current_glitch_intensity_ = 0.0;
     /** @brief Video frame rate in frames per second. Set by HandleVideoInfo. */
     double video_fps_ = 60.0; // Default FPS
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif //VIDEO_PLAYER_OVERLAY_H

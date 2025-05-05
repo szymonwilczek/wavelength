@@ -56,7 +56,6 @@
     "DecoderError": "⚠️ BŁĄD DEKODERA ZDJĘĆ..."
   },
   "VideoPlayer" : {
-    "Title": "VISUAL STREAM DECODER v2.5",
     "Initializing": "INICJALIZACJA...",
     "BufferLoading": "ŁADOWANIE BUFORA...",
     "CodecAnalyzing": "ANALIZOWANIE CODECA...",
@@ -69,8 +68,7 @@
     "Seeking": "PRZEWIJANIE...",
     "Frame": "KLATKA",
     "FrameBuffer": "BUFOR KLATEK",
-    "SignalStrength": "SIŁA SYGNAŁU",
-    "DecoderError": "⚠️ BŁĄD DEKODERA WIDEO..."
+    "SignalStrength": "SIŁA SYGNAŁU"
   },
   "MessageFormatter" : {
     "EmptyMessage": "[Pusta Wiadomość]"
