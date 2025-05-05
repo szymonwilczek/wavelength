@@ -39,7 +39,6 @@
     "Expand": "ROZSZERZ"
   },
   "AudioPlayer" : {
-    "Title": "NEURAL AUDIO DECODER",
     "Initialization": "INICJALIZACJA...",
     "PlaybackFinished": "ZAKOŃCZONO ODTWARZANIE",
     "Seeking": "PRZEWIJANIE...",

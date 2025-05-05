@@ -39,7 +39,6 @@
     "Expand": "EXPAND"
   },
   "AudioPlayer" : {
-    "Title": "NEURAL AUDIO DECODER",
     "Initialization": "INITIALIZING...",
     "PlaybackFinished": "PLAYBACK FINISHED",
     "Seeking": "SEEKING...",

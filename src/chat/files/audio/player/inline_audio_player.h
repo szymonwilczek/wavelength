@@ -13,6 +13,7 @@
 #include "../../../../ui/sliders/cyber_audio_slider.h"
 #include "../../audio/decoder/audio_decoder.h"
 
+class TranslationManager;
 /**
  * @brief An inline audio player widget with a cyberpunk aesthetic.
  *
@@ -301,6 +302,9 @@ private:
 
     /** @brief Static pointer to the currently active InlineAudioPlayer instance. Ensures only one player uses audio output. */
     static inline InlineAudioPlayer* active_player_ = nullptr;
+
+    /** @brief Pointer to the translation manager for handling UI text translations. */
+    TranslationManager* translator_;
 };
 
 #endif //INLINE_AUDIO_PLAYER_H
