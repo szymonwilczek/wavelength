@@ -2,6 +2,8 @@
 
 #include <QJsonObject>
 
+#include "../../../app/managers/translation_manager.h"
+
 QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const QString &frequency) {
     QString content;
     if (message_object.contains("content")) {
@@ -37,6 +39,8 @@ QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const
         timestamp = QDateTime::currentDateTime().toString("[HH:mm:ss]");
     }
 
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
     // Formatowanie wiadomości
     QString formatted_message;
     const bool is_self = message_object.contains("isSelf") && message_object["isSelf"].toBool();
@@ -44,7 +48,7 @@ QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const
 
     QString message_start;
     if (is_self) {
-        message_start = QString("%1 <span style=\"color:#60ff8a;\">[You]:</span> ").arg(timestamp);
+        message_start = QString("%1 <span style=\"color:#60ff8a;\">[%2]:</span> ").arg(timestamp, translator->Translate("MessageFormatter.You", "You"));
     } else {
         message_start = QString("%1 <span style=\"color:#85c4ff;\">[%2]:</span> ").arg(timestamp, sender_name);
     }
@@ -132,7 +136,7 @@ QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const
     } else {
         // Zwykła wiadomość tekstowa
         if (content.isEmpty()) {
-            content = "[Empty message]";
+            content = translator->Translate("MessageFormatter.EmptyMessage", "[Empty Message]");
         }
         content.replace("\n", "<br>");
         formatted_message = message_start + "<span style=\"color:#ffffff;\">" + content + "</span>";

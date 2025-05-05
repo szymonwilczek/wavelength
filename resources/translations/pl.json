@@ -71,6 +71,7 @@
     "SignalStrength": "SIŁA SYGNAŁU"
   },
   "MessageFormatter" : {
+    "You": "Ty",
     "EmptyMessage": "[Pusta Wiadomość]"
   },
   "MessageService" : {
