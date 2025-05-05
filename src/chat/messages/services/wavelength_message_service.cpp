@@ -1,5 +1,6 @@
 #include "wavelength_message_service.h"
 
+#include "../../../app/managers/translation_manager.h"
 #include "../../../auth/authentication_manager.h"
 #include "../../files/attachments/attachment_queue_manager.h"
 
@@ -106,28 +107,30 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
         return false;
     }
 
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
     // Początkowa informacja o przygotowywaniu pliku
     emit progressMessageUpdated(progress_message_id,
-                                "<span style=\"color:#888888;\">Preparing file...</span>");
+                                QString("<span style=\"color:#888888;\">%1</span>").arg(translator->Translate("MessageService.SendFilePrepare", "Preparing file...")));
 
     // Tworzenie kopii ścieżki pliku i ID wiadomości, aby uniknąć problemów z wątkami
     QString file_path_copy = file_path;
     QString progress_msg_id_copy = progress_message_id;
 
     // Przeniesienie całego przetwarzania do osobnego wątku przy użyciu AttachmentQueueManager
-    AttachmentQueueManager::GetInstance()->AddTask([this, file_path_copy, progress_msg_id_copy]() {
+    AttachmentQueueManager::GetInstance()->AddTask([this, file_path_copy, progress_msg_id_copy, translator]() {
         try {
             const QFileInfo file_info(file_path_copy);
             if (!file_info.exists() || !file_info.isReadable()) {
                 emit progressMessageUpdated(progress_msg_id_copy,
-                                            "<span style=\"color:#ff5555;\">Error: File not accessible</span>");
+                                            QString("<span style=\"color:#ff5555;\">%1</span>").arg(translator->Translate("MessageService.SendFileNotAccessible", "ERROR: File not accessible")));
                 return;
             }
 
             QFile file(file_path_copy);
             if (!file.open(QIODevice::ReadOnly)) {
                 emit progressMessageUpdated(progress_msg_id_copy,
-                                            "<span style=\"color:#ff5555;\">Error: Cannot open file</span>");
+                                            QString("<span style=\"color:#ff5555;\">%1</span>").arg(translator->Translate("MessageService.SendFileCannotOpen", "ERROR: Cannot open file")));
                 return;
             }
 
@@ -153,7 +156,8 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
 
             // Informujemy o rozpoczęciu przetwarzania
             emit progressMessageUpdated(progress_msg_id_copy,
-                                        QString("<span style=\"color:#888888;\">Processing %1: %2...</span>")
+                                        QString("<span style=\"color:#888888;\">%1 %2: %3...</span>")
+                                        .arg(translator->Translate("MessageService.SendFileProcessing", "Processing "))
                                         .arg(file_type)
                                         .arg(file_info.fileName()));
 
@@ -175,7 +179,8 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
                     if (progress - last_progress_reported >= 5) {
                         last_progress_reported = progress;
                         emit progressMessageUpdated(progress_msg_id_copy,
-                                                    QString("<span style=\"color:#888888;\">Processing %1: %2... %3%</span>")
+                                                    QString("<span style=\"color:#888888;\">%1 %2: %3... %4%</span>")
+                                                    .arg(translator->Translate("MessageService.SendFileProcessing", "Processing "))
                                                     .arg(file_type)
                                                     .arg(file_info.fileName())
                                                     .arg(progress));
@@ -190,7 +195,8 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
 
             // Informujemy o rozpoczęciu kodowania
             emit progressMessageUpdated(progress_msg_id_copy,
-                                        QString("<span style=\"color:#888888;\">Encoding %1: %2...</span>")
+                                        QString("<span style=\"color:#888888;\">%1 %2: %3...</span>")
+                                        .arg(translator->Translate("MessageService.SendFileEncoding", "Encoding "))
                                         .arg(file_type)
                                         .arg(file_info.fileName()));
 
@@ -218,7 +224,8 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
 
             // Informujemy o rozpoczęciu wysyłania
             emit progressMessageUpdated(progress_msg_id_copy,
-                                        QString("<span style=\"color:#888888;\">Sending %1: %2...</span>")
+                                        QString("<span style=\"color:#888888;\">%1 %2: %3...</span>")
+                                        .arg(translator->Translate("MessageService.SendFileSending", "Sending "))
                                         .arg(file_type)
                                         .arg(file_info.fileName()));
 
@@ -230,7 +237,9 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
         }
         catch (const std::exception& e) {
             emit progressMessageUpdated(progress_msg_id_copy,
-                                        QString("<span style=\"color:#ff5555;\">Error: %1</span>").arg(e.what()));
+                                        QString("<span style=\"color:#ff5555;\">%1 %2</span>")
+                                        .arg(translator->Translate("MessageService.SendFileError", "ERROR: "))
+                                        .arg(e.what()));
         }
     });
 
@@ -240,6 +249,7 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
 bool WavelengthMessageService::SendFileToServer(const QString &json_message, const QString &frequency,
     const QString &progress_message_id) {
     const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    const TranslationManager* translator = TranslationManager::GetInstance();
     QWebSocket* socket = nullptr;
 
     if (registry->HasWavelength(frequency)) {
@@ -248,7 +258,10 @@ bool WavelengthMessageService::SendFileToServer(const QString &json_message, con
     }
 
     if (!socket || !socket->isValid()) {
-        UpdateProgressMessage(progress_message_id, "<span style=\"color:#ff5555;\">Error: Not connected to server</span>");
+        UpdateProgressMessage(progress_message_id,
+            QString("<span style=\"color:#ff5555;\">%1</span>")
+            .arg(translator->Translate("MessageService.SendFileNotConnectedToServer", "ERROR: Not connected to server"))
+            );
         return false;
     }
 
@@ -256,7 +269,10 @@ bool WavelengthMessageService::SendFileToServer(const QString &json_message, con
     socket->sendTextMessage(json_message);
 
     // Potwierdzenie wysłania
-    UpdateProgressMessage(progress_message_id, "<span style=\"color:#66cc66;\">File sent successfully!</span>");
+    UpdateProgressMessage(progress_message_id,
+        QString("<span style=\"color:#66cc66;\">%1</span>")
+        .arg(translator->Translate("MessageService.SendFileSuccess", "File sent successfully!"))
+        );
 
     // Po 5 sekundach usuwamy komunikat postępu
     QTimer::singleShot(5000, this, [this, progress_message_id]() {
@@ -269,6 +285,7 @@ bool WavelengthMessageService::SendFileToServer(const QString &json_message, con
 void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
     const QString &progress_message_id) {
     const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    const TranslationManager* translator = TranslationManager::GetInstance();
     QWebSocket* socket = nullptr;
 
     if (registry->HasWavelength(frequency)) {
@@ -278,7 +295,9 @@ void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_messa
 
     if (!socket || !socket->isValid()) {
         emit progressMessageUpdated(progress_message_id,
-                                    "<span style=\"color:#ff5555;\">Error: Not connected to server</span>");
+                                    QString("<span style=\"color:#ff5555;\">%1</span>")
+                                    .arg(translator->Translate("MessageService.SendFileNotConnectedToServer", "ERROR: Not connected to server"))
+                                    );
         return;
     }
 
@@ -287,7 +306,9 @@ void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_messa
 
     // Potwierdzamy wysłanie - TO JEST OSTATNIA AKTUALIZACJA WIADOMOŚCI
     emit progressMessageUpdated(progress_message_id,
-                                "<span style=\"color:#66cc66;\">File sent successfully!</span>");
+                                QString("<span style=\"color:#66cc66;\">%1</span>")
+                                .arg(translator->Translate("MessageService.SendFileSuccess", "File sent successfully!"))
+                                );
 
 }
 
