@@ -3,6 +3,7 @@
 #include <QParallelAnimationGroup>
 
 #include "../../app/wavelength_config.h"
+#include "../../app/managers/translation_manager.h"
 
 CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent),
                                                            base_wave_amplitude_(0.05),
@@ -32,8 +33,9 @@ CommunicationStream::CommunicationStream(QWidget *parent): QOpenGLWidget(parent)
 
     connect(config_, &WavelengthConfig::configChanged, this, &CommunicationStream::UpdateStreamColor);
 
+    TranslationManager* translator = TranslationManager::GetInstance();
     // Etykieta nazwy strumienia
-    stream_name_label_ = new QLabel("COMMUNICATION STREAM", this);
+    stream_name_label_ = new QLabel(translator->Translate("CommunicationStream.Title", "COMMUNICATION STREAM"), this);
     stream_name_label_->setStyleSheet(
         "QLabel {"
         "  color: #00ccff;"
