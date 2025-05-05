@@ -7,17 +7,22 @@
 #include <QKeyEvent>
 #include <QRegularExpressionValidator>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     : SecurityLayer(parent), is_current_code_numeric_(true)
 {
+    translator_ = TranslationManager::GetInstance();
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const auto title = new QLabel("SECURITY CODE VERIFICATION", this);
+    const auto title = new QLabel(
+        translator_->Translate("ClassifiedSettingsWidget.SecurityCode.Title", "SECURITY CODE VERIFICATION"),
+        this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    const auto instructions = new QLabel("Enter the security code", this);
+    const auto instructions = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SecurityCode.Info", "Enter the security code"), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -81,38 +86,38 @@ SecurityCodeLayer::SecurityCodeLayer(QWidget *parent)
     // Inicjalizacja bazy kodów bezpieczeństwa
     security_codes_ = {
         // Cyberpunk & technologiczne kody
-        SecurityCode("2077", "Night City's most notorious year"),
-        SecurityCode("1337", "Elite hacker language code"),
-        SecurityCode("CODE", "Base representation of what you're entering", false),
-        SecurityCode("HACK", "What hackers do best", false),
-        SecurityCode("GHOS", "In the machine (famous cyberpunk concept)", false),
-        SecurityCode("D3CK", "Cyberdeck connection interface (leet)", false),
+        SecurityCode("2077", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.2077", "2077")),
+        SecurityCode("1337", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1337", "1337")),
+        SecurityCode("CODE", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.CODE", "CODE"), false),
+        SecurityCode("HACK", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.HACK", "HACK"), false),
+        SecurityCode("GHOS", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.GHOS", "GHOS"), false),
+        SecurityCode("D3CK", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.D3CK", "D3CK"), false),
 
         // Matematyczne i naukowe kody
-        SecurityCode("3141", "First digits of π (pi)"),
-        SecurityCode("1618", "Golden ratio φ (phi) first digits"),
-        SecurityCode("2718", "Euler's number (e) first digits"),
-        SecurityCode("1729", "Hardy-Ramanujan number (taxicab)"),
-        SecurityCode("6174", "Kaprekar's constant"),
-        SecurityCode("2048", "2^11, popular game"),
+        SecurityCode("3141", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.3141", "3141")),
+        SecurityCode("1618", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1618", "1618")),
+        SecurityCode("2718", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.2718", "2718")),
+        SecurityCode("1729", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1729", "1729")),
+        SecurityCode("6174", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.6174", "6174")),
+        SecurityCode("2048", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.2048", "2048")),
 
         // Daty związane z technologią, cyberpunkiem i sci-fi
-        SecurityCode("1984", "Orwell's dystopian surveillance society"),
-        SecurityCode("2001", "Kubrick's space odyssey with HAL"),
-        SecurityCode("1982", "Blade Runner release year"),
-        SecurityCode("1999", "The Matrix release year"),
-        SecurityCode("1969", "ARPANET created (Internet precursor)"),
-        SecurityCode("1989", "World Wide Web invented"),
+        SecurityCode("1984", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1984", "1984")),
+        SecurityCode("2001", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.2001", "2001")),
+        SecurityCode("1982", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1982", "1982")),
+        SecurityCode("1999", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1999", "1999")),
+        SecurityCode("1969", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1969", "1969")),
+        SecurityCode("1989", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.1989", "1989")),
 
         // Kulturowe i kryptograficzne
-        SecurityCode("BOOK", "Digital knowledge container", false),
-        SecurityCode("EV1L", "C0RP - Cyberpunk antagonist trope", false),
-        SecurityCode("LOCK", "Security metaphor", false),
+        SecurityCode("BOOK", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.BOOK", "BOOK"), false),
+        SecurityCode("EV1L", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.EV1L", "EV1L"), false),
+        SecurityCode("LOCK", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.LOCK", "LOCK"), false),
 
         // Easter eggi
-        SecurityCode("RICK", "Never gonna give you up...", false),
-        SecurityCode("8080", "Classic Intel processor"),
-        SecurityCode("6502", "CPU used in Apple II and Commodore 64"),
+        SecurityCode("RICK", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.RICK", "RICK"), false),
+        SecurityCode("8080", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.8080", "8080")),
+        SecurityCode("6502", translator_->Translate("ClassifiedSettingsWidget.SecurityCode.6502", "6502")),
     };
 }
 
@@ -127,7 +132,7 @@ void SecurityCodeLayer::Initialize() {
     current_security_code_ = GetRandomSecurityCode(hint, is_numeric);
     is_current_code_numeric_ = is_numeric;
     SetInputValidators(is_numeric);
-    security_code_hint_->setText("HINT: " + hint);
+    security_code_hint_->setText(translator_->Translate("ClassifiedSettingsWidget.SecurityCode.HINT", "HINT: ") + hint);
 
     if (graphicsEffect()) {
         dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
