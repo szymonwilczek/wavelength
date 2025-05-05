@@ -13,6 +13,7 @@
 #include "../video/player/video_player_overlay.h"
 #include "../audio/player/inline_audio_player.h"
 
+class TranslationManager;
 // Forward declarations
 class CyberAttachmentViewer;
 class AutoScalingAttachment;
@@ -187,6 +188,8 @@ private:
     QString attachment_id_;
     /** @brief Flag indicating if attachment_id_ refers to data in AttachmentDataStore. */
     bool has_reference_ = false;
+    /** @brief Translation manager for handling UI text translations. */
+    TranslationManager* translator_ = nullptr;
 
     /**
      * @brief Filters events, specifically handling mouse clicks on the video thumbnail label.

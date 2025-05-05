@@ -5,12 +5,13 @@
 
 #include "attachment_data_store.h"
 #include "auto_scaling_attachment.h"
+#include "../../../app/managers/translation_manager.h"
 #include "../image/displayer/image_viewer.h"
 #include "../../../ui/files/cyber_attachment_viewer.h"
 
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type, QWidget *parent):
-QWidget(parent), filename_(filename), is_loaded_(false) {
-
+QWidget(parent), filename_(filename), is_loaded_(false), translator_(nullptr) {
+    translator_ = TranslationManager::GetInstance();
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
 
@@ -46,7 +47,7 @@ QWidget(parent), filename_(filename), is_loaded_(false) {
     layout->addWidget(info_label_);
 
     // Przycisk do ładowania załącznika - teraz ukryty domyślnie
-    load_button_ = new QPushButton("PONÓW DEKODOWANIE", this);
+    load_button_ = new QPushButton(translator_->Translate("Attachments.Redecode", "REDECODE"), this);
     load_button_->setStyleSheet(
         "QPushButton {"
         "  background-color: #002b3d;"
@@ -75,7 +76,14 @@ QWidget(parent), filename_(filename), is_loaded_(false) {
     layout->addWidget(content_container_);
 
     // Status ładowania
-    progress_label_ = new QLabel("<span style='color:#00ccff;'>Inicjowanie sekwencji dekodowania...</span>", this);
+    progress_label_ = new QLabel(translator_->Translate("Attachments.InitializingDecode", "Initializing decode sequence..."), this);
+    progress_label_->setStyleSheet(
+        "QLabel {"
+        "  color: #00ccff;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-weight: bold;"
+        "}"
+    );
     layout->addWidget(progress_label_);
 
     // Połączenia sygnałów
@@ -190,12 +198,19 @@ void AttachmentPlaceholder::SetBase64Data(const QString &base64_data, const QStr
 void AttachmentPlaceholder::SetLoading(const bool loading) const {
     if (loading) {
         load_button_->setEnabled(false);
-        load_button_->setText("DEKODOWANIE W TOKU...");
-        progress_label_->setText("<span style='color:#00ccff;'>Pozyskiwanie zaszyfrowanych danych...</span>");
+        load_button_->setText(translator_->Translate("Attachments.Decoding", "Decoding..."));
+        progress_label_->setText(translator_->Translate("Attachments.ObtainingDecryptedData", "Obtaining encrypted data..."));
+        progress_label_->setStyleSheet(
+        "QLabel {"
+        "  color: #00ccff;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-weight: bold;"
+        "}"
+        );
         progress_label_->setVisible(true);
     } else {
         load_button_->setEnabled(true);
-        load_button_->setText("INICJUJ DEKODOWANIE");
+        load_button_->setText(translator_->Translate("Attachments.InitDecode", "INIT DECOODE SEQUENCE"));
         progress_label_->setVisible(false);
     }
 }
@@ -214,7 +229,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             if (base64_data.isEmpty()) {
                 QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
-                                          Q_ARG(QString, "⚠️ Nie można odnaleźć danych załącznika"));
+                                          Q_ARG(QString, translator_->Translate("Attachments.DataNotFound", "⚠️ There was an error trying to find attachment data")));
                 return;
             }
 
@@ -224,7 +239,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             if (data.isEmpty()) {
                 QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
-                                          Q_ARG(QString, "⚠️ Nie można zdekodować danych załącznika"));
+                                          Q_ARG(QString, translator_->Translate("Attachments.DecodeError", "⚠️ There was an error trying to decode attachment data")));
                 return;
             }
 
@@ -259,13 +274,13 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
                 if (data.isEmpty()) {
                     QMetaObject::invokeMethod(this, "SetError",
                                               Qt::QueuedConnection,
-                                              Q_ARG(QString, "⚠️ Nie można zdekodować danych załącznika"));
+                                              Q_ARG(QString, translator_->Translate("Attachments.DecodeError", "⚠️ There was an error trying to decode attachment data")));
                 }
 
             } catch (const std::exception& e) {
                 QMetaObject::invokeMethod(this, "SetError",
                                           Qt::QueuedConnection,
-                                          Q_ARG(QString, QString("⚠️ Błąd przetwarzania: %1").arg(e.what())));
+                                          Q_ARG(QString, QString("⚠️ %1: %2").arg(translator_->Translate("Attachments.ProcessingError", "There was an error trying to process the attachment")).arg(e.what())));
             }
         });
     }
@@ -273,9 +288,9 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
 
 void AttachmentPlaceholder::SetError(const QString &error_msg) {
     load_button_->setEnabled(true);
-    load_button_->setText("PONÓW DEKODOWANIE");
+    load_button_->setText(translator_->Translate("Attachments.Redecode", "REDECODE"));
     load_button_->setVisible(true); // Pokaż przycisk przy błędzie
-    progress_label_->setText("<span style='color:#ff3333;'>⚠️ BŁĄD: " + error_msg + "</span>");
+    progress_label_->setText("<span style='color:#ff3333;'>⚠️ ERROR: " + error_msg + "</span>");
     progress_label_->setVisible(true);
     is_loaded_ = false;
 }
@@ -283,7 +298,7 @@ void AttachmentPlaceholder::SetError(const QString &error_msg) {
 void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const bool is_gif) {
     QWidget* parentWindow = window();
     auto full_size_dialog = new QDialog(parentWindow, Qt::Window | Qt::FramelessWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    full_size_dialog->setWindowTitle(is_gif ? "Podgląd animacji" : "Podgląd załącznika");
+    full_size_dialog->setWindowTitle(translator_->Translate("Attachments.FullSizeDialog", "Full Size"));
     full_size_dialog->setModal(false);
     full_size_dialog->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -351,7 +366,7 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
     scroll_area->setWidget(content_widget);
     layout->addWidget(scroll_area, 1);
 
-    const auto closeButton = new QPushButton("Zamknij", full_size_dialog);
+    const auto closeButton = new QPushButton(translator_->Translate("Global.Close", "Close"), full_size_dialog);
     closeButton->setStyleSheet(
         "QPushButton {"
         "  background-color: #002b3d;"
@@ -528,7 +543,7 @@ void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        load_button_->setText("Załaduj ponownie");
+        load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);
     });
@@ -559,7 +574,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
     preview_layout->addWidget(thumbnail_label);
 
     // Dodajemy przycisk odtwarzania pod miniaturką
-    const auto play_button = new QPushButton("ODTWÓRZ WIDEO", video_preview);
+    const auto play_button = new QPushButton(translator_->Translate("Attachments.PlayVideo", "PLAY VIDEO"), video_preview);
     play_button->setStyleSheet(
         "QPushButton { "
         "  background-color: #002b3d; "
@@ -613,7 +628,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 
     // Podłączamy sygnał zakończenia
     connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
-        load_button_->setText("Załaduj ponownie");
+        load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);
     });
