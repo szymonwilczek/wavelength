@@ -10,11 +10,14 @@
 #include <QMessageBox>
 #include <QDebug>
 
+#include "../../../../app/managers/translation_manager.h"
+
 ShortcutsSettingsWidget::ShortcutsSettingsWidget(QWidget *parent)
     : QWidget(parent), config_(WavelengthConfig::GetInstance()), form_layout_(nullptr), restore_button_(nullptr)
 {
+    translator_ = TranslationManager::GetInstance();
     SetupUi();
-    LoadSettings(); // Załaduj skróty przy tworzeniu widgetu
+    LoadSettings();
 }
 
 void ShortcutsSettingsWidget::SetupUi() {
@@ -22,11 +25,13 @@ void ShortcutsSettingsWidget::SetupUi() {
     main_layout->setContentsMargins(15, 15, 15, 15);
     main_layout->setSpacing(10);
 
-    const auto title_label = new QLabel("Keyboard Shortcuts", this);
+    const auto title_label = new QLabel(translator_->Translate("ShortcutSettingsWidget.Title", "Keyboard Shortcuts"), this);
     title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
     main_layout->addWidget(title_label);
 
-    const auto info_label = new QLabel("Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application.", this);
+    const auto info_label = new QLabel(translator_->Translate("ShortcutSettingsWidget.Info",
+        "Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application."),
+        this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
     info_label->setWordWrap(true);
     main_layout->addWidget(info_label);
@@ -85,7 +90,7 @@ void ShortcutsSettingsWidget::SetupUi() {
     main_layout->addWidget(scroll_area, 1); // Rozciągnij scroll area
 
     // Przycisk przywracania domyślnych
-    restore_button_ = new QPushButton("Restore Default Shortcuts", this);
+    restore_button_ = new QPushButton(translator_->Translate("ShortcutSettingsWidget.RestoreDefaultShortcuts", "Restore Default Shortcuts"), this);
     restore_button_->setStyleSheet(
         "QPushButton { background-color: #444; border: 1px solid #666; padding: 8px; border-radius: 4px; color: #ccc; }"
         "QPushButton:hover { background-color: #555; }"
@@ -97,21 +102,21 @@ void ShortcutsSettingsWidget::SetupUi() {
 
 QString ShortcutsSettingsWidget::GetActionDescription(const QString& action_id) {
     // Zwraca czytelny opis na podstawie ID akcji
-    if (action_id == "MainWindow.CreateWavelength") return "Create Wavelength";
-    if (action_id == "MainWindow.JoinWavelength") return "Join Wavelength";
-    if (action_id == "MainWindow.OpenSettings") return "Open Settings";
-    if (action_id == "ChatView.AbortConnection") return "Abort Connection";
-    if (action_id == "ChatView.FocusInput") return "Focus Message Input";
-    if (action_id == "ChatView.AttachFile") return "Attach File";
-    if (action_id == "ChatView.SendMessage") return "Send Message";
-    if (action_id == "SettingsView.SwitchTab0") return "Switch to Wavelength Tab";
-    if (action_id == "SettingsView.SwitchTab1") return "Switch to Appearance Tab";
-    if (action_id == "SettingsView.SwitchTab2") return "Switch to Network Tab";
-    if (action_id == "SettingsView.SwitchTab3") return "Switch to CLASSIFIED Tab";
-    if (action_id == "SettingsView.SwitchTab4") return "Switch to Shortcuts Tab";
-    if (action_id == "SettingsView.Save") return "Save Settings";
-    if (action_id == "SettingsView.Defaults") return "Restore Defaults";
-    if (action_id == "SettingsView.Back") return "Back / Close Settings";
+    if (action_id == "MainWindow.CreateWavelength") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.CreateWavelength", "Create Wavelength");
+    if (action_id == "MainWindow.JoinWavelength") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.JoinWavelength", "Join Wavelength");
+    if (action_id == "MainWindow.OpenSettings") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.OpenSettings", "Open Settings");
+    if (action_id == "ChatView.AbortConnection") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.AbortConnection", "Abort Connection");
+    if (action_id == "ChatView.FocusInput") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.FocusMessageInput", "Focus Message Input");
+    if (action_id == "ChatView.AttachFile") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.AttachFile", "Attach File");
+    if (action_id == "ChatView.SendMessage") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SendMessage", "Send Message");
+    if (action_id == "SettingsView.SwitchTab0") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SwitchToWavelengthTab", "Switch to Wavelength Tab");
+    if (action_id == "SettingsView.SwitchTab1") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SwitchToAppearanceTab", "Switch to Appearance Tab");
+    if (action_id == "SettingsView.SwitchTab2") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SwitchToNetworkTab", "Switch to Network Tab");
+    if (action_id == "SettingsView.SwitchTab3") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SwitchToClassifiedTab", "Switch to CLASSIFIED Tab");
+    if (action_id == "SettingsView.SwitchTab4") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SwitchToShortcutsTab", "Switch to Shortcuts Tab");
+    if (action_id == "SettingsView.Save") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.SaveSettings", "Save Settings");
+    if (action_id == "SettingsView.Defaults") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.RestoreDefaults", "Restore Defaults");
+    if (action_id == "SettingsView.Back") return TranslationManager::GetInstance()->Translate("ShortcutSettingsWidget.BackCloseSettings", "Back / Close Settings");
     return QString(); // Zwróć pusty, jeśli ID nieznane
 }
 
@@ -140,8 +145,9 @@ void ShortcutsSettingsWidget::SaveSettings() const {
 }
 
 void ShortcutsSettingsWidget::RestoreDefaultShortcuts() {
-    if (QMessageBox::question(this, "Restore Default Shortcuts",
-                             "Are you sure you want to restore all keyboard shortcuts to their default values?\nThis action cannot be undone immediately.",
+    if (QMessageBox::question(this, translator_->Translate("ShortcutSettingsWidget.RestoreDefaultTitle", "Restore Default Shortcuts"),
+                             translator_->Translate("ShortcutSettingsWidget.RestoreDefaultMessage",
+                                 "Are you sure you want to restore all keyboard shortcuts to their default values?\nThis action cannot be undone immediately."),
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         // --- ZMIANA: Ustaw domyślne wartości w mapie konfiguracji ---
@@ -154,6 +160,8 @@ void ShortcutsSettingsWidget::RestoreDefaultShortcuts() {
         // Odśwież UI, aby pokazać domyślne wartości
         LoadSettings();
 
-        QMessageBox::information(this, "Defaults Restored", "Default shortcuts have been restored.\nRemember to save settings and restart the application.");
+        QMessageBox::information(this,
+            translator_->Translate("ShortcutSettingsWidget.RestoreDefaultSuccessTitle", "Defaults Restored"),
+            translator_->Translate("ShortcutSettingsWidget.RestoreDefaultSuccessMessage", "Default shortcuts have been restored.\nRemember to save settings and restart the application."));
     }
 }

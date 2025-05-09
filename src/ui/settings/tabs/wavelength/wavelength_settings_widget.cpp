@@ -24,9 +24,9 @@ WavelengthSettingsWidget::WavelengthSettingsWidget(QWidget *parent)
     : QWidget(parent),
       config_(WavelengthConfig::GetInstance()),
       translator_(TranslationManager::GetInstance()),
+      language_combo_(nullptr),
       frequency_value_edit_(nullptr),
-      frequency_unit_combo_(nullptr),
-      language_combo_(nullptr)
+      frequency_unit_combo_(nullptr)
 {
     SetupUi();
     LoadSettings();
@@ -37,11 +37,15 @@ void WavelengthSettingsWidget::SetupUi() {
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto title_label = new QLabel("Wavelength Preferences", this);
+    const auto title_label = new QLabel(
+        translator_->Translate("WavelengthSettingsWidget.Title", "Wavelength Preferences"),
+        this);
     title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
     layout->addWidget(title_label);
 
-    const auto info_label = new QLabel("Configure frequency preferences.\nDo you have some idea for some other settings? Open issue on GitHub!", this);
+    const auto info_label = new QLabel(
+        translator_->Translate("WavelengthSettingsWidget.Info", "Configure frequency preferences.\nDo you have some idea for some other settings? Open issue on GitHub!"),
+        this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
     info_label->setWordWrap(true);
     layout->addWidget(info_label);
@@ -52,7 +56,9 @@ void WavelengthSettingsWidget::SetupUi() {
     form_layout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
     // --- Preferred Start Frequency --- (bez zmian)
-    const auto preferred_frequency_label = new QLabel("Preferred Start Frequency:", this);
+    const auto preferred_frequency_label = new QLabel(
+        translator_->Translate("WavelengthSettingsWidget.WavelengthFrequency", "Preferred Start Frequency:"),
+        this);
     preferred_frequency_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     const auto freq_layout = new QHBoxLayout();
     freq_layout->setSpacing(5);

@@ -8,6 +8,8 @@
 #include <QFormLayout>
 #include <QDebug>
 
+#include "../../../../app/managers/translation_manager.h"
+
 NetworkSettingsWidget::NetworkSettingsWidget(QWidget *parent)
     : QWidget(parent),
       config_(WavelengthConfig::GetInstance()),
@@ -26,11 +28,15 @@ void NetworkSettingsWidget::SetupUi() {
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto title_label = new QLabel("Network Connection", this);
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
+    const auto title_label = new QLabel(translator->Translate("NetworkSettingsWidget.Title", "Network Connection"), this);
     title_label->setStyleSheet("font-size: 14pt; font-weight: bold; color: #00ccff; background-color: transparent; border: none;");
     layout->addWidget(title_label);
 
-    const auto info_label = new QLabel("Configure network connection parameters.\nPlease be aware that the changes made here may affect the correct operation of the application.", this);
+    const auto info_label = new QLabel(translator->Translate("NetworkSettingsWidget.Info",
+        "Configure network connection parameters.\nPlease be aware that the changes made here may affect the correct operation of the application."),
+        this);
     info_label->setStyleSheet("color: #ffcc00; background-color: transparent; border: none; font-size: 9pt;");
     info_label->setWordWrap(true);
     layout->addWidget(info_label);
@@ -41,11 +47,11 @@ void NetworkSettingsWidget::SetupUi() {
     form_layout->setRowWrapPolicy(QFormLayout::WrapLongRows); // Upewnij się, że jest to ustawione
 
     // --- Server Address --- (Przeniesione z WavelengthSettingsWidget)
-    const auto server_addr_label = new QLabel("Server Address:", this);
+    const auto server_addr_label = new QLabel(translator->Translate("NetworkSettingsWidget.ServerAddress", "Server Address"), this);
     server_addr_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     server_address_edit_ = new CyberLineEdit(this);
-    server_address_edit_->setPlaceholderText("Enter server address");
-    const auto server_addr_info = new QLabel("Leave unchanged unless using a custom server.", this);
+    server_address_edit_->setPlaceholderText(translator->Translate("NetworkSettingsWidget.ServerAddressEdit", "Enter server address"));
+    const auto server_addr_info = new QLabel(translator->Translate("NetworkSettingsWidget.ServerAddressInfo", "Leave unchanged unless using a custom server."), this);
     server_addr_info->setStyleSheet("color: #aaaaaa; background-color: transparent; font-family: Consolas; font-size: 8pt; margin-left: 5px;");
     server_addr_info->setWordWrap(true);
     const auto addr_layout = new QVBoxLayout;
@@ -54,7 +60,7 @@ void NetworkSettingsWidget::SetupUi() {
     form_layout->addRow(server_addr_label, addr_layout);
 
     // --- Server Port --- (Przeniesione z WavelengthSettingsWidget)
-    const auto server_port_label = new QLabel("Server Port:", this);
+    const auto server_port_label = new QLabel(translator->Translate("NetworkSettingsWidget.ServerPort", "Server Port"), this);
     server_port_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     server_port_edit_ = new QSpinBox(this);
     server_port_edit_->setRange(1, 65535);
@@ -62,7 +68,7 @@ void NetworkSettingsWidget::SetupUi() {
         "QSpinBox { color: #00eeff; background-color: rgba(10, 25, 40, 180); border: 1px solid #00aaff; padding: 5px; font-family: Consolas; }"
         "QSpinBox::up-button, QSpinBox::down-button { background-color: rgba(0, 150, 220, 100); }"
     );
-    const auto server_port_info = new QLabel("Mainly for debugging. Default server ignores this if address is unchanged.", this);
+    const auto server_port_info = new QLabel(translator->Translate("NetworkSettingsWidget.ServerPortInfo", "Mainly for debugging. Default server ignores this if address is unchanged."), this);
     server_port_info->setStyleSheet("color: #aaaaaa; background-color: transparent; font-family: Consolas; font-size: 8pt; margin-left: 5px;");
     server_port_info->setWordWrap(true);
     const auto port_layout = new QVBoxLayout;
@@ -71,7 +77,7 @@ void NetworkSettingsWidget::SetupUi() {
     form_layout->addRow(server_port_label, port_layout);
 
     // --- Connection Timeout --- (Przeniesione z SettingsView::setupNetworkTab)
-    const auto conn_timeout_label = new QLabel("Connection Timeout:", this);
+    const auto conn_timeout_label = new QLabel(translator->Translate("NetworkSettingsWidget.ConnectionTimeout", "Connection Timeout"), this);
     conn_timeout_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;"); // Styl z innych etykiet
     connection_timeout_edit_ = new QSpinBox(this);
     connection_timeout_edit_->setRange(1000, 60000);
@@ -83,7 +89,7 @@ void NetworkSettingsWidget::SetupUi() {
     form_layout->addRow(conn_timeout_label, connection_timeout_edit_);
 
     // --- Keep Alive Interval --- (Przeniesione z SettingsView::setupNetworkTab)
-    const auto keep_alive_label = new QLabel("Keep Alive Interval:", this);
+    const auto keep_alive_label = new QLabel(translator->Translate("NetworkSettingsWidget.KeepAliveInterval", "Keep Alive Interval"), this);
     keep_alive_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     keep_alive_interval_edit_ = new QSpinBox(this);
     keep_alive_interval_edit_->setRange(1000, 60000);
@@ -95,7 +101,7 @@ void NetworkSettingsWidget::SetupUi() {
     form_layout->addRow(keep_alive_label, keep_alive_interval_edit_);
 
     // --- Max Reconnect Attempts --- (Przeniesione z SettingsView::setupNetworkTab)
-    const auto reconnect_label = new QLabel("Max Reconnect Attempts:", this);
+    const auto reconnect_label = new QLabel(translator->Translate("NetworkSettingsWidget.MaxReconnectAttempts", "Max Reconnect Attempts"), this);
     reconnect_label->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     max_reconnect_attempts_edit_ = new QSpinBox(this);
     max_reconnect_attempts_edit_->setRange(0, 20);
