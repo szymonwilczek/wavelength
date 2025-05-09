@@ -129,7 +129,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
     // Pole hasła
     password_edit_ = new CyberLineEdit(this);
     password_edit_->setEchoMode(QLineEdit::Password);
-    password_edit_->setPlaceholderText(translator_->Translate("JoinWavelengthDialog.PasswordEdit", "WAVELENGTH PASSWORD (IF REQUIRED))");
+    password_edit_->setPlaceholderText(translator_->Translate("JoinWavelengthDialog.PasswordEdit", "WAVELENGTH PASSWORD (IF REQUIRED))"));
     form_layout->addRow(password_label, password_edit_);
 
     main_layout->addLayout(form_layout);
