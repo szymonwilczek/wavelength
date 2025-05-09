@@ -733,7 +733,9 @@ void WavelengthChatView::UpdatePttButtonState() const {
     switch (ptt_state_) {
         case Idle:
             ptt_button_->setEnabled(true);
-            ptt_button_->setText("TALK");
+            ptt_button_->setText(
+                translator_->Translate("ChatView.TalkButton", "TALK")
+                );
             input_field_->setEnabled(true); // Włącz inne kontrolki
             send_button_->setEnabled(true);
             attach_button_->setEnabled(true);
