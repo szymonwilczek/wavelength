@@ -25,6 +25,7 @@
 #include "src/ui/effects/cyberpunk_text_effect.h"
 #include "src/ui/widgets/animated_stacked_widget.h"
 #include "src/app/managers/shortcut_manager.h"
+#include "src/app/managers/translation_manager.h"
 #include "src/ui/views/settings_view.h"
 #include "src/ui/settings/tabs/classified/components/system_override_manager.h"
 #include "src/util/resize_event_filter.h"
@@ -53,6 +54,11 @@ int main(int argc, char *argv[]) {
 
     WavelengthConfig *config = WavelengthConfig::GetInstance();
 
+    TranslationManager* translator = TranslationManager::GetInstance();
+    if (!translator->Initialize(config->GetLanguageCode())) {
+        qCritical() << "Failed to initialize translation manager. Defaulting to English.";
+    }
+
     // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;
     parser.setApplicationDescription("Wavelength Application");
@@ -74,7 +80,7 @@ int main(int argc, char *argv[]) {
                 return 0; // Zakończ bieżącą instancję
             }
             qCritical() << "Failed to relaunch as administrator. Override aborted.";
-            QMessageBox::critical(nullptr, "Admin Privileges Required", "Failed to relaunch with administrator privileges. The override sequence cannot continue.");
+            QMessageBox::critical(nullptr, translator->Translate("MainWindow.IsNotRunningAdminTitle", "Admin Privileges Required"), translator->Translate("MainWindow.IsNotRunningAdminMessage", "Failed to relaunch with administrator privileges. The override sequence cannot continue."));
             return 1; // Zakończ z błędem
         }
         qDebug() << "Running with administrator privileges.";
@@ -217,7 +223,7 @@ int main(int argc, char *argv[]) {
 
     auto *text_effect = new CyberpunkTextEffect(title_label, animation);
 
-    window.setMinimumSize(1024, 768);
+    window.setMinimumSize(1200, 900);
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
 
@@ -425,7 +431,7 @@ int main(int argc, char *argv[]) {
     });
 
     if (!instance_manager->IsCreator()) {
-        window.setWindowTitle("Wavelength - Sub Instance");
+        window.setWindowTitle(translator->Translate("InstanceManager.NotCreatorTitle", "Wavelength - Sub Instance"));
     }
 
     ShortcutManager* shortcut_manager = ShortcutManager::GetInstance();

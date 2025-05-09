@@ -8,6 +8,7 @@
 
 #include "../chat/effects/mask_overlay.h"
 
+class TranslationManager;
 /**
  * @brief A widget that displays another widget (content) with a cyberpunk-themed decryption animation.
  *
@@ -175,6 +176,8 @@ private:
     int scan_progress_ = 0; // Marked as unused
     /** @brief The overlay widget that handles the scanline and reveal effect. */
     MaskOverlay* mask_overlay_;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // CYBER_ATTACHMENT_VIEWER_H

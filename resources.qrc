@@ -37,4 +37,9 @@
         <file>resources/sounds/interface/terminal_typing1.wav</file>
         <file>resources/sounds/interface/terminal_typing2.wav</file>
     </qresource>
+
+    <qresource prefix="/translations">
+        <file alias="en.json">resources/translations/en.json</file>
+        <file alias="pl.json">resources/translations/pl.json</file>
+    </qresource>
 </RCC>

@@ -3,15 +3,21 @@
 #include <QPainterPath>
 #include <QPropertyAnimation>
 
+#include "../../app/managers/translation_manager.h"
+
 CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), decryption_counter_(0),
                                                                is_scanning_(false), is_decrypted_(false) {
+    translator_ = TranslationManager::GetInstance();
     // Główny układ
     layout_ = new QVBoxLayout(this);
     layout_->setContentsMargins(10, 10, 10, 10);
     layout_->setSpacing(10);
 
     // Label statusu
-    status_label_ = new QLabel("INICJALIZACJA SEKWENCJI DESZYFRUJĄCEJ", this);
+    status_label_ = new QLabel(
+        translator_->Translate("CyberAttachmentViewer.Initializing",
+            "INITIALIZING DECYPHERING SEQUENCE..."),
+        this);
     status_label_->setStyleSheet(
         "QLabel {"
         "  color: #00ffff;"
@@ -124,7 +130,8 @@ void CyberAttachmentViewer::SetContent(QWidget *content) {
     mask_overlay_->raise(); // Upewnij się, że maska jest na wierzchu
     mask_overlay_->StartScanning(); // Rozpocznij animację skanowania na masce
 
-    status_label_->setText("WYKRYTO ZASZYFROWANE DANE");
+    status_label_->setText(translator_->Translate("CyberAttachmentViewer.EncryptedDataDetected",
+            "ENCRYPTED DATA DETECTED"));
     is_decrypted_ = false;
     is_scanning_ = false; // Resetuj stan skanowania
     SetDecryptionCounter(0); // Resetuj licznik
@@ -248,7 +255,9 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
     painter.drawText(20, height() - 10, QString("SEC:LVL%1").arg(security_level));
 
     // Prawy dolny - status
-    const QString status = is_decrypted_ ? "UNLOCKED" : "LOCKED";
+    const QString status = is_decrypted_ ? translator_->Translate("CyberAttachmentViewer.Unlocked",
+    "UNLOCKED") : translator_->Translate("CyberAttachmentViewer.Locked",
+    "LOCKED");
     painter.drawText(width() - 60, height() - 10, status);
 }
 
@@ -271,7 +280,8 @@ void CyberAttachmentViewer::StartScanningAnimation() {
     is_scanning_ = true;
     is_decrypted_ = false;
     SetDecryptionCounter(0); // Resetuj postęp
-    status_label_->setText("SKANOWANIE ZABEZPIECZEŃ...");
+    status_label_->setText(translator_->Translate("CyberAttachmentViewer.Scanning",
+            "SECURITY SCANNING..."));
 
     // *** ZMIANA: Nie pokazujemy m_contentWidget ***
     // m_contentWidget->setVisible(true); // USUNIĘTE
@@ -284,7 +294,8 @@ void CyberAttachmentViewer::StartScanningAnimation() {
     // Używamy timera do symulacji czasu skanowania przed deszyfracją
     QTimer::singleShot(2000, this, [this]() { // Czas trwania "skanowania"
                            if (is_scanning_) { // Sprawdź, czy nadal jesteśmy w trybie skanowania
-                               status_label_->setText("SKANOWANIE ZAKOŃCZONE. PRZYGOTOWANIE DESZYFRACJI...");
+                               status_label_->setText(translator_->Translate("CyberAttachmentViewer.ScanningCompleted",
+            "SECURITY SCAN COMPLETED. DECRYPTING..."));
                                // Automatycznie rozpocznij dekodowanie po krótkim opóźnieniu
                                QTimer::singleShot(800, this, &CyberAttachmentViewer::StartDecryptionAnimation);
                            }
@@ -298,7 +309,8 @@ void CyberAttachmentViewer::StartDecryptionAnimation() {
     if (is_decrypted_) return;   // Nie zaczynaj, jeśli już zakończono
 
     is_scanning_ = false; // Skanowanie zakończone, zaczyna się deszyfracja
-    status_label_->setText("ROZPOCZĘTO DEKODOWANIE... 0%");
+    status_label_->setText(translator_->Translate("CyberAttachmentViewer.StartDecrypting",
+            "STARTING DECRYPTION... 0%"));
 
     // *** ZMIANA: Maska nadal jest widoczna, ale zacznie się odsłaniać ***
     mask_overlay_->setVisible(true);
@@ -325,7 +337,9 @@ void CyberAttachmentViewer::UpdateAnimation() const {
         if (QRandomGenerator::global()->bounded(100) < 30) {
             QString base_text = status_label_->text();
             if (base_text.contains("%")) {
-                base_text = QString("DEKODOWANIE... %1%").arg(decryption_counter_);
+                base_text = QString("%1 %2%")
+                .arg(translator_->Translate("CyberAttachmentViewer.Decrypting", "DECRYPTING..."))
+                .arg(decryption_counter_);
             }
 
             // Dodaj losowe znaki
@@ -342,7 +356,9 @@ void CyberAttachmentViewer::UpdateAnimation() const {
 
 void CyberAttachmentViewer::UpdateDecryptionStatus() const {
     // Aktualizuje tylko etykietę tekstową
-    status_label_->setText(QString("DEKODOWANIE... %1%").arg(decryption_counter_));
+    status_label_->setText(QString("%1 %2%")
+    .arg(translator_->Translate("CyberAttachmentViewer.Decrypting", "DECRYPTING..."))
+        .arg(decryption_counter_));
     // Nie trzeba już ręcznie aktualizować maski, robi to sygnał decryptionCounterChanged
 }
 
@@ -351,7 +367,7 @@ void CyberAttachmentViewer::FinishDecryption() {
     is_decrypted_ = true;
     is_scanning_ = false;
 
-    status_label_->setText("DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY");
+    status_label_->setText(translator_->Translate("CyberAttachmentViewer.DecryptingCompleted", "DECRYPTION COMPLETED - ACCESS GRANTED"));
 
     // *** ZMIANA: Ukryj maskę i pokaż zawartość ***
     mask_overlay_->StopScanning(); // Zatrzymuje timer i ukrywa maskę

@@ -5,6 +5,8 @@
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 SnakeGameLayer::SnakeGameLayer(QWidget *parent) 
     : SecurityLayer(parent),
       game_timer_(nullptr),
@@ -20,12 +22,15 @@ SnakeGameLayer::SnakeGameLayer(QWidget *parent)
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
     layout->setSpacing(15);
+    translator_ = TranslationManager::GetInstance();
 
-    const auto title = new QLabel("SECURITY VERIFICATION: SNAKE GAME", this);
+    const auto title = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.Title",
+        "SECURITY VERIFICATION: SNAKE GAME"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    const auto instructions = new QLabel("Zbierz 4 jabłka, aby otworzyć wyjście\nSterowanie: strzałki", this);
+    const auto instructions = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.Info",
+        "Collect 4 apples to open exit\nControls: Arrrows"), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -37,7 +42,8 @@ SnakeGameLayer::SnakeGameLayer(QWidget *parent)
     game_board_->installEventFilter(this);
 
     // Etykieta wyniku
-    score_label_ = new QLabel("Zebrane jabłka: 0/4", this);
+    score_label_ = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.CollectedApples0",
+        "Collected apples: 0/4"), this);
     score_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
     score_label_->setAlignment(Qt::AlignCenter);
 
@@ -127,7 +133,8 @@ void SnakeGameLayer::Reset() {
     exit_position_ = QRandomGenerator::global()->bounded(1, kGridSize - 1);
 
     // Resetuj UI
-    score_label_->setText("Zebrane jabłka: 0/4");
+    score_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.CollectedApples0",
+        "Collected apples: 0/4"));
     score_label_->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;"); // Szary tekst wyniku
     game_board_->setStyleSheet("background-color: rgba(10, 25, 40, 220);"); // Domyślne tło planszy (bez bordera)
     game_board_->clear();
@@ -445,7 +452,9 @@ void SnakeGameLayer::MoveSnake() {
     } else {
         // Jeśli zebrano jabłko
         apples_collected_++;
-        score_label_->setText(QString("Zebrane jabłka: %1/4").arg(apples_collected_));
+        score_label_->setText(QString("%1: %2/4")
+            .arg(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.CollectedApples", "Collected apples"))
+            .arg(apples_collected_));
 
         // Generowanie nowego jabłka (jeśli nie zebrano jeszcze 4)
         if (apples_collected_ < 4) {
@@ -565,7 +574,8 @@ void SnakeGameLayer::FinishGame(const bool success) {
         game_board_->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33;");
 
         // Aktualizacja etykiety wyniku
-        score_label_->setText("Wąż opuścił planszę! Poziom zaliczony.");
+        score_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.SnakeExited",
+        "Snake exited the screen! Level completed."));
         score_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
 
         // Krótkie opóźnienie przed zakończeniem warstwy
@@ -618,7 +628,8 @@ void SnakeGameLayer::OpenBorder() {
     }
 
     // Aktualizacja etykiety wyniku
-    score_label_->setText("Wyjście otwarte! Wyprowadź węża z planszy.");
+    score_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SnakeGame.ExitOpened",
+        "Exit opened!\nESCAPE!!!"));
     score_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
 
     // Inicjalizacja licznika animacji

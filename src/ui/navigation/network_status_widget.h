@@ -7,6 +7,7 @@
 #include <QColor>
 #include <QPaintEvent>
 
+class TranslationManager;
 /**
  * @brief A widget displaying network connection status and ping time with cyberpunk aesthetics.
  *
@@ -104,6 +105,8 @@ private:
     QColor border_color_;
     /** @brief The last measured ping time in milliseconds. */
     qint64 ping_value_;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // NETWORK_STATUS_WIDGET_H

@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <QVector>
 
+class TranslationManager;
 /**
  * @brief A security layer simulating voice recognition verification.
  *
@@ -131,7 +132,6 @@ private:
     /** @brief Flag indicating if audio is currently being recorded. */
     bool is_recording_;
 
-    // --- Speech Detection Variables ---
     /** @brief Threshold level above which audio input is considered potential speech. */
     float noise_threshold_;
     /** @brief Flag indicating if speech is currently detected (based on threshold and hysteresis). */
@@ -140,7 +140,8 @@ private:
     int silence_counter_;
     /** @brief The calculated audio level from the most recently processed audio chunk. */
     float current_audio_level_;
-    // --- End Speech Detection Variables ---
+    /** @brief The translation manager for handling UI translations. */
+    TranslationManager* translator_;
 };
 
 #endif // VOICE_RECOGNITION_LAYER_H

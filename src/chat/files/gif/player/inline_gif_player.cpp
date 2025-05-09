@@ -4,16 +4,20 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "../../../../app/managers/translation_manager.h"
+
 InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent), gif_data_(gif_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    translator_ = TranslationManager::GetInstance();
+
     // Obszar wyświetlania GIF-a
     gif_label_ = new QLabel(this);
     gif_label_->setAlignment(Qt::AlignCenter);
     gif_label_->setStyleSheet("background-color: transparent; color: #ffffff;"); // Przezroczyste tło
-    gif_label_->setText("Ładowanie GIF...");
+    gif_label_->setText(translator_->Translate("GifPlayer.Loading", "LOADING GIF..."));
     gif_label_->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
     layout->addWidget(gif_label_);
 
@@ -99,7 +103,7 @@ void InlineGifPlayer::DisplayThumbnail(const QImage &frame) {
         ));
         // Nie aktualizuj geometrii tutaj, poczekaj na gifInfo
     } else {
-        gif_label_->setText("⚠️ Błąd ładowania miniatury");
+        gif_label_->setText(translator_->Translate("GifPlayer.ThumbnailError", "⚠️ THUMBNAIL LOADING ERROR..."));
     }
 }
 

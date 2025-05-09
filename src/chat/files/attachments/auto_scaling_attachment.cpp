@@ -2,7 +2,11 @@
 
 #include <QVBoxLayout>
 
+#include "../../../app/managers/translation_manager.h"
+
 AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), content_(content), is_scaled_(false) {
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -16,7 +20,7 @@ AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent):
     layout->addWidget(content_container_, 0, Qt::AlignCenter);
 
     // Etykieta informująca o możliwości powiększenia (pokazywana tylko dla przeskalowanych)
-    info_label_ = new QLabel("Kliknij, aby powiększyć", this); // Rodzicem jest AutoScalingAttachment
+    info_label_ = new QLabel(translator->Translate("Attachments.Expand", "EXPAND"), this); // Rodzicem jest AutoScalingAttachment
     info_label_->setStyleSheet(
         "QLabel {"
         "  color: #00ccff;"

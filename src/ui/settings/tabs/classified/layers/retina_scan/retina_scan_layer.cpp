@@ -5,13 +5,17 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     : SecurityLayer(parent), scan_timer_(nullptr), complete_timer_(nullptr), scanline_(0)
 {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const auto title = new QLabel("RETINA SCAN VERIFICATION", this);
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
+    const auto title = new QLabel(translator->Translate("ClassifiedSettingsWidget.RetinaScan.Title", "RETINA SCAN VERIFICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -41,7 +45,9 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
 
     eye_layout->addWidget(scanner_container);
 
-    const auto instructions = new QLabel("Please look directly at the scanner\nDo not move during scan process", this);
+    const auto instructions = new QLabel(translator->Translate("ClassifiedSettingsWidget.RetinaScan.Info",
+        "Please look directly at the scanner\nDo not move during scan process"),
+        this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 

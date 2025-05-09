@@ -6,6 +6,7 @@
 
 #include "../decoder/gif_decoder.h"
 
+class TranslationManager;
 /**
  * @brief An inline widget for displaying and playing animated GIFs within a chat interface.
  *
@@ -154,6 +155,8 @@ private:
     bool is_playing_ = false;
     /** @brief Stores the first frame as a QPixmap for efficient display as a thumbnail. */
     QPixmap thumbnail_pixmap_;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif //INLINE_GIF_PLAYER_H

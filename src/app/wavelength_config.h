@@ -380,6 +380,20 @@ public:
      */
     QVariant GetSetting(const QString& key) const;
 
+    /**
+     * @brief Gets the currently configured language code (e.g., "en", "pl").
+     * @return The language code as a QString.
+     */
+    QString GetLanguageCode() const;
+
+    /**
+     * @brief Sets the application language code.
+     * Emits configChanged("languageCode") if the value changes.
+     * Note: Requires application restart to take full effect.
+     * @param code The new language code (e.g., "en", "pl").
+     */
+    void SetLanguageCode(const QString& code);
+
 signals:
     /**
      * @brief Emitted when a configuration setting changes.
@@ -471,6 +485,7 @@ private:
     QColor title_border_color_; ///< The color for the title label border
     QColor title_glow_color_; ///< The color for the title label glow effect
     QString preferred_start_frequency_; ///< The preferred starting frequency for new Wavelengths
+    QString language_code_; ///< The selected language code (e.g., "en", "pl")
 };
 
 #endif // WAVELENGTH_CONFIG_H

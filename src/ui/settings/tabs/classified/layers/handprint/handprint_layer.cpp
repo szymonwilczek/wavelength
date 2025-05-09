@@ -8,13 +8,17 @@
 #include <QDir>
 #include <QCoreApplication>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 HandprintLayer::HandprintLayer(QWidget *parent)
     : SecurityLayer(parent), handprint_timer_(nullptr), svg_renderer_(nullptr)
 {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const auto title = new QLabel("HANDPRINT AUTHENTICATION", this);
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
+    const auto title = new QLabel(translator->Translate("ClassifiedSettingsWidget.Handprint.Title", "HANDPRINT AUTHENTICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -25,7 +29,7 @@ HandprintLayer::HandprintLayer(QWidget *parent)
     handprint_image_->setAlignment(Qt::AlignCenter);
     handprint_image_->installEventFilter(this);
 
-    const auto instructions = new QLabel("Press and hold on handprint to scan", this);
+    const auto instructions = new QLabel(translator->Translate("ClassifiedSettingsWidget.Handprint.Info", "Press and hold on handprint to scan"), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 

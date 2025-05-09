@@ -1,0 +1,315 @@
+{
+  "Global": {
+    "AppName": "Wavelength",
+    "RestartRequiredTitle": "Wymagane ponowne uruchomienie aplikacji",
+    "RestartRequiredMessage": "Ustawienia języka uległy zmianie.Zrestartuj aplikację, żeby zobaczyć zmiany.",
+    "Ok": "OK",
+    "Cancel": "Zamknij",
+    "Warning": "Ostrzeżenie",
+    "Error": "Błąd",
+    "Information": "Informacja",
+    "Close": "Zamknij"
+  },
+  "MainWindow": {
+    "Title": "Wavelength",
+    "TitleLabel": "WAVELENGTH",
+    "IsNotRunningAdminTitle": "Wymagane Uprawnienia Administratora",
+    "IsNotRunningAdminMessage": "Nie udało się poprawnie uruchomić z permisjami administratora. Sekwencja WYPUSZCZENIA nie może być kontynuowania."
+  },
+  "InstanceManager" : {
+    "NotCreatorTitle": "Wavelength - Instancja podrzędna"
+  },
+  "Navbar": {
+    "GenerateWavelength": "Stwórz Wavelength",
+    "MergeWavelength": "Dołącz do Wavelength",
+    "Settings": "Ustawienia"
+  },
+  "Attachments" : {
+    "Redecode": "ZDEKODUJ PONOWNIE",
+    "InitializingDecode": "Inicjalizowanie sekwencji dekodowania...",
+    "Decoding": "Dekodowanie...",
+    "ObtainingDecryptedData": "Pozyskiwanie zaszyfrowanych danych...",
+    "InitDecode": "INICJUJ SEKWENCJĘ DEKODOWANIA",
+    "DataNotFound": "Wystąpił błąd podczas próby znalezienia danych załącznika",
+    "DecodeError": "Wystąpił błąd podczas próby dekodowania załącznika",
+    "ProcessingError": "Wystąpił błąd podczas próby przetworzenia załącznika",
+    "FullSizeDialog": "Pełny rozmiar",
+    "LoadAgain": "Załaduj ponownie",
+    "PlayVideo": "ODTWÓRZ WIDEO",
+    "Expand": "ROZSZERZ"
+  },
+  "AudioPlayer" : {
+    "Initialization": "INICJALIZACJA...",
+    "PlaybackFinished": "ZAKOŃCZONO ODTWARZANIE",
+    "Seeking": "PRZEWIJANIE...",
+    "Playing": "ODTWARZANIe...",
+    "Paused": "PAUZA",
+    "Ready": "GOTOWY"
+  },
+  "GifPlayer" : {
+    "Loading": "ŁADOWANIE GIFA...",
+    "ThumbnailError": "⚠️ BŁĄD ŁADOWANIA MINIATURKI..."
+  },
+  "ImageViewer" : {
+    "Loading": "ŁADOWANIE ZDJĘCIA...",
+    "EmptyImage": "⚠️ Wyświetlacz otrzymał puste zdjęcie z dekodera.",
+    "DecoderError": "⚠️ BŁĄD DEKODERA ZDJĘĆ..."
+  },
+  "VideoPlayer" : {
+    "Initializing": "INICJALIZACJA...",
+    "BufferLoading": "ŁADOWANIE BUFORA...",
+    "CodecAnalyzing": "ANALIZOWANIE CODECA...",
+    "DecoderInitializing": "INICJALIZACJA DEKODERA...",
+    "PlaybackFinished": "ZAKOŃCZONO ODTWARZANIE",
+    "Ready": "GOTOWY",
+    "Finished": "KONIEC (GOTOWY)",
+    "Paused": "PAUZA",
+    "Playing": "ODTWARZANIE...",
+    "Seeking": "PRZEWIJANIE...",
+    "Frame": "KLATKA",
+    "FrameBuffer": "BUFOR KLATEK",
+    "SignalStrength": "SIŁA SYGNAŁU"
+  },
+  "MessageFormatter" : {
+    "You": "Ty",
+    "EmptyMessage": "[Pusta Wiadomość]"
+  },
+  "MessageService" : {
+    "SendFileEmpty": "ERROR: Pusta Ścieżka Pliku",
+    "SendFilePrepare": "Przygotowywanie pliku...",
+    "SendFileNotAccessible": "ERROR: Plik jest niedostępny",
+    "SendFileCannotOpen": "ERROR: Nie można otworzyć pliku",
+    "SendFileProcessing": "Przetwarzanie ",
+    "SendFileEncoding": "Kodowanie ",
+    "SendFileSending": "Wysyłanie ",
+    "SendFileError": "ERROR: ",
+    "SendFileNotConnectedToServer": "ERROR: Nie połączono z serwerem",
+    "SendFileSuccess": "Plik pomyślnie wysłany!"
+  },
+  "CommunicationStream" : {
+    "Title": "STRUMIEŃ KOMUNIKACJI"
+  },
+  "JoinWavelengthDialog": {
+    "Title": "JOIN_WAVELENGTH::CONNECT",
+    "Header": "DOŁĄCZ DO WAVELENGTH",
+    "InfoLabel": "Wprowadź częstotliwość (130Hz - 180MHz)",
+    "FrequencyLabel": "CZĘSTOTLIWOŚĆ:",
+    "FrequencyEdit": "WPROWADŹ CZĘSTOTLIWOŚĆ",
+    "DecimalHintLabel": "Użyj kropki (.) jako separatora (e.g. 98.7)",
+    "PasswordLabel": "HASŁO:",
+    "PasswordEdit": "HASŁO (JEŚLI WYMAGANE)",
+    "JoinButton": "DOŁĄCZ DO WAVELENGTH",
+    "CancelButton": "ZAMKNIJ",
+    "PasswordRequired": "WAVELENGTH CHRONIONE HASŁEM",
+    "IncorrectPassword": "NIEPOPRAWNE HASŁO",
+    "WavelengthUnavailable": "WAVELENGTH NIEDOSTĘPNE"
+  },
+  "CreateWavelengthDialog": {
+    "Title": "CREATE_WAVELENGTH::NEW_INSTANCE",
+    "Header": "STWÓRZ WAVELENGTH",
+    "InfoLabel": "System automatycznie przydziela najniższą dostępną częstotliwość.",
+    "FrequencyLabel": "PRZYDZIELONA CZĘSTOTLIWOŚĆ:",
+    "LoadingIndicator": "SZUKANIE DOSTĘPNEJ CZĘSTOTLIWOŚCI...",
+    "DefaultIndicator": "UŻYWANIE DOMYŚLNEJ CZESTOTLIWOŚCI...",
+    "PasswordCheckbox": "WYMAGAJ HASŁA",
+    "PasswordLabel": "HASŁO:",
+    "PasswordEdit": "WPROWADŹ HASŁO",
+    "CreateButton": "STWÓRZ WAVELENGTH",
+    "CancelButton": "ZAMKNIJ",
+    "PasswordRequired": "WYMAGAJ HASŁA"
+  },
+  "CyberAttachmentViewer" : {
+    "Initializing": "INICJALIZOWANIE SEKWENCJI ODSZYFROWYWANIA...",
+    "EncryptedDataDetected": "WYKRYTO ZASZYFROWANE DANE",
+    "Unlocked": "ODBLOKOWANE",
+    "Locked": "ZABLOKOWANE",
+    "Scanning": "SKANOWANIE ZABEZPIECZEŃ...",
+    "ScanningCompleted": "SKANOWANIE ZABEZPIECZEŃ ZAKOŃCZONE. DESZYFROWANIE...",
+    "StartDecrypting": "DESZYFROWANIE ROZPOCZĘTE... 0%",
+    "Decrypting": "DESZYFROWANIE...",
+    "DecryptingCompleted": "DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY"
+  },
+  "NetworkStatusWidget" : {
+    "SystemReady": "SYSTEM GOTOWY",
+    "SystemOnline": "SYSTEM ONLINE",
+    "ConnectionFair": "FAIR",
+    "ConnectionUnstable": "NIESTABILNE",
+    "Offline": "OFFLINE"
+  },
+  "AppearanceSettingsWidget": {
+    "Title": "Konfiguracja Wyglądu",
+    "Info": "Skonfiguruj kolory wyglądu aplikacji (kliknij podglądy, aby zmienić).",
+    "BackgroundColor": "Kolor Tła",
+    "BlobColor": "Kolor Bloba",
+    "StreamColor": "Kolor Strumienia",
+    "GridColor": "Kolor Siatki",
+    "GridSpacing": "Odstępy Siatki",
+    "TitleBorderColor": "Kolor Tekstu Tytułowego",
+    "TitleGlowColor": "Kolor Poświaty Tytułowej",
+    "RecentlyUsedColor": "Niedawno Używane Kolory"
+  },
+  "ClassifiedSettingsWidget": {
+    "SecurityCode": {
+      "Title": "WERYFIKACJA KODU BEZPIECZEŃSTWA",
+      "Info": "Wprowadź kod zabezpieczający",
+      "2077": "Najbardziej znany rok w Night City",
+      "1337": "Elitarny kod języka hakerów",
+      "CODE": "Podstawowa reprezentacja tego, co wprowadzasz",
+      "HACK": "Co hakerzy robią najlepiej?",
+      "GHOS": "W maszynie",
+      "D3CK": "Interfejs połączenia Cyberdeck (leet)",
+      "3141": "Pierwsze cyfry liczby π (pi)",
+      "1618": "Złoty podział φ (phi) pierwsze cyfry",
+      "2718": "Liczba Eulera (e) pierwsze cyfry",
+      "1729": "Numer Hardy'ego-Ramanujana",
+      "6174": "Stała Kaprekara",
+      "2048": "2^11, popularna gra",
+      "1984": "Dystopijne społeczeństwo nadzoru Orwella",
+      "2001": "Odyseja kosmiczna Kubricka z HAL",
+      "1982": "Rok premiery Blade Runner",
+      "1999": "Rok premiery filmu Matrix",
+      "1969": "Utworzenie ARPANET (prekursora Internetu)",
+      "1989": "Wynalezienie World Wide Web",
+      "BOOK": "Cyfrowy kontener wiedzy",
+      "EV1L": "C0RP - typ cyberpunkowego antagonisty",
+      "LOCK": "Metafora bezpieczeństwa",
+      "RICK": "Never gonna give you up...",
+      "8080": "Klasyczny procesor Intel",
+      "6502": "Procesor używany w Apple II i Commodore 64",
+      "HINT": "WSKAZÓWKA: "
+    },
+    "Fingerprint": {
+      "Title": "UWIERZYTELNIANIE ODCISKU PALCA",
+      "Info": "Naciśnij i przytrzymaj odcisk palca, aby zeskanować"
+    },
+    "Handprint": {
+      "Title": "UWIERZYTELNIANIE ODCISKU DŁONI",
+      "Info": "Naciśnij i przytrzymaj odcisk dłoni, aby zeskanować"
+    },
+    "SecurityQuestion": {
+      "Title": "WERYFIKACJA PYTANIA ZABEZPIECZAJĄCEGO",
+      "Info": "Odpowiedz na swoje pytanie weryfikacyjne.",
+      "Label": "Jakie jest Twoje najbardziej tajne pytanie dotyczące bezpieczeństwa?",
+      "Verified": "✓ UWIERZYTELNIANIE ZWERYFIKOWANE",
+      "Timeout": "Gdyby to naprawdę byłeś ty, znałbyś odpowiedź.\nNie potrzebujesz pytania."
+    },
+    "RetinaScan": {
+      "Title": "WERYFIKACJA SKANU SIATKÓWKI",
+      "Info": "Patrz bezpośrednio na skaner\nNie ruszaj się podczas procesu skanowania"
+    },
+    "SnakeGame": {
+      "Title": "WERYFIKACJA BEZPIECZEŃSTWA: GRA W SNAKE'A",
+      "Info": "Zbierz 4 jabłka, aby otworzyć wyjście\nKontrolki: Strzałki",
+      "CollectedApples0": "Zebrane jabłka: 0/4",
+      "CollectedApples": "Zebrane jabłka: %1/4",
+      "ExitOpened": "Wyjście otwarte!\nUCIEKAJ!!!",
+      "SnakeExited": "Wąż opuścił ekran! Poziom ukończony."
+    },
+    "TypingTest": {
+      "Title": "TEST WERYFIKACJI PISANIA",
+      "Info": "Wpisz następujący tekst, aby kontynuować"
+    },
+    "VoiceRecognition": {
+      "Title": "WERYFIKACJA ROZPOZNAWANIA GŁOSU",
+      "Info": "Mów do mikrofonu\nTrwa weryfikacja wzorca głosu...",
+      "TalkingDetected": "Mowa wykryta",
+      "SilenceDetected": "Cisza",
+      "VoicePatternVerified": "Zweryfikowanie wzorca głosowego"
+    }
+  },
+  "NetworkSettingsWidget": {
+    "Title": "Połączenie Sieciowe",
+    "Info": "Konfiguracja parametrów połączenia sieciowego.\nNależy pamiętać, że zmiany wprowadzone tutaj mogą mieć wpływ na prawidłowe działanie aplikacji.",
+    "ServerAddress": "Adres Serwera",
+    "ServerAddressEdit": "Wprowadź adres serwera",
+    "ServerAddressInfo": "Pozostaw bez zmian, chyba że korzystasz z niestandardowego serwera.",
+    "ServerPort": "Port Serwera",
+    "ServerPortInfo": "Głównie do debugowania. Domyślny serwer ignoruje to, jeśli adres jest niezmieniony.",
+    "ConnectionTimeout": "Limit czasu połączenia",
+    "KeepAliveInterval": "Interwał utrzymywania aktywności",
+    "MaxReconnectAttempts": "Maksymalna liczba prób ponownego połączenia"
+  },
+  "ShortcutSettingsWidget": {
+    "Title": "Skróty Klawiszowe",
+    "Info": "Dostosowywanie skrótów klawiaturowych dla różnych działań.",
+    "RestoreDefaultShortcuts": "Przywróć Domyślne Skróty",
+    "CreateWavelength": "Stwórz Wavelength",
+    "JoinWavelength": "Dołącz do Wavelength",
+    "OpenSettings": "Otwórz Ustawienia",
+    "AbortConnection": "Zamknij Połączenie",
+    "FocusMessageInput": "Focus na Polu Wiadomości",
+    "AttachFile": "Załącz Plik",
+    "SendMessage": "Wyślij Wiadomość",
+    "SwitchToWavelengthTab": "Zmień na zakładkę Wavelength",
+    "SwitchToAppearanceTab": "Zmień na zakładkę Wygląd",
+    "SwitchToNetworkTab": "Zmień na zakładkę Sieć",
+    "SwitchToClassifiedTab": "Zmień na zakładkę TAJNE",
+    "SwitchToShortcutsTab": "Zmień na zakładkę Skróty",
+    "SaveSettings": "Zapisz Ustawienia",
+    "RestoreDefaults": "Przywróć domyślne",
+    "BackCloseSettings": "Wstecz / Zamknij Ustawienia",
+    "RestoreDefaultMessage": "Czy na pewno chcesz przywrócić domyślne wartości wszystkich skrótów klawiaturowych??\nDziałania tego nie można natychmiast cofnąć.",
+    "RestoreDefaultTitle": "Przywróć Domyślne Skróty",
+    "RestoreDefaultSuccessTitle": "Przywrócone ustawienia domyślne.",
+    "RestoreDefaultSuccessMessage": "Domyślne skróty zostały przywrócone pomyślnie."
+  },
+  "WavelengthSettingsWidget": {
+    "Title": "Preferencje Wavelength",
+    "Info": "Konfiguracja preferencji częstotliwości.\nMasz pomysł na inne ustawienia? Otwórz zgłoszenie na GitHub!",
+    "WavelengthFrequency": "Preferowana częstotliwość startu:",
+    "LanguageLabel": "Język:",
+    "LanguageEnglish": "English",
+    "LanguagePolish": "Polski",
+    "InvalidInput": "Nieprawidłowe dane wejściowe!\nWprowadź prawidłową częstotliwość w zakresie od 130 Hz do 180 MHz..",
+    "InvalidInputTitle": "Nieprawidłowe dane",
+    "PositiveNumber": "Wprowadź poprawny dodatni numer dla wartości częstotliwości.",
+    "MaxValue": "Maksymalna wartość dla %1 to %2",
+    "MinValue": "Minimalna wartość częstotliwości to %1 Hz",
+    "MaxValueHz": "Maksymalna wartość częstotliwości to %1 Hz"
+  },
+  "SettingsView": {
+    "WavelengthTab": "Wavelength",
+    "AppearanceTab": "Wygląd",
+    "NetworkTab": "Sieć",
+    "ClassifiedTab": "TAJNE",
+    "ShortcutsTab": "Skróty",
+    "BackButton": "WSTECZ",
+    "SaveButton": "ZAPISZ USTAWIENIA",
+    "RestoreButton": "PRZYWRÓĆ DOMYŚLNE",
+    "ClassifiedInfo": "INFORMACJE POUFNE - WYMAGANA WERYFIKACJA BEZPIECZEŃSTWA",
+    "ClassifiedSubtitle": "Autoryzacja wymagana do uzyskania dostępu do tajnych ustawień.\nWdrożonych zostanie wiele warstw zabezpieczeń.",
+    "ClassifiedUnlocked": "ODBLOKOWANO TAJNE FUNKCJE",
+    "ClassifiedUnlockedSubtitle": "Ominąłeś wszystkie warstwy zabezpieczeń.\nPrawdziwy potencjał jest już dostępny.",
+    "SystemOverride": "UWAGA: NADPISANIE SYSTEMOWE",
+    "SystemOverrideInitiated": "Sekwencja nadpisania systemu została rozpoczęta (Elewacja dla konkretnego systemu może być wymagana).",
+    "SystemOverrideInProgress": "Sekwencja nadpisania systemu w toku...",
+    "ElevationFailedTitle": "⚠️ Podniesienie uprawnień nie powiodło się.",
+    "ElevationFailedMessage": "Nie można zażądać uprawnień administratora.\nSekwencja nadpisania nie może się rozpocząć.",
+    "SystemSettings": "USTAWIENIA SYSTEMU",
+    "SettingsSavedTitle": "Zapisano Ustawienia",
+    "SettingsSavedMessage": "Ustawienia zostały pomyślnie zapisane.",
+    "RestoreDefaultsTitle": "Przywróć Domyślne",
+    "RestoreDefaultsMessage": "Czy na pewno chcesz przywrócić wszystkie ustawienia do wartości domyślnych??\nObejmuje to kolory wyglądu i ustawienia sieciowe.",
+    "RestoreDefaultsSuccessTitle": "Przywrócono Domyślne Ustawienia",
+    "RestoreDefaultsSuccessMessage": "Ustawienia zostały pomyślnie przywrócone do wartości domyślnych."
+  },
+  "ChatView": {
+    "ConnectionActive": "POŁĄCZENIE AKTYWNE",
+    "Buffer100": "BUFOR:100%",
+    "AttachFile": "Załącz Plik",
+    "SendButton": "WYŚLIJ",
+    "AbortConnection": "ZAMKNIJ POŁĄCZENIE",
+    "TalkButton": "NADAWAJ",
+    "TalkTooltip": "Naciśnij i przytrzymaj, aby nadawać",
+    "ConnectedToWavelength": "Połączono z wavelength ",
+    "ConnectionClosed": "POŁĄCZENIE ZAMKNIĘTE",
+    "SelectFileToAttach": "Wybierz pliki do załączenia",
+    "SendingFile": "Wysyłanie pliku",
+    "FailedToStartFileProcessing": "Nie udało się rozpocząć przetwarzania pliku.",
+    "PttYou": "Ty",
+    "PttDenied": "[SYSTEM] Nie można rozpocząć nadawania",
+    "Aborting": "OPUSZCZANIE...",
+    "PttTransmitting": "NADAWANIE",
+    "PttReceiving": "ODBIÓR"
+  }
+}

@@ -8,6 +8,7 @@
 
 #include "../security_layer.h"
 
+class TranslationManager;
 /**
  * @brief A security layer requiring the user to enter a 4-character security code.
  *
@@ -142,6 +143,8 @@ private:
 
     /** @brief Vector storing all available SecurityCode entries (code, hint, type). */
     QVector<SecurityCode> security_codes_;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // SECURITY_CODE_LAYER_H

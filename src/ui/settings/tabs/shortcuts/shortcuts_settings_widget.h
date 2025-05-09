@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMap>
 
+class TranslationManager;
 class WavelengthConfig;
 class QFormLayout;
 class QKeySequenceEdit;
@@ -73,9 +74,10 @@ private:
     QFormLayout *form_layout_;
     /** @brief Button to trigger the restoration of default shortcuts. */
     QPushButton *restore_button_;
-
     /** @brief Map storing pointers to the QKeySequenceEdit widgets, keyed by their corresponding action ID. */
     QMap<QString, QKeySequenceEdit*> shortcut_edits_;
+    /** @brief Pointer to the TranslationManager for handling UI translations. */
+    TranslationManager* translator_;
 };
 
 #endif // SHORTCUTS_SETTINGS_WIDGET_H

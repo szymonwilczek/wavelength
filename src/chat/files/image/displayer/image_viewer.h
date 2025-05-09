@@ -10,6 +10,7 @@
 
 #include "../decoder/image_decoder.h"
 
+class TranslationManager;
 /**
  * @brief An inline widget for displaying static images (PNG, JPEG, etc.) within a chat interface.
  *
@@ -119,6 +120,8 @@ private:
     int image_height_ = 0;
     /** @brief Flag indicating if the image has an alpha channel. Set by HandleImageInfo. */
     bool has_alpha_ = false;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_ = nullptr;
 };
 
 #endif // INLINE_IMAGE_VIEWER_H

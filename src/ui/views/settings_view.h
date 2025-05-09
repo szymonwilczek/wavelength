@@ -10,6 +10,7 @@
 #include "../../ui/checkbox/cyber_checkbox.h"
 #include "../../app/wavelength_config.h"
 
+class TranslationManager;
 class ShortcutsSettingsWidget;
 class SystemOverrideManager;
 class SnakeGameLayer;
@@ -242,6 +243,8 @@ private:
     QPushButton* override_button_;
     /** @brief Manages the system override sequence (wallpaper change, window minimize, input blocking, etc.). */
     SystemOverrideManager* system_override_manager_;
+    /** @brief Pointer to the TranslationManager singleton instance for UI translations. */
+    TranslationManager* translator_;
 };
 
 #endif // SETTINGS_VIEW_H

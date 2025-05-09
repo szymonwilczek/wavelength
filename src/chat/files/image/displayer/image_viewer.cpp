@@ -2,17 +2,21 @@
 
 #include <QVBoxLayout>
 
-InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent), image_data_(image_data) { // Usunięto m_isZoomed
+#include "../../../../app/managers/translation_manager.h"
+
+InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent), image_data_(image_data) {
 
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    translator_ = TranslationManager::GetInstance();
+
     // Obszar wyświetlania obrazu
     image_label_ = new QLabel(this);
     image_label_->setAlignment(Qt::AlignCenter);
     image_label_->setStyleSheet("background-color: transparent; color: #ffffff;"); // Ustawiamy przezroczyste tło
-    image_label_->setText("Ładowanie obrazu...");
+    image_label_->setText(translator_->Translate("ImageViewer.Loading", "LOADING IMAGE..."));
     image_label_->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
     layout->addWidget(image_label_);
 
@@ -50,7 +54,7 @@ QSize InlineImageViewer::sizeHint() const {
 
 void InlineImageViewer::HandleImageReady(const QImage &image) {
     if (image.isNull()) {
-        HandleError("Otrzymano pusty obraz z dekodera.");
+        HandleError(translator_->Translate("ImageViewer.EmptyImage", "⚠️ Viewer got an empty image from decoder."));
         return;
     }
     original_image_ = image;
@@ -68,7 +72,7 @@ void InlineImageViewer::HandleImageReady(const QImage &image) {
 
 void InlineImageViewer::HandleError(const QString &message) {
     qDebug() << "Image decoder error:" << message;
-    image_label_->setText("⚠️ " + message);
+    image_label_->setText(translator_->Translate("ImageViewer.DecoderError", "⚠️ IMAGE DECODER ERROR..."));
     // Można ustawić minimalny rozmiar, aby tekst błędu był widoczny
     setMinimumSize(100, 50);
     updateGeometry();

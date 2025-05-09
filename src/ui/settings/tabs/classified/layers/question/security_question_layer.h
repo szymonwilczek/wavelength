@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QTimer>
 
+class TranslationManager;
 /**
  * @brief A security layer simulating a security question challenge.
  *
@@ -70,6 +71,8 @@ private:
     QLineEdit* security_question_input_;
     /** @brief Timer controlling when the hint is displayed. */
     QTimer* security_question_timer_;
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_;
 };
 
 #endif // SECURITY_QUESTION_LAYER_H

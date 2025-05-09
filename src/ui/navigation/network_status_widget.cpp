@@ -9,11 +9,14 @@
 #include <QPaintEvent>
 #include <QTimer>
 
+#include "../../app/managers/translation_manager.h"
+
 NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     : QWidget(parent)
     , current_quality_(kNone)
     , ping_value_(0)
 {
+    translator_ = TranslationManager::GetInstance();
     // Zmniejszona wysokość widgetu
     setFixedHeight(30);  // Zmniejszone z 36 na 30
     setMinimumWidth(150);  // Nieznacznie zmniejszona szerokość
@@ -28,7 +31,7 @@ NetworkStatusWidget::NetworkStatusWidget(QWidget *parent)
     icon_label_->setFixedSize(20, 18);  // Zmniejszone z 28x24 na 20x18
 
     // Etykieta statusu
-    status_label_ = new QLabel("SYSTEM READY", this);
+    status_label_ = new QLabel(translator_->Translate("NetworkStatusWidget.SystemReady", "SYSTEM READY"), this);
 
     // Ustaw czcionkę dla statusu
     status_label_->setStyleSheet(
@@ -164,19 +167,19 @@ void NetworkStatusWidget::UpdateStatusDisplay() {
     // Aktualizacja etykiety statusu
     switch (current_quality_) {
     case kExcellent:
-        status_label_->setText("SYSTEM READY");
+        status_label_->setText(translator_->Translate("NetworkStatusWidget.SystemReady", "SYSTEM READY"));
         break;
     case kGood:
-        status_label_->setText("SYSTEM ONLINE");
+        status_label_->setText(translator_->Translate("NetworkStatusWidget.SystemOnline", "SYSTEM ONLINE"));
         break;
     case kFair:
-        status_label_->setText("CONNECTION FAIR");
+        status_label_->setText(translator_->Translate("NetworkStatusWidget.ConnectionFair", "CONNECTION FAIR"));
         break;
     case kPoor:
-        status_label_->setText("CONNECTION UNSTABLE");
+        status_label_->setText(translator_->Translate("NetworkStatusWidget.ConnectionUnstable", "CONNECTION UNSTABLE"));
         break;
     case kNone:
-        status_label_->setText("OFFLINE");
+        status_label_->setText(translator_->Translate("NetworkStatusWidget.Offline", "OFFLINE"));
         break;
     }
 

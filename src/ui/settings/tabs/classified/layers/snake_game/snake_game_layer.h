@@ -8,6 +8,7 @@
 #include <QPair>
 #include <QKeyEvent>
 
+class TranslationManager;
 /**
  * @brief A security layer implementing a classic Snake game as a challenge.
  *
@@ -225,7 +226,6 @@ private:
     /** @brief Flag indicating if the game is over (due to collision or successful exit). */
     bool game_over_;
 
-    // --- Exit Mode Variables ---
     /** @brief Current state of the game (Playing, ExitOpen, etc.). */
     GameState game_state_;
     /** @brief Which side (Left or Right) the exit is on. */
@@ -238,7 +238,8 @@ private:
     int parts_exited_;
     /** @brief Stores the coordinates considered as valid exit points (just outside the border). */
     QVector<QPair<int, int>> exit_points_;
-    // --- End Exit Mode Variables ---
+    /** @brief Pointer to the translation manager for handling UI translations. */
+    TranslationManager* translator_;
 };
 
 #endif // SNAKE_GAME_LAYER_H

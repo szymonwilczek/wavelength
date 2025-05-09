@@ -2,9 +2,11 @@
 
 #include <QApplication>
 
-InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
-                                                                                                               scanline_opacity_(0.15), spectrum_intensity_(0.6) {
+#include "../../../../app/managers/translation_manager.h"
 
+InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
+                                                                                                               scanline_opacity_(0.15), spectrum_intensity_(0.6), translator_(nullptr) {
+    translator_ = TranslationManager::GetInstance();
     // Ustawiamy styl i rozmiar - nadal zachowujemy mały rozmiar
     setFixedSize(480, 120);
     setContentsMargins(0, 0, 0, 0);
@@ -45,7 +47,7 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString
         "font-family: 'Consolas';"
         "font-size: 8pt;"
     );
-    status_label_->setText("INICJALIZACJA...");
+    status_label_->setText(translator_->Translate("AudioPlayer.Initialization", "INITIALIZING..."));
     top_layout->addWidget(status_label_);
 
     layout->addWidget(top_panel);
@@ -122,7 +124,7 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString
     connect(decoder_.get(), &AudioDecoder::playbackFinished, this, [this]() {
         playback_finished_ = true;
         play_button_->setText("↻");
-        status_label_->setText("ZAKOŃCZONO ODTWARZANIE");
+        status_label_->setText(translator_->Translate("AudioPlayer.PlaybackFinished", "PLAYBACK FINISHED"));
         DecreaseSpectrumIntensity();
         update();
     });
@@ -324,7 +326,7 @@ void InlineAudioPlayer::OnSliderPressed() {
     }
 
     slider_dragging_ = true;
-    status_label_->setText("WYSZUKIWANIE...");
+    status_label_->setText(translator_->Translate("AudioPlayer.Seeking", "SEEKING..."));
 }
 
 void InlineAudioPlayer::OnSliderReleased() {
@@ -337,12 +339,12 @@ void InlineAudioPlayer::OnSliderReleased() {
     if (was_playing_) {
         decoder_->Pause(); // Przełącza stan pauzy (wznawia)
         play_button_->setText("❚❚");
-        status_label_->setText("ODTWARZANIE");
+        status_label_->setText(translator_->Translate("AudioPlayer.Playing", "PLAYING..."));
 
         // Aktywujemy wizualizację
         IncreaseSpectrumIntensity();
     } else {
-        status_label_->setText("PAUZA");
+        status_label_->setText(translator_->Translate("AudioPlayer.Paused", "PAUSED"));
     }
 }
 
@@ -411,7 +413,7 @@ void InlineAudioPlayer::TogglePlayback() {
         decoder_->Reset();
         playback_finished_ = false;
         play_button_->setText("❚❚");
-        status_label_->setText("ODTWARZANIE");
+        status_label_->setText(translator_->Translate("AudioPlayer.Playing", "PLAYING..."));
         current_position_ = 0;
         UpdateTimeLabel(0);
         IncreaseSpectrumIntensity();
@@ -419,12 +421,12 @@ void InlineAudioPlayer::TogglePlayback() {
     } else {
         if (decoder_->IsPaused()) {
             play_button_->setText("❚❚");
-            status_label_->setText("ODTWARZANIE");
+            status_label_->setText(translator_->Translate("AudioPlayer.Playing", "PLAYING..."));
             IncreaseSpectrumIntensity();
             decoder_->Pause(); // Wznów odtwarzanie
         } else {
             play_button_->setText("▶");
-            status_label_->setText("PAUZA");
+            status_label_->setText(translator_->Translate("AudioPlayer.Paused", "PAUSED"));
             DecreaseSpectrumIntensity();
             decoder_->Pause(); // Wstrzymaj odtwarzanie
         }
@@ -453,7 +455,7 @@ void InlineAudioPlayer::HandleAudioInfo(const int sample_rate, const int channel
     // Dodajemy informacje o parametrach audio
     audio_info += QString(" (%1kHz, %2ch)").arg(sample_rate/1000.0, 0, 'f', 1).arg(channels);
     audio_info_label_->setText(audio_info.toUpper());
-    status_label_->setText("GOTOWY");
+    status_label_->setText(translator_->Translate("AudioPlayer.Ready", "READY"));
 
     // Przygotowujemy losowe dane dla wizualizacji spektrum
     for (int i = 0; i < 64; i++) {

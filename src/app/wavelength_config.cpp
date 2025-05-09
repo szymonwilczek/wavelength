@@ -73,6 +73,7 @@ void WavelengthConfig::LoadDefaults() {
     title_border_color_ = DefaultConfig::kTitleBorderColor;
     title_glow_color_ = DefaultConfig::kTitleGlowColor;
     preferred_start_frequency_ = "130.0";
+    language_code_ = "en";
     shortcuts_ = default_shortcuts_;
 }
 
@@ -110,6 +111,7 @@ void WavelengthConfig::LoadSettings() {
     max_sent_message_cache_size_ = settings_.value("maxSentMessageCacheSize", max_sent_message_cache_size_).toInt();
     max_recent_wavelength_ = settings_.value("maxRecentWavelength", max_recent_wavelength_).toInt();
     debug_mode_ = settings_.value("debugMode", debug_mode_).toBool();
+    language_code_ = settings_.value("languageCode", language_code_).toString();
     settings_.endGroup();
 
     settings_.beginGroup("Appearance");
@@ -160,6 +162,7 @@ void WavelengthConfig::SaveSettings() {
     settings_.setValue("maxSentMessageCacheSize", max_sent_message_cache_size_);
     settings_.setValue("maxRecentWavelength", max_recent_wavelength_);
     settings_.setValue("debugMode", debug_mode_);
+    settings_.setValue("languageCode", language_code_);
     settings_.endGroup();
 
     settings_.beginGroup("Appearance");
@@ -219,6 +222,19 @@ int WavelengthConfig::GetGridSpacing() const { return grid_spacing_; }
 QColor WavelengthConfig::GetTitleTextColor() const { return title_text_color_; }
 QColor WavelengthConfig::GetTitleBorderColor() const { return title_border_color_; }
 QColor WavelengthConfig::GetTitleGlowColor() const { return title_glow_color_; }
+
+QString WavelengthConfig::GetLanguageCode() const {
+    return language_code_;
+}
+
+void WavelengthConfig::SetLanguageCode(const QString& code) {
+    // Prosta walidacja - można dodać listę wspieranych kodów
+    if (language_code_ != code && !code.isEmpty()) {
+        language_code_ = code;
+        emit configChanged("languageCode"); // Sygnalizuj zmianę ustawienia
+        // Zapis nastąpi przy SaveSettings()
+    }
+}
 
 void WavelengthConfig::SetRelayServerAddress(const QString& address) {
     if (relay_server_address_ != address) {
@@ -370,6 +386,7 @@ QVariant WavelengthConfig::GetSetting(const QString& key) const {
     if (key == "title_border_color") return title_border_color_;
     if (key == "title_glow_color") return title_glow_color_;
     if (key == "recentColors") return recent_colors_; // QStringList jest obsługiwany przez QVariant
+    if (key == "languageCode") return language_code_;
 
     // Jeśli klucz nie pasuje do żadnego znanego ustawienia
     qWarning() << "WavelengthConfig::getSetting - Unknown key:" << key;

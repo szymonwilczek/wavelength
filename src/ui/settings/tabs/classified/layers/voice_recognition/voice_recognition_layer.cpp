@@ -5,6 +5,8 @@
 #include <QPropertyAnimation>
 #include <QPainterPath>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent) 
     : SecurityLayer(parent),
       progress_timer_(nullptr),
@@ -21,7 +23,10 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const auto title = new QLabel("VOICE RECOGNITION VERIFICATION", this);
+    translator_ = TranslationManager::GetInstance();
+
+    const auto title = new QLabel(translator_->Translate("ClassifiedSettingsWidget.VoiceRecognition.Title",
+        "VOICE RECOGNITION VERIFICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
@@ -35,7 +40,8 @@ VoiceRecognitionLayer::VoiceRecognitionLayer(QWidget *parent)
     visualizer_data_.resize(100);
     visualizer_data_.fill(0);
 
-    const auto instructions = new QLabel("Proszę mówić do mikrofonu\nWeryfikacja wzorca głosowego w toku", this);
+    const auto instructions = new QLabel(translator_->Translate("ClassifiedSettingsWidget.VoiceRecognition.Info",
+        "Please speak into the microphone\nVoice pattern verification in progress..."), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -347,7 +353,9 @@ void VoiceRecognitionLayer::UpdateAudioVisualizer(const QByteArray &data) {
     }
 
     // Dodanie wskaźnika stanu mowy
-    QString speaking_status = is_speaking_ ? "Mowa wykryta" : "Cisza";
+    QString speaking_status = is_speaking_ ?
+    translator_->Translate("ClassifiedSettingsWidget.VoiceRecognition.TalkingDetected", "Talking detected") :
+    translator_->Translate("ClassifiedSettingsWidget.VoiceRecognition.SilenceDetected", "Silence");
     painter.setPen(QPen(is_speaking_ ? Qt::green : Qt::red));
     painter.drawText(10, 20, speaking_status);
 
@@ -438,7 +446,7 @@ void VoiceRecognitionLayer::FinishRecognition() {
     // Tekst sukcesu
     painter.setPen(QPen(Qt::green));
     painter.setFont(QFont("Consolas", 12));
-    painter.drawText(final_visualizer.rect(), Qt::AlignCenter, "Weryfikacja głosu zakończona");
+    painter.drawText(final_visualizer.rect(), Qt::AlignCenter, translator_->Translate("ClassifiedSettingsWidget.VoiceRecognition.VoicePatternVerified", "Voice pattern verified"));
 
     painter.end();
 
