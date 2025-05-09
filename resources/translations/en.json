@@ -191,18 +191,18 @@
         "Info": "Answer your security question.",
         "Label": "What is your top secret security question?",
         "Verified": "✓ AUTHENTICATION VERIFIED",
-        "Timeout": "If this was really you, you would know the answer.\\nYou don't need a question."
+        "Timeout": "If this was really you, you would know the answer.\nYou don't need a question."
     },
     "RetinaScan": {
         "Title": "RETINA SCAN VERIFICATION",
-        "Info": "Please look directly at the scanner\\nDo not move during scan process"
+        "Info": "Please look directly at the scanner\nDo not move during scan process"
     },
     "SnakeGame": {
       "Title": "SECURITY VERIFICATION: SNAKE GAME",
-      "Info": "Collect 4 apples to open exit\\nControls: Arrrows",
+      "Info": "Collect 4 apples to open exit\nControls: Arrrows",
       "CollectedApples0": "Collected apples: 0/4",
       "CollectedApples": "Collected apples",
-      "ExitOpened": "Exit opened!\\nESCAPE!!!",
+      "ExitOpened": "Exit opened!\nESCAPE!!!",
       "SnakeExited": "Snake exited the screen! Level completed."
     },
     "TypingTest": {
@@ -211,7 +211,7 @@
     },
     "VoiceRecognition": {
       "Title": "VOICE RECOGNITION VERIFICATION",
-      "Info": "Please speak into the microphone\\nVoice pattern verification in progress...",
+      "Info": "Please speak into the microphone\nVoice pattern verification in progress...",
       "TalkingDetected": "Talking detected",
       "SilenceDetected": "Silence",
       "VoicePatternVerified": "Voice pattern verified"
@@ -219,7 +219,7 @@
   },
   "NetworkSettingsWidget": {
     "Title": "Network Connection",
-    "Info": "Configure network connection parameters.\\nPlease be aware that the changes made here may affect the correct operation of the application.",
+    "Info": "Configure network connection parameters.\nPlease be aware that the changes made here may affect the correct operation of the application.",
     "ServerAddress": "Server Address",
     "ServerAddressEdit": "Enter server address",
     "ServerAddressInfo": "Leave unchanged unless using a custom server.",
@@ -231,7 +231,7 @@
   },
   "ShortcutSettingsWidget": {
     "Title": "Keyboard Shortcuts",
-    "Info": "Customize the keyboard shortcuts for various actions.\\nChanges will take effect after restarting the application.",
+    "Info": "Customize the keyboard shortcuts for various actions.\nChanges will take effect after restarting the application.",
     "RestoreDefaultShortcuts": "Restore Default Shortcuts",
     "CreateWavelength": "Create Wavelength",
     "JoinWavelength": "Join Wavelength",
@@ -248,19 +248,19 @@
     "SaveSettings": "Save Settings",
     "RestoreDefaults": "Restore Defaults",
     "BackCloseSettings": "Back / Close Settings",
-    "RestoreDefaultMessage": "Are you sure you want to restore all keyboard shortcuts to their default values?\\nThis action cannot be undone immediately.",
+    "RestoreDefaultMessage": "Are you sure you want to restore all keyboard shortcuts to their default values?\nThis action cannot be undone immediately.",
     "RestoreDefaultTitle": "Restore Default Shortcuts",
     "RestoreDefaultSuccessTitle": "Defaults Restored.",
     "RestoreDefaultSuccessMessage": "Default shortcuts have been restored successfully."
   },
   "WavelengthSettingsWidget": {
     "Title": "Wavelength Preferences",
-    "Info": "Configure frequency preferences.\\nDo you have some idea for some other settings? Open issue on GitHub!",
+    "Info": "Configure frequency preferences.\nDo you have some idea for some other settings? Open issue on GitHub!",
     "WavelengthFrequency": "Preferred Start Frequency:",
     "LanguageLabel": "Language:",
     "LanguageEnglish": "English",
     "LanguagePolish": "Polski",
-    "InvalidInput": "Invalid Input!\\nPlease enter a valid frequency between 130Hz and 180MHz.",
+    "InvalidInput": "Invalid Input!\nPlease enter a valid frequency between 130Hz and 180MHz.",
     "InvalidInputTitle": "Invalid Input",
     "PositiveNumber": "Please enter a valid positive number for the frequency value.",
     "MaxValue": "Maximum value for %1 is %2",
@@ -277,19 +277,19 @@
     "SaveButton": "SAVE SETTINGS",
     "RestoreButton": "RESTORE DEFAULTS",
     "ClassifiedInfo": "CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED",
-    "ClassifiedSubtitle": "Authorization required to access classified settings.\\nMultiple security layers will be enforced.",
+    "ClassifiedSubtitle": "Authorization required to access classified settings.\nMultiple security layers will be enforced.",
     "ClassifiedUnlocked": "CLASSIFIED FEATURES UNLOCKED",
-    "ClassifiedUnlockedSubtitle": "You have bypassed all security layers.\\nThe true potential is now available.",
+    "ClassifiedUnlockedSubtitle": "You have bypassed all security layers.\nThe true potential is now available.",
     "SystemOverride": "CAUTION: SYSTEM OVERRIDE",
     "SystemOverrideInitiated": "System override sequence initiated (OS specific elevation might be required)",
     "SystemOverrideInProgress": "OVERRIDE IN PROGRESS...",
     "ElevationFailedTitle": "⚠️ Elevation failed.",
-    "ElevationFailedMessage": "Could not request administrator privileges.\\nThe override sequence cannot start.",
+    "ElevationFailedMessage": "Could not request administrator privileges.\nThe override sequence cannot start.",
     "SystemSettings": "SYSTEM SETTINGS",
     "SettingsSavedTitle": "Settings Saved",
     "SettingsSavedMessage": "Settings have been successfully saved.",
     "RestoreDefaultsTitle": "Restore Defaults",
-    "RestoreDefaultsMessage": "Are you sure you want to restore all settings to default values?\\nThis includes appearance colors and network settings.",
+    "RestoreDefaultsMessage": "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings.",
     "RestoreDefaultsSuccessTitle": "Defaults Restored",
     "RestoreDefaultsSuccessMessage": "Settings have been restored to their default values successfully."
   },

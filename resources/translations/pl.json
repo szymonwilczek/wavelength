@@ -191,18 +191,18 @@
       "Info": "Odpowiedz na swoje pytanie weryfikacyjne.",
       "Label": "Jakie jest Twoje najbardziej tajne pytanie dotyczące bezpieczeństwa?",
       "Verified": "✓ UWIERZYTELNIANIE ZWERYFIKOWANE",
-      "Timeout": "Gdyby to naprawdę byłeś ty, znałbyś odpowiedź.\\nNie potrzebujesz pytania."
+      "Timeout": "Gdyby to naprawdę byłeś ty, znałbyś odpowiedź.\nNie potrzebujesz pytania."
     },
     "RetinaScan": {
       "Title": "WERYFIKACJA SKANU SIATKÓWKI",
-      "Info": "Patrz bezpośrednio na skaner\\nNie ruszaj się podczas procesu skanowania"
+      "Info": "Patrz bezpośrednio na skaner\nNie ruszaj się podczas procesu skanowania"
     },
     "SnakeGame": {
-      "Title": "WERYFIKACJA BEZPIECZEŃSTWA: GRA W SNAKE\\'A",
-      "Info": "Zbierz 4 jabłka, aby otworzyć wyjście\\nKontrolki: Strzałki",
+      "Title": "WERYFIKACJA BEZPIECZEŃSTWA: GRA W SNAKE'A",
+      "Info": "Zbierz 4 jabłka, aby otworzyć wyjście\nKontrolki: Strzałki",
       "CollectedApples0": "Zebrane jabłka: 0/4",
       "CollectedApples": "Zebrane jabłka: %1/4",
-      "ExitOpened": "Wyjście otwarte!\\nUCIEKAJ!!!",
+      "ExitOpened": "Wyjście otwarte!\nUCIEKAJ!!!",
       "SnakeExited": "Wąż opuścił ekran! Poziom ukończony."
     },
     "TypingTest": {
@@ -211,7 +211,7 @@
     },
     "VoiceRecognition": {
       "Title": "WERYFIKACJA ROZPOZNAWANIA GŁOSU",
-      "Info": "Mów do mikrofonu\\nTrwa weryfikacja wzorca głosu...",
+      "Info": "Mów do mikrofonu\nTrwa weryfikacja wzorca głosu...",
       "TalkingDetected": "Mowa wykryta",
       "SilenceDetected": "Cisza",
       "VoicePatternVerified": "Zweryfikowanie wzorca głosowego"
@@ -219,7 +219,7 @@
   },
   "NetworkSettingsWidget": {
     "Title": "Połączenie Sieciowe",
-    "Info": "Konfiguracja parametrów połączenia sieciowego.\\nNależy pamiętać, że zmiany wprowadzone tutaj mogą mieć wpływ na prawidłowe działanie aplikacji.",
+    "Info": "Konfiguracja parametrów połączenia sieciowego.\nNależy pamiętać, że zmiany wprowadzone tutaj mogą mieć wpływ na prawidłowe działanie aplikacji.",
     "ServerAddress": "Adres Serwera",
     "ServerAddressEdit": "Wprowadź adres serwera",
     "ServerAddressInfo": "Pozostaw bez zmian, chyba że korzystasz z niestandardowego serwera.",
@@ -248,19 +248,19 @@
     "SaveSettings": "Zapisz Ustawienia",
     "RestoreDefaults": "Przywróć domyślne",
     "BackCloseSettings": "Wstecz / Zamknij Ustawienia",
-    "RestoreDefaultMessage": "Czy na pewno chcesz przywrócić domyślne wartości wszystkich skrótów klawiaturowych??\\nDziałania tego nie można natychmiast cofnąć.",
+    "RestoreDefaultMessage": "Czy na pewno chcesz przywrócić domyślne wartości wszystkich skrótów klawiaturowych??\nDziałania tego nie można natychmiast cofnąć.",
     "RestoreDefaultTitle": "Przywróć Domyślne Skróty",
     "RestoreDefaultSuccessTitle": "Przywrócone ustawienia domyślne.",
     "RestoreDefaultSuccessMessage": "Domyślne skróty zostały przywrócone pomyślnie."
   },
   "WavelengthSettingsWidget": {
     "Title": "Preferencje Wavelength",
-    "Info": "Konfiguracja preferencji częstotliwości.\\nMasz pomysł na inne ustawienia? Otwórz zgłoszenie na GitHub!",
+    "Info": "Konfiguracja preferencji częstotliwości.\nMasz pomysł na inne ustawienia? Otwórz zgłoszenie na GitHub!",
     "WavelengthFrequency": "Preferowana częstotliwość startu:",
     "LanguageLabel": "Język:",
     "LanguageEnglish": "English",
     "LanguagePolish": "Polski",
-    "InvalidInput": "Nieprawidłowe dane wejściowe!\\nWprowadź prawidłową częstotliwość w zakresie od 130 Hz do 180 MHz..",
+    "InvalidInput": "Nieprawidłowe dane wejściowe!\nWprowadź prawidłową częstotliwość w zakresie od 130 Hz do 180 MHz..",
     "InvalidInputTitle": "Nieprawidłowe dane",
     "PositiveNumber": "Wprowadź poprawny dodatni numer dla wartości częstotliwości.",
     "MaxValue": "Maksymalna wartość dla %1 to %2",
@@ -277,19 +277,19 @@
     "SaveButton": "ZAPISZ USTAWIENIA",
     "RestoreButton": "PRZYWRÓĆ DOMYŚLNE",
     "ClassifiedInfo": "INFORMACJE POUFNE - WYMAGANA WERYFIKACJA BEZPIECZEŃSTWA",
-    "ClassifiedSubtitle": "Autoryzacja wymagana do uzyskania dostępu do tajnych ustawień.\\nWdrożonych zostanie wiele warstw zabezpieczeń.",
+    "ClassifiedSubtitle": "Autoryzacja wymagana do uzyskania dostępu do tajnych ustawień.\nWdrożonych zostanie wiele warstw zabezpieczeń.",
     "ClassifiedUnlocked": "ODBLOKOWANO TAJNE FUNKCJE",
-    "ClassifiedUnlockedSubtitle": "Ominąłeś wszystkie warstwy zabezpieczeń.\\nPrawdziwy potencjał jest już dostępny.",
+    "ClassifiedUnlockedSubtitle": "Ominąłeś wszystkie warstwy zabezpieczeń.\nPrawdziwy potencjał jest już dostępny.",
     "SystemOverride": "UWAGA: NADPISANIE SYSTEMOWE",
     "SystemOverrideInitiated": "Sekwencja nadpisania systemu została rozpoczęta (Elewacja dla konkretnego systemu może być wymagana).",
     "SystemOverrideInProgress": "Sekwencja nadpisania systemu w toku...",
     "ElevationFailedTitle": "⚠️ Podniesienie uprawnień nie powiodło się.",
-    "ElevationFailedMessage": "Nie można zażądać uprawnień administratora.\\nSekwencja nadpisania nie może się rozpocząć.",
+    "ElevationFailedMessage": "Nie można zażądać uprawnień administratora.\nSekwencja nadpisania nie może się rozpocząć.",
     "SystemSettings": "USTAWIENIA SYSTEMU",
     "SettingsSavedTitle": "Zapisano Ustawienia",
     "SettingsSavedMessage": "Ustawienia zostały pomyślnie zapisane.",
     "RestoreDefaultsTitle": "Przywróć Domyślne",
-    "RestoreDefaultsMessage": "Czy na pewno chcesz przywrócić wszystkie ustawienia do wartości domyślnych??\\nObejmuje to kolory wyglądu i ustawienia sieciowe.",
+    "RestoreDefaultsMessage": "Czy na pewno chcesz przywrócić wszystkie ustawienia do wartości domyślnych??\nObejmuje to kolory wyglądu i ustawienia sieciowe.",
     "RestoreDefaultsSuccessTitle": "Przywrócono Domyślne Ustawienia",
     "RestoreDefaultsSuccessMessage": "Ustawienia zostały pomyślnie przywrócone do wartości domyślnych."
   },
