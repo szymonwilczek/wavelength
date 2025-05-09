@@ -25,6 +25,7 @@
 
 #include "../../ui/checkbox/cyber_checkbox.h"
 #include "../../app/managers/shortcut_manager.h"
+#include "../../app/managers/translation_manager.h"
 #include "../../ui/settings/tabs/shortcuts/shortcuts_settings_widget.h"
 
 SettingsView::SettingsView(QWidget *parent)
@@ -61,6 +62,8 @@ system_override_manager_(nullptr)
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("SettingsView { background-color: #101820; }");
 
+    translator_ = TranslationManager::GetInstance();
+
     SetupUi();
 
     // Timer do aktualizacji czasu
@@ -78,7 +81,7 @@ system_override_manager_(nullptr)
         qDebug() << "Override sequence finished signal received in SettingsView.";
         if (override_button_) {
             override_button_->setEnabled(true);
-            override_button_->setText("CAUTION: SYSTEM OVERRIDE");
+            override_button_->setText(translator_->Translate("SettingsView.SystemOverride", "CAUTION: SYSTEM OVERRIDE"));
         }
         // Można dodać inne akcje po zakończeniu override
     });
@@ -117,7 +120,13 @@ void SettingsView::SetupUi() {
 
     // Tworzenie przycisków zakładek
     // Zmieniono "Performance" na "Network"
-    QStringList tab_names = {"Wavelength", "Appearance", "Network","Shortcuts", "CLASSIFIED"};
+    QStringList tab_names = {
+        translator_->Translate("SettingsView.WavelengthTab", "Wavelength"),
+        translator_->Translate("SettingsView.AppearanceTab", "Appearance"),
+        translator_->Translate("SettingsView.NetworkTab", "Network"),
+        translator_->Translate("SettingsView.ShortcutsTab", "Shortcuts"),
+        translator_->Translate("SettingsView.ClassifiedTab", "CLASSIFIED"),
+    };
 
     for (int i = 0; i < tab_names.size(); i++) {
         auto btn = new TabButton(tab_names[i], tab_bar_);
@@ -181,11 +190,17 @@ void SettingsView::SetupUi() {
     // Panel przycisków (bez zmian)
     const auto button_layout = new QHBoxLayout();
     button_layout->setSpacing(15);
-    back_button_ = new CyberButton("BACK", this, false);
+    back_button_ = new CyberButton(
+        translator_->Translate("SettingsView.BackButton", "BACK"),
+        this, false);
     back_button_->setFixedHeight(40);
-    defaults_button_ = new CyberButton("RESTORE DEFAULTS", this, false);
+    defaults_button_ = new CyberButton(
+        translator_->Translate("SettingsView.RestoreButton", "RESTORE DEFAULTS"),
+        this, false);
     defaults_button_->setFixedHeight(40);
-    save_button_ = new CyberButton("SAVE SETTINGS", this, true);
+    save_button_ = new CyberButton(
+        translator_->Translate("SettingsView.SaveButton", "SAVE SETTINGS"),
+        this, true);
     save_button_->setFixedHeight(40);
     button_layout->addWidget(back_button_, 1);
     button_layout->addStretch(1);
@@ -213,11 +228,15 @@ void SettingsView::SetupClassifiedTab() {
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(15);
 
-    const auto info_label = new QLabel("CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED", tab);
+    const auto info_label = new QLabel(
+        translator_->Translate("SettingsView.ClassifiedInfo", "CLASSIFIED INFORMATION - SECURITY VERIFICATION REQUIRED"),
+        tab);
     info_label->setStyleSheet("color: #ff3333; background-color: transparent; font-family: Consolas; font-size: 12pt; font-weight: bold;");
     layout->addWidget(info_label);
 
-    const auto warning_label = new QLabel("Authorization required to access classified settings.\nMultiple security layers will be enforced.", tab);
+    const auto warning_label = new QLabel(
+        translator_->Translate("SettingsView.ClassifiedSubtitle", "Authorization required to access classified settings.\nMultiple security layers will be enforced."),
+        tab);
     warning_label->setStyleSheet("color: #ffcc00; background-color: transparent; font-family: Consolas; font-size: 9pt;");
     layout->addWidget(warning_label);
 
@@ -238,12 +257,16 @@ void SettingsView::SetupClassifiedTab() {
     features_layout->setAlignment(Qt::AlignCenter);
     features_layout->setSpacing(20);
 
-    const auto features_title = new QLabel("CLASSIFIED FEATURES UNLOCKED", classified_features_widget_);
+    const auto features_title = new QLabel(
+        translator_->Translate("SettingsView.ClassifiedUnlocked", "CLASSIFIED FEATURES UNLOCKED"),
+        classified_features_widget_);
     features_title->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 14pt; font-weight: bold;");
     features_title->setAlignment(Qt::AlignCenter);
     features_layout->addWidget(features_title);
 
-    const auto features_desc = new QLabel("You have bypassed all security layers.\nThe true potential is now available.", classified_features_widget_);
+    const auto features_desc = new QLabel(
+        translator_->Translate("SettingsView.ClassifiedUnlockedSubtitle", "You have bypassed all security layers.\nThe true potential is now available."),
+        classified_features_widget_);
     features_desc->setStyleSheet("color: #cccccc; font-family: Consolas; font-size: 10pt;");
     features_desc->setAlignment(Qt::AlignCenter);
     features_layout->addWidget(features_desc);
@@ -252,7 +275,9 @@ void SettingsView::SetupClassifiedTab() {
     const auto button_layout_classified = new QHBoxLayout(button_container); // Zmieniono nazwę zmiennej
     button_layout_classified->setSpacing(15);
 
-    override_button_ = new QPushButton("CAUTION: SYSTEM OVERRIDE", button_container);
+    override_button_ = new QPushButton(
+        translator_->Translate("SettingsView.SettingsOverride", "CAUTION: SYSTEM OVERRIDE"),
+        button_container);
     override_button_->setMinimumHeight(50);
     override_button_->setMinimumWidth(250);
     override_button_->setStyleSheet(
@@ -302,9 +327,12 @@ void SettingsView::SetupClassifiedTab() {
             }
         }
 #else
-        QMessageBox::information(this, "System Override", "System override sequence initiated (OS specific elevation might be required).");
+        QMessageBox::information(this,
+            translator_->Translate("SettingsView.SystemOverride", "System Override"),
+            translator_->Translate("SettingsView.SystemOverrideInitiated", "System override sequence initiated (OS specific elevation might be required).")
+            );
         override_button_->setEnabled(false);
-        override_button_->setText("OVERRIDE IN PROGRESS...");
+        override_button_->setText(translator_->Translate("SettingsView.SystemOverrideInProgress", "OVERRIDE IN PROGRESS..."));
         QMetaObject::invokeMethod(system_override_manager_, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
 #endif
     });
@@ -416,7 +444,9 @@ void SettingsView::CreateHeaderPanel() {
     const auto header_layout = new QHBoxLayout();
     header_layout->setSpacing(10);
 
-    title_label_ = new QLabel("SYSTEM SETTINGS", this);
+    title_label_ = new QLabel(
+        translator_->Translate("SettingsView.SystemSettings", "SYSTEM SETTINGS"),
+        this);
     title_label_->setStyleSheet("color: #00ccff; background-color: transparent; font-family: Consolas; font-size: 15pt; letter-spacing: 2px;");
     header_layout->addWidget(title_label_);
 
@@ -490,17 +520,24 @@ void SettingsView::SaveSettings() {
 
     ShortcutManager::GetInstance()->updateRegisteredShortcuts();
 
-    QMessageBox::information(this, "Settings Saved", "Settings have been successfully saved.");
+    QMessageBox::information(this,
+        translator_->Translate("SettingsView.SettingsSavedTitle", "Settings Saved"),
+        translator_->Translate("SettingsView.SettingsSavedMessage", "Settings have been successfully saved.")
+        );
     emit settingsChanged(); // Emituj sygnał po zapisaniu
 }
 
 void SettingsView::RestoreDefaults() {
-    if (QMessageBox::question(this, "Restore Defaults",
-                             "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings.", // Zaktualizowano komunikat
+    if (QMessageBox::question(this,
+        translator_->Translate("SettingsView.RestoreDefaultsTitle", "Restore Defaults"),
+        translator_->Translate("SettingsView.RestoreDefaultsMessage", "Are you sure you want to restore all settings to default values?\nThis includes appearance colors and network settings."), // Zaktualizowano komunikat
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         config_->RestoreDefaults();
         LoadSettingsFromRegistry(); // Odśwież cały widok, w tym delegowane ładowanie
-        QMessageBox::information(this, "Defaults Restored", "Settings have been restored to their default values.");
+        QMessageBox::information(this,
+            translator_->Translate("SettingsView.RestoreDefaultsSuccessTitle", "Defaults Restored"),
+            translator_->Translate("SettingsView.RestoreDefaultsSuccessMessage", "Settings have been restored to their default values.")
+            );
         emit settingsChanged(); // Emituj sygnał również po przywróceniu domyślnych
                              }
 }
@@ -547,7 +584,9 @@ void SettingsView::ResetSecurityLayers() {
 
     if (override_button_) {
         override_button_->setEnabled(true);
-        override_button_->setText("CAUTION: SYSTEM OVERRIDE");
+        override_button_->setText(
+            translator_->Translate("SettingsView.SystemOverride", "CAUTION: SYSTEM OVERRIDE")
+            );
     }
 
     if (debug_mode_enabled_) {
