@@ -3,9 +3,12 @@
 #include "../chat/style/chat_style.h"
 #include <QFileDialog>
 
+#include "../../app/managers/translation_manager.h"
+
 WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanline_opacity_(0.15) {
     setObjectName("chatViewContainer");
 
+    translator_ = TranslationManager::GetInstance();
     // Podstawowy layout
     const auto main_layout = new QVBoxLayout(this);
     main_layout->setContentsMargins(20, 20, 20, 20);
@@ -22,7 +25,9 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     header_layout->addStretch(1);
 
     // Wskaźnik status połączenia
-    status_indicator_ = new QLabel("CONNECTION ACTIVE", this);
+    status_indicator_ = new QLabel(
+    translator_->Translate("ChatView.ConnectionActive", "CONNECTION ACTIVE"),
+        this);
     status_indicator_->setAlignment(Qt::AlignVCenter);
     status_indicator_->setStyleSheet(
         "color: #00ffaa;"
@@ -59,7 +64,9 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     session_label->setStyleSheet(style_sheet);
     info_layout->addWidget(session_label);
 
-    const auto buffer_label = new QLabel("BUFFER:100%", this);
+    const auto buffer_label = new QLabel(
+        translator_->Translate("ChatView.Buffer100", "BUFFER:100%"),
+        this);
     buffer_label->setStyleSheet(style_sheet);
     info_layout->addWidget(buffer_label);
 
@@ -84,7 +91,9 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
 
     // Przycisk załączania plików - niestandardowy wygląd
     attach_button_ = new CyberChatButton("📎", this);
-    attach_button_->setToolTip("Attach file");
+    attach_button_->setToolTip(
+        translator_->Translate("ChatView.AttachFile", "Attach file")
+        );
     attach_button_->setFixedSize(36, 36);
     input_layout->addWidget(attach_button_);
 
@@ -96,14 +105,20 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     input_layout->addWidget(input_field_, 1);
 
     // Przycisk wysyłania - niestandardowy wygląd
-    send_button_ = new CyberChatButton("Send", this);
+    send_button_ = new CyberChatButton(
+        translator_->Translate("ChatView.SendButton", "Send"),
+        this);
     send_button_->setMinimumWidth(80);
     send_button_->setFixedHeight(36);
     input_layout->addWidget(send_button_);
 
     // --- NOWY PRZYCISK PTT ---
-    ptt_button_ = new CyberChatButton("TALK", this);
-    ptt_button_->setToolTip("Click and press to talk.");
+    ptt_button_ = new CyberChatButton(
+        translator_->Translate("ChatView.TalkButton", "TALK"),
+        this);
+    ptt_button_->setToolTip(
+        translator_->Translate("ChatView.TalkTooltip", "Click and press to talk.")
+        );
     ptt_button_->setCheckable(false); // Działa na press/release
     connect(ptt_button_, &QPushButton::pressed, this, &WavelengthChatView::OnPttButtonPressed);
     connect(ptt_button_, &QPushButton::released, this, &WavelengthChatView::OnPttButtonReleased);
@@ -113,7 +128,9 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     main_layout->addLayout(input_layout);
 
     // Przycisk przerwania połączenia
-    abort_button_ = new CyberChatButton("Zakończ połączenie", this);
+    abort_button_ = new CyberChatButton(
+        translator_->Translate("ChatView.AbortConnection", "ABORT CONNECTION"),
+        this);
     abort_button_->setStyleSheet(
         "QPushButton {"
         "  background-color: #662222;"
@@ -189,7 +206,8 @@ void WavelengthChatView::SetWavelength(const QString &frequency, const QString &
 
     message_area_->Clear();
 
-    const QString welcome_message = QString("<span style=\"color:#ffcc00;\">Connected to wavelength %1 Hz @ %2</span>")
+    const QString welcome_message = QString("<span style=\"color:#ffcc00;\">%1 %2 Hz @ %3</span>")
+        .arg(translator_->Translate("ChatView.ConnectedToWavelength", "Connected to wavelength"))
             .arg(frequency, QDateTime::currentDateTime().toString("HH:mm:ss"));
     message_area_->AddMessage(welcome_message, "system", StreamMessage::MessageType::kSystem);
 
@@ -228,7 +246,9 @@ void WavelengthChatView::OnWavelengthClosed(const QString &frequency) {
         return;
     }
 
-    status_indicator_->setText("CONNECTION CLOSED");
+    status_indicator_->setText(
+        translator_->Translate("ChatView.ConnectionClosed", "CONNECTION CLOSED")
+        );
     status_indicator_->setStyleSheet(
         "color: #ff5555;"
         "background-color: rgba(40, 0, 0, 150);"
@@ -257,7 +277,7 @@ void WavelengthChatView::Clear() {
 
 void WavelengthChatView::AttachFile() {
     const QString file_path = QFileDialog::getOpenFileName(this,
-                                                    "Select File to Attach",
+                                                    translator_->Translate("ChatView.SelectFileToAttach", "Select File to Attach"),
                                                     QString(),
                                                     "Media Files (*.jpg *.jpeg *.png *.gif *.mp3 *.mp4 *.wav);;All Files (*)");
 
@@ -273,7 +293,8 @@ void WavelengthChatView::AttachFile() {
     const QString progress_message_id = "file_progress_" + QString::number(QDateTime::currentMSecsSinceEpoch());
 
     // Wyświetlamy początkowy komunikat
-    const QString processing_message = QString("<span style=\"color:#888888;\">Sending file: %1...</span>")
+    const QString processing_message = QString("<span style=\"color:#888888;\">%1: %2...</span>")
+            .arg(translator_->Translate("ChatView.SendingFile", "Sending file"))
             .arg(filename);
 
     message_area_->AddMessage(processing_message, progress_message_id, StreamMessage::MessageType::kTransmitted);
@@ -284,7 +305,8 @@ void WavelengthChatView::AttachFile() {
 
     if (!started) {
         message_area_->AddMessage(progress_message_id,
-                                "<span style=\"color:#ff5555;\">Failed to start file processing.</span>",
+                                QString("<span style=\"color:#ff5555;\">%1</span>")
+                                    .arg(translator_->Translate("ChatView.FailedToStartFileProcessing", "Failed to start file processing.")),
                                 StreamMessage::MessageType::kTransmitted);
     }
 }
@@ -348,7 +370,9 @@ void WavelengthChatView::OnPttGranted(const QString &frequency) {
         StartAudioInput();
         ptt_button_->setStyleSheet("background-color: red; color: white;");
         // --- USTAW WSKAŹNIK NADAJĄCEGO (LOKALNIE) ---
-        message_area_->SetTransmittingUser("You");
+        message_area_->SetTransmittingUser(
+            translator_->Translate("ChatView.PttYou", "You")
+            );
         // --- KONIEC USTAWIANIA WSKAŹNIKA ---
     } else if (ptt_state_ == Requesting) {
         qDebug() << "Received PTT grant for wrong frequency or state:" << frequency << ptt_state_;
@@ -361,7 +385,9 @@ void WavelengthChatView::OnPttDenied(const QString &frequency, const QString &re
         qDebug() << "PTT Denied for" << frequency << ":" << reason;
         // Wyświetl powód odmowy (opcjonalnie)
         // QMessageBox::warning(this, "PTT Denied", reason);
-        message_area_->AddMessage(QString("<span style='color:#ffcc00;'>[SYSTEM] Nie można nadawać: %1</span>").arg(reason),
+        message_area_->AddMessage(QString("<span style='color:#ffcc00;'>%1: %2</span>")
+        .arg(translator_->Translate("ChatView.PttDenied", "[SYSTEM] Cannot start broadcasting"))
+        .arg(reason),
                                 "", StreamMessage::kSystem);
 
         ptt_state_ = Idle;
@@ -495,7 +521,9 @@ void WavelengthChatView::AbortWavelength() {
 
     is_aborting_ = true;
 
-    status_indicator_->setText("ABORTING...");
+    status_indicator_->setText(
+        translator_->Translate("ChatView.Aborting", "ABORTING...")
+        );
     status_indicator_->setStyleSheet(
         "color: #ffaa55;"
         "background-color: rgba(40, 20, 0, 150);"
@@ -719,14 +747,18 @@ void WavelengthChatView::UpdatePttButtonState() const {
             break;
         case Transmitting:
             ptt_button_->setEnabled(true); // Nadal można go zwolnić
-            ptt_button_->setText("BRDCST");
+            ptt_button_->setText(
+                translator_->Translate("ChatView.PttTransmitting", "BRDCST")
+                );
             input_field_->setEnabled(false);
             send_button_->setEnabled(false);
             attach_button_->setEnabled(false);
             break;
         case Receiving:
             ptt_button_->setEnabled(false); // Nie można nacisnąć podczas odbierania
-            ptt_button_->setText("RCVNG");
+            ptt_button_->setText(
+                translator_->Translate("ChatView.PttReceiving", "RCVNG")
+                );
             input_field_->setEnabled(false);
             send_button_->setEnabled(false);
             attach_button_->setEnabled(false);
@@ -735,7 +767,9 @@ void WavelengthChatView::UpdatePttButtonState() const {
 }
 
 void WavelengthChatView::ResetStatusIndicator() const {
-    status_indicator_->setText("CONNECTION ACTIVE");
+    status_indicator_->setText(
+        translator_->Translate("ChatView.ConnectionActive", "CONNECTION ACTIVE")
+        );
     status_indicator_->setStyleSheet(
         "color: #00ffaa;"
         "background-color: rgba(0, 40, 30, 150);"

@@ -286,6 +286,8 @@ private:
     QSoundEffect *ptt_off_sound_;
     // --- End PTT and Audio ---
 
+    TranslationManager* translator_;
+
     /**
      * @brief Initializes the audio format and creates QAudioInput/QAudioOutput objects.
      * Determines supported formats and sets buffer sizes.

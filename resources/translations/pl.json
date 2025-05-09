@@ -304,10 +304,10 @@
     "ConnectedToWavelength": "Połączono z wavelength ",
     "ConnectionClosed": "POŁĄCZENIE ZAMKNIĘTE",
     "SelectFileToAttach": "Wybierz pliki do załączenia",
-    "SendingFile": "Wysyłanie pliku...",
+    "SendingFile": "Wysyłanie pliku",
     "FailedToStartFileProcessing": "Nie udało się rozpocząć przetwarzania pliku.",
     "PttYou": "Ty",
-    "PttDenied": "[SYSTEM] Nie można rozpocząć nadawania:",
+    "PttDenied": "[SYSTEM] Nie można rozpocząć nadawania",
     "Aborting": "OPUSZCZANIE...",
     "PttTransmitting": "NADAWANIE",
     "PttReceiving": "ODBIÓR"
