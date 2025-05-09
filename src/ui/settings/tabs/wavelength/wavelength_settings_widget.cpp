@@ -150,14 +150,21 @@ bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
     const double value_double = c_locale.toDouble(value_str, &ok);
 
     if (!ok || value_double <= 0) {
-        QMessageBox::warning(this, "Invalid Input", "Please enter a valid positive number for the frequency value.");
+        QMessageBox::warning(this,
+            translator_->Translate("WavelengthSettingsWidget.InvalidInputTitle", "Invalid Input"),
+            translator_->Translate("WavelengthSettingsWidget.PositiveNumber", "Please enter a valid positive number for the frequency value.")
+            );
         frequency_value_edit_->setFocus();
         frequency_value_edit_->selectAll();
         return false;
     }
 
     if (value_double > FrequencyLimits::kMaxValuePerUnit) {
-         QMessageBox::warning(this, "Invalid Input", QString("The maximum value for %1 is %2.").arg(unit_str).arg(FrequencyLimits::kMaxValuePerUnit));
+         QMessageBox::warning(this,
+         translator_->Translate("WavelengthSettingsWidget.InvalidInputTitle", "Invalid Input"),
+             QString(translator_->Translate("WavelengthSettingsWidget.MaxValue", "The maximum value for %1 is %2."))
+                .arg(unit_str)
+                .arg(FrequencyLimits::kMaxValuePerUnit));
          frequency_value_edit_->setFocus();
          frequency_value_edit_->selectAll();
          return false;
@@ -172,14 +179,20 @@ bool WavelengthSettingsWidget::ValidateFrequencyInput(double& hz) {
     }
 
     if (hz < FrequencyLimits::kMinHz) {
-        QMessageBox::warning(this, "Invalid Input", QString("The minimum frequency allowed is %1 Hz.").arg(FrequencyLimits::kMinHz));
+        QMessageBox::warning(this,
+            translator_->Translate("WavelengthSettingsWidget.InvalidInputTitle", "Invalid Input"),
+            QString(translator_->Translate("WavelengthSettingsWidget.MinValue", "The minimum frequency allowed is %1 Hz."))
+                    .arg(FrequencyLimits::kMinHz));
          frequency_value_edit_->setFocus();
          frequency_value_edit_->selectAll();
         return false;
     }
 
      if (hz > FrequencyLimits::kMaxHz) {
-         QMessageBox::warning(this, "Invalid Input", QString("The maximum frequency allowed is %1 MHz.").arg(FrequencyLimits::kMaxValuePerUnit));
+         QMessageBox::warning(this,
+             translator_->Translate("WavelengthSettingsWidget.InvalidInputTitle", "Invalid Input"),
+             QString(translator_->Translate("WavelengthSettingsWidget.MaxValueHz", "The maximum frequency allowed is %1 MHz."))
+                    .arg(FrequencyLimits::kMaxValuePerUnit));
          frequency_value_edit_->setFocus();
          frequency_value_edit_->selectAll();
          return false;

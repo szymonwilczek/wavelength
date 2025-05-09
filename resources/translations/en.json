@@ -260,7 +260,12 @@
     "LanguageLabel": "Language:",
     "LanguageEnglish": "English",
     "LanguagePolish": "Polski",
-    "InvalidInput": "Invalid Input!\\nPlease enter a valid frequency between 130Hz and 180MHz."
+    "InvalidInput": "Invalid Input!\\nPlease enter a valid frequency between 130Hz and 180MHz.",
+    "InvalidInputTitle": "Invalid Input",
+    "PositiveNumber": "Please enter a valid positive number for the frequency value.",
+    "MaxValue": "Maximum value for %1 is %2",
+    "MinValue": "Minimum frequency value is %1 Hz",
+    "MaxValueHz": "Maximum frequency value is %1 Hz"
   },
   "SettingsView": {
     "WavelengthTab": "Wavelength",

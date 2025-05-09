@@ -260,7 +260,12 @@
     "LanguageLabel": "Język:",
     "LanguageEnglish": "English",
     "LanguagePolish": "Polski",
-    "InvalidInput": "Nieprawidłowe dane wejściowe!\\nWprowadź prawidłową częstotliwość w zakresie od 130 Hz do 180 MHz.."
+    "InvalidInput": "Nieprawidłowe dane wejściowe!\\nWprowadź prawidłową częstotliwość w zakresie od 130 Hz do 180 MHz..",
+    "InvalidInputTitle": "Nieprawidłowe dane",
+    "PositiveNumber": "Wprowadź poprawny dodatni numer dla wartości częstotliwości.",
+    "MaxValue": "Maksymalna wartość dla %1 to %2",
+    "MinValue": "Minimalna wartość częstotliwości to %1 Hz",
+    "MaxValueHz": "Maksymalna wartość częstotliwości to %1 Hz"
   },
   "SettingsView": {
     "WavelengthTab": "Wavelength",
