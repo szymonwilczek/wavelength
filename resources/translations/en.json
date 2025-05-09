@@ -188,6 +188,7 @@
     },
     "SecurityQuestion": {
         "Title": "SECURITY QUESTION VERIFICATION",
+        "Info": "Answer your security question.",
         "Label": "What is your top secret security question?",
         "Verified": "✓ AUTHENTICATION VERIFIED",
         "Timeout": "If this was really you, you would know the answer.\\nYou don't need a question."
@@ -200,7 +201,8 @@
       "Title": "SECURITY VERIFICATION: SNAKE GAME",
       "Info": "Collect 4 apples to open exit\\nControls: Arrrows",
       "CollectedApples0": "Collected apples: 0/4",
-      "CollectedApples": "Collected apples: %1/4",
+      "CollectedApples": "Collected apples",
+      "ExitOpened": "Exit opened!\\nESCAPE!!!",
       "SnakeExited": "Snake exited the screen! Level completed."
     },
     "TypingTest": {
@@ -211,7 +213,7 @@
       "Title": "VOICE RECOGNITION VERIFICATION",
       "Info": "Please speak into the microphone\\nVoice pattern verification in progress...",
       "TalkingDetected": "Talking detected",
-      "SilenceDetected": "Silence detected",
+      "SilenceDetected": "Silence",
       "VoicePatternVerified": "Voice pattern verified"
     }
   },

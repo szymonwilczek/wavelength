@@ -188,6 +188,7 @@
     },
     "SecurityQuestion": {
       "Title": "WERYFIKACJA PYTANIA ZABEZPIECZAJĄCEGO",
+      "Info": "Odpowiedz na swoje pytanie weryfikacyjne.",
       "Label": "Jakie jest Twoje najbardziej tajne pytanie dotyczące bezpieczeństwa?",
       "Verified": "✓ UWIERZYTELNIANIE ZWERYFIKOWANE",
       "Timeout": "Gdyby to naprawdę byłeś ty, znałbyś odpowiedź.\\nNie potrzebujesz pytania."
@@ -201,6 +202,7 @@
       "Info": "Zbierz 4 jabłka, aby otworzyć wyjście\\nKontrolki: Strzałki",
       "CollectedApples0": "Zebrane jabłka: 0/4",
       "CollectedApples": "Zebrane jabłka: %1/4",
+      "ExitOpened": "Wyjście otwarte!\\nUCIEKAJ!!!",
       "SnakeExited": "Wąż opuścił ekran! Poziom ukończony."
     },
     "TypingTest": {

@@ -5,6 +5,8 @@
 #include <QPropertyAnimation>
 #include <QFontMetrics>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 TypingTestLayer::TypingTestLayer(QWidget *parent) 
     : SecurityLayer(parent),
       current_position_(0),
@@ -15,11 +17,15 @@ TypingTestLayer::TypingTestLayer(QWidget *parent)
     layout->setAlignment(Qt::AlignCenter);
     layout->setSpacing(15);
 
-    title_label_ = new QLabel("TYPING VERIFICATION TEST", this);
+    const TranslationManager* translator = TranslationManager::GetInstance();
+
+    title_label_ = new QLabel(translator->Translate("ClassifiedSettingsWidget.TypingTest.Title",
+        "TYPING VERIFICATION TEST"), this);
     title_label_->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title_label_->setAlignment(Qt::AlignCenter);
 
-    instructions_label_ = new QLabel("Type the following text to continue", this);
+    instructions_label_ = new QLabel(translator->Translate("ClassifiedSettingsWidget.TypingTest.Info",
+        "Type the following text to continue"), this);
     instructions_label_->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions_label_->setAlignment(Qt::AlignCenter);
 

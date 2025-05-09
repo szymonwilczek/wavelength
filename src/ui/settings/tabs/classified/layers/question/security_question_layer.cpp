@@ -3,17 +3,20 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 
+#include "../../../../../../app/managers/translation_manager.h"
+
 SecurityQuestionLayer::SecurityQuestionLayer(QWidget *parent) 
     : SecurityLayer(parent), security_question_timer_(nullptr)
 {
+    translator_ = TranslationManager::GetInstance();
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const auto title = new QLabel("SECURITY QUESTION VERIFICATION", this);
+    const auto title = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Title", "SECURITY QUESTION VERIFICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    const auto instructions = new QLabel("Answer your security question", this);
+    const auto instructions = new QLabel(translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Info", "Answer your security question."), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -65,7 +68,7 @@ SecurityQuestionLayer::~SecurityQuestionLayer() {
 void SecurityQuestionLayer::Initialize() {
     Reset();
 
-    security_question_label_->setText("What is your top secret security question?");
+    security_question_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Label", "What is your top secret security question?"));
     security_question_input_->setFocus();
     security_question_timer_->start();
 
@@ -118,7 +121,7 @@ void SecurityQuestionLayer::CheckSecurityAnswer() {
     );
 
     security_question_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
-    security_question_label_->setText("✓ AUTHENTICATION VERIFIED");
+    security_question_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Verified", "✓ AUTHENTICATION VERIFIED"));
 
     // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
     QTimer::singleShot(800, this, [this]() {
@@ -142,5 +145,6 @@ void SecurityQuestionLayer::CheckSecurityAnswer() {
 
 void SecurityQuestionLayer::SecurityQuestionTimeout() const {
     // Po 10 sekundach pokazujemy podpowiedź
-    security_question_label_->setText("If this was really you, you would know the answer.\nYou don't need a question.");
+    security_question_label_->setText(translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Timeout",
+        "If this was really you, you would know the answer.\nYou don't need a question."));
 }
