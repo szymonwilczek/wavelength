@@ -465,36 +465,45 @@ void WavelengthChatView::OnAudioDataReceived(const QString &frequency, const QBy
 }
 
 void WavelengthChatView::OnReadyReadInput() const {
-    // --- DODANE LOGOWANIE ---
-    qDebug() << "[HOST] onReadyReadInput triggered!";
-    // --- KONIEC DODANIA ---
+    qDebug() << "[HOST] onReadyReadInput triggered! Current ptt_state_:" << ptt_state_
+             << "audio_input_ state:" << (audio_input_ ? QString::number(audio_input_->state()) : "null")
+             << "input_device_:" << static_cast<void *>(input_device_);
 
-    if (!input_device_ || ptt_state_ != Transmitting) {
-        qDebug() << "[HOST] onReadyReadInput: Guard failed (device null or state not Transmitting)";
+    // Krok 1: Sprawdź ogólny stan audio_input_ i ptt_state_
+    // Jeśli PTT nie jest w stanie nadawania, lub audio_input_ nie istnieje/jest zatrzymany, nie przetwarzaj.
+    if (ptt_state_ != Transmitting || !audio_input_ || audio_input_->state() == QAudio::StoppedState) {
+        qDebug() << "[HOST] onReadyReadInput: Guard failed (ptt_state_ not Transmitting, audio_input_ null or stopped). ptt_state_:" << ptt_state_
+                 << "audio_input_ state:" << (audio_input_ ? QString::number(audio_input_->state()) : "null");
+        return;
+    }
+
+    // Krok 2: Sprawdź konkretnie input_device_
+    // To jest kluczowe zabezpieczenie przed użyciem nieprawidłowego wskaźnika.
+    if (!input_device_) {
+        qDebug() << "[HOST] onReadyReadInput: Guard failed (input_device_ is null).";
+        return;
+    }
+
+    // Dodatkowe sprawdzenie, czy urządzenie jest otwarte. Chociaż readyRead powinno to implikować.
+    // Na niektórych platformach/sytuacjach readAll() na zamkniętym (ale nie-null) urządzeniu może crashować.
+    if (!input_device_->isOpen() || !input_device_->isReadable()) {
+        qWarning() << "[HOST] onReadyReadInput: input_device_ is not open or not readable. isOpen:" << input_device_->isOpen() << "isReadable:" << input_device_->isReadable();
         return;
     }
 
     const QByteArray buffer = input_device_->readAll();
-    qDebug() << "[HOST] onReadyReadInput: Read" << buffer.size() << "bytes from input device."; // Loguj rozmiar bufora
+    qDebug() << "[HOST] onReadyReadInput: Read" << buffer.size() << "bytes from input device.";
 
     if (!buffer.isEmpty()) {
-        // 1. Wyślij dane binarne przez WebSocket
         const bool sent = WavelengthMessageService::GetInstance()->SendAudioData(current_frequency_, buffer);
-        // --- DODANE LOGOWANIE ---
         qDebug() << "[HOST] onReadyReadInput: Attempted to send audio data. Success:" << sent;
-        // --- KONIEC DODANIA ---
 
-
-        // 2. Oblicz amplitudę
         const qreal amplitude = CalculateAmplitude(buffer);
-
-        // 3. Zaktualizuj wizualizację lokalnie
         if (message_area_) {
-            // messageArea->setGlitchIntensity(amplitude * 1.5); // Stara metoda
-            message_area_->SetAudioAmplitude(amplitude * 1.5); // Nowa metoda
+            message_area_->SetAudioAmplitude(amplitude * 1.5);
         }
     } else {
-        qDebug() << "[HOST] onReadyReadInput: Buffer was empty.";
+        qDebug() << "[HOST] onReadyReadInput: Buffer was empty (read 0 bytes, or device closed/error between check and read). audio_input_ error:" << (audio_input_ ? audio_input_->error() : -1) ;
     }
 }
 
@@ -646,17 +655,43 @@ void WavelengthChatView::StartAudioInput() {
 }
 
 void WavelengthChatView::StopAudioInput() {
-    if (audio_input_ && audio_input_->state() != QAudio::StoppedState) {
-        audio_input_->stop();
+    if (audio_input_ && (audio_input_->state() == QAudio::ActiveState || audio_input_->state() == QAudio::IdleState)) {
+        qDebug() << "[HOST] StopAudioInput: Attempting to stop. Current audio_input_ state:" << audio_input_->state();
+
+        // Krok 1: Rozłącz sygnał od input_device_, jeśli istnieje i jest połączony.
+        // To zapobiegnie nowym wywołaniom OnReadyReadInput po tym punkcie dla tego urządzenia.
         if (input_device_) {
-            disconnect(input_device_, &QIODevice::readyRead, this, &WavelengthChatView::OnReadyReadInput);
-            input_device_ = nullptr; // QAudioInput zarządza jego usunięciem
+            // disconnect zwraca true, jeśli połączenie zostało pomyślnie usunięte.
+            bool disconnected = disconnect(input_device_, &QIODevice::readyRead, this, &WavelengthChatView::OnReadyReadInput);
+            qDebug() << "[HOST] StopAudioInput: Disconnected readyRead from input_device_:" << disconnected;
         }
-        qDebug() << "Audio input stopped.";
+
+        // Krok 2: Zatrzymaj QAudioInput.
+        // To powinno zatrzymać przepływ danych i unieważnić poprzedni input_device_.
+        audio_input_->stop();
+        qDebug() << "[HOST] StopAudioInput: audio_input_->stop() called. New audio_input_ state:" << audio_input_->state();
+
+        // Krok 3: Wyzeruj wskaźnik input_device_.
+        // Po audio_input_->stop(), poprzedni wskaźnik QIODevice nie powinien być już używany.
+        input_device_ = nullptr;
+
+        qDebug() << "[HOST] Audio input stopped and input_device_ nulled.";
+    } else if (audio_input_) {
+        qDebug() << "[HOST] StopAudioInput: Audio input not in Active or Idle state, or already stopped. Current audio_input_ state:" << audio_input_->state();
+        // Jeśli był już zatrzymany, ale input_device_ nie jest nullptr (co nie powinno się zdarzyć przy poprawnej logice),
+        // dla bezpieczeństwa również rozłącz i wyzeruj.
+        if (input_device_ && audio_input_->state() == QAudio::StoppedState) {
+             disconnect(input_device_, &QIODevice::readyRead, this, &WavelengthChatView::OnReadyReadInput); // Na wszelki wypadek
+             input_device_ = nullptr;
+             qDebug() << "[HOST] StopAudioInput: Cleaned up input_device_ for already stopped audio_input.";
+        }
+    } else {
+        qDebug() << "[HOST] StopAudioInput: audio_input_ is null.";
     }
+
     // Resetuj wizualizację po zatrzymaniu nadawania
     if (message_area_ && ptt_state_ != Receiving) { // Nie resetuj jeśli zaraz zaczniemy odbierać
-        message_area_->SetGlitchIntensity(0.0);
+        message_area_->SetAudioAmplitude(0.0);
     }
 }
 
