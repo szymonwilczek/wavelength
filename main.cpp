@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
 
     auto *text_effect = new CyberpunkTextEffect(title_label, animation);
 
-    window.setMinimumSize(1024, 768);
+    window.setMinimumSize(1200, 900);
     window.setMaximumSize(1600, 900);
     window.resize(1024, 768);
 
