@@ -6,7 +6,7 @@
 #include <QRandomGenerator>
 
 /**
- * @brief Applies a multi-phase cyberpunk-style text reveal animation to a QLabel.
+ * @brief Applies a multiphase cyberpunk-style text reveal animation to a QLabel.
  *
  * This class takes control of a QLabel and animates its text content through
  * several phases:
@@ -18,7 +18,7 @@
  * The animation is driven by a QTimer.
  */
 class CyberpunkTextEffect final : public QObject {
-    Q_OBJECT // Added Q_OBJECT macro for signals/slots
+    Q_OBJECT
 
 public:
     /**
@@ -30,7 +30,7 @@ public:
     explicit CyberpunkTextEffect(QLabel *label, QWidget *parent = nullptr);
 
     /**
-     * @brief Starts the text reveal animation sequence from the beginning.
+     * @brief Starts the text reveal an animation sequence from the beginning.
      * Resets the animation phase and character index, then starts the internal timer.
      */
     void StartAnimation();
