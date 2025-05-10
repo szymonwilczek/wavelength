@@ -216,12 +216,15 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(const bool is_first_time,
       current_audio_amplitude_(0.0f), // <<< Inicjalizacja
       audio_ready_(false),
       next_impact_index_(0),
+      konami_code_({Qt::Key_Up, Qt::Key_Down, Qt::Key_Up, Qt::Key_Down,
+                    Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
+                    Qt::Key_B, Qt::Key_A, Qt::Key_Return}),
       hint_timer_(new QTimer(this)),
       is_destroying_(false),
       destruction_progress_(0.0f),
       click_simulation_timer_(new QTimer(this))
 {
-    if (MAX_IMPACTS > 0) { // Upewnij się, że MAX_IMPACTS jest dodatnie
+    if constexpr (MAX_IMPACTS > 0) { // Upewnij się, że MAX_IMPACTS jest dodatnie
         impacts_.resize(MAX_IMPACTS); // <<< DODAJ ZMIANĘ ROZMIARU
     } else {
         qWarning() << "MAX_IMPACTS is not positive, impacts will not work.";
@@ -239,6 +242,7 @@ FloatingEnergySphereWidget::FloatingEnergySphereWidget(const bool is_first_time,
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_DeleteOnClose);
     setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
     resize(600, 600);
 
     elapsed_timer_.start();
@@ -811,6 +815,12 @@ void FloatingEnergySphereWidget::keyPressEvent(QKeyEvent *event)
 
     // Dodaj klawisz do sekwencji
     key_sequence_.push_back(key);
+
+    if (konami_code_.empty()) {
+        qWarning() << "Konami code is empty, sequence matching will not work.";
+        event->accept(); // Mimo wszystko akceptuj, aby widget nie tracił fokusu
+        return;
+    }
 
     // Utrzymaj rozmiar sekwencji równy długości kodu Konami
     while (key_sequence_.size() > konami_code_.size()) {

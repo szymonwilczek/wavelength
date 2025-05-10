@@ -6,7 +6,7 @@
 #include <QSystemTrayIcon>
 #include <QDir>
 #include <QMessageBox>
-#include <qprocess.h>
+#include <QProcess>
 #include <QStandardPaths>
 #include <random>
 #include <set>
@@ -15,6 +15,8 @@
 #include <shellapi.h>
 #include "shldisp.h"
 #include <winuser.h>
+#elif defined(Q_OS_LINUX)
+#include <unistd.h>
 #endif
 
 #ifdef Q_OS_WIN
@@ -23,6 +25,8 @@ HHOOK SystemOverrideManager::keyboard_hook_ = nullptr;
 HHOOK SystemOverrideManager::mouse_hook_ = nullptr;
 // ---------------------------------
 #endif
+
+
 
 // --- Stałe ---
 constexpr int kMouseLockIntervalMs = 10;
@@ -112,14 +116,14 @@ void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time)
         return;
     }
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     // --- Zainstaluj Hak Klawiatury ---
     if (!InstallKeyboardHook()) {
         // Co zrobić, jeśli hak się nie zainstaluje?
         // Można przerwać, wyświetlić ostrzeżenie lub kontynuować bez blokady klawiatury
         qWarning() << "Keyboard hook installation failed. Input filtering will not work.";
         // Można rozważyć przerwanie:
-        // m_overrideActive = false;
+        // override_active_ = false; // Zmieniono z m_overrideActive
         // emit overrideSequenceStartFailed("Failed to install keyboard input filter.");
         // return;
     }
@@ -129,11 +133,10 @@ void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time)
         // Rozważ przerwanie
     }
     // ---------------------------------
-#endif
 
     override_active_ = true;
 
-    // --- Kolejne kroki ---
+    // --- Kolejne kroki dla Windows ---
     qDebug() << "Changing wallpaper...";
     if (!ChangeWallpaper()) {
         qWarning() << "Failed to change wallpaper.";
@@ -145,15 +148,38 @@ void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time)
     }
 
     // Opóźnienie przed pokazaniem powiadomienia, aby użytkownik zdążył zobaczyć pulpit
-    QTimer::singleShot(500, [this]() {
+    QTimer::singleShot(500, [this, is_first_time]() { // Przekaż is_first_time, jeśli potrzebne w lambda
         qDebug() << "Sending notification...";
-        if (!SendWindowsNotification("Wavelength Override", "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
+        if (!SendSystemNotification("Wavelength Override", "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
             qWarning() << "Failed to send notification.";
         }
     });
 
     qDebug() << "Showing floating animation widget...";
-    ShowFloatingAnimationWidget(is_first_time); // Pokazuje widget i uruchamia dźwięk wewnątrz
+    ShowFloatingAnimationWidget(is_first_time);
+
+#elif defined(Q_OS_LINUX)
+    qInfo() << "Linux: Initiating simplified override sequence.";
+    override_active_ = true;
+
+    // Na Linuksie nie zmieniamy tapety, nie minimalizujemy okien, ani nie instalujemy globalnych haków.
+    // Po prostu pokazujemy widget i wysyłamy powiadomienie.
+
+    QTimer::singleShot(100, [this, is_first_time]() { // Krótsze opóźnienie może być OK
+        qDebug() << "Sending notification (Linux)...";
+        if (!SendSystemNotification("Wavelength Override", "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
+            qWarning() << "Failed to send notification (Linux).";
+        }
+    });
+
+    qDebug() << "Showing floating animation widget (Linux)...";
+    ShowFloatingAnimationWidget(is_first_time); // Pokazuje widget
+
+#else
+    qWarning() << "System Override not implemented for this OS. Showing widget only.";
+    override_active_ = true;
+    ShowFloatingAnimationWidget(is_first_time);
+#endif
 }
 
 bool SystemOverrideManager::ChangeWallpaper()
@@ -258,7 +284,7 @@ bool SystemOverrideManager::RestoreWallpaper()
 #endif
 }
 
-bool SystemOverrideManager::SendWindowsNotification(const QString& title, const QString& message) const {
+bool SystemOverrideManager::SendSystemNotification(const QString& title, const QString& message) const {
     if (tray_icon_) {
         if (!tray_icon_->isVisible()) {
             qDebug() << "Tray icon is not visible, attempting to show it...";
@@ -353,8 +379,8 @@ void SystemOverrideManager::ShowFloatingAnimationWidget(const bool is_first_time
 
     floating_widget_->show();
     floating_widget_->activateWindow();
-    floating_widget_->setFocus();
-
+    floating_widget_->raise();
+    floating_widget_->setFocus(Qt::ActiveWindowFocusReason);
 }
 
 void SystemOverrideManager::HandleFloatingWidgetClosed()
@@ -373,10 +399,22 @@ void SystemOverrideManager::HandleFloatingWidgetClosed()
 
 void SystemOverrideManager::RestoreSystemState()
 {
-    if (!override_active_) { /* ... */ return; }
+    if (!override_active_) {
+        qDebug() << "RestoreSystemState called but override was not active.";
+        // Jeśli widget istnieje, upewnij się, że jest zamykalny i go zamknij
+        if (floating_widget_) {
+            qDebug() << "Override not active, but floating widget exists. Ensuring it's closable and closing.";
+            disconnect(floating_widget_, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::HandleFloatingWidgetClosed);
+            disconnect(floating_widget_, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::RestoreSystemState);
+            floating_widget_->SetClosable(true);
+            floating_widget_->close();
+            floating_widget_ = nullptr;
+        }
+        return;
+    }
     qDebug() << "Restoring system state...";
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     // --- Odinstaluj Haki ---
     UninstallKeyboardHook();
     UninstallMouseHook();
@@ -386,7 +424,6 @@ void SystemOverrideManager::RestoreSystemState()
     // Zatrzymaj i zamknij widget animacji, jeśli nadal istnieje
     if (floating_widget_) {
         qDebug() << "Closing existing floating widget during restore.";
-        // Rozłącz sygnały, aby uniknąć ponownego wywołania restoreSystemState
         disconnect(floating_widget_, &FloatingEnergySphereWidget::widgetClosed, this, &SystemOverrideManager::HandleFloatingWidgetClosed);
         disconnect(floating_widget_, &FloatingEnergySphereWidget::destructionSequenceFinished, this, &SystemOverrideManager::RestoreSystemState);
         floating_widget_->SetClosable(true);
@@ -394,37 +431,45 @@ void SystemOverrideManager::RestoreSystemState()
         floating_widget_ = nullptr;
     }
 
+#if defined(Q_OS_WIN)
     // Przywróć tapetę
     if (!RestoreWallpaper()) {
         qWarning() << "Failed to restore original wallpaper.";
     }
+#elif defined(Q_OS_LINUX)
+    // Na Linuksie nie ma tapety do przywrócenia w tej uproszczonej wersji
+    qDebug() << "Linux: No wallpaper to restore in simplified sequence.";
+#endif
 
-    // Oznacz jako nieaktywny i wyemituj sygnał (jeśli był aktywny)
-    if(override_active_) {
-        override_active_ = false;
-        qDebug() << "System state restoration complete. Override deactivated.";
-        emit overrideFinished(); // Emituj sygnał *przed* próbą relaunchu
-    } else {
-        qDebug() << "System state restoration complete (input unblocked only).";
-    }
+    override_active_ = false; // Zawsze ustawiaj na false po zakończeniu
+    qDebug() << "System state restoration complete. Override deactivated.";
+    emit overrideFinished(); // Emituj sygnał *przed* próbą relaunchu
 
-    // --- NOWE: Relaunch normalnej instancji i zamknij bieżącą (podwyższoną) ---
+    // --- Relaunch normalnej instancji i zamknij bieżącą ---
+    // Ta logika jest teraz wspólna dzięki RelaunchNormally
     qDebug() << "Attempting to relaunch the application normally...";
-#ifdef Q_OS_WIN
-    if (RelaunchNormally()) { // Wywołaj nową funkcję pomocniczą
-        qDebug() << "Normal relaunch initiated. Quitting elevated instance shortly.";
-        // Użyj QTimer::singleShot, aby dać nowemu procesowi chwilę na start
+    if (RelaunchNormally()) {
+        qDebug() << "Normal relaunch initiated. Quitting current instance shortly.";
         QTimer::singleShot(500, [](){ QApplication::quit(); });
     } else {
-        qWarning() << "Failed to relaunch the application normally. Elevated instance will exit anyway.";
-        QTimer::singleShot(500, [](){ QApplication::quit(); }); // Zamknij mimo wszystko
+        qWarning() << "Failed to relaunch the application normally. Current instance will exit anyway.";
+        QTimer::singleShot(500, [](){ QApplication::quit(); });
     }
-#else
-    // Na innych systemach po prostu zamknij
-    qWarning() << "Normal relaunch not implemented for this OS. Quitting elevated instance.";
-    QTimer::singleShot(100, [](){ QApplication::quit(); });
-#endif
-    // -----------------------------------------------------------------------
+}
+
+bool SystemOverrideManager::RelaunchNormally(const QStringList& arguments)
+{
+    const QString app_path = QApplication::applicationFilePath();
+    const QStringList args = arguments;
+
+    qDebug() << "Relaunching normally:" << app_path << "with args:" << args.join(' ');
+
+    if (QProcess::startDetached(app_path, args)) {
+        qDebug() << "QProcess::startDetached successful for normal relaunch.";
+        return true;
+    }
+    qWarning() << "QProcess::startDetached failed for normal relaunch.";
+    return false;
 }
 
 #ifdef Q_OS_WIN
@@ -635,22 +680,5 @@ void SystemOverrideManager::UninstallMouseHook()
         }
         mouse_hook_ = nullptr;
     }
-}
-
-bool SystemOverrideManager::RelaunchNormally(const QStringList& arguments)
-{
-    const QString app_path = QApplication::applicationFilePath();
-    const QStringList args = arguments; // Przekaż argumenty, jeśli są potrzebne
-
-    qDebug() << "Relaunching normally:" << app_path << "with args:" << args.join(' ');
-
-    // Użyj QProcess::startDetached - jest prostsze i powinno wystarczyć
-    if (QProcess::startDetached(app_path, args)) {
-        qDebug() << "QProcess::startDetached successful for normal relaunch.";
-        return true;
-    }
-    qWarning() << "QProcess::startDetached failed for normal relaunch.";
-    // Można dodać fallback na ShellExecuteEx z 'open', ale startDetached jest preferowane
-    return false;
 }
 #endif

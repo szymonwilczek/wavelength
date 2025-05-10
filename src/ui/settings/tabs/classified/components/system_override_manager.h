@@ -118,7 +118,7 @@ private:
      * @param message The main text content of the notification.
      * @return True if the notification was sent successfully, false otherwise.
      */
-    bool SendWindowsNotification(const QString& title, const QString& message) const;
+    bool SendSystemNotification(const QString& title, const QString& message) const;
 
     /**
      * @brief Minimizes all open windows on the desktop (Windows only).
@@ -151,7 +151,6 @@ private:
     /** @brief Flag indicating if the system override sequence is currently active. */
     bool override_active_;
 
-#ifdef Q_OS_WIN
     /**
      * @brief Attempts to relaunch the application without administrative privileges (Windows only).
      * Used after the override sequence to return to a normal instance.
@@ -160,6 +159,7 @@ private:
      */
     static bool RelaunchNormally(const QStringList& arguments = QStringList());
 
+#ifdef Q_OS_WIN
     // --- Hooks ---
     /**
      * @brief Low-level keyboard hook procedure (Windows only).
