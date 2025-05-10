@@ -1,10 +1,9 @@
 #ifndef TRANSLATION_MANAGER_H
 #define TRANSLATION_MANAGER_H
 
-#include <QObject>
 #include <QJsonObject>
-#include <QString>
 #include <QMutex>
+#include <QObject>
 
 /**
  * @brief Manages the loading and delivery of translations for applications.
