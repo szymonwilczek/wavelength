@@ -36,7 +36,7 @@ class CommunicationStream final : public QOpenGLWidget, protected QOpenGLFunctio
     /** @brief Property controlling the wave's vertical amplitude. Animatable. */
     Q_PROPERTY(qreal waveAmplitude READ GetWaveAmplitude WRITE SetWaveAmplitude)
     /** @brief Property controlling the wave's horizontal frequency. Animatable. */
-    Q_PROPERTY(qreal waveFrequency READ GetWaveFrequency WRITE SetWaveFrequency) // Corrected getter name
+    Q_PROPERTY(qreal waveFrequency READ GetWaveFrequency WRITE SetWaveFrequency)
     /** @brief Property controlling the wave's horizontal scrolling speed. Animatable. */
     Q_PROPERTY(qreal waveSpeed READ GetWaveSpeed WRITE SetWaveSpeed)
     /** @brief Property controlling the intensity of visual glitch effects. Animatable. */
@@ -49,11 +49,12 @@ public:
      * @brief Enum defining the different visual states of the communication stream.
      */
     enum StreamState {
-        kIdle,        ///< Default state: Simple wave with occasional random glitches.
-        kReceiving,   ///< Active animation during message reception (before display).
-        kDisplaying   ///< State when a message is actively displayed.
+        kIdle, ///< Default state: Simple wave with occasional random glitches.
+        kReceiving, ///< Active animation during message reception (before display).
+        kDisplaying ///< State when a message is actively displayed.
     };
-    Q_ENUM(StreamState) // Register enum with Qt Meta-Object System
+
+    Q_ENUM(StreamState)
 
     /**
      * @brief Constructs a CommunicationStream widget.
@@ -61,7 +62,7 @@ public:
      * and transmitting user, and sets default animation parameters.
      * @param parent Optional parent widget.
      */
-    explicit CommunicationStream(QWidget* parent = nullptr);
+    explicit CommunicationStream(QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Cleans up OpenGL resources (VAO, VBO, shader program).
@@ -78,40 +79,44 @@ public:
      * @param message_id Optional unique ID, used for progress messages.
      * @return Pointer to the created StreamMessage widget.
      */
-    StreamMessage* AddMessageWithAttachment(const QString& content, const QString& sender, StreamMessage::MessageType type, const QString& message_id = QString());
+    StreamMessage *AddMessageWithAttachment(const QString &content, const QString &sender,
+                                            StreamMessage::MessageType type, const QString &message_id = QString());
 
-    // --- Getters and Setters for Wave Properties ---
     /** @brief Gets the current wave amplitude. */
     qreal GetWaveAmplitude() const { return wave_amplitude_; }
+
     /** @brief Sets the current wave amplitude and triggers an update. */
     void SetWaveAmplitude(qreal amplitude);
 
     /** @brief Gets the current wave frequency. */
-    qreal GetWaveFrequency() const { return wave_frequency_; } // Corrected getter name
+    qreal GetWaveFrequency() const { return wave_frequency_; }
+
     /** @brief Sets the current wave frequency and triggers an update. */
     void SetWaveFrequency(qreal frequency);
 
     /** @brief Gets the current wave speed. */
     qreal GetWaveSpeed() const { return wave_speed_; }
+
     /** @brief Sets the current wave speed and triggers an update. */
     void SetWaveSpeed(qreal speed);
 
     /** @brief Gets the current glitch effect intensity. */
     qreal GetGlitchIntensity() const { return glitch_intensity_; }
+
     /** @brief Sets the current glitch effect intensity and triggers an update. */
     void SetGlitchIntensity(qreal intensity);
 
     /** @brief Gets the current wave thickness. */
     qreal GetWaveThickness() const { return wave_thickness_; }
+
     /** @brief Sets the current wave thickness and triggers an update. */
     void SetWaveThickness(qreal thickness);
-    // --- End Getters and Setters ---
 
     /**
      * @brief Sets the text displayed in the stream name label at the top center.
      * @param name The new name for the stream.
      */
-    void SetStreamName(const QString& name) const;
+    void SetStreamName(const QString &name) const;
 
     /**
      * @brief Adds a new standard message to the stream.
@@ -123,7 +128,8 @@ public:
      * @param message_id Optional unique ID, used for progress messages.
      * @return Pointer to the created StreamMessage widget.
      */
-    StreamMessage* AddMessage(const QString &content, const QString &sender, StreamMessage::MessageType type, const QString& message_id = QString());
+    StreamMessage *AddMessage(const QString &content, const QString &sender, StreamMessage::MessageType type,
+                              const QString &message_id = QString());
 
     /**
      * @brief Removes all messages currently managed by the stream.
@@ -138,7 +144,7 @@ public slots:
      * in a label at the top right.
      * @param user_id The identifier of the transmitting user.
      */
-    void SetTransmittingUser(const QString& user_id) const;
+    void SetTransmittingUser(const QString &user_id) const;
 
     /**
      * @brief Hides the transmitting user label.
@@ -174,7 +180,7 @@ protected:
      * @brief Handles key presses for message navigation (Left/Right arrows) and closing (Enter).
      * @param event The key event.
      */
-    void keyPressEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     /**
@@ -245,28 +251,28 @@ private slots:
      * Updates the stream color if the relevant key ("stream_color" or "all") is provided.
      * @param key The key of the changed setting.
      */
-    void UpdateStreamColor(const QString& key);
+    void UpdateStreamColor(const QString &key);
 
 private:
     /**
-     * @brief Generates visual properties (currently just color) based on a user ID hash.
+     * @brief Generates visual properties (currently color) based on a user ID hash.
      * @param user_id The user identifier string.
      * @return A UserVisuals struct containing the generated properties.
      */
-    static UserVisuals GenerateUserVisuals(const QString& user_id);
+    static UserVisuals GenerateUserVisuals(const QString &user_id);
 
     /**
-     * @brief Connects necessary signals (navigation, read, hidden) from a StreamMessage widget to this CommunicationStream.
+     * @brief Connects the necessary signals (navigation, read, hidden) from a StreamMessage widget to this CommunicationStream.
      * Uses Qt::UniqueConnection to prevent duplicate connections.
      * @param message Pointer to the StreamMessage widget.
      */
-    void ConnectSignalsForMessage(StreamMessage* message);
+    void ConnectSignalsForMessage(const StreamMessage *message);
 
     /**
      * @brief Disconnects all signals originating from the given StreamMessage widget that are connected to this CommunicationStream.
      * @param message Pointer to the StreamMessage widget.
      */
-    void DisconnectSignalsForMessage(StreamMessage* message) const;
+    void DisconnectSignalsForMessage(const StreamMessage *message) const;
 
     /**
      * @brief Updates the visibility of the "Next" and "Previous" buttons on the currently displayed message
@@ -285,44 +291,42 @@ private:
     void UpdateMessagePosition();
 
 
-    // --- Member Variables ---
     // Wave Animation Parameters
     const qreal base_wave_amplitude_; ///< Base amplitude in Idle state.
-    const qreal amplitude_scale_;     ///< Multiplier for audio amplitude effect.
-    qreal wave_amplitude_;            ///< Current animated wave amplitude.
-    qreal target_wave_amplitude_;     ///< Target amplitude for smooth interpolation.
-    qreal wave_frequency_;            ///< Current animated wave frequency.
-    qreal wave_speed_;                ///< Current animated wave speed.
-    qreal glitch_intensity_;          ///< Current animated glitch intensity.
-    qreal wave_thickness_;            ///< Current animated wave thickness.
+    const qreal amplitude_scale_; ///< Multiplier for audio amplitude effect.
+    qreal wave_amplitude_; ///< Current animated wave amplitude.
+    qreal target_wave_amplitude_; ///< Target amplitude for smooth interpolation.
+    qreal wave_frequency_; ///< Current animated wave frequency.
+    qreal wave_speed_; ///< Current animated wave speed.
+    qreal glitch_intensity_; ///< Current animated glitch intensity.
+    qreal wave_thickness_; ///< Current animated wave thickness.
 
     // State and Message Management
-    StreamState state_;               ///< Current visual state of the stream.
-    QList<StreamMessage*> messages_;  ///< List of message widgets managed by the stream.
-    int current_message_index_;       ///< Index of the currently displayed message in messages_.
+    StreamState state_; ///< Current visual state of the stream.
+    QList<StreamMessage *> messages_; ///< List of message widgets managed by the stream.
+    int current_message_index_; ///< Index of the currently displayed message in messages_.
     bool is_clearing_all_messages_ = false; ///< Flag indicating if a full clear operation is in progress.
 
     // UI Elements
-    QLabel* stream_name_label_;       ///< Label displaying the stream name.
-    UserInfoLabel* transmitting_user_label_; ///< Label displaying the transmitting user ID and color indicator.
+    QLabel *stream_name_label_; ///< Label displaying the stream name.
+    UserInfoLabel *transmitting_user_label_; ///< Label displaying the transmitting user ID and color indicator.
 
     // Internal State
-    bool initialized_;                ///< Flag indicating if OpenGL resources are initialized.
-    qreal time_offset_;               ///< Time variable for shader animations.
+    bool initialized_; ///< Flag indicating if OpenGL resources are initialized.
+    qreal time_offset_; ///< Time variable for shader animations.
 
     // Timers
-    QTimer* animation_timer_;         ///< Timer driving the main wave animation updates.
-    QTimer* glitch_timer_;            ///< Timer triggering random glitches in Idle state.
+    QTimer *animation_timer_; ///< Timer driving the main wave animation updates.
+    QTimer *glitch_timer_; ///< Timer triggering random glitches in Idle state.
 
     // OpenGL Resources
-    QOpenGLShaderProgram* shader_program_; ///< Compiled shader program for rendering the wave.
-    QOpenGLVertexArrayObject vao_;         ///< Vertex Array Object.
-    QOpenGLBuffer vertex_buffer_;          ///< Vertex Buffer Object holding the fullscreen quad vertices.
+    QOpenGLShaderProgram *shader_program_; ///< Compiled shader program for rendering the wave.
+    QOpenGLVertexArrayObject vao_; ///< Vertex Array Object.
+    QOpenGLBuffer vertex_buffer_; ///< Vertex Buffer Object holding the fullscreen quad vertices.
 
     // Regedit Config
-    WavelengthConfig* config_; ///< Pointer to the RegeditConfig object for accessing configuration settings.
-    QColor stream_color_;      ///< Color used for rendering the stream color chosen from the registry.
-
+    WavelengthConfig *config_; ///< Pointer to the RegeditConfig object for accessing configuration settings.
+    QColor stream_color_; ///< Color used for rendering the stream color chosen from the registry.
 };
 
 #endif // COMMUNICATION_STREAM_H
