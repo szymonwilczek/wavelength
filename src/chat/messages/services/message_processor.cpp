@@ -1,9 +1,9 @@
-#include "wavelength_message_processor.h"
+#include "message_processor.h"
 
 #include "../../files/attachments/attachment_data_store.h"
 #include "../formatter/message_formatter.h"
 
-void WavelengthMessageProcessor::ProcessIncomingMessage(const QString &message, const QString &frequency) {
+void MessageProcessor::ProcessIncomingMessage(const QString &message, const QString &frequency) {
     bool ok = false;
     const QJsonObject message_object = MessageHandler::GetInstance()->ParseMessage(message, &ok);
 
@@ -54,11 +54,11 @@ void WavelengthMessageProcessor::ProcessIncomingMessage(const QString &message, 
     }
 }
 
-void WavelengthMessageProcessor::ProcessIncomingBinaryMessage(const QByteArray &message, const QString &frequency) {
+void MessageProcessor::ProcessIncomingBinaryMessage(const QByteArray &message, const QString &frequency) {
     emit audioDataReceived(frequency, message);
 }
 
-void WavelengthMessageProcessor::SetSocketMessageHandlers(QWebSocket *socket, QString frequency) {
+void MessageProcessor::SetSocketMessageHandlers(QWebSocket *socket, QString frequency) {
     if (!socket) {
         qWarning() << "[MESSAGE PROCESSOR][CLIENT] setSocketMessageHandlers: Socket is null for frequency" << frequency;
         return;
@@ -93,7 +93,7 @@ void WavelengthMessageProcessor::SetSocketMessageHandlers(QWebSocket *socket, QS
             });
 }
 
-void WavelengthMessageProcessor::ProcessMessageContent(const QJsonObject &message_object, const QString &frequency,
+void MessageProcessor::ProcessMessageContent(const QJsonObject &message_object, const QString &frequency,
                                                        const QString &message_id) {
     if (MessageHandler::GetInstance()->IsMessageProcessed(message_id)) {
         return;
@@ -120,7 +120,7 @@ void WavelengthMessageProcessor::ProcessMessageContent(const QJsonObject &messag
     }
 }
 
-void WavelengthMessageProcessor::ProcessSystemCommand(const QJsonObject &message_object, const QString &frequency) {
+void MessageProcessor::ProcessSystemCommand(const QJsonObject &message_object, const QString &frequency) {
     const QString command = message_object["command"].toString();
 
     if (command == "close_wavelength") {
@@ -128,21 +128,21 @@ void WavelengthMessageProcessor::ProcessSystemCommand(const QJsonObject &message
     }
 }
 
-void WavelengthMessageProcessor::ProcessUserJoined(const QJsonObject &message_object, const QString &frequency) {
+void MessageProcessor::ProcessUserJoined(const QJsonObject &message_object, const QString &frequency) {
     const QString user_id = message_object["userId"].toString();
     const QString formatted_message = MessageFormatter::FormatSystemMessage(
         QString("User %1 joined the wavelength").arg(user_id.left(5)));
     emit systemMessage(frequency, formatted_message);
 }
 
-void WavelengthMessageProcessor::ProcessUserLeft(const QJsonObject &message_object, const QString &frequency) {
+void MessageProcessor::ProcessUserLeft(const QJsonObject &message_object, const QString &frequency) {
     const QString user_id = message_object["userId"].toString();
     const QString formatted_message = MessageFormatter::FormatSystemMessage(
         QString("User %1 left the wavelength").arg(user_id.left(5)));
     emit systemMessage(frequency, formatted_message);
 }
 
-void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequency) {
+void MessageProcessor::ProcessWavelengthClosed(const QString &frequency) {
     WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     if (registry->HasWavelength(frequency)) {
         const QString active_frequency = registry->GetActiveWavelength();
@@ -155,15 +155,15 @@ void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequenc
     }
 }
 
-WavelengthMessageProcessor::WavelengthMessageProcessor(QObject *parent): QObject(parent) {
+MessageProcessor::MessageProcessor(QObject *parent): QObject(parent) {
     const WavelengthMessageService *service = WavelengthMessageService::GetInstance();
-    connect(this, &WavelengthMessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
-    connect(this, &WavelengthMessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
-    connect(this, &WavelengthMessageProcessor::pttStartReceiving, service,
+    connect(this, &MessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
+    connect(this, &MessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
+    connect(this, &MessageProcessor::pttStartReceiving, service,
             &WavelengthMessageService::pttStartReceiving);
-    connect(this, &WavelengthMessageProcessor::pttStopReceiving, service, &WavelengthMessageService::pttStopReceiving);
-    connect(this, &WavelengthMessageProcessor::audioDataReceived, service,
+    connect(this, &MessageProcessor::pttStopReceiving, service, &WavelengthMessageService::pttStopReceiving);
+    connect(this, &MessageProcessor::audioDataReceived, service,
             &WavelengthMessageService::audioDataReceived);
-    connect(this, &WavelengthMessageProcessor::remoteAudioAmplitudeUpdate, service,
+    connect(this, &MessageProcessor::remoteAudioAmplitudeUpdate, service,
             &WavelengthMessageService::remoteAudioAmplitudeUpdate);
 }

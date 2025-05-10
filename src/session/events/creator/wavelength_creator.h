@@ -2,7 +2,7 @@
 #define WAVELENGTH_CREATOR_H
 
 #include "../../../storage/database_manager.h"
-#include "../../../chat/messages/services/wavelength_message_processor.h"
+#include "../../../chat/messages/services/message_processor.h"
 #include "../../../../src/app/wavelength_config.h"
 
 /**

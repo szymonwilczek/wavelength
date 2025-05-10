@@ -102,11 +102,11 @@ void WavelengthSessionCoordinator::ConnectSignals() {
                 &WavelengthSessionCoordinator::onRemoteAudioAmplitudeUpdate);
 
         // WavelengthMessageProcessor
-        connect(WavelengthMessageProcessor::GetInstance(), &WavelengthMessageProcessor::messageReceived,
+        connect(MessageProcessor::GetInstance(), &MessageProcessor::messageReceived,
                 this, &WavelengthSessionCoordinator::onMessageReceived, Qt::DirectConnection);
-        connect(WavelengthMessageProcessor::GetInstance(), &WavelengthMessageProcessor::wavelengthClosed,
+        connect(MessageProcessor::GetInstance(), &MessageProcessor::wavelengthClosed,
                 this, &WavelengthSessionCoordinator::onWavelengthClosed, Qt::DirectConnection);
-        connect(WavelengthMessageProcessor::GetInstance(), &WavelengthMessageProcessor::userKicked,
+        connect(MessageProcessor::GetInstance(), &MessageProcessor::userKicked,
                 this, &WavelengthSessionCoordinator::userKicked, Qt::DirectConnection);
 
         // WavelengthStateManager

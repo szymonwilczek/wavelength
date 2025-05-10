@@ -124,7 +124,7 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
                 initial_info.socket = socket;
                 registry->AddWavelength(frequency, initial_info);
 
-                WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
+                MessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
 
                 connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 

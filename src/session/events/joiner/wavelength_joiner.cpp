@@ -3,7 +3,7 @@
 #include "../../../app/wavelength_config.h"
 #include "../../../auth/authentication_manager.h"
 #include "../../../chat/messages/handler/message_handler.h"
-#include "../../../chat/messages/services/wavelength_message_processor.h"
+#include "../../../chat/messages/services/message_processor.h"
 #include "../../../storage/wavelength_registry.h"
 
 JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &password) {
@@ -140,7 +140,7 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
                 initial_info.socket = socket;
                 registry->AddWavelength(frequency, initial_info);
 
-                WavelengthMessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
+                MessageProcessor::GetInstance()->SetSocketMessageHandlers(socket, frequency);
 
                 connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 

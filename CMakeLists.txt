@@ -58,8 +58,8 @@ add_executable(
         src/session/events/leaver/wavelength_leaver.h
         src/chat/messages/services/wavelength_message_service.cpp
         src/chat/messages/services/wavelength_message_service.h
-        src/chat/messages/services/wavelength_message_processor.cpp
-        src/chat/messages/services/wavelength_message_processor.h
+        src/chat/messages/services/message_processor.cpp
+        src/chat/messages/services/message_processor.h
         src/services/wavelength_state_manager.cpp
         src/services/wavelength_state_manager.h
         src/services/wavelength_event_broker.cpp

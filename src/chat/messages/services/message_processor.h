@@ -17,7 +17,7 @@ class WavelengthMessageService;
  * PTT events, audio data). It collaborates with MessageHandler for parsing and ID management,
  * MessageFormatter for creating displayable HTML, and AttachmentDataStore for handling attachments.
  */
-class WavelengthMessageProcessor final : public QObject {
+class MessageProcessor final : public QObject {
     Q_OBJECT
 
 public:
@@ -25,8 +25,8 @@ public:
      * @brief Gets the singleton instance of the WavelengthMessageProcessor.
      * @return Pointer to the singleton WavelengthMessageProcessor instance.
      */
-    static WavelengthMessageProcessor *GetInstance() {
-        static WavelengthMessageProcessor instance;
+    static MessageProcessor *GetInstance() {
+        static MessageProcessor instance;
         return &instance;
     }
 
@@ -185,23 +185,23 @@ private:
      * Connects internal signals to the corresponding slots in WavelengthMessageService.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthMessageProcessor(QObject *parent = nullptr);
+    explicit MessageProcessor(QObject *parent = nullptr);
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthMessageProcessor() override {
+    ~MessageProcessor() override {
     }
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthMessageProcessor(const WavelengthMessageProcessor &) = delete;
+    MessageProcessor(const MessageProcessor &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthMessageProcessor &operator=(const WavelengthMessageProcessor &) = delete;
+    MessageProcessor &operator=(const MessageProcessor &) = delete;
 };
 
 #endif // WAVELENGTH_MESSAGE_PROCESSOR_H
