@@ -4,10 +4,7 @@
 #include <QDialog>
 #include <QWidget>
 #include <QShowEvent>
-#include <QGraphicsOpacityEffect>
 #include <QPixmap>
-#include <QLinearGradient>
-#include <QDebug>
 
 class OverlayWidget;
 
@@ -27,12 +24,12 @@ public:
      * @brief Enum defining the available animation styles for showing and closing the dialog.
      */
     enum AnimationType {
-        kSlideFromBottom,       ///< Dialog slides in from the bottom and out to the bottom.
-        kFadeIn,                ///< Dialog fades in and out using opacity.
-        kScaleFromCenter,       ///< Dialog scales in from the center (Not fully implemented in provided code).
-        kDigitalMaterialization ///< Dialog slides in, fades in, and then applies a digital materialization effect (requires specific dialog subclass properties).
+        kSlideFromBottom, ///< Dialog slides in from the bottom and out to the bottom.
+        kDigitalMaterialization
+        ///< Dialog slides in, fades in, and then applies a digital materialization effect (requires specific dialog subclass properties).
     };
-    Q_ENUM(AnimationType) // Register enum with Qt Meta-Object System
+
+    Q_ENUM(AnimationType)
 
     /**
      * @brief Constructs an AnimatedDialog.
@@ -61,7 +58,7 @@ public:
 
 signals:
     /**
-     * @brief Emitted when the show animation (AnimateShow) has completely finished.
+     * @brief Emitted when the show animation (AnimateShow) has finished.
      */
     void showAnimationFinished();
 
@@ -81,12 +78,10 @@ protected:
      */
     void closeEvent(QCloseEvent *event) override;
 
-    // --- Properties for specific animations (used by subclasses) ---
     /** @brief Progress property (0.0 to 1.0) for the digital materialization effect. Animatable. */
     double digitalization_progress_ = 0.0;
     /** @brief Progress property (0.0 to 1.0) potentially for corner glow effects (unused in provided code). Animatable. */
     double corner_glow_progress_ = 0.0;
-    // --- End Properties ---
 
 private:
     /**
@@ -110,15 +105,6 @@ private:
     bool closing_;
     /** @brief Pointer to the semi-transparent overlay widget displayed behind the dialog during animation. */
     OverlayWidget *overlay_;
-
-    // --- Variables potentially related to drawing effects (unused in provided code) ---
-    /** @brief Buffer potentially for pre-rendering scanline effects (unused). */
-    QPixmap scanline_buffer_;
-    /** @brief Gradient potentially for scanline effects (unused). */
-    QLinearGradient scan_gradient_;
-    /** @brief Flag indicating if scanline resources are initialized (unused). */
-    bool scanline_initialized_ = false;
-    // --- End Drawing Effect Variables ---
 };
 
 #endif // ANIMATED_DIALOG_H
