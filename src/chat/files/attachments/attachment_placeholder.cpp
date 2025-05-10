@@ -556,7 +556,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 
     auto open_player = [this, data]() {
         video_data_ = data;
-        auto video_player_overlay = new VideoPlayerOverlay(data, mime_type_, nullptr);
+        auto video_player_overlay = new VideoPlayer(data, mime_type_, nullptr);
 
         video_player_overlay->setStyleSheet(
             "QDialog { "
