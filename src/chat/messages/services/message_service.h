@@ -1,10 +1,10 @@
 #ifndef WAVELENGTH_MESSAGE_SERVICE_H
 #define WAVELENGTH_MESSAGE_SERVICE_H
 
-#include <QtConcurrent>
+#include <QMap>
+#include <QObject>
 
-#include "../../../storage/wavelength_registry.h"
-#include "../handler/message_handler.h"
+class QWebSocket;
 
 /**
  * @brief Singleton service responsible for sending messages and files over WebSocket connections.

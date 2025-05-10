@@ -1,8 +1,15 @@
 #include "message_service.h"
 
+#include <qfileinfo.h>
+#include <QJsonDocument>
+#include <QThread>
+#include <QTimer>
+
 #include "../../../app/managers/translation_manager.h"
 #include "../../../auth/authentication_manager.h"
+#include "../../../storage/wavelength_registry.h"
 #include "../../files/attachments/attachment_queue_manager.h"
+#include "../handler/message_handler.h"
 
 bool MessageService::SendPttRequest(const QString &frequency) {
     QWebSocket *socket = GetSocketForFrequency(frequency);
@@ -108,7 +115,7 @@ bool MessageService::SendFile(const QString &file_path, const QString &progress_
     QString file_path_copy = file_path;
     QString progress_msg_id_copy = progress_message_id;
 
-    AttachmentQueueManager::GetInstance()->AddTask([this, file_path_copy, progress_msg_id_copy, translator]() {
+    AttachmentQueueManager::GetInstance()->AddTask([this, file_path_copy, progress_msg_id_copy, translator] {
         try {
             const QFileInfo file_info(file_path_copy);
             if (!file_info.exists() || !file_info.isReadable()) {
@@ -153,7 +160,7 @@ bool MessageService::SendFile(const QString &file_path, const QString &progress_
                                         .arg(file_type)
                                         .arg(file_info.fileName()));
 
-            // reading file in chunks
+            // reading the file in chunks
             QByteArray file_data;
             const qint64 file_size = file_info.size();
             constexpr qint64 chunk_size = 1024 * 1024; // 1 MB chunks
@@ -231,7 +238,7 @@ bool MessageService::SendFile(const QString &file_path, const QString &progress_
 }
 
 bool MessageService::SendFileToServer(const QString &json_message, const QString &frequency,
-                                                const QString &progress_message_id) {
+                                      const QString &progress_message_id) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     const TranslationManager *translator = TranslationManager::GetInstance();
     QWebSocket *socket = nullptr;
@@ -257,7 +264,7 @@ bool MessageService::SendFileToServer(const QString &json_message, const QString
                           .arg(translator->Translate("MessageService.SendFileSuccess", "File sent successfully!"))
     );
 
-    QTimer::singleShot(5000, this, [this, progress_message_id]() {
+    QTimer::singleShot(5000, this, [this, progress_message_id] {
         emit removeProgressMessage(progress_message_id);
     });
 
@@ -265,7 +272,7 @@ bool MessageService::SendFileToServer(const QString &json_message, const QString
 }
 
 void MessageService::HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
-                                                       const QString &progress_message_id) {
+                                             const QString &progress_message_id) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     const TranslationManager *translator = TranslationManager::GetInstance();
     QWebSocket *socket = nullptr;

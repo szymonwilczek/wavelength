@@ -1,7 +1,10 @@
 #include "message_processor.h"
 
+#include "message_service.h"
+#include "../../../storage/wavelength_registry.h"
 #include "../../files/attachments/attachment_data_store.h"
 #include "../formatter/message_formatter.h"
+#include "../handler/message_handler.h"
 
 void MessageProcessor::ProcessIncomingMessage(const QString &message, const QString &frequency) {
     bool ok = false;
@@ -94,7 +97,7 @@ void MessageProcessor::SetSocketMessageHandlers(QWebSocket *socket, QString freq
 }
 
 void MessageProcessor::ProcessMessageContent(const QJsonObject &message_object, const QString &frequency,
-                                                       const QString &message_id) {
+                                             const QString &message_id) {
     if (MessageHandler::GetInstance()->IsMessageProcessed(message_id)) {
         return;
     }
