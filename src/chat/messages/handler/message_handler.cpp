@@ -1,15 +1,16 @@
 #include "message_handler.h"
 
+#include <QJsonDocument>
+
 bool MessageHandler::SendSystemCommand(QWebSocket *socket, const QString &command, const QJsonObject &params) {
     if (!socket || !socket->isValid()) {
-        qDebug() << "Cannot send command - socket is invalid";
+        qDebug() << "[MESSAGE HANDLER] Cannot send command - socket is invalid.";
         return false;
     }
 
     QJsonObject command_object;
     command_object["type"] = command;
 
-    // Add all parameters from the params object
     for (auto it = params.constBegin(); it != params.constEnd(); ++it) {
         command_object[it.key()] = it.value();
     }
@@ -24,9 +25,7 @@ void MessageHandler::MarkMessageAsProcessed(const QString &message_id) {
     if (!message_id.isEmpty()) {
         processed_message_ids_.insert(message_id);
 
-        // Keep the processed message cache from growing too large
         if (processed_message_ids_.size() > kMaxCachedMessageIds) {
-            // Remove approximately 20% of the oldest messages
             constexpr int to_remove = kMaxCachedMessageIds / 5;
             auto it = processed_message_ids_.begin();
             for (int i = 0; i < to_remove && it != processed_message_ids_.end(); ++i) {
@@ -40,7 +39,7 @@ QJsonObject MessageHandler::ParseMessage(const QString &message, bool *ok) {
     const QJsonDocument document = QJsonDocument::fromJson(message.toUtf8());
     if (document.isNull() || !document.isObject()) {
         if (ok) *ok = false;
-        qDebug() << "Failed to parse message JSON";
+        qDebug() << "[MESSAGE HANDLER] Failed to parse message JSON.";
         return QJsonObject();
     }
 
@@ -49,7 +48,7 @@ QJsonObject MessageHandler::ParseMessage(const QString &message, bool *ok) {
 }
 
 QJsonObject MessageHandler::CreateAuthRequest(const QString &frequency, const QString &password,
-    const QString &client_id) {
+                                              const QString &client_id) {
     QJsonObject auth_object;
     auth_object["type"] = "auth";
     auth_object["frequency"] = frequency;
@@ -59,7 +58,7 @@ QJsonObject MessageHandler::CreateAuthRequest(const QString &frequency, const QS
 }
 
 QJsonObject MessageHandler::CreateRegisterRequest(const QString &frequency, const bool is_password_protected,
-    const QString &password, const QString &host_id) {
+                                                  const QString &password, const QString &host_id) {
     QJsonObject register_object;
     register_object["type"] = "register_wavelength";
     register_object["frequency"] = frequency;
