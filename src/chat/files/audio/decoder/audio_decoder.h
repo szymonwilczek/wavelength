@@ -5,14 +5,14 @@
 #pragma comment(lib, "swresample.lib")
 #endif
 
-#include <QObject>
+#include <QAudioFormat>
 #include <QMutex>
+#include <QObject>
 #include <QThread>
 #include <QWaitCondition>
-#include <QAudioOutput>
-#include <QAudioFormat>
-#include <QIODevice>
-#include <QDebug>
+
+class QIODevice;
+class QAudioOutput;
 
 extern "C" {
 #include <libavcodec/avcodec.h>
