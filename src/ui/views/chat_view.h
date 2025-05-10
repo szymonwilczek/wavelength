@@ -7,7 +7,7 @@
 #include <QAudioFormat>
 #include <QIODevice>
 
-#include "../../ui/chat/wavelength_stream_display.h"
+#include "../../ui/chat/stream_display.h"
 #include "../../session/session_coordinator.h"
 
 /**
@@ -243,7 +243,7 @@ private:
     /** @brief Label indicating the connection status ("AKTYWNE POŁĄCZENIE", "ROZŁĄCZANIE", etc.). */
     QLabel *status_indicator_;
     /** @brief Custom widget for displaying the stream of messages and audio visualization. */
-    WavelengthStreamDisplay *message_area_;
+    StreamDisplay *message_area_;
     /** @brief Input field for typing text messages. */
     QLineEdit *input_field_;
     /** @brief Button to open the file attachment dialog. */

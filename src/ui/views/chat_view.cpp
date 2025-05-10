@@ -44,7 +44,7 @@ ChatView::ChatView(QWidget *parent): QWidget(parent), scanline_opacity_(0.15) {
 
     main_layout->addLayout(header_layout);
 
-    message_area_ = new WavelengthStreamDisplay(this);
+    message_area_ = new StreamDisplay(this);
     message_area_->setStyleSheet(ChatStyle::GetScrollBarStyle());
     main_layout->addWidget(message_area_, 1);
 

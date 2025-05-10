@@ -1,8 +1,8 @@
-#include "wavelength_stream_display.h"
+#include "stream_display.h"
 
 #include <QRegularExpression>
 
-WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(parent) {
+StreamDisplay::StreamDisplay(QWidget *parent): QWidget(parent) {
     const auto main_layout = new QVBoxLayout(this);
     main_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -15,10 +15,10 @@ WavelengthStreamDisplay::WavelengthStreamDisplay(QWidget *parent): QWidget(paren
 
     message_timer_ = new QTimer(this);
     message_timer_->setSingleShot(true);
-    connect(message_timer_, &QTimer::timeout, this, &WavelengthStreamDisplay::ProcessNextQueuedMessage);
+    connect(message_timer_, &QTimer::timeout, this, &StreamDisplay::ProcessNextQueuedMessage);
 }
 
-void WavelengthStreamDisplay::SetFrequency(const QString &frequency, const QString &name) {
+void StreamDisplay::SetFrequency(const QString &frequency, const QString &name) {
     if (name.isEmpty()) {
         communication_stream_->SetStreamName(QString("WAVELENGTH: %1 Hz").arg(frequency));
     } else {
@@ -27,7 +27,7 @@ void WavelengthStreamDisplay::SetFrequency(const QString &frequency, const QStri
     Clear();
 }
 
-void WavelengthStreamDisplay::AddMessage(const QString &message, const QString &message_id,
+void StreamDisplay::AddMessage(const QString &message, const QString &message_id,
                                          const StreamMessage::MessageType type) {
     if (!message_id.isEmpty() && displayed_progress_messages_.contains(message_id)) {
         if (StreamMessage *existing_message = displayed_progress_messages_.value(message_id)) {
@@ -68,14 +68,14 @@ void WavelengthStreamDisplay::AddMessage(const QString &message, const QString &
     }
 }
 
-void WavelengthStreamDisplay::Clear() {
+void StreamDisplay::Clear() {
     communication_stream_->ClearMessages();
     message_queue_.clear();
     displayed_progress_messages_.clear();
     message_timer_->stop();
 }
 
-void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
+void StreamDisplay::ProcessNextQueuedMessage() {
     if (message_queue_.isEmpty()) {
         return;
     }
@@ -108,7 +108,7 @@ void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
             if (!displayed_progress_messages_.contains(id)) {
                 displayed_progress_messages_.insert(id, displayed_message);
                 connect(displayed_message, &QObject::destroyed, this,
-                        &WavelengthStreamDisplay::OnStreamMessageDestroyed);
+                        &StreamDisplay::OnStreamMessageDestroyed);
             } else {
                 qWarning() << "[STREAM DISPLAY] Progress message with ID " << id << "already exists in the map!";
             }
@@ -123,7 +123,7 @@ void WavelengthStreamDisplay::ProcessNextQueuedMessage() {
     }
 }
 
-void WavelengthStreamDisplay::OnStreamMessageDestroyed(const QObject *object) {
+void StreamDisplay::OnStreamMessageDestroyed(const QObject *object) {
     auto it = displayed_progress_messages_.begin();
     while (it != displayed_progress_messages_.end()) {
         if (it.value() == object) {

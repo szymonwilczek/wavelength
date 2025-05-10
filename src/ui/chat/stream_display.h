@@ -13,7 +13,7 @@
  * provides slots to forward control signals (like audio amplitude and transmitting user)
  * to the underlying CommunicationStream.
  */
-class WavelengthStreamDisplay final : public QWidget {
+class StreamDisplay final : public QWidget {
     Q_OBJECT
 
     /**
@@ -39,7 +39,7 @@ public:
      * progress message map, and the message processing timer.
      * @param parent Optional parent widget.
      */
-    explicit WavelengthStreamDisplay(QWidget* parent = nullptr);
+    explicit StreamDisplay(QWidget *parent = nullptr);
 
     /**
      * @brief Sets the frequency identifier and optional name for the stream.
@@ -47,7 +47,7 @@ public:
      * @param frequency The frequency identifier (e.g., "100.0").
      * @param name Optional display name for the frequency.
      */
-    void SetFrequency(const QString &frequency, const QString& name = QString());
+    void SetFrequency(const QString &frequency, const QString &name = QString());
 
     /**
      * @brief Adds a new message to the display queue or updates an existing progress message.
@@ -59,7 +59,7 @@ public:
      * @param message_id A unique identifier for progress messages, empty otherwise.
      * @param type The type of the message (Received, Transmitted, System).
      */
-    void AddMessage(const QString& message, const QString& message_id, StreamMessage::MessageType type);
+    void AddMessage(const QString &message, const QString &message_id, StreamMessage::MessageType type);
 
 
     /**
@@ -82,7 +82,7 @@ public slots:
      * @brief Forwards the transmitting user ID to the CommunicationStream.
      * @param userId The identifier of the user currently transmitting audio.
      */
-    void SetTransmittingUser(const QString& userId) const {
+    void SetTransmittingUser(const QString &userId) const {
         communication_stream_->SetTransmittingUser(userId);
     }
 
@@ -118,17 +118,17 @@ private slots:
      * dangling pointers and incorrect update attempts.
      * @param object Pointer to the QObject that was destroyed (the StreamMessage).
      */
-    void OnStreamMessageDestroyed(const QObject* object);
+    void OnStreamMessageDestroyed(const QObject *object);
 
 private:
     /** @brief The underlying widget that handles the visual rendering of the stream and messages. */
-    CommunicationStream* communication_stream_;
+    CommunicationStream *communication_stream_;
     /** @brief Queue holding messages waiting to be processed and displayed. */
     QQueue<MessageData> message_queue_;
     /** @brief Timer controlling the delay between displaying queued messages. */
-    QTimer* message_timer_;
+    QTimer *message_timer_;
     /** @brief Map tracking currently displayed progress messages by their unique ID to allow updates. */
-    QMap<QString, StreamMessage*> displayed_progress_messages_;
+    QMap<QString, StreamMessage *> displayed_progress_messages_;
 };
 
 #endif // WAVELENGTH_STREAM_DISPLAY_H

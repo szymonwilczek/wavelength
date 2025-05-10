@@ -104,8 +104,8 @@ add_executable(
         src/ui/chat/style/chat_style.h
         src/ui/chat/communication_stream.cpp
         src/ui/chat/communication_stream.h
-        src/ui/chat/wavelength_stream_display.cpp
-        src/ui/chat/wavelength_stream_display.h
+        src/ui/chat/stream_display.cpp
+        src/ui/chat/stream_display.h
         src/ui/chat/stream_message.cpp
         src/ui/chat/stream_message.h
         src/ui/files/cyber_attachment_viewer.cpp
