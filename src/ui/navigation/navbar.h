@@ -59,24 +59,26 @@ protected:
 signals:
     /** @brief Emitted when the "Generate Wavelength" button is clicked. */
     void createWavelengthClicked();
+
     /** @brief Emitted when the "Merge Wavelength" button is clicked. */
     void joinWavelengthClicked();
+
     /** @brief Emitted when the "Settings" button is clicked. */
     void settingsClicked();
 
 private:
     /** @brief The main horizontal layout managing all elements within the Navbar. */
-    QHBoxLayout* main_layout_;
+    QHBoxLayout *main_layout_;
     /** @brief Container widget holding the left corner element and the logo label. */
-    QWidget* logo_container_;
+    QWidget *logo_container_;
     /** @brief Label displaying the "WAVELENGTH" logo text with glow effect. */
     QLabel *logo_label_;
     /** @brief Widget displaying the current network connection status. */
-    NetworkStatusWidget* network_status_;
+    NetworkStatusWidget *network_status_;
     /** @brief Container widget holding the action buttons (Create, Join, Settings). */
-    QWidget* buttons_container_;
+    QWidget *buttons_container_;
     /** @brief Decorative label element placed at the far right in normal mode. */
-    QLabel* corner_element_;
+    QLabel *corner_element_;
 
     /** @brief Button to trigger the creation of a new wavelength. */
     CyberpunkButton *create_button_;
@@ -86,12 +88,12 @@ private:
     CyberpunkButton *settings_button_;
 
     /** @brief Spacer item used to push elements apart in the main layout (left side). */
-    QSpacerItem* spacer1_;
+    QSpacerItem *spacer1_;
     /** @brief Spacer item used to push elements apart in the main layout (right side). Its stretch factor changes in chat mode. */
-    QSpacerItem* spacer2_;
+    QSpacerItem *spacer2_;
 
     /** @brief Sound effect played when action buttons are clicked. */
-    QSoundEffect* click_sound_;
+    QSoundEffect *click_sound_;
 };
 
 #endif // NAVBAR_H

@@ -1,11 +1,9 @@
 #ifndef NETWORK_STATUS_WIDGET_H
 #define NETWORK_STATUS_WIDGET_H
 
-#include <QLabel>
 #include <QNetworkAccessManager>
-#include <QTimer>
-#include <QColor>
-#include <QPaintEvent>
+#include <QLabel>
+#include <QWidget>
 
 class TranslationManager;
 /**
@@ -58,13 +56,12 @@ private:
      * @brief Enum representing the perceived quality of the network connection.
      */
     enum NetworkQuality {
-        kNone,      ///< No connection detected.
-        kPoor,      ///< Very high latency or unstable connection.
-        kFair,      ///< Moderate latency.
-        kGood,      ///< Good latency.
-        kExcellent  ///< Low latency.
+        kNone, ///< No connection detected.
+        kPoor, ///< Very high latency or unstable connection.
+        kFair, ///< Moderate latency.
+        kGood, ///< Good latency.
+        kExcellent ///< Low latency.
     };
-    // Note: Consider adding Q_ENUM if this needs to be used with properties/meta-object system
 
     /**
      * @brief Updates the text of the status and ping labels, the icon, and the border color
@@ -88,7 +85,6 @@ private:
      */
     static QColor GetQualityColor(NetworkQuality quality);
 
-    // --- Member Variables ---
     /** @brief Label displaying the textual status (e.g., "SYSTEM READY"). */
     QLabel *status_label_;
     /** @brief Label displaying the measured ping time in milliseconds. */
@@ -106,7 +102,7 @@ private:
     /** @brief The last measured ping time in milliseconds. */
     qint64 ping_value_;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // NETWORK_STATUS_WIDGET_H
