@@ -440,10 +440,6 @@ void WavelengthChatView::OnAudioDataReceived(const QString &frequency, const QBy
 }
 
 void WavelengthChatView::OnReadyReadInput() const {
-    qDebug() << "[CHAT VIEW][HOST] onReadyReadInput triggered! Current ptt_state_:" << ptt_state_
-            << "audio_input_ state:" << (audio_input_ ? QString::number(audio_input_->state()) : "null")
-            << "input_device_:" << static_cast<void *>(input_device_);
-
     // 1. check the overall status of audio_input_ and ptt_state_
     if (ptt_state_ != Transmitting || !audio_input_ || audio_input_->state() == QAudio::StoppedState) {
         qDebug() <<
@@ -467,11 +463,9 @@ void WavelengthChatView::OnReadyReadInput() const {
     }
 
     const QByteArray buffer = input_device_->readAll();
-    qDebug() << "[CHAT VIEW][HOST] onReadyReadInput: Read" << buffer.size() << "bytes from input device.";
 
     if (!buffer.isEmpty()) {
         const bool sent = WavelengthMessageService::GetInstance()->SendAudioData(current_frequency_, buffer);
-        qDebug() << "[CHAT VIEW][HOST] onReadyReadInput: Attempted to send audio data. Success:" << sent;
 
         const qreal amplitude = CalculateAmplitude(buffer);
         if (message_area_) {
