@@ -1,6 +1,7 @@
 #include "path_markers_manager.h"
 
 #include <QDateTime>
+#include <QPainter>
 #include <QPainterPath>
 #include <QRandomGenerator>
 
@@ -268,7 +269,7 @@ void PathMarkersManager::DrawImpulseMarker(QPainter &painter, const PathMarker &
     double inner_size = marker.size * 0.5;
 
     double time = current_time * 0.002;
-    inner_size *= (0.9 + 0.2 * sin(time + marker.position * 10));
+    inner_size *= 0.9 + 0.2 * sin(time + marker.position * 10);
 
     QPainterPath center_hex;
     for (int i = 0; i < 6; i++) {
@@ -305,7 +306,7 @@ void PathMarkersManager::DrawWaveMarker(QPainter &painter, const PathMarker &mar
                                         const QColor &marker_color) {
     if (marker.wave_phase > 0.0) {
         const double wave_radius = marker.size * 1.5 * marker.wave_phase;
-        const double opacity = 1.0 - (marker.wave_phase / 5.0);
+        const double opacity = 1.0 - marker.wave_phase / 5.0;
 
         QColor wave_color = marker_color;
         wave_color.setAlphaF(opacity * 0.7);

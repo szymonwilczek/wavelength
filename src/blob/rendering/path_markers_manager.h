@@ -1,9 +1,13 @@
 #ifndef PATH_MARKERS_MANAGER_H
 #define PATH_MARKERS_MANAGER_H
 
-#include <QPainter>
-#include <QtMath>
+#include <qglobal.h>
 #include <vector>
+
+class QColor;
+class QPainterPath;
+class QPainter;
+class QPointF;
 
 /**
  * @brief Manages the creation, update, and rendering of animated markers along a QPainterPath.
