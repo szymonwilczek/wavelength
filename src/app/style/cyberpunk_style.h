@@ -2,7 +2,6 @@
 #define CYBERPUNK_STYLE_H
 
 #include <QColor>
-#include <QString>
 
 /**
  * @brief Provides a static interface for accessing cyberpunk-themed colors and applying a global stylesheet.
