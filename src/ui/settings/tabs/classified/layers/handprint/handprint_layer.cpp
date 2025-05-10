@@ -5,31 +5,33 @@
 #include <QRandomGenerator>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
-#include <QDir>
 #include <QCoreApplication>
+#include <QTimer>
 
 #include "../../../../../../app/managers/translation_manager.h"
 
 HandprintLayer::HandprintLayer(QWidget *parent)
-    : SecurityLayer(parent), handprint_timer_(nullptr), svg_renderer_(nullptr)
-{
+    : SecurityLayer(parent), handprint_timer_(nullptr), svg_renderer_(nullptr) {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const TranslationManager* translator = TranslationManager::GetInstance();
+    const TranslationManager *translator = TranslationManager::GetInstance();
 
-    const auto title = new QLabel(translator->Translate("ClassifiedSettingsWidget.Handprint.Title", "HANDPRINT AUTHENTICATION"), this);
+    const auto title = new QLabel(
+        translator->Translate("ClassifiedSettingsWidget.Handprint.Title", "HANDPRINT AUTHENTICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
     handprint_image_ = new QLabel(this);
     handprint_image_->setFixedSize(250, 250);
-    handprint_image_->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
+    handprint_image_->setStyleSheet(
+        "background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
     handprint_image_->setCursor(Qt::PointingHandCursor);
     handprint_image_->setAlignment(Qt::AlignCenter);
     handprint_image_->installEventFilter(this);
 
-    const auto instructions = new QLabel(translator->Translate("ClassifiedSettingsWidget.Handprint.Info", "Press and hold on handprint to scan"), this);
+    const auto instructions = new QLabel(
+        translator->Translate("ClassifiedSettingsWidget.Handprint.Info", "Press and hold on handprint to scan"), this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -63,7 +65,7 @@ HandprintLayer::HandprintLayer(QWidget *parent)
     connect(handprint_timer_, &QTimer::timeout, this, &HandprintLayer::UpdateProgress);
 
     handprint_files_ = QStringList()
-        << ":/resources/security/handprint.svg";
+                       << ":/resources/security/handprint.svg";
 
     svg_renderer_ = new QSvgRenderer(this);
 }
@@ -85,7 +87,7 @@ void HandprintLayer::Initialize() {
     Reset();
     LoadRandomHandprint();
     if (graphicsEffect()) {
-        dynamic_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+        dynamic_cast<QGraphicsOpacityEffect *>(graphicsEffect())->setOpacity(1.0);
     }
 }
 
@@ -95,7 +97,8 @@ void HandprintLayer::Reset() {
     }
     handprint_progress_->setValue(0);
 
-    handprint_image_->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
+    handprint_image_->setStyleSheet(
+        "background-color: rgba(10, 25, 40, 220); border: 1px solid #3399ff; border-radius: 5px;");
     handprint_progress_->setStyleSheet(
         "QProgressBar {"
         "  background-color: rgba(30, 30, 30, 150);"
@@ -112,15 +115,13 @@ void HandprintLayer::Reset() {
         handprint_image_->setPixmap(QPixmap::fromImage(base_handprint_));
     }
 
-    if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
+    if (auto *effect = qobject_cast<QGraphicsOpacityEffect *>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
 void HandprintLayer::LoadRandomHandprint() {
-    // Wybierz losowy plik odcisku dłoni
     if (handprint_files_.isEmpty()) {
-        // Jeśli nie ma plików, użyj placeholder
         current_handprint_ = "";
         base_handprint_ = QImage(250, 250, QImage::Format_ARGB32);
         base_handprint_.fill(Qt::transparent);
@@ -138,7 +139,6 @@ void HandprintLayer::LoadRandomHandprint() {
     current_handprint_ = handprint_files_[index];
 
     if (!svg_renderer_->load(current_handprint_)) {
-        // Jeśli nie można załadować SVG, wyświetl komunikat o błędzie
         base_handprint_ = QImage(250, 250, QImage::Format_ARGB32);
         base_handprint_.fill(Qt::transparent);
 
@@ -151,7 +151,6 @@ void HandprintLayer::LoadRandomHandprint() {
         return;
     }
 
-    // Renderowanie SVG do obrazu bazowego w kolorze jasno-szarym
     base_handprint_ = QImage(250, 250, QImage::Format_ARGB32);
     base_handprint_.fill(Qt::transparent);
 
@@ -159,17 +158,13 @@ void HandprintLayer::LoadRandomHandprint() {
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    // Renderowanie odcisku w kolorze jasno-szarym z przezroczystością
-    constexpr QColor light_gray_color(180, 180, 180, 120); // Jasno-szary, częściowo przezroczysty
+    constexpr QColor light_gray_color(180, 180, 180, 120);
 
-    // Ustawienie koloru dla SVG poprzez kompozycję
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter.fillRect(base_handprint_.rect(), Qt::transparent);
 
-    // Rysowanie SVG
     svg_renderer_->render(&painter, QRectF(25, 25, 200, 200));
 
-    // Nałożenie koloru jasno-szarego na wygenerowany obraz
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
     painter.fillRect(base_handprint_.rect(), light_gray_color);
 
@@ -195,8 +190,8 @@ void HandprintLayer::UpdateProgress() {
 
 void HandprintLayer::ProcessHandprint(const bool completed) {
     if (completed) {
-        // Zmiana kolorów na zielony po pomyślnym przejściu
-        handprint_image_->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
+        handprint_image_->setStyleSheet(
+            "background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 5px;");
 
         handprint_progress_->setStyleSheet(
             "QProgressBar {"
@@ -210,7 +205,6 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
             "}"
         );
 
-        // Pełne wypełnienie odcisku kolorem zielonym
         if (svg_renderer_->isValid()) {
             QImage success_image(250, 250, QImage::Format_ARGB32);
             success_image.fill(Qt::transparent);
@@ -219,10 +213,8 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
             painter.setRenderHint(QPainter::Antialiasing);
             painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-            // Renderowanie SVG
             svg_renderer_->render(&painter, QRectF(25, 25, 200, 200));
 
-            // Nałożenie koloru zielonego
             painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
             painter.fillRect(success_image.rect(), QColor(50, 240, 50, 200));
 
@@ -231,9 +223,7 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
             handprint_image_->setPixmap(QPixmap::fromImage(success_image));
         }
 
-        // Małe opóźnienie przed animacją zanikania, aby pokazać zmianę kolorów
         QTimer::singleShot(500, this, [this]() {
-            // Animacja zanikania
             const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
@@ -253,11 +243,8 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
 }
 
 void HandprintLayer::UpdateHandprintScan(const int progress_value) const {
-    if (!svg_renderer_->isValid()) {
-        return; // Brak prawidłowego SVG do renderowania
-    }
+    if (!svg_renderer_->isValid()) return;
 
-    // Tworzymy nowy obraz dla aktualnego stanu skanowania
     QImage scanning_handprint(250, 250, QImage::Format_ARGB32);
     scanning_handprint.fill(Qt::transparent);
 
@@ -265,20 +252,16 @@ void HandprintLayer::UpdateHandprintScan(const int progress_value) const {
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    // Renderowanie SVG
     svg_renderer_->render(&painter, QRectF(25, 25, 200, 200));
 
-    // Obliczenie wysokości niebieskiej części (wypełnionej)
     constexpr int total_height = 200;
-    const int filled_height = static_cast<int>((progress_value / 100.0) * total_height);
+    const int filled_height = static_cast<int>(progress_value / 100.0 * total_height);
 
-    // Nałożenie koloru dla całego obrazu - najpierw szary
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
     painter.fillRect(25, 25, 200, total_height, QColor(180, 180, 180, 120));
 
-    // Następnie nałożenie niebieskiego koloru na zeskanowaną część
     if (filled_height > 0) {
-        painter.fillRect(25, 25, 200, filled_height, QColor(51, 153, 255, 200)); // Jasny niebieski
+        painter.fillRect(25, 25, 200, filled_height, QColor(51, 153, 255, 200));
     }
 
     painter.end();
@@ -289,12 +272,12 @@ void HandprintLayer::UpdateHandprintScan(const int progress_value) const {
 bool HandprintLayer::eventFilter(QObject *obj, QEvent *event) {
     if (obj == handprint_image_) {
         if (event->type() == QEvent::MouseButtonPress) {
-            if (dynamic_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
+            if (dynamic_cast<QMouseEvent *>(event)->button() == Qt::LeftButton) {
                 handprint_timer_->start();
                 return true;
             }
         } else if (event->type() == QEvent::MouseButtonRelease) {
-            if (dynamic_cast<QMouseEvent*>(event)->button() == Qt::LeftButton) {
+            if (dynamic_cast<QMouseEvent *>(event)->button() == Qt::LeftButton) {
                 handprint_timer_->stop();
                 return true;
             }

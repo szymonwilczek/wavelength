@@ -2,10 +2,9 @@
 #define RETINA_SCAN_LAYER_H
 
 #include "../security_layer.h"
-#include <QLabel>
 #include <QProgressBar>
-#include <QTimer>
 #include <QImage>
+#include <QLabel>
 
 /**
  * @brief A security layer simulating a retina scan process.
@@ -76,13 +75,13 @@ private:
     void StartScanAnimation() const;
 
     /** @brief Label displaying the eye image with the animated scanline. */
-    QLabel* eye_image_;
+    QLabel *eye_image_;
     /** @brief Progress bar indicating the scan progress. */
-    QProgressBar* scan_progress_;
+    QProgressBar *scan_progress_;
     /** @brief Timer controlling the scanline movement and progress bar update. */
-    QTimer* scan_timer_;
+    QTimer *scan_timer_;
     /** @brief Timer defining the total duration of the scan process. */
-    QTimer* complete_timer_;
+    QTimer *complete_timer_;
     /** @brief Current vertical position of the scanline (0 to 200). */
     int scanline_;
 

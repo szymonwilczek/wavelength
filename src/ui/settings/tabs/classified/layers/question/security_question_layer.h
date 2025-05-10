@@ -1,10 +1,10 @@
 #ifndef SECURITY_QUESTION_LAYER_H
 #define SECURITY_QUESTION_LAYER_H
 
-#include "../security_layer.h"
 #include <QLabel>
 #include <QLineEdit>
-#include <QTimer>
+
+#include "../security_layer.h"
 
 class TranslationManager;
 /**
@@ -12,7 +12,7 @@ class TranslationManager;
  *
  * This layer presents a generic security question prompt and an input field.
  * It includes a timer that reveals a hint after a delay, suggesting the user
- * doesn't actually need a question if they are legitimate.
+ * doesn't need a question if they are legitimate.
  * In this implementation, any answer entered by the user is considered correct
  * as part of a joke/Easter egg. Upon "successful" authentication (any input followed by Enter),
  * the UI elements turn green, and the layer fades out, emitting the layerCompleted() signal.
@@ -39,7 +39,7 @@ public:
     /**
      * @brief Initializes the layer for display.
      * Resets the input field and styles, sets the initial question text, starts the hint timer,
-     * sets focus to the input field, and ensures the layer is fully opaque.
+     * sets focus on the input field, and ensures the layer is fully opaque.
      */
     void Initialize() override;
 
@@ -53,7 +53,7 @@ public:
 private slots:
     /**
      * @brief Checks the security answer (always accepts in this implementation).
-     * Called when the user presses Enter in the input field. Changes UI colors to green,
+     * Called when the user presses Enter the input field. Changes UI colors to green,
      * updates the label text, and initiates the fade-out animation after a short delay.
      */
     void CheckSecurityAnswer();
@@ -66,13 +66,13 @@ private slots:
 
 private:
     /** @brief Label displaying the security question prompt or hint. */
-    QLabel* security_question_label_;
+    QLabel *security_question_label_;
     /** @brief Input field for the user to type their answer. */
-    QLineEdit* security_question_input_;
+    QLineEdit *security_question_input_;
     /** @brief Timer controlling when the hint is displayed. */
-    QTimer* security_question_timer_;
+    QTimer *security_question_timer_;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 };
 
 #endif // SECURITY_QUESTION_LAYER_H

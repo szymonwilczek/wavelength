@@ -30,8 +30,7 @@ class FloatingEnergySphereWidget;
  * finishes or is interrupted. It also includes logic for checking admin privileges and
  * relaunching the application with or without elevation on Windows.
  */
-class SystemOverrideManager final : public QObject
-{
+class SystemOverrideManager final : public QObject {
     Q_OBJECT
 
 public:
@@ -62,7 +61,7 @@ public:
      * @brief Attempts to relaunch the application with administrative privileges (Windows only).
      * Displays a UAC prompt to the user.
      * @param arguments Optional command-line arguments to pass to the relaunched instance.
-     * @return True if the relaunch request was successfully initiated, false otherwise (e.g., user cancelled UAC).
+     * @return True if the relaunch request was successfully initiated, false otherwise (e.g., user canceled UAC).
      */
     static bool RelaunchAsAdmin(const QStringList& arguments = QStringList());
 #endif
@@ -102,14 +101,14 @@ private:
      * @brief Saves the current wallpaper path and sets the desktop wallpaper to a temporary black image.
      * @return True on success, false otherwise.
      */
-    bool ChangeWallpaper();
+    static bool ChangeWallpaper();
 
     /**
      * @brief Restores the original desktop wallpaper saved by ChangeWallpaper().
      * Also removes the temporary black wallpaper file.
      * @return True if the original wallpaper was successfully restored, false otherwise.
      */
-    bool RestoreWallpaper();
+    static bool RestoreWallpaper();
 
     /**
      * @brief Sends a system notification using QSystemTrayIcon.
@@ -118,7 +117,7 @@ private:
      * @param message The main text content of the notification.
      * @return True if the notification was sent successfully, false otherwise.
      */
-    bool SendSystemNotification(const QString& title, const QString& message) const;
+    [[nodiscard]] bool SendSystemNotification(const QString &title, const QString &message) const;
 
     /**
      * @brief Minimizes all open windows on the desktop (Windows only).
@@ -129,20 +128,15 @@ private:
 
     /**
      * @brief Creates, configures, positions, and shows the FloatingEnergySphereWidget.
-     * Connects necessary signals for closing and sequence completion.
+     * Connects the necessary signals for closing and sequence completion.
      * @param is_first_time Flag passed to the FloatingEnergySphereWidget constructor.
      */
     void ShowFloatingAnimationWidget(bool is_first_time);
 
     /** @brief System tray icon used for displaying notifications. */
-    QSystemTrayIcon* tray_icon_;
+    QSystemTrayIcon *tray_icon_;
     /** @brief Pointer to the floating energy sphere widget instance. */
-    FloatingEnergySphereWidget* floating_widget_;
-
-    /** @brief Media player potentially used for background audio (currently not fully utilized). */
-    QMediaPlayer* media_player_;
-    /** @brief Audio output potentially used with media_player_ (currently not fully utilized). */
-    QAudioOutput* audio_output_;
+    FloatingEnergySphereWidget *floating_widget_;
 
     /** @brief Stores the path to the user's original desktop wallpaper. */
     QString original_wallpaper_path_;
@@ -157,7 +151,7 @@ private:
      * @param arguments Optional command-line arguments to pass to the relaunched instance.
      * @return True if the relaunch was successfully initiated, false otherwise.
      */
-    static bool RelaunchNormally(const QStringList& arguments = QStringList());
+    static bool RelaunchNormally(const QStringList &arguments = QStringList());
 
 #ifdef Q_OS_WIN
     // --- Hooks ---

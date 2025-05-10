@@ -91,14 +91,13 @@ private:
     void UpdateFingerprintScan(int progress_value) const;
 
     /** @brief Label displaying the fingerprint image. */
-    QLabel* fingerprint_image_;
+    QLabel *fingerprint_image_;
     /** @brief Progress bar indicating the scan progress. */
-    QProgressBar* fingerprint_progress_;
+    QProgressBar *fingerprint_progress_;
     /** @brief Timer controlling the progress update while the mouse button is held. */
-    QTimer* fingerprint_timer_;
-
+    QTimer *fingerprint_timer_;
     /** @brief Renderer used to load and draw SVG fingerprint images. */
-    QSvgRenderer* svg_renderer_;
+    QSvgRenderer *svg_renderer_;
     /** @brief The base image of the fingerprint (rendered SVG in gray). */
     QImage base_fingerprint_;
     /** @brief List of paths to available fingerprint SVG files. */

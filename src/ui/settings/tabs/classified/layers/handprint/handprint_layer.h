@@ -2,14 +2,12 @@
 #define HANDPRINT_LAYER_H
 
 #include "../security_layer.h"
-#include <QLabel>
 #include <QProgressBar>
-#include <QTimer>
 #include <QSvgRenderer>
 #include <QWidget>
 #include <QImage>
+#include <QLabel>
 #include <QStringList>
-#include <QEvent>
 
 /**
  * @brief A security layer simulating handprint authentication.
@@ -74,7 +72,7 @@ private:
      * Handles potential loading errors. Sets the initial pixmap on handprint_image_.
      * Note: Currently only supports one hardcoded handprint file.
      */
-    void LoadRandomHandprint(); // Name is slightly misleading as it loads a fixed file
+    void LoadRandomHandprint();
 
     /**
      * @brief Filters mouse press and release events on the handprint_image_ label.
@@ -94,14 +92,14 @@ private:
     void UpdateHandprintScan(int progress_value) const;
 
     /** @brief Label displaying the handprint image. */
-    QLabel* handprint_image_;
+    QLabel *handprint_image_;
     /** @brief Progress bar indicating the scan progress. */
-    QProgressBar* handprint_progress_;
+    QProgressBar *handprint_progress_;
     /** @brief Timer controlling the progress update while the mouse button is held. */
-    QTimer* handprint_timer_;
+    QTimer *handprint_timer_;
 
     /** @brief Renderer used to load and draw the SVG handprint image. */
-    QSvgRenderer* svg_renderer_;
+    QSvgRenderer *svg_renderer_;
     /** @brief The base image of the handprint (rendered SVG in gray). */
     QImage base_handprint_;
     /** @brief List of paths to available handprint SVG files (currently only one). */

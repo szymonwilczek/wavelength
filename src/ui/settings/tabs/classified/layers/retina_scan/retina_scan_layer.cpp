@@ -4,22 +4,22 @@
 #include <QRandomGenerator>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QTimer>
 
 #include "../../../../../../app/managers/translation_manager.h"
 
 RetinaScanLayer::RetinaScanLayer(QWidget *parent)
-    : SecurityLayer(parent), scan_timer_(nullptr), complete_timer_(nullptr), scanline_(0)
-{
+    : SecurityLayer(parent), scan_timer_(nullptr), complete_timer_(nullptr), scanline_(0) {
     const auto layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    const TranslationManager* translator = TranslationManager::GetInstance();
+    const TranslationManager *translator = TranslationManager::GetInstance();
 
-    const auto title = new QLabel(translator->Translate("ClassifiedSettingsWidget.RetinaScan.Title", "RETINA SCAN VERIFICATION"), this);
+    const auto title = new QLabel(
+        translator->Translate("ClassifiedSettingsWidget.RetinaScan.Title", "RETINA SCAN VERIFICATION"), this);
     title->setStyleSheet("color: #ff3333; font-family: Consolas; font-size: 11pt;");
     title->setAlignment(Qt::AlignCenter);
 
-    // Widget dla obrazu oka
     const auto eye_container = new QWidget(this);
     eye_container->setFixedSize(220, 220);
     eye_container->setStyleSheet("background-color: transparent;");
@@ -29,12 +29,11 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     eye_layout->setSpacing(0);
     eye_layout->setAlignment(Qt::AlignCenter);
 
-    // Pojedynczy kontener zamiast warstw
     const auto scanner_container = new QWidget(eye_container);
     scanner_container->setFixedSize(200, 200);
-    scanner_container->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;");
+    scanner_container->setStyleSheet(
+        "background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;");
 
-    // Pojedyncza etykieta dla połączonego obrazu oka i skanera
     eye_image_ = new QLabel(scanner_container);
     eye_image_->setFixedSize(200, 200);
     eye_image_->setAlignment(Qt::AlignCenter);
@@ -46,8 +45,8 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     eye_layout->addWidget(scanner_container);
 
     const auto instructions = new QLabel(translator->Translate("ClassifiedSettingsWidget.RetinaScan.Info",
-        "Please look directly at the scanner\nDo not move during scan process"),
-        this);
+                                                               "Please look directly at the scanner\nDo not move during scan process"),
+                                         this);
     instructions->setStyleSheet("color: #aaaaaa; font-family: Consolas; font-size: 9pt;");
     instructions->setAlignment(Qt::AlignCenter);
 
@@ -58,16 +57,16 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
     scan_progress_->setFixedHeight(8);
     scan_progress_->setFixedWidth(200);
     scan_progress_->setStyleSheet(
-    "QProgressBar {"
-    "  background-color: rgba(30, 30, 30, 150);"
-    "  border: 1px solid #333333;"
-    "  border-radius: 4px;"
-    "}"
-    "QProgressBar::chunk {"
-    "  background-color: #33ccff;"
-    "  border-radius: 3px;"
-    "}"
-);
+        "QProgressBar {"
+        "  background-color: rgba(30, 30, 30, 150);"
+        "  border: 1px solid #333333;"
+        "  border-radius: 4px;"
+        "}"
+        "QProgressBar::chunk {"
+        "  background-color: #33ccff;"
+        "  border-radius: 3px;"
+        "}"
+    );
 
     layout->addWidget(title);
     layout->addSpacing(20);
@@ -83,10 +82,9 @@ RetinaScanLayer::RetinaScanLayer(QWidget *parent)
 
     complete_timer_ = new QTimer(this);
     complete_timer_->setSingleShot(true);
-    complete_timer_->setInterval(5000); // 5 sekund na skanowanie
+    complete_timer_->setInterval(5000);
     connect(complete_timer_, &QTimer::timeout, this, &RetinaScanLayer::FinishScan);
 
-    // Przechowujemy bazowy obraz oka (bez linii skanującej)
     base_eye_image_ = QImage(200, 200, QImage::Format_ARGB32);
 }
 
@@ -109,10 +107,10 @@ void RetinaScanLayer::Initialize() {
     GenerateEyeImage();
 
     if (graphicsEffect()) {
-         static_cast<QGraphicsOpacityEffect*>(graphicsEffect())->setOpacity(1.0);
+        static_cast<QGraphicsOpacityEffect *>(graphicsEffect())->setOpacity(1.0);
     }
 
-    QTimer::singleShot(500, this, &RetinaScanLayer::StartScanAnimation); // Krótsze opóźnienie dla płynności
+    QTimer::singleShot(500, this, &RetinaScanLayer::StartScanAnimation);
 }
 
 void RetinaScanLayer::Reset() {
@@ -126,59 +124,51 @@ void RetinaScanLayer::Reset() {
     scanline_ = 0;
     scan_progress_->setValue(0);
 
-    if (QWidget* eyeParent = eye_image_->parentWidget()) {
-        eyeParent->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;"); // Niebiesko-zielony border
+    if (QWidget *eyeParent = eye_image_->parentWidget()) {
+        eyeParent->setStyleSheet(
+            "background-color: rgba(10, 25, 40, 220); border: 1px solid #33ccff; border-radius: 100px;");
     }
-    // Pasek postępu
+
     scan_progress_->setStyleSheet(
         "QProgressBar {"
         "  background-color: rgba(30, 30, 30, 150);"
-        "  border: 1px solid #333333;" // Szary border
+        "  border: 1px solid #333333;"
         "  border-radius: 4px;"
         "}"
         "QProgressBar::chunk {"
-        "  background-color: #33ccff;" // Niebiesko-zielony chunk
+        "  background-color: #33ccff;"
         "  border-radius: 3px;"
         "}"
     );
 
-    // Resetujemy bazowy obraz oka i czyścimy pixmapę
     base_eye_image_ = QImage(200, 200, QImage::Format_ARGB32);
     base_eye_image_.fill(Qt::transparent);
-    eye_image_->clear(); // Wyczyść aktualną pixmapę
+    eye_image_->clear();
 
-    // --- KLUCZOWA ZMIANA: Przywróć przezroczystość ---
-    if (const auto effect = qobject_cast<QGraphicsOpacityEffect*>(this->graphicsEffect())) {
+    if (const auto effect = qobject_cast<QGraphicsOpacityEffect *>(this->graphicsEffect())) {
         effect->setOpacity(1.0);
     }
 }
 
 void RetinaScanLayer::UpdateScan() {
-    // Aktualizacja paska postępu
     const int value = scan_progress_->value() + 1;
     scan_progress_->setValue(value);
-
-    // Aktualizacja linii skanowania - jeden pełny przebieg
     scanline_ += 1;
 
-    // Zatrzymaj animację po jednym przebiegu
     if (scanline_ >= 200) {
         scan_timer_->stop();
         FinishScan();
         return;
     }
 
-    // Rysowanie oka z linią skanującą
     QImage combined_image = base_eye_image_.copy();
     QPainter painter(&combined_image);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Linia skanująca - na całą szerokość kwadratu (z marginesem 1px)
     const QPen scan_pen(QColor(51, 204, 255, 180), 2);
     painter.setPen(scan_pen);
     painter.drawLine(-10, scanline_, 219, scanline_);
 
-    // Efekt świecenia linii - również na całą szerokość
     constexpr QColor glow_color(51, 204, 255, 50);
     QPen glowPen(glow_color, 1);
 
@@ -193,9 +183,9 @@ void RetinaScanLayer::UpdateScan() {
 }
 
 void RetinaScanLayer::FinishScan() {
-    // Zmiana koloru na zielony po pomyślnym skanowaniu
     if (eye_image_->parentWidget()) {
-        eye_image_->parentWidget()->setStyleSheet("background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 100px;");
+        eye_image_->parentWidget()->setStyleSheet(
+            "background-color: rgba(10, 25, 40, 220); border: 2px solid #33ff33; border-radius: 100px;");
     }
 
     scan_progress_->setStyleSheet(
@@ -210,11 +200,9 @@ void RetinaScanLayer::FinishScan() {
         "}"
     );
 
-    // Pokazujemy finalny obraz bez linii skanującej
     const QImage final_image = base_eye_image_.copy();
     eye_image_->setPixmap(QPixmap::fromImage(final_image));
 
-    // Animacja zanikania po krótkim pokazaniu sukcesu
     QTimer::singleShot(800, this, [this]() {
         const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
@@ -239,31 +227,35 @@ void RetinaScanLayer::StartScanAnimation() const {
 }
 
 void RetinaScanLayer::GenerateEyeImage() {
-    // Tworzenie obrazu oka i zapisanie go w m_baseEyeImage
     base_eye_image_ = QImage(200, 200, QImage::Format_ARGB32);
     base_eye_image_.fill(Qt::transparent);
 
     QPainter painter(&base_eye_image_);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Tło oka (białko)
+    // background of the eye
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(240, 240, 240));
     painter.drawEllipse(10, 10, 180, 180);
 
-    // Tęczówka
+    // iris
     QRadialGradient iris_gradient(QPointF(100, 100), 60);
-
-    // Losowy kolor tęczówki
-    QRandomGenerator* rng = QRandomGenerator::global();
+    QRandomGenerator *rng = QRandomGenerator::global();
     QColor irisColor;
 
     switch (rng->bounded(5)) {
-        case 0: irisColor = QColor(60, 120, 180); break;  // Niebieski
-        case 1: irisColor = QColor(80, 140, 70); break;   // Zielony
-        case 2: irisColor = QColor(110, 75, 50); break;   // Brązowy
-        case 3: irisColor = QColor(100, 80, 140); break;  // Fioletowy
-        case 4: irisColor = QColor(80, 100, 110); break;  // Szary
+        case 0: irisColor = QColor(60, 120, 180);
+            break;
+        case 1: irisColor = QColor(80, 140, 70);
+            break;
+        case 2: irisColor = QColor(110, 75, 50);
+            break;
+        case 3: irisColor = QColor(100, 80, 140);
+            break;
+        case 4: irisColor = QColor(80, 100, 110);
+            break;
+        default:
+            break;
     }
 
     iris_gradient.setColorAt(0, irisColor.lighter(120));
@@ -273,11 +265,10 @@ void RetinaScanLayer::GenerateEyeImage() {
     painter.setBrush(iris_gradient);
     painter.drawEllipse(50, 50, 100, 100);
 
-    // Źrenica
+    // pupil
     painter.setBrush(Qt::black);
     painter.drawEllipse(75, 75, 50, 50);
 
-    // Dodanie losowych wzorów na tęczówce
     painter.setPen(QPen(irisColor.darker(200), 1));
 
     for (int i = 0; i < 20; i++) {
@@ -286,11 +277,10 @@ void RetinaScanLayer::GenerateEyeImage() {
         int radius = rng->bounded(35, 50);
 
         painter.drawArc(100 - radius, 100 - radius,
-                         radius * 2, radius * 2,
-                         start_angle * 16, span_angle * 16);
+                        radius * 2, radius * 2,
+                        start_angle * 16, span_angle * 16);
     }
 
-    // Odblaski
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(255, 255, 255, 180));
     painter.drawEllipse(75, 65, 15, 10);
@@ -298,6 +288,5 @@ void RetinaScanLayer::GenerateEyeImage() {
 
     painter.end();
 
-    // Ustawienie bazowego obrazu oka w widgecie
     eye_image_->setPixmap(QPixmap::fromImage(base_eye_image_));
 }
