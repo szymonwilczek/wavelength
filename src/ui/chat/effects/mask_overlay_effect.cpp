@@ -1,5 +1,9 @@
 #include "mask_overlay_effect.h"
 
+#include <QPainter>
+#include <QRandomGenerator>
+#include <QTimer>
+
 MaskOverlayEffect::MaskOverlayEffect(QWidget *parent): QWidget(parent), reveal_percentage_(0), scanline_y_(0) {
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_NoSystemBackground);
