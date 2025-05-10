@@ -1,6 +1,9 @@
 #include "cyber_push_button.h"
 
 #include <cmath>
+#include <QDateTime>
+#include <QPainter>
+#include <QPainterPath>
 
 CyberPushButton::CyberPushButton(const QString &text, QWidget *parent): QPushButton(text, parent),
                                                                         glow_intensity_(0.5) {
@@ -8,7 +11,7 @@ CyberPushButton::CyberPushButton(const QString &text, QWidget *parent): QPushBut
     setStyleSheet("background-color: transparent; border: none;");
 
     pulse_timer_ = new QTimer(this);
-    connect(pulse_timer_, &QTimer::timeout, this, [this]() {
+    connect(pulse_timer_, &QTimer::timeout, this, [this] {
         const double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
         SetGlowIntensity(base_glow_intensity_ + phase);
     });

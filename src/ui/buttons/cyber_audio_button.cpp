@@ -12,7 +12,7 @@ CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushB
     setStyleSheet("background-color: transparent; border: none;");
 
     pulse_timer_ = new QTimer(this);
-    connect(pulse_timer_, &QTimer::timeout, this, [this]() {
+    connect(pulse_timer_, &QTimer::timeout, this, [this] {
         const double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
         SetGlowIntensity(base_glow_intensity_ + phase);
     });

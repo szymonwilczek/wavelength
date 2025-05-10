@@ -2,9 +2,6 @@
 #define CYBER_BUTTON_H
 
 #include <QPushButton>
-#include <QPainterPath>
-#include <QMouseEvent>
-#include <QEvent>
 
 /**
  * @brief A custom QPushButton styled with a cyberpunk aesthetic.
@@ -28,7 +25,7 @@ public:
      * @param parent Optional parent widget.
      * @param isPrimary If true, uses the primary (blue/cyan) color scheme; otherwise, uses the secondary (pink/magenta) scheme. Defaults to true.
      */
-    explicit CyberButton(const QString& text, QWidget* parent = nullptr, bool isPrimary = true);
+    explicit CyberButton(const QString &text, QWidget *parent = nullptr, bool isPrimary = true);
 
     /**
      * @brief Gets the current intensity of the glow effect.
@@ -50,31 +47,31 @@ protected:
      * based on the primary/secondary color scheme and current state (enabled, down).
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden enter event handler. Animates the glow intensity to a higher value.
      * @param event The enter event.
      */
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEvent *event) override;
 
     /**
      * @brief Overridden leave event handler. Animates the glow intensity back to its default value.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override;
+    void leaveEvent(QEvent *event) override;
 
     /**
      * @brief Overridden mouse press event handler. Sets the glow intensity to maximum and triggers a repaint.
      * @param event The mouse press event.
      */
-    void mousePressEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
     /**
      * @brief Overridden mouse release event handler. Sets the glow intensity back to the hover level and triggers a repaint.
      * @param event The mouse release event.
      */
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     /** @brief Current intensity of the glow effect. Modified by animations and mouse events. */

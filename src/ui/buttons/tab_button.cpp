@@ -1,6 +1,7 @@
 #include "tab_button.h"
 
 #include <cmath>
+#include <QPainter>
 #include <QPropertyAnimation>
 
 TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), underline_offset_(0),
