@@ -1,18 +1,15 @@
 #ifndef SHORTCUT_MANAGER_H
 #define SHORTCUT_MANAGER_H
 
+#include <QMap>
 #include <QObject>
-#include <concepts>
 
-#include "../wavelength_config.h"
-
-class QWidget;
 class QShortcut;
-class WavelengthConfig;
 class QMainWindow;
-class ChatView;
 class SettingsView;
+class ChatView;
 class Navbar;
+class WavelengthConfig;
 
 /**
  * @brief Manages application-wide keyboard shortcuts using a singleton pattern.
@@ -69,8 +66,7 @@ private:
      * Initializes the pointer to the WavelengthConfig singleton.
      * @param parent Optional parent QObject.
      */
-    explicit ShortcutManager(QObject *parent = nullptr) : QObject(parent), config_(WavelengthConfig::GetInstance()) {
-    }
+    explicit ShortcutManager(QObject *parent = nullptr);
 
     /**
      * @brief Private default destructor.
