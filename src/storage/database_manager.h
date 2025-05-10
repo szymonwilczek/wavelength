@@ -2,8 +2,6 @@
 #define DATABASE_MANAGER_H
 
 #include <QObject>
-#include <QString>
-#include <memory>
 #include <pqxx/pqxx>
 
 /**

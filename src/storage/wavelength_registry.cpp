@@ -1,5 +1,7 @@
 #include "wavelength_registry.h"
 
+#include <QDebug>
+
 bool WavelengthRegistry::AddWavelength(const QString &frequency, const WavelengthInfo &info) {
     if (HasWavelength(frequency)) {
         return false;
