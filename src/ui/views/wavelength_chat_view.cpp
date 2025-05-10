@@ -76,7 +76,7 @@ WavelengthChatView::WavelengthChatView(QWidget *parent): QWidget(parent), scanli
     info_layout->addWidget(time_label);
 
     const auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [time_label]() {
+    connect(timer, &QTimer::timeout, [time_label] {
         time_label->setText(QDateTime::currentDateTime().toString("HH:mm:ss"));
     });
     timer->start(1000);
@@ -253,7 +253,7 @@ void WavelengthChatView::OnWavelengthClosed(const QString &frequency) {
     const auto close_message = QString("<span style=\"color:#ff5555;\">Wavelength has been closed by host.</span>");
     message_area_->AddMessage(close_message, "system", StreamMessage::MessageType::kSystem);
 
-    QTimer::singleShot(2000, this, [this]() {
+    QTimer::singleShot(2000, this, [this] {
         Clear();
         emit wavelengthAborted();
     });
@@ -465,8 +465,6 @@ void WavelengthChatView::OnReadyReadInput() const {
     const QByteArray buffer = input_device_->readAll();
 
     if (!buffer.isEmpty()) {
-        const bool sent = WavelengthMessageService::GetInstance()->SendAudioData(current_frequency_, buffer);
-
         const qreal amplitude = CalculateAmplitude(buffer);
         if (message_area_) {
             message_area_->SetAudioAmplitude(amplitude * 1.5);
@@ -528,7 +526,7 @@ void WavelengthChatView::AbortWavelength() {
 
     emit wavelengthAborted();
 
-    QTimer::singleShot(250, this, [this]() {
+    QTimer::singleShot(250, this, [this] {
         Clear();
         is_aborting_ = false;
     });
