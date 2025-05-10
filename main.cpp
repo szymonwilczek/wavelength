@@ -18,7 +18,7 @@
 #include "src/app/managers/app_instance_manager.h"
 #include "src/ui/dialogs/join_wavelength_dialog.h"
 #include "src/ui/views/chat_view.h"
-#include "src/ui/dialogs/wavelength_dialog.h"
+#include "src/ui/dialogs/create_wavelength_dialog.h"
 
 #include "src/session/session_coordinator.h"
 #include "src/app/style/cyberpunk_style.h"
@@ -364,7 +364,7 @@ int main(int argc, char *argv[]) {
 
         animation->SetLifeColor(QColor(0, 200, 0));
 
-        WavelengthDialog dialog(&window);
+        CreateWavelengthDialog dialog(&window);
         if (dialog.exec() == QDialog::Accepted) {
             const QString frequency = dialog.GetFrequency();
             const bool is_password_protected = dialog.IsPasswordProtected();

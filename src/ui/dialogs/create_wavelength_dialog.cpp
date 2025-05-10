@@ -1,4 +1,4 @@
-#include "wavelength_dialog.h"
+#include "create_wavelength_dialog.h"
 
 #include <QFormLayout>
 #include <QGraphicsOpacityEffect>
@@ -7,7 +7,7 @@
 
 #include "../../app/managers/translation_manager.h"
 
-WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
+CreateWavelengthDialog::CreateWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
                                                      shadow_size_(10), scanline_opacity_(0.08) {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
@@ -154,17 +154,17 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDig
         status_label_->hide();
         ValidateInputs();
     });
-    connect(password_edit_, &QLineEdit::textChanged, this, &WavelengthDialog::ValidateInputs);
-    connect(generate_button_, &QPushButton::clicked, this, &WavelengthDialog::TryGenerate);
+    connect(password_edit_, &QLineEdit::textChanged, this, &CreateWavelengthDialog::ValidateInputs);
+    connect(generate_button_, &QPushButton::clicked, this, &CreateWavelengthDialog::TryGenerate);
     connect(cancel_button_, &QPushButton::clicked, this, &QDialog::reject);
 
     frequency_watcher_ = new QFutureWatcher<QString>(this);
-    connect(frequency_watcher_, &QFutureWatcher<double>::finished, this, &WavelengthDialog::OnFrequencyFound);
+    connect(frequency_watcher_, &QFutureWatcher<double>::finished, this, &CreateWavelengthDialog::OnFrequencyFound);
 
     frequency_label_->setText("...");
 
     connect(this, &AnimatedDialog::showAnimationFinished,
-            this, &WavelengthDialog::StartFrequencySearch);
+            this, &CreateWavelengthDialog::StartFrequencySearch);
 
     refresh_timer_ = new QTimer(this);
     refresh_timer_->setInterval(16);
@@ -191,7 +191,7 @@ WavelengthDialog::WavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDig
     });
 }
 
-WavelengthDialog::~WavelengthDialog() {
+CreateWavelengthDialog::~CreateWavelengthDialog() {
     if (refresh_timer_) {
         refresh_timer_->stop();
         delete refresh_timer_;
@@ -199,24 +199,24 @@ WavelengthDialog::~WavelengthDialog() {
     }
 }
 
-void WavelengthDialog::SetDigitalizationProgress(const double progress) {
+void CreateWavelengthDialog::SetDigitalizationProgress(const double progress) {
     if (!animation_started_ && progress > 0.01)
         animation_started_ = true;
     digitalization_progress_ = progress;
     update();
 }
 
-void WavelengthDialog::SetCornerGlowProgress(const double progress) {
+void CreateWavelengthDialog::SetCornerGlowProgress(const double progress) {
     corner_glow_progress_ = progress;
     update();
 }
 
-void WavelengthDialog::SetScanlineOpacity(const double opacity) {
+void CreateWavelengthDialog::SetScanlineOpacity(const double opacity) {
     scanline_opacity_ = opacity;
     update();
 }
 
-void WavelengthDialog::paintEvent(QPaintEvent *event) {
+void CreateWavelengthDialog::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -317,7 +317,7 @@ void WavelengthDialog::paintEvent(QPaintEvent *event) {
     }
 }
 
-void WavelengthDialog::ValidateInputs() const {
+void CreateWavelengthDialog::ValidateInputs() const {
     status_label_->hide();
 
     bool is_password_valid = true;
@@ -328,7 +328,7 @@ void WavelengthDialog::ValidateInputs() const {
     generate_button_->setEnabled(is_password_valid && frequency_found_);
 }
 
-void WavelengthDialog::StartFrequencySearch() {
+void CreateWavelengthDialog::StartFrequencySearch() {
     loading_indicator_->setText(
         translator_->Translate("CreateWavelengthDialog.LoadingIndicator",
                                "SEARCHING FOR AVAILABLE FREQUENCY..."));
@@ -348,11 +348,11 @@ void WavelengthDialog::StartFrequencySearch() {
     });
     timeout_timer->start();
 
-    const QFuture<QString> future = QtConcurrent::run(&WavelengthDialog::FindLowestAvailableFrequency);
+    const QFuture<QString> future = QtConcurrent::run(&CreateWavelengthDialog::FindLowestAvailableFrequency);
     frequency_watcher_->setFuture(future);
 }
 
-void WavelengthDialog::TryGenerate() {
+void CreateWavelengthDialog::TryGenerate() {
     static bool is_generating = false;
     if (is_generating) return;
     is_generating = true;
@@ -373,7 +373,7 @@ void WavelengthDialog::TryGenerate() {
     is_generating = false;
 }
 
-void WavelengthDialog::OnFrequencyFound() {
+void CreateWavelengthDialog::OnFrequencyFound() {
     const auto timeout_timer = findChild<QTimer *>();
     if (timeout_timer && timeout_timer->isActive()) {
         timeout_timer->stop();
@@ -437,7 +437,7 @@ void WavelengthDialog::OnFrequencyFound() {
     scanline_animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-QString WavelengthDialog::FormatFrequencyText(const double frequency) {
+QString CreateWavelengthDialog::FormatFrequencyText(const double frequency) {
     QString unit_text;
     double display_value;
 
@@ -456,7 +456,7 @@ QString WavelengthDialog::FormatFrequencyText(const double frequency) {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult
-QString WavelengthDialog::FindLowestAvailableFrequency() {
+QString CreateWavelengthDialog::FindLowestAvailableFrequency() {
     const WavelengthConfig *config = WavelengthConfig::GetInstance();
     const QString preferred_frequency = config->GetPreferredStartFrequency();
 
@@ -504,7 +504,7 @@ QString WavelengthDialog::FindLowestAvailableFrequency() {
     return result_frequency;
 }
 
-void WavelengthDialog::InitRenderBuffers() {
+void CreateWavelengthDialog::InitRenderBuffers() {
     if (!buffers_initialized_ || height() != previous_height_) {
         scanline_buffer_ = QPixmap(width(), 20);
         scanline_buffer_.fill(Qt::transparent);

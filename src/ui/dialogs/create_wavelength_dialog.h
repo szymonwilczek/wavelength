@@ -20,7 +20,7 @@ class TranslationManager;
  * "digital materialization" animation effect on show/close, featuring a moving scanline.
  * It includes input validation and interacts with the relay server API to find an available frequency.
  */
-class WavelengthDialog final : public AnimatedDialog {
+class CreateWavelengthDialog final : public AnimatedDialog {
     Q_OBJECT
     /** @brief Property controlling the opacity of the horizontal scanlines effect (0.0 to 1.0). Animatable. */
     Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
@@ -38,12 +38,12 @@ public:
      * Connects the show animation finished signal to start the frequency search.
      * @param parent Optional parent widget.
      */
-    explicit WavelengthDialog(QWidget *parent = nullptr);
+    explicit CreateWavelengthDialog(QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Stops and deletes the refresh timer.
      */
-    ~WavelengthDialog() override;
+    ~CreateWavelengthDialog() override;
 
     /** @brief Gets the current digitalization progress (vertical scanline position). */
     double GetDigitalizationProgress() const { return digitalization_progress_; }

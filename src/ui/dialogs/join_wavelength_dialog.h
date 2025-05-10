@@ -3,7 +3,7 @@
 
 #include <QComboBox>
 
-#include "wavelength_dialog.h"
+#include "create_wavelength_dialog.h"
 #include "../../session/events/joiner/wavelength_joiner.h"
 #include "../../ui/dialogs/animated_dialog.h"
 #include "../buttons/cyber_button.h"

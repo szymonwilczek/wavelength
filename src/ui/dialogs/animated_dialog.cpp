@@ -4,7 +4,7 @@
 #include <QScreen>
 
 #include "../../ui/dialogs/join_wavelength_dialog.h"
-#include "../../ui/dialogs/wavelength_dialog.h"
+#include "../../ui/dialogs/create_wavelength_dialog.h"
 #include "../navigation/navbar.h"
 #include "../widgets/overlay_widget.h"
 
@@ -116,7 +116,7 @@ void AnimatedDialog::AnimateShow() {
         bool is_dialog_animated = false;
         QPropertyAnimation *digital_animation = nullptr;
 
-        if (auto digital_dialog = qobject_cast<WavelengthDialog *>(this)) {
+        if (auto digital_dialog = qobject_cast<CreateWavelengthDialog *>(this)) {
             is_dialog_animated = true;
             digital_dialog->StartRefreshTimer();
 
@@ -195,7 +195,7 @@ void AnimatedDialog::AnimateClose() {
 
             bool is_dialog_animated = false;
 
-            if (const auto digitalDialog = qobject_cast<WavelengthDialog *>(this)) {
+            if (const auto digitalDialog = qobject_cast<CreateWavelengthDialog *>(this)) {
                 is_dialog_animated = true;
 
                 const auto digital_animation = new QPropertyAnimation(digitalDialog, "digitalizationProgress");

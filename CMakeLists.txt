@@ -36,8 +36,8 @@ add_executable(
         src/blob/utils/blob_path.h
         src/app/managers/app_instance_manager.cpp
         src/app/managers/app_instance_manager.h
-        src/ui/dialogs/wavelength_dialog.cpp
-        src/ui/dialogs/wavelength_dialog.h
+        src/ui/dialogs/create_wavelength_dialog.cpp
+        src/ui/dialogs/create_wavelength_dialog.h
         src/ui/views/chat_view.cpp
         src/ui/views/chat_view.h
         src/ui/dialogs/join_wavelength_dialog.cpp
