@@ -4,7 +4,7 @@
 
 #include "../../../../app/managers/translation_manager.h"
 
-InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent),
+ImageViewer::ImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent),
     image_data_(image_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -21,30 +21,30 @@ InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *pare
 
     decoder_ = std::make_shared<ImageDecoder>(image_data, this);
 
-    connect(decoder_.get(), &ImageDecoder::imageReady, this, &InlineImageViewer::HandleImageReady);
-    connect(decoder_.get(), &ImageDecoder::error, this, &InlineImageViewer::HandleError);
-    connect(decoder_.get(), &ImageDecoder::imageInfo, this, &InlineImageViewer::HandleImageInfo);
+    connect(decoder_.get(), &ImageDecoder::imageReady, this, &ImageViewer::HandleImageReady);
+    connect(decoder_.get(), &ImageDecoder::error, this, &ImageViewer::HandleError);
+    connect(decoder_.get(), &ImageDecoder::imageInfo, this, &ImageViewer::HandleImageInfo);
 
-    connect(qApp, &QApplication::aboutToQuit, this, &InlineImageViewer::ReleaseResources);
+    connect(qApp, &QApplication::aboutToQuit, this, &ImageViewer::ReleaseResources);
 
-    QTimer::singleShot(0, this, &InlineImageViewer::LoadImage);
+    QTimer::singleShot(0, this, &ImageViewer::LoadImage);
 }
 
-void InlineImageViewer::ReleaseResources() {
+void ImageViewer::ReleaseResources() {
     if (decoder_) {
         decoder_->ReleaseResources();
         decoder_.reset();
     }
 }
 
-QSize InlineImageViewer::sizeHint() const {
+QSize ImageViewer::sizeHint() const {
     if (!original_image_.isNull()) {
         return original_image_.size();
     }
     return QFrame::sizeHint();
 }
 
-void InlineImageViewer::HandleImageReady(const QImage &image) {
+void ImageViewer::HandleImageReady(const QImage &image) {
     if (image.isNull()) {
         HandleError(translator_->Translate("ImageViewer.EmptyImage", "⚠️ Viewer got an empty image from decoder."));
         return;
@@ -56,14 +56,14 @@ void InlineImageViewer::HandleImageReady(const QImage &image) {
     emit imageLoaded();
 }
 
-void InlineImageViewer::HandleError(const QString &message) {
+void ImageViewer::HandleError(const QString &message) {
     qDebug() << "[IMAGE VIEWER] Image decoder error:" << message;
     image_label_->setText(translator_->Translate("ImageViewer.DecoderError", "⚠️ IMAGE DECODER ERROR..."));
     setMinimumSize(100, 50);
     updateGeometry();
 }
 
-void InlineImageViewer::HandleImageInfo(const int width, const int height, const bool has_alpha) {
+void ImageViewer::HandleImageInfo(const int width, const int height, const bool has_alpha) {
     image_width_ = width;
     image_height_ = height;
     has_alpha_ = has_alpha;

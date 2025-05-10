@@ -19,7 +19,7 @@ class TranslationManager;
  * while preserving an aspect ratio (due to QLabel's setScaledContents(true)).
  * It provides signals for when the image is loaded and when its information (size, alpha) is available.
  */
-class InlineImageViewer final : public QFrame {
+class ImageViewer final : public QFrame {
     Q_OBJECT
 
 public:
@@ -30,12 +30,12 @@ public:
      * @param image_data The raw image data to be displayed.
      * @param parent Optional parent widget.
      */
-    explicit InlineImageViewer(const QByteArray &image_data, QWidget *parent = nullptr);
+    explicit ImageViewer(const QByteArray &image_data, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Ensures resources are released by calling ReleaseResources().
      */
-    ~InlineImageViewer() override {
+    ~ImageViewer() override {
         ReleaseResources();
     }
 
@@ -50,7 +50,7 @@ public:
      * Returns the actual image size once loaded, otherwise falls back to the default QFrame size hint.
      * @return The recommended QSize for the widget (original image size).
      */
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
 
 private slots:
     /**

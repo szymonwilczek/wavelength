@@ -16,7 +16,7 @@
 class TranslationManager;
 class CyberAttachmentViewer;
 class AutoScalingAttachment;
-class InlineImageViewer;
+class ImageViewer;
 
 /**
  * @brief A widget that acts as a placeholder for chat attachments before they are loaded.

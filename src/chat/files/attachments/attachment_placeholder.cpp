@@ -323,15 +323,15 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
             });
         });
     } else {
-        const auto full_image = new InlineImageViewer(data, scroll_area);
+        const auto full_image = new ImageViewer(data, scroll_area);
         content_widget = full_image;
 
-        connect(full_image, &InlineImageViewer::imageLoaded, this, [=]() {
+        connect(full_image, &ImageViewer::imageLoaded, this, [=]() {
             QTimer::singleShot(0, this, [=] {
                 show_with_size_check(full_image, full_image->sizeHint());
             });
         });
-        connect(full_image, &InlineImageViewer::imageInfoReady, this, [=](const int w, const int h, bool) {
+        connect(full_image, &ImageViewer::imageInfoReady, this, [=](const int w, const int h, bool) {
             if (!full_size_dialog->isVisible()) {
                 QTimer::singleShot(0, this, [=]() {
                     const QSize currentHint = full_image->sizeHint();
@@ -446,7 +446,7 @@ void AttachmentPlaceholder::AdjustAndShowDialog(QDialog *dialog, const QScrollAr
 
 void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
     const auto viewer = new CyberAttachmentViewer(content_container_);
-    const auto image_viewer = new InlineImageViewer(data, viewer);
+    const auto image_viewer = new ImageViewer(data, viewer);
     image_viewer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     const auto scaling_attachment = new AutoScalingAttachment(image_viewer, viewer);
 

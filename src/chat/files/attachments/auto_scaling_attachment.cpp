@@ -49,11 +49,11 @@ AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent):
     setCursor(Qt::PointingHandCursor);
     content_container_->setCursor(Qt::PointingHandCursor);
 
-    const auto image_viewer = qobject_cast<InlineImageViewer *>(content_);
+    const auto image_viewer = qobject_cast<ImageViewer *>(content_);
     const auto gif_player = qobject_cast<GifPlayer *>(content_);
     if (image_viewer) {
-        connect(image_viewer, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
-        connect(image_viewer, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::CheckAndScaleContent);
+        connect(image_viewer, &ImageViewer::imageLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
+        connect(image_viewer, &ImageViewer::imageInfoReady, this, &AutoScalingAttachment::CheckAndScaleContent);
     } else if (gif_player) {
         connect(gif_player, &GifPlayer::gifLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
     } else {
