@@ -3,29 +3,23 @@
 #include <QPaintEvent>
 #include <QApplication>
 #include <QScreen>
-#include <QDebug>
 
 GLTransitionWidget::GLTransitionWidget(QWidget *parent)
-    : QOpenGLWidget(parent)
-{
-    // Inicjalizacja animacji
+    : QOpenGLWidget(parent) {
     animation_ = new QPropertyAnimation(this, "offset");
     animation_->setEasingCurve(QEasingCurve::OutCubic);
 
     connect(animation_, &QPropertyAnimation::finished, this, &GLTransitionWidget::transitionFinished);
 
-    // Włącz śledzenie myszy dla płynniejszego odświeżania
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
 }
 
-GLTransitionWidget::~GLTransitionWidget()
-{
+GLTransitionWidget::~GLTransitionWidget() {
     delete animation_;
 }
 
-void GLTransitionWidget::SetWidgets(QWidget *current_widget, QWidget *next_widget)
-{
+void GLTransitionWidget::SetWidgets(QWidget *current_widget, QWidget *next_widget) {
     if (!current_widget || !next_widget)
         return;
 
@@ -38,8 +32,7 @@ void GLTransitionWidget::SetWidgets(QWidget *current_widget, QWidget *next_widge
     next_pixmap_.setDevicePixelRatio(device_pixel_ratio);
 }
 
-void GLTransitionWidget::StartTransition(const int duration)
-{
+void GLTransitionWidget::StartTransition(const int duration) {
     offset_ = 0.0f;
     animation_->setDuration(duration);
     animation_->setStartValue(0.0f);
@@ -47,38 +40,32 @@ void GLTransitionWidget::StartTransition(const int duration)
     animation_->start();
 }
 
-void GLTransitionWidget::SetOffset(const float offset)
-{
+void GLTransitionWidget::SetOffset(const float offset) {
     if (offset_ != offset) {
         offset_ = offset;
-        update();  // Wymusza przerysowanie
+        update();
     }
 }
 
-void GLTransitionWidget::paintEvent(QPaintEvent *event)
-{
+void GLTransitionWidget::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
-    // Upewniamy się, że mamy co rysować
     if (current_pixmap_.isNull() || next_pixmap_.isNull())
         return;
 
     QPainter painter(this);
 
-    // Włącz wszystkie opcje wysokiej jakości
     painter.setRenderHints(QPainter::Antialiasing |
-                          QPainter::TextAntialiasing |
-                          QPainter::SmoothPixmapTransform |
-                          QPainter::HighQualityAntialiasing);
+                           QPainter::TextAntialiasing |
+                           QPainter::SmoothPixmapTransform |
+                           QPainter::Antialiasing);
 
     const int w = width();
     const int h = height();
 
-    // Rysuje bieżący widget przesuwający się w lewo
     const int current_x = -w * offset_;
     painter.drawPixmap(current_x, 0, w, h, current_pixmap_);
 
-    // Rysuje następny widget wjeżdżający od prawej
     const int next_x = w * (1.0 - offset_);
     painter.drawPixmap(next_x, 0, w, h, next_pixmap_);
 }
