@@ -1,5 +1,6 @@
 #ifndef WAVELENGTH_UTILITIES_H
 #define WAVELENGTH_UTILITIES_H
+
 #include <QLabel>
 
 class BlobAnimation;
@@ -37,7 +38,7 @@ public:
      * @param text_color The desired color for the label's text.
      * @param border_color The desired color for the label's border.
      */
-    static void UpdateTitleLabelStyle(QLabel* label, const QColor& text_color, const QColor& border_color);
+    static void UpdateTitleLabelStyle(QLabel *label, const QColor &text_color, const QColor &border_color);
 };
 
 #endif // WAVELENGTH_UTILITIES_H
