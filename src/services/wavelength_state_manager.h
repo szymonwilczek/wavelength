@@ -24,7 +24,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthStateManager.
      * @return Pointer to the singleton WavelengthStateManager instance.
      */
-    static WavelengthStateManager* GetInstance() {
+    static WavelengthStateManager *GetInstance() {
         static WavelengthStateManager instance;
         return &instance;
     }
@@ -35,7 +35,7 @@ public:
      * @param is_host Optional output parameter; if provided, it's set to true if the current user is the host of this wavelength.
      * @return A WavelengthInfo struct containing details about the wavelength.
      */
-    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool* is_host = nullptr);
+    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool *is_host = nullptr);
 
     /**
      * @brief Gets the frequency identifier of the currently active wavelength.
@@ -125,7 +125,7 @@ public:
      * @param key The key for the data item.
      * @param value The QVariant value to store.
      */
-    void AddActiveSessionData(const QString &frequency, const QString& key, const QVariant& value);
+    void AddActiveSessionData(const QString &frequency, const QString &key, const QVariant &value);
 
     /**
      * @brief Retrieves previously stored session data for a specific frequency and key.
@@ -134,7 +134,8 @@ public:
      * @param default_value Optional default value to return if the key or frequency is not found.
      * @return The stored QVariant value, or the default_value if not found.
      */
-    QVariant GetActiveSessionData(const QString &frequency, const QString& key, const QVariant& default_value = QVariant());
+    QVariant GetActiveSessionData(const QString &frequency, const QString &key,
+                                  const QVariant &default_value = QVariant());
 
     /**
      * @brief Removes all session data associated with a specific frequency.
@@ -174,7 +175,8 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthStateManager(QObject* parent = nullptr) : QObject(parent) {}
+    explicit WavelengthStateManager(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
@@ -184,19 +186,19 @@ private:
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthStateManager(const WavelengthStateManager&) = delete;
+    WavelengthStateManager(const WavelengthStateManager &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthStateManager& operator=(const WavelengthStateManager&) = delete;
+    WavelengthStateManager &operator=(const WavelengthStateManager &) = delete;
 
     /** @brief Stores temporary session data, keyed by frequency, then by data key. */
-    QMap<QString, QMap<QString, QVariant>> session_data_;
+    QMap<QString, QMap<QString, QVariant> > session_data_{};
     /** @brief List of frequencies currently undergoing a connection attempt. */
-    QList<QString> connecting_wavelengths_;
+    QList<QString> connecting_wavelengths_{};
     /** @brief List of frequencies the user is currently joined to (managed internally). */
-    QList<QString> joined_wavelengths_;
+    QList<QString> joined_wavelengths_{};
 };
 
 #endif // WAVELENGTH_STATE_MANAGER_H

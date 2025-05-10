@@ -3,8 +3,6 @@
 
 #include "blob_state.h"
 #include "../blob_config.h"
-#include <QVector2D>
-#include <QSize> // Added for QSize usage
 
 /**
  * @brief Implements the Resizing state behavior for the Blob animation.
@@ -30,10 +28,10 @@ public:
      * @param blob_center Reference to the blob's center position.
      * @param params Blob appearance parameters (read-only).
      */
-    void Apply(std::vector<QPointF>& control_points,
-              std::vector<QPointF>& velocity,
-              QPointF& blob_center,
-              const BlobConfig::BlobParameters& params) override;
+    void Apply(std::vector<QPointF> &control_points,
+               std::vector<QPointF> &velocity,
+               QPointF &blob_center,
+               const BlobConfig::BlobParameters &params) override;
 
     /**
      * @brief Applies an external force to the blob, similar to the Moving state.
@@ -46,11 +44,11 @@ public:
      * @param control_points Reference to the vector of current control point positions (read-only).
      * @param blob_radius The current average radius of the blob (read-only).
      */
-    void ApplyForce(const QVector2D& force,
-                   std::vector<QPointF>& velocity,
-                   QPointF& blob_center,
-                   const std::vector<QPointF>& control_points,
-                   double blob_radius) override;
+    void ApplyForce(const QVector2D &force,
+                    std::vector<QPointF> &velocity,
+                    QPointF &blob_center,
+                    const std::vector<QPointF> &control_points,
+                    double blob_radius) override;
 
     /**
      * @brief Handles the logic when a resize event occurs while in this state.
@@ -64,12 +62,12 @@ public:
      * @param old_size The size of the widget before the resize.
      * @param new_size The size of the widget after the resize.
      */
-    void HandleResize(std::vector<QPointF>& control_points,
-                     std::vector<QPointF>& target_points,
-                     std::vector<QPointF>& velocity,
-                     QPointF& blob_center,
-                     const QSize& old_size,
-                     const QSize& new_size);
+    void HandleResize(std::vector<QPointF> &control_points,
+                      std::vector<QPointF> &target_points,
+                      std::vector<QPointF> &velocity,
+                      QPointF &blob_center,
+                      const QSize &old_size,
+                      const QSize &new_size);
 };
 
 #endif // RESIZINGSTATE_H

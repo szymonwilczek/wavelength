@@ -43,89 +43,83 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("Wavelength");
     QCoreApplication::setApplicationName("WavelengthApp");
 
-    auto boot_sound = new QSoundEffect(&app); // Rodzic: app
+    auto boot_sound = new QSoundEffect(&app);
     boot_sound->setSource(QUrl("qrc:/resources/sounds/interface/boot_up.wav"));
     boot_sound->setVolume(1.0);
 
-    auto shutdown_sound = new QSoundEffect(&app); // Rodzic: app
+    auto shutdown_sound = new QSoundEffect(&app);
     shutdown_sound->setSource(QUrl("qrc:/resources/sounds/interface/shutdown.wav"));
     shutdown_sound->setVolume(1.0);
 
 
     WavelengthConfig *config = WavelengthConfig::GetInstance();
 
-    TranslationManager* translator = TranslationManager::GetInstance();
+    TranslationManager *translator = TranslationManager::GetInstance();
     if (!translator->Initialize(config->GetLanguageCode())) {
-        qCritical() << "Failed to initialize translation manager. Defaulting to English.";
+        qCritical() << "[MAIN] Failed to initialize translation manager. Fallback to English.";
     }
 
-    // --- Przetwarzanie argumentów linii poleceń ---
     QCommandLineParser parser;
     parser.setApplicationDescription("Wavelength Application");
     parser.addHelpOption();
     parser.addVersionOption();
-    const QCommandLineOption override_option("run-override", "Internal flag to start the system override sequence immediately.");
+    const QCommandLineOption override_option("run-override",
+                                             "Internal flag to start the system override sequence immediately.");
     parser.addOption(override_option);
     parser.process(app);
-    // ---------------------------------------------
 
-    // --- Sprawdź, czy uruchomić sekwencję override ---
     if (parser.isSet(override_option)) {
         qDebug() << "--run-override flag detected.";
 #ifdef Q_OS_WIN
         if (!SystemOverrideManager::IsRunningAsAdmin()) {
-            qWarning() << "Override sequence requires administrator privileges. Attempting relaunch...";
+            qWarning() << "[MAIN] Override sequence requires administrator privileges. Attempting relaunch...";
             if (SystemOverrideManager::RelaunchAsAdmin(app.arguments())) {
-                qDebug() << "Relaunch successful. Exiting current instance.";
-                return 0; // Zakończ bieżącą instancję
+                qDebug() << "[MAIN] Relaunch successful. Exiting current instance.";
+                return 0;
             }
-            qCritical() << "Failed to relaunch as administrator. Override aborted.";
+            qCritical() << "[MAIN] Failed to relaunch as administrator. Override aborted.";
             QMessageBox::critical(nullptr, translator->Translate("MainWindow.IsNotRunningAdminTitle", "Admin Privileges Required"), translator->Translate("MainWindow.IsNotRunningAdminMessage", "Failed to relaunch with administrator privileges. The override sequence cannot continue."));
-            return 1; // Zakończ z błędem
+            return 1;
         }
-        qDebug() << "Running with administrator privileges.";
-        SystemOverrideManager override_manager; // Utwórz na stosie
+        qDebug() << "[MAIN] Running with administrator privileges.";
+        SystemOverrideManager override_manager;
         QObject::connect(&override_manager, &SystemOverrideManager::overrideFinished, &app, &QCoreApplication::quit);
-        override_manager.InitiateOverrideSequence(false); // Rozpocznij sekwencję
-        return QApplication::exec(); // Uruchom pętlę zdarzeń TYLKO dla override
+        override_manager.InitiateOverrideSequence(false);
+        return QApplication::exec();
 #else
         qWarning() << "--run-override flag ignored on non-Windows OS.";
-        // Kontynuuj normalne uruchomienie poniżej
 #endif
     }
 
-    QObject::connect(boot_sound, &QSoundEffect::statusChanged, [boot_sound]() {
+    QObject::connect(boot_sound, &QSoundEffect::statusChanged, [boot_sound] {
         if (boot_sound->status() == QSoundEffect::Ready) {
             boot_sound->play();
-            // Rozłącz sygnał, aby nie reagować na kolejne zmiany (np. po zakończeniu odtwarzania)
             QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
         } else if (boot_sound->status() == QSoundEffect::Error) {
-             qDebug() << "Error loading boot sound. Source:" << boot_sound->source();
-             QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
+            qDebug() << "[MAIN] Error loading boot sound. Source:" << boot_sound->source();
+            QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
         }
     });
 
-    // Sprawdź początkowy status (może już jest błąd lub gotowy synchronicznie?)
     if (boot_sound->status() == QSoundEffect::Error) {
-        qDebug() << "Initial error loading boot sound. Source:" << boot_sound->source();
+        qDebug() << "[MAIN] Initial error loading boot sound. Source:" << boot_sound->source();
     } else if (boot_sound->status() == QSoundEffect::Ready) {
         boot_sound->play();
-        QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr); // Rozłącz, bo już odtworzono
+        QObject::disconnect(boot_sound, &QSoundEffect::statusChanged, nullptr, nullptr);
     }
-    // --- Koniec odtwarzania dźwięku startowego ---
 
-    QObject::connect(&app, &QApplication::aboutToQuit, [shutdown_sound]() {
-        if (shutdown_sound->isLoaded()) { // Sprawdź, czy jest załadowany
+    QObject::connect(&app, &QApplication::aboutToQuit, [shutdown_sound] {
+        if (shutdown_sound->isLoaded()) {
             shutdown_sound->play();
-            QTimer::singleShot(2500, &QCoreApplication::quit); // Opcjonalne małe opóźnienie
+            QTimer::singleShot(2500, &QCoreApplication::quit);
         } else {
-             qDebug() << "Shutdown sound not loaded when quitting.";
+            qDebug() << "[MAIN] Shutdown sound not loaded when quitting.";
         }
     });
 
-    FontManager* font_manager = FontManager::GetInstance();
+    FontManager *font_manager = FontManager::GetInstance();
     if (!font_manager->Initialize()) {
-        qWarning() << "Uwaga: Nie wszystkie czcionki zostały prawidłowo załadowane!";
+        qWarning() << "[MAIN] WARNING: Not all fonts loaded correctly!";
     }
 
     const QFont defaultFont(font_manager->GetFont("BlenderPro", 10, QFont::Bold));
@@ -138,12 +132,8 @@ int main(int argc, char *argv[]) {
 
     CyberpunkStyle::ApplyStyle();
 
-    // app.setPalette(darkPalette);
-    // app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a2a2a; border: 1px solid #767676; }");
-
     QMainWindow window;
     window.setWindowTitle("Wavelength");
-    // window.setStyleSheet("QMainWindow { background-color: #2d2d2d; }");
 
     auto *navbar = new Navbar(&window);
     window.addToolBar(Qt::TopToolBarArea, navbar);
@@ -174,7 +164,7 @@ int main(int argc, char *argv[]) {
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setSamples(4); // Włącz MSAA dla wygładzania krawędzi
+    format.setSamples(4); // MSAA
     animation->setFormat(format);
 
     stacked_widget->addWidget(animation_widget);
@@ -193,15 +183,13 @@ int main(int argc, char *argv[]) {
     title_label->setFont(QFont("Blender Pro Heavy", 40, QFont::Bold));
     title_label->setAlignment(Qt::AlignCenter);
 
-    // Aby uzyskać efekt obramowania z półprzezroczystym wypełnieniem,
-    // będziemy musieli użyć stylów CSS bardziej kreatywnie
     title_label->setStyleSheet(
         "QLabel {"
         "   font-family: 'Blender Pro Heavy';"
         "   letter-spacing: 8px;"
-        "   color: #ffffff;" // Zmień kolor tekstu na biały, zamiast ciemnego półprzezroczystego
+        "   color: #ffffff;"
         "   background-color: transparent;"
-        "   border: 2px solid #e0b0ff;" // Jasnofioletowy neonowy border
+        "   border: 2px solid #e0b0ff;"
         "   border-radius: 8px;"
         "   padding: 10px 20px;"
         "   text-transform: uppercase;"
@@ -210,7 +198,6 @@ int main(int argc, char *argv[]) {
 
     WavelengthUtilities::UpdateTitleLabelStyle(title_label, config->GetTitleTextColor(), config->GetTitleBorderColor());
 
-    // Dodaj mocniejszy efekt poświaty dla cyberpunkowego wyglądu
     auto glow_effect = new QGraphicsDropShadowEffect(title_label);
     glow_effect->setBlurRadius(15);
     glow_effect->setColor(QColor("#e0b0ff"));
@@ -230,10 +217,10 @@ int main(int argc, char *argv[]) {
     const auto instance_manager = new AppInstanceManager(&window, animation, &window);
     // instance_manager->Start();
 
-    QObject::connect(instance_manager, &AppInstanceManager::instanceConnected, [&window]() {
-    window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    window.setEnabled(false);
-});
+    QObject::connect(instance_manager, &AppInstanceManager::instanceConnected, [&window] {
+        window.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+        window.setEnabled(false);
+    });
 
 
     WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
@@ -241,7 +228,6 @@ int main(int argc, char *argv[]) {
 
     auto event_listening = [animation, event_filter](const bool enable) {
         if (enable) {
-            // Włącz nasłuchiwanie eventów
             animation->installEventFilter(event_filter);
         } else {
             animation->removeEventFilter(event_filter);
@@ -252,60 +238,52 @@ int main(int argc, char *argv[]) {
 
 
     QObject::connect(config, &WavelengthConfig::configChanged,
-                     [animation, config, title_label, glow_effect](const QString& key) { // <<< Dodaj titleLabel, glowEffect
-        if (key == "background_color" || key == "all") {
-            QColor new_color = config->GetBackgroundColor();
-            QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
-        }
-        else if (key == "blob_color" || key == "all") {
-            QColor new_color = config->GetBlobColor();
-            QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
-        }
-        // --- NOWE: Obsługa siatki ---
-        else if (key == "grid_color" || key == "all") {
-            QColor new_color = config->GetGridColor();
-            QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection, Q_ARG(QColor, new_color));
-        }
-        else if (key == "grid_spacing" || key == "all") {
-            int new_spacing = config->GetGridSpacing();
-            QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection, Q_ARG(int, new_spacing));
-        }
-        // --- NOWE: Obsługa tytułu ---
-        else if (key == "title_text_color" || key == "title_border_color" || key == "all") {
-             // Aktualizuj styl, jeśli zmienił się kolor tekstu lub ramki
-             QColor text_color = config->GetTitleTextColor();
-             QColor border_color = config->GetTitleBorderColor();
-             // Wywołaj w głównym wątku dla bezpieczeństwa UI
-             QMetaObject::invokeMethod(qApp, [title_label, text_color, border_color](){ // Użyj qApp lub innego QObject z głównego wątku
-                 WavelengthUtilities::UpdateTitleLabelStyle(title_label, text_color, border_color);
-             }, Qt::QueuedConnection);
-        }
-        else if (key == "title_glow_color" || key == "all") {
-            QColor new_color = config->GetTitleGlowColor();
-            if (glow_effect) {
-                // Wywołaj w głównym wątku dla bezpieczeństwa UI
-                QMetaObject::invokeMethod(qApp, [glow_effect, new_color](){
-                    glow_effect->setColor(new_color);
-                }, Qt::QueuedConnection);
-            }
-        }
-        // ---------------------------
-    });
+                     [animation, config, title_label, glow_effect](const QString &key) {
+                         if (key == "background_color" || key == "all") {
+                             QColor new_color = config->GetBackgroundColor();
+                             QMetaObject::invokeMethod(animation, "setBackgroundColor", Qt::QueuedConnection,
+                                                       Q_ARG(QColor, new_color));
+                         } else if (key == "blob_color" || key == "all") {
+                             QColor new_color = config->GetBlobColor();
+                             QMetaObject::invokeMethod(animation, "setBlobColor", Qt::QueuedConnection,
+                                                       Q_ARG(QColor, new_color));
+                         } else if (key == "grid_color" || key == "all") {
+                             QColor new_color = config->GetGridColor();
+                             QMetaObject::invokeMethod(animation, "setGridColor", Qt::QueuedConnection,
+                                                       Q_ARG(QColor, new_color));
+                         } else if (key == "grid_spacing" || key == "all") {
+                             int new_spacing = config->GetGridSpacing();
+                             QMetaObject::invokeMethod(animation, "setGridSpacing", Qt::QueuedConnection,
+                                                       Q_ARG(int, new_spacing));
+                         } else if (key == "title_text_color" || key == "title_border_color" || key == "all") {
+                             QColor text_color = config->GetTitleTextColor();
+                             QColor border_color = config->GetTitleBorderColor();
+                             QMetaObject::invokeMethod(qApp, [title_label, text_color, border_color] {
+                                 WavelengthUtilities::UpdateTitleLabelStyle(title_label, text_color, border_color);
+                             }, Qt::QueuedConnection);
+                         } else if (key == "title_glow_color" || key == "all") {
+                             QColor new_color = config->GetTitleGlowColor();
+                             if (glow_effect) {
+                                 QMetaObject::invokeMethod(qApp, [glow_effect, new_color] {
+                                     glow_effect->setColor(new_color);
+                                 }, Qt::QueuedConnection);
+                             }
+                         }
+                     });
 
     QObject::connect(stacked_widget, &AnimatedStackedWidget::currentChanged,
-    [stacked_widget, animation_widget, animation](const int index) {
-        static int last_index = -1;
-        if (last_index == index) return;
-        last_index = index;
+                     [stacked_widget, animation_widget, animation](const int index) {
+                         static int last_index = -1;
+                         if (last_index == index) return;
+                         last_index = index;
 
-        const QWidget *current_widget = stacked_widget->widget(index);
-        if (current_widget == animation_widget) {
-            // Pokazujemy bloba tylko gdy przechodzimy DO widoku animacji
-            QTimer::singleShot(stacked_widget->GetDuration(), [animation]() {
-                animation->showAnimation();
-            });
-        }
-    });
+                         const QWidget *current_widget = stacked_widget->widget(index);
+                         if (current_widget == animation_widget) {
+                             QTimer::singleShot(stacked_widget->GetDuration(), [animation] {
+                                 animation->showAnimation();
+                             });
+                         }
+                     });
 
     auto switch_to_chat_view = [chat_view, stacked_widget, animation, navbar](const QString &frequency) {
         animation->hideAnimation();
@@ -334,62 +312,54 @@ int main(int argc, char *argv[]) {
                      });
 
     QObject::connect(chat_view, &WavelengthChatView::wavelengthAborted,
-    [stacked_widget, animation_widget, animation, title_label, text_effect, navbar]() {
+                     [stacked_widget, animation_widget, animation, title_label, text_effect, navbar] {
+                         navbar->SetChatMode(false);
+                         animation->hideAnimation();
+                         animation->ResetLifeColor();
+                         stacked_widget->SlideToWidget(animation_widget);
 
-        navbar->SetChatMode(false);
-        animation->hideAnimation();
-        animation->ResetLifeColor();
-        stacked_widget->SlideToWidget(animation_widget);
+                         QTimer::singleShot(stacked_widget->GetDuration(), [animation, text_effect, title_label] {
+                             animation->showAnimation();
+                             animation->ResetVisualization();
+                             title_label->adjustSize();
+                             QTimer::singleShot(0, [title_label, animation] {
+                                 WavelengthUtilities::CenterLabel(title_label, animation);
+                             });
+                             text_effect->StartAnimation();
+                         });
+                     });
 
-        QTimer::singleShot(stacked_widget->GetDuration(), [animation, text_effect, title_label]() {
-            animation->showAnimation();
-            animation->ResetVisualization();
-            title_label->adjustSize(); // Wymuś przeliczenie rozmiaru
-            // Dodaj minimalne opóźnienie przed centrowaniem
-            QTimer::singleShot(0, [title_label, animation]() {
-                WavelengthUtilities::CenterLabel(title_label, animation);
-            });
-            text_effect->StartAnimation(); // Rozpocznij animację tekstu od razu
-        });
-    });
-
-    // Dodaj połączenie z nowym sygnałem dla synchronizacji pozycji tekstu
     QObject::connect(animation, &BlobAnimation::visualizationReset,
-                     [title_label, animation]() {
-                         // Ponownie wycentruj etykietę po zresetowaniu wizualizacji
+                     [title_label, animation] {
                          WavelengthUtilities::CenterLabel(title_label, animation);
                      });
 
-    QObject::connect(navbar, &Navbar::settingsClicked, [stacked_widget, settings_view, animation]() {
+    QObject::connect(navbar, &Navbar::settingsClicked, [stacked_widget, settings_view, animation] {
+        animation->hideAnimation();
 
-    animation->hideAnimation();
+        animation->PauseAllEventTracking();
 
-    animation->PauseAllEventTracking();
-
-    stacked_widget->SlideToWidget(settings_view);
-});
+        stacked_widget->SlideToWidget(settings_view);
+    });
 
     QObject::connect(settings_view, &SettingsView::backToMainView,
-[stacked_widget, animation_widget, animation, title_label, text_effect]() {
+                     [stacked_widget, animation_widget, animation, title_label, text_effect] {
+                         animation->hideAnimation();
+                         animation->ResetLifeColor();
+                         stacked_widget->SlideToWidget(animation_widget);
 
-    animation->hideAnimation();
-    animation->ResetLifeColor();
-    stacked_widget->SlideToWidget(animation_widget);
+                         QTimer::singleShot(stacked_widget->GetDuration(), [animation, text_effect, title_label] {
+                             animation->showAnimation();
+                             animation->ResetVisualization();
+                             title_label->adjustSize();
+                             QTimer::singleShot(0, [title_label, animation] {
+                                 WavelengthUtilities::CenterLabel(title_label, animation);
+                             });
+                             text_effect->StartAnimation();
+                         });
+                     });
 
-    QTimer::singleShot(stacked_widget->GetDuration(), [animation, text_effect, title_label]() {
-        animation->showAnimation();
-        animation->ResetVisualization();
-        title_label->adjustSize(); // Wymuś przeliczenie rozmiaru
-        // Dodaj minimalne opóźnienie przed centrowaniem
-        QTimer::singleShot(0, [title_label, animation]() {
-            WavelengthUtilities::CenterLabel(title_label, animation);
-        });
-        text_effect->StartAnimation(); // Rozpocznij animację tekstu od razu
-    });
-});
-
-    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar]() {
-
+    QObject::connect(navbar, &Navbar::createWavelengthClicked, [&window, animation, coordinator, navbar] {
         navbar->PlayClickSound();
 
         animation->SetLifeColor(QColor(0, 200, 0));
@@ -402,7 +372,7 @@ int main(int argc, char *argv[]) {
 
             if (coordinator->CreateWavelength(frequency, is_password_protected, password)) {
             } else {
-                qDebug() << "Failed to create wavelength";
+                qDebug() << "[MAIN] Failed to create wavelength";
                 animation->ResetLifeColor();
             }
         } else {
@@ -410,7 +380,7 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar]() {
+    QObject::connect(navbar, &Navbar::joinWavelengthClicked, [&window, animation, coordinator, navbar] {
         navbar->PlayClickSound();
 
         animation->SetLifeColor(QColor(0, 0, 200));
@@ -422,7 +392,7 @@ int main(int argc, char *argv[]) {
 
             if (coordinator->JoinWavelength(frequency, password)) {
             } else {
-                qDebug() << "Failed to join wavelength";
+                qDebug() << "[MAIN] Failed to join wavelength";
                 animation->ResetLifeColor();
             }
         } else {
@@ -434,16 +404,15 @@ int main(int argc, char *argv[]) {
         window.setWindowTitle(translator->Translate("InstanceManager.NotCreatorTitle", "Wavelength - Sub Instance"));
     }
 
-    ShortcutManager* shortcut_manager = ShortcutManager::GetInstance();
-    shortcut_manager->RegisterShortcuts(&window);    // Rejestruje skróty dla QMainWindow (Create, Join, Settings)
-    shortcut_manager->RegisterShortcuts(chat_view);   // Rejestruje skróty dla WavelengthChatView
-    shortcut_manager->RegisterShortcuts(settings_view); // Rejestruje skróty dla SettingsVie
+    ShortcutManager *shortcut_manager = ShortcutManager::GetInstance();
+    shortcut_manager->RegisterShortcuts(&window);
+    shortcut_manager->RegisterShortcuts(chat_view);
+    shortcut_manager->RegisterShortcuts(settings_view);
 
 #ifdef Q_OS_WINDOWS
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
         // Windows 10 1809>=
         const auto hwnd = reinterpret_cast<HWND>(window.winId());
-
         constexpr BOOL dark_mode = TRUE;
 
         DwmSetWindowAttribute(hwnd, 20, &dark_mode, sizeof(dark_mode));
@@ -452,16 +421,15 @@ int main(int argc, char *argv[]) {
 
     window.show();
 
-    QTimer::singleShot(500, [title_label, animation, text_effect]() {
+    QTimer::singleShot(500, [title_label, animation, text_effect] {
         title_label->setText("WAVELENGTH");
         title_label->adjustSize();
-        // Dodaj minimalne opóźnienie przed centrowaniem
-        QTimer::singleShot(0, [title_label, animation]() {
+        QTimer::singleShot(0, [title_label, animation] {
             WavelengthUtilities::CenterLabel(title_label, animation);
         });
         title_label->show();
 
-        QTimer::singleShot(300, [text_effect]() {
+        QTimer::singleShot(300, [text_effect] {
             text_effect->StartAnimation();
         });
     });

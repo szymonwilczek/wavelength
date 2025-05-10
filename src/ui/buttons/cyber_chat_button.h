@@ -1,5 +1,6 @@
 #ifndef CYBER_CHAT_BUTTON_H
 #define CYBER_CHAT_BUTTON_H
+
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>

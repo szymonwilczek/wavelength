@@ -1,14 +1,13 @@
 #ifndef AUTO_SCALING_ATTACHMENT_H
 #define AUTO_SCALING_ATTACHMENT_H
 
+#include <QLabel>
 #include <QScreen>
-
-#include "../gif/player/inline_gif_player.h"
-#include "../image/displayer/image_viewer.h"
+#include <QWidget>
 
 /**
  * @brief A wrapper widget that automatically scales its content (e.g., image, GIF)
- *        to fit within a maximum allowed size, while preserving aspect ratio.
+ *        to fit within the maximum allowed size, while preserving an aspect ratio.
  *
  * This widget takes another widget (content) and displays it. If the content's
  * original size exceeds the specified maximum size, the content is scaled down
@@ -27,7 +26,7 @@ public:
      * @param content The widget containing the attachment content to be scaled.
      * @param parent Optional parent widget.
      */
-    explicit AutoScalingAttachment(QWidget* content, QWidget* parent = nullptr);
+    explicit AutoScalingAttachment(QWidget *content, QWidget *parent = nullptr);
 
     /**
      * @brief Sets the maximum allowed size for the content.
@@ -35,7 +34,7 @@ public:
      * Triggers a re-evaluation of the scaling.
      * @param max_size The maximum QSize allowed for the content.
      */
-    void SetMaxAllowedSize(const QSize& max_size);
+    void SetMaxAllowedSize(const QSize &max_size);
 
     /**
      * @brief Gets the original, unscaled size of the content widget.
@@ -56,7 +55,7 @@ public:
      * @brief Gets a pointer to the original content widget.
      * @return Pointer to the content QWidget.
      */
-    QWidget* Content() const {
+    QWidget *Content() const {
         return content_;
     }
 
@@ -82,28 +81,28 @@ protected:
      * @param event The event being processed.
      * @return True if the event was a left-click on the container (event handled), false otherwise.
      */
-    bool eventFilter(QObject* watched, QEvent* event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
     /**
      * @brief Handles mouse enter events.
      * Shows the "Click to enlarge" label if the content is scaled.
-     * @param event The enter event.
+     * @param event The entered event.
      */
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEvent *event) override;
 
     /**
      * @brief Handles mouse leave events.
      * Hides the "Click to enlarge" label.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override;
+    void leaveEvent(QEvent *event) override;
 
     /**
      * @brief Handles resize events for the widget.
      * Updates the position of the "Click to enlarge" label if it's visible.
      * @param event The resize event.
      */
-    void resizeEvent(QResizeEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     /**
@@ -121,11 +120,11 @@ private:
     void UpdateInfoLabelPosition() const;
 
     /** @brief Pointer to the original widget displaying the attachment content. */
-    QWidget* content_;
+    QWidget *content_;
     /** @brief Container widget that holds the content_ and whose size is adjusted during scaling. */
-    QWidget* content_container_;
+    QWidget *content_container_;
     /** @brief Label displayed over scaled content on hover ("Click to enlarge"). */
-    QLabel* info_label_;
+    QLabel *info_label_;
     /** @brief Flag indicating whether the content is currently scaled down. */
     bool is_scaled_;
     /** @brief The current scaled size of the content_container_. */

@@ -9,11 +9,23 @@
  *
  * This class defines a set of predefined QColor values representing a cyberpunk color palette.
  * It also includes a method to apply a comprehensive stylesheet to the entire QApplication,
- * utilizing these colors to style various standard Qt widgets (buttons, line edits, scrollbars, etc.).
+ * using these colors to style various standard Qt widgets (buttons, line edits, scrollbars, etc.).
  * Additionally, it offers helper methods to generate specific CSS-like style strings for custom widgets.
  */
 class CyberpunkStyle {
 public:
+    /**
+     * @brief Applies the cyberpunk style globally to the QApplication.
+     * Sets the application style to "Fusion", configures a custom QPalette using the defined colors,
+     * and applies a detailed stylesheet to style common widgets.
+     */
+    static void ApplyStyle();
+
+    /**
+     * @brief Private constructor to prevent instantiation. This class only provides static members.
+     */
+    CyberpunkStyle() = delete;
+
     /**
      * @brief Gets the primary color (Neon Blue).
      * @return QColor(0, 170, 255).
@@ -80,12 +92,6 @@ public:
      */
     static QColor GetMutedTextColor() { return {150, 160, 170}; } // Przytłumiony tekst
 
-    /**
-     * @brief Applies the cyberpunk style globally to the QApplication.
-     * Sets the application style to "Fusion", configures a custom QPalette using the defined colors,
-     * and applies a detailed stylesheet to style common widgets.
-     */
-    static void ApplyStyle();
 
     /**
      * @brief Generates a CSS-like border style string with a "tech" look.
@@ -101,11 +107,6 @@ public:
      * @return A QString containing the frame style definition.
      */
     static QString GetCyberpunkFrameStyle();
-
-    /**
-     * @brief Private constructor to prevent instantiation. This class only provides static members.
-     */
-    CyberpunkStyle() = delete;
 };
 
 #endif // CYBERPUNK_STYLE_H

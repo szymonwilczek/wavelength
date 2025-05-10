@@ -2,13 +2,11 @@
 #define VOICE_RECOGNITION_LAYER_H
 
 #include "../security_layer.h"
-#include <QLabel>
 #include <QProgressBar>
-#include <QTimer>
 #include <QAudioInput>
-#include <QAudioDeviceInfo>
 #include <QIODevice>
 #include <QByteArray>
+#include <QLabel>
 #include <QVector>
 
 class TranslationManager;
@@ -110,20 +108,20 @@ private:
     bool IsSpeaking(float audio_level) const;
 
     /** @brief Label used as a canvas to draw the audio waveform visualization. */
-    QLabel* audio_visualizer_label_;
+    QLabel *audio_visualizer_label_;
     /** @brief Progress bar indicating the voice recognition progress. */
-    QProgressBar* recognition_progress_;
+    QProgressBar *recognition_progress_;
     /** @brief Timer controlling the progress bar update based on speech detection. */
-    QTimer* progress_timer_;
+    QTimer *progress_timer_;
     /** @brief Timer defining the maximum duration for the recognition attempt. */
-    QTimer* recognition_timer_;
+    QTimer *recognition_timer_;
     /** @brief Timer controlling how often audio input is processed. */
-    QTimer* audio_process_timer_;
+    QTimer *audio_process_timer_;
 
     /** @brief Object managing audio input capture. */
-    QAudioInput* audio_input_;
+    QAudioInput *audio_input_;
     /** @brief I/O device providing access to the raw audio stream from audio_input_. */
-    QIODevice* audio_device_;
+    QIODevice *audio_device_;
 
     /** @brief Buffer storing raw audio data captured while the user is speaking. */
     QByteArray audio_buffer_;
@@ -141,7 +139,7 @@ private:
     /** @brief The calculated audio level from the most recently processed audio chunk. */
     float current_audio_level_;
     /** @brief The translation manager for handling UI translations. */
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 };
 
 #endif // VOICE_RECOGNITION_LAYER_H

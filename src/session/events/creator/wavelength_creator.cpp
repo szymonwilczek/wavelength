@@ -3,31 +3,35 @@
 #include "../../../auth/authentication_manager.h"
 
 bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_protected, const QString &password) {
-    WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
-    const WavelengthConfig* config = WavelengthConfig::GetInstance();
+    WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
+    const WavelengthConfig *config = WavelengthConfig::GetInstance();
 
     if (registry->HasWavelength(frequency)) {
-        qDebug() << "Wavelength" << frequency << "already exists locally";
+        qDebug() << "[CREATOR] Wavelength" << frequency << "already exists locally.";
         return false;
     }
 
     if (registry->IsPendingRegistration(frequency)) {
-        qDebug() << "Wavelength" << frequency << "registration is already pending";
+        qDebug() << "[CREATOR] Wavelength" << frequency << "registration is already pending.";
         return false;
     }
 
     registry->AddPendingRegistration(frequency);
     QString host_id = AuthenticationManager::GetInstance()->GenerateClientId();
+    // ReSharper disable once CppDFAUnreadVariable
+    // ReSharper disable once CppDFAUnusedValue
     auto connected_callback_executed = new bool(false);
+    // ReSharper disable once CppDFAUnreadVariable
+    // ReSharper disable once CppDFAUnusedValue
     auto keep_alive_timer = new QTimer(this);
 
     auto socket = new QWebSocket("", QWebSocketProtocol::VersionLatest, this);
 
-    auto result_handler = [this, frequency, socket, keep_alive_timer, registry](const QString& message) {
+    auto result_handler = [this, frequency, socket, keep_alive_timer, registry](const QString &message) {
         bool ok = false;
         QJsonObject message_object = MessageHandler::GetInstance()->ParseMessage(message, &ok);
         if (!ok) {
-            qDebug() << "[Creator] Failed to parse JSON message in RegisterResultHandler";
+            qDebug() << "[CREATOR] Failed to parse JSON message in RegisterResultHandler.";
             return;
         }
 
@@ -43,7 +47,7 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
             if (success) {
                 WavelengthInfo info = registry->GetWavelengthInfo(frequency);
                 if (info.frequency.isEmpty()) {
-                    qWarning() << "[Creator] WavelengthInfo not found after successful registration for" << frequency;
+                    qWarning() << "[CREATOR] WavelengthInfo not found after successful registration for" << frequency;
                     info.frequency = frequency;
                     info.host_id = message_object["hostId"].toString();
                     info.is_host = true;
@@ -59,13 +63,13 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
                 emit wavelengthCreated(frequency);
             } else {
                 const QString error_message = message_object["error"].toString("Unknown error");
-                qDebug() << "[Creator] Failed to register wavelength:" << error_message;
+                qDebug() << "[CREATOR] Failed to register wavelength:" << error_message;
                 emit connectionError(error_message);
                 keep_alive_timer->stop();
                 socket->close();
             }
         } else {
-            qDebug() << "[Creator] Received unexpected message type in RegisterResultHandler:" << message_type;
+            qDebug() << "[CREATOR] Received unexpected message type in RegisterResultHandler:" << message_type;
         }
     };
 
@@ -93,7 +97,8 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
     connect(socket, &QWebSocket::disconnected, this, disconnect_handler);
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
             this, [this, socket, frequency, registry](const QAbstractSocket::SocketError error) {
-                qDebug() << "[Creator] WebSocket error for wavelength" << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
+                qDebug() << "[CREATOR] WebSocket error for wavelength"
+                        << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
 
                 if (registry->IsPendingRegistration(frequency)) {
                     registry->RemovePendingRegistration(frequency);
@@ -123,14 +128,15 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
 
                 connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 
-                connect(keep_alive_timer, &QTimer::timeout, socket, [socket](){
+                connect(keep_alive_timer, &QTimer::timeout, socket, [socket]() {
                     if (socket->isValid()) {
                         socket->ping();
                     }
                 });
 
-                const MessageHandler* message_handler = MessageHandler::GetInstance();
-                const QJsonObject register_request = message_handler->CreateRegisterRequest(frequency, is_password_protected, password, host_id);
+                const MessageHandler *message_handler = MessageHandler::GetInstance();
+                const QJsonObject register_request = message_handler->CreateRegisterRequest(
+                    frequency, is_password_protected, password, host_id);
                 const QJsonDocument document(register_request);
                 socket->sendTextMessage(document.toJson(QJsonDocument::Compact));
             });

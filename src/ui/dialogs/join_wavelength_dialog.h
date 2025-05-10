@@ -42,22 +42,23 @@ public:
      */
     ~JoinWavelengthDialog() override;
 
-    // --- Animation Property Accessors ---
     /** @brief Gets the current digitalization progress (vertical scanline position). */
     double GetDigitalizationProgress() const { return digitalization_progress_; }
+
     /** @brief Sets the digitalization progress and triggers a repaint. Starts the refresh timer if needed. */
     void SetDigitalizationProgress(double progress);
 
     /** @brief Gets the current corner glow progress. */
     double GetCornerGlowProgress() const { return corner_glow_progress_; }
+
     /** @brief Sets the corner glow progress and triggers a repaint. */
     void SetCornerGlowProgress(double progress);
 
     /** @brief Gets the current opacity of the horizontal scanlines. */
     double GetScanlineOpacity() const { return scanline_opacity_; }
+
     /** @brief Sets the opacity of the horizontal scanlines and triggers a repaint. */
     void SetScanlineOpacity(double opacity);
-    // --- End Animation Property Accessors ---
 
     /**
      * @brief Overridden paint event handler. Draws the custom dialog appearance.
@@ -83,28 +84,28 @@ public:
         return password_edit_->text();
     }
 
-    // --- Refresh Timer Control ---
     /** @brief Gets a pointer to the internal refresh timer used for scanline animation updates. */
-    QTimer* GetRefreshTimer() const { return refresh_timer_; }
+    QTimer *GetRefreshTimer() const { return refresh_timer_; }
     /** @brief Starts the refresh timer. */
     void StartRefreshTimer() const {
         if (refresh_timer_) {
             refresh_timer_->start();
         }
     }
+
     /** @brief Stops the refresh timer. */
     void StopRefreshTimer() const {
         if (refresh_timer_) {
             refresh_timer_->stop();
         }
     }
+
     /** @brief Sets the interval for the refresh timer. */
     void SetRefreshTimerInterval(const int interval) const {
         if (refresh_timer_) {
             refresh_timer_->setInterval(interval);
         }
     }
-    // --- End Refresh Timer Control ---
 
 private slots:
     /**
@@ -133,7 +134,7 @@ private slots:
      * in the status label and triggers a glitch animation.
      * @param error_message The error message received from the joiner.
      */
-    void OnConnectionError(const QString& error_message);
+    void OnConnectionError(const QString &error_message);
 
 private:
     /**
@@ -143,7 +144,6 @@ private:
      */
     void InitRenderBuffers();
 
-    // --- Member Variables ---
     /** @brief Flag indicating if the show animation has started (used to control scanline drawing). */
     bool animation_started_ = false;
     /** @brief Input field for the wavelength frequency. */
@@ -178,7 +178,7 @@ private:
     /** @brief Stores the previous height to detect resize events for buffer reinitialization. */
     int previous_height_ = 0;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // JOIN_WAVELENGTH_DIALOG_H

@@ -11,7 +11,7 @@ find_package(Qt5 COMPONENTS Widgets Network Concurrent REQUIRED)
 
 add_executable(
         ${PROJECT_NAME}
-#        WIN32
+        #        WIN32
         main.cpp
         resources.qrc
         src/ui/navigation/navbar.h
@@ -90,8 +90,8 @@ add_executable(
         src/chat/files/image/displayer/image_viewer.h
         src/chat/files/attachments/attachment_placeholder.cpp
         src/chat/files/attachments/attachment_placeholder.h
-        src/chat/files/video/player/video_player_overlay.cpp
-        src/chat/files/video/player/video_player_overlay.h
+        src/chat/files/video/player/video_player.cpp
+        src/chat/files/video/player/video_player.h
         src/chat/files/attachments/attachment_queue_manager.h
         src/chat/files/attachments/attachment_queue_manager.cpp
         src/util/wavelength_utilities.cpp
@@ -106,12 +106,8 @@ add_executable(
         src/ui/chat/communication_stream.h
         src/ui/chat/wavelength_stream_display.cpp
         src/ui/chat/wavelength_stream_display.h
-        src/ui/chat/effects/disintegration_effect.cpp
-        src/ui/chat/effects/disintegration_effect.h
         src/ui/chat/stream_message.cpp
         src/ui/chat/stream_message.h
-        src/ui/chat/effects/opengl_disintegration_effect.cpp
-        src/ui/chat/effects/opengl_disintegration_effect.h
         src/ui/files/cyber_attachment_viewer.cpp
         src/ui/files/cyber_attachment_viewer.h
         src/ui/chat/effects/cyber_text_display.cpp

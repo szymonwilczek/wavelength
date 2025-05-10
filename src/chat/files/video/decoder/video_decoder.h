@@ -6,7 +6,6 @@
 #pragma warning(disable: 4244 4267 4996)
 #endif
 
-#include <QImage>
 #include <QBuffer>
 
 #include "../../audio/decoder/audio_decoder.h"
@@ -29,7 +28,7 @@ extern "C" {
  * This class takes raw video data (e.g., MP4, WebM) as a QByteArray, uses FFmpeg
  * (libavformat, libavcodec, libswscale) to decode the video stream, and emits each
  * decoded frame as a QImage (Format_RGB888). If an audio stream is present, it
- * utilizes an internal AudioDecoder instance to handle audio decoding and playback
+ * uses an internal AudioDecoder instance to handle audio decoding and playback
  * synchronization.
  *
  * The decoding loop runs in a separate QThread to avoid blocking the main UI thread.
@@ -48,7 +47,7 @@ public:
      * @param video_data The raw video data to be decoded.
      * @param parent Optional parent QObject.
      */
-    explicit VideoDecoder(const QByteArray& video_data, QObject* parent = nullptr);
+    explicit VideoDecoder(const QByteArray &video_data, QObject *parent = nullptr);
 
     /**
      * @brief Destructor.
@@ -70,7 +69,7 @@ public:
     /**
      * @brief Synchronously extracts the first video frame from the data.
      * Performs a separate, simplified FFmpeg initialization and decoding process
-     * to obtain the first frame quickly, typically for generating a thumbnail.
+     * to get the first frame quickly, typically for generating a thumbnail.
      * Emits frameReady() with the first frame upon success.
      * This method runs in the calling thread.
      */
@@ -163,7 +162,7 @@ signals:
      * @brief Emitted for each decoded video frame.
      * @param frame The decoded frame as a QImage (Format_RGB888). A copy is emitted.
      */
-    void frameReady(const QImage& frame);
+    void frameReady(const QImage &frame);
 
     /**
      * @brief Emitted after successful initialization, providing video stream details.
@@ -190,7 +189,7 @@ signals:
      * @brief Emitted when an error occurs during initialization or decoding.
      * @param message A description of the error.
      */
-    void error(const QString& message);
+    void error(const QString &message);
 
 protected:
     /**
@@ -207,7 +206,7 @@ private slots:
      * Relays the audio error message via the main error() signal.
      * @param message The error message from the AudioDecoder.
      */
-    void HandleAudioError(const QString& message) {
+    void HandleAudioError(const QString &message) {
         emit error("Błąd strumienia audio: " + message);
     }
 
@@ -238,9 +237,9 @@ private:
      * @param opaque Pointer to the QBuffer instance.
      * @param buf Buffer to read data into.
      * @param buf_size Size of the buffer.
-     * @return Number of bytes read, or 0 if end of buffer is reached.
+     * @return Number of bytes read, or 0 if the end of buffer is reached.
      */
-    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void *opaque, uint8_t *buf, int buf_size);
 
     /**
      * @brief Custom seek function for FFmpeg's AVIOContext.
@@ -251,22 +250,22 @@ private:
      * @param whence The seeking mode (SEEK_SET, AVSEEK_SIZE).
      * @return The new buffer position, or the total size if whence is AVSEEK_SIZE, or -1 on error.
      */
-    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void *opaque, int64_t offset, int whence);
 
     /** @brief The raw video data provided in the constructor. */
     QByteArray video_data_;
     /** @brief QBuffer used by FFmpeg's custom I/O context to read video_data_. */
     QBuffer buffer_;
     /** @brief FFmpeg context for custom I/O operations (reading from memory). */
-    AVIOContext* io_context_ = nullptr;
+    AVIOContext *io_context_ = nullptr;
     /** @brief FFmpeg context for handling the container format (e.g., MP4, WebM). */
-    AVFormatContext* format_context_ = nullptr;
+    AVFormatContext *format_context_ = nullptr;
     /** @brief FFmpeg context for the video codec. */
-    AVCodecContext* codec_context_ = nullptr;
+    AVCodecContext *codec_context_ = nullptr;
     /** @brief FFmpeg context for image scaling and pixel format conversion (to RGB24). */
-    SwsContext* sws_context_ = nullptr;
+    SwsContext *sws_context_ = nullptr;
     /** @brief FFmpeg frame structure to hold decoded video data. */
-    AVFrame* frame_ = nullptr;
+    AVFrame *frame_ = nullptr;
     /** @brief Index of the video stream within the format context. */
     int video_stream_ = -1;
     /** @brief Calculated average frame rate of the video in frames per second. */
@@ -297,7 +296,7 @@ private:
     int64_t last_frame_pts_ = AV_NOPTS_VALUE;
 
     /** @brief Pointer to the internal AudioDecoder instance (if audio stream exists). */
-    AudioDecoder* audio_decoder_ = nullptr;
+    AudioDecoder *audio_decoder_ = nullptr;
     /** @brief Index of the audio stream within the format context. */
     int audio_stream_index_ = -1;
     /** @brief Current playback position reported by the internal AudioDecoder. Access protected by mutex_. */

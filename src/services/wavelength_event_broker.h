@@ -23,7 +23,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthEventBroker.
      * @return Pointer to the singleton WavelengthEventBroker instance.
      */
-    static WavelengthEventBroker* GetInstance() {
+    static WavelengthEventBroker *GetInstance() {
         static WavelengthEventBroker instance;
         return &instance;
     }
@@ -34,8 +34,8 @@ public:
      * @param event_type A string identifying the type of event (e.g., "message_received").
      * @param data Optional QVariantMap containing data associated with the event.
      */
-    void PublishEvent(const QString& event_type, const QVariantMap& data = QVariantMap()) {
-        qDebug() << "Publishing event:" << event_type << data; // Added data logging
+    void PublishEvent(const QString &event_type, const QVariantMap &data = QVariantMap()) {
+        qDebug() << "[EVENT BROKER] Publishing event:" << event_type << data;
         emit eventPublished(event_type, data);
     }
 
@@ -51,34 +51,43 @@ public:
      * @param slot A pointer to a member function or a lambda function to be called when the event occurs.
      */
     template<typename Receiver, typename Func>
-    requires std::derived_from<Receiver, QObject> &&
-             std::invocable<Func, const QVariantMap&>
-    void SubscribeToEvent(const QString& event_type, Receiver* receiver, Func slot);
-
-    // --- Specific Event Publishing Methods ---
+        requires std::derived_from<Receiver, QObject> &&
+                 std::invocable<Func, const QVariantMap &>
+    void SubscribeToEvent(const QString &event_type, Receiver *receiver, Func slot);
 
     /** @brief Publishes a "wavelength_created" event. Data: {"frequency": QString}. */
     void WavelengthCreated(const QString &frequency);
+
     /** @brief Publishes a "wavelength_joined" event. Data: {"frequency": QString}. */
     void WavelengthJoined(const QString &frequency);
+
     /** @brief Publishes a "wavelength_left" event. Data: {"frequency": QString}. */
     void WavelengthLeft(const QString &frequency);
+
     /** @brief Publishes a "wavelength_closed" event. Data: {"frequency": QString}. */
     void WavelengthClosed(const QString &frequency);
+
     /** @brief Publishes a "message_received" event. Data: {"frequency": QString, "message": QString}. */
-    void MessageReceived(const QString &frequency, const QString& message);
+    void MessageReceived(const QString &frequency, const QString &message);
+
     /** @brief Publishes a "message_sent" event. Data: {"frequency": QString, "message": QString}. */
-    void MessageSent(const QString &frequency, const QString& message);
+    void MessageSent(const QString &frequency, const QString &message);
+
     /** @brief Publishes a "connection_error" event. Data: {"error": QString}. */
-    void ConnectionError(const QString& error_message);
+    void ConnectionError(const QString &error_message);
+
     /** @brief Publishes an "authentication_failed" event. Data: {"frequency": QString}. */
     void AuthenticationFailed(const QString &frequency);
+
     /** @brief Publishes a "user_kicked" event. Data: {"frequency": QString, "reason": QString}. */
-    void UserKicked(const QString &frequency, const QString& reason);
+    void UserKicked(const QString &frequency, const QString &reason);
+
     /** @brief Publishes a "ui_state_changed" event. Data: {"component": QString, "state": QVariant}. */
-    void UiStateChanged(const QString& component, const QVariant& state);
+    void UiStateChanged(const QString &component, const QVariant &state);
+
     /** @brief Publishes a "system_message" event. Data: {"frequency": QString, "message": QString}. */
-    void SystemMessage(const QString &frequency, const QString& message);
+    void SystemMessage(const QString &frequency, const QString &message);
+
     /** @brief Publishes an "active_wavelength_changed" event. Data: {"frequency": QString}. */
     void ActiveWavelengthChanged(const QString &frequency);
 
@@ -89,28 +98,29 @@ signals:
      * @param eventType The string identifier of the published event.
      * @param data The QVariantMap containing data associated with the event.
      */
-    void eventPublished(const QString& eventType, const QVariantMap& data);
+    void eventPublished(const QString &eventType, const QVariantMap &data);
 
 private:
     /**
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthEventBroker(QObject* parent = nullptr) : QObject(parent) {}
+    explicit WavelengthEventBroker(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthEventBroker() override = default; // Use default destructor
+    ~WavelengthEventBroker() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthEventBroker(const WavelengthEventBroker&) = delete;
+    WavelengthEventBroker(const WavelengthEventBroker &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthEventBroker& operator=(const WavelengthEventBroker&) = delete;
+    WavelengthEventBroker &operator=(const WavelengthEventBroker &) = delete;
 };
 #endif // WAVELENGTH_EVENT_BROKER_H

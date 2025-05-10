@@ -7,7 +7,6 @@
 #include <QThreadPool>
 #include <QRunnable>
 #include <functional>
-#include <QDebug>
 
 /**
  * @brief Represents a single task (a function) to be executed in a thread pool.
@@ -17,13 +16,14 @@
  */
 class AttachmentTask final : public QObject, public QRunnable {
     Q_OBJECT
+
 public:
     /**
      * @brief Constructs an AttachmentTask.
      * @param taskFunc The std::function to be executed when run() is called.
      * @param parent Optional parent QObject.
      */
-    explicit AttachmentTask(const std::function<void()>& taskFunc, QObject* parent = nullptr);
+    explicit AttachmentTask(const std::function<void()> &taskFunc, QObject *parent = nullptr);
 
     /**
      * @brief Executes the stored task function (TaskFunc_).
@@ -51,12 +51,13 @@ private:
  */
 class AttachmentQueueManager final : public QObject {
     Q_OBJECT
+
 public:
     /**
      * @brief Gets the singleton instance of the AttachmentQueueManager.
      * @return Pointer to the singleton AttachmentQueueManager instance.
      */
-    static AttachmentQueueManager* GetInstance() {
+    static AttachmentQueueManager *GetInstance() {
         static AttachmentQueueManager instance;
         return &instance;
     }
@@ -67,7 +68,7 @@ public:
      * and attempts to process the queue immediately. This operation is thread-safe.
      * @param TaskFunc The function to be executed as a task.
      */
-    void AddTask(const std::function<void()>& TaskFunc);
+    void AddTask(const std::function<void()> &TaskFunc);
 
 private:
     /**
@@ -75,7 +76,7 @@ private:
      * Determines the maximum number of concurrent tasks based on available system threads.
      * @param parent Optional parent QObject.
      */
-    explicit AttachmentQueueManager(QObject* parent = nullptr);
+    explicit AttachmentQueueManager(QObject *parent = nullptr);
 
     /**
      * @brief Processes the task queue, starting new tasks if slots are available.
@@ -86,9 +87,9 @@ private:
     void ProcessQueue();
 
     /** @brief Queue storing tasks waiting to be executed. Access protected by mutex_. */
-    QQueue<AttachmentTask*> task_queue_;
+    QQueue<AttachmentTask *> task_queue_;
     /** @brief List storing tasks currently being executed by the thread pool. Access protected by mutex_. */
-    QList<AttachmentTask*> active_tasks_;
+    QList<AttachmentTask *> active_tasks_;
     /** @brief Mutex ensuring thread-safe access to task_queue_ and active_tasks_. */
     QMutex mutex_;
     /** @brief Maximum number of tasks allowed to run concurrently. */

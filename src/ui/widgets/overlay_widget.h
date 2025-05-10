@@ -1,10 +1,10 @@
 #ifndef OVERLAY_WIDGET_H
 #define OVERLAY_WIDGET_H
+
 #include <QWidget>
 #include <QPainter>
 #include <QResizeEvent>
 #include <QRect>
-
 
 /**
  * @brief A semi-transparent overlay widget used to dim the background content.
@@ -17,7 +17,7 @@
 class OverlayWidget final : public QWidget {
     Q_OBJECT
     /** @brief Property controlling the opacity of the overlay (0.0 = transparent, 1.0 = fully opaque black). Animatable. */
-    Q_PROPERTY(qreal opacity READ GetOpacity WRITE SetOpacity) // Corrected getter/setter names
+    Q_PROPERTY(qreal opacity READ GetOpacity WRITE SetOpacity)
 
 public:
     /**
@@ -33,20 +33,20 @@ public:
      * Typically called when the parent widget resizes.
      * @param rect The new geometry rectangle, usually matching the parent's bounds.
      */
-    void UpdateGeometry(const QRect& rect);
+    void UpdateGeometry(const QRect &rect);
 
     /**
      * @brief Gets the current opacity of the overlay.
      * @return The current opacity value (0.0 to 1.0).
      */
-    qreal GetOpacity() const { return opacity_; } // Corrected function name
+    qreal GetOpacity() const { return opacity_; }
 
     /**
      * @brief Sets the opacity of the overlay.
      * Triggers a repaint of the widget.
      * @param opacity The desired opacity (0.0 to 1.0).
      */
-    void SetOpacity(qreal opacity); // Corrected function name
+    void SetOpacity(qreal opacity);
 
 private:
     /** @brief Current opacity level of the overlay (0.0 to 1.0). */
@@ -57,7 +57,7 @@ private:
 protected:
     /**
      * @brief Filters events from the parent widget.
-     * Specifically watches for Resize events on the parent to call UpdateGeometry().
+     * Specifically, watches for Resize events on the parent to call UpdateGeometry().
      * @param watched The object that generated the event.
      * @param event The event being processed.
      * @return True if the event was handled, false otherwise.
@@ -72,7 +72,6 @@ protected:
      */
     void paintEvent(QPaintEvent *event) override;
 };
-
 
 
 #endif //OVERLAY_WIDGET_H

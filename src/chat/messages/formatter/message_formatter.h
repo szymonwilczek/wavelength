@@ -19,7 +19,7 @@ public:
      * Extracts sender, content, timestamp, and attachment information from the JSON.
      * Determines if the message is from the current user ("You").
      * For attachments, it stores the base64 data (if present and not already stored)
-     * in the AttachmentDataStore and generates an HTML placeholder `<div>` element.
+     * in the AttachmentDataStore and generates an HTML placeholder div element.
      * This placeholder contains `data-*` attributes (like `data-attachment-id`, `data-mime-type`,
      * `data-filename`) that reference the stored data, keeping the HTML itself lightweight.
      * For text messages, it formats the content with appropriate sender info and timestamp.
@@ -30,7 +30,7 @@ public:
      * @param frequency The frequency identifier, used to look up sender names via WavelengthRegistry if only senderId is present.
      * @return An HTML formatted QString representing the message.
      */
-    static QString FormatMessage(const QJsonObject& message_object, const QString &frequency);
+    static QString FormatMessage(const QJsonObject &message_object, const QString &frequency);
 
     /**
      * @brief Formats a file size in bytes into a human-readable string (e.g., "1.2 MB").
@@ -50,7 +50,7 @@ public:
      * @param message The text content of the system message.
      * @return An HTML formatted QString representing the system message.
      */
-    static QString FormatSystemMessage(const QString& message);
+    static QString FormatSystemMessage(const QString &message);
 };
 
 #endif // MESSAGE_FORMATTER_H

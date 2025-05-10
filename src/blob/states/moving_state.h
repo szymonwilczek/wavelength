@@ -3,7 +3,6 @@
 
 #include "blob_state.h"
 #include "../blob_config.h"
-#include <QVector2D>
 
 /**
  * @brief Implements the Moving state behavior for the Blob animation.
@@ -30,10 +29,10 @@ public:
      * @param blob_center The current center position of the blob (read-only).
      * @param params Blob appearance parameters (read-only, used for radius).
      */
-    void Apply(std::vector<QPointF>& control_points,
-              std::vector<QPointF>& velocity,
-              QPointF& blob_center,
-              const BlobConfig::BlobParameters& params) override;
+    void Apply(std::vector<QPointF> &control_points,
+               std::vector<QPointF> &velocity,
+               QPointF &blob_center,
+               const BlobConfig::BlobParameters &params) override;
 
     /**
      * @brief Applies an external force directly to the blob's velocity and center.
@@ -45,11 +44,11 @@ public:
      * @param control_points Reference to the vector of current control point positions (read-only, used for distance calculation).
      * @param blob_radius The current average radius of the blob (read-only, used for scaling).
      */
-    void ApplyForce(const QVector2D& force,
-                   std::vector<QPointF>& velocity,
-                   QPointF& blob_center,
-                   const std::vector<QPointF>& control_points,
-                   double blob_radius) override;
+    void ApplyForce(const QVector2D &force,
+                    std::vector<QPointF> &velocity,
+                    QPointF &blob_center,
+                    const std::vector<QPointF> &control_points,
+                    double blob_radius) override;
 
     /**
      * @brief Applies an inertia force based on the calculated window velocity.
@@ -63,11 +62,11 @@ public:
      * @param blob_radius The current average radius of the blob (read-only).
      * @param window_velocity The calculated velocity vector of the application window.
      */
-    static void ApplyInertiaForce(std::vector<QPointF>& velocity,
-                                  QPointF& blob_center,
-                                  const std::vector<QPointF>& control_points,
+    static void ApplyInertiaForce(std::vector<QPointF> &velocity,
+                                  QPointF &blob_center,
+                                  const std::vector<QPointF> &control_points,
                                   double blob_radius,
-                                  const QVector2D& window_velocity);
+                                  const QVector2D &window_velocity);
 };
 
 #endif // MOVINGSTATE_H

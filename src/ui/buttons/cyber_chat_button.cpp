@@ -10,12 +10,10 @@ void CyberChatButton::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Paleta kolorów
-    QColor background_color(0, 40, 60); // ciemne tło
-    QColor border_color(0, 170, 255); // neonowy niebieski
-    QColor text_color(0, 220, 255); // jasny neonowy tekst
+    QColor background_color(0, 40, 60);
+    QColor border_color(0, 170, 255);
+    QColor text_color(0, 220, 255);
 
-    // Ścieżka przycisku ze ściętymi rogami
     QPainterPath path;
     int clip_size = 5;
 
@@ -29,7 +27,7 @@ void CyberChatButton::paintEvent(QPaintEvent *event) {
     path.lineTo(0, clip_size);
     path.closeSubpath();
 
-    // Tło przycisku
+    // button background
     if (isDown()) {
         background_color = QColor(0, 30, 45);
     } else if (underMouse()) {
@@ -41,12 +39,12 @@ void CyberChatButton::paintEvent(QPaintEvent *event) {
     painter.setBrush(background_color);
     painter.drawPath(path);
 
-    // Obramowanie
+    // button border
     painter.setPen(QPen(border_color, 1.5));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
-    // Tekst przycisku
+    // button text
     painter.setPen(QPen(text_color, 1));
     painter.setFont(QFont("Consolas", 10, QFont::Bold));
     painter.drawText(rect(), Qt::AlignCenter, text());

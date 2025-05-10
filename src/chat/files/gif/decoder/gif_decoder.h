@@ -2,14 +2,12 @@
 #define GIF_DECODER_H
 
 #ifdef _MSC_VER
-#pragma comment(lib, "swscale.lib") // Link against swscale library on MSVC
+#pragma comment(lib, "swscale.lib")
 #endif
 
-#include <QImage>
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
-#include <QDebug>
 #include <QElapsedTimer>
 
 extern "C" {
@@ -40,7 +38,7 @@ public:
      * @param gif_data The raw GIF data to be decoded.
      * @param parent Optional parent QObject.
      */
-    explicit GifDecoder(const QByteArray& gif_data, QObject* parent = nullptr);
+    explicit GifDecoder(const QByteArray &gif_data, QObject *parent = nullptr);
 
     /**
      * @brief Destructor.
@@ -138,26 +136,26 @@ signals:
      * @brief Emitted for each decoded frame of the GIF.
      * @param frame The decoded frame as a QImage (Format_RGBA8888). A copy is emitted.
      */
-    void frameReady(const QImage& frame);
+    void frameReady(const QImage &frame);
 
     /**
      * @brief Emitted once after successful initialization, containing the first frame.
-     * Useful for displaying a static preview before animation starts.
+     * Useful for displaying a static preview before the animation starts.
      * @param frame The first decoded frame as a QImage (Format_RGBA8888). A copy is emitted.
      */
-    void firstFrameReady(const QImage& frame);
+    void firstFrameReady(const QImage &frame);
 
     /**
      * @brief Emitted when an error occurs during initialization or decoding.
      * @param message A description of the error.
      */
-    void error(const QString& message);
+    void error(const QString &message);
 
     /**
      * @brief Emitted after successful initialization, providing GIF stream details.
      * @param width The width of the GIF in pixels.
      * @param height The height of the GIF in pixels.
-     * @param duration The total duration of the GIF in seconds (may be approximate).
+     * @param duration The total duration of the GIF in seconds (can be approximate).
      * @param frame_rate The calculated average frame rate in frames per second.
      * @param num_of_streams The number of streams found (should typically be 1 for GIF).
      */
@@ -176,12 +174,12 @@ signals:
     void positionChanged(double position);
 
 protected:
-     /**
-      * @brief The main function executed by the QThread.
-      * Contains the loop that reads packets, decodes frames, handles pausing/looping,
-      * calculates frame delays, and emits decoded frames via the frameReady signal.
-      */
-     void run() override;
+    /**
+     * @brief The main function executed by the QThread.
+     * Contains the loop that reads packets, decodes frames, handles pausing/looping,
+     * calculates frame delays, and emits decoded frames via the frameReady signal.
+     */
+    void run() override;
 
 private:
     /**
@@ -190,9 +188,9 @@ private:
      * @param opaque Pointer to the GifDecoder instance.
      * @param buf Buffer to read data into.
      * @param buf_size Size of the buffer.
-     * @return Number of bytes read, or AVERROR_EOF if end of data is reached.
+     * @return Number of bytes read, or AVERROR_EOF if the end of data is reached.
      */
-    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void *opaque, uint8_t *buf, int buf_size);
 
     /**
      * @brief Custom seek function for FFmpeg's AVIOContext.
@@ -203,7 +201,7 @@ private:
      * @param whence The seeking mode (SEEK_SET, SEEK_CUR, SEEK_END, AVSEEK_SIZE).
      * @return The new read position, or the total size if whence is AVSEEK_SIZE, or -1 on error.
      */
-    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void *opaque, int64_t offset, int whence);
 
     /**
      * @brief Internal helper function called by Initialize() to extract and emit the first frame.
@@ -218,23 +216,23 @@ private:
     int read_position_ = 0;
 
     /** @brief FFmpeg context for handling the container format (GIF). */
-    AVFormatContext* format_context_ = nullptr;
+    AVFormatContext *format_context_ = nullptr;
     /** @brief FFmpeg context for the GIF codec. */
-    AVCodecContext* codec_context_ = nullptr;
+    AVCodecContext *codec_context_ = nullptr;
     /** @brief FFmpeg context for image scaling and pixel format conversion (to RGBA). */
-    SwsContext* sws_context_ = nullptr;
+    SwsContext *sws_context_ = nullptr;
     /** @brief FFmpeg frame structure to hold the raw decoded frame data. */
-    AVFrame* frame_ = nullptr;
+    AVFrame *frame_ = nullptr;
     /** @brief FFmpeg frame structure to hold the frame data after conversion to RGBA. */
-    AVFrame* frame_rgb_ = nullptr;
+    AVFrame *frame_rgb_ = nullptr;
     /** @brief FFmpeg context for custom I/O operations (reading from memory). */
-    AVIOContext* io_context_ = nullptr;
+    AVIOContext *io_context_ = nullptr;
     /** @brief Buffer used by the custom I/O context to hold gif_data_. */
-    unsigned char* io_buffer_ = nullptr;
+    unsigned char *io_buffer_ = nullptr;
     /** @brief Index of the video stream within the format context. */
     int gif_stream_ = -1;
     /** @brief Buffer holding the pixel data for frame_rgb_. */
-    uint8_t* buffer_ = nullptr;
+    uint8_t *buffer_ = nullptr;
     /** @brief Size of the buffer_ in bytes. */
     int buffer_size_ = 0;
 

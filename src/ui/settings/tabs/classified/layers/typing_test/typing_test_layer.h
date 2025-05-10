@@ -1,10 +1,10 @@
 #ifndef TYPING_TEST_LAYER_H
 #define TYPING_TEST_LAYER_H
 
-#include "../security_layer.h"
 #include <QLabel>
 #include <QLineEdit>
-#include <QTimer>
+
+#include "../security_layer.h"
 #include <QStringList>
 
 /**
@@ -37,7 +37,7 @@ public:
 
     /**
      * @brief Initializes the layer for display.
-     * Resets the layer state, sets focus to the hidden input field, and ensures the layer is fully opaque.
+     * Resets the layer state, sets focus on the hidden input field, and ensures the layer is fully opaque.
      */
     void Initialize() override;
 
@@ -56,7 +56,7 @@ private slots:
      * as completed, updates styles, and triggers the fade-out animation. Prevents incorrect input.
      * @param text The current text in the hidden input field.
      */
-    void OnTextChanged(const QString& text);
+    void OnTextChanged(const QString &text);
 
     /**
      * @brief Updates the text display label after the test is successfully completed.
@@ -81,13 +81,13 @@ private:
     void UpdateDisplayText() const;
 
     /** @brief Label displaying the layer title ("TYPING VERIFICATION TEST"). */
-    QLabel* title_label_;
+    QLabel *title_label_;
     /** @brief Label displaying instructions for the user. */
-    QLabel* instructions_label_;
+    QLabel *instructions_label_;
     /** @brief Label displaying the text passage to be typed, with dynamic highlighting. */
-    QLabel* display_text_label_;
+    QLabel *display_text_label_;
     /** @brief Hidden input field used to capture user keystrokes without being visible. */
-    QLineEdit* hidden_input_;
+    QLineEdit *hidden_input_;
 
     /** @brief List of words composing the current text passage. */
     QStringList words_;

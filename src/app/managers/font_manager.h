@@ -18,12 +18,6 @@ class FontManager final : public QObject {
 
 public:
     /**
-     * @brief Gets the singleton instance of the FontManager.
-     * @return Pointer to the singleton FontManager instance.
-     */
-    static FontManager* GetInstance();
-
-    /**
      * @brief Initializes the FontManager by loading fonts from predefined paths.
      *
      * Searches for font files (.ttf) within specific subdirectories ("BlenderPro", "Lato", "Poppins")
@@ -33,6 +27,23 @@ public:
     bool Initialize();
 
     /**
+     * @brief Gets the singleton instance of the FontManager.
+     * @return Pointer to the singleton FontManager instance.
+     */
+    static FontManager *GetInstance();
+
+    /**
+    * @brief Creates a QFont object with the specified logical name, size, and weight.
+    *
+    * Uses GetFontFamily to resolve the logical name and then construct a QFont object.
+    * @param font_name The logical name of the font.
+    * @param point_size The desired point size for the font. Defaults to 10.
+    * @param weight The desired font weight (e.g., QFont::Normal, QFont::Bold). Defaults to QFont::Normal.
+    * @return A QFont object configured with the specified parameters.
+    */
+    QFont GetFont(const QString &font_name, int point_size = 10, int weight = QFont::Normal);
+
+    /**
      * @brief Retrieves the actual font family name associated with a logical font name.
      *
      * If the requested logical font name is found, its corresponding system family name is returned.
@@ -40,25 +51,15 @@ public:
      * @param font_name The logical name of the font (e.g., "BlenderPro", "Lato").
      * @return The actual font family name (e.g., "Blender Pro Book") or the default font family name if not found.
      */
-    QString GetFontFamily(const QString& font_name);
-
-    /**
-     * @brief Creates a QFont object with the specified logical name, size, and weight.
-     *
-     * Uses GetFontFamily to resolve the logical name and then constructs a QFont object.
-     * @param font_name The logical name of the font.
-     * @param point_size The desired point size for the font. Defaults to 10.
-     * @param weight The desired font weight (e.g., QFont::Normal, QFont::Bold). Defaults to QFont::Normal.
-     * @return A QFont object configured with the specified parameters.
-     */
-    QFont GetFont(const QString& font_name, int point_size = 10, int weight = QFont::Normal);
+    QString GetFontFamily(const QString &font_name);
 
 private:
     /**
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit FontManager(QObject* parent = nullptr);
+    explicit FontManager(QObject *parent = nullptr): QObject(parent) {
+    };
 
     /**
      * @brief Private default destructor.
@@ -68,7 +69,7 @@ private:
     /**
      * @brief Static pointer to the singleton instance.
      */
-    static FontManager* instance_;
+    static FontManager *instance_;
 
     /**
      * @brief Map storing the mapping between logical font names and actual font family names.
@@ -86,7 +87,7 @@ private:
      * @param font_path The path to the font file (.ttf).
      * @return True if the font was loaded successfully and a family name was retrieved, false otherwise.
      */
-    bool LoadFont(const QString& font_name, const QString& font_path);
+    bool LoadFont(const QString &font_name, const QString &font_path);
 };
 
 #endif // FONT_MANAGER_H

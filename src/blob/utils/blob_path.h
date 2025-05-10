@@ -3,8 +3,7 @@
 
 #include <QPainterPath>
 #include <QPointF>
-#include <vector> // Added for std::vector usage
-#include "blob_math.h"
+#include <vector>
 
 /**
  * @brief Provides a static utility function to create a smooth QPainterPath from blob control points.
@@ -19,7 +18,7 @@ public:
      *
      * Iterates through the provided control points and generates cubic Bezier segments
      * to create a smooth, closed curve passing through them. Uses neighboring points
-     * to calculate control handles for the Bezier curves, effectively creating a
+     * to calculate control handles for the Bézier curves, effectively creating a
      * Catmull-Rom spline effect with a specified tension. Includes validation to skip
      * invalid points.
      *
@@ -27,7 +26,7 @@ public:
      * @param num_of_points The number of control points in the vector. Should match control_points.size().
      * @return A QPainterPath representing the smooth outline of the blob. Returns an empty path if control_points is empty.
      */
-    static QPainterPath CreateBlobPath(const std::vector<QPointF>& control_points, int num_of_points);
+    static QPainterPath CreateBlobPath(const std::vector<QPointF> &control_points, int num_of_points);
 };
 
 #endif // BLOBPATH_H

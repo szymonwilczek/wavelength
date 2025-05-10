@@ -23,7 +23,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthCreator.
      * @return Pointer to the singleton WavelengthCreator instance.
      */
-    static WavelengthCreator* GetInstance() {
+    static WavelengthCreator *GetInstance() {
         static WavelengthCreator instance;
         return &instance;
     }
@@ -37,11 +37,11 @@ public:
      * @param frequency The desired name for the new wavelength.
      * @param is_password_protected True if the wavelength should require a password.
      * @param password The password to set (if protected).
-     * @return True if the creation process was initiated (connection attempt started),
+     * @return True if the creation process was initiated (a connection attempt started),
      *         false if the wavelength already exists or is pending.
      */
     bool CreateWavelength(QString frequency, bool is_password_protected,
-                  const QString& password);
+                          const QString &password);
 
 signals:
     /**
@@ -61,29 +61,30 @@ signals:
      * @brief Emitted if an error occurs during the connection or registration process.
      * @param error_message A description of the error.
      */
-    void connectionError(const QString& error_message);
+    void connectionError(const QString &error_message);
 
 private:
     /**
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthCreator(QObject* parent = nullptr) : QObject(parent) {}
+    explicit WavelengthCreator(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthCreator() override = default; // Use default destructor
+    ~WavelengthCreator() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthCreator(const WavelengthCreator&) = delete;
+    WavelengthCreator(const WavelengthCreator &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthCreator& operator=(const WavelengthCreator&) = delete;
+    WavelengthCreator &operator=(const WavelengthCreator &) = delete;
 };
 
 #endif // WAVELENGTH_CREATOR_H

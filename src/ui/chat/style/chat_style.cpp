@@ -2,7 +2,6 @@
 
 #include "../../../app/style/cyberpunk_style.h"
 
-
 QString ChatStyle::GetChatStyleSheet() {
     return QString(
                 "QWidget#chatViewContainer {"

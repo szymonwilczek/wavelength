@@ -8,7 +8,7 @@ void WavelengthMessageProcessor::ProcessIncomingMessage(const QString &message, 
     const QJsonObject message_object = MessageHandler::GetInstance()->ParseMessage(message, &ok);
 
     if (!ok) {
-        qDebug() << "Failed to parse JSON message";
+        qDebug() << "[MESSAGE PROCESSOR] Failed to parse JSON message.";
         return;
     }
 
@@ -16,20 +16,16 @@ void WavelengthMessageProcessor::ProcessIncomingMessage(const QString &message, 
     const QString message_id = MessageHandler::GetInstance()->GetMessageId(message_object);
     const QString message_frequency = MessageHandler::GetInstance()->GetMessageFrequency(message_object);
 
-
-    // Verify if the message is for the correct frequency
     if (!AreFrequenciesEqual(message_frequency, frequency) && message_frequency != -1) {
-        qDebug() << "Message frequency mismatch:" << message_frequency << "vs" << frequency;
+        qDebug() << "[MESSAGE PROCESSOR] Message frequency mismatch:" << message_frequency << "vs" << frequency;
         return;
     }
 
-    // Check if message has been processed already
     if (MessageHandler::GetInstance()->IsMessageProcessed(message_id)) {
-        qDebug() << "Message already processed:" << message_id;
+        qDebug() << "[MESSAGE PROCESSOR] Message already processed:" << message_id;
         return;
     }
 
-    // Process based on message type
     if (message_type == "message" || message_type == "send_message") {
         ProcessMessageContent(message_object, frequency, message_id);
     } else if (message_type == "system_command") {
@@ -41,22 +37,20 @@ void WavelengthMessageProcessor::ProcessIncomingMessage(const QString &message, 
     } else if (message_type == "wavelength_closed") {
         ProcessWavelengthClosed(frequency);
     } else if (message_type == "ptt_granted") {
-        emit pttGranted(frequency); // Emituj sygnał do serwisu/koordynatora
+        emit pttGranted(frequency);
     } else if (message_type == "ptt_denied") {
         const QString reason = message_object.value("reason").toString("Transmission slot is busy.");
-        emit pttDenied(frequency, reason); // Emituj sygnał
+        emit pttDenied(frequency, reason);
     } else if (message_type == "ptt_start_receiving") {
         const QString senderId = message_object.value("senderId").toString("Unknown");
-        emit pttStartReceiving(frequency, senderId); // Emituj sygnał
+        emit pttStartReceiving(frequency, senderId);
     } else if (message_type == "ptt_stop_receiving") {
-        emit pttStopReceiving(frequency); // Emituj sygnał
-    } else if (message_type == "audio_amplitude") { // Opcjonalne - jeśli serwer wysyła amplitudę
+        emit pttStopReceiving(frequency);
+    } else if (message_type == "audio_amplitude") {
         const qreal amplitude = message_object.value("amplitude").toDouble(0.0);
         emit remoteAudioAmplitudeUpdate(frequency, amplitude);
-    }
-    // --- KONIEC NOWYCH TYPÓW WIADOMOŚCI PTT ---
-    else {
-        qDebug() << "Unknown message type received:" << message_type;
+    } else {
+        qDebug() << "[MESSAGE PROCESSOR] Unknown message type received:" << message_type;
     }
 }
 
@@ -66,71 +60,61 @@ void WavelengthMessageProcessor::ProcessIncomingBinaryMessage(const QByteArray &
 
 void WavelengthMessageProcessor::SetSocketMessageHandlers(QWebSocket *socket, QString frequency) {
     if (!socket) {
-        qWarning() << "[CLIENT] setSocketMessageHandlers: Socket is null for frequency" << frequency;
+        qWarning() << "[MESSAGE PROCESSOR][CLIENT] setSocketMessageHandlers: Socket is null for frequency" << frequency;
         return;
     }
 
-    // Rozłącz stare połączenia, aby uniknąć duplikatów
     disconnect(socket, &QWebSocket::textMessageReceived, this, nullptr);
     disconnect(socket, &QWebSocket::binaryMessageReceived, this, nullptr);
 
 
-    // Połącz dla wiadomości tekstowych
-    const bool connected_text = connect(socket, &QWebSocket::textMessageReceived, this, [this, frequency](const QString& message) {
-        ProcessIncomingMessage(message, frequency);
-    });
+    const bool connected_text = connect(socket, &QWebSocket::textMessageReceived, this,
+                                        [this, frequency](const QString &message) {
+                                            ProcessIncomingMessage(message, frequency);
+                                        });
     if (!connected_text) {
-        qWarning() << "[CLIENT] FAILED to connect textMessageReceived for freq" << frequency;
+        qWarning() << "[MESSAGE PROCESSOR][CLIENT] FAILED to connect textMessageReceived for frequency" << frequency;
     }
 
-    // Połącz dla wiadomości binarnych
-    const bool connected_binary = connect(socket, &QWebSocket::binaryMessageReceived, this, [this, frequency](const QByteArray& message) {
-        ProcessIncomingBinaryMessage(message, frequency);
-    });
+    const bool connected_binary = connect(socket, &QWebSocket::binaryMessageReceived, this,
+                                          [this, frequency](const QByteArray &message) {
+                                              ProcessIncomingBinaryMessage(message, frequency);
+                                          });
 
-    // --- DODANE LOGOWANIE PO CONNECT DLA BINARY ---
     if (!connected_binary) {
-        qWarning() << "[CLIENT] FAILED to connect binaryMessageReceived for freq" << frequency;
+        qWarning() << "[MESSAGE PROCESSOR][CLIENT] FAILED to connect binaryMessageReceived for freqquency" << frequency;
     }
-    // --- KONIEC LOGOWANIA ---
 
-    // Dodajmy też logowanie błędów samego socketa na wszelki wypadek
-    // Rozłączamy najpierw, aby uniknąć wielokrotnego podłączania tego samego slotu
     disconnect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, nullptr);
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
             this, [socket, frequency](const QAbstractSocket::SocketError error) {
-                qWarning() << "[CLIENT] WebSocket Error Occurred on freq" << frequency << ":" << socket->errorString() << "(Code:" << error << ")";
+                qWarning() << "[MESSAGE PROCESSOR][CLIENT] WebSocket Error Occurred on freqquency" << frequency
+                        << ":" << socket->errorString() << "(Code:" << error << ")";
             });
 }
 
 void WavelengthMessageProcessor::ProcessMessageContent(const QJsonObject &message_object, const QString &frequency,
-    const QString &message_id) {
-    // Sprawdź czy wiadomość już przetwarzana
+                                                       const QString &message_id) {
     if (MessageHandler::GetInstance()->IsMessageProcessed(message_id)) {
         return;
     }
 
     MessageHandler::GetInstance()->MarkMessageAsProcessed(message_id);
 
-    // Sprawdź, czy wiadomość zawiera załączniki
     const bool has_attachment = message_object.contains("hasAttachment") && message_object["hasAttachment"].toBool();
 
-    if (has_attachment && message_object.contains("attachmentData") && message_object["attachmentData"].toString().length() > 100) {
-        // Tworzymy lekką wersję wiadomości z referencją
+    if (has_attachment && message_object.contains("attachmentData") && message_object["attachmentData"].toString().
+        length() > 100) {
         QJsonObject light_message = message_object;
 
-        // Zamiast surowych danych base64, zapisujemy dane w magazynie i używamy ID
         const QString attachment_id = AttachmentDataStore::GetInstance()->StoreAttachmentData(
             message_object["attachmentData"].toString());
 
-        // Zastępujemy dane załącznika identyfikatorem
         light_message["attachmentData"] = attachment_id;
 
-        // Formatujemy i emitujemy placeholder
         const QString placeholder_message = MessageFormatter::FormatMessage(light_message, frequency);
         emit messageReceived(frequency, placeholder_message);
     } else {
-        // Dla zwykłych wiadomości tekstowych lub już z referencjami
         const QString formatted_message = MessageFormatter::FormatMessage(message_object, frequency);
         emit messageReceived(frequency, formatted_message);
     }
@@ -141,26 +125,6 @@ void WavelengthMessageProcessor::ProcessSystemCommand(const QJsonObject &message
 
     if (command == "close_wavelength") {
         ProcessWavelengthClosed(frequency);
-    } else if (command == "kick_user") {
-        const QString user_id = message_object["userId"].toString();
-        const QString reason = message_object["reason"].toString("You have been kicked");
-
-        const WavelengthInfo info = WavelengthRegistry::GetInstance()->GetWavelengthInfo(frequency);
-        const QString client_id = info.host_id; // Uproszczenie - potrzeba poprawić
-
-        if (user_id == client_id) {
-            emit userKicked(frequency, reason);
-
-            // Usuń wavelength z rejestru
-            WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
-            if (registry->HasWavelength(frequency)) {
-                const QString activeFreq = registry->GetActiveWavelength();
-                registry->RemoveWavelength(frequency);
-                if (activeFreq == frequency) {
-                    registry->SetActiveWavelength("-1");
-                }
-            }
-        }
     }
 }
 
@@ -179,8 +143,7 @@ void WavelengthMessageProcessor::ProcessUserLeft(const QJsonObject &message_obje
 }
 
 void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequency) {
-
-    WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     if (registry->HasWavelength(frequency)) {
         const QString active_frequency = registry->GetActiveWavelength();
         registry->MarkWavelengthClosing(frequency, true);
@@ -193,11 +156,14 @@ void WavelengthMessageProcessor::ProcessWavelengthClosed(const QString &frequenc
 }
 
 WavelengthMessageProcessor::WavelengthMessageProcessor(QObject *parent): QObject(parent) {
-    const WavelengthMessageService* service = WavelengthMessageService::GetInstance();
+    const WavelengthMessageService *service = WavelengthMessageService::GetInstance();
     connect(this, &WavelengthMessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
     connect(this, &WavelengthMessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
-    connect(this, &WavelengthMessageProcessor::pttStartReceiving, service, &WavelengthMessageService::pttStartReceiving);
+    connect(this, &WavelengthMessageProcessor::pttStartReceiving, service,
+            &WavelengthMessageService::pttStartReceiving);
     connect(this, &WavelengthMessageProcessor::pttStopReceiving, service, &WavelengthMessageService::pttStopReceiving);
-    connect(this, &WavelengthMessageProcessor::audioDataReceived, service, &WavelengthMessageService::audioDataReceived);
-    connect(this, &WavelengthMessageProcessor::remoteAudioAmplitudeUpdate, service, &WavelengthMessageService::remoteAudioAmplitudeUpdate);
+    connect(this, &WavelengthMessageProcessor::audioDataReceived, service,
+            &WavelengthMessageService::audioDataReceived);
+    connect(this, &WavelengthMessageProcessor::remoteAudioAmplitudeUpdate, service,
+            &WavelengthMessageService::remoteAudioAmplitudeUpdate);
 }

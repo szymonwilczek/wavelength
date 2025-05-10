@@ -2,10 +2,7 @@
 #define CYBER_CHECKBOX_H
 
 #include <QCheckBox>
-#include <QPainter>
-#include <QPainterPath>
 #include <QStyleOptionButton>
-#include <QEvent>
 
 /**
  * @brief A custom QCheckBox styled with a cyberpunk aesthetic.
@@ -18,7 +15,7 @@
 class CyberCheckBox final : public QCheckBox {
     Q_OBJECT
     /** @brief Property controlling the intensity of the checkbox border glow (0.0 to 1.0+). Animatable. */
-    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity) // Corrected getter/setter names
+    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
 
 public:
     /**
@@ -28,7 +25,7 @@ public:
      * @param text The label text for the checkbox.
      * @param parent Optional parent widget.
      */
-    explicit CyberCheckBox(const QString& text, QWidget* parent = nullptr);
+    explicit CyberCheckBox(const QString &text, QWidget *parent = nullptr);
 
     /**
      * @brief Returns the recommended size for the checkbox.
@@ -41,14 +38,14 @@ public:
      * @brief Gets the current intensity of the glow effect.
      * @return The glow intensity value (typically 0.5 to 0.9).
      */
-    double GetGlowIntensity() const { return glow_intensity_; } // Corrected function name
+    double GetGlowIntensity() const { return glow_intensity_; }
 
     /**
      * @brief Sets the intensity of the glow effect.
      * Triggers a repaint of the checkbox.
      * @param intensity The desired glow intensity.
      */
-    void SetGlowIntensity(double intensity); // Corrected function name
+    void SetGlowIntensity(double intensity);
 
 protected:
     /**
@@ -57,19 +54,19 @@ protected:
      * if checked, and the label text using the specified cyberpunk style.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden enter event handler. Animates the glow intensity to a higher value.
      * @param event The enter event.
      */
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEvent *event) override;
 
     /**
      * @brief Overridden leave event handler. Animates the glow intensity back to its default value.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override;
+    void leaveEvent(QEvent *event) override;
 
 private:
     /** @brief Current intensity of the glow effect. Modified by animations on hover. */

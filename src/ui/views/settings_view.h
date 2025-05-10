@@ -172,17 +172,17 @@ private:
     /** @brief Container widget for the horizontal row of tab buttons. */
     QWidget *tab_bar_;
     /** @brief List of buttons used for switching between settings tabs. */
-    QList<TabButton*> tab_buttons_;
+    QList<TabButton *> tab_buttons_;
 
     // --- Tab Content Widgets ---
     /** @brief Widget for configuring Wavelength-specific settings (e.g., preferred frequency). */
-    WavelengthSettingsWidget* wavelength_tab_widget_;
+    WavelengthSettingsWidget *wavelength_tab_widget_;
     /** @brief Widget for configuring appearance settings (colors, etc.). */
-    AppearanceSettingsWidget* appearance_tab_widget_;
+    AppearanceSettingsWidget *appearance_tab_widget_;
     /** @brief Widget for configuring network settings (relay server, timeouts). */
-    NetworkSettingsWidget* advanced_tab_widget_; // Renamed from performance/network
+    NetworkSettingsWidget *advanced_tab_widget_;
     /** @brief Widget for configuring keyboard shortcuts. */
-    ShortcutsSettingsWidget* shortcuts_tab_widget_{};
+    ShortcutsSettingsWidget *shortcuts_tab_widget_{};
 
     // --- Action Buttons ---
     /** @brief Button to save the current settings. */
@@ -198,25 +198,25 @@ private:
 
     // --- Security Layers (CLASSIFIED Tab) ---
     /** @brief Security layer simulating fingerprint scanning. */
-    FingerprintLayer* fingerprint_layer_;
+    FingerprintLayer *fingerprint_layer_;
     /** @brief Security layer simulating handprint scanning. */
-    HandprintLayer* handprint_layer_;
+    HandprintLayer *handprint_layer_;
     /** @brief Security layer requiring a 4-character code entry. */
-    SecurityCodeLayer* security_code_layer_;
+    SecurityCodeLayer *security_code_layer_;
     /** @brief Security layer simulating a security question challenge. */
-    SecurityQuestionLayer* security_question_layer_;
+    SecurityQuestionLayer *security_question_layer_;
     /** @brief Security layer simulating a retina scan. */
-    RetinaScanLayer* retina_scan_layer_;
+    RetinaScanLayer *retina_scan_layer_;
     /** @brief Security layer simulating voice recognition. */
-    VoiceRecognitionLayer* voice_recognition_layer_;
+    VoiceRecognitionLayer *voice_recognition_layer_;
     /** @brief Security layer implementing a typing verification test. */
-    TypingTestLayer* typing_test_layer_;
+    TypingTestLayer *typing_test_layer_;
     /** @brief Security layer implementing a Snake game challenge. */
-    SnakeGameLayer* snake_game_layer_;
+    SnakeGameLayer *snake_game_layer_;
     /** @brief Widget displayed after successfully completing all security layers. Contains classified features. */
-    QWidget* access_granted_widget_; // Renamed from classified_features_widget_ for clarity
+    QWidget *access_granted_widget_;
     /** @brief Stacked widget holding all the security layers and the final access granted widget. */
-    QStackedWidget* security_layers_stack_;
+    QStackedWidget *security_layers_stack_;
 
     /** @brief Enum defining the order and indices of the security layers within the stack. */
     enum SecurityLayerIndex {
@@ -228,7 +228,7 @@ private:
         VoiceRecognitionIndex,
         TypingTestIndex,
         SnakeGameIndex,
-        AccessGrantedIndex // Represents the index of access_granted_widget_
+        AccessGrantedIndex
     };
 
     /** @brief Index of the currently active security layer in the CLASSIFIED tab sequence. */
@@ -236,15 +236,14 @@ private:
     /** @brief Flag indicating if debug mode is enabled (bypasses security layers). */
     bool debug_mode_enabled_;
 
-    // --- Classified Features ---
     /** @brief Widget containing the classified features (currently just the override button). Same as access_granted_widget_. */
-    QWidget* classified_features_widget_; // Kept for compatibility, points to access_granted_widget_
+    QWidget *classified_features_widget_;
     /** @brief Button within the classified features widget to initiate the system override sequence. */
-    QPushButton* override_button_;
+    QPushButton *override_button_;
     /** @brief Manages the system override sequence (wallpaper change, window minimize, input blocking, etc.). */
-    SystemOverrideManager* system_override_manager_;
+    SystemOverrideManager *system_override_manager_;
     /** @brief Pointer to the TranslationManager singleton instance for UI translations. */
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 };
 
 #endif // SETTINGS_VIEW_H

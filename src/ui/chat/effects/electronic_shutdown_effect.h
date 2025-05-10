@@ -14,9 +14,9 @@
  * @brief A QGraphicsEffect that simulates an old CRT monitor or electronic device shutting down.
  *
  * This effect animates in two phases based on the `progress` property (0.0 to 1.0):
- * 1. (0.0 - 0.7): The source image vertically collapses into a thin horizontal line,
+ * 1. (0.0-0.7): The source image vertically collapses into a thin horizontal line,
  *    accompanied by visual glitches (random line shifts) and scanline effects.
- * 2. (0.7 - 1.0): The horizontal line fades out, shrinks horizontally, increases in brightness,
+ * 2. (0.7-1.0): The horizontal line fades out, shrinks horizontally, increases in brightness,
  *    and exhibits flickering and glow effects before disappearing completely.
  *
  * The effect uses caching (QCache) to store intermediate results for performance.
@@ -24,7 +24,7 @@
 class ElectronicShutdownEffect final : public QGraphicsEffect {
     Q_OBJECT
     /** @brief Property controlling the progress of the shutdown animation (0.0 to 1.0). Animatable. */
-    Q_PROPERTY(qreal progress READ GetProgress WRITE SetProgress) // Corrected getter/setter names
+    Q_PROPERTY(qreal progress READ GetProgress WRITE SetProgress)
 
 public:
     /**
@@ -32,7 +32,7 @@ public:
      * Initializes the effect, sets up the result cache, and seeds the random generator.
      * @param parent Optional parent QObject.
      */
-    explicit ElectronicShutdownEffect(QObject* parent = nullptr);
+    explicit ElectronicShutdownEffect(QObject *parent = nullptr);
 
     /**
      * @brief Sets the progress of the shutdown animation.
@@ -60,7 +60,7 @@ protected:
      * stored in the cache. Finally, the cached (or newly generated) pixmap is drawn.
      * @param painter The QPainter to use for drawing.
      */
-    void draw(QPainter* painter) override;
+    void draw(QPainter *painter) override;
 
 private:
     /** @brief Current progress level of the shutdown animation (0.0 to 1.0). */
@@ -69,8 +69,6 @@ private:
     qreal last_progress_;
     /** @brief Cache storing pre-rendered effect pixmaps keyed by progress level string for performance. */
     QCache<QString, QPixmap> result_cache_;
-    /** @brief Seed used for the random generator to ensure consistent glitches for a given progress level within a draw cycle (potentially unused if global generator is sufficient). */
-    quint32 random_seed_; // Marked as potentially unused if global generator is always used
 };
 
 #endif // ELECTRONIC_SHUTDOWN_EFFECT_H

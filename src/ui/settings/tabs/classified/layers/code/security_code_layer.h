@@ -95,8 +95,9 @@ private:
          * @param h The hint string.
          * @param num True if the code is numeric only, false otherwise (defaults to true).
          */
-        SecurityCode(const QString& c, const QString& h, const bool num = true)
-            : code(c), hint(h), is_numeric(num) {}
+        SecurityCode(const QString &c, const QString &h, const bool num = true)
+            : code(c), hint(h), is_numeric(num) {
+        }
     };
 
     /**
@@ -105,11 +106,11 @@ private:
      * @param[out] is_numeric True if the selected code is numeric, false otherwise.
      * @return The randomly selected 4-character security code string.
      */
-    QString GetRandomSecurityCode(QString& hint, bool& is_numeric);
+    QString GetRandomSecurityCode(QString &hint, bool &is_numeric);
 
     /**
      * @brief Clears all input fields and resets their styles to the default (error/red) state.
-     * Sets focus to the first input field.
+     * Sets focus on the first input field.
      */
     void ResetInputs();
 
@@ -133,9 +134,9 @@ private:
     void SetInputValidators(bool numeric_only);
 
     /** @brief List containing pointers to the four QLineEdit widgets for code input. */
-    QList<QLineEdit*> code_inputs_;
+    QList<QLineEdit *> code_inputs_;
     /** @brief Label displaying the hint for the current security code. */
-    QLabel* security_code_hint_;
+    QLabel *security_code_hint_;
     /** @brief The currently active security code that the user needs to enter. */
     QString current_security_code_;
     /** @brief Flag indicating if the current_security_code_ is numeric only. */
@@ -144,7 +145,7 @@ private:
     /** @brief Vector storing all available SecurityCode entries (code, hint, type). */
     QVector<SecurityCode> security_codes_;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // SECURITY_CODE_LAYER_H

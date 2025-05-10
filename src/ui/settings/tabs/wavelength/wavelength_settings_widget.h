@@ -4,7 +4,6 @@
 #include <QWidget>
 
 class TranslationManager;
-// Forward declarations
 class WavelengthConfig;
 class QLineEdit;
 class QComboBox;
@@ -64,11 +63,10 @@ private:
      * @param[out] hz The validated frequency converted to Hertz if validation succeeds.
      * @return True if the input is valid, false otherwise.
      */
-    bool ValidateFrequencyInput(double& hz);
+    bool ValidateFrequencyInput(double &hz);
 
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *config_;
-
     /** @brief Pointer to the TranslationManager singleton instance. */
     TranslationManager *translator_;
 

@@ -3,7 +3,6 @@
 
 #include <QLabel>
 #include <QtConcurrent>
-#include <QRandomGenerator>
 
 #include "../../session/wavelength_session_coordinator.h"
 #include "../../ui/dialogs/animated_dialog.h"
@@ -24,11 +23,11 @@ class TranslationManager;
 class WavelengthDialog final : public AnimatedDialog {
     Q_OBJECT
     /** @brief Property controlling the opacity of the horizontal scanlines effect (0.0 to 1.0). Animatable. */
-    Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity) // Corrected getter/setter names
+    Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
     /** @brief Property controlling the progress of the main vertical scanline reveal animation (0.0 to 1.0). Animatable. */
-    Q_PROPERTY(double digitalizationProgress READ GetDigitalizationProgress WRITE SetDigitalizationProgress) // Corrected getter/setter names
+    Q_PROPERTY(double digitalizationProgress READ GetDigitalizationProgress WRITE SetDigitalizationProgress)
     /** @brief Property controlling the visibility/intensity of the corner highlight markers (0.0 to 1.0). Animatable. */
-    Q_PROPERTY(double cornerGlowProgress READ GetCornerGlowProgress WRITE SetCornerGlowProgress) // Corrected getter/setter names
+    Q_PROPERTY(double cornerGlowProgress READ GetCornerGlowProgress WRITE SetCornerGlowProgress)
 
 public:
     /**
@@ -46,45 +45,46 @@ public:
      */
     ~WavelengthDialog() override;
 
-    // --- Animation Property Accessors ---
     /** @brief Gets the current digitalization progress (vertical scanline position). */
-    double GetDigitalizationProgress() const { return digitalization_progress_; } // Corrected function name
+    double GetDigitalizationProgress() const { return digitalization_progress_; }
+
     /** @brief Sets the digitalization progress and triggers a repaint. Starts the refresh timer if needed. */
-    void SetDigitalizationProgress(double progress); // Corrected function name
+    void SetDigitalizationProgress(double progress);
 
     /** @brief Gets the current corner glow progress. */
-    double GetCornerGlowProgress() const { return corner_glow_progress_; } // Corrected function name
+    double GetCornerGlowProgress() const { return corner_glow_progress_; }
+
     /** @brief Sets the corner glow progress and triggers a repaint. */
-    void SetCornerGlowProgress(double progress); // Corrected function name
+    void SetCornerGlowProgress(double progress);
 
     /** @brief Gets the current opacity of the horizontal scanlines. */
-    double GetScanlineOpacity() const { return scanline_opacity_; } // Corrected function name
-    /** @brief Sets the opacity of the horizontal scanlines and triggers a repaint. */
-    void SetScanlineOpacity(double opacity); // Corrected function name
-    // --- End Animation Property Accessors ---
+    double GetScanlineOpacity() const { return scanline_opacity_; }
 
-    // --- Refresh Timer Control ---
+    /** @brief Sets the opacity of the horizontal scanlines and triggers a repaint. */
+    void SetScanlineOpacity(double opacity);
+
     /** @brief Gets a pointer to the internal refresh timer used for scanline animation updates. */
-    QTimer* GetRefreshTimer() const { return refresh_timer_; }
+    QTimer *GetRefreshTimer() const { return refresh_timer_; }
     /** @brief Starts the refresh timer. */
     void StartRefreshTimer() const {
         if (refresh_timer_) {
             refresh_timer_->start();
         }
     }
+
     /** @brief Stops the refresh timer. */
     void StopRefreshTimer() const {
         if (refresh_timer_) {
             refresh_timer_->stop();
         }
     }
+
     /** @brief Sets the interval for the refresh timer. */
     void SetRefreshTimerInterval(const int interval) const {
         if (refresh_timer_) {
             refresh_timer_->setInterval(interval);
         }
     }
-    // --- End Refresh Timer Control ---
 
     /**
      * @brief Gets the frequency assigned by the server (or the default if search failed).
@@ -110,7 +110,7 @@ public:
         return password_edit_->text();
     }
 
-protected: // Changed access specifier to protected for paintEvent
+protected:
     /**
      * @brief Overridden paint event handler. Draws the custom dialog appearance.
      * Renders the background gradient, clipped border, the main vertical scanline reveal effect,
@@ -171,7 +171,6 @@ private:
      */
     void InitRenderBuffers();
 
-    // --- Member Variables ---
     /** @brief Flag indicating if the show animation has started (used to control scanline drawing). */
     bool animation_started_ = false;
     /** @brief Label displaying the assigned frequency. */
@@ -209,7 +208,7 @@ private:
     /** @brief Stores the previous height to detect resize events for buffer reinitialization. */
     int previous_height_ = 0;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // WAVELENGTH_DIALOG_H

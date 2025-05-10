@@ -1,12 +1,16 @@
 #include "cyber_audio_button.h"
 
 #include <cmath>
+#include <QDateTime>
+#include <QPainter>
+#include <QPainterPath>
+#include <QTimer>
 
-CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent), glow_intensity_(0.5) {
+CyberAudioButton::CyberAudioButton(const QString &text, QWidget *parent): QPushButton(text, parent),
+                                                                          glow_intensity_(0.5) {
     setCursor(Qt::PointingHandCursor);
     setStyleSheet("background-color: transparent; border: none;");
 
-    // Timer dla subtelnych efektów
     pulse_timer_ = new QTimer(this);
     connect(pulse_timer_, &QTimer::timeout, this, [this]() {
         const double phase = sin(QDateTime::currentMSecsSinceEpoch() * 0.002) * 0.1;
@@ -30,14 +34,12 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Paleta kolorów - fioletowo-niebieska paleta dla audio
-    QColor bgColor(30, 20, 60);       // ciemny tło
-    QColor borderColor(140, 80, 240); // neonowy fioletowy brzeg
-    QColor textColor(160, 100, 255);  // tekst fioletowy
+    QColor bgColor(30, 20, 60);
+    QColor borderColor(140, 80, 240);
+    QColor textColor(160, 100, 255);
 
-    // Ścieżka przycisku - ścięte rogi dla cyberpunkowego stylu
     QPainterPath path;
-    int clip_size = 4; // mniejszy rozmiar ścięcia dla mniejszego przycisku
+    int clip_size = 4;
 
     path.moveTo(clip_size, 0);
     path.lineTo(width() - clip_size, 0);
@@ -49,17 +51,17 @@ void CyberAudioButton::paintEvent(QPaintEvent *event) {
     path.lineTo(0, clip_size);
     path.closeSubpath();
 
-    // Tło przycisku
+    // button background
     painter.setPen(Qt::NoPen);
     painter.setBrush(bgColor);
     painter.drawPath(path);
 
-    // Obramowanie
+    // button border
     painter.setPen(QPen(borderColor, 1.2));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
-    // Tekst przycisku
+    // button text
     painter.setPen(QPen(textColor, 1));
     painter.setFont(QFont("Consolas", 9, QFont::Bold));
     painter.drawText(rect(), Qt::AlignCenter, text());

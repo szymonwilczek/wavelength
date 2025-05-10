@@ -13,8 +13,7 @@
  * The transition progress is controlled by a QPropertyAnimation animating the 'offset' property.
  * It's intended to be used by AnimatedStackedWidget for hardware-accelerated slide transitions.
  */
-class GLTransitionWidget final : public QOpenGLWidget
-{
+class GLTransitionWidget final : public QOpenGLWidget {
     Q_OBJECT
     /** @brief Property controlling the horizontal offset during the transition (0.0 to 1.0). Animatable. */
     Q_PROPERTY(float offset READ GetOffset WRITE SetOffset)
@@ -36,7 +35,7 @@ public:
     /**
      * @brief Sets the widgets involved in the transition.
      * Captures the current visual state of the provided widgets into pixmaps (current_pixmap_, next_pixmap_)
-     * which will be used for rendering the animation. Takes device pixel ratio into account.
+     * which will be used for rendering the animation. Takes a device's pixel ratio into account.
      * @param current_widget The widget currently visible, which will slide out.
      * @param next_widget The widget that will slide in.
      */
@@ -80,9 +79,9 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    /** @brief Pixmap captured from the widget that is sliding out. */
+    /** @brief Pixmap captured from the widget sliding out. */
     QPixmap current_pixmap_;
-    /** @brief Pixmap captured from the widget that is sliding in. */
+    /** @brief Pixmap captured from the widget sliding in. */
     QPixmap next_pixmap_;
     /** @brief Current progress of the transition animation (0.0 = start, 1.0 = end). */
     float offset_ = 0.0f;

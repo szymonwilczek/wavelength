@@ -3,7 +3,6 @@
 
 DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), is_connected_(false) {
     try {
-        // Parametry połączenia do hostowanej bazy PostgreSQL
         std::string connection_string =
                 "user=u_f67b73d1_c584_40b2_a189_3cf401949c75 "
                 "dbname=db_f67b73d1_c584_40b2_a189_3cf401949c75 "
@@ -18,7 +17,6 @@ DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), is_connected
         if (connection_->is_open()) {
             is_connected_ = true;
 
-            // Sprawdź czy tabela istnieje, jeśli nie - wyświetl ostrzeżenie
             pqxx::work txn{*connection_};
             const pqxx::result result = txn.exec(
                 "SELECT EXISTS (SELECT FROM information_schema.tables "
@@ -26,16 +24,15 @@ DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), is_connected
             );
             const bool table_exists = result[0][0].as<bool>();
             if (!table_exists) {
-                qDebug() << "WARNING: Table 'active_wavelengths' does not exist in the database!";
+                qDebug() << "[DATABASE MANAGER] Table 'active_wavelengths' does not exist in the database!";
             }
             txn.commit();
         } else {
-            qDebug() << "Failed to connect to PostgreSQL";
+            qDebug() << "[DATABASE MANAGER] Failed to connect to PostgreSQL";
             is_connected_ = false;
         }
-    }
-    catch (const std::exception& e) {
-        qDebug() << "Failed to connect to PostgreSQL:" << e.what();
+    } catch (const std::exception &e) {
+        qDebug() << "[DATABASE MANAGER] Failed to connect to PostgreSQL:" << e.what();
         is_connected_ = false;
     }
 }

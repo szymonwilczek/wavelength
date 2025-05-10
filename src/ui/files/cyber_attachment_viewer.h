@@ -26,7 +26,9 @@ class TranslationManager;
 class CyberAttachmentViewer final : public QWidget {
     Q_OBJECT
     /** @brief Property controlling the decryption progress (0-100). Animatable. Drives the MaskOverlay reveal. */
-    Q_PROPERTY(int decryptionCounter READ GetDecryptionCounter WRITE SetDecryptionCounter NOTIFY decryptionCounterChanged) // Added NOTIFY
+    Q_PROPERTY(
+        int decryptionCounter READ GetDecryptionCounter WRITE SetDecryptionCounter NOTIFY decryptionCounterChanged)
+    // Added NOTIFY
 
 public:
     /**
@@ -35,7 +37,7 @@ public:
      * and applies basic styling. Connects the decryptionCounter property to the MaskOverlay's progress.
      * @param parent Optional parent widget.
      */
-    explicit CyberAttachmentViewer(QWidget* parent = nullptr);
+    explicit CyberAttachmentViewer(QWidget *parent = nullptr);
 
     /**
      * @brief Destructor.
@@ -45,14 +47,14 @@ public:
 
     /**
      * @brief Gets the current decryption progress counter (0-100).
-     * @return The decryption counter value.
+     * @return The decryption counter-value.
      */
     int GetDecryptionCounter() const { return decryption_counter_; }
 
     /**
      * @brief Sets the decryption progress counter (0-100).
      * Updates the internal value, updates the status label text, and emits decryptionCounterChanged.
-     * @param counter The new counter value.
+     * @param counter The new counter-value.
      */
     void SetDecryptionCounter(int counter);
 
@@ -69,7 +71,7 @@ public:
      * decryption state, and updates geometry.
      * @param content Pointer to the widget to display.
      */
-    void SetContent(QWidget* content);
+    void SetContent(QWidget *content);
 
     /**
      * @brief Returns the recommended size for the viewer based on its content and layout.
@@ -84,14 +86,14 @@ protected:
      * Ensures the MaskOverlay is resized to match the content container's bounds.
      * @param event The resize event.
      */
-    void resizeEvent(QResizeEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
     /**
      * @brief Overridden paint event handler. Draws the custom cyberpunk border and AR markers.
      * Renders the clipped border, decorative lines, corner markers, and status text (SEC level, LOCK status).
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private slots:
     /**
@@ -116,7 +118,7 @@ private slots:
 
     /**
      * @brief Slot called by animation_timer_ (if active) to update visual elements during animation.
-     * Currently adds random glitch characters to the status label text during decryption.
+     * Adds random glitch characters to the status label text during decryption.
      */
     void UpdateAnimation() const;
 
@@ -141,7 +143,7 @@ signals:
     /**
      * @brief Emitted when the decryptionCounter property changes.
      * Connected to the MaskOverlay's SetRevealProgress slot.
-     * @param value The new decryption counter value (0-100).
+     * @param value The new decryption counter-value (0-100).
      */
     void decryptionCounterChanged(int value);
 
@@ -159,25 +161,21 @@ private:
     bool is_decrypted_;
 
     /** @brief Main layout for the viewer. */
-    QVBoxLayout* layout_;
+    QVBoxLayout *layout_;
     /** @brief Container widget holding the content_widget_ and mask_overlay_. */
-    QWidget* content_container_;
+    QWidget *content_container_;
     /** @brief Layout for the content_container_. */
-    QVBoxLayout* content_layout_;
+    QVBoxLayout *content_layout_;
     /** @brief Pointer to the widget being displayed (e.g., an image viewer). */
-    QWidget* content_widget_ = nullptr;
+    QWidget *content_widget_ = nullptr;
     /** @brief Label displaying status messages (Scanning, Decrypting %, Finished). */
-    QLabel* status_label_;
+    QLabel *status_label_;
     /** @brief Timer potentially used for secondary animations (like status label glitches). */
-    QTimer* animation_timer_;
-    /** @brief Timer potentially for blinking effects (unused in provided code). */
-    QTimer* blink_timer_ = nullptr; // Marked as unused
-    /** @brief Progress variable potentially for scanline animation (unused in provided code). */
-    int scan_progress_ = 0; // Marked as unused
+    QTimer *animation_timer_;
     /** @brief The overlay widget that handles the scanline and reveal effect. */
-    MaskOverlay* mask_overlay_;
+    MaskOverlay *mask_overlay_;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // CYBER_ATTACHMENT_VIEWER_H

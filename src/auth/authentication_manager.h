@@ -5,7 +5,6 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
-#include <QUuid> // Added for QUuid usage
 
 /**
  * @brief Manages authentication and session handling for Wavelength frequencies using a singleton pattern.
@@ -28,7 +27,7 @@ public:
      * @brief Gets the singleton instance of the AuthenticationManager.
      * @return Pointer to the singleton AuthenticationManager instance.
      */
-    static AuthenticationManager* GetInstance() {
+    static AuthenticationManager *GetInstance() {
         static AuthenticationManager instance;
         return &instance;
     }
@@ -47,19 +46,19 @@ public:
     static QString GenerateSessionToken();
 
     /**
+     * @brief Registers or updates the password for a specific frequency.
+     * @param frequency The frequency identifier.
+     * @param password The password to associate with the frequency.
+     */
+    void RegisterPassword(const QString &frequency, const QString &password);
+
+    /**
      * @brief Verifies if the provided password matches the stored password for a given frequency.
      * @param frequency The frequency identifier.
      * @param provided_password The password attempt provided by the client.
      * @return True if the password is correct or if no password is set for the frequency, false otherwise.
      */
-    bool VerifyPassword(const QString &frequency, const QString& provided_password);
-
-    /**
-     * @brief Registers or updates the password for a specific frequency.
-     * @param frequency The frequency identifier.
-     * @param password The password to associate with the frequency.
-     */
-    void RegisterPassword(const QString &frequency, const QString& password);
+    bool VerifyPassword(const QString &frequency, const QString &provided_password);
 
     /**
      * @brief Removes the password associated with a specific frequency.
@@ -74,7 +73,7 @@ public:
      * @param error_message An optional error message to include if authentication failed.
      * @return A compact JSON string representing the authentication result.
      */
-    static QString CreateAuthResponse(bool success, const QString& error_message = QString());
+    static QString CreateAuthResponse(bool success, const QString &error_message = QString());
 
     /**
      * @brief Stores information about a newly established client session.
@@ -83,7 +82,7 @@ public:
      * @param session_token The unique token assigned to this session.
      * @return True if the session was stored successfully (currently always returns true).
      */
-    bool StoreSession(const QString &frequency, const QString& client_id, const QString& session_token);
+    bool StoreSession(const QString &frequency, const QString &client_id, const QString &session_token);
 
     /**
      * @brief Validates an existing session token for a specific frequency.
@@ -92,19 +91,19 @@ public:
      * @param frequency The frequency the session should be associated with.
      * @return True if the session is valid, false otherwise.
      */
-    bool ValidateSession(const QString& session_token, const QString &frequency);
+    bool ValidateSession(const QString &session_token, const QString &frequency);
 
     /**
      * @brief Marks a specific session as inactive.
      * @param session_token The token of the session to deactivate.
      */
-    void DeactivateSession(const QString& session_token);
+    void DeactivateSession(const QString &session_token);
 
     /**
      * @brief Marks all sessions associated with a specific client ID as inactive.
      * @param client_id The ID of the client whose sessions should be deactivated.
      */
-    void DeactivateClientSessions(const QString& client_id);
+    void DeactivateClientSessions(const QString &client_id);
 
     /**
      * @brief Marks all sessions associated with a specific frequency as inactive.
@@ -122,32 +121,33 @@ private:
      * @brief Structure holding information about an active client session.
      */
     struct SessionInfo {
-        QString client_id;      ///< Unique identifier of the client holding the session.
-        QString frequency;      ///< The frequency the session is associated with.
-        QDateTime timestamp;    ///< Timestamp when the session was created or last validated.
-        bool is_active;         ///< Flag indicating if the session is currently active.
+        QString client_id; ///< Unique identifier of the client holding the session.
+        QString frequency; ///< The frequency the session is associated with.
+        QDateTime timestamp; ///< Timestamp when the session was created or last validated.
+        bool is_active; ///< Flag indicating if the session is currently active.
     };
 
     /**
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit AuthenticationManager(QObject* parent = nullptr) : QObject(parent) {}
+    explicit AuthenticationManager(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
      */
-    ~AuthenticationManager() override = default; // Use default destructor
+    ~AuthenticationManager() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    AuthenticationManager(const AuthenticationManager&) = delete;
+    AuthenticationManager(const AuthenticationManager &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    AuthenticationManager& operator=(const AuthenticationManager&) = delete;
+    AuthenticationManager &operator=(const AuthenticationManager &) = delete;
 
     /**
      * @brief Map storing passwords associated with frequencies.
@@ -155,14 +155,14 @@ private:
      * Value: Password (QString).
      * @warning Passwords are stored in plain text in memory. This is insecure.
      */
-    QMap<QString, QString> wavelength_passwords_;
+    QMap<QString, QString> wavelength_passwords_{};
 
     /**
      * @brief Map storing active session information.
      * Key: Session token (QString).
      * Value: SessionInfo struct containing details about the session.
      */
-    QMap<QString, SessionInfo> sessions_;
+    QMap<QString, SessionInfo> sessions_{};
 };
 
 #endif // AUTHENTICATION_MANAGER_H

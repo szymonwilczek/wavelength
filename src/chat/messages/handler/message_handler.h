@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QUuid>
 #include <QSet>
@@ -14,7 +13,7 @@
  *
  * Provides static methods for creating, parsing, and extracting information from
  * JSON-based messages used in the WebSocket communication protocol. It also manages
- * sending system commands and keeps track of processed message IDs to prevent duplicates.
+ * to send system commands and keeps track of processed message IDs to prevent duplicates.
  */
 class MessageHandler final : public QObject {
     Q_OBJECT
@@ -24,7 +23,7 @@ public:
      * @brief Gets the singleton instance of the MessageHandler.
      * @return Pointer to the singleton MessageHandler instance.
      */
-    static MessageHandler* GetInstance() {
+    static MessageHandler *GetInstance() {
         static MessageHandler instance;
         return &instance;
     }
@@ -46,14 +45,15 @@ public:
      * @param params Optional QJsonObject containing additional parameters for the command.
      * @return True if the command was sent successfully (socket valid), false otherwise.
      */
-    static bool SendSystemCommand(QWebSocket* socket, const QString& command, const QJsonObject& params = QJsonObject());
+    static bool SendSystemCommand(QWebSocket *socket, const QString &command,
+                                  const QJsonObject &params = QJsonObject());
 
     /**
      * @brief Checks if a message with the given ID has already been processed.
      * @param message_id The unique identifier of the message to check.
      * @return True if the message ID exists in the processed set, false otherwise.
      */
-    bool IsMessageProcessed(const QString& message_id) const {
+    bool IsMessageProcessed(const QString &message_id) const {
         return !message_id.isEmpty() && processed_message_ids_.contains(message_id);
     }
 
@@ -62,7 +62,7 @@ public:
      * Also manages the size of the processed ID cache, removing older entries if the maximum size is exceeded.
      * @param message_id The unique identifier of the message to mark as processed.
      */
-    void MarkMessageAsProcessed(const QString& message_id);
+    void MarkMessageAsProcessed(const QString &message_id);
 
     /**
      * @brief Parses a JSON string message into a QJsonObject.
@@ -70,14 +70,14 @@ public:
      * @param ok Optional pointer to a boolean flag that will be set to true on success, false on failure.
      * @return The parsed QJsonObject on success, or an empty QJsonObject on failure.
      */
-    static QJsonObject ParseMessage(const QString& message, bool* ok = nullptr);
+    static QJsonObject ParseMessage(const QString &message, bool *ok = nullptr);
 
     /**
      * @brief Extracts the message type string from a parsed message object.
      * @param message_object The QJsonObject representing the parsed message.
      * @return The value of the "type" field as a QString.
      */
-    static QString GetMessageType(const QJsonObject& message_object) {
+    static QString GetMessageType(const QJsonObject &message_object) {
         return message_object["type"].toString();
     }
 
@@ -86,7 +86,7 @@ public:
      * @param message_object The QJsonObject representing the parsed message.
      * @return The value of the "content" field as a QString.
      */
-    static QString GetMessageContent(const QJsonObject& message_object) {
+    static QString GetMessageContent(const QJsonObject &message_object) {
         return message_object["content"].toString();
     }
 
@@ -95,7 +95,7 @@ public:
      * @param message_object The QJsonObject representing the parsed message.
      * @return The value of the "frequency" field as a QString.
      */
-    static QString GetMessageFrequency(const QJsonObject& message_object) {
+    static QString GetMessageFrequency(const QJsonObject &message_object) {
         return message_object["frequency"].toString();
     }
 
@@ -104,7 +104,7 @@ public:
      * @param message_object The QJsonObject representing the parsed message.
      * @return The value of the "senderId" field as a QString.
      */
-    static QString GetMessageSenderId(const QJsonObject& message_object) {
+    static QString GetMessageSenderId(const QJsonObject &message_object) {
         return message_object["senderId"].toString();
     }
 
@@ -113,7 +113,7 @@ public:
      * @param message_object The QJsonObject representing the parsed message.
      * @return The value of the "messageId" field as a QString.
      */
-    static QString GetMessageId(const QJsonObject& message_object) {
+    static QString GetMessageId(const QJsonObject &message_object) {
         return message_object["messageId"].toString();
     }
 
@@ -124,7 +124,7 @@ public:
      * @param client_id The unique identifier of the client sending the request.
      * @return A QJsonObject formatted as an authentication request.
      */
-    static QJsonObject CreateAuthRequest(const QString& frequency, const QString& password, const QString& client_id);
+    static QJsonObject CreateAuthRequest(const QString &frequency, const QString &password, const QString &client_id);
 
     /**
      * @brief Creates a JSON object representing a request to register a new frequency.
@@ -135,7 +135,7 @@ public:
      * @return A QJsonObject formatted as a frequency registration request.
      */
     static QJsonObject CreateRegisterRequest(const QString &frequency, bool is_password_protected,
-                                             const QString& password, const QString& host_id);
+                                             const QString &password, const QString &host_id);
 
     /**
      * @brief Creates a JSON object representing a request to leave or close a frequency.
@@ -157,7 +157,8 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit MessageHandler(QObject* parent = nullptr) : QObject(parent) {}
+    explicit MessageHandler(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
@@ -167,12 +168,12 @@ private:
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    MessageHandler(const MessageHandler&) = delete;
+    MessageHandler(const MessageHandler &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    MessageHandler& operator=(const MessageHandler&) = delete;
+    MessageHandler &operator=(const MessageHandler &) = delete;
 
     /** @brief Set storing the IDs of messages that have already been processed to prevent duplicates. */
     QSet<QString> processed_message_ids_;

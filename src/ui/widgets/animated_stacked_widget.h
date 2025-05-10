@@ -16,8 +16,7 @@
  * smoother slide transitions via GLTransitionWidget. It also plays a sound effect
  * during transitions.
  */
-class AnimatedStackedWidget final : public QStackedWidget
-{
+class AnimatedStackedWidget final : public QStackedWidget {
     Q_OBJECT
     /** @brief Property controlling the duration of the transition animation in milliseconds. */
     Q_PROPERTY(int duration READ GetDuration WRITE SetDuration)
@@ -27,10 +26,10 @@ public:
      * @brief Enum defining the available types of transition animations.
      */
     enum AnimationType {
-        Fade,           ///< Cross-fade between the current and next widget.
-        Slide,          ///< Slide the current widget out and the next widget in (can use OpenGL).
-        SlideAndFade,   ///< Combine sliding and fading effects.
-        Push            ///< Push the current widget partially out while the next slides in.
+        Fade, ///< Cross-fade between the current and next widget.
+        Slide, ///< Slide the current widget out and the next widget in (can use OpenGL).
+        SlideAndFade, ///< Combine sliding and fading effects.
+        Push ///< Push the current widget partially out while the next slides in.
     };
 
     /**
@@ -83,7 +82,7 @@ public slots:
     /**
      * @brief Initiates an animated transition to the widget at the specified index.
      * Plays a sound effect and starts the configured animation type. Does nothing if
-     * an animation is already running or the index is invalid/current.
+     * an animation is already running, or the index is invalid/current.
      * @param index The index of the target widget.
      */
     void SlideToIndex(int index);
@@ -137,7 +136,7 @@ private slots:
 private:
     /**
      * @brief Prepares the appropriate animation based on animation_type_.
-     * Calls the corresponding Animate* method or sets up the OpenGL transition.
+     * Calls the corresponding Animate* method or set up the OpenGL transition.
      * Starts the animation_group_ if not using OpenGL.
      * @param next_index The index of the target widget.
      */

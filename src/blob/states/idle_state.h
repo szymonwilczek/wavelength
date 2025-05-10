@@ -1,8 +1,6 @@
 #ifndef IDLESTATE_H
 #define IDLESTATE_H
 
-#include <QVector2D>
-
 #include "blob_state.h"
 #include "../blob_config.h"
 
@@ -30,10 +28,10 @@ public:
      * @param blob_center Reference to the blob's center position (modified).
      * @param params Blob appearance parameters (read-only).
      */
-    void Apply(std::vector<QPointF>& control_points,
-               std::vector<QPointF>& velocity,
-               QPointF& blob_center,
-               const BlobConfig::BlobParameters& params) override;
+    void Apply(std::vector<QPointF> &control_points,
+               std::vector<QPointF> &velocity,
+               QPointF &blob_center,
+               const BlobConfig::BlobParameters &params) override;
 
     /**
      * @brief Applies an external force to the blob with dampening specific to the Idle state.
@@ -45,10 +43,10 @@ public:
      * @param control_points Reference to the vector of current control point positions (read-only).
      * @param blob_radius The current average radius of the blob (read-only).
      */
-    void ApplyForce(const QVector2D& force,
-                    std::vector<QPointF>& velocity,
-                    QPointF& blob_center,
-                    const std::vector<QPointF>& control_points,
+    void ApplyForce(const QVector2D &force,
+                    std::vector<QPointF> &velocity,
+                    QPointF &blob_center,
+                    const std::vector<QPointF> &control_points,
                     double blob_radius) override;
 
     /**
@@ -72,10 +70,10 @@ public:
      * @param blob_center The current center position of the blob (read-only).
      * @param params Blob appearance parameters (read-only).
      */
-    void ApplyHeartbeatEffect(const std::vector<QPointF>& control_points,
-                              std::vector<QPointF>& velocity,
-                              const QPointF& blob_center,
-                              const BlobConfig::BlobParameters& params);
+    void ApplyHeartbeatEffect(const std::vector<QPointF> &control_points,
+                              std::vector<QPointF> &velocity,
+                              const QPointF &blob_center,
+                              const BlobConfig::BlobParameters &params);
 
 private:
     /** @brief Parameters specific to the idle animation (wave amplitude, frequency, phase). */

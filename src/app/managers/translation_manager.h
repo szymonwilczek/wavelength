@@ -7,76 +7,78 @@
 #include <QMutex>
 
 /**
- * @brief Zarządza ładowaniem i dostarczaniem tłumaczeń dla aplikacji.
+ * @brief Manages the loading and delivery of translations for applications.
  *
- * Klasa implementuje wzorzec singleton i jest odpowiedzialna za wczytanie
- * odpowiedniego pliku JSON z tłumaczeniami na podstawie wybranego języka
- * oraz udostępnianie metody do pobierania przetłumaczonych ciągów znaków.
+ * The class implements the singleton pattern and is responsible for loading
+ * the corresponding JSON file with translations based on the selected language
+ * and providing a method to retrieve the translated strings.
  */
 class TranslationManager final : public QObject {
     Q_OBJECT
 
 public:
     /**
-     * @brief Zwraca instancję singletona TranslationManager.
-     * @return Wskaźnik do instancji TranslationManager.
+     * @brief Initializes the translation manager by loading the appropriate language file.
+     * @param language_code Language code (e.g., "en", "pl").
+     * @return True if the initialization and loading of translations was successful, false otherwise.
      */
-    static TranslationManager* GetInstance();
+    bool Initialize(const QString &language_code);
 
     /**
-     * @brief Inicjalizuje menedżera tłumaczeń, ładując odpowiedni plik językowy.
-     * @param language_code Kod języka (np. "en", "pl").
-     * @return True, jeśli inicjalizacja i załadowanie tłumaczeń powiodło się, false w przeciwnym razie.
+     * @brief Returns an instance of the TranslationManager singleton.
+     * @return A pointer to an instance of TranslationManager.
      */
-    bool Initialize(const QString& language_code);
+    static TranslationManager *GetInstance();
 
     /**
-     * @brief Pobiera przetłumaczony ciąg znaków dla podanego klucza.
+     * @brief Retrieves the translated string for the specified key.
      *
-     * Klucz powinien mieć format "Klasa.Widget.Właściwość" lub podobny,
-     * odpowiadający strukturze w pliku JSON.
+     * The key should have the format “Class.Widget.Property” or similar,
+     * corresponding to the structure in the JSON file.
      *
-     * @param key Klucz tłumaczenia.
-     * @param default_value Wartość zwracana, jeśli klucz nie zostanie znaleziony.
-     * @return Przetłumaczony ciąg znaków lub default_value.
+     * @param key Translation key.
+     * @param default_value The value returned if the key is not found.
+     * @return Translated string or default_value.
      */
-    QString Translate(const QString& key, const QString& default_value = QString()) const;
+    QString Translate(const QString &key, const QString &default_value = QString()) const;
 
     /**
-     * @brief Zwraca aktualnie załadowany kod języka.
-     * @return Kod języka (np. "en", "pl").
+     * @brief Returns the currently loaded language code.
+     * @return Language code (e.g. "en", "pl").
      */
     QString GetCurrentLanguage() const;
 
 private:
     /**
-     * @brief Prywatny konstruktor, aby wymusić wzorzec singleton.
-     * @param parent Opcjonalny rodzic QObject.
+     * @brief Private constructor to enforce the singleton pattern.
+     * @param parent Optional QObject parent.
      */
-    explicit TranslationManager(QObject *parent = nullptr);
+    explicit TranslationManager(QObject *parent = nullptr) : QObject(parent) {
+    }
 
-    /** @brief Usunięty konstruktor kopiujący. */
-    TranslationManager(const TranslationManager&) = delete;
-    /** @brief Usunięty operator przypisania. */
-    TranslationManager& operator=(const TranslationManager&) = delete;
+    /** @brief Removed copy constructor. */
+    TranslationManager(const TranslationManager &) = delete;
+
+    /** @brief Removed assignment constructor. */
+    TranslationManager &operator=(const TranslationManager &) = delete;
 
     /**
-     * @brief Ładuje tłumaczenia z pliku JSON dla podanego kodu języka.
-     * @param language_code Kod języka do załadowania.
-     * @return True, jeśli ładowanie powiodło się, false w przeciwnym razie.
+     * @brief Loads translations from a JSON file for the specified language code.
+     * @param language_code Language code to be loaded.
+     * @return True if loading is successful, false otherwise.
      */
-    bool LoadTranslations(const QString& language_code);
+    bool LoadTranslations(const QString &language_code);
 
-    /** @brief Statyczna instancja singletona. */
-    static TranslationManager* instance_;
-    /** @brief Mutex do ochrony tworzenia instancji w środowisku wielowątkowym. */
+    /** @brief Static singleton instance. */
+    static TranslationManager *instance_;
+    /** @brief Mutex to protect instance creation in a multithreaded environment. */
     static QMutex mutex_;
 
-    /** @brief Przechowuje załadowane tłumaczenia jako obiekt JSON. */
+    /** @brief It stores the loaded translations as a JSON object. */
     QJsonObject translations_;
-    /** @brief Aktualnie załadowany kod języka. */
+    /** @brief Currently loaded language code. */
     QString current_language_code_;
-    /** @brief Flaga wskazująca, czy menedżer został zainicjalizowany. */
+    /** @brief A flag indicating whether the manager has been initialized. */
     bool initialized_ = false;
 };
 

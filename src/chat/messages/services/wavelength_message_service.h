@@ -23,7 +23,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthMessageService.
      * @return Pointer to the singleton WavelengthMessageService instance.
      */
-    static WavelengthMessageService* GetInstance() {
+    static WavelengthMessageService *GetInstance() {
         static WavelengthMessageService instance;
         return &instance;
     }
@@ -34,7 +34,7 @@ public:
      * @param frequency The frequency for which PTT is requested.
      * @return True if the request was sent successfully (socket valid), false otherwise.
      */
-    static bool SendPttRequest(const QString& frequency);
+    static bool SendPttRequest(const QString &frequency);
 
     /**
      * @brief Sends a Push-to-Talk (PTT) release message for the specified frequency.
@@ -42,7 +42,7 @@ public:
      * @param frequency The frequency for which PTT is being released.
      * @return True if the release message was sent successfully (socket valid), false otherwise.
      */
-    static bool SendPttRelease(const QString& frequency);
+    static bool SendPttRelease(const QString &frequency);
 
     /**
      * @brief Sends raw audio data as a binary message for the specified frequency.
@@ -51,30 +51,30 @@ public:
      * @param audio_data The raw audio data bytes.
      * @return True if the binary message was sent successfully (socket valid and data sent), false otherwise.
      */
-    static bool SendAudioData(const QString& frequency, const QByteArray& audio_data);
+    static bool SendAudioData(const QString &frequency, const QByteArray &audio_data);
 
     /**
      * @brief Sends a text message to the currently active frequency.
      * Retrieves the active frequency and socket from WavelengthRegistry.
      * Constructs a JSON message of type "send_message" including content, sender ID, timestamp,
-     * and a unique message ID. Sends the message via the socket. Caches the sent message content locally.
+     * and a unique message ID. Sends the message via the socket. Caches sent message content locally.
      * @param message The text content of the message to send.
      * @return True if the message was sent successfully, false if no active frequency, socket invalid, etc.
      */
-    bool SendTextMessage(const QString& message);
+    bool SendTextMessage(const QString &message);
 
     /**
      * @brief Initiates the process of sending a file to the currently active frequency.
-     * Reads the file, encodes it to base64, determines file type, and constructs a JSON message
-     * of type "send_file" containing the metadata and encoded data.
+     * Reads the file, encodes it to base64, determines a file type, and constructs a JSON message
+     * of a type "send_file" containing the metadata and encoded data.
      * This entire process (reading, encoding) is offloaded to a background thread using AttachmentQueueManager.
      * Emits progressMessageUpdated signals to track the process. Finally, emits sendJsonViaSocket
      * to trigger the actual sending on the main thread.
      * @param file_path The local path to the file to be sent.
      * @param progress_message_id Optional unique ID to associate with progress update messages. If empty, a new one is generated.
-     * @return True if the file sending task was successfully queued, false otherwise (e.g., empty path).
+     * @return True if the file sending a task was successfully queued, false otherwise (e.g., empty path).
      */
-    bool SendFile(const QString& file_path, const QString& progress_message_id = QString());
+    bool SendFile(const QString &file_path, const QString &progress_message_id = QString());
 
     /**
      * @brief Sends a pre-formatted JSON message (typically containing file data) to the server.
@@ -87,7 +87,7 @@ public:
      * @return True if the message was sent successfully, false if the socket is invalid.
      * @deprecated This method seems redundant with HandleSendJsonViaSocket and might be removed.
      */
-    bool SendFileToServer(const QString& json_message, const QString &frequency, const QString& progress_message_id);
+    bool SendFileToServer(const QString &json_message, const QString &frequency, const QString &progress_message_id);
 
 
     /**
@@ -95,7 +95,7 @@ public:
      * The cache maps message ID to message content.
      * @return Pointer to the QMap storing sent message contents.
      */
-    QMap<QString, QString>* GetSentMessageCache() {
+    QMap<QString, QString> *GetSentMessageCache() {
         return &sent_messages_;
     }
 
@@ -118,7 +118,7 @@ public:
      * @brief Sets the client ID for this service instance.
      * @param clientId The client ID string to set.
      */
-    void SetClientId(const QString& clientId) {
+    void SetClientId(const QString &clientId) {
         client_id_ = clientId;
     }
 
@@ -129,7 +129,7 @@ public slots:
      * @param progress_message_id The ID of the progress message to update.
      * @param message The new HTML-formatted status message.
      */
-    void UpdateProgressMessage(const QString& progress_message_id, const QString& message) {
+    void UpdateProgressMessage(const QString &progress_message_id, const QString &message) {
         if (progress_message_id.isEmpty()) return;
         emit progressMessageUpdated(progress_message_id, message);
     }
@@ -142,7 +142,8 @@ public slots:
      * @param frequency The target frequency.
      * @param progress_message_id The ID associated with the progress message for this transfer.
      */
-    void HandleSendJsonViaSocket(const QString& json_message, const QString &frequency, const QString& progress_message_id);
+    void HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
+                                 const QString &progress_message_id);
 
 signals:
     /**
@@ -150,20 +151,20 @@ signals:
      * @param frequency The frequency the message was sent to.
      * @param formatted_message The HTML-formatted version of the sent message (for local display).
      */
-    void messageSent(QString frequency, const QString& formatted_message);
+    void messageSent(QString frequency, const QString &formatted_message);
 
     /**
      * @brief Emitted during file processing and sending to update the status display.
      * @param message_id The unique ID associated with this file transfer's progress messages.
      * @param message The HTML-formatted status update message.
      */
-    void progressMessageUpdated(const QString& message_id, const QString& message);
+    void progressMessageUpdated(const QString &message_id, const QString &message);
 
     /**
      * @brief Emitted after a file transfer is complete (success or failure) to remove the progress message.
      * @param message_id The unique ID of the progress message to remove.
      */
-    void removeProgressMessage(const QString& message_id);
+    void removeProgressMessage(const QString &message_id);
 
     /**
      * @brief Internal signal emitted by the background file processing task when the JSON message is ready to be sent.
@@ -172,7 +173,7 @@ signals:
      * @param frequency The target frequency.
      * @param progress_message_id The ID associated with the progress message for this transfer.
      */
-    void sendJsonViaSocket(const QString& json_message, QString frequency, const QString& progress_message_id);
+    void sendJsonViaSocket(const QString &json_message, QString frequency, const QString &progress_message_id);
 
     /**
      * @brief Emitted when the server grants permission to transmit audio (Push-to-Talk).
@@ -210,7 +211,7 @@ signals:
      * @param frequency The frequency the audio data belongs to.
      * @param audio_data The raw audio data bytes.
      */
-    void audioDataReceived(QString frequency, const QByteArray& audio_data);
+    void audioDataReceived(QString frequency, const QByteArray &audio_data);
 
     /**
      * @brief Emitted when the server sends an update about the remote audio amplitude (optional).
@@ -226,22 +227,23 @@ private:
      * Connects the internal sendJsonViaSocket signal to the HandleSendJsonViaSocket slot.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthMessageService(QObject* parent = nullptr);
+    explicit WavelengthMessageService(QObject *parent = nullptr);
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthMessageService() override {}
+    ~WavelengthMessageService() override {
+    }
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthMessageService(const WavelengthMessageService&) = delete;
+    WavelengthMessageService(const WavelengthMessageService &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthMessageService& operator=(const WavelengthMessageService&) = delete;
+    WavelengthMessageService &operator=(const WavelengthMessageService &) = delete;
 
     /** @brief Cache storing the content of recently sent text messages, mapped by message ID. */
     QMap<QString, QString> sent_messages_;
@@ -254,7 +256,7 @@ private:
      * @param frequency The frequency whose socket is needed.
      * @return Pointer to the QWebSocket if found and valid, nullptr otherwise.
      */
-    static QWebSocket* GetSocketForFrequency(const QString& frequency);
+    static QWebSocket *GetSocketForFrequency(const QString &frequency);
 };
 
 #endif // WAVELENGTH_MESSAGE_SERVICE_H

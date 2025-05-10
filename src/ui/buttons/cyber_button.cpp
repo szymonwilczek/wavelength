@@ -3,9 +3,11 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 
-CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent), glow_intensity_(0.5), is_primary_(isPrimary) {
+CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent),
+    glow_intensity_(0.5), is_primary_(isPrimary) {
     setCursor(Qt::PointingHandCursor);
-    setStyleSheet("background-color: transparent; border: none; font-family: Consolas; font-size: 9pt; font-weight: bold;");
+    setStyleSheet(
+        "background-color: transparent; border: none; font-family: Consolas; font-size: 9pt; font-weight: bold;");
 }
 
 void CyberButton::SetGlowIntensity(const double intensity) {
@@ -17,7 +19,6 @@ void CyberButton::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    // Paleta kolorów zależna od typu przycisku
     QColor background_color, border_color, text_color, glow_color;
 
     if (is_primary_) {
@@ -32,9 +33,8 @@ void CyberButton::paintEvent(QPaintEvent *event) {
         glow_color = QColor(200, 50, 100, 50);
     }
 
-    // Ścieżka przycisku ze ściętymi rogami
     QPainterPath path;
-    int clip_size = 5; // rozmiar ścięcia
+    int clip_size = 5;
 
     path.moveTo(clip_size, 0);
     path.lineTo(width() - clip_size, 0);
@@ -46,7 +46,6 @@ void CyberButton::paintEvent(QPaintEvent *event) {
     path.lineTo(0, clip_size);
     path.closeSubpath();
 
-    // Efekt poświaty
     if (glow_intensity_ > 0.2) {
         painter.setPen(Qt::NoPen);
         painter.setBrush(glow_color);
@@ -54,41 +53,41 @@ void CyberButton::paintEvent(QPaintEvent *event) {
         for (int i = 3; i > 0; i--) {
             double glow_size = i * 2.0 * glow_intensity_;
             QPainterPath glow_path;
-            glow_path.addRoundedRect(rect().adjusted(-glow_size, -glow_size, glow_size, glow_size), 4, 4);
+            glow_path.addRoundedRect(rect()
+                                     .adjusted(-glow_size, -glow_size, glow_size, glow_size),
+                                     4, 4);
             painter.setOpacity(0.15 * glow_intensity_);
             painter.drawPath(glow_path);
         }
         painter.setOpacity(1.0);
     }
 
-    // Tło przycisku
+    // button background
     painter.setPen(Qt::NoPen);
     painter.setBrush(background_color);
     painter.drawPath(path);
 
-    // Obramowanie
+    // button border
     painter.setPen(QPen(border_color, 1.5));
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
 
-    // Tekst przycisku
+    // button text
     painter.setPen(QPen(text_color, 1));
     painter.setFont(font());
 
-    // Efekt przesunięcia dla stanu wciśniętego
+    // button pressed
     if (isDown()) {
         painter.drawText(rect().adjusted(1, 1, 1, 1), Qt::AlignCenter, text());
     } else {
         painter.drawText(rect(), Qt::AlignCenter, text());
     }
 
-    // Jeśli nieaktywny, dodajemy efekt przyciemnienia
     if (!isEnabled()) {
         painter.setPen(Qt::NoPen);
         painter.setBrush(QColor(0, 0, 0, 120));
         painter.drawPath(path);
 
-        // Linie "zakłóceń" dla efektu nieaktywności
         painter.setPen(QPen(QColor(50, 50, 50, 80), 1, Qt::DotLine));
         for (int y = 0; y < height(); y += 3) {
             painter.drawLine(0, y, width(), y);

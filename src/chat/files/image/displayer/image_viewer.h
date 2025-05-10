@@ -16,7 +16,7 @@ class TranslationManager;
  *
  * This class uses ImageDecoder (which relies on Qt's image loading) to decode image data.
  * It displays the image within a QLabel, automatically scaling the content to fit the label's size
- * while preserving aspect ratio (due to QLabel's setScaledContents(true)).
+ * while preserving an aspect ratio (due to QLabel's setScaledContents(true)).
  * It provides signals for when the image is loaded and when its information (size, alpha) is available.
  */
 class InlineImageViewer final : public QFrame {
@@ -25,12 +25,12 @@ class InlineImageViewer final : public QFrame {
 public:
     /**
      * @brief Constructs an InlineImageViewer widget.
-     * Initializes the UI (QLabel), creates the ImageDecoder instance, connects signals,
+     * Initializes the UI (QLabel), creates the ImageDecoder instance, connects signals
      * and triggers asynchronous decoding of the image data.
      * @param image_data The raw image data to be displayed.
      * @param parent Optional parent widget.
      */
-    explicit InlineImageViewer(const QByteArray& image_data, QWidget* parent = nullptr);
+    explicit InlineImageViewer(const QByteArray &image_data, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Ensures resources are released by calling ReleaseResources().
@@ -69,7 +69,7 @@ private slots:
      * Relies on the QLabel's setScaledContents(true) for display scaling.
      * @param image The successfully decoded QImage.
      */
-    void HandleImageReady(const QImage& image);
+    void HandleImageReady(const QImage &image);
 
     /**
      * @brief Slot connected to the decoder's error signal.
@@ -77,7 +77,7 @@ private slots:
      * Sets a minimum size to ensure the error message is visible.
      * @param message The error message from the decoder.
      */
-    void HandleError(const QString& message);
+    void HandleError(const QString &message);
 
     /**
      * @brief Slot connected to the decoder's imageInfo signal.
@@ -106,7 +106,7 @@ signals:
 
 private:
     /** @brief QLabel used to display the image. ScaledContents is enabled. */
-    QLabel* image_label_;
+    QLabel *image_label_;
     /** @brief Shared pointer to the ImageDecoder instance responsible for decoding. */
     std::shared_ptr<ImageDecoder> decoder_;
     /** @brief Stores the raw image data passed in the constructor. */
@@ -121,7 +121,7 @@ private:
     /** @brief Flag indicating if the image has an alpha channel. Set by HandleImageInfo. */
     bool has_alpha_ = false;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // INLINE_IMAGE_VIEWER_H

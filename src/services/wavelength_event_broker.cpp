@@ -2,16 +2,15 @@
 #include <concepts>
 
 template<typename Receiver, typename Func>
-requires std::derived_from<Receiver, QObject> &&
-         std::invocable<Func, const QVariantMap&>
+    requires std::derived_from<Receiver, QObject> &&
+             std::invocable<Func, const QVariantMap &>
 void WavelengthEventBroker::SubscribeToEvent(const QString &event_type, Receiver *receiver, Func slot) {
     connect(this, &WavelengthEventBroker::eventPublished,
-            receiver, [event_type, slot](const QString& type, const QVariantMap& data) {
+            receiver, [event_type, slot](const QString &type, const QVariantMap &data) {
                 if (type == event_type) {
                     (*slot)(data);
                 }
             });
-
 }
 
 void WavelengthEventBroker::WavelengthCreated(const QString &frequency) {

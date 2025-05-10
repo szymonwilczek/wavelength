@@ -12,13 +12,14 @@
  * @brief Structure holding state information relevant for rendering decisions.
  */
 struct BlobRenderState {
-    bool is_being_absorbed = false;         ///< True if the blob is currently being absorbed by another instance.
-    bool is_absorbing = false;              ///< True if the blob is currently absorbing another instance.
+    bool is_being_absorbed = false; ///< True if the blob is currently being absorbed by another instance.
+    bool is_absorbing = false; ///< True if the blob is currently absorbing another instance.
     bool is_closing_after_absorption = false; ///< True if the application is closing after being absorbed.
-    bool is_pulse_active = false;           ///< True if a pulse effect should be rendered.
-    double opacity = 1.0;                   ///< Overall opacity multiplier for the blob.
-    double scale = 1.0;                     ///< Overall scale multiplier for the blob.
-    BlobConfig::AnimationState animation_state = BlobConfig::kIdle; ///< The current animation state (Idle, Moving, Resizing).
+    bool is_pulse_active = false; ///< True if a pulse effect should be rendered.
+    double opacity = 1.0; ///< Overall opacity multiplier for the blob.
+    double scale = 1.0; ///< Overall scale multiplier for the blob.
+    BlobConfig::AnimationState animation_state = BlobConfig::kIdle;
+    ///< The current animation state (Idle, Moving, Resizing).
 };
 
 /**
@@ -36,12 +37,21 @@ public:
      * @brief Constructs a BlobRenderer object.
      * Initializes member variables to default states.
      */
-    BlobRenderer() : static_background_initialized_(false), last_grid_spacing_(0),
-                     glitch_intensity_(0),
-                     last_update_time_(0), idle_amplitude_(0),
+    BlobRenderer() : static_background_initialized_(false), last_grid_spacing_(0), markers_manager_(nullptr),
+                     idle_amplitude_(0),
                      idle_hud_initialized_(false),
                      is_rendering_active_(true),
                      last_animation_state_(BlobConfig::kMoving), last_glow_radius_(0) {
+        // markers_manager_ = new PathMarkersManager();
+    }
+
+    /**
+     * @brief Destructor for BlobRenderer.
+     * Cleans up allocated resources.
+     */
+    ~BlobRenderer() {
+        delete markers_manager_;
+        markers_manager_ = nullptr;
     }
 
     /**
@@ -50,13 +60,11 @@ public:
      * @param control_points The current positions of the blob's control points.
      * @param blob_center The calculated center of the blob.
      * @param params Blob appearance parameters (colors, radius, etc.).
-     * @param animation_state The current animation state, used for rendering decisions (e.g., filling).
      */
     void RenderBlob(QPainter &painter,
                     const std::vector<QPointF> &control_points,
                     const QPointF &blob_center,
-                    const BlobConfig::BlobParameters &params,
-                    BlobConfig::AnimationState animation_state);
+                    const BlobConfig::BlobParameters &params);
 
     /**
      * @brief Updates the internal buffer containing the rendered background grid.
@@ -76,7 +84,7 @@ public:
     /**
      * @brief Draws the background, including a static texture and the dynamic grid.
      * Uses internal caching (grid_buffer_) to avoid redrawing the grid every frame if parameters haven't changed.
-     * Also draws a static background texture underneath the grid.
+     * It also draws a static background texture underneath the grid.
      * @param painter The QPainter to use for drawing.
      * @param background_color The desired background color (used for grid buffer update check).
      * @param grid_color The desired color for the grid lines.
@@ -91,8 +99,8 @@ public:
                         int width, int height);
 
     /**
-     * @brief Renders the entire scene, including background, blob, and potentially HUD.
-     * Orchestrates the drawing process, utilizing cached background and HUD elements when in the Idle state.
+     * @brief Renders the entire scene, including a background, blob, and potentially HUD.
+     * Orchestrates the drawing process, using cached background and HUD elements when in the Idle state.
      * Handles the logic for preparing HUD buffers when transitioning to the Idle state.
      * @param painter The QPainter to use for drawing.
      * @param control_points The current positions of the blob's control points.
@@ -122,15 +130,9 @@ public:
     /**
      * @brief Initializes parameters specific to the Idle state HUD display.
      * Generates random ID, calculates amplitude based on time, gets current timestamp.
-     * Resets the HUD buffer flags.
-     * @param blob_center The current center of the blob.
-     * @param blob_radius The current radius of the blob.
-     * @param hud_color The color to use for HUD elements.
-     * @param width The current width of the rendering area.
-     * @param height The current height of the rendering area.
+     * Reset the HUD buffer flags.
      */
-    void InitializeIdleState(const QPointF& blob_center, double blob_radius, const QColor& hud_color, int width,
-                             int height);
+    void InitializeIdleState();
 
     /**
      * @brief Draws the complete static Heads-Up Display (HUD) elements used in the Idle state.
@@ -142,7 +144,7 @@ public:
      * @param width The width of the rendering area.
      * @param height The height of the rendering area.
      */
-    void DrawCompleteHUD(QPainter& painter, const QPointF& blob_center, double blob_radius, const QColor& hud_color,
+    void DrawCompleteHUD(QPainter &painter, const QPointF &blob_center, double blob_radius, const QColor &hud_color,
                          int width,
                          int height) const;
 
@@ -151,14 +153,6 @@ public:
      */
     void ResetGridBuffer() {
         grid_buffer_ = QPixmap();
-    }
-
-    /**
-     * @brief Sets the intensity for a potential glitch effect (currently seems unused in rendering logic).
-     * @param intensity The desired glitch intensity level.
-     */
-    void SetGlitchIntensity(const double intensity) {
-        glitch_intensity_ = intensity;
     }
 
     /**
@@ -178,8 +172,8 @@ public:
      * @param width The current width of the rendering area.
      * @param height The current height of the rendering area.
      */
-    void ForceHUDInitialization(const QPointF& blob_center, double blob_radius,
-                           const QColor& hud_color, int width, int height);
+    void ForceHUDInitialization(const QPointF &blob_center, double blob_radius,
+                                const QColor &hud_color, int width, int height);
 
 private:
     /** @brief Cached pixmap containing a static background texture (e.g., gradient, noise). Initialized once. */
@@ -196,12 +190,8 @@ private:
     int last_grid_spacing_;
     /** @brief Stores the size used for the last grid_buffer_ update. */
     QSize last_size_;
-    /** @brief Intensity level for a potential glitch effect (currently unused). */
-    double glitch_intensity_;
-    // PathMarkersManager m_markersManager; // Potential future feature for drawing markers along the blob path.
-    /** @brief Timestamp of the last update (potentially for timing animations, currently unused). */
-    qint64 last_update_time_;
-
+    /** @brief Markers Manager for drawing animated markers alongside blob border (currently unused). */
+    PathMarkersManager *markers_manager_;
     /** @brief Randomly generated ID string displayed in the Idle state HUD. */
     QString idle_blob_id_;
     /** @brief Calculated amplitude value displayed in the Idle state HUD. */
@@ -210,8 +200,6 @@ private:
     QString idle_timestamp_;
     /** @brief Flag indicating if the static HUD elements for the Idle state have been initialized and buffered. */
     bool idle_hud_initialized_;
-    /** @brief Cached pixmap containing the complete rendered HUD (potentially unused, static_hud_buffer_ seems primary). */
-    QPixmap complete_hud_buffer_;
 
     /** @brief Flag indicating if rendering is currently active (used for state transition logic). */
     bool is_rendering_active_;
@@ -242,9 +230,9 @@ private:
      * @param glow_radius The radius/spread of the glow effect.
      */
     void DrawGlowEffect(QPainter &painter,
-                       const QPainterPath &blob_path,
-                       const QColor &border_color,
-                       int glow_radius);
+                        const QPainterPath &blob_path,
+                        const QColor &border_color,
+                        int glow_radius);
 
     /**
      * @brief Renders the multi-layered glow effect using QPainter drawPath operations with varying pen widths and colors.
@@ -254,7 +242,8 @@ private:
      * @param border_color The base color for the glow.
      * @param glow_radius The radius/spread of the glow effect.
      */
-    static void RenderGlowEffect(QPainter& painter, const QPainterPath& blob_path, const QColor& border_color, int glow_radius);
+    static void RenderGlowEffect(QPainter &painter, const QPainterPath &blob_path, const QColor &border_color,
+                                 int glow_radius);
 
     /**
      * @brief Draws the border outline of the blob.
@@ -277,14 +266,12 @@ private:
      * @param blob_center The center point for the radial gradient.
      * @param blob_radius The radius for the radial gradient.
      * @param border_color The base color used to derive gradient colors.
-     * @param animation_state The current animation state (currently unused in this method).
      */
     static void DrawFilling(QPainter &painter,
                             const QPainterPath &blob_path,
                             const QPointF &blob_center,
                             double blob_radius,
-                            const QColor &border_color,
-                            BlobConfig::AnimationState animation_state);
+                            const QColor &border_color);
 };
 
 #endif // BLOB_RENDERER_H

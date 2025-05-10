@@ -23,14 +23,14 @@ public:
      * glow layers, spread) and calculates the total space required for the shape.
      * @param parent Optional parent widget.
      */
-    explicit UserInfoLabel(QWidget* parent = nullptr);
+    explicit UserInfoLabel(QWidget *parent = nullptr);
 
     /**
      * @brief Sets the color of the circle and its glow.
      * Triggers a repaint of the label.
      * @param color The desired QColor for the shape.
      */
-    void SetShapeColor(const QColor& color);
+    void SetShapeColor(const QColor &color);
 
     /**
      * @brief Returns the recommended size for the label.
@@ -54,18 +54,18 @@ protected:
      * and finally the label text positioned to the right of the shape.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     /** @brief The base color used for the circle and its glow. */
     QColor shape_color_;
     /** @brief Diameter of the main colored circle indicator. */
     int circle_diameter_;
-    /** @brief Thickness of the pen used to draw the main circle. */
+    /** @brief The thickness of the pen used to draw the main circle. */
     qreal pen_width_;
     /** @brief Number of layers used to render the glow effect. */
     int glow_layers_;
-    /** @brief How much each glow layer expands outwards relative to the previous one. */
+    /** @brief How much each glow layer expands outwards relatively to the previous one. */
     qreal glow_spread_;
     /** @brief Horizontal padding between the right edge of the glow and the start of the text. */
     int shape_padding_;

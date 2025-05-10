@@ -26,7 +26,7 @@
  */
 struct ImpactInfo {
     /** @brief Point of impact in local sphere coordinates (normalized). */
-    QVector3D point = QVector3D(0,0,0);
+    QVector3D point = QVector3D(0, 0, 0);
     /** @brief Time (from time_value_) when the impact started. -1.0f if inactive. */
     float start_time = -1.0f;
     /** @brief Flag indicating if this impact slot is currently active. */
@@ -44,8 +44,7 @@ struct ImpactInfo {
  * The widget plays different initial audio files based on whether it's the first time
  * the application is run.
  */
-class FloatingEnergySphereWidget final : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
-{
+class FloatingEnergySphereWidget final : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
 
 public:
@@ -74,8 +73,10 @@ public:
 signals:
     /** @brief Emitted when the widget is closed normally (not during destruction). */
     void widgetClosed();
+
     /** @brief Emitted when the Konami code sequence is successfully entered. (Deprecated, destruction starts directly) */
     void konamiCodeEntered();
+
     /** @brief Emitted when the destruction animation sequence (visual and audio) completes. */
     void destructionSequenceFinished();
 
@@ -88,7 +89,7 @@ protected:
 
     /**
      * @brief Handles resizing of the OpenGL viewport and updates the projection matrix.
-     * Calculates the field of view dynamically to keep the sphere's apparent size consistent.
+     * Calculates the field of view dynamically to keep the sphere's clear size consistent.
      * @param w The new width.
      * @param h The new height.
      */
@@ -102,7 +103,7 @@ protected:
     void paintGL() override;
 
     /**
-     * @brief Handles mouse press events. Currently accepts the event but primary logic is in mouseMoveEvent.
+     * @brief Handles mouse press events. Accepts the event, but the primary logic is in mouseMoveEvent.
      * @param event The mouse event.
      */
     void mousePressEvent(QMouseEvent *event) override;
@@ -193,7 +194,6 @@ private slots:
      */
     void SimulateClick();
 
-
 private:
     /**
      * @brief Creates the vertex data (positions) for the sphere geometry using rings and sectors.
@@ -221,7 +221,7 @@ private:
      * @param buffer The QAudioBuffer containing decoded audio data.
      * @return The calculated RMS amplitude, normalized roughly to the range [0.0, 1.0].
      */
-    float CalculateRMSAmplitude(const QAudioBuffer& buffer) const;
+    float CalculateRMSAmplitude(const QAudioBuffer &buffer) const;
 
     /**
      * @brief Triggers a visual impact effect at a point on the sphere corresponding to a screen position.
@@ -229,7 +229,7 @@ private:
      * and activates an ImpactInfo entry.
      * @param screen_position The position on the widget where the impact should originate.
      */
-    void TriggerImpactAtScreenPos(const QPoint& screen_position);
+    void TriggerImpactAtScreenPos(const QPoint &screen_position);
 
     /** @brief Flag indicating if this is the first time the widget/app is run (affects initial audio). */
     bool is_first_time_;
@@ -312,8 +312,8 @@ private:
     std::deque<int> key_sequence_;
     /** @brief The target key sequence for the Konami code. */
     const std::vector<int> konami_code_;
-    /** @brief Timer triggering the Konami code audio hint after inactivity. */
-    QTimer* hint_timer_;
+    /** @brief Timer triggering the Konami code audio hints after inactivity. */
+    QTimer *hint_timer_;
     // --- End Konami Code ---
 
     /** @brief Flag indicating if the destruction animation is currently active. */
@@ -324,7 +324,7 @@ private:
     const QString kGoodbyeSoundFilename = "goodbye.wav";
 
     /** @brief Timer triggering simulated random clicks/impacts on the sphere. */
-    QTimer* click_simulation_timer_;
+    QTimer *click_simulation_timer_;
 };
 
 #endif // FLOATING_ENERGY_SPHERE_WIDGET_H

@@ -18,15 +18,15 @@ struct WavelengthInfo {
     /** @brief The unique identifier (name) of the wavelength. */
     QString frequency;
     /** @brief True if the wavelength requires a password to join. */
-    bool is_password_protected = false; // Default value
+    bool is_password_protected = false;
     /** @brief The password for the wavelength (if protected). */
     QString password;
     /** @brief The unique client ID of the user hosting the wavelength. */
     QString host_id;
     /** @brief True if the current user is the host of this wavelength. */
-    bool is_host = false; // Default value
+    bool is_host = false;
     /** @brief The port number the host is listening on (potentially unused with relay). */
-    int host_port = 0; // Default value
+    int host_port = 0;
     /** @brief QPointer to the WebSocket connection associated with this wavelength. Automatically nullifies if the socket is deleted. */
     QPointer<QWebSocket> socket = nullptr;
     /** @brief Flag indicating if the wavelength is currently in the process of being closed. */
@@ -52,7 +52,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthRegistry.
      * @return Pointer to the singleton WavelengthRegistry instance.
      */
-    static WavelengthRegistry* GetInstance() {
+    static WavelengthRegistry *GetInstance() {
         static WavelengthRegistry instance;
         return &instance;
     }
@@ -64,7 +64,7 @@ public:
      * @param info The WavelengthInfo struct containing details about the wavelength.
      * @return True if added successfully, false if the frequency already exists.
      */
-    bool AddWavelength(const QString &frequency, const WavelengthInfo& info);
+    bool AddWavelength(const QString &frequency, const WavelengthInfo &info);
 
     /**
      * @brief Removes a wavelength from the registry.
@@ -106,7 +106,7 @@ public:
      * @param info The new WavelengthInfo struct.
      * @return True if updated successfully, false if the frequency does not exist.
      */
-    bool UpdateWavelength(const QString &frequency, const WavelengthInfo& info);
+    bool UpdateWavelength(const QString &frequency, const WavelengthInfo &info);
 
     /**
      * @brief Sets the specified frequency as the currently active wavelength.
@@ -129,7 +129,7 @@ public:
      * @param frequency The frequency identifier to check.
      * @return True if the given frequency is the active one, false otherwise.
      */
-    bool IsWavelengthActive(const QString &frequency) const { // Changed return type to bool
+    bool IsWavelengthActive(const QString &frequency) const {
         return active_wavelength_ == frequency;
     }
 
@@ -223,17 +223,19 @@ private:
      * @brief Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to "-1".
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthRegistry(QObject* parent = nullptr) : QObject(parent), active_wavelength_("-1") {} // Corrected default active_wavelength_
+    explicit WavelengthRegistry(QObject *parent = nullptr) : QObject(parent), active_wavelength_("-1") {
+    } // Corrected default active_wavelength_
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthRegistry() override = default; // Use default destructor
+    ~WavelengthRegistry() override = default;
 
     /** @brief Deleted copy constructor to prevent copying. */
-    WavelengthRegistry(const WavelengthRegistry&) = delete;
+    WavelengthRegistry(const WavelengthRegistry &) = delete;
+
     /** @brief Deleted assignment operator to prevent assignment. */
-    WavelengthRegistry& operator=(const WavelengthRegistry&) = delete;
+    WavelengthRegistry &operator=(const WavelengthRegistry &) = delete;
 
     /** @brief Map storing WavelengthInfo for each registered frequency. Key is the frequency string. */
     QMap<QString, WavelengthInfo> wavelengths_;

@@ -2,7 +2,7 @@
 #define AUDIO_DECODER_H
 
 #ifdef _MSC_VER
-#pragma comment(lib, "swresample.lib") // Link against swresample library on MSVC
+#pragma comment(lib, "swresample.lib")
 #endif
 
 #include <QObject>
@@ -41,7 +41,7 @@ public:
      * @param audio_data The raw audio data to be decoded.
      * @param parent Optional parent QObject.
      */
-    explicit AudioDecoder(const QByteArray& audio_data, QObject* parent = nullptr);
+    explicit AudioDecoder(const QByteArray &audio_data, QObject *parent = nullptr);
 
     /**
      * @brief Destructor.
@@ -83,7 +83,7 @@ public:
     /**
      * @brief Initializes the FFmpeg components and QAudioOutput for playback.
      * Opens the input stream using the custom I/O context, finds the audio stream and codec,
-     * opens the codec, sets up the resampler (to convert to PCM S16LE stereo 44.1kHz),
+     * opens the codec, sets up the resampler (to convert to PCM S16LE stereo 44.1 kHz),
      * configures and starts QAudioOutput. Emits audioInfo upon success.
      * This operation is thread-safe and should be called before starting the thread.
      * @return True if initialization was successful, false otherwise.
@@ -141,7 +141,7 @@ signals:
      * @brief Emitted when an error occurs during initialization or decoding.
      * @param message A description of the error.
      */
-    void error(const QString& message);
+    void error(const QString &message);
 
     /**
      * @brief Emitted after successful initialization, providing audio stream details.
@@ -172,14 +172,14 @@ protected:
 
     /**
      * @brief Decodes a single audio frame using the FFmpeg resampler and writes the result to the audio device.
-     * Converts the input frame (audio_frame) to the target format (PCM S16LE stereo 44.1kHz),
+     * Converts the input frame (audio_frame) to the target format (PCM S16LE stereo 44.1 kHz),
      * allocates a buffer for the converted data, performs the conversion using swr_convert,
      * and writes the resulting data to the QAudioOutput device (audio_device_).
      * Includes logic to wait if the audio device buffer is nearly full.
      * This method is thread-safe regarding access to shared decoder state via mutex_.
      * @param audio_frame The raw audio frame received from the FFmpeg decoder.
      */
-    void DecodeAudioFrame(const AVFrame* audio_frame) const;
+    void DecodeAudioFrame(const AVFrame *audio_frame) const;
 
 private:
     /**
@@ -188,9 +188,9 @@ private:
      * @param opaque Pointer to the AudioDecoder instance.
      * @param buf Buffer to read data into.
      * @param buf_size Size of the buffer.
-     * @return Number of bytes read, or AVERROR_EOF if end of data is reached.
+     * @return Number of bytes read, or AVERROR_EOF if the end of data is reached.
      */
-    static int ReadPacket(void* opaque, uint8_t* buf, int buf_size);
+    static int ReadPacket(void *opaque, uint8_t *buf, int buf_size);
 
     /**
      * @brief Custom seek function for FFmpeg's AVIOContext.
@@ -201,7 +201,7 @@ private:
      * @param whence The seeking mode (SEEK_SET, SEEK_CUR, SEEK_END, AVSEEK_SIZE).
      * @return The new read position, or the total size if whence is AVSEEK_SIZE, or -1 on error.
      */
-    static int64_t SeekPacket(void* opaque, int64_t offset, int whence);
+    static int64_t SeekPacket(void *opaque, int64_t offset, int whence);
 
     /** @brief The raw audio data provided in the constructor. */
     QByteArray audio_data_;
@@ -209,24 +209,24 @@ private:
     int read_position_ = 0;
 
     /** @brief FFmpeg context for handling the container format. */
-    AVFormatContext* format_context_ = nullptr;
+    AVFormatContext *format_context_ = nullptr;
     /** @brief Index of the audio stream within the format context. */
     int audio_stream_ = -1;
     /** @brief FFmpeg context for the audio codec. */
-    AVCodecContext* audio_codec_context_ = nullptr;
+    AVCodecContext *audio_codec_context_ = nullptr;
     /** @brief FFmpeg context for audio resampling (format/rate/channel conversion). */
-    SwrContext* swr_context_ = nullptr;
+    SwrContext *swr_context_ = nullptr;
     /** @brief FFmpeg frame structure to hold decoded audio data. */
-    AVFrame* audio_frame_ = nullptr;
+    AVFrame *audio_frame_ = nullptr;
     /** @brief FFmpeg context for custom I/O operations (reading from memory). */
-    AVIOContext* io_context_ = nullptr;
+    AVIOContext *io_context_ = nullptr;
     /** @brief Buffer used by the custom I/O context to hold audio_data_. */
-    unsigned char* io_buffer_ = nullptr;
+    unsigned char *io_buffer_ = nullptr;
 
     /** @brief Qt Multimedia object for audio output. */
-    QAudioOutput* audio_output_ = nullptr;
+    QAudioOutput *audio_output_ = nullptr;
     /** @brief Qt I/O device associated with audio_output_, used for writing PCM data. */
-    QIODevice* audio_device_ = nullptr;
+    QIODevice *audio_device_ = nullptr;
     /** @brief Qt audio format description (PCM S16LE stereo 44.1kHz). */
     QAudioFormat audio_format_;
 

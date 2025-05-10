@@ -1,7 +1,6 @@
 #ifndef CLICKABLE_COLOR_PREVIEW_H
 #define CLICKABLE_COLOR_PREVIEW_H
 
-#include <QDebug>
 #include <QStyleOption>
 #include <QPainter>
 #include <QPaintEvent>
@@ -32,7 +31,7 @@ public slots:
      * a transparent background is set.
      * @param color The QColor to display.
      */
-    void SetColor(const QColor& color);
+    void SetColor(const QColor &color);
 
 signals:
     /**
@@ -55,7 +54,6 @@ protected:
      * @param event The paint event.
      */
     void paintEvent(QPaintEvent *event) override;
-
 };
 
 #endif //CLICKABLE_COLOR_PREVIEW_H

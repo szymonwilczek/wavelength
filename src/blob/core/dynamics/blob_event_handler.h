@@ -15,7 +15,7 @@
  * move and resize events. It applies throttling and significance checks to avoid
  * excessive processing, especially during rapid movements or resizing. It emits
  * signals when significant events are detected, allowing other components (like BlobDynamics)
- * to react appropriately. It also manages enabling/disabling event processing,
+ * to react appropriately. It also manages to enable/disable event processing,
  * useful during transitions or animations.
  */
 class BlobEventHandler final : public QObject {
@@ -27,7 +27,7 @@ public:
      * Installs an event filter on the parent widget's window.
      * @param parent_widget The widget whose window events will be monitored.
      */
-    explicit BlobEventHandler(QWidget* parent_widget);
+    explicit BlobEventHandler(QWidget *parent_widget);
 
     /**
      * @brief Destructor.
@@ -47,16 +47,16 @@ public:
      * @param event The QResizeEvent received by the parent widget.
      * @return True if the event was considered significant and processed, false otherwise.
      */
-    bool ProcessResizeEvent(const QResizeEvent* event);
+    bool ProcessResizeEvent(const QResizeEvent *event);
 
     /**
      * @brief Filters events installed on the parent widget's window.
-     * Specifically intercepts and handles QEvent::Move events via HandleMoveEvent.
+     * Specifically, intercepts and handles QEvent::Move events via HandleMoveEvent.
      * @param watched The object being watched (should be the parent widget's window).
      * @param event The event being processed.
      * @return True if the event was handled (currently always returns false after processing), false otherwise.
      */
-    bool eventFilter(QObject* watched, QEvent* event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
     /**
      * @brief Enables event processing.
@@ -95,7 +95,7 @@ signals:
      * @param new_position The new position of the window's top-left corner.
      * @param timestamp The timestamp (ms since epoch) when the event was processed.
      */
-    void windowMoved(const QPointF& new_position, qint64 timestamp);
+    void windowMoved(const QPointF &new_position, qint64 timestamp);
 
     /**
      * @brief Emitted periodically during window movement to provide samples for velocity calculation.
@@ -103,14 +103,14 @@ signals:
      * @param position The window position at the time of sampling.
      * @param timestamp The timestamp (ms since epoch) of the sample.
      */
-    void movementSampleAdded(const QPointF& position, qint64 timestamp);
+    void movementSampleAdded(const QPointF &position, qint64 timestamp);
 
     /**
      * @brief Emitted when a significant resize event is detected after throttling.
      * @param old_size The size of the widget before the resize.
      * @param new_size The size of the widget after the resize.
      */
-    void significantResizeDetected(const QSize& old_size, const QSize& new_size);
+    void significantResizeDetected(const QSize &old_size, const QSize &new_size);
 
     /**
      * @brief Emitted during a resize event to request a specific "resizing" state in the Blob animation.
@@ -140,12 +140,12 @@ private:
      * Applies throttling based on distance and time delta before emitting signals.
      * @param move_event The QMoveEvent to handle.
      */
-    void HandleMoveEvent(const QMoveEvent* move_event);
+    void HandleMoveEvent(const QMoveEvent *move_event);
 
     // --- Member Variables ---
 
     /** @brief Pointer to the parent widget whose window events are monitored. */
-    QWidget* parent_widget_;
+    QWidget *parent_widget_;
     /** @brief Flag indicating whether event processing is currently enabled. */
     bool events_enabled_;
     /** @brief Flag indicating if a visual transition (e.g., animation) is in progress, potentially suppressing event handling. */
@@ -158,7 +158,7 @@ private:
     /** @brief Timestamp (ms since epoch) of the last drag-related event (currently seems unused). */
     qint64 last_drag_event_time_;
 
-    /** @brief Timer used for delayed re-enabling of events (currently seems unused, timeout connected but timer never started). */
+    /** @brief Timer used for delayed re-enabling of events (currently seems unused, timeout connected, but timer never started). */
     QTimer event_re_enable_timer_;
     /** @brief Flag indicating if the window is currently being resized (used to potentially ignore move events during resize). */
     bool is_resizing_ = false;

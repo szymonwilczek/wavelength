@@ -5,7 +5,6 @@
 #include <QDateTime>
 #include <QFontMetrics>
 #include <QDebug>
-#include <QScrollBar>
 #include <QTimer>
 #include <QPaintEvent>
 #include <QWidget>
@@ -31,7 +30,7 @@ public:
      * @param text_color The color for the displayed text.
      * @param parent Optional parent widget.
      */
-    explicit CyberLongTextDisplay(QString  text, const QColor& text_color, QWidget* parent = nullptr);
+    explicit CyberLongTextDisplay(QString text, const QColor &text_color, QWidget *parent = nullptr);
 
     /**
      * @brief Sets the text content to be displayed.
@@ -39,14 +38,14 @@ public:
      * triggers delayed processing, and schedules a repaint.
      * @param text The new text content.
      */
-    void SetText(const QString& text);
+    void SetText(const QString &text);
 
     /**
      * @brief Sets the color for the displayed text.
      * Updates the internal text color and schedules a repaint.
      * @param color The new text color.
      */
-    void SetTextColor(const QColor& color);
+    void SetTextColor(const QColor &color);
 
     /**
      * @brief Returns the recommended size for the widget based on the processed text content.
@@ -69,11 +68,11 @@ public:
 protected:
     /**
      * @brief Overridden paint event handler. Draws the widget's appearance.
-     * Ensures text is processed, draws the background gradient, renders the visible lines
+     * Ensures the text is processed, draws the background gradient, renders the visible lines
      * of the processed text based on the scroll position, and applies a scanline effect.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden resize event handler.
@@ -81,7 +80,7 @@ protected:
      * when the widget's size changes.
      * @param event The resize event.
      */
-    void resizeEvent(QResizeEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     /**
@@ -114,7 +113,7 @@ private:
     QSize size_hint_;
     /** @brief Current vertical scroll position in pixels. */
     int scroll_position_;
-    /** @brief Flag indicating if the processed_lines_ cache is up-to-date with the original_text_ and widget width. */
+    /** @brief Flag indicating if the processed_lines_ cache is up to date with the original_text_ and widget width. */
     bool cached_text_valid_;
     /** @brief Timer used to delay text processing after resize or text change events. */
     QTimer *update_timer_{};

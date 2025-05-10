@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QLabel>
-#include <QCloseEvent>
 #include <QRandomGenerator>
 #include <memory>
 
@@ -28,7 +27,7 @@ class TranslationManager;
  * It handles playback control (play/pause, seek, volume), manages decoder resources,
  * and provides visual feedback on the player's status.
  */
-class VideoPlayerOverlay final : public QDialog {
+class VideoPlayer final : public QDialog {
     Q_OBJECT
     /** @brief Property controlling the opacity of the scanline effect overlay. Animatable. */
     Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
@@ -45,13 +44,13 @@ public:
      * @param mime_type The MIME type of the video data (currently unused).
      * @param parent Optional parent widget.
      */
-    explicit VideoPlayerOverlay(const QByteArray& video_data, const QString& mime_type, QWidget* parent = nullptr);
+    explicit VideoPlayer(const QByteArray &video_data, const QString &mime_type, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor.
      * Stops timers and ensures decoder resources are released by calling ReleaseResources().
      */
-    ~VideoPlayerOverlay() override;
+    ~VideoPlayer() override;
 
     /**
      * @brief Stops the decoder thread, waits for it to finish, releases its resources, and resets the pointer.
@@ -96,14 +95,14 @@ protected:
      * @brief Overridden paint event handler. Draws the background grid overlay.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden close event handler.
      * Stops timers and releases decoder resources before closing the dialog.
      * @param event The close event.
      */
-    void closeEvent(QCloseEvent* event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     /**
@@ -161,7 +160,7 @@ private slots:
      * scanline effects, optional HUD elements (corners, timestamp, frame counter), and glitch effects.
      * @param frame The newly decoded video frame.
      */
-    void UpdateFrame(const QImage& frame);
+    void UpdateFrame(const QImage &frame);
 
     /**
      * @brief Slot called periodically by update_timer_.
@@ -175,7 +174,7 @@ private slots:
      * Logs the error and displays it in the status_label_ and video_label_.
      * @param message The error message from the decoder.
      */
-    void HandleError(const QString& message) const;
+    void HandleError(const QString &message) const;
 
     /**
      * @brief Slot connected to the decoder's videoInfo signal.
@@ -218,34 +217,34 @@ private slots:
 
 private:
     /** @brief QLabel used to display the video frames. */
-    QLabel* video_label_;
+    QLabel *video_label_;
     /** @brief Custom button for play/pause/replay control. */
-    CyberPushButton* play_button_;
+    CyberPushButton *play_button_;
     /** @brief Custom slider for displaying and seeking playback progress. */
-    CyberSlider* progress_slider_;
+    CyberSlider *progress_slider_;
     /** @brief Label displaying current time / total duration (MM:SS / MM:SS). */
-    QLabel* time_label_;
+    QLabel *time_label_;
     /** @brief Custom button for toggling mute. Icon changes based on volume. */
-    CyberPushButton* volume_button_;
+    CyberPushButton *volume_button_;
     /** @brief Custom slider for controlling playback volume. */
-    CyberSlider* volume_slider_;
+    CyberSlider *volume_slider_;
     /** @brief Label displaying playback status (Initializing, Ready, Playing, Paused, Error, Finished). */
-    QLabel* status_label_;
+    QLabel *status_label_;
     /** @brief Label displaying detected video codec information. */
-    QLabel* codec_label_;
+    QLabel *codec_label_;
     /** @brief Label displaying video resolution. */
-    QLabel* resolution_label_;
+    QLabel *resolution_label_;
     /** @brief Label displaying estimated video bitrate. */
-    QLabel* bitrate_label_;
+    QLabel *bitrate_label_;
     /** @brief Label displaying video frames per second. */
-    QLabel* fps_label_;
+    QLabel *fps_label_;
 
     /** @brief Shared pointer to the VideoDecoder instance responsible for decoding and playback. */
     std::shared_ptr<VideoDecoder> decoder_;
     /** @brief Timer for triggering periodic UI updates (pulsing effects, status). */
-    QTimer* update_timer_;
+    QTimer *update_timer_;
     /** @brief Timer for triggering random glitch effects. */
-    QTimer* glitch_timer_;
+    QTimer *glitch_timer_;
 
     /** @brief Stores the raw video data passed in the constructor. */
     QByteArray video_data_;
@@ -284,7 +283,7 @@ private:
     /** @brief Video frame rate in frames per second. Set by HandleVideoInfo. */
     double video_fps_ = 60.0; // Default FPS
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif //VIDEO_PLAYER_OVERLAY_H

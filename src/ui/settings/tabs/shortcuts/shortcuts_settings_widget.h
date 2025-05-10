@@ -66,7 +66,7 @@ private:
      * @param action_id The internal identifier for the shortcut action (e.g., "MainWindow.CreateWavelength").
      * @return A human-readable string describing the action, or an empty string if the ID is unknown.
      */
-    static QString GetActionDescription(const QString& action_id);
+    static QString GetActionDescription(const QString &action_id);
 
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *config_;
@@ -75,9 +75,9 @@ private:
     /** @brief Button to trigger the restoration of default shortcuts. */
     QPushButton *restore_button_;
     /** @brief Map storing pointers to the QKeySequenceEdit widgets, keyed by their corresponding action ID. */
-    QMap<QString, QKeySequenceEdit*> shortcut_edits_;
+    QMap<QString, QKeySequenceEdit *> shortcut_edits_;
     /** @brief Pointer to the TranslationManager for handling UI translations. */
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 };
 
 #endif // SHORTCUTS_SETTINGS_WIDGET_H

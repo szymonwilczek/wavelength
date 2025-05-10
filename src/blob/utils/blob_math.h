@@ -33,8 +33,8 @@ public:
      * @return The clamped value, guaranteed to be within [min, max].
      */
     template<typename T>
-    requires std::totally_ordered<T>
-    static T Clamp(const T& value, const T& min, const T& max) {
+        requires std::totally_ordered<T>
+    static T Clamp(const T &value, const T &min, const T &max) {
         return qBound(min, value, max);
     }
 
@@ -55,7 +55,7 @@ public:
      * @param p0 The point before the segment's start point.
      * @param p1 The start point of the curve segment.
      * @param p2 The end point of the curve segment.
-     * @param tension Controls the "tightness" of the curve. Typically 0.5 for Catmull-Rom.
+     * @param tension Controls the "tightness" of the curve. Typically, 0.5 for Catmull-Rom.
      * @return The calculated control point QPointF.
      */
     static QPointF CalculateBezierControlPoint(const QPointF &p0, const QPointF &p1, const QPointF &p2, float tension);

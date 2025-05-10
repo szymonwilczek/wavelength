@@ -2,8 +2,9 @@
 #define BLOBSTATE_H
 
 #include <QPointF>
-#include <vector>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <QVector2D>
+#include <vector>
 #include "../blob_config.h"
 
 /**
@@ -18,7 +19,7 @@ public:
     /**
      * @brief Virtual destructor. Ensures proper cleanup when deleting derived state objects through a base class pointer.
      */
-    virtual ~BlobState() = default; // Use default implementation
+    virtual ~BlobState() = default;
 
     /**
      * @brief Applies the state-specific logic and effects to the blob.
@@ -29,10 +30,10 @@ public:
      * @param blob_center Reference to the blob's center position (can be modified).
      * @param params Blob appearance parameters (read-only).
      */
-    virtual void Apply(std::vector<QPointF>& control_points,
-                       std::vector<QPointF>& velocity,
-                       QPointF& blob_center,
-                       const BlobConfig::BlobParameters& params) = 0;
+    virtual void Apply(std::vector<QPointF> &control_points,
+                       std::vector<QPointF> &velocity,
+                       QPointF &blob_center,
+                       const BlobConfig::BlobParameters &params) = 0;
 
     /**
      * @brief Applies an external force to the blob, potentially modified by the current state.
@@ -43,10 +44,10 @@ public:
      * @param control_points Reference to the vector of current control point positions (read-only, used for calculations).
      * @param blob_radius The current average radius of the blob (read-only, used for calculations).
      */
-    virtual void ApplyForce(const QVector2D& force,
-                            std::vector<QPointF>& velocity,
-                            QPointF& blob_center,
-                            const std::vector<QPointF>& control_points,
+    virtual void ApplyForce(const QVector2D &force,
+                            std::vector<QPointF> &velocity,
+                            QPointF &blob_center,
+                            const std::vector<QPointF> &control_points,
                             double blob_radius) = 0;
 };
 

@@ -1,17 +1,15 @@
 #ifndef STREAM_MESSAGE_H
 #define STREAM_MESSAGE_H
 
-#include <QWidget>
 #include <QSvgRenderer>
-#include <QBitmap>
 #include <qtimeline.h>
 #include <utility>
 #include <QApplication>
+#include <QVBoxLayout>
 
 #include "../chat/effects/cyber_long_text_display.h"
 #include "../chat/effects/cyber_text_display.h"
 #include "../../chat/files/attachments/attachment_placeholder.h"
-#include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
 
 class CyberAttachmentViewer;
@@ -33,8 +31,6 @@ class StreamMessage final : public QWidget {
     Q_PROPERTY(qreal opacity READ GetOpacity WRITE SetOpacity)
     /** @brief Property controlling the intensity of the border glow effect (0.0 to 1.0+). Animatable. */
     Q_PROPERTY(qreal glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
-    /** @brief Property controlling the progress of the disintegration effect (0.0 to 1.0). Animatable. (Deprecated, use shutdownProgress) */
-    Q_PROPERTY(qreal disintegrationProgress READ GetDisintegrationProgress WRITE SetDisintegrationProgress)
     /** @brief Property controlling the progress of the electronic shutdown effect (0.0 to 1.0). Animatable. */
     Q_PROPERTY(qreal shutdownProgress READ GetShutdownProgress WRITE SetShutdownProgress)
 
@@ -43,14 +39,15 @@ public:
      * @brief Enum defining the type/origin of the message, affecting its styling.
      */
     enum MessageType {
-        kReceived,    ///< Message received from another user (pink/purple theme).
+        kReceived, ///< Message received from another user (pink/purple theme).
         kTransmitted, ///< Message sent by the current user (blue/cyan theme).
-        kSystem       ///< System notification (yellow/orange theme).
+        kSystem ///< System notification (yellow/orange theme).
     };
+
     Q_ENUM(MessageType)
 
     /** @brief Button used to mark the message as read and trigger the closing animation. */
-    QPushButton* mark_read_button;
+    QPushButton *mark_read_button;
 
     /**
      * @brief Static utility function to create a QIcon from an SVG file, colored with the specified color.
@@ -59,34 +56,7 @@ public:
      * @param size The desired size of the output icon pixmap.
      * @return A QIcon containing the colored pixmap, or a null QIcon on failure.
      */
-    static QIcon CreateColoredSvgIcon(const QString& svg_path, const QColor& color, const QSize& size) {
-        QSvgRenderer renderer;
-        if (!renderer.load(svg_path)) {
-            qWarning() << "Nie można załadować SVG:" << svg_path;
-            return QIcon(); // Zwróć pustą ikonę w razie błędu
-        }
-
-        // Utwórz pixmapę o żądanym rozmiarze z przezroczystym tłem
-        QPixmap pixmap(size);
-        pixmap.fill(Qt::transparent);
-
-        // Narysuj SVG na pixmapie
-        QPainter painter(&pixmap);
-        renderer.render(&painter);
-        painter.end(); // Zakończ malowanie na oryginalnej pixmapie
-
-        // Utwórz maskę z kanału alfa oryginalnej pixmapy
-        const QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
-
-        // Utwórz nową pixmapę wypełnioną docelowym kolorem
-        QPixmap colored_pixmap(size);
-        colored_pixmap.fill(color);
-
-        // Zastosuj maskę do kolorowej pixmapy
-        colored_pixmap.setMask(mask);
-
-        return QIcon(colored_pixmap);
-    }
+    static QIcon CreateColoredSvgIcon(const QString &svg_path, const QColor &color, const QSize &size);
 
     /**
      * @brief Constructs a StreamMessage widget.
@@ -98,7 +68,8 @@ public:
      * @param message_id Optional unique identifier, used for progress updates.
      * @param parent Optional parent widget.
      */
-    explicit StreamMessage(QString content, QString sender, MessageType type, QString message_id = QString(), QWidget* parent = nullptr);
+    explicit StreamMessage(QString content, QString sender, MessageType type, QString message_id = QString(),
+                           QWidget *parent = nullptr);
 
     /**
      * @brief Updates the content of an existing message, typically used for progress updates.
@@ -106,28 +77,27 @@ public:
      * and adjusts the widget size if necessary.
      * @param new_content The updated message content.
      */
-    void UpdateContent(const QString& new_content);
+    void UpdateContent(const QString &new_content);
 
     // --- Property Getters/Setters ---
     /** @brief Gets the current opacity level. */
     qreal GetOpacity() const { return opacity_; }
+
     /** @brief Sets the opacity level and updates the QGraphicsOpacityEffect. */
     void SetOpacity(qreal opacity);
 
     /** @brief Gets the current glow intensity level. */
     qreal GetGlowIntensity() const { return glow_intensity_; }
+
     /** @brief Sets the glow intensity level and triggers a repaint. */
     void SetGlowIntensity(qreal intensity);
 
-    /** @brief Gets the current disintegration progress (deprecated). */
-    qreal GetDisintegrationProgress() const { return disintegration_progress_; }
-    /** @brief Sets the disintegration progress and updates the DisintegrationEffect (deprecated). */
-    void SetDisintegrationProgress(qreal progress);
-
     /** @brief Gets the current electronic shutdown effect progress. */
     qreal GetShutdownProgress() const { return shutdown_progress_; }
+
     /** @brief Sets the electronic shutdown effect progress and updates the ElectronicShutdownEffect. */
     void SetShutdownProgress(qreal progress);
+
     // --- End Property Getters/Setters ---
 
     // --- Simple Getters ---
@@ -150,7 +120,7 @@ public:
      * Connects signals to handle attachment loading and size changes.
      * @param html The HTML string containing the attachment placeholder div.
      */
-    void AddAttachment(const QString& html);
+    void AddAttachment(const QString &html);
 
     /**
      * @brief Adjusts the size of the message widget to fit its content, especially after an attachment has loaded.
@@ -188,7 +158,7 @@ public:
      * Applies the ElectronicShutdownEffect and animates its progress.
      * Hides the widget and emits hidden() upon completion.
      */
-    void StartDisintegrationAnimation(); // Note: Name is misleading, uses ElectronicShutdownEffect
+    void StartShutdownAnimation();
 
     /**
      * @brief Shows or hides the navigation buttons (Next, Previous) and the Mark Read button.
@@ -199,13 +169,14 @@ public:
     void ShowNavigationButtons(bool has_previous, bool has_next) const;
 
     /** @brief Gets a pointer to the Next navigation button. */
-    QPushButton* GetNextButton() const { return next_button_; }
+    QPushButton *GetNextButton() const { return next_button_; }
     /** @brief Gets a pointer to the Previous navigation button. */
-    QPushButton* GetPrevButton() const { return prev_button_; }
+    QPushButton *GetPrevButton() const { return prev_button_; }
 
 signals:
     /** @brief Emitted when the message is marked as read (MarkAsRead() is called). */
     void messageRead();
+
     /** @brief Emitted when the message finishes its fade-out or closing animation and becomes hidden. */
     void hidden();
 
@@ -224,31 +195,31 @@ protected:
      * sender text, and other AR-style elements based on the message type.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden resize event handler. Updates the layout of internal elements (buttons, scroll area).
      * @param event The resize event.
      */
-    void resizeEvent(QResizeEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
     /**
      * @brief Overridden key press event handler. Handles Space/Enter to mark as read, and Left/Right arrows for navigation.
      * @param event The key event.
      */
-    void keyPressEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
     /**
      * @brief Overridden focus in event handler. Slightly increases glow intensity for visual feedback.
      * @param event The focus event.
      */
-    void focusInEvent(QFocusEvent* event) override;
+    void focusInEvent(QFocusEvent *event) override;
 
     /**
      * @brief Overridden focus out event handler. Resets glow intensity.
      * @param event The focus event.
      */
-    void focusOutEvent(QFocusEvent* event) override;
+    void focusOutEvent(QFocusEvent *event) override;
 
 private slots:
     /**
@@ -268,23 +239,24 @@ private:
      * @param attribute The name of the attribute to extract (e.g., "data-attachment-id").
      * @return The attribute's value, or an empty string if not found.
      */
-    static QString ExtractAttribute(const QString& html, const QString& attribute);
+    static QString ExtractAttribute(const QString &html, const QString &attribute);
 
     /**
      * @brief Starts a simpler closing animation (glitch/fade) used specifically for long messages displayed in a scroll area.
      */
     void StartLongMessageClosingAnimation();
 
-    // --- Attachment Processing Helper Methods (Potentially redundant with AddAttachment) ---
     /** @brief Helper to process image attachments (likely superseded by AddAttachment). */
-    void ProcessImageAttachment(const QString& html);
+    void ProcessImageAttachment(const QString &html);
+
     /** @brief Helper to process GIF attachments (likely superseded by AddAttachment). */
-    void ProcessGifAttachment(const QString& html);
+    void ProcessGifAttachment(const QString &html);
+
     /** @brief Helper to process audio attachments (likely superseded by AddAttachment). */
-    void ProcessAudioAttachment(const QString& html);
+    void ProcessAudioAttachment(const QString &html);
+
     /** @brief Helper to process video attachments (likely superseded by AddAttachment). */
-    void ProcessVideoAttachment(const QString& html);
-    // --- End Attachment Processing Helper Methods ---
+    void ProcessVideoAttachment(const QString &html);
 
     /**
      * @brief Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities.
@@ -299,30 +271,28 @@ private:
 
     // --- Member Variables ---
     QString message_id_; ///< Unique identifier for the message (optional).
-    QString content_;    ///< Original message content (may contain HTML).
+    QString content_; ///< Original message content (may contain HTML).
     QString clean_content_; ///< Processed message content (plain text).
-    QString sender_;     ///< Sender identifier.
-    MessageType type_;   ///< Message type (Received, Transmitted, System).
-    qreal opacity_;      ///< Current opacity level (for animation).
+    QString sender_; ///< Sender identifier.
+    MessageType type_; ///< Message type (Received, Transmitted, System).
+    qreal opacity_; ///< Current opacity level (for animation).
     qreal glow_intensity_; ///< Current glow intensity level (for animation).
-    qreal disintegration_progress_; ///< Current disintegration progress (deprecated).
     qreal shutdown_progress_; ///< Current electronic shutdown progress.
-    bool is_read_;       ///< Flag indicating if the message has been marked as read.
+    bool is_read_; ///< Flag indicating if the message has been marked as read.
 
     // UI Elements
-    QVBoxLayout* main_layout_; ///< Main vertical layout.
-    QPushButton* next_button_; ///< Button to navigate to the next message.
-    QPushButton* prev_button_; ///< Button to navigate to the previous message.
-    QTimer* animation_timer_; ///< Timer for subtle background animations.
-    QWidget* attachment_widget_ = nullptr; ///< Widget holding the attachment placeholder/viewer.
-    QLabel* content_label_ = nullptr; ///< Label for displaying short text content (if no CyberTextDisplay).
-    CyberTextDisplay* text_display_ = nullptr; ///< Widget for animated text reveal (short messages).
-    QScrollArea* scroll_area_ = nullptr; ///< Scroll area for long messages.
-    CyberLongTextDisplay* long_text_display_ = nullptr; ///< Widget for displaying long text within scroll area.
+    QVBoxLayout *main_layout_; ///< Main vertical layout.
+    QPushButton *next_button_; ///< Button to navigate to the next message.
+    QPushButton *prev_button_; ///< Button to navigate to the previous message.
+    QTimer *animation_timer_; ///< Timer for subtle background animations.
+    QWidget *attachment_widget_ = nullptr; ///< Widget holding the attachment placeholder/viewer.
+    QLabel *content_label_ = nullptr; ///< Label for displaying short text content (if no CyberTextDisplay).
+    CyberTextDisplay *text_display_ = nullptr; ///< Widget for animated text reveal (short messages).
+    QScrollArea *scroll_area_ = nullptr; ///< Scroll area for long messages.
+    CyberLongTextDisplay *long_text_display_ = nullptr; ///< Widget for displaying long text within scroll area.
 
     // Effects
-    DisintegrationEffect* disintegration_effect_ = nullptr; ///< Graphics effect for disintegration (deprecated).
-    ElectronicShutdownEffect* shutdown_effect_ = nullptr; ///< Graphics effect for electronic shutdown animation.
+    ElectronicShutdownEffect *shutdown_effect_ = nullptr; ///< Graphics effect for electronic shutdown animation.
 };
 
 #endif // STREAM_MESSAGE_H

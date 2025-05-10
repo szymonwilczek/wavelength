@@ -2,7 +2,6 @@
 #define IMAGE_DECODER_H
 
 #include <QImage>
-#include <QDebug>
 #include <QObject>
 
 /**
@@ -22,7 +21,7 @@ public:
      * @param image_data The raw image data to be decoded.
      * @param parent Optional parent QObject.
      */
-    explicit ImageDecoder(const QByteArray& image_data, QObject* parent = nullptr)
+    explicit ImageDecoder(const QByteArray &image_data, QObject *parent = nullptr)
         : QObject(parent), image_data_(image_data) {
     }
 
@@ -31,7 +30,6 @@ public:
      * Does not require special resource management like FFmpeg-based decoders.
      */
     ~ImageDecoder() override {
-        // Nie wymaga specjalnego zwalniania zasobów jak w FFmpeg
     }
 
     /**
@@ -39,7 +37,6 @@ public:
      * In this Qt-based implementation, there are no specific resources to release globally.
      */
     static void ReleaseResources() {
-        // Nic do zwalniania w tej implementacji
     }
 
     /**
@@ -55,13 +52,13 @@ signals:
      * @brief Emitted when the image has been successfully decoded.
      * @param image The decoded image as a QImage object. A copy is emitted.
      */
-    void imageReady(const QImage& image);
+    void imageReady(const QImage &image);
 
     /**
      * @brief Emitted if an error occurs during image loading or decoding.
      * @param message A description of the error.
      */
-    void error(const QString& message);
+    void error(const QString &message);
 
     /**
      * @brief Emitted after successful decoding, providing basic image information.

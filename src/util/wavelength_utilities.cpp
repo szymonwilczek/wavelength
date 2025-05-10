@@ -10,7 +10,7 @@ double WavelengthUtilities::NormalizeFrequency(const double frequency) {
     const double result = formatted.toDouble(&ok);
 
     if (!ok) {
-        qDebug() << "Failed to normalize frequency:" << frequency;
+        qDebug() << "[UTIL] Failed to normalize frequency:" << frequency;
         return frequency;
     }
 
@@ -29,7 +29,7 @@ void WavelengthUtilities::CenterLabel(QLabel *label, const BlobAnimation *animat
     }
 }
 
-void WavelengthUtilities::UpdateTitleLabelStyle(QLabel* label, const QColor& text_color, const QColor& border_color) {
+void WavelengthUtilities::UpdateTitleLabelStyle(QLabel *label, const QColor &text_color, const QColor &border_color) {
     if (!label) return;
     const QString style = QString(
         "QLabel {"
@@ -44,5 +44,5 @@ void WavelengthUtilities::UpdateTitleLabelStyle(QLabel* label, const QColor& tex
         "}"
     ).arg(text_color.name(QColor::HexRgb), border_color.name(QColor::HexRgb));
     label->setStyleSheet(style);
-    qDebug() << "Updated titleLabel style:" << style;
+    qDebug() << "[UTIL] Updated titleLabel style:" << style;
 }

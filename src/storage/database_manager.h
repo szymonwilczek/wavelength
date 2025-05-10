@@ -21,7 +21,7 @@ public:
      * @brief Gets the singleton instance of the DatabaseManager.
      * @return Pointer to the singleton DatabaseManager instance.
      */
-    static DatabaseManager* GetInstance() {
+    static DatabaseManager *GetInstance() {
         static DatabaseManager instance;
         return &instance;
     }
@@ -42,22 +42,23 @@ private:
      * 'active_wavelengths' table upon successful connection.
      * @param parent Optional parent QObject.
      */
-    explicit DatabaseManager(QObject* parent = nullptr);
+    explicit DatabaseManager(QObject *parent = nullptr);
 
     /**
      * @brief Private destructor.
      * The unique_ptr automatically manages the pqxx::connection lifetime.
      */
-    ~DatabaseManager() override = default; // Use default destructor
+    ~DatabaseManager() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    DatabaseManager(const DatabaseManager&) = delete;
+    DatabaseManager(const DatabaseManager &) = delete;
+
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    DatabaseManager& operator=(const DatabaseManager&) = delete;
+    DatabaseManager &operator=(const DatabaseManager &) = delete;
 
     /** @brief Unique pointer managing the pqxx database connection object. */
     std::unique_ptr<pqxx::connection> connection_;

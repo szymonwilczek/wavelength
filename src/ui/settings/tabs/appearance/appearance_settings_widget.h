@@ -85,7 +85,7 @@ private slots:
      * Adds the selected color back to the top of the recent colors list in WavelengthConfig.
      * @param color The color that was clicked.
      */
-    void SelectRecentColor(const QColor& color) const;
+    void SelectRecentColor(const QColor &color) const;
 
     /**
      * @brief Opens a QColorDialog to allow the user to select the grid color.
@@ -129,35 +129,32 @@ private:
      * @param preview_widget Pointer to the QWidget (expected to be a ClickableColorPreview).
      * @param color The new color to set.
      */
-    static void UpdateColorPreview(QWidget* preview_widget, const QColor& color);
+    static void UpdateColorPreview(QWidget *preview_widget, const QColor &color);
 
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *m_config;
 
-    // --- UI Elements ---
     /** @brief Clickable preview widget for the background color. */
-    QWidget* bg_color_preview_;
+    QWidget *bg_color_preview_;
     /** @brief Clickable preview widget for the blob color. */
-    QWidget* blob_color_preview_;
+    QWidget *blob_color_preview_;
     /** @brief Clickable preview widget for the stream color. */
-    QWidget* stream_color_preview_;
+    QWidget *stream_color_preview_;
     /** @brief Clickable preview widget for the grid color. */
-    QWidget* grid_color_preview_;
+    QWidget *grid_color_preview_;
     /** @brief Spin box for adjusting the grid spacing. */
-    QSpinBox* grid_spacing_spin_box_;
+    QSpinBox *grid_spacing_spin_box_;
     /** @brief Clickable preview widget for the title text color. */
-    QWidget* title_text_color_preview_;
+    QWidget *title_text_color_preview_;
     /** @brief Clickable preview widget for the title border color. */
-    QWidget* title_border_color_preview_;
+    QWidget *title_border_color_preview_;
     /** @brief Clickable preview widget for the title glow color. */
-    QWidget* title_glow_color_preview_;
+    QWidget *title_glow_color_preview_;
     /** @brief Horizontal layout containing the recent color preview buttons. */
-    QHBoxLayout* recent_colors_layout_;
+    QHBoxLayout *recent_colors_layout_;
     /** @brief List storing pointers to the dynamically created recent color buttons. */
-    QList<QPushButton*> recent_color_buttons_;
-    // --- End UI Elements ---
+    QList<QPushButton *> recent_color_buttons_;
 
-    // --- Selected Values (mirror config for potential SaveSettings logic) ---
     /** @brief Currently selected background color. */
     QColor selected_background_color_;
     /** @brief Currently selected blob color. */
@@ -176,7 +173,7 @@ private:
     QColor selected_title_glow_color_;
     // --- End Selected Values ---
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif // APPEARANCE_SETTINGS_WIDGET_H

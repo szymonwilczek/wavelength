@@ -3,10 +3,10 @@
 
 #include <vector>
 #include <memory>
-#include <thread> // Added for std::thread
-#include <mutex> // Added for std::mutex
-#include <condition_variable> // Added for std::condition_variable
-#include <atomic> // Added for std::atomic
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 
 #include "../blob_config.h"
 #include "../physics/blob_physics.h"
@@ -55,13 +55,13 @@ public:
 
     /**
      * @brief Gets the current calculated center position of the blob.
-     * If control points are not yet initialized, returns the center of the widget.
+     * If control points are not yet initialized, return the center of the widget.
      * @return The blob's center position as a QPointF.
      */
     QPointF GetBlobCenter() const {
-        std::lock_guard lock(points_mutex_); // Ensure thread safety when accessing blob_center_
+        std::lock_guard lock(points_mutex_);
         if (control_points_.empty()) {
-            return QPointF(width() / 2.0, height() / 2.0);
+            return {width() / 2.0, height() / 2.0};
         }
         return blob_center_;
     }
@@ -71,7 +71,7 @@ public:
      * Stores the original color to be restored later by ResetLifeColor().
      * @param color The temporary color to apply.
      */
-    void SetLifeColor(const QColor& color);
+    void SetLifeColor(const QColor &color);
 
     /**
      * @brief Resets the blob's border color to its original value before SetLifeColor() was called.
@@ -87,7 +87,7 @@ public:
 
     /**
      * @brief Resumes all event tracking mechanisms after being paused.
-     * Restarts timers, enables the event handler, resets the blob state, and forces a redraw.
+     * Restarts timers, enables the event handler, resets the blob state, and forces a redrawing.
      */
     void ResumeAllEventTracking();
 
@@ -142,7 +142,6 @@ signals:
      * Allows other UI elements to update accordingly.
      */
     void visualizationReset();
-
 
 protected:
     /**
@@ -213,6 +212,7 @@ protected:
      * Generates vertex data for horizontal and vertical lines based on grid spacing.
      */
     void DrawGrid();
+
     // --- End OpenGL Methods ---
 
 private slots:
@@ -252,7 +252,6 @@ private slots:
      */
     void CheckWindowPosition();
 
-
 private:
     /**
      * @brief Initializes the blob's state (control points, target points, velocity, center)
@@ -270,7 +269,7 @@ private:
 
     /**
      * @brief Applies an external force vector to the blob.
-     * Delegates the force application to the current state object.
+     * Delegates force application to the current state object.
      * @param force The force vector to apply.
      */
     void ApplyForces(const QVector2D &force);
@@ -295,7 +294,7 @@ private:
      * @param num_of_points The number of control points to generate.
      * @return A vector of QPointF representing the generated control points.
      */
-    static std::vector<QPointF> GenerateOrganicShape(const QPointF& center, double base_radius, int num_of_points);
+    static std::vector<QPointF> GenerateOrganicShape(const QPointF &center, double base_radius, int num_of_points);
 
     /**
      * @brief The main function executed by the physics simulation thread.
@@ -346,12 +345,8 @@ private:
 
     /** @brief Main timer driving the animation updates (~60 FPS). */
     QTimer animation_timer_;
-    /** @brief Timer potentially used for idle state effects (may be deprecated or integrated elsewhere). */
-    QTimer idle_timer_;
     /** @brief Timer used to automatically switch back to Idle state after inactivity in Moving/Resizing state. */
     QTimer state_reset_timer_;
-    /** @brief Timer potentially used for idle transition animation (may be deprecated). */
-    QTimer* transition_to_idle_timer_ = nullptr;
 
     /** @brief Object responsible for calculating physics interactions. */
     BlobPhysics physics_;
@@ -365,7 +360,7 @@ private:
     /** @brief Unique pointer to the Resizing state logic object. */
     std::unique_ptr<ResizingState> resizing_state_;
     /** @brief Pointer to the currently active state object (points to one of the above). */
-    BlobState* current_blob_state_;
+    BlobState *current_blob_state_;
 
     /** @brief Stores the last known window position (potentially used by physics). */
     QPointF last_window_position_;
@@ -386,7 +381,7 @@ private:
     bool events_enabled_ = true;
     /** @brief Timer for delayed re-enabling of events after transitions. */
     QTimer event_re_enable_timer_;
-    /** @brief Flag indicating if a redraw is needed in the next animation frame. */
+    /** @brief Flag indicating if a redrawing is needed in the next animation frame. */
     bool needs_redraw_ = false;
 
     /** @brief The separate thread object running the physics simulation (PhysicsThreadFunction). */
@@ -394,7 +389,7 @@ private:
 
     // --- OpenGL Specific Members ---
     /** @brief Pointer to the shader program used for rendering the blob. */
-    QOpenGLShaderProgram* shader_program_ = nullptr;
+    QOpenGLShaderProgram *shader_program_ = nullptr;
     /** @brief Vertex Buffer Object storing blob geometry data. */
     QOpenGLBuffer vbo_;
     /** @brief Vertex Array Object encapsulating vertex buffer state. */

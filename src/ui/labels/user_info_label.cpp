@@ -4,12 +4,11 @@
 #include <QStyleOption>
 
 UserInfoLabel::UserInfoLabel(QWidget *parent): QLabel(parent),
-                                               circle_diameter_(10), // Średnica głównego okręgu
-                                               pen_width_(2.0),      // Grubość linii okręgu
-                                               glow_layers_(4),      // Liczba warstw poświaty
-                                               glow_spread_(2.0),    // Jak bardzo rozszerza się poświata na warstwę
+                                               circle_diameter_(10),
+                                               pen_width_(2.0),
+                                               glow_layers_(4),
+                                               glow_spread_(2.0),
                                                shape_padding_(5) {
-    // Oblicz całkowity rozmiar potrzebny na kształt z poświatą
     total_shape_size_ = circle_diameter_ + glow_layers_ * glow_spread_ * 2;
 }
 
@@ -36,23 +35,21 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // 1. Narysuj tło (bez zmian)
+    // 1. background
     QStyleOption opt;
     opt.initFrom(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
-    // 2. Narysuj okrąg z poświatą
+    // 2. circle with a glow
     if (shape_color_.isValid()) {
         painter.save();
 
-        // Wyśrodkuj obszar rysowania kształtu pionowo i umieść po lewej
-        qreal totalPadding = glow_layers_ * glow_spread_; // Dodatkowy padding na poświatę
+        qreal totalPadding = glow_layers_ * glow_spread_;
         qreal yPos = (height() - total_shape_size_) / 2.0;
-        QRectF baseRect(contentsMargins().left() + totalPadding, // Zostaw miejsce na poświatę po lewej
-                        yPos + totalPadding,                   // Zostaw miejsce na poświatę na górze
+        QRectF baseRect(contentsMargins().left() + totalPadding,
+                        yPos + totalPadding,
                         circle_diameter_, circle_diameter_);
 
-        // Rysowanie poświaty (od zewnątrz do wewnątrz)
         for (int i = glow_layers_; i >= 1; --i) {
             qreal currentSpread = i * glow_spread_;
             qreal currentDiameter = circle_diameter_ + currentSpread * 2;
@@ -60,23 +57,19 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
                             baseRect.center().y() - currentDiameter / 2.0,
                             currentDiameter, currentDiameter);
 
-            // Kolor poświaty - ten sam co główny, ale z niską alfą
             QColor glowColor = shape_color_;
-            // Alfa maleje im dalej od środka (np. liniowo lub potęgowo)
-            int alpha = qMax(0, 50 - i * (50 / glow_layers_)); // Prosty spadek liniowy
+            int alpha = qMax(0, 50 - i * (50 / glow_layers_));
             glowColor.setAlpha(alpha);
 
-            // Grubość linii poświaty może być większa
-            qreal glowPenWidth = pen_width_ + currentSpread * 0.5; // Grubsza dla większego rozmycia
+            qreal glowPenWidth = pen_width_ + currentSpread * 0.5;
 
             QPen glowPen(glowColor, glowPenWidth);
-            glowPen.setCapStyle(Qt::RoundCap); // Zaokrąglone końce dla gładszej poświaty
+            glowPen.setCapStyle(Qt::RoundCap);
             painter.setPen(glowPen);
             painter.setBrush(Qt::NoBrush);
             painter.drawEllipse(glowRect);
         }
 
-        // Rysowanie głównego okręgu
         QPen mainPen(shape_color_, pen_width_);
         painter.setPen(mainPen);
         painter.setBrush(Qt::NoBrush);
@@ -85,9 +78,8 @@ void UserInfoLabel::paintEvent(QPaintEvent *event) {
         painter.restore();
     }
 
-    // 3. Narysuj tekst obok kształtu (bez zmian w logice rysowania tekstu)
+    // 3. draw text next to the shape
     QRect textRect = contentsRect();
-    // Przesuń tekst w prawo o całkowity rozmiar kształtu i padding
     textRect.setLeft(textRect.left() + total_shape_size_ + shape_padding_);
 
     QColor textColor = palette().color(QPalette::WindowText);

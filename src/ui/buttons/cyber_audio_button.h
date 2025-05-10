@@ -1,13 +1,8 @@
 #ifndef CYBER_AUDIO_BUTTON_H
 #define CYBER_AUDIO_BUTTON_H
 
-#include <QDateTime>
-#include <QPainter>
-#include <QPainterPath>
 #include <QPushButton>
-#include <QTimer>
 #include <QMouseEvent>
-#include <QEvent>
 
 /**
  * @brief A custom QPushButton styled with a cyberpunk aesthetic, specifically themed for audio controls.
@@ -29,7 +24,7 @@ public:
      * @param text The text to display on the button.
      * @param parent Optional parent widget.
      */
-    explicit CyberAudioButton(const QString& text, QWidget* parent = nullptr);
+    explicit CyberAudioButton(const QString &text, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Stops the pulse timer.
@@ -49,7 +44,7 @@ public:
      */
     void SetGlowIntensity(const double intensity) {
         glow_intensity_ = intensity;
-        update(); // Trigger repaint when intensity changes
+        update();
     }
 
 protected:
@@ -58,14 +53,14 @@ protected:
      * Renders the clipped background, neon border, glow effect, decorative lines/markers, and text.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden enter event handler. Increases the base glow intensity when the mouse enters.
      * @param event The enter event.
      */
-    void enterEvent(QEvent* event) override {
-        base_glow_intensity_ = 0.8; // Increase base glow on hover
+    void enterEvent(QEvent *event) override {
+        base_glow_intensity_ = 0.8;
         QPushButton::enterEvent(event);
     }
 
@@ -73,8 +68,8 @@ protected:
      * @brief Overridden leave event handler. Resets the base glow intensity when the mouse leaves.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override {
-        base_glow_intensity_ = 0.5; // Reset base glow on leave
+    void leaveEvent(QEvent *event) override {
+        base_glow_intensity_ = 0.5;
         QPushButton::leaveEvent(event);
     }
 
@@ -82,8 +77,8 @@ protected:
      * @brief Overridden mouse press event handler. Maximizes the base glow intensity when pressed.
      * @param event The mouse press event.
      */
-    void mousePressEvent(QMouseEvent* event) override {
-        base_glow_intensity_ = 1.0; // Max glow on press
+    void mousePressEvent(QMouseEvent *event) override {
+        base_glow_intensity_ = 1.0;
         QPushButton::mousePressEvent(event);
     }
 
@@ -91,12 +86,11 @@ protected:
      * @brief Overridden mouse release event handler. Sets the base glow intensity back to the hover level.
      * @param event The mouse release event.
      */
-    void mouseReleaseEvent(QMouseEvent* event) override {
-        // Restore hover glow intensity if mouse is still over, otherwise leaveEvent will handle it
+    void mouseReleaseEvent(QMouseEvent *event) override {
         if (rect().contains(event->pos())) {
-             base_glow_intensity_ = 0.8;
+            base_glow_intensity_ = 0.8;
         } else {
-             base_glow_intensity_ = 0.5; // Or reset if released outside
+            base_glow_intensity_ = 0.5;
         }
         QPushButton::mouseReleaseEvent(event);
     }
@@ -107,7 +101,7 @@ private:
     /** @brief Base level for the glow effect, modified by hover/press states. */
     double base_glow_intensity_;
     /** @brief Timer responsible for the subtle pulsing animation of the glow effect. */
-    QTimer* pulse_timer_;
+    QTimer *pulse_timer_;
 };
 
 #endif //CYBER_AUDIO_BUTTON_H
