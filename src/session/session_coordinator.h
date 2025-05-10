@@ -2,13 +2,9 @@
 #define WAVELENGTH_SESSION_COORDINATOR_H
 
 #include <QObject>
-#include <QString>
+#include <QDebug>
 
-#include "events/leaver/wavelength_leaver.h"
-#include "../chat/messages/services/message_service.h"
-#include "../services/wavelength_state_manager.h"
-#include "../services/wavelength_event_broker.h"
-#include "../../src/app/wavelength_config.h"
+struct WavelengthInfo;
 
 /**
  * @brief Singleton coordinator class acting as a facade for Wavelength session management.
@@ -96,9 +92,7 @@ public:
      * @param file_path The local path to the file.
      * @return True if the file sending a task was successfully queued, false otherwise.
      */
-    static bool SendFile(const QString &file_path) {
-        return MessageService::GetInstance()->SendFile(file_path);
-    }
+    static bool SendFile(const QString &file_path);
 
     // ---- State Management Methods ----
 
@@ -109,54 +103,42 @@ public:
      * @param is_host Optional output parameter; set to true if the current user is the host.
      * @return A WavelengthInfo struct.
      */
-    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool *is_host = nullptr) {
-        return WavelengthStateManager::GetWavelengthInfo(frequency, is_host);
-    }
+    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool *is_host = nullptr);
 
     /**
      * @brief Gets the frequency identifier of the currently active wavelength.
      * Delegates the call to WavelengthStateManager.
      * @return The active frequency string, or "-1" if none.
      */
-    static QString GetActiveWavelength() {
-        return WavelengthStateManager::GetActiveWavelength();
-    }
+    static QString GetActiveWavelength();
 
     /**
      * @brief Sets the specified frequency as the currently active wavelength.
      * Delegates the call to WavelengthStateManager.
      * @param frequency The frequency identifier to set as active.
      */
-    static void SetActiveWavelength(const QString &frequency) {
-        WavelengthStateManager::GetInstance()->SetActiveWavelength(frequency);
-    }
+    static void SetActiveWavelength(const QString &frequency);
 
     /**
      * @brief Checks if the current user is the host of the currently active wavelength.
      * Delegates the call to WavelengthStateManager.
      * @return True if the user is the host of the active wavelength, false otherwise.
      */
-    static bool IsActiveWavelengthHost() {
-        return WavelengthStateManager::IsActiveWavelengthHost();
-    }
+    static bool IsActiveWavelengthHost();
 
     /**
      * @brief Gets a list of frequencies the user is currently joined to.
      * Delegates the call to WavelengthStateManager.
      * @return A QList<QString> of joined frequencies.
      */
-    static QList<QString> GetJoinedWavelengths() {
-        return WavelengthStateManager::GetInstance()->GetJoinedWavelengths();
-    }
+    static QList<QString> GetJoinedWavelengths();
 
     /**
      * @brief Gets the count of wavelengths the user is currently joined to.
      * Delegates the call to WavelengthStateManager.
      * @return The number of joined wavelengths.
      */
-    static int GetJoinedWavelengthCount() {
-        return WavelengthStateManager::GetInstance()->GetJoinedWavelengthCount();
-    }
+    static int GetJoinedWavelengthCount();
 
     /**
      * @brief Checks if a specific wavelength is password protected.
@@ -164,9 +146,7 @@ public:
      * @param frequency The frequency identifier.
      * @return True if password protected, false otherwise.
      */
-    static bool IsWavelengthPasswordProtected(const QString &frequency) {
-        return WavelengthStateManager::IsWavelengthPasswordProtected(frequency);
-    }
+    static bool IsWavelengthPasswordProtected(const QString &frequency);
 
     /**
      * @brief Checks if the current user is the host of a specific wavelength.
@@ -174,9 +154,7 @@ public:
      * @param frequency The frequency identifier.
      * @return True if the user is the host, false otherwise.
      */
-    static bool IsWavelengthHost(const QString &frequency) {
-        return WavelengthStateManager::IsWavelengthHost(frequency);
-    }
+    static bool IsWavelengthHost(const QString &frequency);
 
     /**
      * @brief Checks if the user is considered joined to a specific wavelength (based on registry presence).
@@ -201,27 +179,21 @@ public:
      * Delegates the call to WavelengthConfig.
      * @return The server address string.
      */
-    static QString GetRelayServerAddress() {
-        return WavelengthConfig::GetInstance()->GetRelayServerAddress();
-    }
+    static QString GetRelayServerAddress();
 
     /**
      * @brief Sets the relay server address in the configuration.
      * Delegates the call to WavelengthConfig.
      * @param address The new server address string.
      */
-    static void SetRelayServerAddress(const QString &address) {
-        WavelengthConfig::GetInstance()->SetRelayServerAddress(address);
-    }
+    static void SetRelayServerAddress(const QString &address);
 
     /**
      * @brief Gets the full URL (ws://address:port) of the relay server.
      * Delegates the call to WavelengthConfig.
      * @return The full WebSocket URL string.
      */
-    static QString GetRelayServerUrl() {
-        return WavelengthConfig::GetInstance()->GetRelayServerUrl();
-    }
+    static QString GetRelayServerUrl();
 
 signals:
     /** @brief Emitted when a wavelength is successfully created. Relayed from WavelengthCreator. */
@@ -278,44 +250,28 @@ private slots:
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The frequency created.
      */
-    void onWavelengthCreated(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
-        emit wavelengthCreated(frequency);
-        WavelengthEventBroker::GetInstance()->WavelengthCreated(frequency);
-    }
+    void onWavelengthCreated(const QString &frequency);
 
     /**
      * @brief Slot triggered when a wavelength is joined.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The frequency joined.
      */
-    void onWavelengthJoined(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthJoined signal for frequency" << frequency;
-        emit wavelengthJoined(frequency);
-        WavelengthEventBroker::GetInstance()->WavelengthJoined(frequency);
-    }
+    void onWavelengthJoined(const QString &frequency);
 
     /**
      * @brief Slot triggered when the active wavelength is left.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The frequency left.
      */
-    void onWavelengthLeft(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthLeft signal for frequency" << frequency;
-        emit wavelengthLeft(frequency);
-        WavelengthEventBroker::GetInstance()->WavelengthLeft(frequency);
-    }
+    void onWavelengthLeft(const QString &frequency);
 
     /**
      * @brief Slot triggered when a wavelength is closed.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The frequency closed.
      */
-    void onWavelengthClosed(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthClosed signal for frequency" << frequency;
-        emit wavelengthClosed(frequency);
-        WavelengthEventBroker::GetInstance()->WavelengthClosed(frequency);
-    }
+    void onWavelengthClosed(const QString &frequency);
 
     /**
      * @brief Slot triggered when a message is received.
@@ -323,11 +279,7 @@ private slots:
      * @param frequency The frequency the message belongs to.
      * @param message The formatted message content.
      */
-    void onMessageReceived(const QString &frequency, const QString &message) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating messageReceived signal";
-        emit messageReceived(frequency, message);
-        WavelengthEventBroker::GetInstance()->MessageReceived(frequency, message);
-    }
+    void onMessageReceived(const QString &frequency, const QString &message);
 
     /**
      * @brief Slot triggered when a message is sent.
@@ -335,45 +287,28 @@ private slots:
      * @param frequency The frequency the message was sent to.
      * @param message The formatted message content.
      */
-    void onMessageSent(const QString &frequency, const QString &message) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating messageSent signal";
-        emit messageSent(frequency, message);
-        WavelengthEventBroker::GetInstance()->MessageSent(frequency, message);
-    }
+    void onMessageSent(const QString &frequency, const QString &message);
 
     /**
      * @brief Slot triggered when a connection error occurs.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param errorMessage Description of the error.
      */
-    void onConnectionError(const QString &errorMessage) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating connectionError signal:" << errorMessage;
-        emit connectionError(errorMessage);
-        WavelengthEventBroker::GetInstance()->ConnectionError(errorMessage);
-    }
+    void onConnectionError(const QString &errorMessage);
 
     /**
      * @brief Slot triggered when authentication fails during join.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The frequency for which authentication failed.
      */
-    void onAuthenticationFailed(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating authenticationFailed signal for frequency" << frequency;
-        emit authenticationFailed(frequency);
-        WavelengthEventBroker::GetInstance()->AuthenticationFailed(frequency);
-    }
+    void onAuthenticationFailed(const QString &frequency);
 
     /**
      * @brief Slot triggered when the active wavelength changes.
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param frequency The new active frequency.
      */
-    void onActiveWavelengthChanged(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" <<
-                frequency;
-        emit activeWavelengthChanged(frequency);
-        WavelengthEventBroker::GetInstance()->ActiveWavelengthChanged(frequency);
-    }
+    void onActiveWavelengthChanged(const QString &frequency);
 
     /**
      * @brief Slot triggered when a configuration setting changes.

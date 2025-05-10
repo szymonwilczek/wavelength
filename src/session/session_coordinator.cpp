@@ -1,5 +1,13 @@
 #include "session_coordinator.h"
 
+#include <QFile>
+
+#include "../app/wavelength_config.h"
+#include "../chat/messages/services/message_processor.h"
+#include "../chat/messages/services/message_service.h"
+#include "../services/wavelength_event_broker.h"
+#include "../services/wavelength_state_manager.h"
+#include "../storage/wavelength_registry.h"
 #include "events/creator/wavelength_creator.h"
 #include "events/joiner/wavelength_joiner.h"
 #include "events/leaver/wavelength_leaver.h"
@@ -10,7 +18,7 @@ void SessionCoordinator::Initialize() {
 }
 
 bool SessionCoordinator::CreateWavelength(const QString &frequency, const bool is_password_protected,
-                                                    const QString &password) {
+                                          const QString &password) {
         const bool success = WavelengthCreator::GetInstance()->CreateWavelength(
                 frequency, is_password_protected, password);
 
@@ -50,12 +58,115 @@ bool SessionCoordinator::SendMessage(const QString &message) {
         return MessageService::GetInstance()->SendTextMessage(message);
 }
 
+bool SessionCoordinator::SendFile(const QString &file_path) {
+        return MessageService::GetInstance()->SendFile(file_path);
+}
+
+WavelengthInfo SessionCoordinator::GetWavelengthInfo(const QString &frequency, bool *is_host) {
+        return WavelengthStateManager::GetWavelengthInfo(frequency, is_host);
+}
+
+QString SessionCoordinator::GetActiveWavelength() {
+        return WavelengthStateManager::GetActiveWavelength();
+}
+
+bool SessionCoordinator::IsActiveWavelengthHost() {
+        return WavelengthStateManager::IsActiveWavelengthHost();
+}
+
+QList<QString> SessionCoordinator::GetJoinedWavelengths() {
+        return WavelengthStateManager::GetInstance()->GetJoinedWavelengths();
+}
+
+int SessionCoordinator::GetJoinedWavelengthCount() {
+        return WavelengthStateManager::GetInstance()->GetJoinedWavelengthCount();
+}
+
+bool SessionCoordinator::IsWavelengthPasswordProtected(const QString &frequency) {
+        return WavelengthStateManager::GetInstance()->IsWavelengthPasswordProtected(frequency);
+}
+
+bool SessionCoordinator::IsWavelengthHost(const QString &frequency) {
+        return WavelengthStateManager::GetInstance()->IsWavelengthHost(frequency);
+}
+
+void SessionCoordinator::SetActiveWavelength(const QString &frequency) {
+        WavelengthStateManager::GetInstance()->SetActiveWavelength(frequency);
+}
+
 bool SessionCoordinator::IsWavelengthJoined(const QString &frequency) {
         return WavelengthStateManager::GetInstance()->IsWavelengthJoined(frequency);
 }
 
 bool SessionCoordinator::IsWavelengthConnected(const QString &frequency) {
         return WavelengthStateManager::GetInstance()->IsWavelengthConnected(frequency);
+}
+
+QString SessionCoordinator::GetRelayServerAddress() {
+        return WavelengthConfig::GetInstance()->GetRelayServerAddress();
+}
+
+void SessionCoordinator::SetRelayServerAddress(const QString &address) {
+        WavelengthConfig::GetInstance()->SetRelayServerAddress(address);
+}
+
+QString SessionCoordinator::GetRelayServerUrl() {
+        return WavelengthConfig::GetInstance()->GetRelayServerUrl();
+}
+
+void SessionCoordinator::onWavelengthCreated(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
+        emit wavelengthCreated(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthCreated(frequency);
+}
+
+void SessionCoordinator::onWavelengthJoined(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthJoined signal for frequency" << frequency;
+        emit wavelengthJoined(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthJoined(frequency);
+}
+
+void SessionCoordinator::onWavelengthLeft(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthLeft signal for frequency" << frequency;
+        emit wavelengthLeft(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthLeft(frequency);
+}
+
+void SessionCoordinator::onWavelengthClosed(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthClosed signal for frequency" << frequency;
+        emit wavelengthClosed(frequency);
+        WavelengthEventBroker::GetInstance()->WavelengthClosed(frequency);
+}
+
+void SessionCoordinator::onMessageReceived(const QString &frequency, const QString &message) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating messageReceived signal";
+        emit messageReceived(frequency, message);
+        WavelengthEventBroker::GetInstance()->MessageReceived(frequency, message);
+}
+
+void SessionCoordinator::onMessageSent(const QString &frequency, const QString &message) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating messageSent signal";
+        emit messageSent(frequency, message);
+        WavelengthEventBroker::GetInstance()->MessageSent(frequency, message);
+}
+
+void SessionCoordinator::onConnectionError(const QString &errorMessage) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating connectionError signal:" << errorMessage;
+        emit connectionError(errorMessage);
+        WavelengthEventBroker::GetInstance()->ConnectionError(errorMessage);
+}
+
+void SessionCoordinator::onAuthenticationFailed(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating authenticationFailed signal for frequency" << frequency;
+        emit authenticationFailed(frequency);
+        WavelengthEventBroker::GetInstance()->AuthenticationFailed(frequency);
+}
+
+void SessionCoordinator::onActiveWavelengthChanged(const QString &frequency) {
+        qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" <<
+                        frequency;
+        emit activeWavelengthChanged(frequency);
+        WavelengthEventBroker::GetInstance()->ActiveWavelengthChanged(frequency);
 }
 
 void SessionCoordinator::ConnectSignals() {
