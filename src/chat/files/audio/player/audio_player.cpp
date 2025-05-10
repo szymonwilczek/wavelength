@@ -1,4 +1,4 @@
-#include "inline_audio_player.h"
+#include "audio_player.h"
 
 #include <QApplication>
 #include <QPainter>
@@ -10,7 +10,7 @@
 
 #include "../../../../app/managers/translation_manager.h"
 
-InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type,
+AudioPlayer::AudioPlayer(const QByteArray &audio_data, const QString &mime_type,
                                      QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
                                                        scanline_opacity_(0.15), spectrum_intensity_(0.6),
                                                        translator_(nullptr) {
@@ -106,12 +106,12 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString
 
     decoder_ = std::make_shared<AudioDecoder>(audio_data, this);
 
-    connect(play_button_, &QPushButton::clicked, this, &InlineAudioPlayer::TogglePlayback);
-    connect(progress_slider_, &QSlider::sliderMoved, this, &InlineAudioPlayer::UpdateTimeLabel);
-    connect(progress_slider_, &QSlider::sliderPressed, this, &InlineAudioPlayer::OnSliderPressed);
-    connect(progress_slider_, &QSlider::sliderReleased, this, &InlineAudioPlayer::OnSliderReleased);
-    connect(decoder_.get(), &AudioDecoder::error, this, &InlineAudioPlayer::HandleError);
-    connect(decoder_.get(), &AudioDecoder::audioInfo, this, &InlineAudioPlayer::HandleAudioInfo);
+    connect(play_button_, &QPushButton::clicked, this, &AudioPlayer::TogglePlayback);
+    connect(progress_slider_, &QSlider::sliderMoved, this, &AudioPlayer::UpdateTimeLabel);
+    connect(progress_slider_, &QSlider::sliderPressed, this, &AudioPlayer::OnSliderPressed);
+    connect(progress_slider_, &QSlider::sliderReleased, this, &AudioPlayer::OnSliderReleased);
+    connect(decoder_.get(), &AudioDecoder::error, this, &AudioPlayer::HandleError);
+    connect(decoder_.get(), &AudioDecoder::audioInfo, this, &AudioPlayer::HandleAudioInfo);
     connect(decoder_.get(), &AudioDecoder::playbackFinished, this, [this]() {
         playback_finished_ = true;
         play_button_->setText("↻");
@@ -120,14 +120,14 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString
         update();
     });
 
-    connect(volume_slider_, &QSlider::valueChanged, this, &InlineAudioPlayer::AdjustVolume);
-    connect(volume_button_, &QPushButton::clicked, this, &InlineAudioPlayer::ToggleMute);
+    connect(volume_slider_, &QSlider::valueChanged, this, &AudioPlayer::AdjustVolume);
+    connect(volume_button_, &QPushButton::clicked, this, &AudioPlayer::ToggleMute);
 
-    connect(decoder_.get(), &AudioDecoder::positionChanged, this, &InlineAudioPlayer::UpdateSliderPosition);
+    connect(decoder_.get(), &AudioDecoder::positionChanged, this, &AudioPlayer::UpdateSliderPosition);
 
     ui_timer_ = new QTimer(this);
     ui_timer_->setInterval(50);
-    connect(ui_timer_, &QTimer::timeout, this, &InlineAudioPlayer::UpdateUI);
+    connect(ui_timer_, &QTimer::timeout, this, &AudioPlayer::UpdateUI);
     ui_timer_->start();
 
     QTimer::singleShot(100, this, [this]() {
@@ -142,7 +142,7 @@ InlineAudioPlayer::InlineAudioPlayer(const QByteArray &audio_data, const QString
     });
 }
 
-void InlineAudioPlayer::ReleaseResources() {
+void AudioPlayer::ReleaseResources() {
     if (ui_timer_) {
         ui_timer_->stop();
     }
@@ -162,7 +162,7 @@ void InlineAudioPlayer::ReleaseResources() {
     is_active_ = false;
 }
 
-void InlineAudioPlayer::Activate() {
+void AudioPlayer::Activate() {
     if (is_active_)
         return;
 
@@ -189,7 +189,7 @@ void InlineAudioPlayer::Activate() {
     spectrum_animation->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
-void InlineAudioPlayer::Deactivate() {
+void AudioPlayer::Deactivate() {
     if (!is_active_)
         return;
 
@@ -210,7 +210,7 @@ void InlineAudioPlayer::Deactivate() {
     is_active_ = false;
 }
 
-void InlineAudioPlayer::AdjustVolume(const int volume) const {
+void AudioPlayer::AdjustVolume(const int volume) const {
     if (!decoder_)
         return;
 
@@ -219,7 +219,7 @@ void InlineAudioPlayer::AdjustVolume(const int volume) const {
     UpdateVolumeIcon(volume_float);
 }
 
-void InlineAudioPlayer::ToggleMute() {
+void AudioPlayer::ToggleMute() {
     if (!decoder_)
         return;
 
@@ -231,7 +231,7 @@ void InlineAudioPlayer::ToggleMute() {
     }
 }
 
-void InlineAudioPlayer::UpdateVolumeIcon(const float volume) const {
+void AudioPlayer::UpdateVolumeIcon(const float volume) const {
     if (volume <= 0.01f) {
         volume_button_->setText("🔈");
     } else if (volume < 0.5f) {
@@ -241,7 +241,7 @@ void InlineAudioPlayer::UpdateVolumeIcon(const float volume) const {
     }
 }
 
-void InlineAudioPlayer::paintEvent(QPaintEvent *event) {
+void AudioPlayer::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -282,7 +282,7 @@ void InlineAudioPlayer::paintEvent(QPaintEvent *event) {
     painter.setFont(QFont("Consolas", 7));
 }
 
-bool InlineAudioPlayer::eventFilter(QObject *watched, QEvent *event) {
+bool AudioPlayer::eventFilter(QObject *watched, QEvent *event) {
     if (watched == spectrum_view_ && event->type() == QEvent::Paint) {
         PaintSpectrum(spectrum_view_);
         return true;
@@ -290,7 +290,7 @@ bool InlineAudioPlayer::eventFilter(QObject *watched, QEvent *event) {
     return QFrame::eventFilter(watched, event);
 }
 
-void InlineAudioPlayer::OnSliderPressed() {
+void AudioPlayer::OnSliderPressed() {
     was_playing_ = !decoder_->IsPaused();
 
     if (was_playing_) {
@@ -301,7 +301,7 @@ void InlineAudioPlayer::OnSliderPressed() {
     status_label_->setText(translator_->Translate("AudioPlayer.Seeking", "SEEKING..."));
 }
 
-void InlineAudioPlayer::OnSliderReleased() {
+void AudioPlayer::OnSliderReleased() {
     SeekAudio(progress_slider_->value());
 
     slider_dragging_ = false;
@@ -317,7 +317,7 @@ void InlineAudioPlayer::OnSliderReleased() {
     }
 }
 
-void InlineAudioPlayer::UpdateTimeLabel(const int position) {
+void AudioPlayer::UpdateTimeLabel(const int position) {
     if (!decoder_ || audio_duration_ <= 0)
         return;
 
@@ -332,7 +332,7 @@ void InlineAudioPlayer::UpdateTimeLabel(const int position) {
         .arg(total_seconds % 60, 2, 10, QChar('0')));
 }
 
-void InlineAudioPlayer::UpdateSliderPosition(double position) const {
+void AudioPlayer::UpdateSliderPosition(double position) const {
     if (audio_duration_ <= 0)
         return;
 
@@ -358,7 +358,7 @@ void InlineAudioPlayer::UpdateSliderPosition(double position) const {
     );
 }
 
-void InlineAudioPlayer::SeekAudio(const int position) const {
+void AudioPlayer::SeekAudio(const int position) const {
     if (!decoder_ || audio_duration_ <= 0)
         return;
 
@@ -366,7 +366,7 @@ void InlineAudioPlayer::SeekAudio(const int position) const {
     decoder_->Seek(seek_position);
 }
 
-void InlineAudioPlayer::TogglePlayback() {
+void AudioPlayer::TogglePlayback() {
     if (!decoder_)
         return;
 
@@ -396,13 +396,13 @@ void InlineAudioPlayer::TogglePlayback() {
     }
 }
 
-void InlineAudioPlayer::HandleError(const QString &message) const {
+void AudioPlayer::HandleError(const QString &message) const {
     qDebug() << "[INLINE AUDIO PLAYER] Audio decoder error:" << message;
     status_label_->setText("ERROR: " + message.left(20));
     audio_info_label_->setText("⚠️ " + message.left(30));
 }
 
-void InlineAudioPlayer::HandleAudioInfo(const int sample_rate, const int channels, const double duration) {
+void AudioPlayer::HandleAudioInfo(const int sample_rate, const int channels, const double duration) {
     audio_duration_ = duration;
     progress_slider_->setRange(0, duration * 1000);
 
@@ -422,7 +422,7 @@ void InlineAudioPlayer::HandleAudioInfo(const int sample_rate, const int channel
     }
 }
 
-void InlineAudioPlayer::UpdateUI() {
+void AudioPlayer::UpdateUI() {
     if (decoder_ && !decoder_->IsPaused() && !playback_finished_) {
         const int random_update = QRandomGenerator::global()->bounded(100);
 
@@ -446,7 +446,7 @@ void InlineAudioPlayer::UpdateUI() {
     }
 }
 
-void InlineAudioPlayer::PaintSpectrum(QWidget *target) {
+void AudioPlayer::PaintSpectrum(QWidget *target) {
     QPainter painter(target);
     painter.setRenderHint(QPainter::Antialiasing);
 

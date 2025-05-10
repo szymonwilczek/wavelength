@@ -503,7 +503,7 @@ void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
 
 void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
     const auto viewer = new CyberAttachmentViewer(content_container_);
-    const auto audio_player = new InlineAudioPlayer(data, mime_type_, viewer);
+    const auto audio_player = new AudioPlayer(data, mime_type_, viewer);
 
     viewer->SetContent(audio_player);
 

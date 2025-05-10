@@ -22,7 +22,7 @@ class TranslationManager;
  * one player is actively using resources (like the audio output device) at a time.
  * Includes visual effects like animated spectrum intensity.
  */
-class InlineAudioPlayer final : public QFrame {
+class AudioPlayer final : public QFrame {
     Q_OBJECT
     /** @brief Property controlling the opacity of a potential scanline effect (currently unused in paintEvent). */
     Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
@@ -39,7 +39,7 @@ public:
      * @param mime_type The MIME type of the audio data (e.g., "audio/mpeg").
      * @param parent Optional parent widget.
      */
-    explicit InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent = nullptr);
+    explicit AudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent = nullptr);
 
     /**
      * @brief Gets the current opacity value for the scanline effect.
@@ -76,7 +76,7 @@ public:
     /**
      * @brief Destructor. Ensures resources are released.
      */
-    ~InlineAudioPlayer() override {
+    ~AudioPlayer() override {
         ReleaseResources();
     }
 
@@ -290,7 +290,7 @@ private:
     QVector<double> spectrum_data_;
 
     /** @brief Static pointer to the currently active InlineAudioPlayer instance. Ensures only one player uses audio output. */
-    static inline InlineAudioPlayer *active_player_ = nullptr;
+    static inline AudioPlayer *active_player_ = nullptr;
 
     /** @brief Pointer to the translation manager for handling UI text translations. */
     TranslationManager *translator_;

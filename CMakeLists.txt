@@ -78,8 +78,8 @@ add_executable(
         src/chat/files/video/decoder/video_decoder.h
         src/chat/files/audio/decoder/audio_decoder.cpp
         src/chat/files/audio/decoder/audio_decoder.h
-        src/chat/files/audio/player/inline_audio_player.cpp
-        src/chat/files/audio/player/inline_audio_player.h
+        src/chat/files/audio/player/audio_player.cpp
+        src/chat/files/audio/player/audio_player.h
         src/chat/files/gif/decoder/gif_decoder.cpp
         src/chat/files/gif/decoder/gif_decoder.h
         src/chat/files/gif/player/inline_gif_player.cpp
