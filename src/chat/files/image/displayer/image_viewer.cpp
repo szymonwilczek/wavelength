@@ -4,44 +4,36 @@
 
 #include "../../../../app/managers/translation_manager.h"
 
-InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent), image_data_(image_data) {
-
+InlineImageViewer::InlineImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent),
+    image_data_(image_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     translator_ = TranslationManager::GetInstance();
 
-    // Obszar wyświetlania obrazu
     image_label_ = new QLabel(this);
     image_label_->setAlignment(Qt::AlignCenter);
-    image_label_->setStyleSheet("background-color: transparent; color: #ffffff;"); // Ustawiamy przezroczyste tło
+    image_label_->setStyleSheet("background-color: transparent; color: #ffffff;");
     image_label_->setText(translator_->Translate("ImageViewer.Loading", "LOADING IMAGE..."));
-    image_label_->setScaledContents(true); // Kluczowa zmiana: Włącz skalowanie zawartości QLabel
+    image_label_->setScaledContents(true);
     layout->addWidget(image_label_);
 
-    // Dekoder obrazu
     decoder_ = std::make_shared<ImageDecoder>(image_data, this);
 
-    // Połącz sygnały
     connect(decoder_.get(), &ImageDecoder::imageReady, this, &InlineImageViewer::HandleImageReady);
     connect(decoder_.get(), &ImageDecoder::error, this, &InlineImageViewer::HandleError);
     connect(decoder_.get(), &ImageDecoder::imageInfo, this, &InlineImageViewer::HandleImageInfo);
 
-    // Usunięto instalację filtra zdarzeń dla zoomu
-    // Usunięto setCursor
-
-    // Obsługa zamykania aplikacji
     connect(qApp, &QApplication::aboutToQuit, this, &InlineImageViewer::ReleaseResources);
 
-    // Dekoduj obraz
     QTimer::singleShot(0, this, &InlineImageViewer::LoadImage);
 }
 
 void InlineImageViewer::ReleaseResources() {
     if (decoder_) {
         decoder_->ReleaseResources();
-        decoder_.reset(); // Zwalniamy wskaźnik
+        decoder_.reset();
     }
 }
 
@@ -49,7 +41,7 @@ QSize InlineImageViewer::sizeHint() const {
     if (!original_image_.isNull()) {
         return original_image_.size();
     }
-    return QFrame::sizeHint(); // Zwróć domyślny, jeśli obraz nie jest załadowany
+    return QFrame::sizeHint();
 }
 
 void InlineImageViewer::HandleImageReady(const QImage &image) {
@@ -58,22 +50,15 @@ void InlineImageViewer::HandleImageReady(const QImage &image) {
         return;
     }
     original_image_ = image;
-
-    // Ustaw pixmapę na QLabel - skalowanie załatwi setScaledContents(true)
     image_label_->setPixmap(QPixmap::fromImage(original_image_));
 
-    // Nie ustawiamy już setFixedSize - pozwalamy layoutowi zarządzać rozmiarem
-    // m_imageLabel->setFixedSize(m_originalImage.size()); // Usunięto
-    // setFixedSize(m_originalImage.size()); // Usunięto
-
-    updateGeometry(); // Informujemy layout o potencjalnej zmianie rozmiaru
-    emit imageLoaded(); // Sygnalizujemy załadowanie obrazu
+    updateGeometry();
+    emit imageLoaded();
 }
 
 void InlineImageViewer::HandleError(const QString &message) {
-    qDebug() << "Image decoder error:" << message;
+    qDebug() << "[IMAGE VIEWER] Image decoder error:" << message;
     image_label_->setText(translator_->Translate("ImageViewer.DecoderError", "⚠️ IMAGE DECODER ERROR..."));
-    // Można ustawić minimalny rozmiar, aby tekst błędu był widoczny
     setMinimumSize(100, 50);
     updateGeometry();
 }

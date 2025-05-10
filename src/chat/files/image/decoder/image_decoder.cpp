@@ -3,19 +3,16 @@
 QImage ImageDecoder::Decode() {
     QImage image;
 
-    // Próbujemy bezpośrednio załadować obraz z danych binarnych
     if (!image.loadFromData(image_data_)) {
-        emit error("Nie można załadować obrazu - nieprawidłowy format pliku");
+        emit error("[IMAGE DECODER] Unable to load image - invalid file format.");
         return QImage();
     }
 
-    // Sprawdzenie czy obraz został poprawnie załadowany
     if (image.isNull()) {
-        emit error("Dekodowanie obrazu nie powiodło się");
+        emit error("[IMAGE DECODER] Image decoding failed.");
         return QImage();
     }
 
-    // Emitujemy sygnał z informacjami o obrazie
     emit imageInfo(image.width(), image.height(), image.hasAlphaChannel());
     emit imageReady(image);
 
