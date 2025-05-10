@@ -2,7 +2,6 @@
 #define MOVINGSTATE_H
 
 #include "blob_state.h"
-#include "../blob_config.h"
 
 /**
  * @brief Implements the Moving state behavior for the Blob animation.

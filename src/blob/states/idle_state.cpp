@@ -1,7 +1,6 @@
 #include "idle_state.h"
-#include <cmath>
-#include <qmath.h>
-#include <QDebug>
+
+#include <math.h>
 
 IdleState::IdleState() {
     main_phase_offset_ = 0.0;

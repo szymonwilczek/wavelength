@@ -1,5 +1,4 @@
 #include "moving_state.h"
-#include <QDebug>
 
 MovingState::MovingState() = default;
 

@@ -2,7 +2,6 @@
 #define RESIZINGSTATE_H
 
 #include "blob_state.h"
-#include "../blob_config.h"
 
 /**
  * @brief Implements the Resizing state behavior for the Blob animation.

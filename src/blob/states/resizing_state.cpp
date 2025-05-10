@@ -1,7 +1,6 @@
 #include "resizing_state.h"
 
 #include <QSizeF>
-#include <QVector2D>
 
 ResizingState::ResizingState() {
 }
