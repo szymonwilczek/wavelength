@@ -1,7 +1,7 @@
 #include "wavelength_state_manager.h"
 
 WavelengthInfo WavelengthStateManager::GetWavelengthInfo(const QString &frequency, bool *is_host) {
-    const WavelengthRegistry* registry = WavelengthRegistry::GetInstance();
+    const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     WavelengthInfo info = registry->GetWavelengthInfo(frequency);
 
     if (is_host) {
@@ -29,11 +29,9 @@ bool WavelengthStateManager::IsActiveWavelengthHost() {
 }
 
 QList<QString> WavelengthStateManager::GetJoinedWavelengths() {
-    // Ponieważ nie mamy bezpośredniej metody, musimy śledzić dołączone wavelength sami
     QList<QString> result;
 
-    // Dodaj zarejestrowane wavelength z naszej własnej listy
-    for (const auto& frequency : joined_wavelengths_) {
+    for (const auto &frequency: joined_wavelengths_) {
         if (WavelengthRegistry::GetInstance()->HasWavelength(frequency)) {
             result.append(frequency);
         }
@@ -90,7 +88,7 @@ void WavelengthStateManager::AddActiveSessionData(const QString &frequency, cons
 }
 
 QVariant WavelengthStateManager::GetActiveSessionData(const QString &frequency, const QString &key,
-    const QVariant &default_value) {
+                                                      const QVariant &default_value) {
     if (!session_data_.contains(frequency) || !session_data_[frequency].contains(key)) {
         return default_value;
     }
