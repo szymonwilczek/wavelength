@@ -10,13 +10,17 @@ QString AuthenticationManager::GenerateClientId() {
 
 QString AuthenticationManager::GenerateSessionToken() {
     const QByteArray token_data = QUuid::createUuid().toByteArray() +
-                          QByteArray::number(QDateTime::currentMSecsSinceEpoch());
+                                  QByteArray::number(QDateTime::currentMSecsSinceEpoch());
     return {QCryptographicHash::hash(token_data, QCryptographicHash::Sha256).toHex()};
 }
 
-bool AuthenticationManager::VerifyPassword(const QString &frequency, const QString& provided_password) {
+void AuthenticationManager::RegisterPassword(const QString &frequency, const QString &password) {
+    wavelength_passwords_.insert(frequency, password);
+}
+
+bool AuthenticationManager::VerifyPassword(const QString &frequency, const QString &provided_password) {
     if (!wavelength_passwords_.contains(frequency)) {
-        qDebug() << "No password stored for frequency" << frequency;
+        qDebug() << "[AUTH MANAGER] No password stored for frequency" << frequency;
         return false;
     }
 
@@ -26,17 +30,13 @@ bool AuthenticationManager::VerifyPassword(const QString &frequency, const QStri
     return is_valid;
 }
 
-void AuthenticationManager::RegisterPassword(const QString &frequency, const QString& password) {
-    wavelength_passwords_.insert(frequency, password);
-}
-
 void AuthenticationManager::RemovePassword(const QString &frequency) {
     if (wavelength_passwords_.contains(frequency)) {
         wavelength_passwords_.remove(frequency);
     }
 }
 
-QString AuthenticationManager::CreateAuthResponse(const bool success, const QString& error_message) {
+QString AuthenticationManager::CreateAuthResponse(const bool success, const QString &error_message) {
     QJsonObject response;
     response["type"] = "authResult";
     response["success"] = success;
@@ -52,7 +52,8 @@ QString AuthenticationManager::CreateAuthResponse(const bool success, const QStr
     return QJsonDocument(response).toJson(QJsonDocument::Compact);
 }
 
-bool AuthenticationManager::StoreSession(const QString &frequency, const QString& client_id, const QString& session_token) {
+bool AuthenticationManager::StoreSession(const QString &frequency, const QString &client_id,
+                                         const QString &session_token) {
     SessionInfo info;
     info.client_id = client_id;
     info.frequency = frequency;
@@ -64,29 +65,27 @@ bool AuthenticationManager::StoreSession(const QString &frequency, const QString
     return true;
 }
 
-bool AuthenticationManager::ValidateSession(const QString& session_token, const QString &frequency) {
+bool AuthenticationManager::ValidateSession(const QString &session_token, const QString &frequency) {
     if (!sessions_.contains(session_token)) {
-        qDebug() << "Session token not found";
+        qDebug() << "[AUTH MANAGER] Session token not found";
         return false;
     }
 
-    const SessionInfo& info = sessions_[session_token];
+    const SessionInfo &session_info = sessions_[session_token];
 
-    // Check if session is for the correct frequency
-    if (info.frequency != frequency) {
-        qDebug() << "Session frequency mismatch:" << info.frequency << "vs" << frequency;
+    if (session_info.frequency != frequency) {
+        qDebug() << "[AUTH MANAGER] Session frequency mismatch:" << session_info.frequency << "vs" << frequency;
         return false;
     }
 
-    // Check if session is active
-    if (!info.is_active) {
-        qDebug() << "Session is no longer active";
+    if (!session_info.is_active) {
+        qDebug() << "[AUTH MANAGER] Session is no longer active";
         return false;
     }
 
-    // Check if session has expired (24 hours)
-    if (const QDateTime expiry_time = info.timestamp.addSecs(86400); QDateTime::currentDateTime() > expiry_time) {
-        qDebug() << "Session has expired";
+    if (const QDateTime expiry_time = session_info.timestamp.addSecs(86400);
+        QDateTime::currentDateTime() > expiry_time) {
+        qDebug() << "[AUTH MANAGER] Session has expired";
         sessions_[session_token].is_active = false;
         return false;
     }
@@ -94,13 +93,13 @@ bool AuthenticationManager::ValidateSession(const QString& session_token, const 
     return true;
 }
 
-void AuthenticationManager::DeactivateSession(const QString& session_token) {
+void AuthenticationManager::DeactivateSession(const QString &session_token) {
     if (sessions_.contains(session_token)) {
         sessions_[session_token].is_active = false;
     }
 }
 
-void AuthenticationManager::DeactivateClientSessions(const QString& client_id) {
+void AuthenticationManager::DeactivateClientSessions(const QString &client_id) {
     for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
         if (it.value().client_id == client_id) {
             it.value().is_active = false;
@@ -128,7 +127,7 @@ void AuthenticationManager::CleanupExpiredSessions() {
         }
     }
 
-    for (const QString& token : tokens_to_remove) {
+    for (const QString &token: tokens_to_remove) {
         sessions_.remove(token);
     }
 }
