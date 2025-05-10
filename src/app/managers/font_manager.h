@@ -58,7 +58,8 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit FontManager(QObject *parent = nullptr);
+    explicit FontManager(QObject *parent = nullptr): QObject(parent) {
+    };
 
     /**
      * @brief Private default destructor.
