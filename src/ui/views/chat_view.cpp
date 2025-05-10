@@ -616,8 +616,8 @@ void ChatView::StopAudioInput() {
     if (audio_input_ && (audio_input_->state() == QAudio::ActiveState || audio_input_->state() == QAudio::IdleState)) {
         // 1. disconnect the signal from input_device_, if it exists and is connected.
         if (input_device_) {
-            const bool disconnected = disconnect(input_device_, &QIODevice::readyRead, this,
-                                                 &ChatView::OnReadyReadInput);
+            disconnect(input_device_, &QIODevice::readyRead, this,
+                       &ChatView::OnReadyReadInput);
         }
 
         // 2. stop QAudioInput.
