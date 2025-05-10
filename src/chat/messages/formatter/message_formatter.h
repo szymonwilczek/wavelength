@@ -1,8 +1,9 @@
 #ifndef MESSAGE_FORMATTER_H
 #define MESSAGE_FORMATTER_H
 
-#include "../../../storage/wavelength_registry.h"
-#include "../../files/attachments/attachment_data_store.h"
+#include <QString>
+
+class QJsonObject;
 
 /**
  * @brief Provides static utility functions for formatting messages into HTML strings.
