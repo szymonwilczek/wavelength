@@ -27,19 +27,14 @@ public:
      * @brief Constructs a BlobTransitionManager.
      * @param parent Optional parent QObject.
      */
-    explicit BlobTransitionManager(QObject* parent = nullptr);
-
-    /**
-     * @brief Destructor. Cleans up the transition timer if it exists.
-     */
-    ~BlobTransitionManager() override;
+    explicit BlobTransitionManager(QObject *parent = nullptr);
 
     /**
      * @brief Structure representing a single sample of the window's position at a specific time.
      */
     struct WindowMovementSample {
-        QPointF position;   ///< The window's top-left position at the time of the sample.
-        qint64 timestamp;   ///< The timestamp (milliseconds since epoch) when the sample was taken.
+        QPointF position; ///< The window's top-left position at the time of the sample.
+        qint64 timestamp; ///< The timestamp (milliseconds since epoch) when the sample was taken.
     };
 
     /**
@@ -59,12 +54,13 @@ public:
      * @param SetLastWindowPos A function callback to update the last known window position used by dynamics.
      */
     void ProcessMovementBuffer(
-        std::vector<QPointF>& velocity,
-        QPointF& blob_center,
-        std::vector<QPointF>& control_points,
+        std::vector<QPointF> &velocity,
+        QPointF &blob_center,
+        std::vector<QPointF> &control_points,
         float blob_radius,
-        const std::function<void(std::vector<QPointF>&, QPointF&, std::vector<QPointF>&, float, QVector2D)> &ApplyInertiaForce,
-        const std::function<void(const QPointF&)> &SetLastWindowPos
+        const std::function<void(std::vector<QPointF> &, QPointF &, std::vector<QPointF> &, float, QVector2D)> &
+        ApplyInertiaForce,
+        const std::function<void(const QPointF &)> &SetLastWindowPos
     );
 
     /**
@@ -81,7 +77,7 @@ public:
      * @param position The window position sample.
      * @param timestamp The timestamp of the sample.
      */
-    void AddMovementSample(const QPointF& position, qint64 timestamp);
+    void AddMovementSample(const QPointF &position, qint64 timestamp);
 
     /**
      * @brief Clears the internal buffer of window movement samples.
@@ -92,7 +88,7 @@ public:
      * @brief Checks if the manager currently considers the window to be moving.
      * @return True if moving, false otherwise.
      */
-    bool IsMoving() const { return is_moving_; }
+    [[nodiscard]] bool IsMoving() const { return is_moving_; }
 
     /**
      * @brief Manually sets the moving state.
@@ -114,9 +110,9 @@ public:
 
     /**
      * @brief Gets the current value of the inactivity counter.
-     * @return The inactivity counter value.
+     * @return The inactivity counter-value.
      */
-    int GetInactivityCounter() const { return inactivity_counter_; }
+    [[nodiscard]] int GetInactivityCounter() const { return inactivity_counter_; }
 
     /**
      * @brief Increments the inactivity counter. Called when no significant movement is detected.
@@ -125,13 +121,13 @@ public:
 
     /**
      * @brief Gets the timestamp of the last recorded movement sample.
-     * @return Timestamp in milliseconds since epoch.
+     * @return Timestamp in milliseconds since the epoch.
      */
-    qint64 GetLastMovementTime() const { return last_movement_time_; }
+    [[nodiscard]] qint64 GetLastMovementTime() const { return last_movement_time_; }
 
     /**
      * @brief Manually sets the timestamp of the last movement.
-     * @param time The timestamp in milliseconds since epoch.
+     * @param time The timestamp in milliseconds since the epoch.
      */
     void SetLastMovementTime(const qint64 time) { last_movement_time_ = time; }
 
@@ -139,7 +135,7 @@ public:
      * @brief Gets a copy of the current movement buffer.
      * @return A deque containing the recent WindowMovementSample structs.
      */
-    std::pmr::deque<WindowMovementSample> GetMovementBuffer() const { return movement_buffer_; }
+    [[nodiscard]] std::pmr::deque<WindowMovementSample> GetMovementBuffer() const { return movement_buffer_; }
 
 signals:
     /**
@@ -164,28 +160,6 @@ private:
     std::pmr::deque<WindowMovementSample> movement_buffer_;
     /** @brief Smoothed velocity vector calculated from the movement buffer. */
     QVector2D m_smoothed_velocity_;
-
-    // --- Members related to idle transition (potentially deprecated/incomplete) ---
-    /** @brief Flag indicating if a transition to the idle state is in progress. */
-    bool in_transition_to_idle_ = false;
-    /** @brief Timestamp when the transition to idle started. */
-    qint64 transition_to_idle_start_time_ = 0;
-    /** @brief Duration of the transition to idle. */
-    qint64 transition_to_idle_duration_ = 0;
-    /** @brief Stores control points state before starting idle transition. */
-    std::vector<QPointF> original_control_points_;
-    /** @brief Stores velocities state before starting idle transition. */
-    std::vector<QPointF> original_velocities_;
-    /** @brief Stores blob center state before starting idle transition. */
-    QPointF original_blob_center_;
-    /** @brief Target control point positions for the idle state. */
-    std::vector<QPointF> target_idle_points_;
-    /** @brief Target center position for the idle state. */
-    QPointF target_idle_center_;
-    /** @brief Timer used for managing the idle transition steps. */
-    QTimer* transition_to_idle_timer_ = nullptr;
-    // --- End of idle transition members ---
-
     /** @brief Flag indicating if the window is currently considered to be moving based on processed samples. */
     bool is_moving_ = false;
     /** @brief Counter incremented each frame when no significant movement is detected. Used to determine when movement stops. */
