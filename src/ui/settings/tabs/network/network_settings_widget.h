@@ -3,7 +3,6 @@
 
 #include <QWidget>
 
-// Forward declarations
 class WavelengthConfig;
 class CyberLineEdit;
 class QSpinBox;
@@ -53,7 +52,6 @@ private:
 
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *config_;
-
     /** @brief Input field for the relay server address. */
     CyberLineEdit *server_address_edit_;
     /** @brief Spin box for the relay server port. */
