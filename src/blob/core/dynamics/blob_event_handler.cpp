@@ -1,6 +1,8 @@
 #include "blob_event_handler.h"
 
 #include <QDateTime>
+#include <QResizeEvent>
+#include <QWidget>
 
 BlobEventHandler::BlobEventHandler(QWidget *parent_widget)
     : QObject(parent_widget),
@@ -48,7 +50,7 @@ bool BlobEventHandler::ProcessResizeEvent(const QResizeEvent *event) {
 
     // throttling
     if (const qint64 current_time = QDateTime::currentMSecsSinceEpoch();
-        significant_change && (current_time - last_resize_time >= 16)) {
+        significant_change && current_time - last_resize_time >= 16) {
         last_resize_time = current_time;
 
         emit resizeStateRequested();

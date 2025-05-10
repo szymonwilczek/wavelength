@@ -2,11 +2,11 @@
 #define BLOBEVENTHANDLER_H
 
 #include <QObject>
-#include <QWidget>
-#include <QTimer>
 #include <QPointF>
-#include <QResizeEvent>
-#include <QDebug>
+#include <QTimer>
+
+class QMoveEvent;
+class QResizeEvent;
 
 /**
  * @brief Handles and processes window events (move, resize) for the Blob animation.
@@ -141,8 +141,6 @@ private:
      * @param move_event The QMoveEvent to handle.
      */
     void HandleMoveEvent(const QMoveEvent *move_event);
-
-    // --- Member Variables ---
 
     /** @brief Pointer to the parent widget whose window events are monitored. */
     QWidget *parent_widget_;
