@@ -1,8 +1,8 @@
-#include "cyber_text_display.h"
+#include "text_display_effect.h"
 
 #include <QPropertyAnimation>
 
-CyberTextDisplay::CyberTextDisplay(const QString &text, const TypingSoundType sound_type,
+TextDisplayEffect::TextDisplayEffect(const QString &text, const TypingSoundType sound_type,
                                    QWidget *parent): QWidget(parent), full_text_(text), revealed_chars_(0),
                                                      glitch_intensity_(0.0), is_fully_revealed_(false),
                                                      has_been_fully_revealed_once_(false),
@@ -25,10 +25,10 @@ CyberTextDisplay::CyberTextDisplay(const QString &text, const TypingSoundType so
     plain_text_ = RemoveHtml(full_text_);
 
     text_timer_ = new QTimer(this);
-    connect(text_timer_, &QTimer::timeout, this, &CyberTextDisplay::RevealNextChar);
+    connect(text_timer_, &QTimer::timeout, this, &TextDisplayEffect::RevealNextChar);
 
     glitch_timer_ = new QTimer(this);
-    connect(glitch_timer_, &QTimer::timeout, this, &CyberTextDisplay::RandomGlitch);
+    connect(glitch_timer_, &QTimer::timeout, this, &TextDisplayEffect::RandomGlitch);
     glitch_timer_->start(100);
 
     font_ = QFont(font_family, 10);
@@ -61,18 +61,18 @@ CyberTextDisplay::CyberTextDisplay(const QString &text, const TypingSoundType so
         }
     });
 
-    connect(this, &CyberTextDisplay::fullTextRevealed, this, &CyberTextDisplay::HandleFullTextRevealed);
+    connect(this, &TextDisplayEffect::fullTextRevealed, this, &TextDisplayEffect::HandleFullTextRevealed);
 
     RecalculateHeight();
 }
 
-CyberTextDisplay::~CyberTextDisplay() {
+TextDisplayEffect::~TextDisplayEffect() {
     if (media_player_ && media_player_->state() == QMediaPlayer::PlayingState) {
         media_player_->stop();
     }
 }
 
-void CyberTextDisplay::StartReveal() {
+void TextDisplayEffect::StartReveal() {
     if (has_been_fully_revealed_once_) {
         SetRevealedChars(plain_text_.length());
         text_timer_->stop();
@@ -97,7 +97,7 @@ void CyberTextDisplay::StartReveal() {
     update();
 }
 
-void CyberTextDisplay::SetText(const QString &new_text) {
+void TextDisplayEffect::SetText(const QString &new_text) {
     full_text_ = new_text;
     plain_text_ = RemoveHtml(full_text_);
     has_been_fully_revealed_once_ = false;
@@ -105,7 +105,7 @@ void CyberTextDisplay::SetText(const QString &new_text) {
     StartReveal();
 }
 
-void CyberTextDisplay::SetRevealedChars(const int chars) {
+void TextDisplayEffect::SetRevealedChars(const int chars) {
     revealed_chars_ = qMin(chars, plain_text_.length());
     const bool just_revealed = (revealed_chars_ >= plain_text_.length() && !is_fully_revealed_);
 
@@ -120,12 +120,12 @@ void CyberTextDisplay::SetRevealedChars(const int chars) {
     }
 }
 
-void CyberTextDisplay::SetGlitchIntensity(const qreal intensity) {
+void TextDisplayEffect::SetGlitchIntensity(const qreal intensity) {
     glitch_intensity_ = intensity;
     update();
 }
 
-void CyberTextDisplay::SetGlitchEffectEnabled(const bool enabled) {
+void TextDisplayEffect::SetGlitchEffectEnabled(const bool enabled) {
     if (enabled && !glitch_timer_->isActive()) {
         glitch_timer_->start(100);
     } else if (!enabled && glitch_timer_->isActive()) {
@@ -135,14 +135,14 @@ void CyberTextDisplay::SetGlitchEffectEnabled(const bool enabled) {
     }
 }
 
-QSize CyberTextDisplay::sizeHint() const {
+QSize TextDisplayEffect::sizeHint() const {
     const QFontMetrics font_metrics(font_);
     constexpr int width = 300;
     const int height = font_metrics.lineSpacing() * (plain_text_.count('\n') + 1) + 20;
     return QSize(width, height);
 }
 
-void CyberTextDisplay::paintEvent(QPaintEvent *event) {
+void TextDisplayEffect::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -218,12 +218,12 @@ void CyberTextDisplay::paintEvent(QPaintEvent *event) {
     }
 }
 
-void CyberTextDisplay::resizeEvent(QResizeEvent *event) {
+void TextDisplayEffect::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
     RecalculateHeight();
 }
 
-void CyberTextDisplay::hideEvent(QHideEvent *event) {
+void TextDisplayEffect::hideEvent(QHideEvent *event) {
     QWidget::hideEvent(event);
     if (media_player_ && media_player_->state() == QMediaPlayer::PlayingState) {
         media_player_->stop();
@@ -232,7 +232,7 @@ void CyberTextDisplay::hideEvent(QHideEvent *event) {
     glitch_timer_->stop();
 }
 
-void CyberTextDisplay::HandleFullTextRevealed() const {
+void TextDisplayEffect::HandleFullTextRevealed() const {
     if (text_timer_->isActive()) {
         text_timer_->stop();
     }
@@ -245,7 +245,7 @@ void CyberTextDisplay::HandleFullTextRevealed() const {
     }
 }
 
-void CyberTextDisplay::RevealNextChar() {
+void TextDisplayEffect::RevealNextChar() {
     if (revealed_chars_ < plain_text_.length()) {
         SetRevealedChars(revealed_chars_ + 1);
 
@@ -262,7 +262,7 @@ void CyberTextDisplay::RevealNextChar() {
     }
 }
 
-void CyberTextDisplay::RandomGlitch() {
+void TextDisplayEffect::RandomGlitch() {
     if (QRandomGenerator::global()->bounded(100) < 3) {
         TriggerGlitch();
     } else {
@@ -272,7 +272,7 @@ void CyberTextDisplay::RandomGlitch() {
     }
 }
 
-void CyberTextDisplay::TriggerGlitch() {
+void TextDisplayEffect::TriggerGlitch() {
     const auto glitch_animation = new QPropertyAnimation(this, "glitchIntensity");
     glitch_animation->setDuration(200);
     glitch_animation->setStartValue(0.2);
@@ -281,7 +281,7 @@ void CyberTextDisplay::TriggerGlitch() {
     glitch_animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-QString CyberTextDisplay::RemoveHtml(const QString &html) {
+QString TextDisplayEffect::RemoveHtml(const QString &html) {
     QString text = html;
     text.remove(QRegExp("<[^>]*>")); // removes html tags
     text = text.simplified(); // removes whitespaces
@@ -295,7 +295,7 @@ QString CyberTextDisplay::RemoveHtml(const QString &html) {
     return text;
 }
 
-void CyberTextDisplay::RecalculateHeight() {
+void TextDisplayEffect::RecalculateHeight() {
     const QFontMetrics font_metrics(font_);
     const int text_width = qMax(300, width() - 30);
 

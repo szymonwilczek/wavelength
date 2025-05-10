@@ -37,7 +37,7 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
     content_layout_->setContentsMargins(0, 0, 0, 0); // Zmieniono marginesy na 0
     layout_->addWidget(content_container_, 1);
 
-    mask_overlay_ = new MaskOverlay(content_container_);
+    mask_overlay_ = new MaskOverlayEffect(content_container_);
     mask_overlay_->setVisible(false);
 
     animation_timer_ = new QTimer(this);
@@ -55,7 +55,7 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     content_container_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    connect(this, &CyberAttachmentViewer::decryptionCounterChanged, mask_overlay_, &MaskOverlay::SetRevealProgress);
+    connect(this, &CyberAttachmentViewer::decryptionCounterChanged, mask_overlay_, &MaskOverlayEffect::SetRevealProgress);
 
     QTimer::singleShot(500, this, &CyberAttachmentViewer::OnActionButtonClicked);
 }

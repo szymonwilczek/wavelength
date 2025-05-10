@@ -1,4 +1,4 @@
-#include "cyber_long_text_display.h"
+#include "long_text_display_effect.h"
 
 #include <QPainter>
 #include <QFontMetrics>
@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <utility>
 
-CyberLongTextDisplay::CyberLongTextDisplay(QString text, const QColor &text_color, QWidget *parent): QWidget(parent),
+LongTextDisplayEffect::LongTextDisplayEffect(QString text, const QColor &text_color, QWidget *parent): QWidget(parent),
     original_text_(std::move(text)), text_color_(text_color),
     scroll_position_(0), cached_text_valid_(false) {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -18,7 +18,7 @@ CyberLongTextDisplay::CyberLongTextDisplay(QString text, const QColor &text_colo
     ProcessText();
 }
 
-void CyberLongTextDisplay::SetText(const QString &text) {
+void LongTextDisplayEffect::SetText(const QString &text) {
     if (original_text_ == text) return;
     original_text_ = text;
     cached_text_valid_ = false;
@@ -26,32 +26,32 @@ void CyberLongTextDisplay::SetText(const QString &text) {
     update();
 }
 
-void CyberLongTextDisplay::SetTextColor(const QColor &color) {
+void LongTextDisplayEffect::SetTextColor(const QColor &color) {
     if (text_color_ == color) return;
     text_color_ = color;
     update();
 }
 
-QSize CyberLongTextDisplay::sizeHint() const {
+QSize LongTextDisplayEffect::sizeHint() const {
     if (!cached_text_valid_) {
-        const_cast<CyberLongTextDisplay *>(this)->ProcessText();
+        const_cast<LongTextDisplayEffect *>(this)->ProcessText();
     }
     return size_hint_;
 }
 
-QSize CyberLongTextDisplay::minimumSizeHint() const {
+QSize LongTextDisplayEffect::minimumSizeHint() const {
     return sizeHint();
 }
 
 
-void CyberLongTextDisplay::SetScrollPosition(const int position) {
+void LongTextDisplayEffect::SetScrollPosition(const int position) {
     if (scroll_position_ != position) {
         scroll_position_ = position;
         update();
     }
 }
 
-void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
+void LongTextDisplayEffect::paintEvent(QPaintEvent *event) {
     if (!cached_text_valid_) {
         ProcessText();
     }
@@ -92,13 +92,13 @@ void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
     }
 }
 
-void CyberLongTextDisplay::resizeEvent(QResizeEvent *event) {
+void LongTextDisplayEffect::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
     cached_text_valid_ = false;
     ProcessText();
 }
 
-void CyberLongTextDisplay::ProcessText() {
+void LongTextDisplayEffect::ProcessText() {
     if (cached_text_valid_) return;
 
     processed_lines_.clear();

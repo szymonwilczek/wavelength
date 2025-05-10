@@ -18,7 +18,7 @@
  * recalculations during resizing. It supports vertical scrolling via the SetScrollPosition method
  * and emits a signal indicating the total required height for the content.
  */
-class CyberLongTextDisplay final : public QWidget {
+class LongTextDisplayEffect final : public QWidget {
     Q_OBJECT
 
 public:
@@ -30,7 +30,7 @@ public:
      * @param text_color The color for the displayed text.
      * @param parent Optional parent widget.
      */
-    explicit CyberLongTextDisplay(QString text, const QColor &text_color, QWidget *parent = nullptr);
+    explicit LongTextDisplayEffect(QString text, const QColor &text_color, QWidget *parent = nullptr);
 
     /**
      * @brief Sets the text content to be displayed.

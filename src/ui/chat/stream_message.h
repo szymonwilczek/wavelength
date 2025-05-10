@@ -7,8 +7,8 @@
 #include <QApplication>
 #include <QVBoxLayout>
 
-#include "../chat/effects/cyber_long_text_display.h"
-#include "../chat/effects/cyber_text_display.h"
+#include "../chat/effects/long_text_display_effect.h"
+#include "../chat/effects/text_display_effect.h"
 #include "../../chat/files/attachments/attachment_placeholder.h"
 #include "effects/electronic_shutdown_effect.h"
 
@@ -287,9 +287,9 @@ private:
     QTimer *animation_timer_; ///< Timer for subtle background animations.
     QWidget *attachment_widget_ = nullptr; ///< Widget holding the attachment placeholder/viewer.
     QLabel *content_label_ = nullptr; ///< Label for displaying short text content (if no CyberTextDisplay).
-    CyberTextDisplay *text_display_ = nullptr; ///< Widget for animated text reveal (short messages).
+    TextDisplayEffect *text_display_ = nullptr; ///< Widget for animated text reveal (short messages).
     QScrollArea *scroll_area_ = nullptr; ///< Scroll area for long messages.
-    CyberLongTextDisplay *long_text_display_ = nullptr; ///< Widget for displaying long text within scroll area.
+    LongTextDisplayEffect *long_text_display_ = nullptr; ///< Widget for displaying long text within scroll area.
 
     // Effects
     ElectronicShutdownEffect *shutdown_effect_ = nullptr; ///< Graphics effect for electronic shutdown animation.

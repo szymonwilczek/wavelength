@@ -1,20 +1,20 @@
-#include "mask_overlay.h"
+#include "mask_overlay_effect.h"
 
-MaskOverlay::MaskOverlay(QWidget *parent): QWidget(parent), reveal_percentage_(0), scanline_y_(0) {
+MaskOverlayEffect::MaskOverlayEffect(QWidget *parent): QWidget(parent), reveal_percentage_(0), scanline_y_(0) {
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_NoSystemBackground);
 
     scan_timer_ = new QTimer(this);
-    connect(scan_timer_, &QTimer::timeout, this, &MaskOverlay::UpdateScanLine);
+    connect(scan_timer_, &QTimer::timeout, this, &MaskOverlayEffect::UpdateScanLine);
     scan_timer_->start(30);
 }
 
-void MaskOverlay::SetRevealProgress(const int percentage) {
+void MaskOverlayEffect::SetRevealProgress(const int percentage) {
     reveal_percentage_ = qBound(0, percentage, 100);
     update();
 }
 
-void MaskOverlay::StartScanning() {
+void MaskOverlayEffect::StartScanning() {
     reveal_percentage_ = 0;
     scanline_y_ = 0;
     if (!scan_timer_->isActive()) {
@@ -24,12 +24,12 @@ void MaskOverlay::StartScanning() {
     update();
 }
 
-void MaskOverlay::StopScanning() {
+void MaskOverlayEffect::StopScanning() {
     scan_timer_->stop();
     setVisible(false);
 }
 
-void MaskOverlay::paintEvent(QPaintEvent *event) {
+void MaskOverlayEffect::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -83,7 +83,7 @@ void MaskOverlay::paintEvent(QPaintEvent *event) {
     }
 }
 
-void MaskOverlay::UpdateScanLine() {
+void MaskOverlayEffect::UpdateScanLine() {
     scanline_y_ += 4;
     if (scanline_y_ > height()) {
         scanline_y_ = 0;

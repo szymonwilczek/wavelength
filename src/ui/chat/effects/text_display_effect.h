@@ -19,7 +19,7 @@
  * and neon colors against a gradient background with scanlines. It handles HTML removal from the input text and
  * recalculates its required height based on content and width.
  */
-class CyberTextDisplay final : public QWidget {
+class TextDisplayEffect final : public QWidget {
     Q_OBJECT
     /** @brief Property controlling the number of characters currently revealed in the typing animation. Animatable. */
     Q_PROPERTY(int revealedChars READ GetRevealedChars WRITE SetRevealedChars)
@@ -45,12 +45,12 @@ public:
      * @param sound_type The type of typing sounds to use (defaults to kUserSound).
      * @param parent Optional parent widget.
      */
-    explicit CyberTextDisplay(const QString &text, TypingSoundType sound_type = kUserSound, QWidget *parent = nullptr);
+    explicit TextDisplayEffect(const QString &text, TypingSoundType sound_type = kUserSound, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Stops the media player if it's playing.
      */
-    ~CyberTextDisplay() override;
+    ~TextDisplayEffect() override;
 
     /**
      * @brief Starts or restarts the text revealing animation from the beginning.

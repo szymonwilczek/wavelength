@@ -17,7 +17,7 @@
  * transparent, revealing the content underneath. The widget is transparent to mouse events,
  * allowing interaction with the underlying widget.
  */
-class MaskOverlay final : public QWidget {
+class MaskOverlayEffect final : public QWidget {
     Q_OBJECT
 
 public:
@@ -27,7 +27,7 @@ public:
      * sets up and starts the timer for the scanline animation.
      * @param parent Optional parent widget.
      */
-    explicit MaskOverlay(QWidget* parent = nullptr);
+    explicit MaskOverlayEffect(QWidget *parent = nullptr);
 
 public slots:
     /**
@@ -57,7 +57,7 @@ protected:
      * near the reveal boundary.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private slots:
     /**
@@ -73,7 +73,7 @@ private:
     /** @brief The current vertical position (y-coordinate) of the scanline. */
     int scanline_y_;
     /** @brief Timer controlling the animation of the scanline's movement. */
-    QTimer* scan_timer_;
+    QTimer *scan_timer_;
 };
 
 #endif // MASK_OVERLAY_H

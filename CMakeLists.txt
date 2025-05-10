@@ -110,14 +110,14 @@ add_executable(
         src/ui/chat/stream_message.h
         src/ui/files/cyber_attachment_viewer.cpp
         src/ui/files/cyber_attachment_viewer.h
-        src/ui/chat/effects/cyber_text_display.cpp
-        src/ui/chat/effects/cyber_text_display.h
+        src/ui/chat/effects/text_display_effect.cpp
+        src/ui/chat/effects/text_display_effect.h
         src/chat/files/attachments/auto_scaling_attachment.cpp
         src/chat/files/attachments/auto_scaling_attachment.h
         src/ui/chat/effects/electronic_shutdown_effect.cpp
         src/ui/chat/effects/electronic_shutdown_effect.h
-        src/ui/chat/effects/cyber_long_text_display.cpp
-        src/ui/chat/effects/cyber_long_text_display.h
+        src/ui/chat/effects/long_text_display_effect.cpp
+        src/ui/chat/effects/long_text_display_effect.h
         src/app/style/cyberpunk_style.cpp
         src/app/style/cyberpunk_style.h
         src/ui/effects/cyberpunk_text_effect.cpp
@@ -171,8 +171,8 @@ add_executable(
         src/ui/settings/tabs/wavelength/wavelength_settings_widget.h
         src/ui/settings/tabs/network/network_settings_widget.cpp
         src/ui/settings/tabs/network/network_settings_widget.h
-        src/ui/chat/effects/mask_overlay.cpp
-        src/ui/chat/effects/mask_overlay.h
+        src/ui/chat/effects/mask_overlay_effect.cpp
+        src/ui/chat/effects/mask_overlay_effect.h
         src/ui/labels/user_info_label.cpp
         src/ui/labels/user_info_label.h
         src/app/managers/shortcut_manager.cpp

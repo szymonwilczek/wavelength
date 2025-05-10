@@ -53,7 +53,7 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
 
             scroll_area->setStyleSheet("QScrollArea { background: transparent; border: none; }");
 
-            auto long_text_display = new CyberLongTextDisplay(clean_content_, text_color);
+            auto long_text_display = new LongTextDisplayEffect(clean_content_, text_color);
             scroll_area->setWidget(long_text_display);
 
             main_layout_->addWidget(scroll_area);
@@ -61,23 +61,23 @@ StreamMessage::StreamMessage(QString content, QString sender, MessageType type, 
             long_text_display_ = long_text_display;
 
             connect(scroll_area->verticalScrollBar(), &QScrollBar::valueChanged,
-                    long_text_display, &CyberLongTextDisplay::SetScrollPosition);
+                    long_text_display, &LongTextDisplayEffect::SetScrollPosition);
 
-            connect(long_text_display, &CyberLongTextDisplay::contentHeightChanged, this,
+            connect(long_text_display, &LongTextDisplayEffect::contentHeightChanged, this,
                     [scroll_area](const int height) {
                         scroll_area->widget()->setMinimumHeight(height);
                     });
 
             setMinimumHeight(350);
         } else {
-            CyberTextDisplay::TypingSoundType sound_type;
+            TextDisplayEffect::TypingSoundType sound_type;
             if (sender_ == "SYSTEM") {
-                sound_type = CyberTextDisplay::kSystemSound;
+                sound_type = TextDisplayEffect::kSystemSound;
             } else {
-                sound_type = CyberTextDisplay::kUserSound;
+                sound_type = TextDisplayEffect::kUserSound;
             }
 
-            text_display_ = new CyberTextDisplay(clean_content_, sound_type, this);
+            text_display_ = new TextDisplayEffect(clean_content_, sound_type, this);
             main_layout_->addWidget(text_display_);
         }
     } else {
@@ -389,7 +389,7 @@ void StreamMessage::FadeIn() {
         animation_group->deleteLater();
 
         if (text_display_) {
-            QTimer::singleShot(50, text_display_, &CyberTextDisplay::StartReveal);
+            QTimer::singleShot(50, text_display_, &TextDisplayEffect::StartReveal);
         }
     });
 

@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QDebug>
 
-#include "../chat/effects/mask_overlay.h"
+#include "../chat/effects/mask_overlay_effect.h"
 
 class TranslationManager;
 /**
@@ -173,7 +173,7 @@ private:
     /** @brief Timer potentially used for secondary animations (like status label glitches). */
     QTimer *animation_timer_;
     /** @brief The overlay widget that handles the scanline and reveal effect. */
-    MaskOverlay *mask_overlay_;
+    MaskOverlayEffect *mask_overlay_;
     /** @brief Pointer to the translation manager for handling UI translations. */
     TranslationManager *translator_ = nullptr;
 };
