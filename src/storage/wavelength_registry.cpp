@@ -6,7 +6,7 @@ bool WavelengthRegistry::AddWavelength(const QString &frequency, const Wavelengt
     }
 
     wavelengths_[frequency] = info;
-    wavelengths_[frequency].frequency = frequency;  // Ensure frequency is correct
+    wavelengths_[frequency].frequency = frequency;
 
     if (pending_registrations_.contains(frequency)) {
         pending_registrations_.remove(frequency);
@@ -18,11 +18,10 @@ bool WavelengthRegistry::AddWavelength(const QString &frequency, const Wavelengt
 
 bool WavelengthRegistry::RemoveWavelength(const QString &frequency) {
     if (!HasWavelength(frequency)) {
-        qDebug() << "Cannot remove - wavelength" << frequency << "does not exist";
+        qDebug() << "[REGISTRY] Cannot remove - wavelength" << frequency << "does not exist";
         return false;
     }
 
-    // If this is the active wavelength, clear it
     if (active_wavelength_ == frequency) {
         active_wavelength_ = -1;
     }
@@ -37,17 +36,17 @@ WavelengthInfo WavelengthRegistry::GetWavelengthInfo(const QString &frequency) c
     if (HasWavelength(frequency)) {
         return wavelengths_[frequency];
     }
-    return WavelengthInfo(); // Return empty info
+    return WavelengthInfo();
 }
 
 bool WavelengthRegistry::UpdateWavelength(const QString &frequency, const WavelengthInfo &info) {
     if (!HasWavelength(frequency)) {
-        qDebug() << "Cannot update - wavelength" << frequency << "does not exist";
+        qDebug() << "[REGISTRY] Cannot update - wavelength" << frequency << "does not exist.";
         return false;
     }
 
     wavelengths_[frequency] = info;
-    wavelengths_[frequency].frequency = frequency;  // Ensure frequency is correct
+    wavelengths_[frequency].frequency = frequency;
 
     emit wavelengthUpdated(frequency);
     return true;
@@ -55,7 +54,7 @@ bool WavelengthRegistry::UpdateWavelength(const QString &frequency, const Wavele
 
 void WavelengthRegistry::SetActiveWavelength(const QString &frequency) {
     if (frequency != -1 && !HasWavelength(frequency)) {
-        qDebug() << "Cannot set active - wavelength" << frequency << "does not exist";
+        qDebug() << "[REGISTRY] Cannot set active - wavelength" << frequency << "does not exist.";
         return;
     }
 
@@ -67,8 +66,8 @@ void WavelengthRegistry::SetActiveWavelength(const QString &frequency) {
 
 bool WavelengthRegistry::AddPendingRegistration(const QString &frequency) {
     if (HasWavelength(frequency) || pending_registrations_.contains(frequency)) {
-        qDebug() << "Cannot add pending registration - wavelength"
-                << frequency << "already exists or is pending";
+        qDebug() << "[REGISTRY] Cannot add pending registration - wavelength"
+                << frequency << "already exists or is pending.";
         return false;
     }
 
@@ -116,7 +115,7 @@ bool WavelengthRegistry::IsWavelengthClosing(const QString &frequency) const {
 void WavelengthRegistry::ClearAllWavelengths() {
     QList<QString> frequencies = wavelengths_.keys();
 
-    for (QString frequency : frequencies) {
+    for (QString frequency: frequencies) {
         RemoveWavelength(frequency);
     }
 
