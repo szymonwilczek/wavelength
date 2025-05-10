@@ -1,4 +1,4 @@
-#include "inline_gif_player.h"
+#include "gif_player.h"
 
 #include <QApplication>
 #include <QTimer>
@@ -6,7 +6,7 @@
 
 #include "../../../../app/managers/translation_manager.h"
 
-InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent), gif_data_(gif_data) {
+GifPlayer::GifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent), gif_data_(gif_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -22,11 +22,11 @@ InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): Q
 
     decoder_ = std::make_shared<GifDecoder>(gif_data, this);
 
-    connect(decoder_.get(), &GifDecoder::firstFrameReady, this, &InlineGifPlayer::DisplayThumbnail,
+    connect(decoder_.get(), &GifDecoder::firstFrameReady, this, &GifPlayer::DisplayThumbnail,
             Qt::QueuedConnection);
-    connect(decoder_.get(), &GifDecoder::frameReady, this, &InlineGifPlayer::UpdateFrame, Qt::QueuedConnection);
-    connect(decoder_.get(), &GifDecoder::error, this, &InlineGifPlayer::HandleError, Qt::QueuedConnection);
-    connect(decoder_.get(), &GifDecoder::gifInfo, this, &InlineGifPlayer::HandleGifInfo, Qt::QueuedConnection);
+    connect(decoder_.get(), &GifDecoder::frameReady, this, &GifPlayer::UpdateFrame, Qt::QueuedConnection);
+    connect(decoder_.get(), &GifDecoder::error, this, &GifPlayer::HandleError, Qt::QueuedConnection);
+    connect(decoder_.get(), &GifDecoder::gifInfo, this, &GifPlayer::HandleGifInfo, Qt::QueuedConnection);
 
     QTimer::singleShot(0, this, [this]() {
         if (decoder_) {
@@ -36,13 +36,13 @@ InlineGifPlayer::InlineGifPlayer(const QByteArray &gif_data, QWidget *parent): Q
         }
     });
 
-    connect(qApp, &QApplication::aboutToQuit, this, &InlineGifPlayer::ReleaseResources);
+    connect(qApp, &QApplication::aboutToQuit, this, &GifPlayer::ReleaseResources);
 
     setMouseTracking(true);
     gif_label_->setMouseTracking(true);
 }
 
-void InlineGifPlayer::ReleaseResources() {
+void GifPlayer::ReleaseResources() {
     if (decoder_) {
         decoder_->Stop();
         if (decoder_->IsDecoderRunning()) {
@@ -53,38 +53,38 @@ void InlineGifPlayer::ReleaseResources() {
     }
 }
 
-QSize InlineGifPlayer::sizeHint() const {
+QSize GifPlayer::sizeHint() const {
     if (gif_width_ > 0 && gif_height_ > 0) {
         return QSize(gif_width_, gif_height_);
     }
     return QFrame::sizeHint();
 }
 
-void InlineGifPlayer::StartPlayback() {
+void GifPlayer::StartPlayback() {
     if (decoder_ && !is_playing_) {
         is_playing_ = true;
         decoder_->Resume();
     }
 }
 
-void InlineGifPlayer::StopPlayback() {
+void GifPlayer::StopPlayback() {
     if (decoder_ && is_playing_) {
         is_playing_ = false;
         decoder_->Pause();
     }
 }
 
-void InlineGifPlayer::enterEvent(QEvent *event) {
+void GifPlayer::enterEvent(QEvent *event) {
     StartPlayback();
     QFrame::enterEvent(event);
 }
 
-void InlineGifPlayer::leaveEvent(QEvent *event) {
+void GifPlayer::leaveEvent(QEvent *event) {
     StopPlayback();
     QFrame::leaveEvent(event);
 }
 
-void InlineGifPlayer::DisplayThumbnail(const QImage &frame) {
+void GifPlayer::DisplayThumbnail(const QImage &frame) {
     if (!frame.isNull()) {
         thumbnail_pixmap_ = QPixmap::fromImage(frame);
         gif_label_->setPixmap(thumbnail_pixmap_.scaled(
@@ -97,19 +97,19 @@ void InlineGifPlayer::DisplayThumbnail(const QImage &frame) {
     }
 }
 
-void InlineGifPlayer::UpdateFrame(const QImage &frame) const {
+void GifPlayer::UpdateFrame(const QImage &frame) const {
     if (frame.isNull() || !is_playing_) return;
     gif_label_->setPixmap(QPixmap::fromImage(frame));
 }
 
-void InlineGifPlayer::HandleError(const QString &message) {
+void GifPlayer::HandleError(const QString &message) {
     qDebug() << "[INLINE GIF PLAYER] GIF decoder error:" << message;
     gif_label_->setText("⚠️ " + message);
     setMinimumSize(100, 50);
     updateGeometry();
 }
 
-void InlineGifPlayer::HandleGifInfo(const int width, const int height, const double duration, const double frame_rate) {
+void GifPlayer::HandleGifInfo(const int width, const int height, const double duration, const double frame_rate) {
     gif_width_ = width;
     gif_height_ = height;
     gif_duration_ = duration;

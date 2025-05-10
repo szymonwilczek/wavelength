@@ -310,11 +310,11 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
     };
 
     if (is_gif) {
-        InlineGifPlayer *full_gif = nullptr;
-        full_gif = new InlineGifPlayer(data, scroll_area);
+        GifPlayer *full_gif = nullptr;
+        full_gif = new GifPlayer(data, scroll_area);
         content_widget = full_gif;
 
-        connect(full_gif, &InlineGifPlayer::gifLoaded, this, [=]() mutable {
+        connect(full_gif, &GifPlayer::gifLoaded, this, [=]() mutable {
             QTimer::singleShot(0, this, [=]() mutable {
                 show_with_size_check(full_gif, full_gif->sizeHint());
                 if (full_gif) {
@@ -475,7 +475,7 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
 
 void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
     const auto viewer = new CyberAttachmentViewer(content_container_);
-    const auto gif_player = new InlineGifPlayer(data, viewer);
+    const auto gif_player = new GifPlayer(data, viewer);
     const auto scaling_attachment = new AutoScalingAttachment(gif_player, viewer);
 
     QSize max_size(400, 300);

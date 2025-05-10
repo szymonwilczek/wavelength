@@ -82,8 +82,8 @@ add_executable(
         src/chat/files/audio/player/audio_player.h
         src/chat/files/gif/decoder/gif_decoder.cpp
         src/chat/files/gif/decoder/gif_decoder.h
-        src/chat/files/gif/player/inline_gif_player.cpp
-        src/chat/files/gif/player/inline_gif_player.h
+        src/chat/files/gif/player/gif_player.cpp
+        src/chat/files/gif/player/gif_player.h
         src/chat/files/image/decoder/image_decoder.cpp
         src/chat/files/image/decoder/image_decoder.h
         src/chat/files/image/displayer/image_viewer.cpp

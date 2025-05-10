@@ -3,7 +3,7 @@
 #include <QVBoxLayout>
 
 #include "../../../app/managers/translation_manager.h"
-#include "../gif/player/inline_gif_player.h"
+#include "../gif/player/gif_player.h"
 #include "../image/displayer/image_viewer.h"
 
 AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent): QWidget(parent), content_(content),
@@ -50,12 +50,12 @@ AutoScalingAttachment::AutoScalingAttachment(QWidget *content, QWidget *parent):
     content_container_->setCursor(Qt::PointingHandCursor);
 
     const auto image_viewer = qobject_cast<InlineImageViewer *>(content_);
-    const auto gif_player = qobject_cast<InlineGifPlayer *>(content_);
+    const auto gif_player = qobject_cast<GifPlayer *>(content_);
     if (image_viewer) {
         connect(image_viewer, &InlineImageViewer::imageLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
         connect(image_viewer, &InlineImageViewer::imageInfoReady, this, &AutoScalingAttachment::CheckAndScaleContent);
     } else if (gif_player) {
-        connect(gif_player, &InlineGifPlayer::gifLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
+        connect(gif_player, &GifPlayer::gifLoaded, this, &AutoScalingAttachment::CheckAndScaleContent);
     } else {
         QTimer::singleShot(50, this, &AutoScalingAttachment::CheckAndScaleContent);
     }

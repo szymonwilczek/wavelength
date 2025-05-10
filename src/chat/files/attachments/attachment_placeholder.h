@@ -9,7 +9,7 @@
 #include <QVBoxLayout>
 
 #include "attachment_queue_manager.h"
-#include "../gif/player/inline_gif_player.h"
+#include "../gif/player/gif_player.h"
 #include "../video/player/video_player.h"
 #include "../audio/player/audio_player.h"
 

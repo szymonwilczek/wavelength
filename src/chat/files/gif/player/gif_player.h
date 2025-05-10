@@ -15,7 +15,7 @@ class TranslationManager;
  * over the widget, playback starts automatically. Playback pauses when the mouse leaves.
  * The widget scales the displayed GIF while maintaining an aspect ratio.
  */
-class InlineGifPlayer final : public QFrame {
+class GifPlayer final : public QFrame {
     Q_OBJECT
 
 public:
@@ -27,12 +27,12 @@ public:
      * @param gif_data The raw GIF data to be played.
      * @param parent Optional parent widget.
      */
-    explicit InlineGifPlayer(const QByteArray &gif_data, QWidget *parent = nullptr);
+    explicit GifPlayer(const QByteArray &gif_data, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Ensures resources are released by calling ReleaseResources().
      */
-    ~InlineGifPlayer() override {
+    ~GifPlayer() override {
         ReleaseResources();
     }
 
@@ -47,7 +47,7 @@ public:
      * Returns the actual GIF width and height once known, otherwise falls back to the default QFrame size hint.
      * @return The recommended QSize for the widget.
      */
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
 
     /**
      * @brief Starts or resumes GIF playback.
