@@ -297,7 +297,7 @@ private:
     /** @brief Current audio amplitude value used for rendering (smoothed). */
     float current_audio_amplitude_;
     /** @brief Target audio amplitude based on the currently playing audio buffer. */
-    float target_audio_amplitude_;
+    float target_audio_amplitude_{};
     /** @brief Flag indicating if audio data has been successfully decoded and is ready for visualization. */
     bool audio_ready_;
     // --- End Audio ---
