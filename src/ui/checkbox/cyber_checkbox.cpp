@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QStyleOptionButton>
 
 CyberCheckBox::CyberCheckBox(const QString &text, QWidget *parent): QCheckBox(text, parent), glow_intensity_(0.5) {
     setStyleSheet(
