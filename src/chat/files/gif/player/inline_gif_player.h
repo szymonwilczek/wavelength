@@ -13,7 +13,7 @@ class TranslationManager;
  * This class uses GifDecoder to decode GIF data in a separate thread. It displays
  * the first frame as a static thumbnail initially. When the user hovers the mouse
  * over the widget, playback starts automatically. Playback pauses when the mouse leaves.
- * The widget scales the displayed GIF while maintaining aspect ratio.
+ * The widget scales the displayed GIF while maintaining an aspect ratio.
  */
 class InlineGifPlayer final : public QFrame {
     Q_OBJECT
@@ -27,7 +27,7 @@ public:
      * @param gif_data The raw GIF data to be played.
      * @param parent Optional parent widget.
      */
-    explicit InlineGifPlayer(const QByteArray& gif_data, QWidget* parent = nullptr);
+    explicit InlineGifPlayer(const QByteArray &gif_data, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor. Ensures resources are released by calling ReleaseResources().
@@ -85,7 +85,7 @@ private slots:
      * Stores the pixmap for later use (e.g., when pausing).
      * @param frame The first decoded frame of the GIF.
      */
-    void DisplayThumbnail(const QImage& frame);
+    void DisplayThumbnail(const QImage &frame);
 
     /**
      * @brief Slot connected to the decoder's frameReady signal.
@@ -93,7 +93,7 @@ private slots:
      * Relies on QLabel's setScaledContents(true) for rendering.
      * @param frame The newly decoded frame from the GIF.
      */
-    void UpdateFrame(const QImage& frame) const;
+    void UpdateFrame(const QImage &frame) const;
 
     /**
      * @brief Slot connected to the decoder's positionChanged signal.
@@ -109,7 +109,7 @@ private slots:
      * Logs the error message and displays it in the QLabel. Sets a minimum size for the widget.
      * @param message The error message from the decoder.
      */
-    void HandleError(const QString& message);
+    void HandleError(const QString &message);
 
     /**
      * @brief Slot connected to the decoder's gifInfo signal.
@@ -119,9 +119,8 @@ private slots:
      * @param height The height of the GIF in pixels.
      * @param duration The total duration of the GIF in seconds.
      * @param frame_rate The calculated average frame rate.
-     * @param num_of_streams The number of streams found (usually 1 for GIF).
      */
-    void HandleGifInfo(int width, int height, double duration, double frame_rate, int num_of_streams);
+    void HandleGifInfo(int width, int height, double duration, double frame_rate);
 
 signals:
     /**
@@ -132,7 +131,7 @@ signals:
 
 private:
     /** @brief QLabel used to display the GIF frames. ScaledContents is enabled. */
-    QLabel* gif_label_;
+    QLabel *gif_label_;
     /** @brief Shared pointer to the GifDecoder instance responsible for decoding. */
     std::shared_ptr<GifDecoder> decoder_;
 
@@ -156,7 +155,7 @@ private:
     /** @brief Stores the first frame as a QPixmap for efficient display as a thumbnail. */
     QPixmap thumbnail_pixmap_;
     /** @brief Pointer to the translation manager for handling UI translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 };
 
 #endif //INLINE_GIF_PLAYER_H
