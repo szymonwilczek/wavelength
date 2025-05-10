@@ -23,7 +23,7 @@ class TranslationManager;
  * The viewer itself has a cyberpunk-styled border and AR markers drawn in its paintEvent.
  * It manages the lifecycle of the MaskOverlay and the visibility of the content widget.
  */
-class CyberAttachmentViewer final : public QWidget {
+class AttachmentViewer final : public QWidget {
     Q_OBJECT
     /** @brief Property controlling the decryption progress (0-100). Animatable. Drives the MaskOverlay reveal. */
     Q_PROPERTY(
@@ -37,13 +37,13 @@ public:
      * and applies basic styling. Connects the decryptionCounter property to the MaskOverlay's progress.
      * @param parent Optional parent widget.
      */
-    explicit CyberAttachmentViewer(QWidget *parent = nullptr);
+    explicit AttachmentViewer(QWidget *parent = nullptr);
 
     /**
      * @brief Destructor.
      * Ensures graphics effects are removed from the content widget if set.
      */
-    ~CyberAttachmentViewer() override;
+    ~AttachmentViewer() override;
 
     /**
      * @brief Gets the current decryption progress counter (0-100).

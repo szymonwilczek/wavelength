@@ -7,7 +7,7 @@
 #include "auto_scaling_attachment.h"
 #include "../../../app/managers/translation_manager.h"
 #include "../image/displayer/image_viewer.h"
-#include "../../../ui/files/cyber_attachment_viewer.h"
+#include "../../../ui/files/attachment_viewer.h"
 
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type,
                                              QWidget *parent): QWidget(parent), filename_(filename), is_loaded_(false) {
@@ -120,7 +120,7 @@ void AttachmentPlaceholder::SetContent(QWidget *content) {
     updateGeometry();
 
     QTimer::singleShot(50, this, [this, content]() {
-        if (const auto viewer = qobject_cast<CyberAttachmentViewer *>(content)) {
+        if (const auto viewer = qobject_cast<AttachmentViewer *>(content)) {
             viewer->UpdateContentLayout();
         } else {
             content->updateGeometry();
@@ -445,7 +445,7 @@ void AttachmentPlaceholder::AdjustAndShowDialog(QDialog *dialog, const QScrollAr
 }
 
 void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
-    const auto viewer = new CyberAttachmentViewer(content_container_);
+    const auto viewer = new AttachmentViewer(content_container_);
     const auto image_viewer = new ImageViewer(data, viewer);
     image_viewer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     const auto scaling_attachment = new AutoScalingAttachment(image_viewer, viewer);
@@ -474,7 +474,7 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
-    const auto viewer = new CyberAttachmentViewer(content_container_);
+    const auto viewer = new AttachmentViewer(content_container_);
     const auto gif_player = new GifPlayer(data, viewer);
     const auto scaling_attachment = new AutoScalingAttachment(gif_player, viewer);
 
@@ -502,12 +502,12 @@ void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
-    const auto viewer = new CyberAttachmentViewer(content_container_);
+    const auto viewer = new AttachmentViewer(content_container_);
     const auto audio_player = new AudioPlayer(data, mime_type_, viewer);
 
     viewer->SetContent(audio_player);
 
-    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+    connect(viewer, &AttachmentViewer::viewingFinished, this, [this]() {
         load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);
@@ -518,7 +518,7 @@ void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
-    const auto viewer = new CyberAttachmentViewer(content_container_);
+    const auto viewer = new AttachmentViewer(content_container_);
     const auto video_preview = new QWidget(viewer);
 
     const auto preview_layout = new QVBoxLayout(video_preview);
@@ -584,7 +584,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
     thumbnail_label_ = thumbnail_label;
     ClickHandler_ = open_player;
 
-    connect(viewer, &CyberAttachmentViewer::viewingFinished, this, [this]() {
+    connect(viewer, &AttachmentViewer::viewingFinished, this, [this]() {
         load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);

@@ -6,7 +6,7 @@
 #include <QBitmap>
 
 #include "../../chat/files/attachments/auto_scaling_attachment.h"
-#include "../files/cyber_attachment_viewer.h"
+#include "../files/attachment_viewer.h"
 
 StreamMessage::StreamMessage(QString content, QString sender, MessageType type, QString message_id,
                              QWidget *parent): QWidget(parent), message_id_(std::move(message_id)),
@@ -243,8 +243,8 @@ void StreamMessage::AddAttachment(const QString &html) {
             this, [this]() {
                 QTimer::singleShot(200, this, [this]() {
                     if (attachment_widget_) {
-                        QList<CyberAttachmentViewer *> viewers =
-                                attachment_widget_->findChildren<CyberAttachmentViewer *>();
+                        QList<AttachmentViewer *> viewers =
+                                attachment_widget_->findChildren<AttachmentViewer *>();
 
                         if (!viewers.isEmpty()) {
                             QTimer::singleShot(100, this, [this, viewers]() {
@@ -283,9 +283,9 @@ void StreamMessage::AdjustSizeToContent() {
 
     QTimer::singleShot(100, this, [this, max_width, max_height]() {
         if (attachment_widget_) {
-            QList<CyberAttachmentViewer *> viewers = attachment_widget_->findChildren<CyberAttachmentViewer *>();
+            QList<AttachmentViewer *> viewers = attachment_widget_->findChildren<AttachmentViewer *>();
             if (!viewers.isEmpty()) {
-                CyberAttachmentViewer *viewer = viewers.first();
+                AttachmentViewer *viewer = viewers.first();
                 viewer->updateGeometry();
                 const QSize viewer_size = viewer->sizeHint();
 
@@ -339,8 +339,8 @@ QSize StreamMessage::sizeHint() const {
     if (attachment_widget_) {
         const QSize attachment_size = attachment_widget_->sizeHint();
 
-        QList<const CyberAttachmentViewer *> viewers =
-                attachment_widget_->findChildren<const CyberAttachmentViewer *>();
+        QList<const AttachmentViewer *> viewers =
+                attachment_widget_->findChildren<const AttachmentViewer *>();
 
         if (!viewers.isEmpty()) {
             const QSize viewer_size = viewers.first()->sizeHint();

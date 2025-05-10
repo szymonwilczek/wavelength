@@ -14,7 +14,7 @@
 #include "../audio/player/audio_player.h"
 
 class TranslationManager;
-class CyberAttachmentViewer;
+class AttachmentViewer;
 class AutoScalingAttachment;
 class ImageViewer;
 

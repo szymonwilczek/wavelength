@@ -12,7 +12,7 @@
 #include "../../chat/files/attachments/attachment_placeholder.h"
 #include "effects/electronic_shutdown_effect.h"
 
-class CyberAttachmentViewer;
+class AttachmentViewer;
 
 /**
  * @brief A custom widget representing a single message within the CommunicationStream.

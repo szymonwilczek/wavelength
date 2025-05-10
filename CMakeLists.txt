@@ -108,8 +108,8 @@ add_executable(
         src/ui/chat/stream_display.h
         src/ui/chat/stream_message.cpp
         src/ui/chat/stream_message.h
-        src/ui/files/cyber_attachment_viewer.cpp
-        src/ui/files/cyber_attachment_viewer.h
+        src/ui/files/attachment_viewer.cpp
+        src/ui/files/attachment_viewer.h
         src/ui/chat/effects/text_display_effect.cpp
         src/ui/chat/effects/text_display_effect.h
         src/chat/files/attachments/auto_scaling_attachment.cpp

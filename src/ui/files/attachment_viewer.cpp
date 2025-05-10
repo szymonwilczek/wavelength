@@ -1,11 +1,11 @@
-#include "cyber_attachment_viewer.h"
+#include "attachment_viewer.h"
 
 #include <QPainterPath>
 #include <QPropertyAnimation>
 
 #include "../../app/managers/translation_manager.h"
 
-CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), decryption_counter_(0),
+AttachmentViewer::AttachmentViewer(QWidget *parent): QWidget(parent), decryption_counter_(0),
                                                                is_scanning_(false), is_decrypted_(false) {
     translator_ = TranslationManager::GetInstance();
 
@@ -41,7 +41,7 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
     mask_overlay_->setVisible(false);
 
     animation_timer_ = new QTimer(this);
-    connect(animation_timer_, &QTimer::timeout, this, &CyberAttachmentViewer::UpdateAnimation);
+    connect(animation_timer_, &QTimer::timeout, this, &AttachmentViewer::UpdateAnimation);
 
     setStyleSheet(
         "CyberAttachmentViewer {"
@@ -55,18 +55,18 @@ CyberAttachmentViewer::CyberAttachmentViewer(QWidget *parent): QWidget(parent), 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     content_container_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    connect(this, &CyberAttachmentViewer::decryptionCounterChanged, mask_overlay_, &MaskOverlayEffect::SetRevealProgress);
+    connect(this, &AttachmentViewer::decryptionCounterChanged, mask_overlay_, &MaskOverlayEffect::SetRevealProgress);
 
-    QTimer::singleShot(500, this, &CyberAttachmentViewer::OnActionButtonClicked);
+    QTimer::singleShot(500, this, &AttachmentViewer::OnActionButtonClicked);
 }
 
-CyberAttachmentViewer::~CyberAttachmentViewer() {
+AttachmentViewer::~AttachmentViewer() {
     if (content_widget_) {
         content_widget_->setGraphicsEffect(nullptr);
     }
 }
 
-void CyberAttachmentViewer::SetDecryptionCounter(const int counter) {
+void AttachmentViewer::SetDecryptionCounter(const int counter) {
     if (decryption_counter_ != counter) {
         decryption_counter_ = counter;
         UpdateDecryptionStatus();
@@ -74,7 +74,7 @@ void CyberAttachmentViewer::SetDecryptionCounter(const int counter) {
     }
 }
 
-void CyberAttachmentViewer::UpdateContentLayout() {
+void AttachmentViewer::UpdateContentLayout() {
     if (content_widget_) {
         content_layout_->invalidate();
         content_layout_->activate();
@@ -94,7 +94,7 @@ void CyberAttachmentViewer::UpdateContentLayout() {
     }
 }
 
-void CyberAttachmentViewer::SetContent(QWidget *content) {
+void AttachmentViewer::SetContent(QWidget *content) {
     if (content_widget_) {
         content_layout_->removeWidget(content_widget_);
         content_widget_->deleteLater();
@@ -136,7 +136,7 @@ void CyberAttachmentViewer::SetContent(QWidget *content) {
     });
 }
 
-QSize CyberAttachmentViewer::sizeHint() const {
+QSize AttachmentViewer::sizeHint() const {
     QSize hint;
     int extra_height = status_label_->sizeHint().height() + layout_->spacing();
     const int extra_width = layout_->contentsMargins().left() + layout_->contentsMargins().right();
@@ -164,7 +164,7 @@ QSize CyberAttachmentViewer::sizeHint() const {
     return hint;
 }
 
-void CyberAttachmentViewer::resizeEvent(QResizeEvent *event) {
+void AttachmentViewer::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
     if (content_container_ && mask_overlay_) {
         mask_overlay_->setGeometry(content_container_->rect());
@@ -172,7 +172,7 @@ void CyberAttachmentViewer::resizeEvent(QResizeEvent *event) {
     }
 }
 
-void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
+void AttachmentViewer::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -236,7 +236,7 @@ void CyberAttachmentViewer::paintEvent(QPaintEvent *event) {
     painter.drawText(width() - 60, height() - 10, status);
 }
 
-void CyberAttachmentViewer::OnActionButtonClicked() {
+void AttachmentViewer::OnActionButtonClicked() {
     if (!is_decrypted_) {
         if (!is_scanning_) {
             StartScanningAnimation();
@@ -246,7 +246,7 @@ void CyberAttachmentViewer::OnActionButtonClicked() {
     }
 }
 
-void CyberAttachmentViewer::StartScanningAnimation() {
+void AttachmentViewer::StartScanningAnimation() {
     if (!content_widget_) return;
 
     is_scanning_ = true;
@@ -264,14 +264,14 @@ void CyberAttachmentViewer::StartScanningAnimation() {
             status_label_->setText(
                 translator_->Translate("CyberAttachmentViewer.ScanningCompleted",
                                        "SECURITY SCAN COMPLETED. DECRYPTING..."));
-            QTimer::singleShot(800, this, &CyberAttachmentViewer::StartDecryptionAnimation);
+            QTimer::singleShot(800, this, &AttachmentViewer::StartDecryptionAnimation);
         }
     });
 
     update();
 }
 
-void CyberAttachmentViewer::StartDecryptionAnimation() {
+void AttachmentViewer::StartDecryptionAnimation() {
     if (!content_widget_) return;
     if (is_decrypted_) return;
 
@@ -289,11 +289,11 @@ void CyberAttachmentViewer::StartDecryptionAnimation() {
     decryption_animation->setEndValue(100);
     decryption_animation->setEasingCurve(QEasingCurve::OutQuad);
 
-    connect(decryption_animation, &QPropertyAnimation::finished, this, &CyberAttachmentViewer::FinishDecryption);
+    connect(decryption_animation, &QPropertyAnimation::finished, this, &AttachmentViewer::FinishDecryption);
     decryption_animation->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
-void CyberAttachmentViewer::UpdateAnimation() const {
+void AttachmentViewer::UpdateAnimation() const {
     if (!is_decrypted_) {
         if (QRandomGenerator::global()->bounded(100) < 30) {
             QString base_text = status_label_->text();
@@ -314,13 +314,13 @@ void CyberAttachmentViewer::UpdateAnimation() const {
     }
 }
 
-void CyberAttachmentViewer::UpdateDecryptionStatus() const {
+void AttachmentViewer::UpdateDecryptionStatus() const {
     status_label_->setText(QString("%1 %2%")
         .arg(translator_->Translate("CyberAttachmentViewer.Decrypting", "DECRYPTING..."))
         .arg(decryption_counter_));
 }
 
-void CyberAttachmentViewer::FinishDecryption() {
+void AttachmentViewer::FinishDecryption() {
     is_decrypted_ = true;
     is_scanning_ = false;
 
@@ -336,6 +336,6 @@ void CyberAttachmentViewer::FinishDecryption() {
     update();
 }
 
-void CyberAttachmentViewer::CloseViewer() {
+void AttachmentViewer::CloseViewer() {
     emit viewingFinished();
 }
