@@ -333,7 +333,7 @@ void SettingsView::SetupClassifiedTab() {
             );
         override_button_->setEnabled(false);
         override_button_->setText(translator_->Translate("SettingsView.SystemOverrideInProgress", "OVERRIDE IN PROGRESS..."));
-        QMetaObject::invokeMethod(system_override_manager_, "initiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
+        QMetaObject::invokeMethod(system_override_manager_, "InitiateOverrideSequence", Qt::QueuedConnection, Q_ARG(bool, false));
 #endif
     });
     button_layout_classified->addWidget(override_button_);
