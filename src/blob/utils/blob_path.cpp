@@ -1,6 +1,7 @@
 #include "blob_path.h"
+#include "blob_math.h"
 
-QPainterPath BlobPath::CreateBlobPath(const std::vector<QPointF>& control_points, const int num_of_points) {
+QPainterPath BlobPath::CreateBlobPath(const std::vector<QPointF> &control_points, const int num_of_points) {
     QPainterPath path;
 
     if (control_points.empty()) return path;
@@ -23,7 +24,7 @@ QPainterPath BlobPath::CreateBlobPath(const std::vector<QPointF>& control_points
         if (!BlobMath::IsValidPoint(p0) || !BlobMath::IsValidPoint(p1) ||
             !BlobMath::IsValidPoint(p2) || !BlobMath::IsValidPoint(p3)) {
             continue;
-            }
+        }
 
         QPointF c1 = p1 + QPointF((p2.x() - p0.x()) * tension, (p2.y() - p0.y()) * tension);
         QPointF c2 = p2 + QPointF((p1.x() - p3.x()) * tension, (p1.y() - p3.y()) * tension);

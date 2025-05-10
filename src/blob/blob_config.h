@@ -10,14 +10,13 @@
  * physics simulation, idle state behavior, and overall animation state.
  */
 namespace BlobConfig {
-
     /**
      * @brief Defines the possible animation states for the blob.
      */
     enum AnimationState {
-        kIdle,      ///< The blob is stationary or exhibiting subtle idle animations.
-        kMoving,    ///< The blob is reacting to window movement (inertia).
-        kResizing   ///< The blob is reacting to window resizing.
+        kIdle, ///< The blob is stationary or exhibiting subtle idle animations.
+        kMoving, ///< The blob is reacting to window movement (inertia).
+        kResizing ///< The blob is reacting to window resizing.
     };
 
     /**
@@ -32,7 +31,7 @@ namespace BlobConfig {
         QColor border_color;
         /** @brief The radius/spread of the glow effect around the border in pixels. */
         int glow_radius = 10;
-        /** @brief The width of the main border line in pixels. */
+        /** @brief The width of the main borderline in pixels. */
         int border_width = 6;
         /** @brief The background color of the widget area. */
         QColor background_color;
