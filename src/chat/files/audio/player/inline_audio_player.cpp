@@ -1,7 +1,11 @@
 #include "inline_audio_player.h"
 
 #include <QApplication>
+#include <QPainter>
+#include <QPainterPath>
+#include <qpen.h>
 #include <QRandomGenerator>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../../app/managers/translation_manager.h"

@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QWindow>
 #include <functional>
+#include <QVBoxLayout>
 
 #include "attachment_queue_manager.h"
 #include "../gif/player/inline_gif_player.h"
