@@ -7,8 +7,11 @@
 #endif
 
 #include <QBuffer>
+#include <qmutex.h>
+#include <QThread>
+#include <QWaitCondition>
 
-#include "../../audio/decoder/audio_decoder.h"
+class AudioDecoder;
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -122,11 +125,7 @@ public:
      * This operation is thread-safe.
      * @param volume The desired volume level (0.0 to 1.0).
      */
-    void SetVolume(float volume) const {
-        if (audio_decoder_) {
-            audio_decoder_->SetVolume(volume);
-        }
-    }
+    void SetVolume(float volume) const;
 
     /**
      * @brief Gets the current playback volume (from the internal AudioDecoder).
@@ -134,9 +133,7 @@ public:
      * This operation is thread-safe.
      * @return The current volume level (0.0 to 1.0).
      */
-    float GetVolume() const {
-        return audio_decoder_ ? audio_decoder_->GetVolume() : 0.0f;
-    }
+    float GetVolume() const;
 
     /**
      * @brief Checks if the playback is currently paused.

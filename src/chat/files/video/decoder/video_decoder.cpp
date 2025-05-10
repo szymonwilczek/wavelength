@@ -1,6 +1,9 @@
 #include "video_decoder.h"
 
 #include <QImage>
+#include <QDebug>
+
+#include "../../audio/decoder/audio_decoder.h"
 
 VideoDecoder::VideoDecoder(const QByteArray &video_data, QObject *parent): QThread(parent), video_data_(video_data),
                                                                            paused_(true) {
@@ -269,6 +272,16 @@ void VideoDecoder::Seek(const double position) {
 
     if (paused_)
         wait_condition_.wakeOne();
+}
+
+void VideoDecoder::SetVolume(float volume) const {
+    if (audio_decoder_) {
+        audio_decoder_->SetVolume(volume);
+    }
+}
+
+float VideoDecoder::GetVolume() const {
+    return audio_decoder_ ? audio_decoder_->GetVolume() : 0.0f;
 }
 
 void VideoDecoder::run() {
