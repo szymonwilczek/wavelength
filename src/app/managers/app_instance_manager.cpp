@@ -1,14 +1,11 @@
 #include "app_instance_manager.h"
-#include "../../blob/core/blob_animation.h"
+
+#include <qcoreapplication.h>
 #include <QMainWindow>
-#include <QDataStream>
-#include <QCoreApplication>
-#include <QUuid>
-#include <QScreen>
-#include <QThread>
-#include <QRandomGenerator>
-#include <chrono>
 #include <QSequentialAnimationGroup>
+#include <QUuid>
+
+#include "../../blob/core/blob_animation.h"
 
 const QString AppInstanceManager::kServerName = "pk4-projekt-blob-animation";
 
