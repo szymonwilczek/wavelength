@@ -169,7 +169,7 @@ void AutoScalingAttachment::CheckAndScaleContent() {
     }
 
     if (parentWidget()) {
-        QTimer::singleShot(0, parentWidget(), [parent = parentWidget()]() {
+        QTimer::singleShot(0, parentWidget(), [parent = parentWidget()] {
             if (parent->layout()) parent->layout()->activate();
             parent->updateGeometry();
         });
