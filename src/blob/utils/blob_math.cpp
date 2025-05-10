@@ -1,5 +1,7 @@
 #include "blob_math.h"
 
+#include <qmath.h>
+#include <QPointF>
 #include <QRandomGenerator>
 
 bool BlobMath::IsValidPoint(const QPointF &point) {
