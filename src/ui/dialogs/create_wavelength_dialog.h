@@ -1,16 +1,17 @@
 #ifndef WAVELENGTH_DIALOG_H
 #define WAVELENGTH_DIALOG_H
 
-#include <QLabel>
-#include <QtConcurrent>
+#include <QFuture>
+#include <QTimer>
 
-#include "../../session/session_coordinator.h"
-#include "../../ui/dialogs/animated_dialog.h"
-#include "../../ui/buttons/cyber_button.h"
-#include "../../ui/checkbox/cyber_checkbox.h"
-#include "../input/cyber_line_edit.h"
+#include "animated_dialog.h"
 
+class CyberButton;
+class CyberLineEdit;
+class CyberCheckBox;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A dialog window for creating a new Wavelength frequency.
  *
@@ -98,17 +99,13 @@ public:
      * @brief Checks if the "Password Protected" checkbox is checked.
      * @return True if the checkbox is checked, false otherwise.
      */
-    bool IsPasswordProtected() const {
-        return password_protected_checkbox_->isChecked();
-    }
+    bool IsPasswordProtected() const;
 
     /**
      * @brief Gets the password entered by the user.
      * @return The password string.
      */
-    QString GetPassword() const {
-        return password_edit_->text();
-    }
+    QString GetPassword() const;
 
 protected:
     /**

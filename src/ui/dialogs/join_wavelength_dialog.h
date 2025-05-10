@@ -1,14 +1,16 @@
 #ifndef JOIN_WAVELENGTH_DIALOG_H
 #define JOIN_WAVELENGTH_DIALOG_H
 
-#include <QComboBox>
+#include <QTimer>
 
-#include "create_wavelength_dialog.h"
-#include "../../session/events/joiner/wavelength_joiner.h"
-#include "../../ui/dialogs/animated_dialog.h"
-#include "../buttons/cyber_button.h"
+#include "animated_dialog.h"
 
+class CyberButton;
+class QLabel;
+class QComboBox;
+class CyberLineEdit;
 class TranslationManager;
+
 /**
  * @brief A dialog window for joining an existing Wavelength frequency.
  *
@@ -80,9 +82,7 @@ public:
      * @brief Gets the password entered by the user from the input field.
      * @return The password string.
      */
-    QString GetPassword() const {
-        return password_edit_->text();
-    }
+    QString GetPassword() const;
 
     /** @brief Gets a pointer to the internal refresh timer used for scanline animation updates. */
     QTimer *GetRefreshTimer() const { return refresh_timer_; }

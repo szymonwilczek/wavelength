@@ -4,8 +4,6 @@
 #include <QScreen>
 
 #include "../../ui/dialogs/join_wavelength_dialog.h"
-#include "../../ui/dialogs/create_wavelength_dialog.h"
-#include "../navigation/navbar.h"
 #include "../widgets/overlay_widget.h"
 
 AnimatedDialog::AnimatedDialog(QWidget *parent, const AnimationType type)
@@ -64,7 +62,7 @@ void AnimatedDialog::closeEvent(QCloseEvent *event) {
             overlay_animation->setEndValue(0.0);
             overlay_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-            connect(overlay_animation, &QPropertyAnimation::finished, this, [this]() {
+            connect(overlay_animation, &QPropertyAnimation::finished, this, [this] {
                 if (overlay_) {
                     overlay_->deleteLater();
                     overlay_ = nullptr;
@@ -128,7 +126,7 @@ void AnimatedDialog::AnimateShow() {
 
             sequential_group->addAnimation(digital_animation); // 2. animation of digitization
 
-            connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, digital_dialog]() {
+            connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, digital_dialog] {
                 emit showAnimationFinished();
                 digital_dialog->SetRefreshTimerInterval(100);
             });
@@ -144,14 +142,14 @@ void AnimatedDialog::AnimateShow() {
 
             sequential_group->addAnimation(digital_animation); // 2. animation of digitization
 
-            connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, join_dialog]() {
+            connect(sequential_group, &QSequentialAnimationGroup::finished, this, [this, join_dialog] {
                 emit showAnimationFinished();
                 join_dialog->SetRefreshTimerInterval(100);
             });
         }
 
         if (!is_dialog_animated) {
-            connect(show_parallel_group, &QParallelAnimationGroup::finished, this, [this]() {
+            connect(show_parallel_group, &QParallelAnimationGroup::finished, this, [this] {
                 emit showAnimationFinished();
             });
             show_parallel_group->start(QAbstractAnimation::DeleteWhenStopped);
@@ -214,7 +212,7 @@ void AnimatedDialog::AnimateClose() {
                 group->addAnimation(digital_animation);
                 group->addAnimation(glitch_animation);
 
-                connect(group, &QAbstractAnimation::finished, this, [this]() {
+                connect(group, &QAbstractAnimation::finished, this, [this] {
                     close();
                 });
 
@@ -238,7 +236,7 @@ void AnimatedDialog::AnimateClose() {
                 group->addAnimation(digital_animation);
                 group->addAnimation(glitch_animation);
 
-                connect(group, &QAbstractAnimation::finished, this, [this]() {
+                connect(group, &QAbstractAnimation::finished, this, [this] {
                     close();
                 });
 
@@ -246,7 +244,7 @@ void AnimatedDialog::AnimateClose() {
             }
 
             if (!is_dialog_animated) {
-                connect(animation, &QPropertyAnimation::finished, this, [this]() {
+                connect(animation, &QPropertyAnimation::finished, this, [this] {
                     close();
                 });
                 animation->start(QAbstractAnimation::DeleteWhenStopped);
@@ -259,7 +257,7 @@ void AnimatedDialog::AnimateClose() {
 
     if (animation) {
         animation->setDuration(duration_);
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
+        connect(animation, &QPropertyAnimation::finished, this, [this] {
             close();
         });
         animation->start(QAbstractAnimation::DeleteWhenStopped);
