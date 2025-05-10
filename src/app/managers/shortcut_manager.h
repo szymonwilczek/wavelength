@@ -6,6 +6,8 @@
 #include <QMap>
 #include <concepts>
 
+#include "../wavelength_config.h"
+
 class QWidget;
 class QShortcut;
 class WavelengthConfig;
@@ -31,27 +33,27 @@ public:
      * @brief Gets the singleton instance of the ShortcutManager.
      * @return Pointer to the singleton ShortcutManager instance.
      */
-    static ShortcutManager* GetInstance();
+    static ShortcutManager *GetInstance();
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    ShortcutManager(const ShortcutManager&) = delete;
+    ShortcutManager(const ShortcutManager &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    ShortcutManager& operator=(const ShortcutManager&) = delete;
+    ShortcutManager &operator=(const ShortcutManager &) = delete;
 
     /**
      * @brief Registers shortcuts specific to the provided parent widget.
      *
      * Identifies the type of the parent widget (QMainWindow, WavelengthChatView, SettingsView)
-     * and calls the appropriate private registration method. Clears any previously registered
+     * and calls the appropriate private registration method. Clear any previously registered
      * shortcuts for this widget before registering new ones.
      * @param parent The widget for which to register shortcuts. Must not be null.
      */
-    void RegisterShortcuts(QWidget* parent);
+    void RegisterShortcuts(QWidget *parent);
 
 public slots:
     /**
@@ -69,44 +71,33 @@ private:
      * Initializes the pointer to the WavelengthConfig singleton.
      * @param parent Optional parent QObject.
      */
-    explicit ShortcutManager(QObject *parent = nullptr);
+    explicit ShortcutManager(QObject *parent = nullptr) : QObject(parent), config_(WavelengthConfig::GetInstance()) {
+    }
 
     /**
      * @brief Private default destructor.
      */
     ~ShortcutManager() override = default;
 
-    /**
-     * @brief Pointer to the WavelengthConfig singleton instance for retrieving shortcut sequences.
-     */
-    WavelengthConfig* config_;
-
-    /**
-     * @brief Stores all registered shortcuts, organized by parent widget.
-     * The outer map's key is the parent QWidget*.
-     * The inner map's key is the action ID (QString, e.g., "MainWindow.OpenSettings")
-     * and the value is the corresponding QShortcut* object.
-     */
-    QMap<QWidget*, QMap<QString, QShortcut*>> registered_shortcuts_;
 
     /**
      * @brief Registers shortcuts specific to the main application window.
      * @param window Pointer to the QMainWindow instance.
      * @param navbar Pointer to the Navbar instance within the main window.
      */
-    void RegisterMainWindowShortcuts(QMainWindow* window, Navbar* navbar);
+    void RegisterMainWindowShortcuts(QMainWindow *window, Navbar *navbar);
 
     /**
      * @brief Registers shortcuts specific to the WavelengthChatView.
      * @param chat_view Pointer to the WavelengthChatView instance.
      */
-    void RegisterChatViewShortcuts(WavelengthChatView* chat_view);
+    void RegisterChatViewShortcuts(WavelengthChatView *chat_view);
 
     /**
      * @brief Registers shortcuts specific to the SettingsView.
      * @param settings_view Pointer to the SettingsView instance.
      */
-    void RegisterSettingsViewShortcuts(SettingsView* settings_view);
+    void RegisterSettingsViewShortcuts(SettingsView *settings_view);
 
     /**
      * @brief Template helper function to create and connect a QShortcut.
@@ -121,8 +112,21 @@ private:
      * @param lambda The function or lambda to execute when the shortcut is activated.
      */
     template<typename Func>
-    requires std::invocable<Func>
-    void CreateAndConnectShortcut(const QString& action_id, QWidget* parent, Func lambda);
+        requires std::invocable<Func>
+    void CreateAndConnectShortcut(const QString &action_id, QWidget *parent, Func lambda);
+
+    /**
+     * @brief Pointer to the WavelengthConfig singleton instance for retrieving shortcut sequences.
+     */
+    WavelengthConfig *config_;
+
+    /**
+     * @brief Stores all registered shortcuts, organized by parent widget.
+     * The outer map's key is the parent QWidget*.
+     * The inner map's key is the action ID (QString, e.g., "MainWindow.OpenSettings"),
+     * and the value is the corresponding QShortcut* object.
+     */
+    QMap<QWidget *, QMap<QString, QShortcut *> > registered_shortcuts_;
 };
 
 #endif // SHORTCUT_MANAGER_H
