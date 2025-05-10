@@ -1,6 +1,9 @@
 #include "cyber_line_edit.h"
 
+#include <QPainter>
+#include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QTimer>
 
 CyberLineEdit::CyberLineEdit(QWidget *parent): QLineEdit(parent), glow_intensity_(0.0), cursor_visible_(true) {
     setStyleSheet("border: none; background-color: transparent; padding: 6px; font-family: Consolas; font-size: 9pt;");
@@ -13,7 +16,7 @@ CyberLineEdit::CyberLineEdit(QWidget *parent): QLineEdit(parent), glow_intensity
 
     cursor_blink_timer_ = new QTimer(this);
     cursor_blink_timer_->setInterval(530);
-    connect(cursor_blink_timer_, &QTimer::timeout, this, [this]() {
+    connect(cursor_blink_timer_, &QTimer::timeout, this, [this] {
         cursor_visible_ = !cursor_visible_;
 
         if (hasFocus()) {
