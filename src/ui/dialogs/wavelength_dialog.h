@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QtConcurrent>
 
-#include "../../session/wavelength_session_coordinator.h"
+#include "../../session/session_coordinator.h"
 #include "../../ui/dialogs/animated_dialog.h"
 #include "../../ui/buttons/cyber_button.h"
 #include "../../ui/checkbox/cyber_checkbox.h"

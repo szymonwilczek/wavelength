@@ -66,8 +66,8 @@ add_executable(
         src/services/wavelength_event_broker.h
         src/app/wavelength_config.cpp
         src/app/wavelength_config.h
-        src/session/wavelength_session_coordinator.cpp
-        src/session/wavelength_session_coordinator.h
+        src/session/session_coordinator.cpp
+        src/session/session_coordinator.h
         src/chat/messages/formatter/message_formatter.cpp
         src/chat/messages/formatter/message_formatter.h
         src/blob/core/dynamics/blob_transition_manager.cpp

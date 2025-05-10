@@ -8,7 +8,7 @@
 #include <QIODevice>
 
 #include "../../ui/chat/wavelength_stream_display.h"
-#include "../../session/wavelength_session_coordinator.h"
+#include "../../session/session_coordinator.h"
 
 /**
  * @brief The main view for displaying and interacting with a specific Wavelength chat session.

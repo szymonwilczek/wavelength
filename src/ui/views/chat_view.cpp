@@ -155,14 +155,14 @@ ChatView::ChatView(QWidget *parent): QWidget(parent), scanline_opacity_(0.15) {
     connect(message_service, &MessageService::progressMessageUpdated,
             this, &ChatView::UpdateProgressMessage);
 
-    const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
-    connect(coordinator, &WavelengthSessionCoordinator::pttGranted, this, &ChatView::OnPttGranted);
-    connect(coordinator, &WavelengthSessionCoordinator::pttDenied, this, &ChatView::OnPttDenied);
-    connect(coordinator, &WavelengthSessionCoordinator::pttStartReceiving, this,
+    const SessionCoordinator *coordinator = SessionCoordinator::GetInstance();
+    connect(coordinator, &SessionCoordinator::pttGranted, this, &ChatView::OnPttGranted);
+    connect(coordinator, &SessionCoordinator::pttDenied, this, &ChatView::OnPttDenied);
+    connect(coordinator, &SessionCoordinator::pttStartReceiving, this,
             &ChatView::OnPttStartReceiving);
-    connect(coordinator, &WavelengthSessionCoordinator::pttStopReceiving, this,
+    connect(coordinator, &SessionCoordinator::pttStopReceiving, this,
             &ChatView::OnPttStopReceiving);
-    connect(coordinator, &WavelengthSessionCoordinator::audioDataReceived, this,
+    connect(coordinator, &SessionCoordinator::audioDataReceived, this,
             &ChatView::OnAudioDataReceived);
 
     const auto glitch_timer = new QTimer(this);
@@ -507,7 +507,7 @@ void ChatView::AbortWavelength() {
         "font-size: 9pt;"
     );
 
-    const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
+    const SessionCoordinator *coordinator = SessionCoordinator::GetInstance();
 
     bool isHost = false;
     if (coordinator->GetWavelengthInfo(current_frequency_, &isHost).is_host) {

@@ -18,7 +18,7 @@
  * It handles the initialization sequence, connects signals between components, and forwards
  * events and actions. It also publishes events to the WavelengthEventBroker for decoupling.
  */
-class WavelengthSessionCoordinator final : public QObject {
+class SessionCoordinator final : public QObject {
     Q_OBJECT
 
 public:
@@ -26,10 +26,20 @@ public:
      * @brief Gets the singleton instance of the WavelengthSessionCoordinator.
      * @return Pointer to the singleton WavelengthSessionCoordinator instance.
      */
-    static WavelengthSessionCoordinator *GetInstance() {
-        static WavelengthSessionCoordinator instance;
+    static SessionCoordinator *GetInstance() {
+        static SessionCoordinator instance;
         return &instance;
     }
+
+    /**
+     * @brief Deleted copy constructor to prevent copying.
+     */
+    SessionCoordinator(const SessionCoordinator &) = delete;
+
+    /**
+     * @brief Deleted assignment operator to prevent assignment.
+     */
+    SessionCoordinator &operator=(const SessionCoordinator &) = delete;
 
     /**
      * @brief Initializes the coordinator and its underlying components.
@@ -100,7 +110,7 @@ public:
      * @return A WavelengthInfo struct.
      */
     static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool *is_host = nullptr) {
-        return WavelengthStateManager::GetInstance()->GetWavelengthInfo(frequency, is_host);
+        return WavelengthStateManager::GetWavelengthInfo(frequency, is_host);
     }
 
     /**
@@ -109,7 +119,7 @@ public:
      * @return The active frequency string, or "-1" if none.
      */
     static QString GetActiveWavelength() {
-        return WavelengthStateManager::GetInstance()->GetActiveWavelength();
+        return WavelengthStateManager::GetActiveWavelength();
     }
 
     /**
@@ -127,7 +137,7 @@ public:
      * @return True if the user is the host of the active wavelength, false otherwise.
      */
     static bool IsActiveWavelengthHost() {
-        return WavelengthStateManager::GetInstance()->IsActiveWavelengthHost();
+        return WavelengthStateManager::IsActiveWavelengthHost();
     }
 
     /**
@@ -155,7 +165,7 @@ public:
      * @return True if password protected, false otherwise.
      */
     static bool IsWavelengthPasswordProtected(const QString &frequency) {
-        return WavelengthStateManager::GetInstance()->IsWavelengthPasswordProtected(frequency);
+        return WavelengthStateManager::IsWavelengthPasswordProtected(frequency);
     }
 
     /**
@@ -165,9 +175,8 @@ public:
      * @return True if the user is the host, false otherwise.
      */
     static bool IsWavelengthHost(const QString &frequency) {
-        return WavelengthStateManager::GetInstance()->IsWavelengthHost(frequency);
+        return WavelengthStateManager::IsWavelengthHost(frequency);
     }
-
 
     /**
      * @brief Checks if the user is considered joined to a specific wavelength (based on registry presence).
@@ -414,23 +423,13 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthSessionCoordinator(QObject *parent = nullptr) : QObject(parent) {
+    explicit SessionCoordinator(QObject *parent = nullptr) : QObject(parent) {
     }
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthSessionCoordinator() override = default;
-
-    /**
-     * @brief Deleted copy constructor to prevent copying.
-     */
-    WavelengthSessionCoordinator(const WavelengthSessionCoordinator &) = delete;
-
-    /**
-     * @brief Deleted assignment operator to prevent assignment.
-     */
-    WavelengthSessionCoordinator &operator=(const WavelengthSessionCoordinator &) = delete;
+    ~SessionCoordinator() override = default;
 
     /**
      * @brief Connects signals between the various Wavelength components.

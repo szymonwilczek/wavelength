@@ -20,7 +20,7 @@
 #include "src/ui/views/chat_view.h"
 #include "src/ui/dialogs/wavelength_dialog.h"
 
-#include "src/session/wavelength_session_coordinator.h"
+#include "src/session/session_coordinator.h"
 #include "src/app/style/cyberpunk_style.h"
 #include "src/ui/effects/cyberpunk_text_effect.h"
 #include "src/ui/widgets/animated_stacked_widget.h"
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     });
 
 
-    WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
+    SessionCoordinator *coordinator = SessionCoordinator::GetInstance();
     coordinator->Initialize();
 
     auto event_listening = [animation, event_filter](const bool enable) {
@@ -292,21 +292,21 @@ int main(int argc, char *argv[]) {
         stacked_widget->SlideToWidget(chat_view);
     };
 
-    QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
+    QObject::connect(coordinator, &SessionCoordinator::messageReceived,
                      chat_view, &ChatView::OnMessageReceived);
 
-    QObject::connect(coordinator, &WavelengthSessionCoordinator::messageSent,
+    QObject::connect(coordinator, &SessionCoordinator::messageSent,
                      chat_view, &ChatView::OnMessageSent);
 
-    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
+    QObject::connect(coordinator, &SessionCoordinator::wavelengthClosed,
                      chat_view, &ChatView::OnWavelengthClosed);
 
-    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
+    QObject::connect(coordinator, &SessionCoordinator::wavelengthCreated,
                      [switch_to_chat_view](const QString &frequency) {
                          switch_to_chat_view(frequency);
                      });
 
-    QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthJoined,
+    QObject::connect(coordinator, &SessionCoordinator::wavelengthJoined,
                      [switch_to_chat_view](const QString &frequency) {
                          switch_to_chat_view(frequency);
                      });
