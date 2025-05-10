@@ -156,14 +156,14 @@ void MessageProcessor::ProcessWavelengthClosed(const QString &frequency) {
 }
 
 MessageProcessor::MessageProcessor(QObject *parent): QObject(parent) {
-    const WavelengthMessageService *service = WavelengthMessageService::GetInstance();
-    connect(this, &MessageProcessor::pttGranted, service, &WavelengthMessageService::pttGranted);
-    connect(this, &MessageProcessor::pttDenied, service, &WavelengthMessageService::pttDenied);
+    const MessageService *service = MessageService::GetInstance();
+    connect(this, &MessageProcessor::pttGranted, service, &MessageService::pttGranted);
+    connect(this, &MessageProcessor::pttDenied, service, &MessageService::pttDenied);
     connect(this, &MessageProcessor::pttStartReceiving, service,
-            &WavelengthMessageService::pttStartReceiving);
-    connect(this, &MessageProcessor::pttStopReceiving, service, &WavelengthMessageService::pttStopReceiving);
+            &MessageService::pttStartReceiving);
+    connect(this, &MessageProcessor::pttStopReceiving, service, &MessageService::pttStopReceiving);
     connect(this, &MessageProcessor::audioDataReceived, service,
-            &WavelengthMessageService::audioDataReceived);
+            &MessageService::audioDataReceived);
     connect(this, &MessageProcessor::remoteAudioAmplitudeUpdate, service,
-            &WavelengthMessageService::remoteAudioAmplitudeUpdate);
+            &MessageService::remoteAudioAmplitudeUpdate);
 }

@@ -1,10 +1,10 @@
 #ifndef WAVELENGTH_MESSAGE_PROCESSOR_H
 #define WAVELENGTH_MESSAGE_PROCESSOR_H
 
-#include "wavelength_message_service.h"
+#include "message_service.h"
 #include "../handler/message_handler.h"
 
-class WavelengthMessageService;
+class MessageService;
 
 /**
  * @brief Singleton class responsible for processing incoming WebSocket messages for specific wavelengths.

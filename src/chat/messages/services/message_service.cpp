@@ -1,10 +1,10 @@
-#include "wavelength_message_service.h"
+#include "message_service.h"
 
 #include "../../../app/managers/translation_manager.h"
 #include "../../../auth/authentication_manager.h"
 #include "../../files/attachments/attachment_queue_manager.h"
 
-bool WavelengthMessageService::SendPttRequest(const QString &frequency) {
+bool MessageService::SendPttRequest(const QString &frequency) {
     QWebSocket *socket = GetSocketForFrequency(frequency);
     if (!socket) return false;
 
@@ -18,7 +18,7 @@ bool WavelengthMessageService::SendPttRequest(const QString &frequency) {
     return true;
 }
 
-bool WavelengthMessageService::SendPttRelease(const QString &frequency) {
+bool MessageService::SendPttRelease(const QString &frequency) {
     QWebSocket *socket = GetSocketForFrequency(frequency);
     if (!socket) return false;
 
@@ -32,7 +32,7 @@ bool WavelengthMessageService::SendPttRelease(const QString &frequency) {
     return true;
 }
 
-bool WavelengthMessageService::SendAudioData(const QString &frequency, const QByteArray &audio_data) {
+bool MessageService::SendAudioData(const QString &frequency, const QByteArray &audio_data) {
     QWebSocket *socket = GetSocketForFrequency(frequency);
     if (!socket) return false;
 
@@ -40,7 +40,7 @@ bool WavelengthMessageService::SendAudioData(const QString &frequency, const QBy
     return bytes_sent == audio_data.size();
 }
 
-bool WavelengthMessageService::SendTextMessage(const QString &message) {
+bool MessageService::SendTextMessage(const QString &message) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     const QString frequency = registry->GetActiveWavelength();
 
@@ -92,7 +92,7 @@ bool WavelengthMessageService::SendTextMessage(const QString &message) {
     return true;
 }
 
-bool WavelengthMessageService::SendFile(const QString &file_path, const QString &progress_message_id) {
+bool MessageService::SendFile(const QString &file_path, const QString &progress_message_id) {
     if (file_path.isEmpty()) {
         emit progressMessageUpdated(progress_message_id,
                                     "<span style=\"color:#ff5555;\">Error: Empty file path</span>");
@@ -230,7 +230,7 @@ bool WavelengthMessageService::SendFile(const QString &file_path, const QString 
     return true;
 }
 
-bool WavelengthMessageService::SendFileToServer(const QString &json_message, const QString &frequency,
+bool MessageService::SendFileToServer(const QString &json_message, const QString &frequency,
                                                 const QString &progress_message_id) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     const TranslationManager *translator = TranslationManager::GetInstance();
@@ -264,7 +264,7 @@ bool WavelengthMessageService::SendFileToServer(const QString &json_message, con
     return true;
 }
 
-void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
+void MessageService::HandleSendJsonViaSocket(const QString &json_message, const QString &frequency,
                                                        const QString &progress_message_id) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     const TranslationManager *translator = TranslationManager::GetInstance();
@@ -292,14 +292,14 @@ void WavelengthMessageService::HandleSendJsonViaSocket(const QString &json_messa
     );
 }
 
-WavelengthMessageService::WavelengthMessageService(QObject *parent): QObject(parent) {
+MessageService::MessageService(QObject *parent): QObject(parent) {
     // Łączymy sygnał wysyłania przez socket z odpowiednim slotem
-    connect(this, &WavelengthMessageService::sendJsonViaSocket,
-            this, &WavelengthMessageService::HandleSendJsonViaSocket,
+    connect(this, &MessageService::sendJsonViaSocket,
+            this, &MessageService::HandleSendJsonViaSocket,
             Qt::QueuedConnection);
 }
 
-QWebSocket *WavelengthMessageService::GetSocketForFrequency(const QString &frequency) {
+QWebSocket *MessageService::GetSocketForFrequency(const QString &frequency) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     if (!registry->HasWavelength(frequency)) {
         qWarning() << "[MESSAGE SERVICE] No wavelength info found for frequency" << frequency <<

@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "events/leaver/wavelength_leaver.h"
-#include "../chat/messages/services/wavelength_message_service.h"
+#include "../chat/messages/services/message_service.h"
 #include "../services/wavelength_state_manager.h"
 #include "../services/wavelength_event_broker.h"
 #include "../../src/app/wavelength_config.h"
@@ -87,7 +87,7 @@ public:
      * @return True if the file sending a task was successfully queued, false otherwise.
      */
     static bool SendFile(const QString &file_path) {
-        return WavelengthMessageService::GetInstance()->SendFile(file_path);
+        return MessageService::GetInstance()->SendFile(file_path);
     }
 
     // ---- State Management Methods ----

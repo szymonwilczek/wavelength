@@ -151,8 +151,8 @@ ChatView::ChatView(QWidget *parent): QWidget(parent), scanline_opacity_(0.15) {
     connect(attach_button_, &QPushButton::clicked, this, &ChatView::AttachFile);
     connect(abort_button_, &QPushButton::clicked, this, &ChatView::AbortWavelength);
 
-    const WavelengthMessageService *message_service = WavelengthMessageService::GetInstance();
-    connect(message_service, &WavelengthMessageService::progressMessageUpdated,
+    const MessageService *message_service = MessageService::GetInstance();
+    connect(message_service, &MessageService::progressMessageUpdated,
             this, &ChatView::UpdateProgressMessage);
 
     const WavelengthSessionCoordinator *coordinator = WavelengthSessionCoordinator::GetInstance();
@@ -289,7 +289,7 @@ void ChatView::AttachFile() {
 
     message_area_->AddMessage(processing_message, progress_message_id, StreamMessage::MessageType::kTransmitted);
 
-    WavelengthMessageService *service = WavelengthMessageService::GetInstance();
+    MessageService *service = MessageService::GetInstance();
     const bool started = service->SendFile(file_path, progress_message_id);
 
     if (!started) {
@@ -321,7 +321,7 @@ void ChatView::OnPttButtonPressed() {
     qDebug() << "[CHAT VIEW] PTT Button Pressed - Requesting PTT for" << current_frequency_;
     ptt_state_ = Requesting;
     UpdatePttButtonState();
-    WavelengthMessageService::GetInstance()->SendPttRequest(current_frequency_);
+    MessageService::GetInstance()->SendPttRequest(current_frequency_);
     ptt_button_->setStyleSheet("background-color: yellow; color: black;");
 }
 
@@ -335,7 +335,7 @@ void ChatView::OnPttButtonReleased() {
     if (ptt_state_ == Transmitting) {
         qDebug() << "[CHAT VIEW] PTT Button Released - Stopping Transmission for" << current_frequency_;
         StopAudioInput();
-        WavelengthMessageService::GetInstance()->SendPttRelease(current_frequency_);
+        MessageService::GetInstance()->SendPttRelease(current_frequency_);
         message_area_->ClearTransmittingUser();
         message_area_->SetAudioAmplitude(0.0);
     } else if (ptt_state_ == Requesting) {
@@ -484,7 +484,7 @@ void ChatView::SendMessage() const {
 
     input_field_->clear();
 
-    WavelengthMessageService *manager = WavelengthMessageService::GetInstance();
+    MessageService *manager = MessageService::GetInstance();
     manager->SendTextMessage(message);
 }
 

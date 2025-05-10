@@ -47,7 +47,7 @@ void WavelengthSessionCoordinator::CloseWavelength(const QString &frequency) {
 }
 
 bool WavelengthSessionCoordinator::SendMessage(const QString &message) {
-        return WavelengthMessageService::GetInstance()->SendTextMessage(message);
+        return MessageService::GetInstance()->SendTextMessage(message);
 }
 
 bool WavelengthSessionCoordinator::IsWavelengthJoined(const QString &frequency) {
@@ -86,19 +86,19 @@ void WavelengthSessionCoordinator::ConnectSignals() {
                 this, &WavelengthSessionCoordinator::onWavelengthClosed, Qt::DirectConnection);
 
         // WavelengthMessageService
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::messageSent,
+        connect(MessageService::GetInstance(), &MessageService::messageSent,
                 this, &WavelengthSessionCoordinator::onMessageSent, Qt::DirectConnection);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::pttGranted, this,
+        connect(MessageService::GetInstance(), &MessageService::pttGranted, this,
                 &WavelengthSessionCoordinator::onPttGranted);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::pttDenied, this,
+        connect(MessageService::GetInstance(), &MessageService::pttDenied, this,
                 &WavelengthSessionCoordinator::onPttDenied);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::pttStartReceiving, this,
+        connect(MessageService::GetInstance(), &MessageService::pttStartReceiving, this,
                 &WavelengthSessionCoordinator::onPttStartReceiving);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::pttStopReceiving, this,
+        connect(MessageService::GetInstance(), &MessageService::pttStopReceiving, this,
                 &WavelengthSessionCoordinator::onPttStopReceiving);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::audioDataReceived, this,
+        connect(MessageService::GetInstance(), &MessageService::audioDataReceived, this,
                 &WavelengthSessionCoordinator::onAudioDataReceived);
-        connect(WavelengthMessageService::GetInstance(), &WavelengthMessageService::remoteAudioAmplitudeUpdate, this,
+        connect(MessageService::GetInstance(), &MessageService::remoteAudioAmplitudeUpdate, this,
                 &WavelengthSessionCoordinator::onRemoteAudioAmplitudeUpdate);
 
         // WavelengthMessageProcessor

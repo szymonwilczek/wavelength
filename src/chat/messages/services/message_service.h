@@ -15,7 +15,7 @@
  * File sending is handled asynchronously using AttachmentQueueManager to avoid blocking the main thread.
  * It provides signals for tracking message sending progress and status, as well as PTT and audio events.
  */
-class WavelengthMessageService final : public QObject {
+class MessageService final : public QObject {
     Q_OBJECT
 
 public:
@@ -23,10 +23,20 @@ public:
      * @brief Gets the singleton instance of the WavelengthMessageService.
      * @return Pointer to the singleton WavelengthMessageService instance.
      */
-    static WavelengthMessageService *GetInstance() {
-        static WavelengthMessageService instance;
+    static MessageService *GetInstance() {
+        static MessageService instance;
         return &instance;
     }
+
+    /**
+     * @brief Deleted copy constructor to prevent copying.
+     */
+    MessageService(const MessageService &) = delete;
+
+    /**
+     * @brief Deleted assignment operator to prevent assignment.
+     */
+    MessageService &operator=(const MessageService &) = delete;
 
     /**
      * @brief Sends a Push-to-Talk (PTT) request message for the specified frequency.
@@ -110,7 +120,7 @@ public:
      * @brief Gets the client ID currently associated with this service instance.
      * @return The client ID string.
      */
-    QString GetClientId() const {
+    [[nodiscard]] QString GetClientId() const {
         return client_id_;
     }
 
@@ -227,23 +237,12 @@ private:
      * Connects the internal sendJsonViaSocket signal to the HandleSendJsonViaSocket slot.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthMessageService(QObject *parent = nullptr);
+    explicit MessageService(QObject *parent = nullptr);
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthMessageService() override {
-    }
-
-    /**
-     * @brief Deleted copy constructor to prevent copying.
-     */
-    WavelengthMessageService(const WavelengthMessageService &) = delete;
-
-    /**
-     * @brief Deleted assignment operator to prevent assignment.
-     */
-    WavelengthMessageService &operator=(const WavelengthMessageService &) = delete;
+    ~MessageService() override = default;
 
     /** @brief Cache storing the content of recently sent text messages, mapped by message ID. */
     QMap<QString, QString> sent_messages_;
