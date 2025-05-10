@@ -26,7 +26,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthSessionCoordinator.
      * @return Pointer to the singleton WavelengthSessionCoordinator instance.
      */
-    static WavelengthSessionCoordinator* GetInstance() {
+    static WavelengthSessionCoordinator *GetInstance() {
         static WavelengthSessionCoordinator instance;
         return &instance;
     }
@@ -48,7 +48,7 @@ public:
      * @return True if the creation process was initiated, false otherwise (e.g., already exists).
      */
     static bool CreateWavelength(const QString &frequency,
-                                 bool is_password_protected, const QString& password);
+                                 bool is_password_protected, const QString &password);
 
     /**
      * @brief Initiates joining an existing wavelength.
@@ -57,7 +57,7 @@ public:
      * @param password Optional password for the wavelength.
      * @return True if the join process was initiated, false otherwise (e.g., already joined).
      */
-    static bool JoinWavelength(const QString &frequency, const QString& password = QString());
+    static bool JoinWavelength(const QString &frequency, const QString &password = QString());
 
     /**
      * @brief Leaves the currently active wavelength.
@@ -78,15 +78,15 @@ public:
      * @param message The text message content.
      * @return True if the message was sent successfully, false otherwise.
      */
-    static bool SendMessage(const QString& message);
+    static bool SendMessage(const QString &message);
 
     /**
      * @brief Sends a file to the currently active wavelength.
      * Delegates the call to WavelengthMessageService.
      * @param file_path The local path to the file.
-     * @return True if the file sending task was successfully queued, false otherwise.
+     * @return True if the file sending a task was successfully queued, false otherwise.
      */
-    static bool SendFile(const QString& file_path) {
+    static bool SendFile(const QString &file_path) {
         return WavelengthMessageService::GetInstance()->SendFile(file_path);
     }
 
@@ -99,7 +99,7 @@ public:
      * @param is_host Optional output parameter; set to true if the current user is the host.
      * @return A WavelengthInfo struct.
      */
-    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool* is_host = nullptr) {
+    static WavelengthInfo GetWavelengthInfo(const QString &frequency, bool *is_host = nullptr) {
         return WavelengthStateManager::GetInstance()->GetWavelengthInfo(frequency, is_host);
     }
 
@@ -201,7 +201,7 @@ public:
      * Delegates the call to WavelengthConfig.
      * @param address The new server address string.
      */
-    static void SetRelayServerAddress(const QString& address) {
+    static void SetRelayServerAddress(const QString &address) {
         WavelengthConfig::GetInstance()->SetRelayServerAddress(address);
     }
 
@@ -217,34 +217,49 @@ public:
 signals:
     /** @brief Emitted when a wavelength is successfully created. Relayed from WavelengthCreator. */
     void wavelengthCreated(QString frequency);
+
     /** @brief Emitted when a wavelength is successfully joined. Relayed from WavelengthJoiner. */
     void wavelengthJoined(QString frequency);
+
     /** @brief Emitted when the user leaves the active wavelength. Relayed from WavelengthLeaver. */
     void wavelengthLeft(QString frequency);
+
     /** @brief Emitted when a wavelength is closed (by host or server). Relayed from multiple components. */
     void wavelengthClosed(QString frequency);
+
     /** @brief Emitted when a message is received. Relayed from WavelengthMessageProcessor/Joiner. */
-    void messageReceived(QString frequency, const QString& message);
+    void messageReceived(QString frequency, const QString &message);
+
     /** @brief Emitted when a message is successfully sent. Relayed from WavelengthMessageService. */
-    void messageSent(QString frequency, const QString& message);
+    void messageSent(QString frequency, const QString &message);
+
     /** @brief Emitted when a connection error occurs. Relayed from WavelengthCreator/Joiner. */
-    void connectionError(const QString& error_message);
+    void connectionError(const QString &error_message);
+
     /** @brief Emitted when authentication fails during join. Relayed from WavelengthJoiner. */
     void authenticationFailed(QString frequency);
+
     /** @brief Emitted when the current user is kicked from a frequency. Relayed from WavelengthMessageProcessor. */
-    void userKicked(QString frequency, const QString& reason);
+    void userKicked(QString frequency, const QString &reason);
+
     /** @brief Emitted when the active wavelength changes. Relayed from WavelengthStateManager. */
     void activeWavelengthChanged(QString frequency);
+
     /** @brief Emitted when PTT transmission is granted. Relayed from WavelengthMessageService. */
     void pttGranted(QString frequency);
+
     /** @brief Emitted when PTT transmission is denied. Relayed from WavelengthMessageService. */
     void pttDenied(QString frequency, QString reason);
+
     /** @brief Emitted when another user starts PTT transmission. Relayed from WavelengthMessageService. */
     void pttStartReceiving(QString frequency, QString sender_id);
+
     /** @brief Emitted when another user stops PTT transmission. Relayed from WavelengthMessageService. */
     void pttStopReceiving(QString frequency);
+
     /** @brief Emitted when raw audio data is received. Relayed from WavelengthMessageService. */
-    void audioDataReceived(QString frequency, const QByteArray& audio_data);
+    void audioDataReceived(QString frequency, const QByteArray &audio_data);
+
     /** @brief Emitted when remote audio amplitude updates are received. Relayed from WavelengthMessageService. */
     void remoteAudioAmplitudeUpdate(QString frequency, qreal amplitude);
 
@@ -256,7 +271,7 @@ private slots:
      */
     void onWavelengthCreated(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthCreated signal for frequency" << frequency;
-        emit wavelengthCreated(frequency);  // DIRECT SIGNAL EMISSION
+        emit wavelengthCreated(frequency);
         WavelengthEventBroker::GetInstance()->WavelengthCreated(frequency);
     }
 
@@ -267,7 +282,7 @@ private slots:
      */
     void onWavelengthJoined(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthJoined signal for frequency" << frequency;
-        emit wavelengthJoined(frequency);  // DIRECT SIGNAL EMISSION
+        emit wavelengthJoined(frequency);
         WavelengthEventBroker::GetInstance()->WavelengthJoined(frequency);
     }
 
@@ -278,7 +293,7 @@ private slots:
      */
     void onWavelengthLeft(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthLeft signal for frequency" << frequency;
-        emit wavelengthLeft(frequency);  // DIRECT SIGNAL EMISSION
+        emit wavelengthLeft(frequency);
         WavelengthEventBroker::GetInstance()->WavelengthLeft(frequency);
     }
 
@@ -289,7 +304,7 @@ private slots:
      */
     void onWavelengthClosed(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating wavelengthClosed signal for frequency" << frequency;
-        emit wavelengthClosed(frequency);  // DIRECT SIGNAL EMISSION
+        emit wavelengthClosed(frequency);
         WavelengthEventBroker::GetInstance()->WavelengthClosed(frequency);
     }
 
@@ -299,9 +314,9 @@ private slots:
      * @param frequency The frequency the message belongs to.
      * @param message The formatted message content.
      */
-    void onMessageReceived(const QString &frequency, const QString& message) {
+    void onMessageReceived(const QString &frequency, const QString &message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageReceived signal";
-        emit messageReceived(frequency, message);  // DIRECT SIGNAL EMISSION
+        emit messageReceived(frequency, message);
         WavelengthEventBroker::GetInstance()->MessageReceived(frequency, message);
     }
 
@@ -311,9 +326,9 @@ private slots:
      * @param frequency The frequency the message was sent to.
      * @param message The formatted message content.
      */
-    void onMessageSent(const QString &frequency, const QString& message) {
+    void onMessageSent(const QString &frequency, const QString &message) {
         qDebug() << "WavelengthSessionCoordinator: Propagating messageSent signal";
-        emit messageSent(frequency, message);  // DIRECT SIGNAL EMISSION
+        emit messageSent(frequency, message);
         WavelengthEventBroker::GetInstance()->MessageSent(frequency, message);
     }
 
@@ -322,9 +337,9 @@ private slots:
      * Relays the signal and publishes the event via WavelengthEventBroker.
      * @param errorMessage Description of the error.
      */
-    void onConnectionError(const QString& errorMessage) {
+    void onConnectionError(const QString &errorMessage) {
         qDebug() << "WavelengthSessionCoordinator: Propagating connectionError signal:" << errorMessage;
-        emit connectionError(errorMessage);  // DIRECT SIGNAL EMISSION
+        emit connectionError(errorMessage);
         WavelengthEventBroker::GetInstance()->ConnectionError(errorMessage);
     }
 
@@ -335,7 +350,7 @@ private slots:
      */
     void onAuthenticationFailed(const QString &frequency) {
         qDebug() << "WavelengthSessionCoordinator: Propagating authenticationFailed signal for frequency" << frequency;
-        emit authenticationFailed(frequency);  // DIRECT SIGNAL EMISSION
+        emit authenticationFailed(frequency);
         WavelengthEventBroker::GetInstance()->AuthenticationFailed(frequency);
     }
 
@@ -345,8 +360,9 @@ private slots:
      * @param frequency The new active frequency.
      */
     void onActiveWavelengthChanged(const QString &frequency) {
-        qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" << frequency;
-        emit activeWavelengthChanged(frequency);  // DIRECT SIGNAL EMISSION
+        qDebug() << "WavelengthSessionCoordinator: Propagating activeWavelengthChanged signal for frequency" <<
+                frequency;
+        emit activeWavelengthChanged(frequency);
         WavelengthEventBroker::GetInstance()->ActiveWavelengthChanged(frequency);
     }
 
@@ -355,23 +371,42 @@ private slots:
      * Logs the change.
      * @param key The configuration key that changed.
      */
-    static void onConfigChanged(const QString& key) {
+    static void onConfigChanged(const QString &key) {
         qDebug() << "Configuration changed:" << key;
     }
 
     // --- PTT Slots (receiving from WavelengthMessageService) ---
+
     /** @brief Relays the pttGranted signal. */
-    void onPttGranted(const QString &frequency) { emit pttGranted(frequency); }
+    void onPttGranted(const QString &frequency) {
+        emit pttGranted(frequency);
+    }
+
     /** @brief Relays the pttDenied signal. */
-    void onPttDenied(const QString &frequency, const QString &reason) { emit pttDenied(frequency, reason); }
+    void onPttDenied(const QString &frequency, const QString &reason) {
+        emit pttDenied(frequency, reason);
+    }
+
     /** @brief Relays the pttStartReceiving signal. */
-    void onPttStartReceiving(const QString &frequency, const QString &sender_id) { emit pttStartReceiving(frequency, sender_id); }
+    void onPttStartReceiving(const QString &frequency, const QString &sender_id) {
+        emit pttStartReceiving(frequency, sender_id);
+    }
+
     /** @brief Relays the pttStopReceiving signal. */
-    void onPttStopReceiving(const QString &frequency) { emit pttStopReceiving(frequency); }
+    void onPttStopReceiving(const QString &frequency) {
+        emit pttStopReceiving(frequency);
+    }
+
     /** @brief Relays the audioDataReceived signal. */
-    void onAudioDataReceived(const QString &frequency, const QByteArray& audio_data) { emit audioDataReceived(frequency, audio_data); }
+    void onAudioDataReceived(const QString &frequency, const QByteArray &audio_data) {
+        emit audioDataReceived(frequency, audio_data);
+    }
+
     /** @brief Relays the remoteAudioAmplitudeUpdate signal. */
-    void onRemoteAudioAmplitudeUpdate(const QString &frequency, const qreal amplitude) { emit remoteAudioAmplitudeUpdate(frequency, amplitude); }
+    void onRemoteAudioAmplitudeUpdate(const QString &frequency, const qreal amplitude) {
+        emit remoteAudioAmplitudeUpdate(frequency, amplitude);
+    }
+
     // --- End PTT Slots ---
 
 private:
@@ -379,23 +414,23 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthSessionCoordinator(QObject* parent = nullptr) : QObject(parent) {
-        // Private constructor for singleton
+    explicit WavelengthSessionCoordinator(QObject *parent = nullptr) : QObject(parent) {
     }
 
     /**
      * @brief Private destructor.
      */
-    ~WavelengthSessionCoordinator() override = default; // Use default destructor
+    ~WavelengthSessionCoordinator() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthSessionCoordinator(const WavelengthSessionCoordinator&) = delete;
+    WavelengthSessionCoordinator(const WavelengthSessionCoordinator &) = delete;
+
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthSessionCoordinator& operator=(const WavelengthSessionCoordinator&) = delete;
+    WavelengthSessionCoordinator &operator=(const WavelengthSessionCoordinator &) = delete;
 
     /**
      * @brief Connects signals between the various Wavelength components.
