@@ -1,13 +1,19 @@
 #include "attachment_placeholder.h"
 
 #include <qfileinfo.h>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QWindow>
 
 #include "attachment_data_store.h"
+#include "attachment_queue_manager.h"
 #include "auto_scaling_attachment.h"
 #include "../../../app/managers/translation_manager.h"
-#include "../image/displayer/image_viewer.h"
 #include "../../../ui/files/attachment_viewer.h"
+#include "../audio/player/audio_player.h"
+#include "../gif/player/gif_player.h"
+#include "../image/displayer/image_viewer.h"
+#include "../video/player/video_player.h"
 
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type,
                                              QWidget *parent): QWidget(parent), filename_(filename), is_loaded_(false) {
@@ -119,7 +125,7 @@ void AttachmentPlaceholder::SetContent(QWidget *content) {
     layout()->activate();
     updateGeometry();
 
-    QTimer::singleShot(50, this, [this, content]() {
+    QTimer::singleShot(50, this, [this, content] {
         if (const auto viewer = qobject_cast<AttachmentViewer *>(content)) {
             viewer->UpdateContentLayout();
         } else {
@@ -203,7 +209,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
     SetLoading(true);
 
     if (has_reference_) {
-        AttachmentQueueManager::GetInstance()->AddTask([this]() {
+        AttachmentQueueManager::GetInstance()->AddTask([this] {
             const QString base64_data = AttachmentDataStore::GetInstance()->GetAttachmentData(attachment_id_);
 
             if (base64_data.isEmpty()) {
@@ -247,7 +253,7 @@ void AttachmentPlaceholder::onLoadButtonClicked() {
             }
         });
     } else {
-        AttachmentQueueManager::GetInstance()->AddTask([this]() {
+        AttachmentQueueManager::GetInstance()->AddTask([this] {
             try {
                 const QByteArray data = QByteArray::fromBase64(base64_data_.toUtf8());
 
@@ -301,6 +307,7 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
 
     QWidget *content_widget = nullptr;
 
+    // ReSharper disable once CppDFAUnreachableFunctionCall
     auto show_with_size_check = [this, full_size_dialog, scroll_area](QWidget *contentWgt, const QSize size) {
         if (size.isValid()) {
             AdjustAndShowDialog(full_size_dialog, scroll_area, contentWgt, size);
@@ -326,14 +333,14 @@ void AttachmentPlaceholder::ShowFullSizeDialog(const QByteArray &data, const boo
         const auto full_image = new ImageViewer(data, scroll_area);
         content_widget = full_image;
 
-        connect(full_image, &ImageViewer::imageLoaded, this, [=]() {
+        connect(full_image, &ImageViewer::imageLoaded, this, [=] {
             QTimer::singleShot(0, this, [=] {
                 show_with_size_check(full_image, full_image->sizeHint());
             });
         });
         connect(full_image, &ImageViewer::imageInfoReady, this, [=](const int w, const int h, bool) {
             if (!full_size_dialog->isVisible()) {
-                QTimer::singleShot(0, this, [=]() {
+                QTimer::singleShot(0, this, [=] {
                     const QSize currentHint = full_image->sizeHint();
                     if (currentHint.isValid()) {
                         show_with_size_check(full_image, currentHint);
@@ -464,7 +471,7 @@ void AttachmentPlaceholder::ShowCyberImage(const QByteArray &data) {
     }
     scaling_attachment->SetMaxAllowedSize(max_size);
 
-    connect(scaling_attachment, &AutoScalingAttachment::clicked, this, [this, data]() {
+    connect(scaling_attachment, &AutoScalingAttachment::clicked, this, [this, data] {
         ShowFullSizeDialog(data, false); // false -> not a GIF
     });
 
@@ -492,7 +499,7 @@ void AttachmentPlaceholder::ShowCyberGif(const QByteArray &data) {
 
     scaling_attachment->SetMaxAllowedSize(max_size);
 
-    connect(scaling_attachment, &AutoScalingAttachment::clicked, this, [this, data]() {
+    connect(scaling_attachment, &AutoScalingAttachment::clicked, this, [this, data] {
         ShowFullSizeDialog(data, true); // true -> it is GIF
     });
 
@@ -507,7 +514,7 @@ void AttachmentPlaceholder::ShowCyberAudio(const QByteArray &data) {
 
     viewer->SetContent(audio_player);
 
-    connect(viewer, &AttachmentViewer::viewingFinished, this, [this]() {
+    connect(viewer, &AttachmentViewer::viewingFinished, this, [this] {
         load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);
@@ -554,7 +561,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 
     viewer->SetContent(video_preview);
 
-    auto open_player = [this, data]() {
+    auto open_player = [this, data] {
         video_data_ = data;
         auto video_player_overlay = new VideoPlayer(data, mime_type_, nullptr);
 
@@ -569,7 +576,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 
         // disconnecting connections before closing
         QMetaObject::Connection conn = connect(video_player_overlay, &QDialog::finished,
-                                               [this, video_player_overlay]() {
+                                               [this, video_player_overlay] {
                                                    disconnect(video_player_overlay, nullptr, this, nullptr);
                                                    video_data_.clear();
                                                });
@@ -584,7 +591,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
     thumbnail_label_ = thumbnail_label;
     ClickHandler_ = open_player;
 
-    connect(viewer, &AttachmentViewer::viewingFinished, this, [this]() {
+    connect(viewer, &AttachmentViewer::viewingFinished, this, [this] {
         load_button_->setText(translator_->Translate("Attachments.LoadAgain", "Load again"));
         load_button_->setVisible(true);
         content_container_->setVisible(false);
@@ -595,7 +602,7 @@ void AttachmentPlaceholder::ShowCyberVideo(const QByteArray &data) {
 }
 
 void AttachmentPlaceholder::GenerateThumbnail(const QByteArray &video_data, QLabel *thumbnail_label) {
-    AttachmentQueueManager::GetInstance()->AddTask([this, video_data, thumbnail_label]() {
+    AttachmentQueueManager::GetInstance()->AddTask([this, video_data, thumbnail_label] {
         try {
             auto temp_decoder = std::make_shared<VideoDecoder>(video_data, nullptr);
 

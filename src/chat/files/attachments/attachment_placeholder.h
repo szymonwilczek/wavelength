@@ -1,22 +1,13 @@
 #ifndef ATTACHMENT_PLACEHOLDER_H
 #define ATTACHMENT_PLACEHOLDER_H
 
-#include <QFuture>
-#include <QScrollArea>
 #include <QWidget>
-#include <QWindow>
-#include <functional>
-#include <QVBoxLayout>
-
-#include "attachment_queue_manager.h"
-#include "../gif/player/gif_player.h"
-#include "../video/player/video_player.h"
-#include "../audio/player/audio_player.h"
 
 class TranslationManager;
-class AttachmentViewer;
-class AutoScalingAttachment;
-class ImageViewer;
+class QVBoxLayout;
+class QPushButton;
+class QLabel;
+class QScrollArea;
 
 /**
  * @brief A widget that acts as a placeholder for chat attachments before they are loaded.
