@@ -60,7 +60,7 @@ public:
      * @brief Gets the current opacity of the scanline effect.
      * @return The scanline opacity value (0.0 to 1.0).
      */
-    double GetScanlineOpacity() const { return scanline_opacity_; }
+    [[nodiscard]] double GetScanlineOpacity() const { return scanline_opacity_; }
 
     /**
      * @brief Sets the opacity of the scanline effect.
@@ -97,9 +97,9 @@ public:
     void OnMessageSent(const QString &frequency, const QString &message) const;
 
     /**
-     * @brief Handles the event when the current Wavelength is closed by the host.
+     * @brief Handles the event when the host closes the current Wavelength.
      * Updates the status indicator, displays a system message, and schedules the view
-     * to be cleared and the wavelengthAborted() signal to be emitted after a delay.
+     * to be cleared, and the wavelengthAborted() signal to be emitted after a delay.
      * Does nothing if the frequency doesn't match or if the local user initiated the closure.
      * @param frequency The frequency of the closed Wavelength.
      */
@@ -144,7 +144,7 @@ private slots:
 
     /**
      * @brief Slot called when the server grants the PTT request.
-     * If the frequency matches and the state is Requesting, sets the state to Transmitting,
+     * If the frequency matches and the state is Requested, sets the state to Transmitting,
      * updates the button appearance, starts audio input, and updates the message area to show
      * the local user is transmitting.
      * @param frequency The frequency for which PTT was granted.
@@ -153,7 +153,7 @@ private slots:
 
     /**
      * @brief Slot called when the server denies the PTT request.
-     * If the frequency matches and the state is Requesting, displays a system message with the reason,
+     * If the frequency matches and the state is Requested, displays a system message with the reason,
      * resets the PTT state to Idle, and updates the button appearance.
      * @param frequency The frequency for which PTT was denied.
      * @param reason The reason for denial provided by the server.
@@ -180,7 +180,7 @@ private slots:
 
     /**
      * @brief Slot called when binary audio data is received from the server.
-     * If the frequency matches and the state is Receiving, writes the data to the audio output device,
+     * If the frequency matches and the state is Received, writes the data to the audio output device,
      * calculates the amplitude of the received audio, and updates the audio visualization in the message area.
      * @param frequency The frequency the audio data belongs to.
      * @param audio_data The raw audio data chunk.
@@ -211,7 +211,7 @@ private slots:
     /**
      * @brief Initiates the process of leaving or closing the current Wavelength.
      * Updates the status indicator, calls the appropriate method on WavelengthSessionCoordinator
-     * (CloseWavelength if host, LeaveWavelength otherwise), emits wavelengthAborted(), and schedules
+     * (CloseWavelength if hosted, LeaveWavelength otherwise), emits wavelengthAborted(), and schedules
      * the view to be cleared after a short delay.
      */
     void AbortWavelength();
@@ -227,7 +227,7 @@ private slots:
     void TriggerConnectionEffect();
 
     /**
-     * @brief Triggers a subtle scanline effect animation when there is activity (e.g., message received).
+     * @brief Triggers a subtle scanline effect animation when there is activity (e.g., a message received).
      */
     void TriggerActivityEffect();
 
@@ -278,7 +278,7 @@ private:
     QIODevice *input_device_;
     /** @brief I/O device providing access to the raw audio stream for audio_output_. */
     QIODevice *output_device_;
-    /** @brief The audio format used for both input and output (PCM, 16kHz, 16-bit mono). */
+    /** @brief The audio format used for both input and output (PCM, 16 kHz, 16-bit mono). */
     QAudioFormat audio_format_;
     /** @brief Sound effect played when the PTT button is pressed. */
     QSoundEffect *ptt_on_sound_;
@@ -324,7 +324,7 @@ private:
      * @param buffer The raw audio data.
      * @return The calculated RMS amplitude, normalized to approximately [0.0, 1.0].
      */
-    qreal CalculateAmplitude(const QByteArray& buffer) const;
+    [[nodiscard]] qreal CalculateAmplitude(const QByteArray& buffer) const;
 
     /**
      * @brief Updates the appearance and enabled state of the PTT button based on the current ptt_state_.
