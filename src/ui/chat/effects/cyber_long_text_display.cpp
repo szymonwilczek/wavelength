@@ -7,7 +7,8 @@
 #include <QDebug>
 #include <utility>
 
-CyberLongTextDisplay::CyberLongTextDisplay(QString text, const QColor &text_color, QWidget *parent): QWidget(parent), original_text_(std::move(text)), text_color_(text_color),
+CyberLongTextDisplay::CyberLongTextDisplay(QString text, const QColor &text_color, QWidget *parent): QWidget(parent),
+    original_text_(std::move(text)), text_color_(text_color),
     scroll_position_(0), cached_text_valid_(false) {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -33,7 +34,7 @@ void CyberLongTextDisplay::SetTextColor(const QColor &color) {
 
 QSize CyberLongTextDisplay::sizeHint() const {
     if (!cached_text_valid_) {
-        const_cast<CyberLongTextDisplay*>(this)->ProcessText();
+        const_cast<CyberLongTextDisplay *>(this)->ProcessText();
     }
     return size_hint_;
 }
@@ -69,14 +70,12 @@ void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
     const int line_height = font_metrics.lineSpacing();
     constexpr int topMargin = 10;
 
-    // Oblicz zakres widocznych linii
     int first_visible_line = scroll_position_ / line_height;
     int last_visible_line = (scroll_position_ + height() - topMargin) / line_height;
 
     first_visible_line = qMax(0, first_visible_line);
     last_visible_line = qMin(last_visible_line, processed_lines_.size() - 1);
 
-    // Rysujemy tylko widoczne linie tekstu
     painter.setPen(text_color_);
     for (int i = first_visible_line; i <= last_visible_line; ++i) {
         const int y = topMargin + font_metrics.ascent() + i * line_height - scroll_position_;
@@ -86,7 +85,6 @@ void CyberLongTextDisplay::paintEvent(QPaintEvent *event) {
         }
     }
 
-    // Efekt skanowanych linii
     painter.setOpacity(0.1);
     painter.setPen(QPen(text_color_, 1, Qt::DotLine));
     for (int y_scan = 0; y_scan < height(); y_scan += 4) {
@@ -111,7 +109,7 @@ void CyberLongTextDisplay::ProcessText() {
 
     QStringList paragraphs = original_text_.split("\n", Qt::KeepEmptyParts);
 
-    for (const QString& paragraph : paragraphs) {
+    for (const QString &paragraph: paragraphs) {
         if (paragraph.isEmpty()) {
             processed_lines_.append("");
             continue;
@@ -120,7 +118,7 @@ void CyberLongTextDisplay::ProcessText() {
         QStringList words = paragraph.split(" ", Qt::SkipEmptyParts);
         QString current_line;
 
-        for (const QString& word : words) {
+        for (const QString &word: words) {
             QString test_line = current_line.isEmpty() ? word : current_line + " " + word;
             int current_line_width = fm.horizontalAdvance(test_line);
 
@@ -135,7 +133,7 @@ void CyberLongTextDisplay::ProcessText() {
                 const int word_width = fm.horizontalAdvance(word);
                 if (word_width > available_width) {
                     QString part;
-                    for (const QChar& c : word) {
+                    for (const QChar &c: word) {
                         QString test_part = part + c;
                         const int part_width = fm.horizontalAdvance(test_part);
                         if (part_width <= available_width) {
@@ -146,7 +144,7 @@ void CyberLongTextDisplay::ProcessText() {
                             part = QString(c);
                         }
                     }
-                    current_line = part; // Przypisz ostatnią część
+                    current_line = part;
                 } else {
                     current_line = word;
                 }
@@ -165,8 +163,8 @@ void CyberLongTextDisplay::ProcessText() {
 
     const QSize new_size_hint(required_width, required_height);
     if (size_hint_ != new_size_hint) {
-         size_hint_ = new_size_hint;
-         updateGeometry();
+        size_hint_ = new_size_hint;
+        updateGeometry();
     }
 
     cached_text_valid_ = true;
