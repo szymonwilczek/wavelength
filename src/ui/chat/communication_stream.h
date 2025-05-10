@@ -1,17 +1,17 @@
 #ifndef COMMUNICATION_STREAM_H
 #define COMMUNICATION_STREAM_H
 
-#include <qcoreapplication.h>
+#include <QOpenGLBuffer>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 
 #include "stream_message.h"
 #include "../labels/user_info_label.h"
 
+class QOpenGLShaderProgram;
 class WavelengthConfig;
+
 /**
  * @brief Structure holding visual properties generated for a user ID.
  * Currently only holds the generated color.

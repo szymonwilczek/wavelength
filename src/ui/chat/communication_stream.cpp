@@ -1,6 +1,13 @@
 #include "communication_stream.h"
 
+#include <QElapsedTimer>
+#include <QKeyEvent>
+#include <QOpenGLShaderProgram>
 #include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
+#include <QPushButton>
+#include <QRandomGenerator>
+#include <QTimer>
 
 #include "../../app/wavelength_config.h"
 #include "../../app/managers/translation_manager.h"
@@ -103,7 +110,7 @@ StreamMessage *CommunicationStream::AddMessageWithAttachment(const QString &cont
     ConnectSignalsForMessage(message);
 
     if (current_message_index_ == -1) {
-        QTimer::singleShot(1200, this, [this]() {
+        QTimer::singleShot(1200, this, [this] {
             if (!messages_.isEmpty()) {
                 ShowMessageAtIndex(messages_.size() - 1);
             }
@@ -158,7 +165,7 @@ StreamMessage *CommunicationStream::AddMessage(const QString &content, const QSt
     ConnectSignalsForMessage(message);
 
     if (current_message_index_ == -1) {
-        QTimer::singleShot(1200, this, [this]() {
+        QTimer::singleShot(1200, this, [this] {
             if (!messages_.isEmpty()) {
                 ShowMessageAtIndex(messages_.size() - 1);
             }
@@ -463,7 +470,7 @@ void CommunicationStream::StartReceivingAnimation() {
     group->addAnimation(glitch_animation);
     group->start(QAbstractAnimation::DeleteWhenStopped);
 
-    connect(group, &QParallelAnimationGroup::finished, this, [this]() {
+    connect(group, &QParallelAnimationGroup::finished, this, [this] {
         target_wave_amplitude_ = 0.15;
         state_ = kDisplaying;
     });
@@ -671,7 +678,7 @@ void CommunicationStream::HandleMessageHidden() {
                 ReturnToIdleAnimation();
             } else {
                 int next_index_to_show = qMin(hidden_message_index, messages_.size() - 1);
-                QTimer::singleShot(0, this, [this, next_index_to_show]() {
+                QTimer::singleShot(0, this, [this, next_index_to_show] {
                     if (next_index_to_show >= 0 && next_index_to_show < messages_.size()) {
                         ShowMessageAtIndex(next_index_to_show);
                     } else if (!messages_.isEmpty()) {
@@ -746,7 +753,7 @@ void CommunicationStream::OptimizeForMessageTransition() const {
             animation_timer_->setInterval(33);
         }
 
-        QTimer::singleShot(500, this, [this]() {
+        QTimer::singleShot(500, this, [this] {
             animation_timer_->setInterval(16);
             in_transition = false;
         });
