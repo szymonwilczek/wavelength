@@ -1,5 +1,7 @@
 #include "attachment_queue_manager.h"
 
+#include <QThreadPool>
+
 AttachmentTask::AttachmentTask(const std::function<void()> &taskFunc, QObject *parent): QObject(parent),
     TaskFunc_(taskFunc) {
     setAutoDelete(false);
@@ -14,7 +16,7 @@ void AttachmentQueueManager::AddTask(const std::function<void()> &TaskFunc) {
     QMutexLocker locker(&mutex_);
 
     auto task = new AttachmentTask(TaskFunc);
-    connect(task, &AttachmentTask::finished, this, [this, task]() {
+    connect(task, &AttachmentTask::finished, this, [this, task] {
         QMutexLocker taskLocker(&mutex_);
         active_tasks_.removeOne(task);
         task->deleteLater();
