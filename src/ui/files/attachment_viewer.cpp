@@ -6,7 +6,7 @@
 #include "../../app/managers/translation_manager.h"
 
 AttachmentViewer::AttachmentViewer(QWidget *parent): QWidget(parent), decryption_counter_(0),
-                                                               is_scanning_(false), is_decrypted_(false) {
+                                                     is_scanning_(false), is_decrypted_(false) {
     translator_ = TranslationManager::GetInstance();
 
     layout_ = new QVBoxLayout(this);
