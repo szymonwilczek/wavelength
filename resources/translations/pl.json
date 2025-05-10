@@ -146,7 +146,7 @@
     "GridSpacing": "Odstępy Siatki",
     "TitleBorderColor": "Kolor Tekstu Tytułowego",
     "TitleGlowColor": "Kolor Poświaty Tytułowej",
-    "RecentlyUsedColor": "Niedawno Używane Kolory"
+    "RecentlyUsedColors": "Niedawno Używane Kolory"
   },
   "ClassifiedSettingsWidget": {
     "SecurityCode": {

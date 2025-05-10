@@ -146,7 +146,7 @@
     "GridSpacing": "Grid Spacing",
     "TitleBorderColor": "Title Text Color",
     "TitleGlowColor": "Title Glow Color",
-    "RecentlyUsedColor": "Recently Used Color"
+    "RecentlyUsedColors": "Recently Used Colors"
   },
   "ClassifiedSettingsWidget": {
     "SecurityCode": {
