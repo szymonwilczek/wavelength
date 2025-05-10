@@ -1,12 +1,27 @@
 #include "stream_message.h"
 
+#include <cmath>
 #include <QParallelAnimationGroup>
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QBitmap>
+#include <QDateTime>
+#include <QKeyEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPropertyAnimation>
+#include <QPushButton>
+#include <QScreen>
+#include <QScrollArea>
+#include <QSvgRenderer>
+#include <QTimer>
 
+#include "../../chat/files/attachments/attachment_placeholder.h"
 #include "../../chat/files/attachments/auto_scaling_attachment.h"
 #include "../files/attachment_viewer.h"
+#include "effects/electronic_shutdown_effect.h"
+#include "effects/long_text_display_effect.h"
+#include "effects/text_display_effect.h"
 
 StreamMessage::StreamMessage(QString content, QString sender, MessageType type, QString message_id,
                              QWidget *parent): QWidget(parent), message_id_(std::move(message_id)),
@@ -240,14 +255,14 @@ void StreamMessage::AddAttachment(const QString &html) {
     }
 
     connect(attachment_widget, &AttachmentPlaceholder::attachmentLoaded,
-            this, [this]() {
-                QTimer::singleShot(200, this, [this]() {
+            this, [this] {
+                QTimer::singleShot(200, this, [this] {
                     if (attachment_widget_) {
                         QList<AttachmentViewer *> viewers =
                                 attachment_widget_->findChildren<AttachmentViewer *>();
 
                         if (!viewers.isEmpty()) {
-                            QTimer::singleShot(100, this, [this, viewers]() {
+                            QTimer::singleShot(100, this, [this, viewers] {
                                 viewers.first()->updateGeometry();
                                 AdjustSizeToContent();
                             });
@@ -258,7 +273,7 @@ void StreamMessage::AddAttachment(const QString &html) {
                 });
             });
 
-    QTimer::singleShot(100, this, [this]() {
+    QTimer::singleShot(100, this, [this] {
         if (attachment_widget_) {
             const QSize initial_size = attachment_widget_->sizeHint();
             setMinimumSize(qMax(initial_size.width() + 60, 500),
@@ -281,7 +296,7 @@ void StreamMessage::AdjustSizeToContent() {
     int max_width = available_geometry.width() * 0.8;
     int max_height = available_geometry.height() * 0.35;
 
-    QTimer::singleShot(100, this, [this, max_width, max_height]() {
+    QTimer::singleShot(100, this, [this, max_width, max_height] {
         if (attachment_widget_) {
             QList<AttachmentViewer *> viewers = attachment_widget_->findChildren<AttachmentViewer *>();
             if (!viewers.isEmpty()) {
@@ -385,7 +400,7 @@ void StreamMessage::FadeIn() {
     animation_group->addAnimation(opacity_animation);
     animation_group->addAnimation(glow_animation);
 
-    connect(animation_group, &QParallelAnimationGroup::finished, this, [this, animation_group]() {
+    connect(animation_group, &QParallelAnimationGroup::finished, this, [this, animation_group] {
         animation_group->deleteLater();
 
         if (text_display_) {
@@ -416,7 +431,7 @@ void StreamMessage::FadeOut() {
     animation_group->addAnimation(opacity_animation);
     animation_group->addAnimation(glow_animation);
 
-    connect(animation_group, &QParallelAnimationGroup::finished, this, [this, animation_group]() {
+    connect(animation_group, &QParallelAnimationGroup::finished, this, [this, animation_group] {
         animation_group->deleteLater();
         hide();
         emit hidden();
@@ -458,7 +473,7 @@ void StreamMessage::StartShutdownAnimation() {
     shutdown_animation->setEndValue(1.0);
     shutdown_animation->setEasingCurve(QEasingCurve::InQuad);
 
-    connect(shutdown_animation, &QPropertyAnimation::finished, this, [this]() {
+    connect(shutdown_animation, &QPropertyAnimation::finished, this, [this] {
         hide();
         emit hidden();
     });
@@ -746,7 +761,7 @@ void StreamMessage::StartLongMessageClosingAnimation() {
     fade_animation->setEasingCurve(QEasingCurve::OutQuad);
     animation_group->addAnimation(fade_animation);
 
-    connect(animation_group, &QSequentialAnimationGroup::finished, this, [this]() {
+    connect(animation_group, &QSequentialAnimationGroup::finished, this, [this] {
         hide();
         emit hidden();
     });

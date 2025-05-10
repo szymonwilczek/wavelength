@@ -1,17 +1,15 @@
 #ifndef STREAM_MESSAGE_H
 #define STREAM_MESSAGE_H
 
-#include <QSvgRenderer>
-#include <qtimeline.h>
-#include <utility>
-#include <QApplication>
-#include <QVBoxLayout>
+#include <QWidget>
 
-#include "../chat/effects/long_text_display_effect.h"
-#include "../chat/effects/text_display_effect.h"
-#include "../../chat/files/attachments/attachment_placeholder.h"
-#include "effects/electronic_shutdown_effect.h"
-
+class ElectronicShutdownEffect;
+class LongTextDisplayEffect;
+class QScrollArea;
+class TextDisplayEffect;
+class QLabel;
+class QVBoxLayout;
+class QPushButton;
 class AttachmentViewer;
 
 /**
@@ -290,8 +288,6 @@ private:
     TextDisplayEffect *text_display_ = nullptr; ///< Widget for animated text reveal (short messages).
     QScrollArea *scroll_area_ = nullptr; ///< Scroll area for long messages.
     LongTextDisplayEffect *long_text_display_ = nullptr; ///< Widget for displaying long text within scroll area.
-
-    // Effects
     ElectronicShutdownEffect *shutdown_effect_ = nullptr; ///< Graphics effect for electronic shutdown animation.
 };
 
