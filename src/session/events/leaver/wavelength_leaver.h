@@ -2,11 +2,6 @@
 #define WAVELENGTH_LEAVER_H
 
 #include <QObject>
-#include <QString>
-
-#include "../../../storage/wavelength_registry.h"
-#include "../../../storage/database_manager.h"
-#include "../../../chat/messages/handler/message_handler.h"
 
 /**
  * @brief Singleton class responsible for handling the process of leaving or closing wavelengths.
@@ -24,7 +19,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthLeaver.
      * @return Pointer to the singleton WavelengthLeaver instance.
      */
-    static WavelengthLeaver* GetInstance() {
+    static WavelengthLeaver *GetInstance() {
         static WavelengthLeaver instance;
         return &instance;
     }
@@ -66,7 +61,8 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthLeaver(QObject* parent = nullptr) : QObject(parent) {}
+    explicit WavelengthLeaver(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
@@ -76,12 +72,12 @@ private:
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthLeaver(const WavelengthLeaver&) = delete;
+    WavelengthLeaver(const WavelengthLeaver &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthLeaver& operator=(const WavelengthLeaver&) = delete;
+    WavelengthLeaver &operator=(const WavelengthLeaver &) = delete;
 };
 
 #endif // WAVELENGTH_LEAVER_H

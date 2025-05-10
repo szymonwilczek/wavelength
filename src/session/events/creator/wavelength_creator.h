@@ -1,9 +1,7 @@
 #ifndef WAVELENGTH_CREATOR_H
 #define WAVELENGTH_CREATOR_H
 
-#include "../../../storage/database_manager.h"
-#include "../../../chat/messages/services/message_processor.h"
-#include "../../../../src/app/wavelength_config.h"
+#include <QObject>
 
 /**
  * @brief Singleton class responsible for initiating the creation of a new wavelength.
