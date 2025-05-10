@@ -1,9 +1,17 @@
 #include "attachment_viewer.h"
 
+#include <QApplication>
+#include <QEvent>
+#include <QLabel>
+#include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QRandomGenerator>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "../../app/managers/translation_manager.h"
+#include "../chat/effects/mask_overlay_effect.h"
 
 AttachmentViewer::AttachmentViewer(QWidget *parent): QWidget(parent), decryption_counter_(0),
                                                      is_scanning_(false), is_decrypted_(false) {
@@ -82,7 +90,7 @@ void AttachmentViewer::UpdateContentLayout() {
         content_widget_->updateGeometry();
         updateGeometry();
 
-        QTimer::singleShot(50, this, [this]() {
+        QTimer::singleShot(50, this, [this] {
             QEvent event(QEvent::LayoutRequest);
             QApplication::sendEvent(this, &event);
 
@@ -122,7 +130,7 @@ void AttachmentViewer::SetContent(QWidget *content) {
     content_layout_->activate();
     updateGeometry();
 
-    QTimer::singleShot(10, this, [this]() {
+    QTimer::singleShot(10, this, [this] {
         if (content_widget_ && mask_overlay_) {
             mask_overlay_->setGeometry(content_container_->rect());
             mask_overlay_->raise();
@@ -259,7 +267,7 @@ void AttachmentViewer::StartScanningAnimation() {
     mask_overlay_->raise();
     mask_overlay_->StartScanning();
 
-    QTimer::singleShot(2000, this, [this]() {
+    QTimer::singleShot(2000, this, [this] {
         if (is_scanning_) {
             status_label_->setText(
                 translator_->Translate("CyberAttachmentViewer.ScanningCompleted",

@@ -1,14 +1,13 @@
 #ifndef CYBER_ATTACHMENT_VIEWER_H
 #define CYBER_ATTACHMENT_VIEWER_H
 
-#include <QApplication>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QDebug>
+#include <QWidget>
 
-#include "../chat/effects/mask_overlay_effect.h"
-
+class MaskOverlayEffect;
+class QLabel;
+class QVBoxLayout;
 class TranslationManager;
+
 /**
  * @brief A widget that displays another widget (content) with a cyberpunk-themed decryption animation.
  *
@@ -28,7 +27,6 @@ class AttachmentViewer final : public QWidget {
     /** @brief Property controlling the decryption progress (0-100). Animatable. Drives the MaskOverlay reveal. */
     Q_PROPERTY(
         int decryptionCounter READ GetDecryptionCounter WRITE SetDecryptionCounter NOTIFY decryptionCounterChanged)
-    // Added NOTIFY
 
 public:
     /**
