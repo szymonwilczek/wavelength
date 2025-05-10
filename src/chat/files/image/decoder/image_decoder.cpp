@@ -1,5 +1,7 @@
 #include "image_decoder.h"
 
+#include <QImage>
+
 QImage ImageDecoder::Decode() {
     QImage image;
 

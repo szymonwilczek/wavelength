@@ -1,16 +1,12 @@
 #ifndef INLINE_IMAGE_VIEWER_H
 #define INLINE_IMAGE_VIEWER_H
 
-#include <QLabel>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QTimer>
-#include <memory>
-#include <QApplication>
+#include <QFrame>
 
-#include "../decoder/image_decoder.h"
-
+class QLabel;
+class ImageDecoder;
 class TranslationManager;
+
 /**
  * @brief An inline widget for displaying static images (PNG, JPEG, etc.) within a chat interface.
  *
@@ -57,10 +53,7 @@ private slots:
      * @brief Initiates the image decoding process by calling Decode() on the ImageDecoder.
      * Called asynchronously via QTimer::singleShot after the constructor finishes.
      */
-    void LoadImage() const {
-        if (!decoder_) return;
-        decoder_->Decode();
-    }
+    void LoadImage() const;
 
     /**
      * @brief Slot connected to the decoder's imageReady signal.
