@@ -1,10 +1,7 @@
 #ifndef CYBER_SLIDER_H
 #define CYBER_SLIDER_H
-#include <QPainter>
-#include <QPainterPath>
+
 #include <QSlider>
-#include <QPaintEvent>
-#include <QEvent>
 
 /**
  * @brief A custom QSlider styled with a general cyberpunk aesthetic (blue theme).
@@ -26,7 +23,7 @@ public:
      * @param orientation The orientation of the slider (Horizontal or Vertical).
      * @param parent Optional parent widget.
      */
-    explicit CyberSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
+    explicit CyberSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
     /**
      * @brief Gets the current intensity of the glow effect.
@@ -48,25 +45,24 @@ protected:
      * and the glow effect using cyberpunk-themed blue colors. Includes decorative lines on the handle.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden enter event handler. Animates the glow effect intensity increase on mouse hover.
      * @param event The enter event.
      */
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEvent *event) override;
 
     /**
      * @brief Overridden leave event handler. Animates the glow effect intensity decrease when the mouse leaves.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override;
+    void leaveEvent(QEvent *event) override;
 
 private:
     /** @brief Current intensity of the glow effect. Modified by animations on hover. */
     double glow_intensity_;
 };
-
 
 
 #endif //CYBER_SLIDER_H

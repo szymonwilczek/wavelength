@@ -1,16 +1,13 @@
 #ifndef CYBER_AUDIO_SLIDER_H
 #define CYBER_AUDIO_SLIDER_H
-#include <QPainter>
-#include <QPainterPath>
+
 #include <QSlider>
 #include <QStyle>
-#include <QPaintEvent>
-#include <QEvent>
 
 /**
  * @brief A custom QSlider styled with a cyberpunk aesthetic, specifically themed for audio controls.
  *
- * This slider features a dark purple track, a neon purple progress bar, and a handle
+ * This slider features a dark purple track, a neon-purple progress bar, and a handle
  * with a subtle glow effect that animates on hover. It's designed visually to represent
  * audio volume or similar audio-related settings.
  */
@@ -27,7 +24,7 @@ public:
      * @param orientation The orientation of the slider (Horizontal or Vertical).
      * @param parent Optional parent widget.
      */
-    explicit CyberAudioSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
+    explicit CyberAudioSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
     /**
      * @brief Gets the current intensity of the glow effect.
@@ -49,19 +46,19 @@ protected:
      * using cyberpunk-themed purple/blue colors. Includes decorative lines on the progress bar and handle.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden enter event handler. Animates the glow effect intensity increase on mouse hover.
      * @param event The enter event.
      */
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEvent *event) override;
 
     /**
      * @brief Overridden leave event handler. Animates the glow effect intensity decrease when the mouse leaves.
      * @param event The leave event.
      */
-    void leaveEvent(QEvent* event) override;
+    void leaveEvent(QEvent *event) override;
 
 private:
     /** @brief Current intensity of the glow effect. Modified by animations on hover. */
