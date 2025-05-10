@@ -2,8 +2,6 @@
 #define SHORTCUT_MANAGER_H
 
 #include <QObject>
-#include <QKeySequence>
-#include <QMap>
 #include <concepts>
 
 #include "../wavelength_config.h"
