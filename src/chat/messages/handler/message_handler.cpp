@@ -1,6 +1,7 @@
 #include "message_handler.h"
 
 #include <QJsonDocument>
+#include <QWebSocket>
 
 bool MessageHandler::SendSystemCommand(QWebSocket *socket, const QString &command, const QJsonObject &params) {
     if (!socket || !socket->isValid()) {
