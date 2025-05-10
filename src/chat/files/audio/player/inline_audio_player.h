@@ -1,10 +1,7 @@
 #ifndef INLINE_AUDIO_PLAYER_H
 #define INLINE_AUDIO_PLAYER_H
 
-#include <QFrame>
 #include <QLabel>
-#include <QHBoxLayout>
-#include <QRandomGenerator>
 #include <memory>
 #include <QPropertyAnimation>
 #include <QVector>
@@ -14,6 +11,7 @@
 #include "../../audio/decoder/audio_decoder.h"
 
 class TranslationManager;
+
 /**
  * @brief An inline audio player widget with a cyberpunk aesthetic.
  *
@@ -33,15 +31,6 @@ class InlineAudioPlayer final : public QFrame {
 
 public:
     /**
-     * @brief Gets a pointer to the currently active InlineAudioPlayer instance.
-     * Only one player can be active at a time to manage audio output resources.
-     * @return Pointer to the active player, or nullptr if none is active.
-     */
-    static InlineAudioPlayer* GetActivePlayer() {
-        return active_player_;
-    }
-
-    /**
      * @brief Constructs an InlineAudioPlayer widget.
      * Initializes UI elements (labels, buttons, sliders, spectrum view), sets up layouts,
      * creates the AudioDecoder instance, connects signals and slots for controls and decoder events,
@@ -50,7 +39,7 @@ public:
      * @param mime_type The MIME type of the audio data (e.g., "audio/mpeg").
      * @param parent Optional parent widget.
      */
-    explicit InlineAudioPlayer(const QByteArray& audio_data, const QString& mime_type, QWidget* parent = nullptr);
+    explicit InlineAudioPlayer(const QByteArray &audio_data, const QString &mime_type, QWidget *parent = nullptr);
 
     /**
      * @brief Gets the current opacity value for the scanline effect.
@@ -65,7 +54,7 @@ public:
      */
     void SetScanlineOpacity(const double opacity) {
         scanline_opacity_ = opacity;
-        update(); // Trigger repaint when opacity changes
+        update();
     }
 
     /**
@@ -81,7 +70,7 @@ public:
      */
     void SetSpectrumIntensity(const double intensity) {
         spectrum_intensity_ = intensity;
-        update(); // Trigger repaint when intensity changes
+        update();
     }
 
     /**
@@ -120,7 +109,7 @@ public:
 
     /**
      * @brief Toggles the mute state.
-     * If currently unmuted, mutes and remembers the last volume. If muted, restores the last volume (or 100% if last volume was 0).
+     * If currently unmuted, mutes and remembers the last volume. If muted, restore the last volume (or 100% if the last volume was 0).
      */
     void ToggleMute();
 
@@ -136,7 +125,7 @@ protected:
      * @brief Overridden paint event handler. Draws the cyberpunk-style frame border.
      * @param event The paint event.
      */
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
 
     /**
      * @brief Overridden event filter. Intercepts paint events for the spectrum_view_ widget
@@ -145,17 +134,17 @@ protected:
      * @param event The event being processed.
      * @return True if the event was handled (spectrum painted), false otherwise.
      */
-    bool eventFilter(QObject* watched, QEvent* event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     /**
-     * @brief Slot called when the progress slider is pressed by the user.
+     * @brief Slot called when the user presses the progress slider.
      * Remembers the playback state and pauses playback temporarily during seeking. Updates status label.
      */
     void OnSliderPressed();
 
     /**
-     * @brief Slot called when the progress slider is released by the user.
+     * @brief Slot called when the user releases the progress slider.
      * Performs the actual seek operation based on the slider's final position.
      * Resumes playback if it was active before seeking. Updates status label.
      */
@@ -195,7 +184,7 @@ private slots:
      * Prints the error message to debug output and updates the status/info labels.
      * @param message The error message from the decoder.
      */
-    void HandleError(const QString& message) const;
+    void HandleError(const QString &message) const;
 
     /**
      * @brief Slot connected to the decoder's audioInfo signal.
@@ -210,7 +199,7 @@ private slots:
     /**
      * @brief Slot called periodically by ui_timer_.
      * Updates UI elements, primarily the spectrum data for visualization (random fluctuations).
-     * Also includes placeholder logic for updating status label text occasionally.
+     * It also includes placeholder logic for updating status label text occasionally.
      */
     void UpdateUI();
 
@@ -221,7 +210,7 @@ private slots:
         const auto spectrum_animation = new QPropertyAnimation(this, "spectrumIntensity");
         spectrum_animation->setDuration(600);
         spectrum_animation->setStartValue(spectrum_intensity_);
-        spectrum_animation->setEndValue(0.6); // Target intensity when active/playing
+        spectrum_animation->setEndValue(0.6);
         spectrum_animation->setEasingCurve(QEasingCurve::OutCubic);
         spectrum_animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
@@ -233,7 +222,7 @@ private slots:
         const auto spectrum_animation = new QPropertyAnimation(this, "spectrumIntensity");
         spectrum_animation->setDuration(800);
         spectrum_animation->setStartValue(spectrum_intensity_);
-        spectrum_animation->setEndValue(0.2); // Target intensity when inactive/paused
+        spectrum_animation->setEndValue(0.2);
         spectrum_animation->setEasingCurve(QEasingCurve::OutCubic);
         spectrum_animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
@@ -245,33 +234,33 @@ private:
      * Called via the event filter on the spectrum_view_ widget.
      * @param target The QWidget (spectrum_view_) to paint onto.
      */
-    void PaintSpectrum(QWidget* target);
+    void PaintSpectrum(QWidget *target);
 
     // --- Member Variables ---
 
     /** @brief Label displaying audio type, sample rate, channels. */
-    QLabel* audio_info_label_;
+    QLabel *audio_info_label_;
     /** @brief Label displaying playback status (Initializing, Ready, Playing, Paused, Error, Finished). */
-    QLabel* status_label_;
+    QLabel *status_label_;
     /** @brief Widget container where the spectrum visualization is drawn. */
-    QWidget* spectrum_view_;
+    QWidget *spectrum_view_;
     /** @brief Custom button for play/pause/replay control. */
-    CyberAudioButton* play_button_;
+    CyberAudioButton *play_button_;
     /** @brief Custom slider for displaying and seeking playback progress. */
-    CyberAudioSlider* progress_slider_;
+    CyberAudioSlider *progress_slider_;
     /** @brief Label displaying current time / total duration (MM:SS / MM:SS). */
-    QLabel* time_label_;
+    QLabel *time_label_;
     /** @brief Custom button for toggling mute. Icon changes based on volume. */
-    CyberAudioButton* volume_button_;
+    CyberAudioButton *volume_button_;
     /** @brief Custom slider for controlling playback volume. */
-    CyberAudioSlider* volume_slider_;
+    CyberAudioSlider *volume_slider_;
 
     /** @brief Shared pointer to the AudioDecoder instance responsible for decoding and playback. */
     std::shared_ptr<AudioDecoder> decoder_;
     /** @brief Timer for triggering periodic UI updates (e.g., spectrum data). */
-    QTimer* ui_timer_;
+    QTimer *ui_timer_;
     /** @brief Timer for triggering repaints of the spectrum view. */
-    QTimer* spectrum_timer_;
+    QTimer *spectrum_timer_;
 
     /** @brief Stores the raw audio data passed in the constructor. */
     QByteArray m_audioData;
@@ -301,10 +290,10 @@ private:
     QVector<double> spectrum_data_;
 
     /** @brief Static pointer to the currently active InlineAudioPlayer instance. Ensures only one player uses audio output. */
-    static inline InlineAudioPlayer* active_player_ = nullptr;
+    static inline InlineAudioPlayer *active_player_ = nullptr;
 
     /** @brief Pointer to the translation manager for handling UI text translations. */
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 };
 
 #endif //INLINE_AUDIO_PLAYER_H
