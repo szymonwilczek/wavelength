@@ -31,8 +31,6 @@ class StreamMessage final : public QWidget {
     Q_PROPERTY(qreal opacity READ GetOpacity WRITE SetOpacity)
     /** @brief Property controlling the intensity of the border glow effect (0.0 to 1.0+). Animatable. */
     Q_PROPERTY(qreal glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
-    /** @brief Property controlling the progress of the disintegration effect (0.0 to 1.0). Animatable. (Deprecated, use shutdownProgress) */
-    Q_PROPERTY(qreal disintegrationProgress READ GetDisintegrationProgress WRITE SetDisintegrationProgress)
     /** @brief Property controlling the progress of the electronic shutdown effect (0.0 to 1.0). Animatable. */
     Q_PROPERTY(qreal shutdownProgress READ GetShutdownProgress WRITE SetShutdownProgress)
 
@@ -93,9 +91,6 @@ public:
 
     /** @brief Sets the glow intensity level and triggers a repaint. */
     void SetGlowIntensity(qreal intensity);
-
-    /** @brief Gets the current disintegration progress (deprecated). */
-    qreal GetDisintegrationProgress() const { return disintegration_progress_; }
 
     /** @brief Gets the current electronic shutdown effect progress. */
     qreal GetShutdownProgress() const { return shutdown_progress_; }
