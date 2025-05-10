@@ -9,6 +9,25 @@
 #include <QVariant>
 #include <QKeySequence>
 
+/** @brief Default configuration values for the Wavelength application. */
+namespace DefaultConfig {
+    const QString kRelayServerAddress = "localhost"; ///< Default relay server address
+    constexpr int kRelayServerPort = 3000; ///< Default relay server port
+    constexpr int kConnectionTimeout = 5000; ///< Default connection timeout in milliseconds
+    constexpr int kKeepAliveInterval = 30000; ///< Default keep-alive interval in milliseconds
+    constexpr int kMaxReconnectAttempts = 5; ///< Default maximum number of reconnection attempts
+    constexpr bool kIsDebugMode = false; ///< Default debug mode status
+    const auto kBackgroundColor = QColor(0x101820); ///< Dark Blue background color
+    const auto kBlobColor = QColor(0x4682B4); ///< Steel Blue color for blob animation
+    const auto kMessageColor = QColor(0xE0E0E0); ///< Light Gray color for messages
+    const auto kStreamColor = QColor(0x00B3FF); ///< Light Blue color for stream visualization
+    constexpr auto kGridColor = QColor(40, 60, 80, 150); ///< Grid color with transparency
+    constexpr int kGridSpacing = 35; ///< Default grid spacing in pixels
+    const auto kTitleTextColor = QColor(0xFFFFFF); ///< White color for title text
+    const auto kTitleBorderColor = QColor(0xE0B0FF); ///< Light Purple color for a title border
+    const auto kTitleGlowColor = QColor(0xE0B0FF); ///< Light Purple color for a title glow
+}
+
 /**
  * @brief Manages application configuration settings using a singleton pattern.
  *
@@ -34,7 +53,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthConfig.
      * @return Pointer to the singleton WavelengthConfig instance.
      */
-    static WavelengthConfig* GetInstance();
+    static WavelengthConfig *GetInstance();
 
     /**
      * @brief Default destructor.
@@ -54,7 +73,7 @@ public:
      * Emits configChanged("relayServerAddress") if the value changes.
      * @param address The new relay server address.
      */
-    void SetRelayServerAddress(const QString& address);
+    void SetRelayServerAddress(const QString &address);
 
     /**
      * @brief Gets the configured relay server port.
@@ -117,69 +136,17 @@ public:
     // --- Application Settings ---
 
     /**
-     * @brief Gets the maximum number of messages to keep in the chat history.
-     * @return The maximum chat history size.
-     */
-    int GetMaxChatHistorySize() const;
-
-    /**
-     * @brief Sets the maximum number of messages to keep in the chat history.
-     * Emits configChanged("maxChatHistorySize") if the value changes and is positive.
-     * @param size The new maximum size.
-     */
-    void SetMaxChatHistorySize(int size);
-
-    /**
-     * @brief Gets the maximum number of processed message IDs to store (for duplicate detection).
-     * @return The maximum number of processed message IDs.
-     */
-    int GetMaxProcessedMessageIds() const;
-
-    /**
-     * @brief Sets the maximum number of processed message IDs to store.
-     * Emits configChanged("maxProcessedMessageIds") if the value changes and is positive.
-     * @param size The new maximum size.
-     */
-    void SetMaxProcessedMessageIds(int size);
-
-    /**
-     * @brief Gets the maximum number of sent messages to cache (for potential resending).
-     * @return The maximum sent message cache size.
-     */
-    int GetMaxSentMessageCacheSize() const;
-
-    /**
-     * @brief Sets the maximum number of sent messages to cache.
-     * Emits configChanged("maxSentMessageCacheSize") if the value changes and is positive.
-     * @param size The new maximum size.
-     */
-    void SetMaxSentMessageCacheSize(int size);
-
-    /**
-     * @brief Gets the maximum number of recent Wavelength connections to remember.
-     * @return The maximum number of recent Wavelengths.
-     */
-    int GetMaxRecentWavelength() const;
-
-    /**
-     * @brief Sets the maximum number of recent Wavelength connections to remember.
-     * Emits configChanged("maxRecentWavelength") if the value changes and is positive.
-     * @param size The new maximum size.
-     */
-    void SetMaxRecentWavelength(int size);
-
-    /**
-     * @brief Checks if debug mode is enabled.
-     * @return True if debug mode is enabled, false otherwise.
-     */
-    bool IsDebugMode() const;
-
-    /**
      * @brief Enables or disables debug mode.
      * Emits configChanged("debugMode") if the value changes.
      * @param enabled True to enable debug mode, false to disable.
      */
     void SetDebugMode(bool enabled);
+
+    /**
+    * @brief Checks if debug mode is enabled.
+    * @return True if debug mode is enabled, false otherwise.
+    */
+    bool IsDebugMode() const;
 
     /**
      * @brief Gets the preferred starting frequency for new Wavelengths.
@@ -209,7 +176,7 @@ public:
      * Emits configChanged("background_color") if the value changes and is valid.
      * @param color The new background color.
      */
-    void SetBackgroundColor(const QColor& color);
+    void SetBackgroundColor(const QColor &color);
 
     /**
      * @brief Gets the color used for the blob animation.
@@ -223,7 +190,7 @@ public:
      * Emits configChanged("blob_color") if the value changes and is valid.
      * @param color The new blob color.
      */
-    void SetBlobColor(const QColor& color);
+    void SetBlobColor(const QColor &color);
 
     /**
      * @brief Gets the color used for stream visualization elements.
@@ -237,7 +204,7 @@ public:
      * Emits configChanged("stream_color") if the value changes and is valid.
      * @param color The new stream color.
      */
-    void SetStreamColor(const QColor& color);
+    void SetStreamColor(const QColor &color);
 
     /**
      * @brief Gets the color for the background grid lines.
@@ -251,7 +218,7 @@ public:
      * Emits configChanged("grid_color") if the value changes and is valid.
      * @param color The new grid color.
      */
-    void SetGridColor(const QColor& color);
+    void SetGridColor(const QColor &color);
 
     /**
      * @brief Gets the spacing between background grid lines in pixels.
@@ -278,7 +245,7 @@ public:
      * Emits configChanged("title_text_color") if the value changes and is valid.
      * @param color The new title text color.
      */
-    void SetTitleTextColor(const QColor& color);
+    void SetTitleTextColor(const QColor &color);
 
     /**
      * @brief Gets the color for the title label border.
@@ -292,7 +259,7 @@ public:
      * Emits configChanged("title_border_color") if the value changes and is valid.
      * @param color The new title border color.
      */
-    void SetTitleBorderColor(const QColor& color);
+    void SetTitleBorderColor(const QColor &color);
 
     /**
      * @brief Gets the color for the title label glow effect.
@@ -306,7 +273,7 @@ public:
      * Emits configChanged("title_glow_color") if the value changes and is valid.
      * @param color The new title glow color.
      */
-    void SetTitleGlowColor(const QColor& color);
+    void SetTitleGlowColor(const QColor &color);
 
     // --- Recent Colors ---
 
@@ -322,7 +289,7 @@ public:
      * Emits recentColorsChanged() if the list is modified.
      * @param color The QColor to add.
      */
-    void AddRecentColor(const QColor& color);
+    void AddRecentColor(const QColor &color);
 
     // --- Shortcuts ---
 
@@ -334,7 +301,7 @@ public:
      * @param default_sequence An optional fallback sequence if the action_id is not found.
      * @return The QKeySequence for the action.
      */
-    QKeySequence GetShortcut(const QString& action_id, const QKeySequence& default_sequence = QKeySequence()) const;
+    QKeySequence GetShortcut(const QString &action_id, const QKeySequence &default_sequence = QKeySequence()) const;
 
     /**
      * @brief Sets the keyboard shortcut for a specific action.
@@ -342,7 +309,7 @@ public:
      * @param action_id The identifier of the action.
      * @param sequence The new QKeySequence.
      */
-    void SetShortcut(const QString& action_id, const QKeySequence& sequence);
+    void SetShortcut(const QString &action_id, const QKeySequence &sequence);
 
     /**
      * @brief Gets a map of all currently configured shortcuts.
@@ -378,7 +345,7 @@ public:
      * @param key The string key identifying the setting (e.g., "relayServerPort", "backgroundColor").
      * @return A QVariant containing the setting's value, or an invalid QVariant if the key is unknown.
      */
-    QVariant GetSetting(const QString& key) const;
+    QVariant GetSetting(const QString &key) const;
 
     /**
      * @brief Gets the currently configured language code (e.g., "en", "pl").
@@ -392,7 +359,7 @@ public:
      * Note: Requires application restart to take full effect.
      * @param code The new language code (e.g., "en", "pl").
      */
-    void SetLanguageCode(const QString& code);
+    void SetLanguageCode(const QString &code);
 
 signals:
     /**
@@ -400,7 +367,7 @@ signals:
      * @param key The key of the setting that changed (e.g., "blobColor", "maxChatHistorySize").
      *            Can be "all" if RestoreDefaults() was called.
      */
-    void configChanged(const QString& key);
+    void configChanged(const QString &key);
 
     /**
      * @brief Emitted when the list of recent colors changes (a color was added).
@@ -418,12 +385,12 @@ private:
     /**
      * @brief Deleted copy constructor.
      */
-    WavelengthConfig(const WavelengthConfig&) = delete;
+    WavelengthConfig(const WavelengthConfig &) = delete;
 
     /**
      * @brief Deleted assignment operator.
      */
-    WavelengthConfig& operator=(const WavelengthConfig&) = delete;
+    WavelengthConfig &operator=(const WavelengthConfig &) = delete;
 
     /**
      * @brief Loads the hardcoded default values for all settings into the member variables.
@@ -445,7 +412,7 @@ private:
     /**
      * @brief Static pointer to the singleton instance.
      */
-    static WavelengthConfig* instance_;
+    static WavelengthConfig *instance_;
 
     /**
      * @brief QSettings object used for reading and writing configuration data.
@@ -465,12 +432,8 @@ private:
     QMap<QString, QKeySequence> shortcuts_;
 
     // --- Member Variables holding current configuration values ---
-    QString relay_server_address_;  ///< The address of the relay server
-    int relay_server_port_;  ///< The port of the relay server
-    int max_chat_history_size_; ///< The maximum number of messages to keep in chat history
-    int max_processed_message_ids_; ///< The maximum number of processed message IDs to store
-    int max_sent_message_cache_size_; ///< The maximum number of sent messages to cache
-    int max_recent_wavelength_; ///< The maximum number of recent Wavelength connections to remember
+    QString relay_server_address_; ///< The address of the relay server
+    int relay_server_port_; ///< The port of the relay server
     int connection_timeout_; ///< The connection timeout in milliseconds
     int keep_alive_interval_; ///< The keep-alive interval in milliseconds
     int max_reconnect_attempts_; ///< The maximum number of reconnection attempts
