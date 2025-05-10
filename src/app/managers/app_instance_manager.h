@@ -2,16 +2,14 @@
 #define APP_INSTANCE_MANAGER_H
 
 #include <QObject>
-#include <QLocalServer>
-#include <QLocalSocket>
-#include <QTimer>
-#include <QMutex>
-#include <QVector>
-#include <memory>
-#include <atomic>
 #include <QPointF>
-#include <QPropertyAnimation>
 #include <QSizeF>
+#include <QString>
+#include <QLocalSocket>
+#include <QLocalServer>
+#include <QMutex>
+#include <QPropertyAnimation>
+#include <QTimer>
 #include <thread>
 
 class BlobAnimation;
@@ -110,8 +108,8 @@ private slots:
     void onNewConnection();
 
     /**
-         * @brief Slot called when a connected socket disconnects. Handles cleanup and potential role change (client becoming creator).
-         */
+    * @brief Slot called when a connected socket disconnects. Handles cleanup and potential role change (the client becoming creator).
+    */
     void clientDisconnected();
 
     /**
@@ -186,8 +184,6 @@ private:
      */
     void FinalizeAbsorption();
 
-    // --- Member Variables ---
-
     QMainWindow *main_window_; ///< Pointer to the main application window.
     BlobAnimation *blob_; ///< Pointer to the BlobAnimation object.
     QLocalServer *server_ = nullptr; ///< Local server instance (used only by the creator).
@@ -209,7 +205,6 @@ private:
     static constexpr int kUpdateIntervalMs = 50; ///< Interval (in ms) for sending position updates.
     static const QString kServerName; ///< Name used for the local server discovery.
 
-    // Attraction/Absorption Parameters
     static constexpr double kAttractionForce = 0.5;
     ///< Deprecated attraction force constant (logic now uses kSmoothForce).
     static constexpr double kAbsorptionDistance = 50.0; ///< Distance (in pixels) at which absorption starts.

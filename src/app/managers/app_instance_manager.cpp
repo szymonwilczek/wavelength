@@ -93,7 +93,7 @@ void AppInstanceManager::clientDisconnected() {
             client_ids_.remove(socket);
             emit instanceDisconnected(clientId);
 
-            QMetaObject::invokeMethod(main_window_, [this]() {
+            QMetaObject::invokeMethod(main_window_, [this] {
                 if (main_window_ && !main_window_->isEnabled()) {
                     main_window_->setEnabled(true);
                 }
@@ -213,7 +213,7 @@ bool AppInstanceManager::ProcessMessage(const QByteArray &message, QLocalSocket 
                 info.blob_center = blob_center;
                 info.window_position = window_position;
                 info.window_size = window_size;
-                info.is_creator = is_creator_ ? false : (sender == nullptr);
+                info.is_creator = is_creator_ ? false : sender == nullptr;
                 connected_instances_.append(info);
 
                 if (sender && is_creator_) {
@@ -293,7 +293,7 @@ QByteArray AppInstanceManager::CreatePositionMessage() const {
 
 void AppInstanceManager::InitAttractionThread() {
     is_thread_running = true;
-    attraction_thread_ = std::make_unique<std::thread>([this]() {
+    attraction_thread_ = std::make_unique<std::thread>([this] {
         while (is_thread_running) {
             constexpr int sleep_time_ms = 16;
             if (is_being_absorbed_ || is_absorbing_) {
@@ -321,14 +321,14 @@ void AppInstanceManager::InitAttractionThread() {
 
                         if (const double distance = QLineF(global_position, global_creator_position).length();
                             distance < kAbsorptionDistance && !is_being_absorbed_) {
-                            QMetaObject::invokeMethod(this, [this]() {
+                            QMetaObject::invokeMethod(this, [this] {
                                 is_being_absorbed_ = true;
                                 main_window_->setWindowFlags(main_window_->windowFlags() | Qt::WindowStaysOnTopHint);
                                 main_window_->show();
                                 StartAbsorptionAnimation();
                             }, Qt::QueuedConnection);
                         } else {
-                            QMetaObject::invokeMethod(this, [this, global_creator_position]() {
+                            QMetaObject::invokeMethod(this, [this, global_creator_position] {
                                 ApplyAttractionForce(global_creator_position);
                             }, Qt::QueuedConnection);
                         }
@@ -357,7 +357,7 @@ void AppInstanceManager::ApplyAttractionForce(const QPointF &target_position) {
 
     static constexpr double kSmoothForce = 0.02;
 
-    const QPointF new_center = current_center + (difference * kSmoothForce);
+    const QPointF new_center = current_center + difference * kSmoothForce;
 
     const QPointF new_position(
         new_center.x() - window_size.width() / 2.0,
@@ -410,7 +410,7 @@ void AppInstanceManager::StartAbsorptionAnimation() {
 
     absorption_sequence->addAnimation(fade_animation);
 
-    connect(absorption_sequence, &QSequentialAnimationGroup::finished, this, [this]() {
+    connect(absorption_sequence, &QSequentialAnimationGroup::finished, this, [this] {
         FinalizeAbsorption();
     });
 
@@ -419,8 +419,8 @@ void AppInstanceManager::StartAbsorptionAnimation() {
 
 void AppInstanceManager::FinalizeAbsorption() {
     if (is_being_absorbed_) {
-        QMetaObject::invokeMethod(this, [this]() {
-            QTimer::singleShot(100, [this]() {
+        QMetaObject::invokeMethod(this, [this] {
+            QTimer::singleShot(100, [this] {
                 qApp->quit();
             });
         }, Qt::QueuedConnection);
