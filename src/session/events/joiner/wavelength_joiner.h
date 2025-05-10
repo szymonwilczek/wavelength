@@ -1,10 +1,8 @@
 #ifndef WAVELENGTH_JOINER_H
 #define WAVELENGTH_JOINER_H
+#include <QObject>
+#include <QString>
 
-#include "../../../storage/database_manager.h"
-#include "../../../storage/wavelength_registry.h"
-#include "../../../chat/messages/services/wavelength_message_processor.h"
-#include "../../../../src/app/wavelength_config.h"
 
 /**
  * @brief Represents the result of an attempt to join a wavelength.
@@ -33,7 +31,7 @@ public:
      * @brief Gets the singleton instance of the WavelengthJoiner.
      * @return Pointer to the singleton WavelengthJoiner instance.
      */
-    static WavelengthJoiner* GetInstance() {
+    static WavelengthJoiner *GetInstance() {
         static WavelengthJoiner instance;
         return &instance;
     }
@@ -50,13 +48,15 @@ public:
      *         or {true, QString()} if the connection process was initiated. Asynchronous results
      *         are communicated via signals.
      */
-    JoinResult JoinWavelength(QString frequency, const QString& password = QString());
+    JoinResult JoinWavelength(QString frequency, const QString &password = QString());
 
 signals:
     /**
      * @brief Emitted when the user successfully joins the specified wavelength.
      * @param frequency The frequency identifier of the joined wavelength.
      */
+
+
     void wavelengthJoined(QString frequency);
 
     /**
@@ -76,7 +76,7 @@ signals:
      * @brief Emitted if an error occurs during the connection or join process.
      * @param error_message A description of the error.
      */
-    void connectionError(const QString& error_message);
+    void connectionError(const QString &error_message);
 
     /**
      * @brief Emitted when a regular chat message is received for the joined frequency.
@@ -84,7 +84,7 @@ signals:
      * @param frequency The frequency the message belongs to.
      * @param formatted_message The HTML-formatted message string.
      */
-    void messageReceived(QString frequency, const QString& formatted_message);
+    void messageReceived(QString frequency, const QString &formatted_message);
 
     /**
      * @brief Emitted when the user explicitly leaves or is disconnected from the active wavelength.
@@ -97,7 +97,8 @@ private:
      * @brief Private constructor to enforce the singleton pattern.
      * @param parent Optional parent QObject.
      */
-    explicit WavelengthJoiner(QObject* parent = nullptr) : QObject(parent) {}
+    explicit WavelengthJoiner(QObject *parent = nullptr) : QObject(parent) {
+    }
 
     /**
      * @brief Private destructor.
@@ -107,12 +108,12 @@ private:
     /**
      * @brief Deleted copy constructor to prevent copying.
      */
-    WavelengthJoiner(const WavelengthJoiner&) = delete;
+    WavelengthJoiner(const WavelengthJoiner &) = delete;
 
     /**
      * @brief Deleted assignment operator to prevent assignment.
      */
-    WavelengthJoiner& operator=(const WavelengthJoiner&) = delete;
+    WavelengthJoiner &operator=(const WavelengthJoiner &) = delete;
 };
 
 #endif // WAVELENGTH_JOINER_H
