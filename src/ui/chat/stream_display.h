@@ -1,7 +1,11 @@
 #ifndef WAVELENGTH_STREAM_DISPLAY_H
 #define WAVELENGTH_STREAM_DISPLAY_H
 
-#include "../../ui/chat/communication_stream.h"
+#include <QQueue>
+
+#include "stream_message.h"
+
+class CommunicationStream;
 
 /**
  * @brief A widget that manages and displays messages within a CommunicationStream.
@@ -74,32 +78,24 @@ public slots:
      * @brief Sets the intensity of the glitch effect in the CommunicationStream.
      * @param intensity The desired glitch intensity level.
      */
-    void SetGlitchIntensity(const qreal intensity) const {
-        communication_stream_->SetGlitchIntensity(intensity);
-    }
+    void SetGlitchIntensity(const qreal intensity) const;
 
     /**
      * @brief Forwards the transmitting user ID to the CommunicationStream.
      * @param userId The identifier of the user currently transmitting audio.
      */
-    void SetTransmittingUser(const QString &userId) const {
-        communication_stream_->SetTransmittingUser(userId);
-    }
+    void SetTransmittingUser(const QString &userId) const;
 
     /**
      * @brief Tells the CommunicationStream to clear the transmitting user display.
      */
-    void ClearTransmittingUser() const {
-        communication_stream_->ClearTransmittingUser();
-    }
+    void ClearTransmittingUser() const;
 
     /**
      * @brief Forwards the audio amplitude level to the CommunicationStream.
      * @param amplitude The current audio amplitude level.
      */
-    void SetAudioAmplitude(const qreal amplitude) const {
-        communication_stream_->SetAudioAmplitude(amplitude);
-    }
+    void SetAudioAmplitude(const qreal amplitude) const;
 
 private slots:
     /**
