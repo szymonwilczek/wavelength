@@ -1,9 +1,7 @@
 #ifndef STREAM_MESSAGE_H
 #define STREAM_MESSAGE_H
 
-#include <QWidget>
 #include <QSvgRenderer>
-#include <QBitmap>
 #include <qtimeline.h>
 #include <utility>
 #include <QApplication>
@@ -12,7 +10,6 @@
 #include "../chat/effects/cyber_long_text_display.h"
 #include "../chat/effects/cyber_text_display.h"
 #include "../../chat/files/attachments/attachment_placeholder.h"
-#include "effects/disintegration_effect.h"
 #include "effects/electronic_shutdown_effect.h"
 
 class CyberAttachmentViewer;
@@ -61,34 +58,7 @@ public:
      * @param size The desired size of the output icon pixmap.
      * @return A QIcon containing the colored pixmap, or a null QIcon on failure.
      */
-    static QIcon CreateColoredSvgIcon(const QString &svg_path, const QColor &color, const QSize &size) {
-        QSvgRenderer renderer;
-        if (!renderer.load(svg_path)) {
-            qWarning() << "Nie można załadować SVG:" << svg_path;
-            return QIcon(); // Zwróć pustą ikonę w razie błędu
-        }
-
-        // Utwórz pixmapę o żądanym rozmiarze z przezroczystym tłem
-        QPixmap pixmap(size);
-        pixmap.fill(Qt::transparent);
-
-        // Narysuj SVG na pixmapie
-        QPainter painter(&pixmap);
-        renderer.render(&painter);
-        painter.end(); // Zakończ malowanie na oryginalnej pixmapie
-
-        // Utwórz maskę z kanału alfa oryginalnej pixmapy
-        const QBitmap mask = pixmap.createMaskFromColor(Qt::transparent);
-
-        // Utwórz nową pixmapę wypełnioną docelowym kolorem
-        QPixmap colored_pixmap(size);
-        colored_pixmap.fill(color);
-
-        // Zastosuj maskę do kolorowej pixmapy
-        colored_pixmap.setMask(mask);
-
-        return QIcon(colored_pixmap);
-    }
+    static QIcon CreateColoredSvgIcon(const QString &svg_path, const QColor &color, const QSize &size);
 
     /**
      * @brief Constructs a StreamMessage widget.
@@ -126,9 +96,6 @@ public:
 
     /** @brief Gets the current disintegration progress (deprecated). */
     qreal GetDisintegrationProgress() const { return disintegration_progress_; }
-
-    /** @brief Sets the disintegration progress and updates the DisintegrationEffect (deprecated). */
-    void SetDisintegrationProgress(qreal progress);
 
     /** @brief Gets the current electronic shutdown effect progress. */
     qreal GetShutdownProgress() const { return shutdown_progress_; }
@@ -196,7 +163,7 @@ public:
      * Applies the ElectronicShutdownEffect and animates its progress.
      * Hides the widget and emits hidden() upon completion.
      */
-    void StartDisintegrationAnimation(); // Note: Name is misleading, uses ElectronicShutdownEffect
+    void StartShutdownAnimation();
 
     /**
      * @brief Shows or hides the navigation buttons (Next, Previous) and the Mark Read button.
@@ -284,7 +251,6 @@ private:
      */
     void StartLongMessageClosingAnimation();
 
-    // --- Attachment Processing Helper Methods (Potentially redundant with AddAttachment) ---
     /** @brief Helper to process image attachments (likely superseded by AddAttachment). */
     void ProcessImageAttachment(const QString &html);
 
@@ -296,8 +262,6 @@ private:
 
     /** @brief Helper to process video attachments (likely superseded by AddAttachment). */
     void ProcessVideoAttachment(const QString &html);
-
-    // --- End Attachment Processing Helper Methods ---
 
     /**
      * @brief Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities.
@@ -318,7 +282,6 @@ private:
     MessageType type_; ///< Message type (Received, Transmitted, System).
     qreal opacity_; ///< Current opacity level (for animation).
     qreal glow_intensity_; ///< Current glow intensity level (for animation).
-    qreal disintegration_progress_; ///< Current disintegration progress (deprecated).
     qreal shutdown_progress_; ///< Current electronic shutdown progress.
     bool is_read_; ///< Flag indicating if the message has been marked as read.
 
