@@ -4,7 +4,6 @@
 #include <QDateTime>
 #include <QMap>
 #include <QObject>
-#include <QString>
 
 /**
  * @brief Manages authentication and session handling for Wavelength frequencies using a singleton pattern.
