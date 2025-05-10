@@ -10,7 +10,7 @@ class QWidget;
 class QShortcut;
 class WavelengthConfig;
 class QMainWindow;
-class WavelengthChatView;
+class ChatView;
 class SettingsView;
 class Navbar;
 
@@ -89,7 +89,7 @@ private:
      * @brief Registers shortcuts specific to the WavelengthChatView.
      * @param chat_view Pointer to the WavelengthChatView instance.
      */
-    void RegisterChatViewShortcuts(WavelengthChatView *chat_view);
+    void RegisterChatViewShortcuts(ChatView *chat_view);
 
     /**
      * @brief Registers shortcuts specific to the SettingsView.

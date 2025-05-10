@@ -17,7 +17,7 @@
 #include "src/app/managers/font_manager.h"
 #include "src/app/managers/app_instance_manager.h"
 #include "src/ui/dialogs/join_wavelength_dialog.h"
-#include "src/ui/views/wavelength_chat_view.h"
+#include "src/ui/views/chat_view.h"
 #include "src/ui/dialogs/wavelength_dialog.h"
 
 #include "src/session/wavelength_session_coordinator.h"
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 
     stacked_widget->addWidget(animation_widget);
 
-    auto chat_view = new WavelengthChatView(stacked_widget);
+    auto chat_view = new ChatView(stacked_widget);
     stacked_widget->addWidget(chat_view);
 
     auto settings_view = new SettingsView(stacked_widget);
@@ -293,13 +293,13 @@ int main(int argc, char *argv[]) {
     };
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageReceived,
-                     chat_view, &WavelengthChatView::OnMessageReceived);
+                     chat_view, &ChatView::OnMessageReceived);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::messageSent,
-                     chat_view, &WavelengthChatView::OnMessageSent);
+                     chat_view, &ChatView::OnMessageSent);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthClosed,
-                     chat_view, &WavelengthChatView::OnWavelengthClosed);
+                     chat_view, &ChatView::OnWavelengthClosed);
 
     QObject::connect(coordinator, &WavelengthSessionCoordinator::wavelengthCreated,
                      [switch_to_chat_view](const QString &frequency) {
@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
                          switch_to_chat_view(frequency);
                      });
 
-    QObject::connect(chat_view, &WavelengthChatView::wavelengthAborted,
+    QObject::connect(chat_view, &ChatView::wavelengthAborted,
                      [stacked_widget, animation_widget, animation, title_label, text_effect, navbar] {
                          navbar->SetChatMode(false);
                          animation->hideAnimation();

@@ -23,7 +23,7 @@
  * It interacts with WavelengthSessionCoordinator and WavelengthMessageService for session management,
  * message handling, and PTT functionality.
  */
-class WavelengthChatView final : public QWidget {
+class ChatView final : public QWidget {
     Q_OBJECT
     /** @brief Property controlling the opacity of the animated scanline effect (0.0 to 1.0). Animatable. */
     Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
@@ -47,13 +47,13 @@ public:
      * for time display and random visual effects.
      * @param parent Optional parent widget.
      */
-    explicit WavelengthChatView(QWidget *parent = nullptr);
+    explicit ChatView(QWidget *parent = nullptr);
 
     /**
      * @brief Destructor.
      * Stops audio input/output and cleans up audio resources.
      */
-    ~WavelengthChatView() override;
+    ~ChatView() override;
 
     /**
      * @brief Gets the current opacity of the scanline effect.

@@ -38,8 +38,8 @@ add_executable(
         src/app/managers/app_instance_manager.h
         src/ui/dialogs/wavelength_dialog.cpp
         src/ui/dialogs/wavelength_dialog.h
-        src/ui/views/wavelength_chat_view.cpp
-        src/ui/views/wavelength_chat_view.h
+        src/ui/views/chat_view.cpp
+        src/ui/views/chat_view.h
         src/ui/dialogs/join_wavelength_dialog.cpp
         src/ui/dialogs/join_wavelength_dialog.h
         src/storage/database_manager.cpp

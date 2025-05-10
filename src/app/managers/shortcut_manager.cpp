@@ -6,7 +6,7 @@
 #include "../wavelength_config.h"
 #include "../../ui/buttons/navbar_button.h"
 #include "../../ui/views/settings_view.h"
-#include "../../ui/views/wavelength_chat_view.h"
+#include "../../ui/views/chat_view.h"
 #include "../../ui/navigation/navbar.h"
 #include <concepts>
 
@@ -35,7 +35,7 @@ void ShortcutManager::RegisterShortcuts(QWidget *parent) {
         } else {
             qWarning() << "[SHORTCUT MANAGER] Could not find Navbar in QMainWindow.";
         }
-    } else if (auto *chat_view = qobject_cast<WavelengthChatView *>(parent)) {
+    } else if (auto *chat_view = qobject_cast<ChatView *>(parent)) {
         RegisterChatViewShortcuts(chat_view);
     } else if (auto *settings_view = qobject_cast<SettingsView *>(parent)) {
         RegisterSettingsViewShortcuts(settings_view);
@@ -84,7 +84,7 @@ void ShortcutManager::RegisterMainWindowShortcuts(QMainWindow *window, Navbar *n
     });
 }
 
-void ShortcutManager::RegisterChatViewShortcuts(WavelengthChatView *chat_view) {
+void ShortcutManager::RegisterChatViewShortcuts(ChatView *chat_view) {
     CreateAndConnectShortcut("ChatView.AbortConnection", chat_view, [chat_view]() {
         if (auto *button = chat_view->findChild<QPushButton *>("abortButton")) {
             button->click();
