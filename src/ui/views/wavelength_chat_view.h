@@ -9,7 +9,6 @@
 
 #include "../../ui/chat/wavelength_stream_display.h"
 #include "../../session/wavelength_session_coordinator.h"
-#include "../buttons/cyber_chat_button.h"
 
 /**
  * @brief The main view for displaying and interacting with a specific Wavelength chat session.
@@ -33,10 +32,10 @@ class WavelengthChatView final : public QWidget {
      * @brief Enum representing the possible states of the Push-to-Talk (PTT) functionality.
      */
     enum PttState {
-        Idle,         ///< Not requesting, transmitting, or receiving PTT.
-        Requesting,   ///< PTT button pressed, waiting for grant from the server.
+        Idle, ///< Not requesting, transmitting, or receiving PTT.
+        Requesting, ///< PTT button pressed, waiting for grant from the server.
         Transmitting, ///< PTT granted, microphone is active, sending audio data.
-        Receiving     ///< Receiving audio data from another user.
+        Receiving ///< Receiving audio data from another user.
     };
 
 public:
@@ -185,7 +184,7 @@ private slots:
      * @param frequency The frequency the audio data belongs to.
      * @param audio_data The raw audio data chunk.
      */
-    void OnAudioDataReceived(const QString &frequency, const QByteArray& audio_data) const;
+    void OnAudioDataReceived(const QString &frequency, const QByteArray &audio_data) const;
 
     /**
      * @brief Slot called when the audio input device has data ready to be read.
@@ -239,7 +238,6 @@ signals:
     void wavelengthAborted();
 
 private:
-    // --- UI Elements ---
     /** @brief Label displaying the Wavelength frequency and name. */
     QLabel *header_label_;
     /** @brief Label indicating the connection status ("AKTYWNE POŁĄCZENIE", "ROZŁĄCZANIE", etc.). */
@@ -256,7 +254,6 @@ private:
     QPushButton *abort_button_;
     /** @brief Button for Push-to-Talk functionality. */
     QPushButton *ptt_button_;
-    // --- End UI Elements ---
 
     /** @brief The frequency of the Wavelength currently displayed in this view. "-1.0" if inactive. */
     QString current_frequency_ = "-1.0";
@@ -267,7 +264,6 @@ private:
     /** @brief Stores the ID of the user currently transmitting audio (if receiving). */
     QString current_transmitter_id_;
 
-    // --- PTT and Audio ---
     /** @brief Current state of the Push-to-Talk interaction. */
     PttState ptt_state_;
     /** @brief Object managing audio input from the microphone. */
@@ -284,9 +280,8 @@ private:
     QSoundEffect *ptt_on_sound_;
     /** @brief Sound effect played when the PTT button is released. */
     QSoundEffect *ptt_off_sound_;
-    // --- End PTT and Audio ---
 
-    TranslationManager* translator_;
+    TranslationManager *translator_;
 
     /**
      * @brief Initializes the audio format and creates QAudioInput/QAudioOutput objects.
@@ -324,7 +319,7 @@ private:
      * @param buffer The raw audio data.
      * @return The calculated RMS amplitude, normalized to approximately [0.0, 1.0].
      */
-    [[nodiscard]] qreal CalculateAmplitude(const QByteArray& buffer) const;
+    [[nodiscard]] qreal CalculateAmplitude(const QByteArray &buffer) const;
 
     /**
      * @brief Updates the appearance and enabled state of the PTT button based on the current ptt_state_.
