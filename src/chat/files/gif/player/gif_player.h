@@ -1,12 +1,12 @@
 #ifndef INLINE_GIF_PLAYER_H
 #define INLINE_GIF_PLAYER_H
 
-#include <memory>
-#include <QLabel>
+#include <QFrame>
 
-#include "../decoder/gif_decoder.h"
-
+class GifDecoder;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief An inline widget for displaying and playing animated GIFs within a chat interface.
  *
