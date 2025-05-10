@@ -20,7 +20,7 @@ class CyberpunkButton final : public QPushButton {
 
     /**
      * @brief Property controlling the intensity of the button's glow effect (0.0 to 1.0). Animatable.
-     * Affects the brightness and thickness of the frame border and the text's drop shadow.
+     * It affects the brightness and thickness of the frame border and the text's drop shadow.
      */
     Q_PROPERTY(qreal glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity) // Corrected getter name
 
@@ -44,7 +44,7 @@ public:
      * @brief Gets the current intensity of the glow effect.
      * @return The glow intensity value (typically between 0.0 and 1.0).
      */
-    qreal GetGlowIntensity() const { return glow_intensity_; } // Corrected function name
+    qreal GetGlowIntensity() const { return glow_intensity_; }
 
     /**
      * @brief Sets the intensity of the glow effect and updates the button's appearance.
@@ -52,7 +52,7 @@ public:
      * Triggers a repaint of the button.
      * @param intensity The desired glow intensity (typically between 0.0 and 1.0).
      */
-    void SetGlowIntensity(qreal intensity); // Corrected function name
+    void SetGlowIntensity(qreal intensity);
 
 protected:
     /**
@@ -83,8 +83,6 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    /** @brief Legacy animation pointer, seems unused. */
-    QPropertyAnimation *animation_ = nullptr; // Marked as potentially unused
     /** @brief Animation controlling the glowIntensity property on hover. */
     QPropertyAnimation *glow_animation_;
     /** @brief Graphics effect providing the glow/shadow for the button text. */

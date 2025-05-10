@@ -3,13 +3,12 @@
 #include <cmath>
 #include <QPropertyAnimation>
 
-TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), underline_offset_(0), is_active_(false) {
-
+TabButton::TabButton(const QString &text, QWidget *parent): QPushButton(text, parent), underline_offset_(0),
+                                                            is_active_(false) {
     setFlat(true);
     setCursor(Qt::PointingHandCursor);
     setCheckable(true);
 
-    // Styl przycisku zakładki
     setStyleSheet(
         "TabButton {"
         "  color: #00ccff;"
@@ -72,23 +71,20 @@ void TabButton::paintEvent(QPaintEvent *event) {
 
     const QColor underline_color = is_active_ ? QColor(0, 220, 255) : QColor(0, 180, 220, 180);
 
-    // Rysowanie podkreślenia
+    // underline
     const int line_y = height() - 5;
 
     if (is_active_) {
-        // Aktywna zakładka ma pełne podkreślenie
         painter.setPen(QPen(underline_color, 2));
         painter.drawLine(5, line_y, width() - 5, line_y);
     } else if (underline_offset_ > 0) {
-        // Zakładka z animującym się podkreśleniem przy najechaniu
         painter.setPen(QPen(underline_color, 1.5));
 
-        // Animowane podkreślenie porusza się lekko w poziomie
         const double offset = sin(underline_offset_) * 2.0;
         const int center_x = width() / 2;
         const int line_width = width() * 0.6 * (underline_offset_ / 5.0);
 
-        painter.drawLine(center_x - line_width/2 + offset, line_y,
-                         center_x + line_width/2 + offset, line_y);
+        painter.drawLine(center_x - line_width / 2 + offset, line_y,
+                         center_x + line_width / 2 + offset, line_y);
     }
 }
