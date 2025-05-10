@@ -1,11 +1,10 @@
 #ifndef ATTACHMENT_PLACEHOLDER_H
 #define ATTACHMENT_PLACEHOLDER_H
 
-#include <qfuture.h>
+#include <QFuture>
 #include <QScrollArea>
 #include <QWidget>
 #include <QWindow>
-#include <QEvent>
 #include <functional>
 
 #include "attachment_queue_manager.h"
@@ -14,7 +13,6 @@
 #include "../audio/player/inline_audio_player.h"
 
 class TranslationManager;
-// Forward declarations
 class CyberAttachmentViewer;
 class AutoScalingAttachment;
 class InlineImageViewer;
@@ -40,7 +38,7 @@ public:
      * @param type The general type of the attachment (e.g., "image", "audio", "video", "gif"). Used for icon selection.
      * @param parent Optional parent widget.
      */
-    explicit AttachmentPlaceholder(const QString& filename, const QString& type, QWidget* parent = nullptr);
+    explicit AttachmentPlaceholder(const QString &filename, const QString &type, QWidget *parent = nullptr);
 
     /**
      * @brief Sets the actual content widget to be displayed within the placeholder.
@@ -48,7 +46,7 @@ public:
      * adjusts layout and size policies, and emits attachmentLoaded() after a short delay.
      * @param content The QWidget containing the loaded attachment content (e.g., ImageViewer, GifPlayer).
      */
-    void SetContent(QWidget* content);
+    void SetContent(QWidget *content);
 
     /**
      * @brief Provides a size hint for the placeholder widget.
@@ -63,14 +61,14 @@ public:
      * @param attachment_id The unique ID referencing the data in AttachmentDataStore.
      * @param mime_type The MIME type of the attachment (e.g., "image/png", "audio/mpeg").
      */
-    void SetAttachmentReference(const QString& attachment_id, const QString& mime_type);
+    void SetAttachmentReference(const QString &attachment_id, const QString &mime_type);
 
     /**
      * @brief Sets the attachment data directly as a base64 encoded string.
      * @param base64_data The base64 encoded attachment data.
      * @param mime_type The MIME type of the attachment.
      */
-    void SetBase64Data(const QString& base64_data, const QString& mime_type);
+    void SetBase64Data(const QString &base64_data, const QString &mime_type);
 
     /**
      * @brief Updates the UI elements to reflect the loading state.
@@ -100,7 +98,7 @@ public slots:
      * Enables the retry button and shows the error message in the progress label.
      * @param error_msg The error message to display.
      */
-    void SetError(const QString& error_msg);
+    void SetError(const QString &error_msg);
 
     /**
      * @brief Creates and shows a non-modal dialog to display the full-size attachment (image or GIF).
@@ -108,7 +106,7 @@ public slots:
      * @param data The raw byte data of the attachment.
      * @param is_gif True if the data represents a GIF, false otherwise (assumed image).
      */
-    void ShowFullSizeDialog(const QByteArray& data, bool is_gif);
+    void ShowFullSizeDialog(const QByteArray &data, bool is_gif);
 
     /**
      * @brief Adjusts the size and position of the full-size dialog and shows it.
@@ -120,35 +118,36 @@ public slots:
      * @param content_widget The widget displaying the actual content (image/GIF).
      * @param original_content_size The original, unscaled size of the content widget.
      */
-    void AdjustAndShowDialog(QDialog* dialog, const QScrollArea* scroll_area, QWidget* content_widget, QSize original_content_size) const;
+    void AdjustAndShowDialog(QDialog *dialog, const QScrollArea *scroll_area, QWidget *content_widget,
+                             QSize original_content_size) const;
 
     /**
      * @brief Creates and displays a CyberAttachmentViewer containing an image.
      * Wraps an InlineImageViewer in an AutoScalingAttachment to handle thumbnail scaling and click-to-enlarge.
      * @param data The raw byte data of the image.
      */
-    void ShowCyberImage(const QByteArray& data);
+    void ShowCyberImage(const QByteArray &data);
 
     /**
      * @brief Creates and displays a CyberAttachmentViewer containing a GIF.
      * Wraps an InlineGifPlayer in an AutoScalingAttachment to handle thumbnail scaling and click-to-enlarge.
      * @param data The raw byte data of the GIF.
      */
-    void ShowCyberGif(const QByteArray& data);
+    void ShowCyberGif(const QByteArray &data);
 
     /**
      * @brief Creates and displays a CyberAttachmentViewer containing an audio player.
      * Uses InlineAudioPlayer.
      * @param data The raw byte data of the audio file.
      */
-    void ShowCyberAudio(const QByteArray& data);
+    void ShowCyberAudio(const QByteArray &data);
 
     /**
      * @brief Creates and displays a CyberAttachmentViewer containing a video preview (thumbnail + play button).
      * Clicking the preview opens a VideoPlayerOverlay dialog.
      * @param data The raw byte data of the video file.
      */
-    void ShowCyberVideo(const QByteArray& data);
+    void ShowCyberVideo(const QByteArray &data);
 
     /**
      * @brief Generates a thumbnail image from the first frame of a video in a background thread.
@@ -157,7 +156,7 @@ public slots:
      * @param video_data The raw byte data of the video.
      * @param thumbnail_label The QLabel widget to display the generated thumbnail.
      */
-    void GenerateThumbnail(const QByteArray& video_data, QLabel* thumbnail_label);
+    void GenerateThumbnail(const QByteArray &video_data, QLabel *thumbnail_label);
 
 private:
     /** @brief The original filename of the attachment. */
@@ -167,21 +166,21 @@ private:
     /** @brief The MIME type of the attachment (e.g., "image/png"). */
     QString mime_type_;
     /** @brief Label displaying the attachment icon and filename. */
-    QLabel* info_label_;
+    QLabel *info_label_;
     /** @brief Label displaying loading progress or error messages. */
-    QLabel* progress_label_;
+    QLabel *progress_label_;
     /** @brief Button to initiate loading or retry on error. */
-    QPushButton* load_button_;
+    QPushButton *load_button_;
     /** @brief Container widget holding the loaded attachment content. */
-    QWidget* content_container_;
+    QWidget *content_container_;
     /** @brief Layout for the content_container_. */
-    QVBoxLayout* content_layout_;
+    QVBoxLayout *content_layout_;
     /** @brief Flag indicating if the attachment content has been successfully loaded and set. */
     bool is_loaded_;
     /** @brief Temporary storage for video data when opening the player overlay. */
     QByteArray video_data_;
     /** @brief Pointer to the QLabel used for the video thumbnail preview. */
-    QLabel* thumbnail_label_ = nullptr;
+    QLabel *thumbnail_label_ = nullptr;
     /** @brief Function object (lambda) storing the action to perform when the video thumbnail is clicked. */
     std::function<void()> ClickHandler_;
     /** @brief Stores the attachment ID if data is referenced from AttachmentDataStore. */
@@ -189,7 +188,7 @@ private:
     /** @brief Flag indicating if attachment_id_ refers to data in AttachmentDataStore. */
     bool has_reference_ = false;
     /** @brief Translation manager for handling UI text translations. */
-    TranslationManager* translator_ = nullptr;
+    TranslationManager *translator_ = nullptr;
 
     /**
      * @brief Filters events, specifically handling mouse clicks on the video thumbnail label.
@@ -197,7 +196,7 @@ private:
      * @param event The event being processed.
      * @return True if the event was handled (thumbnail clicked), false otherwise.
      */
-    bool eventFilter(QObject* watched, QEvent* event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
     /**
      * @brief Emits the attachmentLoaded signal after ensuring layout updates.
