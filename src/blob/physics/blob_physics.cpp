@@ -1,7 +1,12 @@
 #include "blob_physics.h"
+
 #include <qfuture.h>
 #include <QRandomGenerator>
 #include <qtconcurrentrun.h>
+
+#include "../utils/blob_math.h"
+#include "../blob_config.h"
+
 
 BlobPhysics::BlobPhysics() {
     physics_timer_.start();
@@ -233,7 +238,7 @@ void BlobPhysics::UpdatePhysicsParallel(std::vector<QPointF> &control_points,
 
         futures.append(QtConcurrent::run(&thread_pool_, [&, start_idx, end_idx, radius_threshold_squared,
                                              damping_factor, velocity_blend, prev_velocity_blend,
-                                             velocity_threshold_squared, max_speed_squared]() {
+                                             velocity_threshold_squared, max_speed_squared] {
                                              const double center_x = blob_center.x();
                                              const double center_y = blob_center.y();
 
