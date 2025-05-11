@@ -2,11 +2,14 @@
 
 #include <QMainWindow>
 #include <QShortcut>
+#include <QDebug>
+#include <QLineEdit>
 
 #include "../wavelength_config.h"
 #include "../../ui/navigation/navbar.h"
 #include "../../ui/views/settings_view.h"
 #include "../../ui/views/chat_view.h"
+#include "../../ui/buttons/navbar_button.h"
 
 class QPushButton;
 class QLineEdit;
