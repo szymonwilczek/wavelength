@@ -46,5 +46,4 @@ void WavelengthUtilities::UpdateTitleLabelStyle(QLabel *label, const QColor &tex
         "}"
     ).arg(text_color.name(QColor::HexRgb), border_color.name(QColor::HexRgb));
     label->setStyleSheet(style);
-    qDebug() << "[UTIL] Updated titleLabel style:" << style;
 }
