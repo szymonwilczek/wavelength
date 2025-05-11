@@ -1,12 +1,8 @@
 #ifndef WAVELENGTH_REGISTRY_H
 #define WAVELENGTH_REGISTRY_H
 
-#include <QDateTime>
-#include <QMap>
 #include <QPointer>
-#include <QSet>
-
-class QWebSocket;
+#include <QWebSocket>
 
 /**
  * @brief Structure holding information about a specific wavelength (frequency).
