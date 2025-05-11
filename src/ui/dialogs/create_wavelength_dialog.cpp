@@ -365,7 +365,7 @@ void CreateWavelengthDialog::StartFrequencySearch() {
         if (frequency_watcher_ && frequency_watcher_->isRunning()) {
             loading_indicator_->setText(
                 translator_->Translate("CreateWavelengthDialog.DefaultIndicator", "USING DEFAULT FREQUENCY..."));
-            frequency_ = 130.0;
+            frequency_ = "130.0";
             frequency_found_ = true;
             OnFrequencyFound();
             qDebug() << "[WVLGTH-DIALOG] Timeout when searching for frequencies - Fallback to the default value.";
