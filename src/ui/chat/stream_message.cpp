@@ -1,12 +1,14 @@
 #include "stream_message.h"
 
 #include <cmath>
+#include <QApplication>
 #include <QParallelAnimationGroup>
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QBitmap>
 #include <QDateTime>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
@@ -15,6 +17,8 @@
 #include <QScrollArea>
 #include <QSvgRenderer>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QDebug>
 
 #include "../../chat/files/attachments/attachment_placeholder.h"
 #include "../../chat/files/attachments/auto_scaling_attachment.h"
