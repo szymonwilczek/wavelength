@@ -1,5 +1,8 @@
 #include "auto_scaling_attachment.h"
 
+#include <QLabel>
+#include <QMouseEvent>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../app/managers/translation_manager.h"
