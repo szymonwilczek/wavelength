@@ -1,6 +1,7 @@
 #include "blob_physics.h"
 
 #include <qfuture.h>
+#include <qmath.h>
 #include <QRandomGenerator>
 #include <qtconcurrentrun.h>
 
