@@ -1,10 +1,24 @@
 #include "chat_view.h"
 
-#include "../chat/style/chat_style.h"
+#include <QAudioInput>
+#include <QAudioOutput>
 #include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPainter>
+#include <QPropertyAnimation>
+#include <QRandomGenerator>
+#include <QSoundEffect>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "../../app/managers/translation_manager.h"
+#include "../../chat/messages/services/message_service.h"
+#include "../../session/session_coordinator.h"
 #include "../buttons/cyber_chat_button.h"
+#include "../chat/style/chat_style.h"
+#include "../../ui/chat/stream_display.h"
+#include "../../storage/wavelength_registry.h"
 
 ChatView::ChatView(QWidget *parent): QWidget(parent), scanline_opacity_(0.15) {
     setObjectName("chatViewContainer");

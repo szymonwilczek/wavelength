@@ -5,8 +5,9 @@
 #include <QElapsedTimer>
 #include <QMessageBox>
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
 #include <QRandomGenerator>
-#include <QPushButton>
+#include <QTimer>
 
 #include "../../ui/settings/tabs/classified/components/system_override_manager.h"
 #include "../../ui/settings/tabs/appearance/appearance_settings_widget.h"
@@ -21,11 +22,13 @@
 #include "../../ui/settings/tabs/classified/layers/voice_recognition/voice_recognition_layer.h"
 #include "../../ui/settings/tabs/classified/layers/typing_test/typing_test_layer.h"
 #include "../../ui/settings/tabs/classified/layers/snake_game/snake_game_layer.h"
+#include "../../ui/settings/tabs/shortcuts/shortcuts_settings_widget.h"
 
-#include "../../ui/checkbox/cyber_checkbox.h"
 #include "../../app/managers/shortcut_manager.h"
 #include "../../app/managers/translation_manager.h"
-#include "../../ui/settings/tabs/shortcuts/shortcuts_settings_widget.h"
+#include "../../app/wavelength_config.h"
+#include "../buttons/tab_button.h"
+#include "../buttons/cyber_button.h"
 
 SettingsView::SettingsView(QWidget *parent)
     : QWidget(parent),
@@ -66,7 +69,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     refresh_timer_ = new QTimer(this);
     refresh_timer_->setInterval(1000);
-    connect(refresh_timer_, &QTimer::timeout, this, [this]() {
+    connect(refresh_timer_, &QTimer::timeout, this, [this] {
         const QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
         if (time_label_) time_label_->setText(QString("TS: %1").arg(timestamp));
     });
@@ -74,7 +77,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     system_override_manager_ = new SystemOverrideManager(this);
 
-    connect(system_override_manager_, &SystemOverrideManager::overrideFinished, this, [this]() {
+    connect(system_override_manager_, &SystemOverrideManager::overrideFinished, this, [this] {
         qDebug() << "[SETTINGS VIEW] Override sequence finished signal received in SettingsView.";
         if (override_button_) {
             override_button_->setEnabled(true);
@@ -142,7 +145,7 @@ void SettingsView::SetupUi() {
             );
         }
 
-        connect(btn, &QPushButton::clicked, this, [this, i]() { SwitchToTab(i); });
+        connect(btn, &QPushButton::clicked, this, [this, i] { SwitchToTab(i); });
         tab_layout->addWidget(btn);
         tab_buttons_.append(btn);
     }
@@ -296,7 +299,7 @@ void SettingsView::SetupClassifiedTab() {
         "}"
     );
     override_button_->setEnabled(true);
-    connect(override_button_, &QPushButton::clicked, this, [this]() {
+    connect(override_button_, &QPushButton::clicked, this, [this] {
         qDebug() << "[SETTINGS VIEW] Override button clicked.";
 #ifdef Q_OS_WIN
         if (SystemOverrideManager::IsRunningAsAdmin()) {
@@ -343,42 +346,42 @@ void SettingsView::SetupClassifiedTab() {
     security_layers_stack_->addWidget(snake_game_layer_);
     security_layers_stack_->addWidget(classified_features_widget_);
 
-    connect(fingerprint_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(fingerprint_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = HandprintIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         handprint_layer_->Initialize();
     });
-    connect(handprint_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(handprint_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = SecurityCodeIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         security_code_layer_->Initialize();
     });
-    connect(security_code_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(security_code_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = SecurityQuestionIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         security_question_layer_->Initialize();
     });
-    connect(security_question_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(security_question_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = RetinaScanIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         retina_scan_layer_->Initialize();
     });
-    connect(retina_scan_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(retina_scan_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = VoiceRecognitionIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         voice_recognition_layer_->Initialize();
     });
-    connect(voice_recognition_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(voice_recognition_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = TypingTestIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         typing_test_layer_->Initialize();
     });
-    connect(typing_test_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(typing_test_layer_, &SecurityLayer::layerCompleted, this, [this] {
         current_layer_index_ = SnakeGameIndex;
         security_layers_stack_->setCurrentIndex(current_layer_index_);
         snake_game_layer_->Initialize();
     });
-    connect(snake_game_layer_, &SecurityLayer::layerCompleted, this, [this]() {
+    connect(snake_game_layer_, &SecurityLayer::layerCompleted, this, [this] {
         int features_index = security_layers_stack_->indexOf(classified_features_widget_);
         if (features_index != -1) {
             current_layer_index_ = static_cast<SecurityLayerIndex>(features_index);

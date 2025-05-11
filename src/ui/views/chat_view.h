@@ -1,14 +1,17 @@
 #ifndef WAVELENGTH_CHAT_VIEW_H
 #define WAVELENGTH_CHAT_VIEW_H
 
-#include <QAudioInput>
-#include <QLineEdit>
-#include <QSoundEffect>
 #include <QAudioFormat>
-#include <QIODevice>
+#include <QWidget>
 
-#include "../../ui/chat/stream_display.h"
-#include "../../session/session_coordinator.h"
+class TranslationManager;
+class QSoundEffect;
+class QAudioOutput;
+class QAudioInput;
+class QPushButton;
+class QLineEdit;
+class StreamDisplay;
+class QLabel;
 
 /**
  * @brief The main view for displaying and interacting with a specific Wavelength chat session.
@@ -280,7 +283,7 @@ private:
     QSoundEffect *ptt_on_sound_;
     /** @brief Sound effect played when the PTT button is released. */
     QSoundEffect *ptt_off_sound_;
-
+    /** @brief Pointer to the translation manager for handling UI translations. */
     TranslationManager *translator_;
 
     /**
