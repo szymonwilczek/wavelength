@@ -268,7 +268,7 @@ void SettingsView::SetupClassifiedTab() {
     button_layout_classified->setSpacing(15);
 
     override_button_ = new QPushButton(
-        translator_->Translate("SettingsView.SettingsOverride", "CAUTION: SYSTEM OVERRIDE"),
+        translator_->Translate("SettingsView.SystemOverride", "CAUTION: SYSTEM OVERRIDE"),
         button_container);
     override_button_->setMinimumHeight(50);
     override_button_->setMinimumWidth(250);
