@@ -2,18 +2,12 @@
 #define APPEARANCE_SETTINGS_WIDGET_H
 
 #include <QWidget>
-#include <QColor>
-#include <QStringList>
 
-class TranslationManager;
-class WavelengthConfig;
-class QLabel;
 class QPushButton;
 class QHBoxLayout;
-class QGridLayout;
-class QColorDialog;
 class QSpinBox;
-class ClickableColorPreview;
+class WavelengthConfig;
+class TranslationManager;
 
 /**
  * @brief A widget for configuring the application's appearance settings.

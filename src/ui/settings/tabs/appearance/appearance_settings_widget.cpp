@@ -6,7 +6,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QColorDialog>
-#include <QDebug>
 #include <QSpinBox>
 
 #include "../../../../app/managers/translation_manager.h"
@@ -362,7 +361,7 @@ void AppearanceSettingsWidget::UpdateRecentColorsUI() {
             ).arg(color.name(QColor::HexRgb)));
 
 
-            connect(color_button, &QPushButton::clicked, this, [this, color]() {
+            connect(color_button, &QPushButton::clicked, this, [this, color] {
                 this->SelectRecentColor(color);
             });
 

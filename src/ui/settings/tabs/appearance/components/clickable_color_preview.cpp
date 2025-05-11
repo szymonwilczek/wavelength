@@ -1,5 +1,8 @@
 #include "clickable_color_preview.h"
 
+#include <QMouseEvent>
+#include <QPainter>
+
 ClickableColorPreview::ClickableColorPreview(QWidget *parent): QWidget(parent) {
     setCursor(Qt::PointingHandCursor);
     setFixedSize(24, 24);
