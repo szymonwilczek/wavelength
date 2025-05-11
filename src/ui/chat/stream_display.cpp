@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QRandomGenerator>
+#include <QVBoxLayout>
 
 #include "communication_stream.h"
 

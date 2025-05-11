@@ -1,6 +1,7 @@
 #ifndef WAVELENGTH_STREAM_DISPLAY_H
 #define WAVELENGTH_STREAM_DISPLAY_H
 
+#include <QMap>
 #include <QQueue>
 
 #include "stream_message.h"
