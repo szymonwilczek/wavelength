@@ -2,6 +2,7 @@
 #define CYBERPUNK_TEXT_EFFECT_H
 
 #include <QObject>
+#include <QTimer>
 
 class QLabel;
 
