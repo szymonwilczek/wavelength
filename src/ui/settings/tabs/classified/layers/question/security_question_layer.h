@@ -1,12 +1,12 @@
 #ifndef SECURITY_QUESTION_LAYER_H
 #define SECURITY_QUESTION_LAYER_H
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "../security_layer.h"
 
+class QLineEdit;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A security layer simulating a security question challenge.
  *

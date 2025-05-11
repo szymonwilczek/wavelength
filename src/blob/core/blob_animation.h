@@ -1,30 +1,22 @@
 #ifndef BLOBANIMATION_H
 #define BLOBANIMATION_H
 
-#include <vector>
-#include <memory>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <atomic>
+#include <QOpenGLBuffer>
+#include <QOpenGLFunctions>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLWidget>
 
 #include "../blob_config.h"
 #include "../physics/blob_physics.h"
 #include "../rendering/blob_render.h"
-#include "../states/blob_state.h"
-#include "../states/idle_state.h"
-#include "../states/moving_state.h"
-#include "../states/resizing_state.h"
 #include "dynamics/blob_event_handler.h"
 #include "dynamics/blob_transition_manager.h"
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLShaderProgram>
-#include <QTimer>
-#include <QPaintEvent>
+class QOpenGLShaderProgram;
+class BlobState;
+class ResizingState;
+class MovingState;
+class IdleState;
 
 /**
  * @brief Main widget responsible for rendering and animating the dynamic blob.
@@ -303,8 +295,6 @@ private:
      */
     void PhysicsThreadFunction();
 
-    // --- Member Variables ---
-
     /** @brief Handles window move/resize event filtering and processing. */
     BlobEventHandler event_handler_;
     /** @brief Manages movement analysis, velocity calculation, and state transitions based on movement. */
@@ -371,7 +361,7 @@ private:
     double precalc_max_distance_ = 0.0;
 
     /** @brief Mutex protecting access to shared data between UI and physics threads (control_points_, velocity_, etc.). */
-    mutable std::mutex points_mutex_; // Marked mutable to allow locking in const methods like GetBlobCenter
+    mutable std::mutex points_mutex_;
     /** @brief Atomic flag controlling the physics thread loop. */
     std::atomic<bool> physics_active_{true};
     /** @brief Condition variable used by the physics thread to wait for the next frame time. */
@@ -387,7 +377,6 @@ private:
     /** @brief The separate thread object running the physics simulation (PhysicsThreadFunction). */
     std::thread physics_thread_;
 
-    // --- OpenGL Specific Members ---
     /** @brief Pointer to the shader program used for rendering the blob. */
     QOpenGLShaderProgram *shader_program_ = nullptr;
     /** @brief Vertex Buffer Object storing blob geometry data. */
@@ -396,7 +385,6 @@ private:
     QOpenGLVertexArrayObject vao_;
     /** @brief Vector storing vertex data (x, y pairs) to be uploaded to the VBO. */
     std::vector<GLfloat> gl_vertices_;
-    // --- End OpenGL Specific Members ---
 };
 
 #endif // BLOBANIMATION_H

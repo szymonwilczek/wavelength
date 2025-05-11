@@ -1,6 +1,8 @@
 #include "wavelength_utilities.h"
 
 #include <QString>
+#include <QDebug>
+#include <QLabel>
 
 #include "../blob/core/blob_animation.h"
 

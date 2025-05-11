@@ -1,9 +1,7 @@
 #ifndef CLICKABLE_COLOR_PREVIEW_H
 #define CLICKABLE_COLOR_PREVIEW_H
 
-#include <QStyleOption>
-#include <QPainter>
-#include <QPaintEvent>
+#include <QWidget>
 
 /**
  * @brief A small, clickable widget that displays a solid color preview.

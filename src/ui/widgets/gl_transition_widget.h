@@ -2,8 +2,8 @@
 #define GL_TRANSITION_WIDGET_H
 
 #include <QOpenGLWidget>
-#include <QPixmap>
-#include <QPropertyAnimation>
+
+class QPropertyAnimation;
 
 /**
  * @brief An OpenGL widget designed to render smooth, animated slide transitions between two other widgets.

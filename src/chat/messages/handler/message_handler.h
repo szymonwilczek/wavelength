@@ -1,12 +1,11 @@
 #ifndef MESSAGE_HANDLER_H
 #define MESSAGE_HANDLER_H
 
-#include <QObject>
-#include <QString>
 #include <QJsonObject>
+#include <QObject>
 #include <QUuid>
-#include <QSet>
-#include <QWebSocket>
+
+class QWebSocket;
 
 /**
  * @brief Singleton class responsible for handling WebSocket message operations.
@@ -163,7 +162,7 @@ private:
     /**
      * @brief Private destructor.
      */
-    ~MessageHandler() override = default; // Use default destructor
+    ~MessageHandler() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.

@@ -2,8 +2,6 @@
 #define BLOBPATH_H
 
 #include <QPainterPath>
-#include <QPointF>
-#include <vector>
 
 /**
  * @brief Provides a static utility function to create a smooth QPainterPath from blob control points.
@@ -24,7 +22,7 @@ public:
      *
      * @param control_points A vector containing the QPointF coordinates of the blob's control points.
      * @param num_of_points The number of control points in the vector. Should match control_points.size().
-     * @return A QPainterPath representing the smooth outline of the blob. Returns an empty path if control_points is empty.
+     * @return A QPainterPath representing the smooth outline of the blob. Returns an empty path if control_points are empty.
      */
     static QPainterPath CreateBlobPath(const std::vector<QPointF> &control_points, int num_of_points);
 };

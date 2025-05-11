@@ -1,11 +1,15 @@
 #include "image_viewer.h"
 
+#include <QApplication>
+#include <QLabel>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../../app/managers/translation_manager.h"
+#include "../decoder/image_decoder.h"
 
 ImageViewer::ImageViewer(const QByteArray &image_data, QWidget *parent): QFrame(parent),
-    image_data_(image_data) {
+                                                                         image_data_(image_data) {
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -42,6 +46,11 @@ QSize ImageViewer::sizeHint() const {
         return original_image_.size();
     }
     return QFrame::sizeHint();
+}
+
+void ImageViewer::LoadImage() const {
+    if (!decoder_) return;
+    decoder_->Decode();
 }
 
 void ImageViewer::HandleImageReady(const QImage &image) {

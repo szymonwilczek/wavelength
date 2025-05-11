@@ -1,8 +1,7 @@
 #ifndef TAB_BUTTON_H
 #define TAB_BUTTON_H
-#include <QPainter>
+
 #include <QPushButton>
-#include <QPaintEvent>
 
 /**
  * @brief A custom QPushButton styled as a tab button with an animated underline effect.

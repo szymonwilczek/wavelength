@@ -2,12 +2,9 @@
 #define WAVELENGTH_CONFIG_H
 
 #include <QColor>
-#include <QString>
-#include <QSettings>
-#include <QHostAddress>
-#include <QMap>
-#include <QVariant>
 #include <QKeySequence>
+#include <QSettings>
+#include <QString>
 
 /** @brief Default configuration values for the Wavelength application. */
 namespace DefaultConfig {
@@ -59,8 +56,6 @@ public:
      * @brief Default destructor.
      */
     ~WavelengthConfig() override = default;
-
-    // --- Network Settings ---
 
     /**
      * @brief Gets the configured relay server address.
@@ -133,8 +128,6 @@ public:
      */
     void SetMaxReconnectAttempts(int attempts);
 
-    // --- Application Settings ---
-
     /**
      * @brief Enables or disables debug mode.
      * Emits configChanged("debugMode") if the value changes.
@@ -161,8 +154,6 @@ public:
      * @param frequency The desired frequency as a string.
      */
     void SetPreferredStartFrequency(const QString &frequency);
-
-    // --- Appearance Settings ---
 
     /**
      * @brief Gets the main background color.
@@ -275,8 +266,6 @@ public:
      */
     void SetTitleGlowColor(const QColor &color);
 
-    // --- Recent Colors ---
-
     /**
      * @brief Gets the list of recently used colors.
      * @return A QStringList containing color hex codes (e.g., "#RRGGBB").
@@ -290,8 +279,6 @@ public:
      * @param color The QColor to add.
      */
     void AddRecentColor(const QColor &color);
-
-    // --- Shortcuts ---
 
     /**
      * @brief Gets the configured keyboard shortcut for a specific action.
@@ -323,8 +310,6 @@ public:
      */
     QMap<QString, QKeySequence> GetDefaultShortcutsMap() const;
 
-    // --- Persistence ---
-
     /**
      * @brief Saves all current configuration settings to persistent storage (QSettings).
      */
@@ -336,8 +321,6 @@ public:
      * Emits configChanged("all") and recentColorsChanged().
      */
     void RestoreDefaults();
-
-    // --- Generic Access ---
 
     /**
      * @brief Gets a configuration setting value by its key.
@@ -430,8 +413,6 @@ private:
      * Key: Action ID. Value: Current QKeySequence.
      */
     QMap<QString, QKeySequence> shortcuts_;
-
-    // --- Member Variables holding current configuration values ---
     QString relay_server_address_; ///< The address of the relay server
     int relay_server_port_; ///< The port of the relay server
     int connection_timeout_; ///< The connection timeout in milliseconds

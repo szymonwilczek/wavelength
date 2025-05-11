@@ -2,25 +2,23 @@
 #define FLOATING_ENERGY_SPHERE_WIDGET_H
 
 #include <deque>
+#include <QAudioFormat>
 #include <QElapsedTimer>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_3_Core>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
+#include <QMediaPlayer>
+#include <QOpenGLBuffer>
+#include <QOpenGLWidget>
+#include <QVector3D>
+#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLVertexArrayObject>
 #include <QTimer>
-#include <QPoint>
-#include <vector>
-#include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QAudioDecoder>
 #include <QtMultimedia/QAudioBuffer>
-#include <QAudioFormat>
-#include <QCloseEvent>
 
 /** @brief Maximum number of concurrent impact effects supported by the shader. */
 #define MAX_IMPACTS 5
 
+class QOpenGLShaderProgram;
 /**
  * @brief Structure holding information about a single impact effect on the sphere.
  */

@@ -1,6 +1,12 @@
 #include "stream_display.h"
 
 #include <QRegularExpression>
+#include <QTimer>
+#include <QDebug>
+#include <QRandomGenerator>
+#include <QVBoxLayout>
+
+#include "communication_stream.h"
 
 StreamDisplay::StreamDisplay(QWidget *parent): QWidget(parent) {
     const auto main_layout = new QVBoxLayout(this);
@@ -28,7 +34,7 @@ void StreamDisplay::SetFrequency(const QString &frequency, const QString &name) 
 }
 
 void StreamDisplay::AddMessage(const QString &message, const QString &message_id,
-                                         const StreamMessage::MessageType type) {
+                               const StreamMessage::MessageType type) {
     if (!message_id.isEmpty() && displayed_progress_messages_.contains(message_id)) {
         if (StreamMessage *existing_message = displayed_progress_messages_.value(message_id)) {
             existing_message->UpdateContent(message);
@@ -73,6 +79,22 @@ void StreamDisplay::Clear() {
     message_queue_.clear();
     displayed_progress_messages_.clear();
     message_timer_->stop();
+}
+
+void StreamDisplay::SetGlitchIntensity(const qreal intensity) const {
+    communication_stream_->SetGlitchIntensity(intensity);
+}
+
+void StreamDisplay::SetTransmittingUser(const QString &userId) const {
+    communication_stream_->SetTransmittingUser(userId);
+}
+
+void StreamDisplay::ClearTransmittingUser() const {
+    communication_stream_->ClearTransmittingUser();
+}
+
+void StreamDisplay::SetAudioAmplitude(const qreal amplitude) const {
+    communication_stream_->SetAudioAmplitude(amplitude);
 }
 
 void StreamDisplay::ProcessNextQueuedMessage() {

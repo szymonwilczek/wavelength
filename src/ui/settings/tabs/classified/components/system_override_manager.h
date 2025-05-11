@@ -1,17 +1,13 @@
 #ifndef SYSTEM_OVERRIDE_MANAGER_H
 #define SYSTEM_OVERRIDE_MANAGER_H
 
-#include <QAudioOutput>
-#include <QObject>
-#include <QTimer>
-#include <QString>
-#include <QSystemTrayIcon>
-#include <QMediaPlayer>
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
 
+#include <QObject>
+
+class QSystemTrayIcon;
 class FloatingEnergySphereWidget;
 
 /**
@@ -154,7 +150,6 @@ private:
     static bool RelaunchNormally(const QStringList &arguments = QStringList());
 
 #ifdef Q_OS_WIN
-    // --- Hooks ---
     /**
      * @brief Low-level keyboard hook procedure (Windows only).
      * Filters keyboard input, allowing only specific keys defined in kAllowedKeys.
@@ -201,7 +196,6 @@ private:
     static void UninstallMouseHook();
     /** @brief Handle to the installed low-level mouse hook (Windows only). */
     static HHOOK mouse_hook_;
-    // --------------------------------------------
 #endif
 };
 

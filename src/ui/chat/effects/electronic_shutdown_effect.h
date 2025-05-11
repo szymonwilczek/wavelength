@@ -1,14 +1,8 @@
 #ifndef ELECTRONIC_SHUTDOWN_EFFECT_H
 #define ELECTRONIC_SHUTDOWN_EFFECT_H
 
-#include <QGraphicsEffect>
-#include <QPainter>
-#include <QRandomGenerator>
-#include <QDateTime>
 #include <QCache>
-#include <QPixmap>
-#include <QObject>
-#include <QtGlobal>
+#include <QGraphicsEffect>
 
 /**
  * @brief A QGraphicsEffect that simulates an old CRT monitor or electronic device shutting down.

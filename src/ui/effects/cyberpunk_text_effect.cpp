@@ -1,5 +1,7 @@
 #include "cyberpunk_text_effect.h"
 
+#include <QLabel>
+#include <QRandomGenerator>
 #include <QTimer>
 
 CyberpunkTextEffect::CyberpunkTextEffect(QLabel *label, QWidget *parent): QObject(parent), label_(label),

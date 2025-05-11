@@ -1,11 +1,10 @@
 #ifndef TYPING_TEST_LAYER_H
 #define TYPING_TEST_LAYER_H
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "../security_layer.h"
-#include <QStringList>
+
+class QLineEdit;
+class QLabel;
 
 /**
  * @brief A security layer implementing a typing verification test.

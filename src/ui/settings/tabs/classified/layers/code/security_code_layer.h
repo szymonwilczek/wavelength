@@ -1,14 +1,12 @@
 #ifndef SECURITY_CODE_LAYER_H
 #define SECURITY_CODE_LAYER_H
 
-#include <QLabel>
-#include <QLineEdit>
-#include <QVector>
-#include <QList>
-
 #include "../security_layer.h"
 
+class QLabel;
+class QLineEdit;
 class TranslationManager;
+
 /**
  * @brief A security layer requiring the user to enter a 4-character security code.
  *

@@ -1,5 +1,8 @@
 #include "wavelength_leaver.h"
 
+#include "../../../chat/messages/handler/message_handler.h"
+#include "../../../storage/wavelength_registry.h"
+
 void WavelengthLeaver::LeaveWavelength() {
     WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     QString frequency = registry->GetActiveWavelength();

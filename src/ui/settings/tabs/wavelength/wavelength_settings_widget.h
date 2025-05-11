@@ -3,14 +3,10 @@
 
 #include <QWidget>
 
-class TranslationManager;
-class WavelengthConfig;
 class QLineEdit;
 class QComboBox;
-class QLabel;
-class QVBoxLayout;
-class QFormLayout;
-class QHBoxLayout;
+class WavelengthConfig;
+class TranslationManager;
 
 /**
  * @brief A widget for configuring Wavelength-specific settings, primarily the preferred start frequency.

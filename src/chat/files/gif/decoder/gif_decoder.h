@@ -8,7 +8,6 @@
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
-#include <QElapsedTimer>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -237,7 +236,7 @@ private:
     int buffer_size_ = 0;
 
     /** @brief Mutex protecting access to shared state variables from different threads. */
-    mutable QMutex mutex_; // Marked mutable to allow locking in const methods like GetDuration/IsPaused
+    mutable QMutex mutex_;
     /** @brief Condition variable used to pause/resume the decoding thread. */
     QWaitCondition wait_condition_;
     /** @brief Flag indicating if the thread should stop execution. Access protected by mutex_. */

@@ -2,10 +2,10 @@
 #define ANIMATED_STACKED_WIDGET_H
 
 #include <QStackedWidget>
-#include <QParallelAnimationGroup>
-#include <QSoundEffect>
 
-#include "gl_transition_widget.h"
+class GLTransitionWidget;
+class QSoundEffect;
+class QParallelAnimationGroup;
 
 /**
  * @brief A QStackedWidget subclass that provides animated transitions between widgets.

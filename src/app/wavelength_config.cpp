@@ -1,9 +1,7 @@
 #include "wavelength_config.h"
 
-#include <QStandardPaths>
-#include <QDir>
 #include <QCoreApplication>
-#include <qkeysequence.h>
+#include <QDebug>
 
 WavelengthConfig *WavelengthConfig::GetInstance() {
     if (!instance_) {

@@ -1,9 +1,9 @@
 #ifndef WAVELENGTH_MESSAGE_PROCESSOR_H
 #define WAVELENGTH_MESSAGE_PROCESSOR_H
 
-#include "message_service.h"
-#include "../handler/message_handler.h"
+#include <QObject>
 
+class QWebSocket;
 class MessageService;
 
 /**
@@ -29,6 +29,16 @@ public:
         static MessageProcessor instance;
         return &instance;
     }
+
+    /**
+     * @brief Deleted copy constructor to prevent copying.
+     */
+    MessageProcessor(const MessageProcessor &) = delete;
+
+    /**
+     * @brief Deleted assignment operator to prevent assignment.
+     */
+    MessageProcessor &operator=(const MessageProcessor &) = delete;
 
     /**
      * @brief Compares two frequency strings for equality.
@@ -190,18 +200,7 @@ private:
     /**
      * @brief Private destructor.
      */
-    ~MessageProcessor() override {
-    }
-
-    /**
-     * @brief Deleted copy constructor to prevent copying.
-     */
-    MessageProcessor(const MessageProcessor &) = delete;
-
-    /**
-     * @brief Deleted assignment operator to prevent assignment.
-     */
-    MessageProcessor &operator=(const MessageProcessor &) = delete;
+    ~MessageProcessor() override = default;
 };
 
 #endif // WAVELENGTH_MESSAGE_PROCESSOR_H

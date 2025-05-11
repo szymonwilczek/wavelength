@@ -3,17 +3,20 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPainterPath>
-#include <qpen.h>
 #include <QRandomGenerator>
 #include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../../app/managers/translation_manager.h"
+#include "../../../../ui/buttons/cyber_audio_button.h"
+#include "../../../../ui/sliders/cyber_audio_slider.h"
+#include "../decoder/audio_decoder.h"
+
 
 AudioPlayer::AudioPlayer(const QByteArray &audio_data, const QString &mime_type,
-                                     QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
-                                                       scanline_opacity_(0.15), spectrum_intensity_(0.6),
-                                                       translator_(nullptr) {
+                         QWidget *parent): QFrame(parent), m_audioData(audio_data), mime_type_(mime_type),
+                                           scanline_opacity_(0.15), spectrum_intensity_(0.6),
+                                           translator_(nullptr) {
     translator_ = TranslationManager::GetInstance();
 
     setFixedSize(480, 120);
@@ -112,7 +115,7 @@ AudioPlayer::AudioPlayer(const QByteArray &audio_data, const QString &mime_type,
     connect(progress_slider_, &QSlider::sliderReleased, this, &AudioPlayer::OnSliderReleased);
     connect(decoder_.get(), &AudioDecoder::error, this, &AudioPlayer::HandleError);
     connect(decoder_.get(), &AudioDecoder::audioInfo, this, &AudioPlayer::HandleAudioInfo);
-    connect(decoder_.get(), &AudioDecoder::playbackFinished, this, [this]() {
+    connect(decoder_.get(), &AudioDecoder::playbackFinished, this, [this] {
         playback_finished_ = true;
         play_button_->setText("↻");
         status_label_->setText(translator_->Translate("AudioPlayer.PlaybackFinished", "PLAYBACK FINISHED"));
@@ -130,11 +133,11 @@ AudioPlayer::AudioPlayer(const QByteArray &audio_data, const QString &mime_type,
     connect(ui_timer_, &QTimer::timeout, this, &AudioPlayer::UpdateUI);
     ui_timer_->start();
 
-    QTimer::singleShot(100, this, [this]() {
+    QTimer::singleShot(100, this, [this] {
         decoder_->start(QThread::HighPriority);
     });
 
-    connect(qApp, &QApplication::aboutToQuit, this, [this]() {
+    connect(qApp, &QApplication::aboutToQuit, this, [this] {
         if (active_player_ == this) {
             active_player_ = nullptr;
         }

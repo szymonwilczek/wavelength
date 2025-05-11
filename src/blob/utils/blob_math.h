@@ -1,10 +1,10 @@
 #ifndef BLOBMATH_H
 #define BLOBMATH_H
 
-#include <QPointF>
-#include <QtMath>
-#include <vector>
 #include <concepts>
+#include <vector>
+
+class QPointF;
 
 /**
  * @brief Provides static utility functions for mathematical operations related to the Blob animation.

@@ -1,5 +1,7 @@
 #include "wavelength_state_manager.h"
 
+#include "../storage/wavelength_registry.h"
+
 WavelengthInfo WavelengthStateManager::GetWavelengthInfo(const QString &frequency, bool *is_host) {
     const WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
     WavelengthInfo info = registry->GetWavelengthInfo(frequency);

@@ -1,12 +1,15 @@
 #include "fingerprint_layer.h"
-#include <QVBoxLayout>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QRandomGenerator>
+
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QProgressBar>
 #include <QPropertyAnimation>
-#include <QDir>
-#include <QCoreApplication>
+#include <QRandomGenerator>
+#include <QSvgRenderer>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "../../../../../../app/managers/translation_manager.h"
 
@@ -222,7 +225,7 @@ void FingerprintLayer::ProcessFingerprint(const bool completed) {
             fingerprint_image_->setPixmap(QPixmap::fromImage(success_image));
         }
 
-        QTimer::singleShot(500, this, [this]() {
+        QTimer::singleShot(500, this, [this] {
             const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
@@ -232,7 +235,7 @@ void FingerprintLayer::ProcessFingerprint(const bool completed) {
             animation->setEndValue(0.0);
             animation->setEasingCurve(QEasingCurve::OutQuad);
 
-            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            connect(animation, &QPropertyAnimation::finished, this, [this] {
                 emit layerCompleted();
             });
 
@@ -256,7 +259,7 @@ void FingerprintLayer::UpdateFingerprintScan(const int progress_value) const {
     svg_renderer_->render(&painter, QRectF(20, 20, 160, 160));
 
     constexpr int total_height = 160;
-    const int filled_height = static_cast<int>((progress_value / 100.0) * total_height);
+    const int filled_height = static_cast<int>(progress_value / 100.0 * total_height);
 
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
     painter.fillRect(20, 20, 160, total_height, QColor(180, 180, 180, 120));

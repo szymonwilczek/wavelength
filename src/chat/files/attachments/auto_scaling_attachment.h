@@ -1,9 +1,9 @@
 #ifndef AUTO_SCALING_ATTACHMENT_H
 #define AUTO_SCALING_ATTACHMENT_H
 
-#include <QLabel>
-#include <QScreen>
 #include <QWidget>
+
+class QLabel;
 
 /**
  * @brief A wrapper widget that automatically scales its content (e.g., image, GIF)

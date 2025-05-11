@@ -2,11 +2,6 @@
 #define MASK_OVERLAY_H
 
 #include <QWidget>
-#include <QPainter>
-#include <QTimer>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QPaintEvent>
 
 /**
  * @brief A custom overlay widget that creates a "reveal" effect using a moving scanline.

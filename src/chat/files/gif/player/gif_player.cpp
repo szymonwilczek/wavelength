@@ -1,10 +1,12 @@
 #include "gif_player.h"
 
 #include <QApplication>
+#include <QLabel>
 #include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../../app/managers/translation_manager.h"
+#include "../decoder/gif_decoder.h"
 
 GifPlayer::GifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent), gif_data_(gif_data) {
     const auto layout = new QVBoxLayout(this);
@@ -28,7 +30,7 @@ GifPlayer::GifPlayer(const QByteArray &gif_data, QWidget *parent): QFrame(parent
     connect(decoder_.get(), &GifDecoder::error, this, &GifPlayer::HandleError, Qt::QueuedConnection);
     connect(decoder_.get(), &GifDecoder::gifInfo, this, &GifPlayer::HandleGifInfo, Qt::QueuedConnection);
 
-    QTimer::singleShot(0, this, [this]() {
+    QTimer::singleShot(0, this, [this] {
         if (decoder_) {
             if (!decoder_->Initialize()) {
                 qDebug() << "[INLINE GIF PLAYER] Decoder initialization failed.";

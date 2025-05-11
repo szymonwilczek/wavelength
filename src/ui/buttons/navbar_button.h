@@ -2,10 +2,9 @@
 #define CYBERPUNK_BUTTON_H
 
 #include <QPushButton>
-#include <QPropertyAnimation>
-#include <QGraphicsDropShadowEffect>
-#include <QPainter>
-#include <QPaintEvent>
+
+class QGraphicsDropShadowEffect;
+class QPropertyAnimation;
 
 /**
  * @brief A custom QPushButton styled with a cyberpunk aesthetic, featuring animated glow effects.

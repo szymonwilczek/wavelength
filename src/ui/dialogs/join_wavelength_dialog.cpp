@@ -1,10 +1,20 @@
 #include "join_wavelength_dialog.h"
 
 #include <QApplication>
+#include <QComboBox>
+#include <QDoubleValidator>
 #include <QFormLayout>
+#include <QLabel>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPropertyAnimation>
+#include <QRandomGenerator>
 #include <QVBoxLayout>
 
 #include "../../app/managers/translation_manager.h"
+#include "../../session/events/joiner/wavelength_joiner.h"
+#include "../input/cyber_line_edit.h"
+#include "../buttons/cyber_button.h"
 
 JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
                                                              shadow_size_(10), scanline_opacity_(0.08) {
@@ -174,7 +184,7 @@ JoinWavelengthDialog::JoinWavelengthDialog(QWidget *parent): AnimatedDialog(pare
 
     refresh_timer_ = new QTimer(this);
     refresh_timer_->setInterval(16);
-    connect(refresh_timer_, &QTimer::timeout, this, [this]() {
+    connect(refresh_timer_, &QTimer::timeout, this, [this] {
         if (digitalization_progress_ > 0.0 && digitalization_progress_ < 1.0) {
             const int scanline_y = height() * digitalization_progress_;
 
@@ -313,6 +323,10 @@ void JoinWavelengthDialog::paintEvent(QPaintEvent *event) {
 
 QString JoinWavelengthDialog::GetFrequency() const {
     return frequency_edit_->text();
+}
+
+QString JoinWavelengthDialog::GetPassword() const {
+    return password_edit_->text();
 }
 
 void JoinWavelengthDialog::ValidateInput() const {

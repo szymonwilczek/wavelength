@@ -1,9 +1,13 @@
 #include "voice_recognition_layer.h"
+
+#include <QAudioInput>
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
 #include <QPropertyAnimation>
 #include <QPainterPath>
+#include <QProgressBar>
 #include <QTimer>
 
 #include "../../../../../../app/managers/translation_manager.h"
@@ -412,7 +416,7 @@ void VoiceRecognitionLayer::FinishRecognition() {
 
     audio_visualizer_label_->setPixmap(QPixmap::fromImage(final_visualizer));
 
-    QTimer::singleShot(800, this, [this]() {
+    QTimer::singleShot(800, this, [this] {
         const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
 
@@ -422,7 +426,7 @@ void VoiceRecognitionLayer::FinishRecognition() {
         animation->setEndValue(0.0);
         animation->setEasingCurve(QEasingCurve::OutQuad);
 
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
+        connect(animation, &QPropertyAnimation::finished, this, [this] {
             emit layerCompleted();
         });
 

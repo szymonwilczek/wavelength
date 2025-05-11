@@ -1,6 +1,6 @@
 #include "blob_transition_manager.h"
-#include <QDebug>
-#include <qmath.h>
+
+#include <QDateTime>
 
 BlobTransitionManager::BlobTransitionManager(QObject *parent)
     : QObject(parent) {
@@ -54,7 +54,7 @@ void BlobTransitionManager::ProcessMovementBuffer(
     const double velocity_magnitude = m_smoothed_velocity_.length();
 
     if (const bool significant_movement = velocity_magnitude > 0.3;
-        significant_movement || (current_time - last_movement_time_) < 200) {
+        significant_movement || current_time - last_movement_time_ < 200) {
         if (significant_movement) {
             const QVector2D scaled_velocity = m_smoothed_velocity_ * 0.6;
             ApplyInertiaForce(
@@ -82,7 +82,7 @@ void BlobTransitionManager::ProcessMovementBuffer(
     }
 
     // clearing buffer after idle time
-    if (movement_buffer_.size() > 1 && (current_time - last_movement_time_) > 500) {
+    if (movement_buffer_.size() > 1 && current_time - last_movement_time_ > 500) {
         const QPointF last_position = movement_buffer_.back().position;
         const qint64 last_timestamp = movement_buffer_.back().timestamp;
 

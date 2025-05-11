@@ -1,5 +1,7 @@
 #include "audio_decoder.h"
 
+#include <QAudioOutput>
+
 extern "C" {
 #include <libavutil/opt.h>
 }

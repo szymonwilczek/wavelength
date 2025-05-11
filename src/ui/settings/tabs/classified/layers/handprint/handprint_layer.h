@@ -2,12 +2,10 @@
 #define HANDPRINT_LAYER_H
 
 #include "../security_layer.h"
-#include <QProgressBar>
-#include <QSvgRenderer>
-#include <QWidget>
-#include <QImage>
-#include <QLabel>
-#include <QStringList>
+
+class QSvgRenderer;
+class QProgressBar;
+class QLabel;
 
 /**
  * @brief A security layer simulating handprint authentication.

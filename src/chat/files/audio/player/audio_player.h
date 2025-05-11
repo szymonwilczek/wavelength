@@ -2,14 +2,11 @@
 #define INLINE_AUDIO_PLAYER_H
 
 #include <QLabel>
-#include <memory>
 #include <QPropertyAnimation>
-#include <QVector>
 
-#include "../../../../ui/buttons/cyber_audio_button.h"
-#include "../../../../ui/sliders/cyber_audio_slider.h"
-#include "../../audio/decoder/audio_decoder.h"
-
+class AudioDecoder;
+class CyberAudioSlider;
+class CyberAudioButton;
 class TranslationManager;
 
 /**
@@ -235,8 +232,6 @@ private:
      * @param target The QWidget (spectrum_view_) to paint onto.
      */
     void PaintSpectrum(QWidget *target);
-
-    // --- Member Variables ---
 
     /** @brief Label displaying audio type, sample rate, channels. */
     QLabel *audio_info_label_;

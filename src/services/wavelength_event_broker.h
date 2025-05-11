@@ -1,10 +1,9 @@
 #ifndef WAVELENGTH_EVENT_BROKER_H
 #define WAVELENGTH_EVENT_BROKER_H
 
+#include <QMap>
 #include <QObject>
-#include <QString>
-#include <QDebug>
-#include <concepts>
+
 
 /**
  * @brief A singleton event broker for decoupling components within the Wavelength application.
@@ -34,10 +33,7 @@ public:
      * @param event_type A string identifying the type of event (e.g., "message_received").
      * @param data Optional QVariantMap containing data associated with the event.
      */
-    void PublishEvent(const QString &event_type, const QVariantMap &data = QVariantMap()) {
-        qDebug() << "[EVENT BROKER] Publishing event:" << event_type << data;
-        emit eventPublished(event_type, data);
-    }
+    void PublishEvent(const QString &event_type, const QVariantMap &data = QVariantMap());
 
     /**
      * @brief Subscribes a receiver object's slot to a specific event type.

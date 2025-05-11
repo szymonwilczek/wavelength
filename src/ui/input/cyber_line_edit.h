@@ -2,9 +2,6 @@
 #define CYBER_INPUT_H
 
 #include <QLineEdit>
-#include <QPainter>
-#include <QPainterPath>
-#include <QTimer>
 
 /**
  * @brief A custom QLineEdit styled with a cyberpunk aesthetic.

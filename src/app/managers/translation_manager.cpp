@@ -1,10 +1,7 @@
 #include "translation_manager.h"
+
 #include <QFile>
 #include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QDebug>
-#include <QMutexLocker>
 
 bool TranslationManager::Initialize(const QString &language_code) {
     if (initialized_) {

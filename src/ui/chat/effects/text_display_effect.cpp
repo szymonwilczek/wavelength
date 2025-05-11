@@ -1,13 +1,21 @@
 #include "text_display_effect.h"
 
+#include <QDateTime>
+#include <QFontDatabase>
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
+#include <QPainter>
 #include <QPropertyAnimation>
+#include <QRandomGenerator>
+#include <QTimer>
 
 TextDisplayEffect::TextDisplayEffect(const QString &text, const TypingSoundType sound_type,
-                                   QWidget *parent): QWidget(parent), full_text_(text), revealed_chars_(0),
-                                                     glitch_intensity_(0.0), is_fully_revealed_(false),
-                                                     has_been_fully_revealed_once_(false),
-                                                     media_player_(nullptr), audio_output_(nullptr), playlist_(nullptr),
-                                                     sound_type_(sound_type) {
+                                     QWidget *parent): QWidget(parent), full_text_(text), revealed_chars_(0),
+                                                       glitch_intensity_(0.0), is_fully_revealed_(false),
+                                                       has_been_fully_revealed_once_(false),
+                                                       media_player_(nullptr), audio_output_(nullptr),
+                                                       playlist_(nullptr),
+                                                       sound_type_(sound_type) {
     setMinimumWidth(400);
     setMinimumHeight(60);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -107,7 +115,7 @@ void TextDisplayEffect::SetText(const QString &new_text) {
 
 void TextDisplayEffect::SetRevealedChars(const int chars) {
     revealed_chars_ = qMin(chars, plain_text_.length());
-    const bool just_revealed = (revealed_chars_ >= plain_text_.length() && !is_fully_revealed_);
+    const bool just_revealed = revealed_chars_ >= plain_text_.length() && !is_fully_revealed_;
 
     update();
 
@@ -237,7 +245,7 @@ void TextDisplayEffect::HandleFullTextRevealed() const {
         text_timer_->stop();
     }
     if (media_player_ && media_player_->state() == QMediaPlayer::PlayingState) {
-        QTimer::singleShot(0, this, [this]() {
+        QTimer::singleShot(0, this, [this] {
             if (media_player_ && media_player_->state() == QMediaPlayer::PlayingState) {
                 media_player_->stop();
             }

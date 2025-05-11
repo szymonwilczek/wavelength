@@ -1,5 +1,8 @@
 #include "overlay_widget.h"
 
+#include <QPainter>
+#include <QResizeEvent>
+
 #include "../navigation/navbar.h"
 
 OverlayWidget::OverlayWidget(QWidget *parent)

@@ -1,7 +1,11 @@
 #include "animated_stacked_widget.h"
 
-#include <QCoreApplication>
 #include <QGraphicsOpacityEffect>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
+#include <QSoundEffect>
+
+#include "gl_transition_widget.h"
 
 AnimatedStackedWidget::AnimatedStackedWidget(QWidget *parent)
     : QStackedWidget(parent),

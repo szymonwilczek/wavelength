@@ -1,6 +1,7 @@
 #include "cyber_button.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPropertyAnimation>
 
 CyberButton::CyberButton(const QString &text, QWidget *parent, const bool isPrimary): QPushButton(text, parent),

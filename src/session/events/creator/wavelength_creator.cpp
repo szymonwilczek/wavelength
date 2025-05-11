@@ -1,6 +1,14 @@
 #include "wavelength_creator.h"
 
+#include <QJsonDocument>
+#include <QTimer>
+
+#include "../../../app/wavelength_config.h"
 #include "../../../auth/authentication_manager.h"
+#include "../../../chat/messages/handler/message_handler.h"
+#include "../../../chat/messages/services/message_processor.h"
+#include "../../../storage/wavelength_registry.h"
+
 
 bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_protected, const QString &password) {
     WavelengthRegistry *registry = WavelengthRegistry::GetInstance();
@@ -73,7 +81,7 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
         }
     };
 
-    auto disconnect_handler = [this, frequency, socket, keep_alive_timer, connected_callback_executed, registry]() {
+    auto disconnect_handler = [this, frequency, socket, keep_alive_timer, connected_callback_executed, registry] {
         keep_alive_timer->stop();
 
         if (registry->IsPendingRegistration(frequency)) {
@@ -109,7 +117,7 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
             });
 
     connect(socket, &QWebSocket::connected, this, [this, socket, frequency, is_password_protected,
-                password, host_id, keep_alive_timer, connected_callback_executed, result_handler, registry]() {
+                password, host_id, keep_alive_timer, connected_callback_executed, result_handler, registry] {
                 if (*connected_callback_executed) {
                     return;
                 }
@@ -128,7 +136,7 @@ bool WavelengthCreator::CreateWavelength(QString frequency, bool is_password_pro
 
                 connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 
-                connect(keep_alive_timer, &QTimer::timeout, socket, [socket]() {
+                connect(keep_alive_timer, &QTimer::timeout, socket, [socket] {
                     if (socket->isValid()) {
                         socket->ping();
                     }

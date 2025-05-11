@@ -2,9 +2,6 @@
 #define ANIMATED_DIALOG_H
 
 #include <QDialog>
-#include <QWidget>
-#include <QShowEvent>
-#include <QPixmap>
 
 class OverlayWidget;
 

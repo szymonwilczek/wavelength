@@ -1,16 +1,14 @@
 #include "navbar.h"
-#include "../../ui/buttons/navbar_button.h"
+
+#include <QContextMenuEvent>
+#include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSpacerItem>
-#include <QContextMenuEvent>
-#include <QCoreApplication>
-#include <QPushButton>
-#include <QGraphicsDropShadowEffect>
 #include <QSoundEffect>
 
 #include "network_status_widget.h"
 #include "../../app/managers/translation_manager.h"
+#include "../../ui/buttons/navbar_button.h"
 
 Navbar::Navbar(QWidget *parent) : QToolBar(parent) {
     setMovable(false);

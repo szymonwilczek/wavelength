@@ -2,10 +2,15 @@
 #define BLOBPHYSICS_H
 
 #include <QThreadPool>
-#include <vector>
 #include <QVector2D>
-#include "../blob_config.h"
-#include "../utils/blob_math.h"
+#include <vector>
+
+class QPointF;
+
+namespace BlobConfig {
+    struct PhysicsParameters;
+    struct BlobParameters;
+}
 
 /**
  * @brief Handles the physics simulation for the Blob animation.

@@ -1,11 +1,12 @@
 #ifndef NETWORK_STATUS_WIDGET_H
 #define NETWORK_STATUS_WIDGET_H
 
-#include <QNetworkAccessManager>
-#include <QLabel>
 #include <QWidget>
 
+class QNetworkAccessManager;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A widget displaying network connection status and ping time with cyberpunk aesthetics.
  *

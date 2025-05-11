@@ -1,8 +1,7 @@
 #ifndef WAVELENGTH_JOINER_H
 #define WAVELENGTH_JOINER_H
-#include <QObject>
-#include <QString>
 
+#include <QObject>
 
 /**
  * @brief Represents the result of an attempt to join a wavelength.

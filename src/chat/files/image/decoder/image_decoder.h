@@ -1,7 +1,6 @@
 #ifndef IMAGE_DECODER_H
 #define IMAGE_DECODER_H
 
-#include <QImage>
 #include <QObject>
 
 /**

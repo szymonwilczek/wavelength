@@ -1,5 +1,8 @@
 #include "auto_scaling_attachment.h"
 
+#include <QLabel>
+#include <QMouseEvent>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "../../../app/managers/translation_manager.h"
@@ -169,7 +172,7 @@ void AutoScalingAttachment::CheckAndScaleContent() {
     }
 
     if (parentWidget()) {
-        QTimer::singleShot(0, parentWidget(), [parent = parentWidget()]() {
+        QTimer::singleShot(0, parentWidget(), [parent = parentWidget()] {
             if (parent->layout()) parent->layout()->activate();
             parent->updateGeometry();
         });

@@ -1,15 +1,14 @@
 #ifndef SHORTCUTS_SETTINGS_WIDGET_H
 #define SHORTCUTS_SETTINGS_WIDGET_H
 
-#include <QWidget>
 #include <QMap>
+#include <QWidget>
 
 class TranslationManager;
-class WavelengthConfig;
-class QFormLayout;
 class QKeySequenceEdit;
-class QLabel;
 class QPushButton;
+class QFormLayout;
+class WavelengthConfig;
 
 /**
  * @brief A widget for configuring keyboard shortcuts for various application actions.

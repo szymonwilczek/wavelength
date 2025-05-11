@@ -1,18 +1,27 @@
 #include "shortcut_manager.h"
 
-#include <QShortcut>
 #include <QMainWindow>
+#include <QShortcut>
+#include <QDebug>
+#include <QLineEdit>
 
 #include "../wavelength_config.h"
-#include "../../ui/buttons/navbar_button.h"
+#include "../../ui/navigation/navbar.h"
 #include "../../ui/views/settings_view.h"
 #include "../../ui/views/chat_view.h"
-#include "../../ui/navigation/navbar.h"
-#include <concepts>
+#include "../../ui/buttons/navbar_button.h"
+
+class QPushButton;
+class QLineEdit;
+class CyberpunkButton;
 
 ShortcutManager *ShortcutManager::GetInstance() {
     static ShortcutManager instance;
     return &instance;
+}
+
+ShortcutManager::ShortcutManager(QObject *parent) : QObject(parent),
+                                                    config_(WavelengthConfig::GetInstance()) {
 }
 
 void ShortcutManager::RegisterShortcuts(QWidget *parent) {
@@ -67,7 +76,7 @@ void ShortcutManager::updateRegisteredShortcuts() {
 }
 
 void ShortcutManager::RegisterMainWindowShortcuts(QMainWindow *window, Navbar *navbar) {
-    CreateAndConnectShortcut("MainWindow.CreateWavelength", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.CreateWavelength", window, [navbar] {
         if (navbar && navbar->findChild<CyberpunkButton *>("createWavelengthButton")) {
             navbar->findChild<CyberpunkButton *>("createWavelengthButton")->click();
         } else if (navbar) {
@@ -75,17 +84,17 @@ void ShortcutManager::RegisterMainWindowShortcuts(QMainWindow *window, Navbar *n
         }
     });
 
-    CreateAndConnectShortcut("MainWindow.JoinWavelength", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.JoinWavelength", window, [navbar] {
         if (navbar) emit navbar->joinWavelengthClicked();
     });
 
-    CreateAndConnectShortcut("MainWindow.OpenSettings", window, [navbar]() {
+    CreateAndConnectShortcut("MainWindow.OpenSettings", window, [navbar] {
         if (navbar) emit navbar->settingsClicked();
     });
 }
 
 void ShortcutManager::RegisterChatViewShortcuts(ChatView *chat_view) {
-    CreateAndConnectShortcut("ChatView.AbortConnection", chat_view, [chat_view]() {
+    CreateAndConnectShortcut("ChatView.AbortConnection", chat_view, [chat_view] {
         if (auto *button = chat_view->findChild<QPushButton *>("abortButton")) {
             button->click();
         } else {
@@ -93,7 +102,7 @@ void ShortcutManager::RegisterChatViewShortcuts(ChatView *chat_view) {
         }
     });
 
-    CreateAndConnectShortcut("ChatView.FocusInput", chat_view, [chat_view]() {
+    CreateAndConnectShortcut("ChatView.FocusInput", chat_view, [chat_view] {
         if (auto *input = chat_view->findChild<QLineEdit *>("chatInputField")) {
             input->setFocus(Qt::ShortcutFocusReason);
             input->selectAll();
@@ -105,11 +114,11 @@ void ShortcutManager::RegisterChatViewShortcuts(ChatView *chat_view) {
         }
     });
 
-    CreateAndConnectShortcut("ChatView.AttachFile", chat_view, [chat_view]() {
+    CreateAndConnectShortcut("ChatView.AttachFile", chat_view, [chat_view] {
         chat_view->AttachFile();
     });
 
-    CreateAndConnectShortcut("ChatView.SendMessage", chat_view, [chat_view]() {
+    CreateAndConnectShortcut("ChatView.SendMessage", chat_view, [chat_view] {
         if (auto *button = chat_view->findChild<QPushButton *>("sendButton")) {
             button->click();
         } else {
@@ -122,28 +131,28 @@ void ShortcutManager::RegisterSettingsViewShortcuts(SettingsView *settings_view)
     CreateAndConnectShortcut("SettingsView.SwitchTab0", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 0));
     });
-    CreateAndConnectShortcut("SettingsView.SwitchTab1", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab1", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 1));
     });
-    CreateAndConnectShortcut("SettingsView.SwitchTab2", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab2", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 2));
     });
-    CreateAndConnectShortcut("SettingsView.SwitchTab3", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab3", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 3));
     });
-    CreateAndConnectShortcut("SettingsView.SwitchTab4", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.SwitchTab4", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SwitchToTab", Qt::QueuedConnection, Q_ARG(int, 4));
     });
 
-    CreateAndConnectShortcut("SettingsView.Save", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.Save", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "SaveSettings", Qt::QueuedConnection);
     });
 
-    CreateAndConnectShortcut("SettingsView.Defaults", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.Defaults", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "RestoreDefaults", Qt::QueuedConnection);
     });
 
-    CreateAndConnectShortcut("SettingsView.Back", settings_view, [settings_view]() {
+    CreateAndConnectShortcut("SettingsView.Back", settings_view, [settings_view] {
         QMetaObject::invokeMethod(settings_view, "HandleBackButton", Qt::QueuedConnection);
     });
 }

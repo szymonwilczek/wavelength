@@ -1,5 +1,8 @@
 #include "wavelength_joiner.h"
 
+#include <QJsonDocument>
+#include <QTimer>
+
 #include "../../../app/wavelength_config.h"
 #include "../../../auth/authentication_manager.h"
 #include "../../../chat/messages/handler/message_handler.h"
@@ -87,7 +90,7 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
         }
     };
 
-    auto disconnect_handler = [this, frequency, socket, keep_alive_timer, connected_callback_executed, registry]() {
+    auto disconnect_handler = [this, frequency, socket, keep_alive_timer, connected_callback_executed, registry] {
         keep_alive_timer->stop();
 
         if (registry->IsPendingRegistration(frequency)) {
@@ -126,7 +129,7 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
 
     connect(socket, &QWebSocket::connected, this,
             [this, socket, frequency, password, client_id, keep_alive_timer, connected_callback_executed, result_handler
-                , registry]() {
+                , registry] {
                 if (*connected_callback_executed) {
                     return;
                 }
@@ -144,7 +147,7 @@ JoinResult WavelengthJoiner::JoinWavelength(QString frequency, const QString &pa
 
                 connect(socket, &QWebSocket::textMessageReceived, this, result_handler);
 
-                connect(keep_alive_timer, &QTimer::timeout, socket, [socket]() {
+                connect(keep_alive_timer, &QTimer::timeout, socket, [socket] {
                     if (socket->isValid()) {
                         socket->ping();
                     }

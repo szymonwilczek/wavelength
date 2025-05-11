@@ -4,6 +4,8 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QFontMetrics>
+#include <QLabel>
+#include <QLineEdit>
 #include <QTimer>
 
 #include "../../../../../../app/managers/translation_manager.h"
@@ -251,7 +253,7 @@ void TypingTestLayer::OnTextChanged(const QString &text) {
             display_text_label_->setStyleSheet(
                 "color: #33ff33; font-family: Consolas; font-size: 16pt; background-color: transparent; border: none;");
 
-            QTimer::singleShot(1000, this, [this]() {
+            QTimer::singleShot(1000, this, [this] {
                 const auto effect = new QGraphicsOpacityEffect(this);
                 this->setGraphicsEffect(effect);
 
@@ -261,7 +263,7 @@ void TypingTestLayer::OnTextChanged(const QString &text) {
                 animation->setEndValue(0.0);
                 animation->setEasingCurve(QEasingCurve::OutQuad);
 
-                connect(animation, &QPropertyAnimation::finished, this, [this]() {
+                connect(animation, &QPropertyAnimation::finished, this, [this] {
                     emit layerCompleted();
                 });
 

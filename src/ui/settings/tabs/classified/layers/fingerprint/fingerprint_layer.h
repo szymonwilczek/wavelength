@@ -2,12 +2,10 @@
 #define FINGERPRINT_LAYER_H
 
 #include "../security_layer.h"
-#include <QLabel>
-#include <QProgressBar>
-#include <QTimer>
-#include <QSvgRenderer>
-#include <QImage>
-#include <QStringList>
+
+class QSvgRenderer;
+class QProgressBar;
+class QLabel;
 
 /**
  * @brief A security layer simulating fingerprint authentication.

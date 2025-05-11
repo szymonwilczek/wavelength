@@ -1,10 +1,9 @@
 #ifndef FONT_MANAGER_H
 #define FONT_MANAGER_H
 
-#include <QObject>
-#include <QMap>
-#include <QString>
 #include <QFont>
+#include <QMap>
+#include <QObject>
 
 /**
  * @brief Manages application fonts using a singleton pattern.

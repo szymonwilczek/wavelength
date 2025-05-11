@@ -1,5 +1,8 @@
 #include "cyber_chat_button.h"
 
+#include <QPainter>
+#include <QPainterPath>
+
 CyberChatButton::CyberChatButton(const QString &text, QWidget *parent): QPushButton(text, parent) {
     setCursor(Qt::PointingHandCursor);
 }

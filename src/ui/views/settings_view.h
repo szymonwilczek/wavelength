@@ -2,17 +2,10 @@
 #define SETTINGS_VIEW_H
 
 #include <QStackedWidget>
-#include <QDateTime>
-#include <QList>
-
-#include "../../ui/buttons/cyber_button.h"
-#include "../../ui/buttons/tab_button.h"
-#include "../../ui/checkbox/cyber_checkbox.h"
-#include "../../app/wavelength_config.h"
 
 class TranslationManager;
-class ShortcutsSettingsWidget;
 class SystemOverrideManager;
+class QPushButton;
 class SnakeGameLayer;
 class TypingTestLayer;
 class VoiceRecognitionLayer;
@@ -21,13 +14,14 @@ class SecurityQuestionLayer;
 class SecurityCodeLayer;
 class HandprintLayer;
 class FingerprintLayer;
+class CyberButton;
+class ShortcutsSettingsWidget;
+class NetworkSettingsWidget;
 class AppearanceSettingsWidget;
 class WavelengthSettingsWidget;
-class NetworkSettingsWidget;
-class QSpinBox;
+class TabButton;
 class QLabel;
-class QTimer;
-class QPushButton;
+class WavelengthConfig;
 
 /**
  * @brief The main view for configuring application settings.
@@ -156,11 +150,9 @@ private:
      */
     void CreateHeaderPanel();
 
-    // --- Core ---
     /** @brief Pointer to the WavelengthConfig singleton instance. */
     WavelengthConfig *config_;
 
-    // --- UI Elements ---
     /** @brief Stacked widget holding the content widgets for each settings tab. */
     QStackedWidget *tab_content_;
     /** @brief Label displaying the main title "SYSTEM SETTINGS". */
@@ -174,7 +166,6 @@ private:
     /** @brief List of buttons used for switching between settings tabs. */
     QList<TabButton *> tab_buttons_;
 
-    // --- Tab Content Widgets ---
     /** @brief Widget for configuring Wavelength-specific settings (e.g., preferred frequency). */
     WavelengthSettingsWidget *wavelength_tab_widget_;
     /** @brief Widget for configuring appearance settings (colors, etc.). */
@@ -184,7 +175,6 @@ private:
     /** @brief Widget for configuring keyboard shortcuts. */
     ShortcutsSettingsWidget *shortcuts_tab_widget_{};
 
-    // --- Action Buttons ---
     /** @brief Button to save the current settings. */
     CyberButton *save_button_;
     /** @brief Button to restore default settings. */
@@ -192,11 +182,9 @@ private:
     /** @brief Button to navigate back to the previous view. */
     CyberButton *back_button_;
 
-    // --- Timers ---
     /** @brief Timer used to periodically update the time_label_. */
     QTimer *refresh_timer_;
 
-    // --- Security Layers (CLASSIFIED Tab) ---
     /** @brief Security layer simulating fingerprint scanning. */
     FingerprintLayer *fingerprint_layer_;
     /** @brief Security layer simulating handprint scanning. */

@@ -1,12 +1,8 @@
 #ifndef WAVELENGTH_REGISTRY_H
 #define WAVELENGTH_REGISTRY_H
 
-#include <QObject>
-#include <QString>
 #include <QPointer>
 #include <QWebSocket>
-#include <QDateTime>
-#include <QDebug>
 
 /**
  * @brief Structure holding information about a specific wavelength (frequency).

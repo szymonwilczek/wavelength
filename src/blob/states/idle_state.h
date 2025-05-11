@@ -2,7 +2,6 @@
 #define IDLESTATE_H
 
 #include "blob_state.h"
-#include "../blob_config.h"
 
 /**
  * @brief Implements the Idle state behavior for the Blob animation.

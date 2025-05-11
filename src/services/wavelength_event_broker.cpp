@@ -1,4 +1,6 @@
 #include "wavelength_event_broker.h"
+
+#include <QDebug>
 #include <concepts>
 
 template<typename Receiver, typename Func>
@@ -11,6 +13,11 @@ void WavelengthEventBroker::SubscribeToEvent(const QString &event_type, Receiver
                     (*slot)(data);
                 }
             });
+}
+
+void WavelengthEventBroker::PublishEvent(const QString &event_type, const QVariantMap &data) {
+    qDebug() << "[EVENT BROKER] Publishing event:" << event_type << data;
+    emit eventPublished(event_type, data);
 }
 
 void WavelengthEventBroker::WavelengthCreated(const QString &frequency) {

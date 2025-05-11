@@ -1,14 +1,31 @@
 #include "create_wavelength_dialog.h"
 
+#include <qeventloop.h>
 #include <QFormLayout>
+#include <QLabel>
+#include <QFutureWatcher>
 #include <QGraphicsOpacityEffect>
+#include <QJsonDocument>
+#include <QUrlQuery>
 #include <QNetworkReply>
+#include <QPainter>
+#include <QPainterPath>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
+#include <QRandomGenerator>
+#include <qtconcurrentrun.h>
 #include <QVBoxLayout>
 
+#include "../../app/wavelength_config.h"
 #include "../../app/managers/translation_manager.h"
+#include "../../session/session_coordinator.h"
+#include "../../ui/dialogs/animated_dialog.h"
+#include "../../ui/buttons/cyber_button.h"
+#include "../../ui/checkbox/cyber_checkbox.h"
+#include "../input/cyber_line_edit.h"
 
 CreateWavelengthDialog::CreateWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
-                                                     shadow_size_(10), scanline_opacity_(0.08) {
+                                                                 shadow_size_(10), scanline_opacity_(0.08) {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -121,7 +138,7 @@ CreateWavelengthDialog::CreateWavelengthDialog(QWidget *parent): AnimatedDialog(
     status_label_ = new QLabel(this);
     status_label_->setStyleSheet(
         "color: #ff3355; background-color: transparent; font-family: Consolas; font-size: 9pt;");
-    status_label_->hide(); // Ukryj na początku
+    status_label_->hide();
     main_layout->addWidget(status_label_);
 
     const auto button_layout = new QHBoxLayout();
@@ -169,7 +186,7 @@ CreateWavelengthDialog::CreateWavelengthDialog(QWidget *parent): AnimatedDialog(
     refresh_timer_ = new QTimer(this);
     refresh_timer_->setInterval(16);
 
-    connect(refresh_timer_, &QTimer::timeout, this, [this]() {
+    connect(refresh_timer_, &QTimer::timeout, this, [this] {
         if (digitalization_progress_ > 0.0 && digitalization_progress_ < 1.0) {
             const int current_scanline_y = static_cast<int>(height() * digitalization_progress_);
 
@@ -214,6 +231,14 @@ void CreateWavelengthDialog::SetCornerGlowProgress(const double progress) {
 void CreateWavelengthDialog::SetScanlineOpacity(const double opacity) {
     scanline_opacity_ = opacity;
     update();
+}
+
+bool CreateWavelengthDialog::IsPasswordProtected() const {
+    return password_protected_checkbox_->isChecked();
+}
+
+QString CreateWavelengthDialog::GetPassword() const {
+    return password_edit_->text();
 }
 
 void CreateWavelengthDialog::paintEvent(QPaintEvent *event) {
@@ -336,7 +361,7 @@ void CreateWavelengthDialog::StartFrequencySearch() {
     const auto timeout_timer = new QTimer(this);
     timeout_timer->setSingleShot(true);
     timeout_timer->setInterval(5000); // 5-second searching limit
-    connect(timeout_timer, &QTimer::timeout, [this]() {
+    connect(timeout_timer, &QTimer::timeout, [this] {
         if (frequency_watcher_ && frequency_watcher_->isRunning()) {
             loading_indicator_->setText(
                 translator_->Translate("CreateWavelengthDialog.DefaultIndicator", "USING DEFAULT FREQUENCY..."));
@@ -408,12 +433,12 @@ void CreateWavelengthDialog::OnFrequencyFound() {
     const auto animation_group = new QParallelAnimationGroup(this);
     animation_group->addAnimation(loader_slide_animation);
 
-    connect(loader_slide_animation, &QPropertyAnimation::finished, [this, frequency_text]() {
+    connect(loader_slide_animation, &QPropertyAnimation::finished, [this, frequency_text] {
         loading_indicator_->hide();
         frequency_label_->setText(frequency_text);
     });
 
-    connect(loader_slide_animation, &QPropertyAnimation::finished, [this, frequency_animation]() {
+    connect(loader_slide_animation, &QPropertyAnimation::finished, [this, frequency_animation] {
         frequency_animation->start(QAbstractAnimation::DeleteWhenStopped);
     });
 

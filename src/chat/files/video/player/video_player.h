@@ -1,22 +1,20 @@
 #ifndef VIDEO_PLAYER_OVERLAY_H
 #define VIDEO_PLAYER_OVERLAY_H
 
-#include <QDialog>
-#include <QLabel>
-#include <QRandomGenerator>
-#include <memory>
-
 #ifdef Q_OS_WINDOWS
 #include <windows.h>
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 #endif
 
-#include "../../../../ui/buttons/cyber_push_button.h"
-#include "../../../../ui/sliders/cyber_slider.h"
-#include "../decoder/video_decoder.h"
+#include <QDialog>
 
+class VideoDecoder;
+class CyberSlider;
+class CyberPushButton;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A QDialog overlay for playing videos with a cyberpunk aesthetic.
  *
@@ -62,7 +60,7 @@ public:
      * @brief Gets the current opacity value for the scanline effect.
      * @return The scanline opacity (0.0 to 1.0).
      */
-    double GetScanlineOpacity() const { return scanline_opacity_; }
+    [[nodiscard]] double GetScanlineOpacity() const { return scanline_opacity_; }
 
     /**
      * @brief Sets the opacity for the scanline effect.
@@ -78,7 +76,7 @@ public:
      * @brief Gets the current opacity value for the background grid effect.
      * @return The grid opacity (0.0 to 1.0).
      */
-    double GetGridOpacity() const { return grid_opacity_; }
+    [[nodiscard]] double GetGridOpacity() const { return grid_opacity_; }
 
     /**
      * @brief Sets the opacity for the background grid effect.
@@ -120,13 +118,13 @@ private slots:
     void TogglePlayback();
 
     /**
-     * @brief Slot called when the progress slider is pressed by the user.
+     * @brief Slot called when the user presses the progress slider.
      * Remembers the playback state, pauses playback temporarily, and updates the status label.
      */
     void OnSliderPressed();
 
     /**
-     * @brief Slot called when the progress slider is released by the user.
+     * @brief Slot called when the user releases the progress slider.
      * Performs the seek operation based on the slider's final position.
      * Resumes playback if it was active before seeking. Updates status label.
      */
@@ -179,7 +177,7 @@ private slots:
     /**
      * @brief Slot connected to the decoder's videoInfo signal.
      * Stores video dimensions, duration, FPS. Sets the progress slider range.
-     * Updates info labels (resolution, bitrate, FPS, codec). Adjusts update timer interval.
+     * Updates info labels (resolution, bitrate, FPS, codec). Adjusts an update timer interval.
      * Enables the HUD display. Extracts the first frame for a thumbnail.
      * @param width Video width in pixels.
      * @param height Video height in pixels.

@@ -1,9 +1,8 @@
 #include "blob_render.h"
 
 #include <QDateTime>
-#include <QRadialGradient>
+#include <QPainter>
 #include <QRandomGenerator>
-#include <QDebug>
 
 #include "../utils/blob_path.h"
 
@@ -283,8 +282,8 @@ void BlobRenderer::RenderScene(QPainter &painter,
                                QColor &last_background_color,
                                QColor &last_grid_color,
                                int &last_grid_spacing) {
-    const bool state_changing_to_idle = (render_state.animation_state == BlobConfig::kIdle && last_animation_state_ !=
-                                         BlobConfig::kIdle);
+    const bool state_changing_to_idle = render_state.animation_state == BlobConfig::kIdle && last_animation_state_ !=
+                                        BlobConfig::kIdle;
 
     if (state_changing_to_idle) {
         InitializeIdleState();

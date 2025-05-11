@@ -1,6 +1,8 @@
 #include "message_formatter.h"
 
 #include "../../../app/managers/translation_manager.h"
+#include "../../../storage/wavelength_registry.h"
+#include "../../files/attachments/attachment_data_store.h"
 
 QString MessageFormatter::FormatMessage(const QJsonObject &message_object, const QString &frequency) {
     QString content;

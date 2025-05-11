@@ -1,15 +1,11 @@
 #ifndef CYBER_TEXT_DISPLAY_H
 #define CYBER_TEXT_DISPLAY_H
 
-#include <QAudioOutput>
-#include <QLabel>
-#include <QTimer>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QPainter>
-#include <QFontDatabase>
-#include <QMediaPlayer>
-#include <QMediaPlaylist>
+#include <QWidget>
+
+class QMediaPlaylist;
+class QAudioOutput;
+class QMediaPlayer;
 
 /**
  * @brief A custom widget that displays text with cyberpunk terminal-style "typing" reveal animation and glitch effects.

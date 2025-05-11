@@ -1,12 +1,10 @@
 #ifndef ATTACHMENT_QUEUE_MANAGER_H
 #define ATTACHMENT_QUEUE_MANAGER_H
 
+#include <QMutex>
 #include <QObject>
 #include <QQueue>
-#include <QMutex>
-#include <QThreadPool>
 #include <QRunnable>
-#include <functional>
 
 /**
  * @brief Represents a single task (a function) to be executed in a thread pool.

@@ -1,11 +1,14 @@
 #include "security_code_layer.h"
-#include <QHBoxLayout>
-#include <QRandomGenerator>
+
 #include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
-#include <QTimer>
 #include <QKeyEvent>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPropertyAnimation>
+#include <QRandomGenerator>
 #include <QRegularExpressionValidator>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "../../../../../../app/managers/translation_manager.h"
 
@@ -267,7 +270,7 @@ void SecurityCodeLayer::CheckSecurityCode() {
             );
         }
 
-        QTimer::singleShot(800, this, [this]() {
+        QTimer::singleShot(800, this, [this] {
             const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
@@ -277,7 +280,7 @@ void SecurityCodeLayer::CheckSecurityCode() {
             animation->setEndValue(0.0);
             animation->setEasingCurve(QEasingCurve::OutQuad);
 
-            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            connect(animation, &QPropertyAnimation::finished, this, [this] {
                 emit layerCompleted();
             });
 
@@ -329,7 +332,7 @@ void SecurityCodeLayer::ShowErrorEffect() {
         input->setStyleSheet(error_style);
     }
 
-    QTimer::singleShot(300, this, [this, original_style]() {
+    QTimer::singleShot(300, this, [this, original_style] {
         for (QLineEdit *input: code_inputs_) {
             input->setStyleSheet(original_style);
         }

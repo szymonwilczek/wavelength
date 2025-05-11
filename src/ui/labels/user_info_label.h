@@ -2,8 +2,6 @@
 #define USER_INFO_LABEL_H
 
 #include <QLabel>
-#include <QColor>
-#include <QtMath>
 
 /**
  * @brief A custom QLabel that displays text alongside a colored circle with a glow effect.

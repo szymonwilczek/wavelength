@@ -1,6 +1,8 @@
 #include "electronic_shutdown_effect.h"
 
 #include <qmath.h>
+#include <QPainter>
+#include <QRandomGenerator>
 
 ElectronicShutdownEffect::ElectronicShutdownEffect(QObject *parent): QGraphicsEffect(parent), progress_(0.0),
                                                                      last_progress_(-1.0),

@@ -2,10 +2,9 @@
 #define WAVELENGTH_STATE_MANAGER_H
 
 #include <QObject>
-#include <QString>
-#include <QList>
+#include <QVariant>
 
-#include "../storage/wavelength_registry.h"
+struct WavelengthInfo;
 
 /**
  * @brief Singleton class providing a centralized interface for querying and managing the state of wavelengths.
@@ -181,7 +180,7 @@ private:
     /**
      * @brief Private destructor.
      */
-    ~WavelengthStateManager() override = default; // Use default destructor
+    ~WavelengthStateManager() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.

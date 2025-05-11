@@ -2,14 +2,8 @@
 #define BLOB_TRANSITION_MANAGER_H
 
 #include <deque>
+#include <QObject>
 #include <QVector2D>
-#include <QPointF>
-#include <QTimer>
-#include <QDateTime>
-#include <vector>
-#include <functional>
-#include <memory_resource>
-#include "../../blob_config.h"
 
 /**
  * @brief Manages transitions and movement analysis for the Blob animation based on window events.

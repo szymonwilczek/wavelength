@@ -2,7 +2,6 @@
 #define CYBER_CHECKBOX_H
 
 #include <QCheckBox>
-#include <QStyleOptionButton>
 
 /**
  * @brief A custom QCheckBox styled with a cyberpunk aesthetic.

@@ -1,8 +1,8 @@
 #include "navbar_button.h"
-#include <QResizeEvent>
-#include <QHBoxLayout>
-#include <QStyleOption>
+
+#include <QGraphicsDropShadowEffect>
 #include <QPainter>
+#include <QPropertyAnimation>
 
 CyberpunkButton::CyberpunkButton(const QString &text, QWidget *parent)
     : QPushButton(text, parent) {
@@ -69,7 +69,7 @@ void CyberpunkButton::paintEvent(QPaintEvent *event) {
 
     float base_width = 2.0;
     float max_width_increase = 0.5;
-    float pen_width = base_width + (glow_intensity_ * max_width_increase);
+    float pen_width = base_width + glow_intensity_ * max_width_increase;
 
     border_color = QColor(r, g, b, alpha);
     frame_pen.setColor(border_color);

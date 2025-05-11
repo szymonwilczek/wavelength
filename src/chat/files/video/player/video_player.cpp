@@ -1,10 +1,16 @@
 #include "video_player.h"
 
-#include <QOperatingSystemVersion>
+#include <QCloseEvent>
+#include <QLabel>
+#include <QPainter>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
+#include <QRandomGenerator>
 #include <QVBoxLayout>
 
+#include "../../../../ui/buttons/cyber_push_button.h"
+#include "../../../../ui/sliders/cyber_slider.h"
+#include "../decoder/video_decoder.h"
 #include "../../../../app/managers/translation_manager.h"
 
 VideoPlayer::VideoPlayer(const QByteArray &video_data, const QString &mime_type,
@@ -254,7 +260,7 @@ void VideoPlayer::InitializePlayer() {
         connect(decoder_.get(), &VideoDecoder::error, this, &VideoPlayer::HandleError, Qt::QueuedConnection);
         connect(decoder_.get(), &VideoDecoder::videoInfo, this, &VideoPlayer::HandleVideoInfo,
                 Qt::QueuedConnection);
-        connect(decoder_.get(), &VideoDecoder::playbackFinished, this, [this]() {
+        connect(decoder_.get(), &VideoDecoder::playbackFinished, this, [this] {
             playback_finished_ = true;
             play_button_->setText("↻");
             status_label_->setText(
@@ -521,7 +527,7 @@ void VideoPlayer::HandleVideoInfo(const int width, const int height, const doubl
 
     progress_slider_->setRange(0, duration * 1000);
 
-    QTimer::singleShot(100, this, [this]() {
+    QTimer::singleShot(100, this, [this] {
         if (decoder_ && !decoder_->isFinished()) {
             decoder_->ExtractFirstFrame();
         }

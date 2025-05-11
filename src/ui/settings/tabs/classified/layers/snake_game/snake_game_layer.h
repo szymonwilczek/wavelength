@@ -1,13 +1,11 @@
 #ifndef SNAKE_GAME_LAYER_H
 #define SNAKE_GAME_LAYER_H
 
-#include <QLabel>
-
 #include "../security_layer.h"
-#include <QVector>
-#include <QPair>
 
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A security layer implementing a classic Snake game as a challenge.
  *

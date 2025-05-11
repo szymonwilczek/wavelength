@@ -1,10 +1,15 @@
 #include "blob_animation.h"
 
-#include <QApplication>
-#include <QDebug>
+#include <QDateTime>
+#include <QOpenGLShaderProgram>
+#include <QPainter>
+#include <QPaintEvent>
 #include <QRandomGenerator>
 
 #include "../../app/wavelength_config.h"
+#include "../states/idle_state.h"
+#include "../states/moving_state.h"
+#include "../states/resizing_state.h"
 
 BlobAnimation::BlobAnimation(QWidget *parent)
     : QOpenGLWidget(parent),
@@ -80,7 +85,7 @@ BlobAnimation::BlobAnimation(QWidget *parent)
             [this](const QPointF &pos, const qint64 timestamp) {
                 transition_manager_.AddMovementSample(pos, timestamp);
             });
-    connect(&event_handler_, &BlobEventHandler::resizeStateRequested, this, [this]() {
+    connect(&event_handler_, &BlobEventHandler::resizeStateRequested, this, [this] {
         SwitchToState(BlobConfig::kResizing);
     });
     connect(&event_handler_, &BlobEventHandler::significantResizeDetected, this,
@@ -698,9 +703,9 @@ std::vector<QPointF> BlobAnimation::GenerateOrganicShape(const QPointF &center, 
         for (int i = 0; i < num_of_points; ++i) {
             const int prev = i > 0 ? i - 1 : num_of_points - 1;
             const int next = i < num_of_points - 1 ? i + 1 : 0;
-            smoothed_factors[i] = (temp_factors[prev] * 0.2 +
-                                   temp_factors[i] * 0.6 +
-                                   temp_factors[next] * 0.2);
+            smoothed_factors[i] = temp_factors[prev] * 0.2 +
+                                  temp_factors[i] * 0.6 +
+                                  temp_factors[next] * 0.2;
         }
     }
 

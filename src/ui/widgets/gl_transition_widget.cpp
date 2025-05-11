@@ -1,7 +1,8 @@
 #include "gl_transition_widget.h"
-#include <QPainter>
-#include <QPaintEvent>
+
 #include <QApplication>
+#include <QPainter>
+#include <QPropertyAnimation>
 #include <QScreen>
 
 GLTransitionWidget::GLTransitionWidget(QWidget *parent)

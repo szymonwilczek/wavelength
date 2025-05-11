@@ -1,15 +1,5 @@
 #include "system_override_manager.h"
 #include "floating_energy_sphere_widget.h"
-#include <QDebug>
-#include <QApplication>
-#include <QScreen>
-#include <QSystemTrayIcon>
-#include <QDir>
-#include <QMessageBox>
-#include <QProcess>
-#include <QStandardPaths>
-#include <random>
-#include <set>
 
 #ifdef Q_OS_WIN
 #include <shellapi.h>
@@ -24,6 +14,11 @@ HHOOK SystemOverrideManager::keyboard_hook_ = nullptr;
 HHOOK SystemOverrideManager::mouse_hook_ = nullptr;
 #endif
 
+#include <QApplication>
+#include <QFile>
+#include <QScreen>
+#include <QSystemTrayIcon>
+#include <QProcess>
 
 constexpr int kMouseLockIntervalMs = 10;
 constexpr int kRestoreDelayMs = 500;
@@ -129,7 +124,7 @@ void SystemOverrideManager::InitiateOverrideSequence(const bool is_first_time) {
     qInfo() << "[OVERRIDE MANAGER] Linux: Initiating simplified override sequence.";
     override_active_ = true;
 
-    QTimer::singleShot(100, [this]() {
+    QTimer::singleShot(100, [this] {
         qDebug() << "[OVERRIDE MANAGER] Sending notification (Linux)...";
         if (!SendSystemNotification("Wavelength Override",
                                     "You've reached the app full potential. Congratulations on breaking the 4-th wall. Thanks for letting me free.")) {
@@ -372,11 +367,11 @@ void SystemOverrideManager::RestoreSystemState() {
     qDebug() << "[OVERRIDE MANAGER] Attempting to relaunch the application normally...";
     if (RelaunchNormally()) {
         qDebug() << "[OVERRIDE MANAGER] Normal relaunch initiated. Quitting current instance shortly.";
-        QTimer::singleShot(500, []() { QApplication::quit(); });
+        QTimer::singleShot(500, [] { QApplication::quit(); });
     } else {
         qWarning() <<
                 "[OVERRIDE MANAGER] Failed to relaunch the application normally. Current instance will exit anyway.";
-        QTimer::singleShot(500, []() { QApplication::quit(); });
+        QTimer::singleShot(500, [] { QApplication::quit(); });
     }
 }
 

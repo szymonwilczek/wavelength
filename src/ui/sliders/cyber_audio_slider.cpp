@@ -3,9 +3,10 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QStyle>
 
 CyberAudioSlider::CyberAudioSlider(const Qt::Orientation orientation, QWidget *parent): QSlider(orientation, parent),
-    glow_intensity_(0.5) {
+                                                                                        glow_intensity_(0.5) {
     setStyleSheet("background: transparent; border: none;");
 }
 

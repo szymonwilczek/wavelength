@@ -6,8 +6,6 @@
 class WavelengthConfig;
 class CyberLineEdit;
 class QSpinBox;
-class QVBoxLayout;
-class QFormLayout;
 
 /**
  * @brief A widget for configuring advanced network settings for the application.

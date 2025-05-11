@@ -1,9 +1,10 @@
 #ifndef CYBERPUNK_TEXT_EFFECT_H
 #define CYBERPUNK_TEXT_EFFECT_H
-#include <QLabel>
+
 #include <QObject>
 #include <QTimer>
-#include <QRandomGenerator>
+
+class QLabel;
 
 /**
  * @brief Applies a multiphase cyberpunk-style text reveal animation to a QLabel.

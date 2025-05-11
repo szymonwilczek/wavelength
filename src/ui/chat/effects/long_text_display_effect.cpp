@@ -1,11 +1,6 @@
 #include "long_text_display_effect.h"
 
 #include <QPainter>
-#include <QFontMetrics>
-#include <QPaintEvent>
-#include <QLinearGradient>
-#include <QDebug>
-#include <utility>
 
 LongTextDisplayEffect::LongTextDisplayEffect(QString text, const QColor &text_color, QWidget *parent): QWidget(parent),
     original_text_(std::move(text)), text_color_(text_color),
@@ -120,7 +115,7 @@ void LongTextDisplayEffect::ProcessText() {
 
         for (const QString &word: words) {
             QString test_line = current_line.isEmpty() ? word : current_line + " " + word;
-            int current_line_width = fm.horizontalAdvance(test_line);
+            const int current_line_width = fm.horizontalAdvance(test_line);
 
             if (current_line_width <= available_width) {
                 current_line = test_line;

@@ -1,12 +1,11 @@
 #include "network_status_widget.h"
 
-#include <QPainter>
-#include <QNetworkReply>
-#include <QHBoxLayout>
-#include <QDateTime>
-#include <qeventloop.h>
+#include <QEventLoop>
 #include <QGraphicsDropShadowEffect>
-#include <QPaintEvent>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QNetworkReply>
+#include <QPainter>
 #include <QTimer>
 
 #include "../../app/managers/translation_manager.h"

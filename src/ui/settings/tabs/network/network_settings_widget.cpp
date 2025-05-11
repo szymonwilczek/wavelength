@@ -1,14 +1,13 @@
 #include "network_settings_widget.h"
-#include "../../../../app/wavelength_config.h"
-#include "../../../../ui/input/cyber_line_edit.h"
 
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
-#include <QDebug>
 
 #include "../../../../app/managers/translation_manager.h"
+#include "../../../../app/wavelength_config.h"
+#include "../../../../ui/input/cyber_line_edit.h"
 
 NetworkSettingsWidget::NetworkSettingsWidget(QWidget *parent)
     : QWidget(parent),
