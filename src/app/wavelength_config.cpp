@@ -40,6 +40,7 @@ void WavelengthConfig::LoadDefaults() {
     preferred_start_frequency_ = "130.0";
     language_code_ = "en";
     shortcuts_ = default_shortcuts_;
+    preferred_start_frequency_ = DefaultConfig::kPrefferredStartFrequency;
 }
 
 void WavelengthConfig::LoadDefaultShortcuts() {
@@ -66,7 +67,7 @@ void WavelengthConfig::LoadDefaultShortcuts() {
 
 void WavelengthConfig::LoadSettings() {
     settings_.beginGroup("Wavelength");
-    preferred_start_frequency_ = settings_.value("preferredStartFrequency", preferred_start_frequency_).toDouble();
+    preferred_start_frequency_ = settings_.value("preferredStartFrequency", preferred_start_frequency_).toString();
     settings_.endGroup();
 
     settings_.beginGroup("Application");

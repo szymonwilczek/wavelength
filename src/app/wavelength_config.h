@@ -23,6 +23,7 @@ namespace DefaultConfig {
     const auto kTitleTextColor = QColor(0xFFFFFF); ///< White color for title text
     const auto kTitleBorderColor = QColor(0xE0B0FF); ///< Light Purple color for a title border
     const auto kTitleGlowColor = QColor(0xE0B0FF); ///< Light Purple color for a title glow
+    const QString kPrefferredStartFrequency = "130.0"; ///< Default preferred starting frequency
 }
 
 /**
@@ -58,10 +59,20 @@ public:
     ~WavelengthConfig() override = default;
 
     /**
+     * @brief Deleted copy constructor.
+     */
+    WavelengthConfig(const WavelengthConfig &) = delete;
+
+    /**
+     * @brief Deleted assignment operator.
+     */
+    WavelengthConfig &operator=(const WavelengthConfig &) = delete;
+
+    /**
      * @brief Gets the configured relay server address.
      * @return The relay server address as a QString.
      */
-    QString GetRelayServerAddress() const;
+    [[nodiscard]] QString GetRelayServerAddress() const;
 
     /**
      * @brief Sets the relay server address.
@@ -74,7 +85,7 @@ public:
      * @brief Gets the configured relay server port.
      * @return The relay server port number.
      */
-    int GetRelayServerPort() const;
+    [[nodiscard]] int GetRelayServerPort() const;
 
     /**
      * @brief Sets the relay server port.
@@ -87,13 +98,13 @@ public:
      * @brief Constructs the full WebSocket URL for the relay server.
      * @return The URL as a QString (e.g., "ws://127.0.0.1:8080").
      */
-    QString GetRelayServerUrl() const;
+    [[nodiscard]] QString GetRelayServerUrl() const;
 
     /**
      * @brief Gets the connection timeout in milliseconds.
      * @return The connection timeout duration.
      */
-    int GetConnectionTimeout() const;
+    [[nodiscard]] int GetConnectionTimeout() const;
 
     /**
      * @brief Sets the connection timeout in milliseconds.
@@ -106,7 +117,7 @@ public:
      * @brief Gets the keep-alive interval in milliseconds.
      * @return The keep-alive interval duration.
      */
-    int GetKeepAliveInterval() const;
+    [[nodiscard]] int GetKeepAliveInterval() const;
 
     /**
      * @brief Sets the keep-alive interval in milliseconds.
@@ -119,7 +130,7 @@ public:
      * @brief Gets the maximum number of reconnection attempts.
      * @return The maximum number of attempts.
      */
-    int GetMaxReconnectAttempts() const;
+    [[nodiscard]] int GetMaxReconnectAttempts() const;
 
     /**
      * @brief Sets the maximum number of reconnection attempts.
@@ -139,13 +150,13 @@ public:
     * @brief Checks if debug mode is enabled.
     * @return True if debug mode is enabled, false otherwise.
     */
-    bool IsDebugMode() const;
+    [[nodiscard]] bool IsDebugMode() const;
 
     /**
      * @brief Gets the preferred starting frequency for new Wavelengths.
      * @return The preferred frequency as a string (e.g., "130.0").
      */
-    QString GetPreferredStartFrequency() const;
+    [[nodiscard]] QString GetPreferredStartFrequency() const;
 
     /**
      * @brief Sets the preferred starting frequency.
@@ -159,7 +170,7 @@ public:
      * @brief Gets the main background color.
      * @return The background QColor.
      */
-    QColor GetBackgroundColor() const;
+    [[nodiscard]] QColor GetBackgroundColor() const;
 
     /**
      * @brief Sets the main background color.
@@ -173,7 +184,7 @@ public:
      * @brief Gets the color used for the blob animation.
      * @return The blob QColor.
      */
-    QColor GetBlobColor() const;
+    [[nodiscard]] QColor GetBlobColor() const;
 
     /**
      * @brief Sets the color for the blob animation.
@@ -187,7 +198,7 @@ public:
      * @brief Gets the color used for stream visualization elements.
      * @return The stream QColor.
      */
-    QColor GetStreamColor() const;
+    [[nodiscard]] QColor GetStreamColor() const;
 
     /**
      * @brief Sets the color for stream visualization elements.
@@ -201,7 +212,7 @@ public:
      * @brief Gets the color for the background grid lines.
      * @return The grid QColor.
      */
-    QColor GetGridColor() const;
+    [[nodiscard]] QColor GetGridColor() const;
 
     /**
      * @brief Sets the color for the background grid lines.
@@ -215,7 +226,7 @@ public:
      * @brief Gets the spacing between background grid lines in pixels.
      * @return The grid spacing.
      */
-    int GetGridSpacing() const;
+    [[nodiscard]] int GetGridSpacing() const;
 
     /**
      * @brief Sets the spacing between background grid lines.
@@ -228,7 +239,7 @@ public:
      * @brief Gets the color for the title label text.
      * @return The title text QColor.
      */
-    QColor GetTitleTextColor() const;
+    [[nodiscard]] QColor GetTitleTextColor() const;
 
     /**
      * @brief Sets the color for the title label text.
@@ -242,7 +253,7 @@ public:
      * @brief Gets the color for the title label border.
      * @return The title border QColor.
      */
-    QColor GetTitleBorderColor() const;
+    [[nodiscard]] QColor GetTitleBorderColor() const;
 
     /**
      * @brief Sets the color for the title label border.
@@ -256,7 +267,7 @@ public:
      * @brief Gets the color for the title label glow effect.
      * @return The title glow QColor.
      */
-    QColor GetTitleGlowColor() const;
+    [[nodiscard]] QColor GetTitleGlowColor() const;
 
     /**
      * @brief Sets the color for the title label glow effect.
@@ -270,7 +281,7 @@ public:
      * @brief Gets the list of recently used colors.
      * @return A QStringList containing color hex codes (e.g., "#RRGGBB").
      */
-    QStringList GetRecentColors() const;
+    [[nodiscard]] QStringList GetRecentColors() const;
 
     /**
      * @brief Adds a color to the list of recently used colors.
@@ -288,7 +299,8 @@ public:
      * @param default_sequence An optional fallback sequence if the action_id is not found.
      * @return The QKeySequence for the action.
      */
-    QKeySequence GetShortcut(const QString &action_id, const QKeySequence &default_sequence = QKeySequence()) const;
+    [[nodiscard]] QKeySequence GetShortcut(const QString &action_id,
+                                           const QKeySequence &default_sequence = QKeySequence()) const;
 
     /**
      * @brief Sets the keyboard shortcut for a specific action.
@@ -302,13 +314,13 @@ public:
      * @brief Gets a map of all currently configured shortcuts.
      * @return A QMap where keys are action IDs and values are QKeySequences.
      */
-    QMap<QString, QKeySequence> GetAllShortcuts() const;
+    [[nodiscard]] QMap<QString, QKeySequence> GetAllShortcuts() const;
 
     /**
      * @brief Gets a map of the default shortcuts defined within the application.
      * @return A QMap containing the default action IDs and their corresponding QKeySequences.
      */
-    QMap<QString, QKeySequence> GetDefaultShortcutsMap() const;
+    [[nodiscard]] QMap<QString, QKeySequence> GetDefaultShortcutsMap() const;
 
     /**
      * @brief Saves all current configuration settings to persistent storage (QSettings).
@@ -328,13 +340,13 @@ public:
      * @param key The string key identifying the setting (e.g., "relayServerPort", "backgroundColor").
      * @return A QVariant containing the setting's value, or an invalid QVariant if the key is unknown.
      */
-    QVariant GetSetting(const QString &key) const;
+    [[nodiscard]] QVariant GetSetting(const QString &key) const;
 
     /**
      * @brief Gets the currently configured language code (e.g., "en", "pl").
      * @return The language code as a QString.
      */
-    QString GetLanguageCode() const;
+    [[nodiscard]] QString GetLanguageCode() const;
 
     /**
      * @brief Sets the application language code.
@@ -364,16 +376,6 @@ private:
      * @param parent Optional parent QObject.
      */
     explicit WavelengthConfig(QObject *parent = nullptr);
-
-    /**
-     * @brief Deleted copy constructor.
-     */
-    WavelengthConfig(const WavelengthConfig &) = delete;
-
-    /**
-     * @brief Deleted assignment operator.
-     */
-    WavelengthConfig &operator=(const WavelengthConfig &) = delete;
 
     /**
      * @brief Loads the hardcoded default values for all settings into the member variables.
