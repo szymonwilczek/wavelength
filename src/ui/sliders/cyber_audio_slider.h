@@ -2,7 +2,6 @@
 #define CYBER_AUDIO_SLIDER_H
 
 #include <QSlider>
-#include <QStyle>
 
 /**
  * @brief A custom QSlider styled with a cyberpunk aesthetic, specifically themed for audio controls.

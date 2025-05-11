@@ -13,7 +13,7 @@
 class CyberSlider final : public QSlider {
     Q_OBJECT
     /** @brief Property controlling the intensity of the handle's glow effect (0.0 to 1.0). Animatable. */
-    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity) // Corrected getter/setter names
+    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
 
 public:
     /**
@@ -29,14 +29,14 @@ public:
      * @brief Gets the current intensity of the glow effect.
      * @return The glow intensity value (typically 0.0 to 1.0).
      */
-    double GetGlowIntensity() const { return glow_intensity_; } // Corrected function name
+    double GetGlowIntensity() const { return glow_intensity_; }
 
     /**
      * @brief Sets the intensity of the glow effect.
      * Triggers a repaint of the slider.
      * @param intensity The desired glow intensity.
      */
-    void SetGlowIntensity(double intensity); // Corrected function name
+    void SetGlowIntensity(double intensity);
 
 protected:
     /**
