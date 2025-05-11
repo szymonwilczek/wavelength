@@ -1,8 +1,13 @@
 #include "animated_dialog.h"
 
 #include <QApplication>
+#include <qevent.h>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QScreen>
+#include <QSequentialAnimationGroup>
 
+#include "create_wavelength_dialog.h"
 #include "../../ui/dialogs/join_wavelength_dialog.h"
 #include "../widgets/overlay_widget.h"
 
