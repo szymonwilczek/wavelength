@@ -6,7 +6,6 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
-#include <QDebug>
 #include <QString>
 #include <QDoubleValidator>
 #include <QMessageBox>
@@ -137,7 +136,7 @@ void WavelengthSettingsWidget::LoadSettings() const {
         unit_index = 1;
     }
 
-    frequency_value_edit_->setText(QString::number(display_value, 'f', (unit_index > 0) ? 3 : 1));
+    frequency_value_edit_->setText(QString::number(display_value, 'f', unit_index > 0 ? 3 : 1));
     frequency_unit_combo_->setCurrentIndex(unit_index);
 
     const QString current_lang_code = config_->GetLanguageCode();
