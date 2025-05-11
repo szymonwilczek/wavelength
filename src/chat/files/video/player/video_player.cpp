@@ -1,6 +1,8 @@
 #include "video_player.h"
 
+#include <QCloseEvent>
 #include <QLabel>
+#include <QPainter>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
