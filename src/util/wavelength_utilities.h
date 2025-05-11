@@ -1,8 +1,8 @@
 #ifndef WAVELENGTH_UTILITIES_H
 #define WAVELENGTH_UTILITIES_H
 
-#include <QLabel>
-
+class QColor;
+class QLabel;
 class BlobAnimation;
 
 /**

@@ -1,8 +1,10 @@
 #ifndef RESIZE_EVENT_FILTER_H
 #define RESIZE_EVENT_FILTER_H
 
-#include "wavelength_utilities.h"
-#include "../blob/core/blob_animation.h"
+#include <QObject>
+
+class BlobAnimation;
+class QLabel;
 
 /**
  * @brief An event filter specifically designed to center a QLabel within a BlobAnimation widget whenever the BlobAnimation widget is resized.
@@ -18,8 +20,7 @@ public:
      * @param label The QLabel widget that needs to be centered.
      * @param animation The BlobAnimation widget within which the label should be centered, and which will be monitored for resize events. The animation widget is also set as the parent of this event filter object.
      */
-    ResizeEventFilter(QLabel *label, BlobAnimation *animation)
-        : QObject(animation), label_(label), animation_(animation) {}
+    ResizeEventFilter(QLabel *label, BlobAnimation *animation);
 
 protected:
     /**
