@@ -53,7 +53,6 @@ void WavelengthConfig::LoadDefaultShortcuts() {
     default_shortcuts_["ChatView.FocusInput"] = QKeySequence("Ctrl+L");
     default_shortcuts_["ChatView.AttachFile"] = QKeySequence("Ctrl+O");
     default_shortcuts_["ChatView.SendMessage"] = QKeySequence("Ctrl+Enter");
-    default_shortcuts_["ChatView.TogglePTT"] = QKeySequence("Space");
     // settings view
     default_shortcuts_["SettingsView.SwitchTab0"] = QKeySequence("Ctrl+1");
     default_shortcuts_["SettingsView.SwitchTab1"] = QKeySequence("Ctrl+2");
@@ -146,8 +145,8 @@ void WavelengthConfig::SaveSettings() {
     settings_.remove("");
 
     for (auto it = shortcuts_.constBegin(); it != shortcuts_.constEnd(); ++it) {
-        QString action_id = it.key();
-        QKeySequence sequence = it.value();
+        const QString &action_id = it.key();
+        const QKeySequence &sequence = it.value();
         settings_.setValue(action_id, sequence);
     }
 
