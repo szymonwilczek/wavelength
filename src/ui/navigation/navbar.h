@@ -2,12 +2,13 @@
 #define NAVBAR_H
 
 #include <QToolBar>
-#include <QHBoxLayout>
-#include <QSoundEffect>
-#include <QSpacerItem>
 
-#include "../../ui/buttons/navbar_button.h"
-#include "network_status_widget.h"
+class QSoundEffect;
+class QSpacerItem;
+class CyberpunkButton;
+class NetworkStatusWidget;
+class QLabel;
+class QHBoxLayout;
 
 /**
  * @brief A custom QToolBar serving as the main navigation bar for the application.
