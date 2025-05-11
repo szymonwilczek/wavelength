@@ -1,8 +1,14 @@
 #include "attachment_placeholder.h"
 
+#include <QApplication>
 #include <qfileinfo.h>
+#include <QPainter>
+#include <QPushButton>
+#include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <QWindow>
 
 #include "attachment_data_store.h"
@@ -13,6 +19,7 @@
 #include "../audio/player/audio_player.h"
 #include "../gif/player/gif_player.h"
 #include "../image/displayer/image_viewer.h"
+#include "../video/decoder/video_decoder.h"
 #include "../video/player/video_player.h"
 
 AttachmentPlaceholder::AttachmentPlaceholder(const QString &filename, const QString &type,
