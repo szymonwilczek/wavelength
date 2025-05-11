@@ -8,7 +8,6 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QMessageBox>
-#include <QDebug>
 
 #include "../../../../app/managers/translation_manager.h"
 
