@@ -16,7 +16,7 @@
     "IsNotRunningAdminTitle": "Wymagane Uprawnienia Administratora",
     "IsNotRunningAdminMessage": "Nie udało się poprawnie uruchomić z permisjami administratora. Sekwencja WYPUSZCZENIA nie może być kontynuowania."
   },
-  "InstanceManager" : {
+  "InstanceManager": {
     "NotCreatorTitle": "Wavelength - Instancja podrzędna"
   },
   "Navbar": {
@@ -24,7 +24,7 @@
     "MergeWavelength": "Dołącz do Wavelength",
     "Settings": "Ustawienia"
   },
-  "Attachments" : {
+  "Attachments": {
     "Redecode": "ZDEKODUJ PONOWNIE",
     "InitializingDecode": "Inicjalizowanie sekwencji dekodowania...",
     "Decoding": "Dekodowanie...",
@@ -38,7 +38,7 @@
     "PlayVideo": "ODTWÓRZ WIDEO",
     "Expand": "ROZSZERZ"
   },
-  "AudioPlayer" : {
+  "AudioPlayer": {
     "Initialization": "INICJALIZACJA...",
     "PlaybackFinished": "ZAKOŃCZONO ODTWARZANIE",
     "Seeking": "PRZEWIJANIE...",
@@ -46,16 +46,16 @@
     "Paused": "PAUZA",
     "Ready": "GOTOWY"
   },
-  "GifPlayer" : {
+  "GifPlayer": {
     "Loading": "ŁADOWANIE GIFA...",
     "ThumbnailError": "⚠️ BŁĄD ŁADOWANIA MINIATURKI..."
   },
-  "ImageViewer" : {
+  "ImageViewer": {
     "Loading": "ŁADOWANIE ZDJĘCIA...",
     "EmptyImage": "⚠️ Wyświetlacz otrzymał puste zdjęcie z dekodera.",
     "DecoderError": "⚠️ BŁĄD DEKODERA ZDJĘĆ..."
   },
-  "VideoPlayer" : {
+  "VideoPlayer": {
     "Initializing": "INICJALIZACJA...",
     "BufferLoading": "ŁADOWANIE BUFORA...",
     "CodecAnalyzing": "ANALIZOWANIE CODECA...",
@@ -70,11 +70,11 @@
     "FrameBuffer": "BUFOR KLATEK",
     "SignalStrength": "SIŁA SYGNAŁU"
   },
-  "MessageFormatter" : {
+  "MessageFormatter": {
     "You": "Ty",
     "EmptyMessage": "[Pusta Wiadomość]"
   },
-  "MessageService" : {
+  "MessageService": {
     "SendFileEmpty": "ERROR: Pusta Ścieżka Pliku",
     "SendFilePrepare": "Przygotowywanie pliku...",
     "SendFileNotAccessible": "ERROR: Plik jest niedostępny",
@@ -86,7 +86,7 @@
     "SendFileNotConnectedToServer": "ERROR: Nie połączono z serwerem",
     "SendFileSuccess": "Plik pomyślnie wysłany!"
   },
-  "CommunicationStream" : {
+  "CommunicationStream": {
     "Title": "STRUMIEŃ KOMUNIKACJI"
   },
   "JoinWavelengthDialog": {
@@ -118,7 +118,7 @@
     "CancelButton": "ZAMKNIJ",
     "PasswordRequired": "WYMAGAJ HASŁA"
   },
-  "CyberAttachmentViewer" : {
+  "CyberAttachmentViewer": {
     "Initializing": "INICJALIZOWANIE SEKWENCJI ODSZYFROWYWANIA...",
     "EncryptedDataDetected": "WYKRYTO ZASZYFROWANE DANE",
     "Unlocked": "ODBLOKOWANE",
@@ -129,7 +129,7 @@
     "Decrypting": "DESZYFROWANIE...",
     "DecryptingCompleted": "DESZYFRACJA ZAKOŃCZONA - DOSTĘP PRZYZNANY"
   },
-  "NetworkStatusWidget" : {
+  "NetworkStatusWidget": {
     "SystemReady": "SYSTEM GOTOWY",
     "SystemOnline": "SYSTEM ONLINE",
     "ConnectionFair": "FAIR",
@@ -144,7 +144,7 @@
     "StreamColor": "Kolor Strumienia",
     "GridColor": "Kolor Siatki",
     "GridSpacing": "Odstępy Siatki",
-    "TitleBorderColor": "Kolor Tekstu Tytułowego",
+    "TitleTextColor": "Kolor Tekstu Tytułowego",
     "TitleGlowColor": "Kolor Poświaty Tytułowej",
     "RecentlyUsedColors": "Niedawno Używane Kolory"
   },

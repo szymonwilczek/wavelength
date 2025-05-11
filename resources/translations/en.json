@@ -16,7 +16,7 @@
     "IsNotRunningAdminTitle": "Admin Privileges Required",
     "IsNotRunningAdminMessage": "Failed to relaunch with administrator privileges. The override sequence cannot continue."
   },
-  "InstanceManager" : {
+  "InstanceManager": {
     "NotCreatorTitle": "Wavelength - Sub Instance"
   },
   "Navbar": {
@@ -24,7 +24,7 @@
     "MergeWavelength": "Merge Wavelength",
     "Settings": "Settings"
   },
-  "Attachments" : {
+  "Attachments": {
     "Redecode": "REDECODE",
     "InitializingDecode": "Initializing decode sequence...",
     "Decoding": "Decoding...",
@@ -38,7 +38,7 @@
     "PlayVideo": "PLAY VIDEO",
     "Expand": "EXPAND"
   },
-  "AudioPlayer" : {
+  "AudioPlayer": {
     "Initialization": "INITIALIZING...",
     "PlaybackFinished": "PLAYBACK FINISHED",
     "Seeking": "SEEKING...",
@@ -46,16 +46,16 @@
     "Paused": "PAUSED",
     "Ready": "READY"
   },
-  "GifPlayer" : {
+  "GifPlayer": {
     "Loading": "LOADING GIF...",
     "ThumbnailError": "⚠️ THUMBNAIL LOADING ERROR..."
   },
-  "ImageViewer" : {
+  "ImageViewer": {
     "Loading": "LOADING IMAGE...",
     "EmptyImage": "⚠️ Viewer got an empty image from decoder.",
     "DecoderError": "⚠️ IMAGE DECODER ERROR..."
   },
-  "VideoPlayer" : {
+  "VideoPlayer": {
     "Initializing": "INITIALIZING...",
     "BufferLoading": "BUFFER LOADING...",
     "CodecAnalyzing": "CODEC ANALYZING...",
@@ -70,11 +70,11 @@
     "FrameBuffer": "FRAME BUFFER",
     "SignalStrength": "SIGNAL STRENGTH"
   },
-  "MessageFormatter" : {
+  "MessageFormatter": {
     "You": "You",
     "EmptyMessage": "[Empty Message]"
   },
-  "MessageService" : {
+  "MessageService": {
     "SendFileEmpty": "ERORR: Empty file path",
     "SendFilePrepare": "Preparing file...",
     "SendFileNotAccessible": "ERROR: File not accessible",
@@ -86,7 +86,7 @@
     "SendFileNotConnectedToServer": "ERROR: Not connected to server",
     "SendFileSuccess": "File sent successfully!"
   },
-  "CommunicationStream" : {
+  "CommunicationStream": {
     "Title": "COMMUNICATION STREAM"
   },
   "JoinWavelengthDialog": {
@@ -118,7 +118,7 @@
     "CancelButton": "CANCEL",
     "PasswordRequired": "PASSWORD REQUIRED"
   },
-  "CyberAttachmentViewer" : {
+  "CyberAttachmentViewer": {
     "Initializing": "INITIALIZING DECYPHERING SEQUENCE...",
     "EncryptedDataDetected": "ENCRYPTED DATA DETECTED",
     "Unlocked": "UNLOCKED",
@@ -129,7 +129,7 @@
     "Decrypting": "DECRYPTING...",
     "DecryptingCompleted": "DECRYPTION COMPLETED - ACCESS GRANTED"
   },
-  "NetworkStatusWidget" : {
+  "NetworkStatusWidget": {
     "SystemReady": "SYSTEM READY",
     "SystemOnline": "SYSTEM ONLINE",
     "ConnectionFair": "CONNECTION FAIR",
@@ -144,7 +144,7 @@
     "StreamColor": "Stream Color",
     "GridColor": "Grid Color",
     "GridSpacing": "Grid Spacing",
-    "TitleBorderColor": "Title Text Color",
+    "TitleTextColor": "Title Text Color",
     "TitleGlowColor": "Title Glow Color",
     "RecentlyUsedColors": "Recently Used Colors"
   },
@@ -179,23 +179,23 @@
       "HINT": "HINT: "
     },
     "Fingerprint": {
-        "Title": "FINGERPRINT AUTHENTICATION",
-        "Info": "Press and hold on fingerprint to scan"
+      "Title": "FINGERPRINT AUTHENTICATION",
+      "Info": "Press and hold on fingerprint to scan"
     },
     "Handprint": {
-        "Title": "HANDPRINT AUTHENTICATION",
-        "Info": "Press and hold on handprint to scan"
+      "Title": "HANDPRINT AUTHENTICATION",
+      "Info": "Press and hold on handprint to scan"
     },
     "SecurityQuestion": {
-        "Title": "SECURITY QUESTION VERIFICATION",
-        "Info": "Answer your security question.",
-        "Label": "What is your top secret security question?",
-        "Verified": "✓ AUTHENTICATION VERIFIED",
-        "Timeout": "If this was really you, you would know the answer.\nYou don't need a question."
+      "Title": "SECURITY QUESTION VERIFICATION",
+      "Info": "Answer your security question.",
+      "Label": "What is your top secret security question?",
+      "Verified": "✓ AUTHENTICATION VERIFIED",
+      "Timeout": "If this was really you, you would know the answer.\nYou don't need a question."
     },
     "RetinaScan": {
-        "Title": "RETINA SCAN VERIFICATION",
-        "Info": "Please look directly at the scanner\nDo not move during scan process"
+      "Title": "RETINA SCAN VERIFICATION",
+      "Info": "Please look directly at the scanner\nDo not move during scan process"
     },
     "SnakeGame": {
       "Title": "SECURITY VERIFICATION: SNAKE GAME",
