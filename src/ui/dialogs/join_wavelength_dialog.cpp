@@ -5,6 +5,8 @@
 #include <QDoubleValidator>
 #include <QFormLayout>
 #include <QLabel>
+#include <QPainter>
+#include <QPainterPath>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
 #include <QVBoxLayout>
