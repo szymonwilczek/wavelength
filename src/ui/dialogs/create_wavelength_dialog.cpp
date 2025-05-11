@@ -8,6 +8,8 @@
 #include <QJsonDocument>
 #include <QUrlQuery>
 #include <QNetworkReply>
+#include <QPainter>
+#include <QPainterPath>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
