@@ -2,6 +2,7 @@
 #define BLOB_RENDERER_H
 
 #include <QPainterPath>
+#include <QPixmap>
 
 #include "path_markers_manager.h"
 #include "../blob_config.h"

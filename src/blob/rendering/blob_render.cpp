@@ -1,6 +1,7 @@
 #include "blob_render.h"
 
 #include <QDateTime>
+#include <QPainter>
 #include <QRandomGenerator>
 
 #include "../utils/blob_path.h"
