@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 #include <QOpenGLShaderProgram>
+#include <QPainter>
 #include <QPaintEvent>
 #include <QRandomGenerator>
 
