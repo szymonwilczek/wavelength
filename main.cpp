@@ -6,14 +6,21 @@
 #pragma comment(lib, "dwmapi.lib")
 #endif
 
+#include <QApplication>
+#include <QCoreApplication>
+#include <qguiapplication.h>
 #include <QMainWindow>
 #include "src/ui/navigation/navbar.h"
 #include "src/blob/core/blob_animation.h"
 #include <QLabel>
-#include <QMessageBox>
+#include <QSoundEffect>
 #include <QTimer>
 #include <QStyleFactory>
+#include <QCommandLineParser>
+#include <QGraphicsDropShadowEffect>
+#include <QVBoxLayout>
 
+#include "src/app/wavelength_config.h"
 #include "src/app/managers/font_manager.h"
 #include "src/app/managers/app_instance_manager.h"
 #include "src/ui/dialogs/join_wavelength_dialog.h"
@@ -27,7 +34,6 @@
 #include "src/app/managers/shortcut_manager.h"
 #include "src/app/managers/translation_manager.h"
 #include "src/ui/views/settings_view.h"
-#include "src/ui/settings/tabs/classified/components/system_override_manager.h"
 #include "src/util/resize_event_filter.h"
 #include "src/util/wavelength_utilities.h"
 
@@ -285,6 +291,7 @@ int main(int argc, char *argv[]) {
                          }
                      });
 
+    // ReSharper disable once CppDFAUnreachableFunctionCall
     auto switch_to_chat_view = [chat_view, stacked_widget, animation, navbar](const QString &frequency) {
         animation->hideAnimation();
         navbar->SetChatMode(true);
