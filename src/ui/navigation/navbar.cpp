@@ -3,6 +3,7 @@
 #include <QContextMenuEvent>
 #include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QSoundEffect>
 
 #include "network_status_widget.h"
