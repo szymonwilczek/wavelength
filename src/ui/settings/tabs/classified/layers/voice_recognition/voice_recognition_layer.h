@@ -2,14 +2,12 @@
 #define VOICE_RECOGNITION_LAYER_H
 
 #include "../security_layer.h"
-#include <QProgressBar>
-#include <QAudioInput>
-#include <QIODevice>
-#include <QByteArray>
-#include <QLabel>
-#include <QVector>
 
+class QAudioInput;
+class QProgressBar;
+class QLabel;
 class TranslationManager;
+
 /**
  * @brief A security layer simulating voice recognition verification.
  *

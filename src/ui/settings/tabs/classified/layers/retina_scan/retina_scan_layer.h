@@ -2,9 +2,9 @@
 #define RETINA_SCAN_LAYER_H
 
 #include "../security_layer.h"
-#include <QProgressBar>
-#include <QImage>
-#include <QLabel>
+
+class QProgressBar;
+class QLabel;
 
 /**
  * @brief A security layer simulating a retina scan process.

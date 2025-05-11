@@ -1,12 +1,16 @@
 #include "handprint_layer.h"
-#include <QVBoxLayout>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QRandomGenerator>
+
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QProgressBar>
 #include <QPropertyAnimation>
-#include <QCoreApplication>
+#include <QRandomGenerator>
+#include <QSvgRenderer>
 #include <QTimer>
+#include <QVBoxLayout>
+
 
 #include "../../../../../../app/managers/translation_manager.h"
 
@@ -223,7 +227,7 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
             handprint_image_->setPixmap(QPixmap::fromImage(success_image));
         }
 
-        QTimer::singleShot(500, this, [this]() {
+        QTimer::singleShot(500, this, [this] {
             const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
@@ -233,7 +237,7 @@ void HandprintLayer::ProcessHandprint(const bool completed) {
             animation->setEndValue(0.0);
             animation->setEasingCurve(QEasingCurve::OutQuad);
 
-            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            connect(animation, &QPropertyAnimation::finished, this, [this] {
                 emit layerCompleted();
             });
 

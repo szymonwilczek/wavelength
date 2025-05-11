@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QGraphicsOpacityEffect>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
 #include <QTimer>
@@ -95,7 +96,7 @@ void SnakeGameLayer::Initialize() {
         static_cast<QGraphicsOpacityEffect *>(graphicsEffect())->setOpacity(1.0);
     }
 
-    QTimer::singleShot(200, this, [this]() {
+    QTimer::singleShot(200, this, [this] {
         if (!game_over_) {
             game_timer_->start();
         }
@@ -319,7 +320,7 @@ void SnakeGameLayer::MoveSnake() {
 
         if (parts_exited_ >= snake_.size()) {
             game_over_ = true;
-            QTimer::singleShot(10, this, [this]() {
+            QTimer::singleShot(10, this, [this] {
                 FinishGame(true);
             });
             return;
@@ -498,7 +499,7 @@ void SnakeGameLayer::FinishGame(const bool success) {
                                                      "Snake exited the screen! Level completed."));
         score_label_->setStyleSheet("color: #33ff33; font-family: Consolas; font-size: 10pt;");
 
-        QTimer::singleShot(1000, this, [this]() {
+        QTimer::singleShot(1000, this, [this] {
             const auto effect = new QGraphicsOpacityEffect(this);
             this->setGraphicsEffect(effect);
 
@@ -508,7 +509,7 @@ void SnakeGameLayer::FinishGame(const bool success) {
             animation->setEndValue(0.0);
             animation->setEasingCurve(QEasingCurve::OutQuad);
 
-            connect(animation, &QPropertyAnimation::finished, this, [this]() {
+            connect(animation, &QPropertyAnimation::finished, this, [this] {
                 emit layerCompleted();
             });
 
@@ -519,7 +520,7 @@ void SnakeGameLayer::FinishGame(const bool success) {
 
         game_board_->setStyleSheet("background-color: rgba(40, 10, 10, 220);");
 
-        QTimer::singleShot(500, this, [this]() {
+        QTimer::singleShot(500, this, [this] {
             Reset();
             InitializeGame();
             game_timer_->start();

@@ -1,15 +1,12 @@
 #include "floating_energy_sphere_widget.h"
-#include <QOpenGLShader>
-#include <QVector3D>
-#include <cmath>
-#include <QDebug>
-#include <QApplication>
-#include <random>
-#include <QMediaContent>
-#include <QUrl>
-#include <limits>
+
+#include <QCoreApplication>
 #include <QDir>
 #include <qmath.h>
+#include <QMouseEvent>
+#include <QOpenGLShaderProgram>
+#include <random>
+
 
 auto vertex_shader_source = R"(
     #version 330 core
@@ -414,8 +411,8 @@ void FloatingEnergySphereWidget::resizeGL(const int w, int h) {
     constexpr float sphere_radius = 1.0f;
     constexpr float padding_factor = 2.0f;
 
-    const float required_tan_half_fov_vertical = (sphere_radius * padding_factor) / camera_distance_;
-    const float required_tan_half_fov_horizontal = (sphere_radius * padding_factor) / camera_distance_;
+    const float required_tan_half_fov_vertical = sphere_radius * padding_factor / camera_distance_;
+    const float required_tan_half_fov_horizontal = sphere_radius * padding_factor / camera_distance_;
 
     const float tan_half_fov_y = qMax(required_tan_half_fov_vertical, required_tan_half_fov_horizontal / aspect_ratio);
 
@@ -498,7 +495,7 @@ void FloatingEnergySphereWidget::UpdateAnimation() {
         return;
     }
 
-    const bool is_playing = (media_player_ && media_player_->state() == QMediaPlayer::PlayingState);
+    const bool is_playing = media_player_ && media_player_->state() == QMediaPlayer::PlayingState;
 
     if (is_playing && audio_ready_ && audio_buffer_duration_ms_ > 0) {
         const qint64 current_position_ms = media_player_->position();
@@ -666,7 +663,7 @@ void FloatingEnergySphereWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void FloatingEnergySphereWidget::mouseMoveEvent(QMouseEvent *event) {
-    if (mouse_pressed_ && (event->buttons() & Qt::LeftButton)) {
+    if (mouse_pressed_ && event->buttons() & Qt::LeftButton) {
         const QPoint delta = event->pos() - last_mouse_position_;
         last_mouse_position_ = event->pos();
 
@@ -885,8 +882,8 @@ void FloatingEnergySphereWidget::TriggerImpactAtScreenPos(const QPoint &screen_p
         return;
     }
 
-    const float ndc_x = (2.0f * win_x) / width() - 1.0f;
-    const float ndc_y = (2.0f * win_y) / height() - 1.0f;
+    const float ndc_x = 2.0f * win_x / width() - 1.0f;
+    const float ndc_y = 2.0f * win_y / height() - 1.0f;
 
     const QVector4D near_point_h = inverse_view_projection * QVector4D(ndc_x, ndc_y, -1.0f, 1.0f); // Bliska płaszczyzna
     const QVector4D far_point_h = inverse_view_projection * QVector4D(ndc_x, ndc_y, 1.0f, 1.0f); // Daleka płaszczyzna
@@ -938,8 +935,8 @@ void FloatingEnergySphereWidget::SimulateClick() {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    std::uniform_int_distribution<> distrib_x(0, width() - 1);
-    std::uniform_int_distribution<> distrib_y(0, height() - 1);
+    std::uniform_int_distribution distrib_x(0, width() - 1);
+    std::uniform_int_distribution distrib_y(0, height() - 1);
 
     const QPoint screen_position(distrib_x(gen), distrib_y(gen));
 

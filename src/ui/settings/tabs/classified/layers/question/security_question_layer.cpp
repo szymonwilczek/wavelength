@@ -1,6 +1,8 @@
 #include "security_question_layer.h"
 #include <QVBoxLayout>
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
+#include <QLineEdit>
 #include <QPropertyAnimation>
 #include <QTimer>
 
@@ -125,7 +127,7 @@ void SecurityQuestionLayer::CheckSecurityAnswer() {
     security_question_label_->setText(
         translator_->Translate("ClassifiedSettingsWidget.SecurityQuestion.Verified", "✓ AUTHENTICATION VERIFIED"));
 
-    QTimer::singleShot(800, this, [this]() {
+    QTimer::singleShot(800, this, [this] {
         const auto effect = new QGraphicsOpacityEffect(this);
         this->setGraphicsEffect(effect);
 
@@ -135,7 +137,7 @@ void SecurityQuestionLayer::CheckSecurityAnswer() {
         animation->setEndValue(0.0);
         animation->setEasingCurve(QEasingCurve::OutQuad);
 
-        connect(animation, &QPropertyAnimation::finished, this, [this]() {
+        connect(animation, &QPropertyAnimation::finished, this, [this] {
             emit layerCompleted();
         });
 
