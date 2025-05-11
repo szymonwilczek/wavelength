@@ -414,17 +414,17 @@ private:
      */
     QMap<QString, QKeySequence> shortcuts_;
     QString relay_server_address_; ///< The address of the relay server
-    int relay_server_port_; ///< The port of the relay server
-    int connection_timeout_; ///< The connection timeout in milliseconds
-    int keep_alive_interval_; ///< The keep-alive interval in milliseconds
-    int max_reconnect_attempts_; ///< The maximum number of reconnection attempts
-    bool debug_mode_; ///< Flag indicating if debug mode is enabled
+    int relay_server_port_{}; ///< The port of the relay server
+    int connection_timeout_{}; ///< The connection timeout in milliseconds
+    int keep_alive_interval_{}; ///< The keep-alive interval in milliseconds
+    int max_reconnect_attempts_{}; ///< The maximum number of reconnection attempts
+    bool debug_mode_{}; ///< Flag indicating if debug mode is enabled
     QColor background_color_; ///< The main background color of the application
     QColor blob_color_; ///< The color used for the blob animation
     QColor stream_color_; ///< The color used for stream visualization elements
     QStringList recent_colors_; ///< List of recently used colors (hex codes)
     QColor grid_color_; ///< The color for the background grid lines
-    int grid_spacing_; ///< The spacing between background grid lines in pixels
+    int grid_spacing_{}; ///< The spacing between background grid lines in pixels
     QColor title_text_color_; ///< The color for the title label text
     QColor title_border_color_; ///< The color for the title label border
     QColor title_glow_color_; ///< The color for the title label glow effect
