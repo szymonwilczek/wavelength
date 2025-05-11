@@ -2,9 +2,6 @@
 #define OVERLAY_WIDGET_H
 
 #include <QWidget>
-#include <QPainter>
-#include <QResizeEvent>
-#include <QRect>
 
 /**
  * @brief A semi-transparent overlay widget used to dim the background content.
