@@ -8,7 +8,7 @@ class ImageDecoder;
 class TranslationManager;
 
 /**
- * @brief An inline widget for displaying static images (PNG, JPEG, etc.) within a chat interface.
+ * @brief A widget for displaying static images (PNG, JPEG, etc.) within a chat interface.
  *
  * This class uses ImageDecoder (which relies on Qt's image loading) to decode image data.
  * It displays the image within a QLabel, automatically scaling the content to fit the label's size
