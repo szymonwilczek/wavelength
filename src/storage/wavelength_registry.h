@@ -21,7 +21,7 @@ struct WavelengthInfo {
     QString host_id;
     /** @brief True if the current user is the host of this wavelength. */
     bool is_host = false;
-    /** @brief The port number the host is listening on (potentially unused with relay). */
+    /** @brief The port number the host is listening on. */
     int host_port = 0;
     /** @brief QPointer to the WebSocket connection associated with this wavelength. Automatically nullifies if the socket is deleted. */
     QPointer<QWebSocket> socket = nullptr;
@@ -220,7 +220,7 @@ private:
      * @param parent Optional parent QObject.
      */
     explicit WavelengthRegistry(QObject *parent = nullptr) : QObject(parent), active_wavelength_("-1") {
-    } // Corrected default active_wavelength_
+    }
 
     /**
      * @brief Private destructor.
