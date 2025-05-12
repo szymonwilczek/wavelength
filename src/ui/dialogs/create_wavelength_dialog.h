@@ -192,8 +192,6 @@ private:
     QString frequency_ = "130.0";
     /** @brief Flag indicating if the frequency search has completed successfully or timed out. */
     bool frequency_found_ = false;
-    /** @brief Size parameter for shadow effects (potentially unused). */
-    const int shadow_size_;
     /** @brief Current opacity for the horizontal scanline effect. */
     double scanline_opacity_;
     /** @brief Buffer holding the pre-rendered vertical scanline gradient. */
