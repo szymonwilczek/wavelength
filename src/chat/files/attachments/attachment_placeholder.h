@@ -96,7 +96,7 @@ public slots:
      * @brief Creates and shows a non-modal dialog to display the full-size attachment (image or GIF).
      * Uses InlineImageViewer or InlineGifPlayer within a QScrollArea.
      * @param data The raw byte data of the attachment.
-     * @param is_gif True if the data represents a GIF, false otherwise (assumed image).
+     * @param is_gif True if the data represents a GIF, false otherwise.
      */
     void ShowFullSizeDialog(const QByteArray &data, bool is_gif);
 
