@@ -290,8 +290,7 @@ private:
      */
     void UpdateMessagePosition();
 
-
-    // Wave Animation Parameters
+    // wave animation parameters
     const qreal base_wave_amplitude_; ///< Base amplitude in Idle state.
     const qreal amplitude_scale_; ///< Multiplier for audio amplitude effect.
     qreal wave_amplitude_; ///< Current animated wave amplitude.
@@ -301,30 +300,30 @@ private:
     qreal glitch_intensity_; ///< Current animated glitch intensity.
     qreal wave_thickness_; ///< Current animated wave thickness.
 
-    // State and Message Management
+    // state and message management
     StreamState state_; ///< Current visual state of the stream.
     QList<StreamMessage *> messages_; ///< List of message widgets managed by the stream.
     int current_message_index_; ///< Index of the currently displayed message in messages_.
     bool is_clearing_all_messages_ = false; ///< Flag indicating if a full clear operation is in progress.
 
-    // UI Elements
+    // ui elements
     QLabel *stream_name_label_; ///< Label displaying the stream name.
     UserInfoLabel *transmitting_user_label_; ///< Label displaying the transmitting user ID and color indicator.
 
-    // Internal State
+    // internal state
     bool initialized_; ///< Flag indicating if OpenGL resources are initialized.
     qreal time_offset_; ///< Time variable for shader animations.
 
-    // Timers
+    // timers
     QTimer *animation_timer_; ///< Timer driving the main wave animation updates.
     QTimer *glitch_timer_; ///< Timer triggering random glitches in Idle state.
 
-    // OpenGL Resources
+    // OpenGL resources
     QOpenGLShaderProgram *shader_program_; ///< Compiled shader program for rendering the wave.
     QOpenGLVertexArrayObject vao_; ///< Vertex Array Object.
     QOpenGLBuffer vertex_buffer_; ///< Vertex Buffer Object holding the fullscreen quad vertices.
 
-    // Regedit Config
+    // regedit config
     WavelengthConfig *config_; ///< Pointer to the RegeditConfig object for accessing configuration settings.
     QColor stream_color_; ///< Color used for rendering the stream color chosen from the registry.
 };
