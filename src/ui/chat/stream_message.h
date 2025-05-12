@@ -77,7 +77,6 @@ public:
      */
     void UpdateContent(const QString &new_content);
 
-    // --- Property Getters/Setters ---
     /** @brief Gets the current opacity level. */
     qreal GetOpacity() const { return opacity_; }
 
@@ -96,9 +95,6 @@ public:
     /** @brief Sets the electronic shutdown effect progress and updates the ElectronicShutdownEffect. */
     void SetShutdownProgress(qreal progress);
 
-    // --- End Property Getters/Setters ---
-
-    // --- Simple Getters ---
     /** @brief Checks if the message has been marked as read. */
     bool IsRead() const { return is_read_; }
     /** @brief Gets the sender identifier. */
@@ -109,7 +105,6 @@ public:
     MessageType GetType() const { return type_; }
     /** @brief Gets the unique message identifier (if provided). */
     QString GetMessageId() const { return message_id_; }
-    // --- End Simple Getters ---
 
     /**
      * @brief Parses HTML content to find an attachment placeholder and adds the corresponding AttachmentPlaceholder widget.
@@ -267,7 +262,6 @@ private:
      */
     void UpdateLayout() const;
 
-    // --- Member Variables ---
     QString message_id_; ///< Unique identifier for the message (optional).
     QString content_; ///< Original message content (may contain HTML).
     QString clean_content_; ///< Processed message content (plain text).
@@ -278,7 +272,6 @@ private:
     qreal shutdown_progress_; ///< Current electronic shutdown progress.
     bool is_read_; ///< Flag indicating if the message has been marked as read.
 
-    // UI Elements
     QVBoxLayout *main_layout_; ///< Main vertical layout.
     QPushButton *next_button_; ///< Button to navigate to the next message.
     QPushButton *prev_button_; ///< Button to navigate to the previous message.
