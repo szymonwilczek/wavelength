@@ -23,14 +23,14 @@ struct InstanceInfo {
     QPointF blob_center; ///< Center position of the blob within its window.
     QPoint window_position; ///< Global position of the instance's window.
     QSize window_size; ///< Size of the instance's window.
-    bool is_creator; ///< Flag indicating if this instance is the creator (server).
+    bool is_creator; ///< Flag indicating if this instance is the creator (was opened first).
 };
 
 /**
  * @brief Manages communication and interaction between multiple instances of the application.
  *
  * This class handles the detection of existing instances, establishing a local server/client
- * connection using QLocalServer and QLocalSocket, and exchanging position data between instances.
+ * connection and exchanging position data between instances.
  * It also implements an attraction and absorption mechanism where client instances are drawn
  * towards the creator instance and eventually absorbed (closed).
  */
@@ -47,7 +47,7 @@ public:
     explicit AppInstanceManager(QMainWindow *window, BlobAnimation *blob, QObject *parent = nullptr);
 
     /**
-     * @brief Destructor. Cleans up resources like threads, server, and sockets.
+     * @brief Destructor. Cleans up the resources.
      */
     ~AppInstanceManager() override;
 
@@ -68,7 +68,7 @@ public:
     [[nodiscard]] QString GetInstanceId() const { return instance_id_; }
 
     /**
-     * @brief Checks if this instance is the creator (server).
+     * @brief Checks if this instance is the creator (server - was opened first).
      * @return True if this instance is the creator, false otherwise.
      */
     [[nodiscard]] bool IsCreator() const { return is_creator_; }
@@ -209,13 +209,8 @@ private:
     ///< Deprecated attraction force constant (logic now uses kSmoothForce).
     static constexpr double kAbsorptionDistance = 50.0; ///< Distance (in pixels) at which absorption starts.
 
-    QPropertyAnimation *animation_window_ = nullptr;
-    ///< Pointer to the window property animation (seems unused, animation created locally in StartAbsorptionAnimation).
     std::atomic<bool> is_being_absorbed_ = false;
     ///< Atomic flag indicating if this client instance is currently being absorbed.
-    std::atomic<bool> is_absorbing_ = false;
-    ///< Atomic flag indicating if this creator instance is currently absorbing another (seems unused).
-    QTimer absorption_timer_; ///< Timer potentially related to absorption (seems unused).
 };
 
 #endif // APP_INSTANCE_MANAGER_H

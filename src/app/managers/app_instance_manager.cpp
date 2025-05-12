@@ -293,7 +293,7 @@ void AppInstanceManager::InitAttractionThread() {
     attraction_thread_ = std::make_unique<std::thread>([this] {
         while (is_thread_running) {
             constexpr int sleep_time_ms = 16;
-            if (is_being_absorbed_ || is_absorbing_) {
+            if (is_being_absorbed_) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
                 continue;
             }
@@ -340,7 +340,7 @@ void AppInstanceManager::InitAttractionThread() {
 }
 
 void AppInstanceManager::ApplyAttractionForce(const QPointF &target_position) {
-    if (is_being_absorbed_ || is_absorbing_) return;
+    if (is_being_absorbed_) return;
 
     const QPoint current_position = main_window_->pos();
     const QSize window_size = main_window_->size();
