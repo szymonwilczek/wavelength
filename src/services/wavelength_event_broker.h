@@ -4,7 +4,6 @@
 #include <QMap>
 #include <QObject>
 
-
 /**
  * @brief A singleton event broker for decoupling components within the Wavelength application.
  *
