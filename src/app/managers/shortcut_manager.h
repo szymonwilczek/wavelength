@@ -116,7 +116,9 @@ private:
 
     /**
      * @brief Stores all registered shortcuts, organized by parent widget.
+     *
      * The outer map's key is the parent QWidget*.
+     *
      * The inner map's key is the action ID (QString, e.g., "MainWindow.OpenSettings"),
      * and the value is the corresponding QShortcut* object.
      */
