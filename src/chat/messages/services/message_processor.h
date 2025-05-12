@@ -22,8 +22,8 @@ class MessageProcessor final : public QObject {
 
 public:
     /**
-     * @brief Gets the singleton instance of the WavelengthMessageProcessor.
-     * @return Pointer to the singleton WavelengthMessageProcessor instance.
+     * @brief Gets the singleton instance of the MessageProcessor.
+     * @return Pointer to the singleton MessageProcessor instance.
      */
     static MessageProcessor *GetInstance() {
         static MessageProcessor instance;
