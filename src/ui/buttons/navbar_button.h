@@ -21,7 +21,7 @@ class CyberpunkButton final : public QPushButton {
      * @brief Property controlling the intensity of the button's glow effect (0.0 to 1.0). Animatable.
      * It affects the brightness and thickness of the frame border and the text's drop shadow.
      */
-    Q_PROPERTY(qreal glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity) // Corrected getter name
+    Q_PROPERTY(qreal glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
 
 public:
     /**

@@ -15,7 +15,7 @@
 class CyberPushButton final : public QPushButton {
     Q_OBJECT
     /** @brief Property controlling the intensity of the button's glow effect (0.0 to 1.0+). Animatable. */
-    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity) // Corrected property name accessors
+    Q_PROPERTY(double glowIntensity READ GetGlowIntensity WRITE SetGlowIntensity)
 
 public:
     /**
