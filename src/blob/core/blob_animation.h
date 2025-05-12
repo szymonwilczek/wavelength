@@ -174,7 +174,6 @@ protected:
      */
     bool eventFilter(QObject *watched, QEvent *event) override;
 
-    // --- OpenGL Methods ---
     /**
      * @brief Initializes OpenGL functions, shaders, VAO, and VBO. Called once before the first paintGL call.
      */
@@ -204,8 +203,6 @@ protected:
      * Generates vertex data for horizontal and vertical lines based on grid spacing.
      */
     void DrawGrid();
-
-    // --- End OpenGL Methods ---
 
 private slots:
     /**
@@ -352,7 +349,7 @@ private:
     /** @brief Pointer to the currently active state object (points to one of the above). */
     BlobState *current_blob_state_;
 
-    /** @brief Stores the last known window position (potentially used by physics). */
+    /** @brief Stores the last known window position. */
     QPointF last_window_position_;
 
     /** @brief Precalculated minimum distance constraint for physics. */
