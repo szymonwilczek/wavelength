@@ -43,8 +43,6 @@ public:
      */
     void Initialize();
 
-    // ---- Facade Methods for Core Wavelength Operations ----
-
     /**
      * @brief Initiates the creation of a new wavelength.
      * Delegates the call to WavelengthCreator and registers the wavelength as joined locally upon initiation.
@@ -93,8 +91,6 @@ public:
      * @return True if the file sending a task was successfully queued, false otherwise.
      */
     static bool SendFile(const QString &file_path);
-
-    // ---- State Management Methods ----
 
     /**
      * @brief Retrieves detailed information about a specific wavelength.
@@ -171,8 +167,6 @@ public:
      * @return True if connected, false otherwise.
      */
     static bool IsWavelengthConnected(const QString &frequency);
-
-    // ---- Configuration Methods ----
 
     /**
      * @brief Gets the configured relay server address.
@@ -319,8 +313,6 @@ private slots:
         qDebug() << "Configuration changed:" << key;
     }
 
-    // --- PTT Slots (receiving from WavelengthMessageService) ---
-
     /** @brief Relays the pttGranted signal. */
     void onPttGranted(const QString &frequency) {
         emit pttGranted(frequency);
@@ -350,8 +342,6 @@ private slots:
     void onRemoteAudioAmplitudeUpdate(const QString &frequency, const qreal amplitude) {
         emit remoteAudioAmplitudeUpdate(frequency, amplitude);
     }
-
-    // --- End PTT Slots ---
 
 private:
     /**
