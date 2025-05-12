@@ -73,7 +73,6 @@ public:
      * @param grid_spacing The spacing between grid lines in pixels.
      * @param width The current width of the rendering area.
      * @param height The current height of the rendering area.
-     * @deprecated This method seems redundant as DrawBackground handles buffer updates internally. Consider removing or refactoring.
      */
     void UpdateGridBuffer(const QColor &background_color,
                           const QColor &grid_color,
