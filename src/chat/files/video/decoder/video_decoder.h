@@ -150,7 +150,6 @@ public:
      * @return True if an audio stream was detected during initialization, false otherwise.
      */
     bool HasAudio() const {
-        // Check if audio_stream_index_ was successfully found during initialization
         return audio_stream_index_ != -1;
     }
 
