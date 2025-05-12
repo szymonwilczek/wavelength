@@ -21,8 +21,8 @@ add_executable(
         src/blob/blob_config.h
         src/blob/physics/blob_physics.cpp
         src/blob/physics/blob_physics.h
-        src/blob/rendering/blob_render.cpp
-        src/blob/rendering/blob_render.h
+        src/blob/rendering/blob_renderer.cpp
+        src/blob/rendering/blob_renderer.h
         src/blob/states/blob_state.h
         src/blob/states/idle_state.cpp
         src/blob/states/idle_state.h

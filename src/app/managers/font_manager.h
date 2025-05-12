@@ -20,7 +20,7 @@ public:
      * @brief Initializes the FontManager by loading fonts from predefined paths.
      *
      * Searches for font files (.ttf) within specific subdirectories ("BlenderPro", "Lato", "Poppins")
-     * located in potential resource paths (application resources, relative paths).
+     * located in resource paths (application resources, relative paths).
      * @return True if all expected font families were loaded successfully, false otherwise.
      */
     bool Initialize();
@@ -72,7 +72,9 @@ private:
 
     /**
      * @brief Map storing the mapping between logical font names and actual font family names.
+     *
      * Key: Logical font name (e.g., "Poppins").
+     *
      * Value: Actual font family name loaded by QFontDatabase (e.g., "Poppins Regular").
      */
     QMap<QString, QString> font_families_;

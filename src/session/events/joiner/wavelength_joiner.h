@@ -102,7 +102,7 @@ private:
     /**
      * @brief Private destructor.
      */
-    ~WavelengthJoiner() override = default; // Use default destructor
+    ~WavelengthJoiner() override = default;
 
     /**
      * @brief Deleted copy constructor to prevent copying.

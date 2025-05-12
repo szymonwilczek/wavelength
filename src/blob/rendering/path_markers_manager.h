@@ -34,7 +34,6 @@ public:
         double quantum_offset; ///< Random offset for quantum effect timing (type 2).
         double speed; ///< Individual movement speed of the marker along the path.
 
-        // Fields for quantum cycle (type 2)
         int quantum_state; ///< Current state: 0=Single, 1=Expanding, 2=Fragmented, 3=Collapsing.
         double quantum_state_time; ///< Time elapsed in the current quantum state.
         double quantum_state_duration; ///< Total duration planned for the current quantum state.
@@ -87,7 +86,7 @@ public:
      * Performs bounds checking via std::vector::at().
      * @param index The index of the desired marker.
      * @return A constant reference to the PathMarker struct.
-     * @throws std::out_of_range if the index is invalid.
+     * @throws out_of_range if the index is invalid.
      */
     const PathMarker &GetMarker(const size_t index) const {
         return markers_.at(index);

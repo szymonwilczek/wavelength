@@ -15,8 +15,6 @@
  * - Storing, validating, and managing active client sessions.
  * - Deactivating sessions based on token, client ID, or frequency.
  * - Cleaning up expired sessions.
- *
- * Note: Password storage is currently in-memory and plain text, which is insecure for production environments.
  */
 class AuthenticationManager final : public QObject {
     Q_OBJECT
@@ -149,10 +147,10 @@ private:
     AuthenticationManager &operator=(const AuthenticationManager &) = delete;
 
     /**
-     * @brief Map storing passwords associated with frequencies.
+     * @brief Map storing salted and hashed passwords associated with frequencies.
      * Key: Frequency identifier (QString).
-     * Value: Password (QString).
-     * @warning Passwords are stored in plain text in memory. This is insecure.
+     * Value: QString in the format "salt_hex$hashed_password_hex".
+     * @note Passwords are now stored salted and hashed for improved security.
      */
     QMap<QString, QString> wavelength_passwords_{};
 

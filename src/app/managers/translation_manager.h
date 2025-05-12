@@ -72,7 +72,6 @@ private:
     static TranslationManager *instance_;
     /** @brief Mutex to protect instance creation in a multithreaded environment. */
     static QMutex mutex_;
-
     /** @brief It stores the loaded translations as a JSON object. */
     QJsonObject translations_;
     /** @brief Currently loaded language code. */

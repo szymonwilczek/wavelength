@@ -1,6 +1,7 @@
 #ifndef BLOBSTATE_H
 #define BLOBSTATE_H
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include <QVector2D>
 #include <vector>
 #include "../blob_config.h"

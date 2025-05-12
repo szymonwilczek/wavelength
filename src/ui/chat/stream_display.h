@@ -79,7 +79,7 @@ public slots:
      * @brief Sets the intensity of the glitch effect in the CommunicationStream.
      * @param intensity The desired glitch intensity level.
      */
-    void SetGlitchIntensity(const qreal intensity) const;
+    void SetGlitchIntensity(qreal intensity) const;
 
     /**
      * @brief Forwards the transmitting user ID to the CommunicationStream.
@@ -96,7 +96,7 @@ public slots:
      * @brief Forwards the audio amplitude level to the CommunicationStream.
      * @param amplitude The current audio amplitude level.
      */
-    void SetAudioAmplitude(const qreal amplitude) const;
+    void SetAudioAmplitude(qreal amplitude) const;
 
 private slots:
     /**

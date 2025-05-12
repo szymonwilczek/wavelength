@@ -91,7 +91,7 @@ public:
      * @return True if paused, false otherwise.
      */
     bool IsPaused() const {
-        QMutexLocker locker(&mutex_); // Ensure thread safety when reading paused_
+        QMutexLocker locker(&mutex_);
         return paused_;
     }
 
@@ -116,7 +116,7 @@ public:
      * @return The duration in seconds, or 0.0 if not available.
      */
     double GetDuration() const {
-        QMutexLocker locker(&mutex_); // Protect access to format_context_
+        QMutexLocker locker(&mutex_);
         if (format_context_ && format_context_->duration != AV_NOPTS_VALUE) {
             return format_context_->duration / static_cast<double>(AV_TIME_BASE);
         }
@@ -162,6 +162,7 @@ signals:
 
     /**
      * @brief Emitted when the decoder reaches the end of the stream (before looping).
+     * @deprecated This signal is not emitted, but wasn't remove as part of legacy code cleanup.
      * Note: Currently not emitted as the decoder loops indefinitely.
      */
     void playbackFinished();

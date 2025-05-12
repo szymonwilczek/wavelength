@@ -3,6 +3,7 @@
 #include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRandomGenerator>
 
 QString AuthenticationManager::GenerateClientId() {
     return QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -15,7 +16,16 @@ QString AuthenticationManager::GenerateSessionToken() {
 }
 
 void AuthenticationManager::RegisterPassword(const QString &frequency, const QString &password) {
-    wavelength_passwords_.insert(frequency, password);
+    QByteArray salt(16, Qt::Uninitialized);
+    QRandomGenerator::global()->generate(salt.begin(), salt.end());
+
+    const QByteArray salted_password_data = salt + password.toUtf8();
+    const QByteArray hashed_password = QCryptographicHash::hash(salted_password_data, QCryptographicHash::Sha256);
+
+    const QString stored_value = QString::fromLatin1(salt.toHex()) + "$" + QString::fromLatin1(hashed_password.toHex());
+
+    wavelength_passwords_.insert(frequency, stored_value);
+    qDebug() << "[AUTH MANAGER] Registered new salted and hashed password for frequency" << frequency;
 }
 
 bool AuthenticationManager::VerifyPassword(const QString &frequency, const QString &provided_password) {
@@ -24,9 +34,29 @@ bool AuthenticationManager::VerifyPassword(const QString &frequency, const QStri
         return false;
     }
 
-    const QString stored_password = wavelength_passwords_[frequency];
-    const bool is_valid = provided_password == stored_password;
+    const QString stored_value = wavelength_passwords_[frequency];
+    const QStringList parts = stored_value.split('$');
 
+    if (parts.size() != 2) {
+        qWarning() << "[AUTH MANAGER] Invalid stored password format for frequency" << frequency;
+        return false;
+    }
+
+    const QByteArray salt = QByteArray::fromHex(parts[0].toLatin1());
+    const QByteArray stored_hash = QByteArray::fromHex(parts[1].toLatin1());
+
+    const QByteArray salted_provided_password_data = salt + provided_password.toUtf8();
+
+    const QByteArray calculated_hash = QCryptographicHash::hash(salted_provided_password_data,
+                                                                QCryptographicHash::Sha256);
+
+    const bool is_valid = calculated_hash == stored_hash;
+
+    if (!is_valid) {
+        qDebug() << "[AUTH MANAGER] Password verification failed for frequency" << frequency;
+    } else {
+        qDebug() << "[AUTH MANAGER] Password verification successful for frequency" << frequency;
+    }
     return is_valid;
 }
 

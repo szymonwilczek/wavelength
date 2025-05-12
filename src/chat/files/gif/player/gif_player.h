@@ -8,7 +8,7 @@ class QLabel;
 class TranslationManager;
 
 /**
- * @brief An inline widget for displaying and playing animated GIFs within a chat interface.
+ * @brief A widget for displaying and playing animated GIFs within a chat interface.
  *
  * This class uses GifDecoder to decode GIF data in a separate thread. It displays
  * the first frame as a static thumbnail initially. When the user hovers the mouse
@@ -96,15 +96,6 @@ private slots:
     void UpdateFrame(const QImage &frame) const;
 
     /**
-     * @brief Slot connected to the decoder's positionChanged signal.
-     * Updates the internal current_position_ variable. (Currently not used elsewhere).
-     * @param position The current playback position in seconds.
-     */
-    void UpdatePosition(const double position) {
-        current_position_ = position;
-    }
-
-    /**
      * @brief Slot connected to the decoder's error signal.
      * Logs the error message and displays it in the QLabel. Sets a minimum size for the widget.
      * @param message The error message from the decoder.
@@ -148,8 +139,6 @@ private:
     double frame_rate_ = 0;
     /** @brief Current playback position in seconds. Updated by UpdatePosition. */
     double current_position_ = 0;
-    /** @brief Stores the first frame as a QImage (potentially unused after thumbnail_pixmap_ is set). */
-    QImage thumbnail_frame_;
     /** @brief Flag indicating if the GIF is currently playing (mouse hover). */
     bool is_playing_ = false;
     /** @brief Stores the first frame as a QPixmap for efficient display as a thumbnail. */

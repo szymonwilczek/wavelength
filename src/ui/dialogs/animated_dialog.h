@@ -77,7 +77,7 @@ protected:
 
     /** @brief Progress property (0.0 to 1.0) for the digital materialization effect. Animatable. */
     double digitalization_progress_ = 0.0;
-    /** @brief Progress property (0.0 to 1.0) potentially for corner glow effects (unused in provided code). Animatable. */
+    /** @brief Progress property (0.0 to 1.0) potentially for corner glow effects. Animatable. */
     double corner_glow_progress_ = 0.0;
 
 private:

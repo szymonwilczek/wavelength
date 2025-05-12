@@ -1,4 +1,4 @@
-#include "blob_render.h"
+#include "blob_renderer.h"
 
 #include <QDateTime>
 #include <QPainter>

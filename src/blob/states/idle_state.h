@@ -81,8 +81,6 @@ private:
     double second_phase_ = 0.0;
     /** @brief Phase offset for the rotational effect. */
     double rotation_phase_ = 0.0;
-    /** @brief Main phase offset (currently seems unused). */
-    double main_phase_offset_ = 0.0;
     /** @brief Flag indicating if the state is currently running the initial heartbeat animation. */
     bool is_initializing_ = true;
     /** @brief Counter for the number of heartbeats completed during initialization. */

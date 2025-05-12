@@ -3,7 +3,6 @@
 #include <math.h>
 
 IdleState::IdleState() {
-    main_phase_offset_ = 0.0;
 }
 
 void IdleState::UpdatePhases() {

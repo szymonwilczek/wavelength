@@ -25,7 +25,7 @@
 #include "../input/cyber_line_edit.h"
 
 CreateWavelengthDialog::CreateWavelengthDialog(QWidget *parent): AnimatedDialog(parent, kDigitalMaterialization),
-                                                                 shadow_size_(10), scanline_opacity_(0.08) {
+                                                                 scanline_opacity_(0.08) {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground);

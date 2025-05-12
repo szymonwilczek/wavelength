@@ -69,7 +69,7 @@ public:
      */
     void SetScanlineOpacity(const double opacity) {
         scanline_opacity_ = opacity;
-        update(); // Trigger repaint when opacity changes
+        update();
     }
 
     /**
@@ -85,7 +85,7 @@ public:
      */
     void SetGridOpacity(const double opacity) {
         grid_opacity_ = opacity;
-        update(); // Trigger repaint when opacity changes
+        update();
     }
 
 protected:
@@ -246,8 +246,6 @@ private:
 
     /** @brief Stores the raw video data passed in the constructor. */
     QByteArray video_data_;
-    /** @brief Stores the MIME type of the video data (currently unused). */
-    QString mime_type_;
 
     /** @brief Original width of the video in pixels. Set by HandleVideoInfo. */
     int video_width_ = 0;

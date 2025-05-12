@@ -412,8 +412,11 @@ private:
 
     /**
      * @brief Map storing the currently active keyboard shortcuts (loaded from settings or defaults).
-     * Key: Action ID. Value: Current QKeySequence.
-     */
+     *
+     * Key: Action ID.
+     *
+     * Value: Current QKeySequence.
+    */
     QMap<QString, QKeySequence> shortcuts_;
     QString relay_server_address_; ///< The address of the relay server
     int relay_server_port_{}; ///< The port of the relay server

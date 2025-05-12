@@ -46,7 +46,6 @@ public:
      */
     ~AnimatedStackedWidget() override;
 
-    // --- Settings ---
     /**
      * @brief Sets the duration of the transition animation.
      * @param duration The animation duration in milliseconds.
@@ -76,7 +75,6 @@ public:
      * @return True if an animation is in progress, false otherwise.
      */
     bool IsAnimating() const { return animation_running_; }
-    // --- End Settings ---
 
 public slots:
     /**

@@ -7,6 +7,7 @@
  * @brief Provides a static interface for accessing cyberpunk-themed colors and applying a global stylesheet.
  *
  * This class defines a set of predefined QColor values representing a cyberpunk color palette.
+ *
  * It also includes a method to apply a comprehensive stylesheet to the entire QApplication,
  * using these colors to style various standard Qt widgets (buttons, line edits, scrollbars, etc.).
  * Additionally, it offers helper methods to generate specific CSS-like style strings for custom widgets.
@@ -29,68 +30,67 @@ public:
      * @brief Gets the primary color (Neon Blue).
      * @return QColor(0, 170, 255).
      */
-    static QColor GetPrimaryColor() { return {0, 170, 255}; } // Neonowy niebieski
+    static QColor GetPrimaryColor() { return {0, 170, 255}; }
 
     /**
      * @brief Gets the secondary color (Lighter Blue).
      * @return QColor(0, 220, 255).
      */
-    static QColor GetSecondaryColor() { return {0, 220, 255}; } // Jaśniejszy niebieski
+    static QColor GetSecondaryColor() { return {0, 220, 255}; }
 
     /**
      * @brief Gets the accent color (Purple).
      * @return QColor(150, 70, 240).
      */
-    static QColor GetAccentColor() { return {150, 70, 240}; } // Fioletowy akcent
+    static QColor GetAccentColor() { return {150, 70, 240}; }
 
     /**
      * @brief Gets the warning color (Warning Yellow).
      * @return QColor(255, 180, 0).
      */
-    static QColor GetWarningColor() { return {255, 180, 0}; } // Ostrzegawczy żółty
+    static QColor GetWarningColor() { return {255, 180, 0}; }
 
     /**
      * @brief Gets the danger color (Danger Red).
      * @return QColor(255, 60, 60).
      */
-    static QColor GetDangerColor() { return {255, 60, 60}; } // Niebezpieczny czerwony
+    static QColor GetDangerColor() { return {255, 60, 60}; }
 
     /**
      * @brief Gets the success color (Neon Green).
      * @return QColor(0, 240, 130).
      */
-    static QColor GetSuccessColor() { return {0, 240, 130}; } // Neonowy zielony
+    static QColor GetSuccessColor() { return {0, 240, 130}; }
 
     /**
      * @brief Gets the dark background color.
      * @return QColor(10, 20, 30).
      */
-    static QColor GetBackgroundDarkColor() { return {10, 20, 30}; } // Bardzo ciemne tło
+    static QColor GetBackgroundDarkColor() { return {10, 20, 30}; }
 
     /**
      * @brief Gets the medium background color.
      * @return QColor(20, 35, 50).
      */
-    static QColor GetBackgroundMediumColor() { return {20, 35, 50}; } // Średnie tło
+    static QColor GetBackgroundMediumColor() { return {20, 35, 50}; }
 
     /**
      * @brief Gets the light background color.
      * @return QColor(30, 50, 70).
      */
-    static QColor GetBackgroundLightColor() { return {30, 50, 70}; } // Jaśniejsze tło
+    static QColor GetBackgroundLightColor() { return {30, 50, 70}; }
 
     /**
      * @brief Gets the main text color.
      * @return QColor(220, 230, 240).
      */
-    static QColor GetTextColor() { return {220, 230, 240}; } // Główny tekst
+    static QColor GetTextColor() { return {220, 230, 240}; }
 
     /**
      * @brief Gets the muted text color (for disabled elements, etc.).
      * @return QColor(150, 160, 170).
      */
-    static QColor GetMutedTextColor() { return {150, 160, 170}; } // Przytłumiony tekst
-
+    static QColor GetMutedTextColor() { return {150, 160, 170}; }
 
     /**
      * @brief Generates a CSS-like border style string with a "tech" look.

@@ -281,7 +281,6 @@ private:
     /** @brief Timestamp of the last animation frame in seconds. */
     float last_frame_time_secs_;
 
-    // --- Audio ---
     /** @brief Media player for playing audio files (initial sound, hint, destruction). */
     QMediaPlayer *media_player_;
     /** @brief Decoder for extracting audio data from files for amplitude analysis. */
@@ -298,21 +297,18 @@ private:
     float target_audio_amplitude_{};
     /** @brief Flag indicating if audio data has been successfully decoded and is ready for visualization. */
     bool audio_ready_;
-    // --- End Audio ---
 
     /** @brief Stores information about active impact effects. */
     std::vector<ImpactInfo> impacts_;
     /** @brief Index of the next slot to use in the impacts_ vector (circular). */
     int next_impact_index_;
 
-    // --- Konami Code ---
     /** @brief Stores the sequence of recently pressed keys for Konami code detection. */
     std::deque<int> key_sequence_;
     /** @brief The target key sequence for the Konami code. */
     const std::vector<int> konami_code_;
     /** @brief Timer triggering the Konami code audio hints after inactivity. */
     QTimer *hint_timer_;
-    // --- End Konami Code ---
 
     /** @brief Flag indicating if the destruction animation is currently active. */
     bool is_destroying_;

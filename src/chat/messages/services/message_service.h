@@ -20,8 +20,8 @@ class MessageService final : public QObject {
 
 public:
     /**
-     * @brief Gets the singleton instance of the WavelengthMessageService.
-     * @return Pointer to the singleton WavelengthMessageService instance.
+     * @brief Gets the singleton instance of the MessageService.
+     * @return Pointer to the singleton MessageService instance.
      */
     static MessageService *GetInstance() {
         static MessageService instance;
@@ -244,11 +244,6 @@ private:
      */
     ~MessageService() override = default;
 
-    /** @brief Cache storing the content of recently sent text messages, mapped by message ID. */
-    QMap<QString, QString> sent_messages_;
-    /** @brief Stores the client ID associated with this service instance. */
-    QString client_id_;
-
     /**
      * @brief Helper function to retrieve the active WebSocket connection for a given frequency.
      * Uses WavelengthRegistry to look up the socket. Includes checks for validity.
@@ -256,6 +251,11 @@ private:
      * @return Pointer to the QWebSocket if found and valid, nullptr otherwise.
      */
     static QWebSocket *GetSocketForFrequency(const QString &frequency);
+
+    /** @brief Cache storing the content of recently sent text messages, mapped by message ID. */
+    QMap<QString, QString> sent_messages_;
+    /** @brief Stores the client ID associated with this service instance. */
+    QString client_id_;
 };
 
 #endif // WAVELENGTH_MESSAGE_SERVICE_H

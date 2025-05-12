@@ -11,10 +11,10 @@ class QResizeEvent;
 /**
  * @brief Handles and processes window events (move, resize) for the Blob animation.
  *
- * This class filters events for a parent widget's window, specifically focusing on
- * move and resize events. It applies throttling and significance checks to avoid
- * excessive processing, especially during rapid movements or resizing. It emits
- * signals when significant events are detected, allowing other components (like BlobDynamics)
+ * This class filters events for a parent widget's window.
+ * It applies throttling and significance checks to avoid excessive processing,
+ * especially during rapid movements or resizing.
+ * It emits signals when significant events are detected, allowing other components
  * to react appropriately. It also manages to enable/disable event processing,
  * useful during transitions or animations.
  */
@@ -36,12 +36,6 @@ public:
     ~BlobEventHandler() override;
 
     /**
-     * @brief Placeholder for processing general events. Currently unused.
-     * @return Always returns false (event not handled here).
-     */
-    static bool ProcessEvent();
-
-    /**
      * @brief Processes a resize event for the parent widget.
      * Applies throttling and checks for significant size changes before emitting signals.
      * @param event The QResizeEvent received by the parent widget.
@@ -54,7 +48,7 @@ public:
      * Specifically, intercepts and handles QEvent::Move events via HandleMoveEvent.
      * @param watched The object being watched (should be the parent widget's window).
      * @param event The event being processed.
-     * @return True if the event was handled (currently always returns false after processing), false otherwise.
+     * @return True if the event was handled, false otherwise.
      */
     bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -153,10 +147,7 @@ private:
     QPointF last_processed_position_;
     /** @brief Timestamp (ms since epoch) of the last processed move event. */
     qint64 last_processed_move_time_;
-    /** @brief Timestamp (ms since epoch) of the last drag-related event (currently seems unused). */
-    qint64 last_drag_event_time_;
-
-    /** @brief Timer used for delayed re-enabling of events (currently seems unused, timeout connected, but timer never started). */
+    /** @brief Timer used for delayed re-enabling of events */
     QTimer event_re_enable_timer_;
     /** @brief Flag indicating if the window is currently being resized (used to potentially ignore move events during resize). */
     bool is_resizing_ = false;

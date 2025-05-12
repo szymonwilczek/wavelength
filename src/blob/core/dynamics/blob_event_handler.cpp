@@ -10,8 +10,7 @@ BlobEventHandler::BlobEventHandler(QWidget *parent_widget)
       events_enabled_(true),
       transition_in_progress_(false),
       last_processed_position_(0, 0),
-      last_processed_move_time_(0),
-      last_drag_event_time_(0) {
+      last_processed_move_time_(0) {
     event_re_enable_timer_.setSingleShot(true);
     connect(&event_re_enable_timer_, &QTimer::timeout,
             this, &BlobEventHandler::onEventReEnableTimeout);
@@ -25,11 +24,6 @@ BlobEventHandler::~BlobEventHandler() {
     if (parent_widget_ && parent_widget_->window()) {
         parent_widget_->window()->removeEventFilter(this);
     }
-}
-
-bool BlobEventHandler::ProcessEvent() {
-    // currently not used, but could be useful in the future
-    return false;
 }
 
 bool BlobEventHandler::ProcessResizeEvent(const QResizeEvent *event) {
