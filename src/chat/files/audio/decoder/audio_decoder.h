@@ -172,6 +172,7 @@ protected:
 
     /**
      * @brief Decodes a single audio frame using the FFmpeg resampler and writes the result to the audio device.
+     *
      * Converts the input frame (audio_frame) to the target format (PCM S16LE stereo 44.1 kHz),
      * allocates a buffer for the converted data, performs the conversion using swr_convert,
      * and writes the resulting data to the QAudioOutput device (audio_device_).

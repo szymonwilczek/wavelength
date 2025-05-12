@@ -10,7 +10,7 @@ class CyberAudioButton;
 class TranslationManager;
 
 /**
- * @brief An inline audio player widget with a cyberpunk aesthetic.
+ * @brief An audio player widget with a cyberpunk aesthetic.
  *
  * This widget provides playback controls (play/pause, seek, volume) for audio data,
  * displays audio information (type, sample rate, channels), shows the current time
@@ -21,7 +21,7 @@ class TranslationManager;
  */
 class AudioPlayer final : public QFrame {
     Q_OBJECT
-    /** @brief Property controlling the opacity of a potential scanline effect (currently unused in paintEvent). */
+    /** @brief Property controlling the opacity of a potential scanline effect. */
     Q_PROPERTY(double scanlineOpacity READ GetScanlineOpacity WRITE SetScanlineOpacity)
     /** @brief Property controlling the intensity/height of the spectrum visualization bars. Animatable. */
     Q_PROPERTY(double spectrumIntensity READ GetSpectrumIntensity WRITE SetSpectrumIntensity)
@@ -149,7 +149,7 @@ private slots:
 
     /**
      * @brief Slot called when the progress slider's value changes (e.g., user dragging).
-     * Updates the time label display based on the slider's current position (without seeking yet).
+     * Updates the time label display based on the slider's current position.
      * @param position The slider's current value (milliseconds).
      */
     void UpdateTimeLabel(int position);
