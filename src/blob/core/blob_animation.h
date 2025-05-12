@@ -8,7 +8,7 @@
 
 #include "../blob_config.h"
 #include "../physics/blob_physics.h"
-#include "../rendering/blob_render.h"
+#include "../rendering/blob_renderer.h"
 #include "dynamics/blob_event_handler.h"
 #include "dynamics/blob_transition_manager.h"
 
