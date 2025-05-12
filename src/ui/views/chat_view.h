@@ -243,7 +243,7 @@ signals:
 private:
     /** @brief Label displaying the Wavelength frequency and name. */
     QLabel *header_label_;
-    /** @brief Label indicating the connection status ("AKTYWNE POŁĄCZENIE", "ROZŁĄCZANIE", etc.). */
+    /** @brief Label indicating the connection status ("CONNECTION ACTIVE", "ABORTING", etc.). */
     QLabel *status_indicator_;
     /** @brief Custom widget for displaying the stream of messages and audio visualization. */
     StreamDisplay *message_area_;
@@ -331,7 +331,7 @@ private:
     void UpdatePttButtonState() const;
 
     /**
-     * @brief Resets the status_indicator_ label to its default "AKTYWNE POŁĄCZENIE" state and style.
+     * @brief Resets the status_indicator_ label to its default "CONNECTION ACTIVE" state and style.
      */
     void ResetStatusIndicator() const;
 };
