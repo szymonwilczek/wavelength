@@ -1,16 +1,31 @@
 #include "database_manager.h"
 #include <QDebug>
+#include <cstdlib>
 
 DatabaseManager::DatabaseManager(QObject *parent): QObject(parent), is_connected_(false) {
     try {
+        const char *db_user = std::getenv("DB_USER");
+        const char *db_name = std::getenv("DB_NAME");
+        const char *db_password = std::getenv("DB_PASSWORD");
+        const char *db_host = std::getenv("DB_HOST");
+        const char *db_port = std::getenv("DB_PORT");
+        const char *db_sslmode = std::getenv("DB_SSLMODE");
+        const char *db_app_name = std::getenv("DB_APP_NAME");
+
+        if (!db_user || !db_name || !db_password || !db_host || !db_port || !db_sslmode || !db_app_name) {
+            qDebug() << "[DATABASE MANAGER] One or more database connection environment variables are not set.";
+            is_connected_ = false;
+            return;
+        }
+
         std::string connection_string =
-                "user=u_f67b73d1_c584_40b2_a189_3cf401949c75 "
-                "dbname=db_f67b73d1_c584_40b2_a189_3cf401949c75 "
-                "password=NUlV9202u7L7J8i9sVIk6hC8erKY2O5v5v72s0v3nJ1hyy6QsnA2 "
-                "host=pg.rapidapp.io "
-                "port=5433 "
-                "sslmode=require "
-                "application_name=rapidapp_cpp";
+                "user=" + std::string(db_user) +
+                " dbname=" + std::string(db_name) +
+                " password=" + std::string(db_password) +
+                " host=" + std::string(db_host) +
+                " port=" + std::string(db_port) +
+                " sslmode=" + std::string(db_sslmode) +
+                " application_name=" + std::string(db_app_name);
 
         connection_ = std::make_unique<pqxx::connection>(connection_string);
 
