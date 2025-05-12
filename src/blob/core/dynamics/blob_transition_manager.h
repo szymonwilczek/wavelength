@@ -10,8 +10,7 @@
  *
  * This class processes a buffer of window movement samples to calculate velocity and determine
  * if the window is actively moving. It applies inertia forces to the blob based on this movement
- * and detects when movement starts and stops. It also handles transitions between states,
- * although the idle transition logic seems partially implemented or deprecated.
+ * and detects when movement starts and stops.
  */
 class BlobTransitionManager final : public QObject {
     Q_OBJECT
@@ -59,7 +58,6 @@ public:
 
     /**
      * @brief Clears the internal movement sample buffer.
-     * @deprecated Consider using ClearMovementBuffer() instead for clarity.
      */
     void ClearAllMovementBuffers() {
         movement_buffer_.clear();
@@ -133,7 +131,7 @@ public:
 
 signals:
     /**
-     * @brief Emitted when a transition (e.g., to idle state) completes. (Currently seems unused).
+     * @brief Emitted when a transition (e.g., to idle state) completes.
      */
     void transitionCompleted();
 
