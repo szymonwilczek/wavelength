@@ -165,7 +165,6 @@ private:
     QColor selected_title_border_color_;
     /** @brief Currently selected title glow color. */
     QColor selected_title_glow_color_;
-    // --- End Selected Values ---
     /** @brief Pointer to the translation manager for handling UI translations. */
     TranslationManager *translator_ = nullptr;
 };
