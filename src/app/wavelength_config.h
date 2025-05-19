@@ -23,7 +23,7 @@ namespace DefaultConfig {
     const auto kTitleTextColor = QColor(0xFFFFFF); ///< White color for title text
     const auto kTitleBorderColor = QColor(0xE0B0FF); ///< Light Purple color for a title border
     const auto kTitleGlowColor = QColor(0xE0B0FF); ///< Light Purple color for a title glow
-    const QString kPrefferredStartFrequency = "130.0"; ///< Default preferred starting frequency
+    const QString kPreferredStartFrequency = "130.0"; ///< Default preferred starting frequency
 }
 
 /**
