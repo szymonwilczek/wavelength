@@ -1,0 +1,9 @@
+<map id="DatabaseManager::DatabaseManager" name="DatabaseManager::DatabaseManager">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern. Attempts to establish the connection to the Pos..." alt="" coords="259,61,448,100"/>
+<area shape="rect" id="Node000002" href="$classDatabaseManager.html#aefa3d6eae7782904f5d758462b573b1e" title="Deleted copy constructor to prevent copying." alt="" coords="13,5,203,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="250,60,195,47,196,42,252,55"/>
+<area shape="rect" id="Node000003" href="$classDatabaseManager.html#a5ade7662722395bc4e0017153ded028b" title="Gets the singleton instance of the DatabaseManager." alt="" coords="5,68,211,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="243,83,211,83,211,78,243,78"/>
+<area shape="rect" id="Node000004" href="$classDatabaseManager.html#ab5a4c00314aae0887ac7a1495f6b803c" title="Deleted assignment operator to prevent assignment." alt="" coords="13,118,203,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="244,105,174,120,173,114,243,100"/>
+</map>

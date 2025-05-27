@@ -1,0 +1,12 @@
+<map id="SnakeGameLayer::GenerateApple" name="SnakeGameLayer::GenerateApple">
+<area shape="rect" id="Node000001" title="Generates a new apple at a random empty cell on the grid." alt="" coords="762,73,947,112"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#ac358c311b3176870e88f0e7f906d2982" title="Sets up the initial state of the game board and snake. Clears the grid, places the snake in the cente..." alt="" coords="501,55,714,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="746,84,715,81,715,75,747,79"/>
+<area shape="rect" id="Node000004" href="$classSnakeGameLayer.html#a2b11869c78eead91d7124948615fea73" title="Moves the snake one step in the current direction_. Calculates the new head position,..." alt="" coords="5,55,204,79"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="747,100,519,104,385,101,251,94,170,83,171,77,252,88,385,96,519,98,747,95"/>
+<area shape="rect" id="Node000003" href="$classSnakeGameLayer.html#af2e6b78d4d5f24e0df450f63b378392a" title="Handles the end of the game (success or failure). Stops timers. On success, updates UI to green,..." alt="" coords="252,5,453,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="525,54,420,33,421,28,526,49"/>
+<area shape="rect" id="Node000007" href="$classSnakeGameLayer.html#a0b9116f28aa01ee249a638d5cf706b30" title="Initializes the layer for display. Resets the game state, initializes the game logic (snake position,..." alt="" coords="263,55,442,79"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="485,70,442,70,442,64,485,64"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="272,36,171,57,170,51,271,31"/>
+</map>

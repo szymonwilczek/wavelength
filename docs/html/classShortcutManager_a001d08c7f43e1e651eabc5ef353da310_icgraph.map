@@ -1,0 +1,9 @@
+<map id="ShortcutManager::updateRegisteredShortcuts" name="ShortcutManager::updateRegisteredShortcuts">
+<area shape="rect" id="Node000001" title="Updates the key sequences for all currently registered shortcuts." alt="" coords="666,5,897,44"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a53de2b196fd35488e2fcb3efd091e04d" title="Saves all current settings from the various tabs to the WavelengthConfig object and persists them...." alt="" coords="436,12,618,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="651,27,619,27,619,22,651,22"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a88aeaa2ebb222180310ba66f0dba95d5" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="236,12,388,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="420,27,388,27,388,22,420,22"/>
+<area shape="rect" id="Node000004" href="$classSettingsView.html#a4b22f39018ca1c051b4d88f6d2636683" title="Constructs the SettingsView. Initializes the UI, sets up all tabs including the security layers for t..." alt="" coords="5,12,188,37"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="220,27,188,27,188,22,220,22"/>
+</map>

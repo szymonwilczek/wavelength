@@ -1,0 +1,45 @@
+<map id="AppearanceSettingsWidget::AppearanceSettingsWidget" name="AppearanceSettingsWidget::AppearanceSettingsWidget">
+<area shape="rect" id="Node000001" title="Constructs the AppearanceSettingsWidget. Initializes the UI, loads current settings from WavelengthCo..." alt="" coords="5,125,193,164"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="263,8,398,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,122,239,66,270,51,273,56,242,71,137,127"/>
+<area shape="rect" id="Node000004" href="$classAppearanceSettingsWidget.html#a6fe0566bf80009056b20a9cada6d7f63" title="Loads the current appearance settings from WavelengthConfig and updates the UI elements." alt="" coords="241,125,420,164"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="193,142,225,142,225,147,193,147"/>
+<area shape="rect" id="Node000006" href="$classAppearanceSettingsWidget.html#a596c1f9d621dfcc6c7e949c76b35f985" title="Updates the UI section displaying recently used colors. Clears the existing recent color buttons and ..." alt="" coords="468,68,647,107"/>
+<area shape="poly" id="edge25_Node000001_Node000006" title=" " alt="" coords="178,122,240,110,349,97,452,89,452,95,350,102,241,115,179,127"/>
+<area shape="rect" id="Node000008" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="245,188,416,227"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="173,162,242,181,241,186,172,167"/>
+<area shape="rect" id="Node000009" href="$classAppearanceSettingsWidget.html#afd618e63d3144f4e1fafe6fdce1b1c13" title="Creates and arranges all the UI elements (labels, previews, spin boxes, layouts) for the widget." alt="" coords="241,401,420,440"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="119,163,305,388,301,391,115,166"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="486,5,629,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,24,471,23,471,28,398,29"/>
+<area shape="rect" id="Node000005" href="$classAppearanceSettingsWidget.html#ade1faf2be357c3745ae918673356810d" title="Static utility function to update the background color of a ClickableColorPreview widget." alt="" coords="695,464,875,503"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="420,126,476,123,535,127,595,140,623,152,649,168,681,197,708,231,730,269,748,308,771,386,783,448,777,449,766,387,743,310,726,271,704,234,678,200,646,172,620,157,593,145,535,132,476,128,421,131"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="409,122,463,108,464,114,410,127"/>
+<area shape="rect" id="Node000007" href="$classAppearanceSettingsWidget.html#aa61917cd3e1737b2aaa8f2c18734b61c" title="Slot triggered when a recent color button is clicked. Adds the selected color back to the top of the ..." alt="" coords="695,68,875,107"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="648,85,680,85,680,90,648,90"/>
+<area shape="rect" id="Node000010" href="$classAppearanceSettingsWidget.html#a4550e9feb1a4020d3dd2b0ca8d134e12" title="Opens a QColorDialog to allow the user to select the background color. Updates the local preview and ..." alt="" coords="468,621,647,660"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="343,439,362,475,390,520,426,567,470,608,474,611,471,616,466,612,422,571,385,523,357,478,338,442"/>
+<area shape="rect" id="Node000011" href="$classAppearanceSettingsWidget.html#a6a93e091e4ab3f12c05e04ca4ae5c6cd" title="Opens a QColorDialog to allow the user to select the blob color. Updates the local preview and immedi..." alt="" coords="468,684,647,723"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="340,440,355,487,381,549,419,614,443,644,470,671,473,673,470,677,466,675,439,648,415,617,376,551,350,488,334,441"/>
+<area shape="rect" id="Node000012" href="$classAppearanceSettingsWidget.html#aa59b5dc13a7abfda4bd28c6aa4f939bb" title="Opens a QColorDialog to allow the user to select the grid color. Updates the local preview and immedi..." alt="" coords="468,183,647,221"/>
+<area shape="poly" id="edge13_Node000009_Node000012" title=" " alt="" coords="338,400,357,364,386,319,422,272,466,231,471,227,474,232,470,235,426,275,390,322,362,367,343,402"/>
+<area shape="rect" id="Node000013" href="$classAppearanceSettingsWidget.html#aa562ee5bd248d8f1a161c21aaaf3d93c" title="Opens a QColorDialog to allow the user to select the stream color. Updates the local preview and imme..." alt="" coords="468,245,647,284"/>
+<area shape="poly" id="edge15_Node000009_Node000013" title=" " alt="" coords="347,399,397,348,431,319,467,294,477,288,480,293,469,299,434,324,401,352,351,403"/>
+<area shape="rect" id="Node000014" href="$classAppearanceSettingsWidget.html#ac57ce626ae67684c72621e4a927c85e9" title="Opens a QColorDialog to allow the user to select the title border color. Updates the local preview an..." alt="" coords="468,433,647,472"/>
+<area shape="poly" id="edge17_Node000009_Node000014" title=" " alt="" coords="421,431,453,435,452,441,420,436"/>
+<area shape="rect" id="Node000015" href="$classAppearanceSettingsWidget.html#a215dad6034dfc20a10ab89d3f448e7f0" title="Opens a QColorDialog to allow the user to select the title glow color. Updates the local preview and ..." alt="" coords="468,496,647,535"/>
+<area shape="poly" id="edge19_Node000009_Node000015" title=" " alt="" coords="372,438,469,482,483,488,481,493,467,487,370,443"/>
+<area shape="rect" id="Node000016" href="$classAppearanceSettingsWidget.html#a25382da42c1f3225b9c5c0393e14d0d0" title="Opens a QColorDialog to allow the user to select the title text color. Updates the local preview and ..." alt="" coords="468,559,647,597"/>
+<area shape="poly" id="edge21_Node000009_Node000016" title=" " alt="" coords="350,439,400,491,433,520,469,545,477,549,474,554,467,550,430,524,397,495,346,442"/>
+<area shape="rect" id="Node000017" href="$classClickableColorPreview.html#aa0291a9c0f494c29b0e33219d81d5e2f" title="Emitted when the widget is clicked with the left mouse button." alt="" coords="481,308,634,347"/>
+<area shape="poly" id="edge23_Node000009_Node000017" title=" " alt="" coords="373,398,467,357,485,350,487,355,469,362,375,403"/>
+<area shape="rect" id="Node000018" href="$classAppearanceSettingsWidget.html#a75775949816a0c54f6238b4b194d9a41" title="Slot triggered when the grid spacing spin box value changes. Immediately saves the new spacing value ..." alt="" coords="468,371,647,409"/>
+<area shape="poly" id="edge24_Node000009_Node000018" title=" " alt="" coords="420,406,452,402,453,407,421,411"/>
+<area shape="poly" id="edge10_Node000010_Node000005" title=" " alt="" coords="625,618,646,608,677,586,707,561,755,513,759,516,711,565,681,590,649,612,627,623"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="628,681,646,671,685,635,718,593,746,551,766,515,770,518,750,554,723,596,689,638,649,675,631,686"/>
+<area shape="poly" id="edge14_Node000012_Node000005" title=" " alt="" coords="633,220,649,231,674,255,696,282,733,342,759,400,776,448,771,450,754,402,728,344,692,285,670,258,646,235,630,224"/>
+<area shape="poly" id="edge16_Node000013_Node000005" title=" " alt="" coords="629,282,649,295,688,331,722,372,770,449,765,451,718,375,684,334,646,299,626,287"/>
+<area shape="poly" id="edge18_Node000014_Node000005" title=" " alt="" coords="648,462,680,467,679,472,647,467"/>
+<area shape="poly" id="edge20_Node000015_Node000005" title=" " alt="" coords="647,500,679,495,680,501,648,505"/>
+<area shape="poly" id="edge22_Node000016_Node000005" title=" " alt="" coords="618,556,646,545,729,507,732,512,648,550,620,561"/>
+</map>

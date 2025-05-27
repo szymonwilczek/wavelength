@@ -1,0 +1,9 @@
+<map id="SnakeGameLayer::OpenBorder" name="SnakeGameLayer::OpenBorder">
+<area shape="rect" id="Node000001" title="Initiates the &quot;exit open&quot; state after collecting 4 apples. Changes the game state,..." alt="" coords="758,12,959,37"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a2b11869c78eead91d7124948615fea73" title="Moves the snake one step in the current direction_. Calculates the new head position,..." alt="" coords="512,12,710,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="743,27,711,27,711,22,743,22"/>
+<area shape="rect" id="Node000003" href="$classSnakeGameLayer.html#a602655706fe1871a80f00e427d0bfb48" title="Slot called periodically by game_timer_ to update the game state. Calls MoveSnake() if the game is no..." alt="" coords="256,12,464,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="497,27,464,27,464,22,497,22"/>
+<area shape="rect" id="Node000004" href="$classSnakeGameLayer.html#a4ce8dd997b82e3ac19cf6409ad2bc4df" title="Constructs a SnakeGameLayer. Initializes the UI elements (title, instructions, game board,..." alt="" coords="5,5,208,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="240,27,208,27,208,22,240,22"/>
+</map>

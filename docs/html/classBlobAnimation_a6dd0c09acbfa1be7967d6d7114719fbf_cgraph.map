@@ -1,0 +1,11 @@
+<map id="BlobAnimation::showAnimation" name="BlobAnimation::showAnimation">
+<area shape="rect" id="Node000001" title="Makes the animation widget visible and resumes event tracking." alt="" coords="5,38,208,62"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#aea443f68ce3f9a932a56a96e44b367d6" title="Resumes all event tracking mechanisms after being paused. Restarts timers, enables the event handler,..." alt="" coords="256,31,432,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,47,240,47,240,53,208,53"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a2b520d867895a9631aaa1a88e64ada61" title="Initializes the blob&#39;s state (control points, target points, velocity, center) based on current param..." alt="" coords="486,12,672,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="432,38,470,34,471,39,433,43"/>
+<area shape="rect" id="Node000005" href="$classBlobAnimation.html#a90940f8b5f62d348952264e233b2aafb" title="Switches the blob&#39;s current animation state (Idle, Moving, Resizing). Updates the current_blob_state_..." alt="" coords="480,62,678,86"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="433,56,465,60,464,65,432,62"/>
+<area shape="rect" id="Node000004" href="$classBlobAnimation.html#a152a62b2db9d731d14939708a4a8496a" title="Generates a set of points forming an organic, blob&#45;like shape around a center point...." alt="" coords="726,5,938,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="673,22,711,22,711,27,673,27"/>
+</map>

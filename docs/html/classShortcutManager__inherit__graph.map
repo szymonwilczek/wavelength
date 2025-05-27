@@ -1,0 +1,5 @@
+<map id="ShortcutManager" name="ShortcutManager">
+<area shape="rect" id="Node000001" title="Manages application&#45;wide keyboard shortcuts using a singleton pattern." alt="" coords="5,117,236,631"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="92,5,150,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,84,124,117,118,117,118,84"/>
+</map>

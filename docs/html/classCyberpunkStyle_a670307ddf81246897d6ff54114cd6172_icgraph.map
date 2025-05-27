@@ -1,0 +1,9 @@
+<map id="CyberpunkStyle::GetBackgroundDarkColor" name="CyberpunkStyle::GetBackgroundDarkColor">
+<area shape="rect" id="Node000001" title="Gets the dark background color." alt="" coords="262,48,474,86"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#aab9d53bca1b64a79b2df831183173b12" title="Applies the cyberpunk style globally to the QApplication. Sets the application style to &quot;Fusion&quot;,..." alt="" coords="16,5,203,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,47,177,33,178,28,248,42"/>
+<area shape="rect" id="Node000003" href="$classChatStyle.html#a16852d7a0a1434b6b6e4b280a1b07480" title="Gets the base stylesheet for the main chat view container and header. Defines background,..." alt="" coords="9,55,210,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,70,210,70,210,64,246,64"/>
+<area shape="rect" id="Node000004" href="$classCyberpunkStyle.html#a4692fe3874bd1762dcc02b3e2751142e" title="Generates a CSS&#45;like style string for a basic cyberpunk&#45;themed frame. Includes background color,..." alt="" coords="5,104,214,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="261,93,203,106,201,100,260,88"/>
+</map>

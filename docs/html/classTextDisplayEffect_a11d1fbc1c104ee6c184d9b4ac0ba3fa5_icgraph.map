@@ -1,0 +1,9 @@
+<map id="TextDisplayEffect::RecalculateHeight" name="TextDisplayEffect::RecalculateHeight">
+<area shape="rect" id="Node000001" title="Recalculates the required height for the widget based on the plain_text_ content and current width...." alt="" coords="186,68,318,107"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#a464c8ade1dd52938905b9d958e189fc1" title="Overridden resize event handler. Recalculates the required height based on the new width." alt="" coords="5,5,138,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,65,128,47,130,42,181,60"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#a08a497134c49a1068add82b03ea21712" title="Sets new text content for the widget. Updates the internal text, removes HTML, recalculates required ..." alt="" coords="5,68,138,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,90,138,90,138,85,170,85"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="5,131,138,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="181,115,130,133,128,128,179,110"/>
+</map>

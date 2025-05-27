@@ -1,0 +1,9 @@
+<map id="WavelengthStateManager::GetJoinedWavelengths" name="WavelengthStateManager::GetJoinedWavelengths">
+<area shape="rect" id="Node000001" title="Gets a list of frequency identifiers for all wavelengths the user is currently joined to...." alt="" coords="482,37,651,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a3f257e59bcba5b49ec2ad0c9258916de" title="Gets the total number of wavelengths the user is currently joined to." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="466,45,434,41,435,35,467,40"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#ae9832c3641377296715a89522e938192" title="Gets a list of frequencies the user is currently joined to. Delegates the call to WavelengthStateMana..." alt="" coords="258,68,420,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="467,73,421,79,420,74,466,68"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a53f18e845c87c6efcdcf7c99823aa5a7" title="Gets the count of wavelengths the user is currently joined to. Delegates the call to WavelengthStateM..." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

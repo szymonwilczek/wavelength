@@ -1,0 +1,7 @@
+<map id="VideoPlayer::UpdateUI" name="VideoPlayer::UpdateUI">
+<area shape="rect" id="Node000001" title="Slot called periodically by update_timer_. Updates UI elements like pulsing effects (scanline/grid op..." alt="" coords="5,33,160,58"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#abf2b63d3ad93ffedd3615966e52b6aa0" title="Sets the opacity for the background grid effect. Triggers an update() to repaint the widget." alt="" coords="208,5,395,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,33,192,29,192,34,160,38"/>
+<area shape="rect" id="Node000003" href="$classVideoPlayer.html#a1e79879c54531c1947e52ba04cc67491" title="Sets the opacity for the scanline effect. Triggers an update() to repaint the widget." alt="" coords="217,54,386,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,53,202,58,201,64,160,58"/>
+</map>

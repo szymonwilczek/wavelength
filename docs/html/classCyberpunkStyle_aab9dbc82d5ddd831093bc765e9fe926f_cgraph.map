@@ -1,0 +1,5 @@
+<map id="CyberpunkStyle::GetTechBorderStyle" name="CyberpunkStyle::GetTechBorderStyle">
+<area shape="rect" id="Node000001" title="Generates a CSS&#45;like border style string with a &quot;tech&quot; look. The border color depends on the is_activ..." alt="" coords="5,5,216,44"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#abfd4f5b01a3833e07116b1d4b4242fa6" title="Gets the primary color (Neon Blue)." alt="" coords="264,5,454,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,22,248,22,248,27,216,27"/>
+</map>

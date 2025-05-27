@@ -1,0 +1,19 @@
+<map id="GifDecoder::Reinitialize" name="GifDecoder::Reinitialize">
+<area shape="rect" id="Node000001" title="Reinitializes the decoder after it has been stopped or encountered an error. Stops the thread if runn..." alt="" coords="5,95,163,119"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a75ca53e116fcdd49a14551af6c00f301" title="Emitted when an error occurs during initialization or decoding." alt="" coords="694,21,816,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,92,146,60,177,43,210,31,273,17,337,9,466,3,584,8,679,19,678,24,583,14,466,8,338,14,273,23,211,36,179,48,149,64,102,96"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a8efb010b65c3e2603f4b960a28f2c5f0" title="Checks if the decoding thread is currently running." alt="" coords="211,45,414,70"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,91,237,71,238,76,145,97"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html#a01de0ef70e11e3a5f2d34abf6f3abc59" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal gif_data_ QByteArray buff..." alt="" coords="230,95,396,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,104,215,104,215,110,163,110"/>
+<area shape="rect" id="Node000006" href="$classGifDecoder.html#a467647faa027616ace4550575f988eff" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="672,95,838,119"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="141,117,211,128,327,138,417,141,508,138,624,128,682,120,682,125,625,134,508,143,417,146,327,143,210,134,140,123"/>
+<area shape="rect" id="Node000007" href="$classGifDecoder.html#aabd9c60230945d793d1dd36028cd9db4" title="Releases all FFmpeg resources (contexts, frames, buffers). Does not release the custom I/O context bu..." alt="" coords="211,193,415,218"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="107,118,154,145,212,173,249,186,247,191,210,177,152,149,105,122"/>
+<area shape="rect" id="Node000005" href="$classGifDecoder.html#a07f76f9758f596da1d500741c03af66f" title="Constructs a GifDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I/O ..." alt="" coords="463,95,624,119"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="396,113,448,113,448,119,396,118"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="581,92,702,49,704,54,583,97"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="463,101,411,101,411,95,463,96"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="625,113,657,113,657,119,624,118"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="672,101,640,101,640,95,672,96"/>
+</map>

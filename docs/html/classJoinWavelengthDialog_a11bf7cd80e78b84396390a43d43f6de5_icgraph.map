@@ -1,0 +1,5 @@
+<map id="JoinWavelengthDialog::OnAuthFailed" name="JoinWavelengthDialog::OnAuthFailed">
+<area shape="rect" id="Node000001" title="Slot triggered by WavelengthJoiner when authentication fails (incorrect password)...." alt="" coords="211,5,360,44"/>
+<area shape="rect" id="Node000002" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="5,5,163,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,27,163,27,163,22,195,22"/>
+</map>

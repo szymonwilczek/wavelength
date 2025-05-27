@@ -1,0 +1,7 @@
+<map id="AudioDecoder::ReleaseResources" name="AudioDecoder::ReleaseResources">
+<area shape="rect" id="Node000001" title="Releases all FFmpeg and Qt Multimedia resources. Stops audio output, frees contexts (format,..." alt="" coords="255,31,475,55"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a6948c3168d8c0c5a3badeeacf88f59bc" title="Reinitializes the decoder after it has been stopped or encountered an error. Releases existing resour..." alt="" coords="19,5,193,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,33,193,29,193,23,239,28"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#a6889d988c02106b114434bd895825c39" title="Destructor. Stops the decoding thread, waits for it to finish, and releases all allocated resources." alt="" coords="5,55,207,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,57,207,60,207,55,239,52"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="WavelengthConfig::SetTitleBorderColor" name="WavelengthConfig::SetTitleBorderColor">
+<area shape="rect" id="Node000001" title="Sets the color for the title label border. Adds the color to recent colors. Emits configChanged(&quot;titl..." alt="" coords="5,37,185,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a7ebb29db2d1c1664c1fca81e52f67565" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="233,5,431,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,42,217,38,218,43,186,47"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="247,68,416,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="186,66,232,72,231,77,185,71"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="479,5,649,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="431,22,463,22,463,27,431,27"/>
+</map>

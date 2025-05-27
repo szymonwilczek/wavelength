@@ -1,0 +1,25 @@
+<map id="ChatView::SetWavelength" name="ChatView::SetWavelength">
+<area shape="rect" id="Node000001" title="Configures the view for a specific Wavelength. Sets the header title with the frequency and optional ..." alt="" coords="5,212,178,237"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="226,135,437,159"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,209,225,178,274,162,276,167,226,183,132,214"/>
+<area shape="rect" id="Node000014" href="$classChatView.html#a5d0b4d046c069b49e17f1eabdf350455" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="504,184,687,222"/>
+<area shape="poly" id="edge12_Node000001_Node000014" title=" " alt="" coords="178,218,489,205,489,210,178,223"/>
+<area shape="rect" id="Node000015" href="$classChatView.html#a476ece731fd3932c775997511934c84a" title="Resets the status_indicator_ label to its default &quot;CONNECTION ACTIVE&quot; state and style." alt="" coords="228,236,435,261"/>
+<area shape="poly" id="edge10_Node000001_Node000015" title=" " alt="" coords="178,230,212,234,212,239,178,236"/>
+<area shape="rect" id="Node000016" href="$classChatView.html#a6f4a2722c1e86fc6dff89289caac4a9a" title="Triggers a more pronounced scanline effect animation when connecting to a Wavelength." alt="" coords="236,285,426,324"/>
+<area shape="poly" id="edge11_Node000001_Node000016" title=" " alt="" coords="128,235,227,270,250,277,248,282,225,275,126,240"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#a3d9355ae6f778ed4799141d921b6e7e4" title="Gets the singleton instance of the MessageService." alt="" coords="496,32,695,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,132,413,102,484,71,523,59,524,64,486,76,415,107,357,137"/>
+<area shape="rect" id="Node000005" href="$classMessageService.html#a75fb7423ceb5f01542eb53c93c332df7" title="Sends a Push&#45;to&#45;Talk (PTT) release message for the specified frequency. Constructs a JSON message of ..." alt="" coords="485,85,706,110"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="401,131,510,111,511,116,402,137"/>
+<area shape="rect" id="Node000011" href="$classChatView.html#abd9ae8e738358b9be6f5e935ea4826a3" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="508,135,683,159"/>
+<area shape="poly" id="edge7_Node000002_Node000011" title=" " alt="" coords="438,144,493,144,493,150,438,150"/>
+<area shape="poly" id="edge9_Node000002_Node000014" title=" " alt="" coords="394,157,490,178,489,183,393,163"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#a2a6e9a079ac7a537b6342e1fb63a52dc" title="Deleted copy constructor to prevent copying." alt="" coords="754,29,980,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="695,41,739,40,739,46,695,46"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="823,31,814,21,819,11,837,5,867,3,902,6,918,14,916,18,901,11,867,8,838,10,822,15,819,20,827,27"/>
+<area shape="rect" id="Node000006" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="773,78,961,117"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="707,95,757,95,757,100,707,100"/>
+<area shape="rect" id="Node000012" href="$classChatView.html#a034774a31cd27434eeb01e9965736aeb" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="768,141,966,166"/>
+<area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="684,146,752,148,752,154,683,152"/>
+</map>

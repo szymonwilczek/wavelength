@@ -1,0 +1,5 @@
+<map id="GifDecoder::Initialize" name="GifDecoder::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the FFmpeg components for decoding the GIF. Opens the input stream using the custom I/O c..." alt="" coords="167,5,309,30"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a5f3075f25bb1e6e0fbad6a4abc1ccef9" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,5,119,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,20,119,20,119,15,151,15"/>
+</map>

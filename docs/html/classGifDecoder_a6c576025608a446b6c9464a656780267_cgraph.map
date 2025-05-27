@@ -1,0 +1,5 @@
+<map id="GifDecoder::Reset" name="GifDecoder::Reset">
+<area shape="rect" id="Node000001" title="Resets the playback position to the beginning of the GIF. Seeks the FFmpeg format context to the star..." alt="" coords="5,5,135,30"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#ae33e9555abafda1bb8c8fd9e7c336f98" title="Emitted periodically during playback to indicate the current position." alt="" coords="183,5,375,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,15,167,15,167,20,135,20"/>
+</map>

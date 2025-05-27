@@ -1,0 +1,12 @@
+<map id="SettingsView::settingsChanged" name="SettingsView::settingsChanged">
+<area shape="rect" id="Node000001" title="Emitted when settings are saved or restored to defaults, indicating that other parts of the applicati..." alt="" coords="683,31,887,55"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#af70830edb09631a2fb953acd08632d6a" title="Restores all settings across all tabs to their default values. Prompts the user for confirmation befo..." alt="" coords="436,5,635,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="668,34,635,30,636,25,668,28"/>
+<area shape="rect" id="Node000005" href="$classSettingsView.html#a53de2b196fd35488e2fcb3efd091e04d" title="Saves all current settings from the various tabs to the WavelengthConfig object and persists them...." alt="" coords="444,55,627,79"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="668,57,628,61,627,56,668,52"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a88aeaa2ebb222180310ba66f0dba95d5" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="236,31,388,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="421,33,388,37,388,32,420,28"/>
+<area shape="rect" id="Node000004" href="$classSettingsView.html#a4b22f39018ca1c051b4d88f6d2636683" title="Constructs the SettingsView. Initializes the UI, sets up all tabs including the security layers for t..." alt="" coords="5,31,188,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="220,46,188,46,188,40,220,40"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="429,58,388,54,389,49,430,53"/>
+</map>

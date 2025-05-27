@@ -1,0 +1,35 @@
+<map id="SettingsView::SetupUi" name="SettingsView::SetupUi">
+<area shape="rect" id="Node000001" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="5,156,158,181"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#ad7d4778792710f95dbffd0aabe5523ae" title="Creates the header panel containing the view title, session ID, and current time labels." alt="" coords="222,5,408,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,154,137,105,169,77,204,53,214,48,216,53,207,58,172,81,140,109,95,158"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a145b9dd24fb8e7dd1fd7b4a5a2cfc452" title="Handles the click event of the &quot;BACK&quot; button. Resets the CLASSIFIED tab&#39;s security layers and emits t..." alt="" coords="227,68,403,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,153,205,117,228,109,230,114,207,122,114,158"/>
+<area shape="rect" id="Node000006" href="$classSettingsView.html#af70830edb09631a2fb953acd08632d6a" title="Restores all settings across all tabs to their default values. Prompts the user for confirmation befo..." alt="" coords="215,236,414,261"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="115,179,207,214,253,229,252,234,205,219,113,184"/>
+<area shape="rect" id="Node000009" href="$classSettingsView.html#a53de2b196fd35488e2fcb3efd091e04d" title="Saves all current settings from the various tabs to the WavelengthConfig object and persists them...." alt="" coords="224,320,406,345"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="98,179,145,222,207,270,275,310,272,315,204,275,141,226,94,183"/>
+<area shape="rect" id="Node000013" href="$classSettingsView.html#a1e089a2a90ea4b3e13e3a06c99933c39" title="Creates and configures the &quot;CLASSIFIED&quot; tab. Sets up the stacked widget containing all the security l..." alt="" coords="206,180,424,205"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="158,174,190,177,190,182,157,179"/>
+<area shape="rect" id="Node000015" href="$classSettingsView.html#a2cf33a05b8930177452f465a635f6707" title="Switches the visible tab content based on the clicked tab button. Updates the active state of tab but..." alt="" coords="225,131,404,156"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="157,158,209,152,210,157,158,163"/>
+<area shape="rect" id="Node000004" href="$classSettingsView.html#a6dc4f4685ceffc8cdb6e5ec71c0a55d3" title="Emitted when the user clicks the &quot;BACK&quot; button, requesting a return to the previous view." alt="" coords="485,68,689,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="403,83,469,81,469,86,403,88"/>
+<area shape="rect" id="Node000005" href="$classSettingsView.html#a220c6d57ea52dc424ad3c3db5c0a9c7a" title="Resets all security layers in the CLASSIFIED tab to their initial state. Calls Reset() on each layer...." alt="" coords="494,117,681,156"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="404,101,479,114,478,120,403,106"/>
+<area shape="rect" id="Node000007" href="$classSettingsView.html#a23258b6c0cb0fc74537588ea6283b873" title="Loads settings from the WavelengthConfig object into the UI elements of all tabs. Delegates loading t..." alt="" coords="496,229,678,268"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="415,246,481,246,481,251,415,251"/>
+<area shape="rect" id="Node000008" href="$classSettingsView.html#ae9abfe25abeea5fa897efdf85e9a4cab" title="Emitted when settings are saved or restored to defaults, indicating that other parts of the applicati..." alt="" coords="486,292,689,317"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="379,259,509,286,508,291,378,264"/>
+<area shape="poly" id="edge12_Node000009_Node000008" title=" " alt="" coords="406,321,470,314,471,319,407,326"/>
+<area shape="rect" id="Node000010" href="$classShortcutManager.html#a785ee2205518cfe2ba40c8c818cf9b0b" title="Gets the singleton instance of the ShortcutManager." alt="" coords="487,404,687,429"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="348,343,405,366,473,389,506,398,505,403,471,394,404,371,346,348"/>
+<area shape="rect" id="Node000012" href="$classShortcutManager.html#a001d08c7f43e1e651eabc5ef353da310" title="Updates the key sequences for all currently registered shortcuts." alt="" coords="472,341,702,380"/>
+<area shape="poly" id="edge13_Node000009_Node000012" title=" " alt="" coords="407,339,457,345,457,350,406,345"/>
+<area shape="rect" id="Node000011" href="$classShortcutManager.html#a3bfcb924aeb88b7e4baded8bd37ed3c4" title="Deleted copy constructor to prevent copying." alt="" coords="750,397,930,436"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="688,414,734,414,734,419,688,419"/>
+<area shape="poly" id="edge11_Node000011_Node000011" title=" " alt="" coords="793,398,790,388,797,378,814,373,840,371,868,373,884,379,882,384,867,378,840,376,815,378,800,383,795,389,798,396"/>
+<area shape="poly" id="edge16_Node000013_Node000005" title=" " alt="" coords="378,177,478,156,479,162,379,182"/>
+<area shape="rect" id="Node000014" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="488,180,686,205"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="424,190,473,190,473,195,424,195"/>
+<area shape="poly" id="edge18_Node000015_Node000005" title=" " alt="" coords="405,138,478,137,478,142,405,144"/>
+</map>

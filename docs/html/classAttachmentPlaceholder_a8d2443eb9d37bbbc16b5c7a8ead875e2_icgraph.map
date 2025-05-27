@@ -1,0 +1,5 @@
+<map id="AttachmentPlaceholder::onLoadButtonClicked" name="AttachmentPlaceholder::onLoadButtonClicked">
+<area shape="rect" id="Node000001" title="Slot triggered when the load/retry button is clicked or automatically after initialization...." alt="" coords="218,5,374,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#a75277d4204ecadbc370f7a4c393cd0be" title="Constructs an AttachmentPlaceholder widget. Initializes the UI elements (labels, button,..." alt="" coords="5,5,170,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,27,170,27,170,22,202,22"/>
+</map>

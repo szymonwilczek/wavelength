@@ -1,0 +1,7 @@
+<map id="VideoPlayer::SeekVideo" name="VideoPlayer::SeekVideo">
+<area shape="rect" id="Node000001" title="Initiates a seek operation in the VideoDecoder. Converts the slider position (milliseconds) to second..." alt="" coords="471,5,632,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#aeea22f350e5b8a4189efa048c91c1ef0" title="Slot called when the user releases the progress slider. Performs the seek operation based on the slid..." alt="" coords="221,5,423,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="456,20,423,20,423,15,456,15"/>
+<area shape="rect" id="Node000003" href="$classVideoPlayer.html#a6ee50b34775069f86b0cace600c3923c" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

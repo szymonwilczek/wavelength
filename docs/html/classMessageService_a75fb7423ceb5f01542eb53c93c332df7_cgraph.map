@@ -1,0 +1,14 @@
+<map id="MessageService::SendPttRelease" name="MessageService::SendPttRelease">
+<area shape="rect" id="Node000001" title="Sends a Push&#45;to&#45;Talk (PTT) release message for the specified frequency. Constructs a JSON message of ..." alt="" coords="5,75,227,100"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="275,68,463,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,85,259,85,259,90,227,90"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="512,5,649,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="436,65,497,46,499,52,437,70"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="511,68,650,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="463,85,495,85,495,90,463,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="702,96,840,135"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="448,105,511,115,581,118,650,115,687,115,687,120,650,121,581,123,511,121,447,110"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="698,5,844,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="650,22,683,22,683,27,650,27"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="651,95,687,100,687,106,650,100"/>
+</map>

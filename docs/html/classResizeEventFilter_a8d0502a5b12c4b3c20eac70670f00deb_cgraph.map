@@ -1,0 +1,5 @@
+<map id="ResizeEventFilter::eventFilter" name="ResizeEventFilter::eventFilter">
+<area shape="rect" id="Node000001" title="Filters events sent to the watched object (the BlobAnimation widget). Checks if the event is a Resize..." alt="" coords="5,5,136,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthUtilities.html#ae1865de39462f152f60553104e13f0f1" title="Centers a QLabel widget within the bounds of a BlobAnimation widget. Calculates the appropriate geome..." alt="" coords="184,5,316,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,22,168,22,168,27,136,27"/>
+</map>

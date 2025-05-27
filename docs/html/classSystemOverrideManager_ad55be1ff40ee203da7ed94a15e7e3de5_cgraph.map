@@ -1,0 +1,22 @@
+<map id="SystemOverrideManager::ShowFloatingAnimationWidget" name="SystemOverrideManager::ShowFloatingAnimationWidget">
+<area shape="rect" id="Node000001" title="Creates, configures, positions, and shows the FloatingEnergySphereWidget. Connects the necessary sign..." alt="" coords="5,160,213,199"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#ae81d952cf10dd7a2389a6d958e789b16" title="Emitted when the destruction animation sequence (visual and audio) completes." alt="" coords="718,5,919,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,157,202,135,260,115,376,87,495,64,702,34,703,39,496,69,378,92,261,121,204,140,153,162"/>
+<area shape="rect" id="Node000003" href="$classSystemOverrideManager.html#a1d774843ddf2350e4b0ebd78777733bf" title="Slot called when the FloatingEnergySphereWidget emits its widgetClosed signal. Cleans up the widget p..." alt="" coords="261,131,459,169"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,165,245,161,246,166,213,170"/>
+<area shape="rect" id="Node000004" href="$classSystemOverrideManager.html#a0834ff9c3ad9bfec1d08ba05648e6122" title="Restores the system state to normal. Uninstalls input hooks (Windows), restores the original wallpape..." alt="" coords="507,131,670,169"/>
+<area shape="poly" id="edge11_Node000001_Node000004" title=" " alt="" coords="213,184,331,186,459,178,502,171,503,176,459,183,331,191,213,189"/>
+<area shape="rect" id="Node000008" href="$classFloatingEnergySphereWidget.html#a29cc66014476f5961a48d45017506b7b" title="Emitted when the widget is closed normally (not during destruction)." alt="" coords="723,256,914,295"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="213,191,708,258,707,263,213,196"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="459,156,492,156,492,162,459,162"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="610,128,658,90,717,53,728,48,730,53,720,58,661,95,614,132"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="507,144,474,144,474,138,507,139"/>
+<area shape="poly" id="edge8_Node000004_Node000004" title=" " alt="" coords="546,131,543,121,550,112,565,106,589,104,614,106,629,113,626,118,613,112,589,109,566,111,553,116,549,122,551,130"/>
+<area shape="rect" id="Node000005" href="$classSystemOverrideManager.html#ac2593eaad2d059efe9595fe96886ba7d" title="Emitted when the system override sequence has finished and the system state has been restored." alt="" coords="737,68,900,107"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="661,128,730,109,731,114,663,133"/>
+<area shape="rect" id="Node000006" href="$classSystemOverrideManager.html#a8147e73709b13a6948f5ff871e2fd5c4" title="Attempts to relaunch the application without administrative privileges (Windows only)...." alt="" coords="737,131,900,169"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="671,147,721,147,721,153,671,153"/>
+<area shape="rect" id="Node000007" href="$classSystemOverrideManager.html#a96048d245f236a58c59e8212c4642bf9" title="Restores the original desktop wallpaper saved by ChangeWallpaper(). Also removes the temporary black ..." alt="" coords="737,193,900,232"/>
+<area shape="poly" id="edge9_Node000004_Node000007" title=" " alt="" coords="663,167,731,186,730,191,661,172"/>
+<area shape="poly" id="edge10_Node000004_Node000008" title=" " alt="" coords="614,168,661,205,720,242,730,247,728,252,717,247,658,210,610,172"/>
+</map>

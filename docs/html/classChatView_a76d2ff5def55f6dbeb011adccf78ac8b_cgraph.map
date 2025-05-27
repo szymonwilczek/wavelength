@@ -1,0 +1,5 @@
+<map id="ChatView::OnMessageReceived" name="ChatView::OnMessageReceived">
+<area shape="rect" id="Node000001" title="Handles displaying a received message for the current Wavelength. Adds the message to the message_are..." alt="" coords="5,12,214,37"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a46f88ff87e6ed3d63fc4bff52305a45a" title="Triggers a subtle scanline effect animation when there is activity (e.g., a message received)." alt="" coords="262,5,430,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,22,246,22,246,27,214,27"/>
+</map>

@@ -1,0 +1,32 @@
+<map id="AuthenticationManager::GenerateClientId" name="AuthenticationManager::GenerateClientId">
+<area shape="rect" id="Node000001" title="Generates a unique client identifier." alt="" coords="717,159,872,197"/>
+<area shape="rect" id="Node000002" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="488,40,628,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="740,154,598,82,600,77,742,149"/>
+<area shape="rect" id="Node000004" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="447,138,669,162"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="702,170,667,166,668,160,702,164"/>
+<area shape="rect" id="Node000008" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="469,194,647,218"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="703,192,648,198,648,193,702,186"/>
+<area shape="rect" id="Node000014" href="$classMessageService.html#ac1041f89fa4eed1b98556cc3f93c2077" title="Sends a text message to the currently active frequency. Retrieves the active frequency and socket fro..." alt="" coords="467,299,649,337"/>
+<area shape="poly" id="edge12_Node000001_Node000014" title=" " alt="" coords="749,208,594,300,591,296,746,203"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="247,5,382,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="472,50,383,37,383,32,473,45"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="247,68,382,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="492,136,382,107,384,102,493,131"/>
+<area shape="rect" id="Node000006" href="$classJoinWavelengthDialog.html#a0cb74ecdcc726cea2ce437c85cd75185" title="Attempts to join the wavelength using the entered frequency and password. Shows a wait cursor,..." alt="" coords="240,131,390,169"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="431,153,390,153,390,147,431,147"/>
+<area shape="rect" id="Node000007" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="15,128,173,167"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="224,152,173,151,173,146,224,146"/>
+<area shape="rect" id="Node000009" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="243,194,387,218"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="453,209,387,209,387,203,453,203"/>
+<area shape="rect" id="Node000013" href="$classSessionCoordinator.html#a8c66229e945eb35fa8791ea88d37cdaa" title="Sends a file to the currently active wavelength. Delegates the call to WavelengthMessageService." alt="" coords="247,243,382,281"/>
+<area shape="poly" id="edge11_Node000008_Node000013" title=" " alt="" coords="487,225,383,249,382,244,486,220"/>
+<area shape="rect" id="Node000010" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="23,278,165,302"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="251,226,232,232,122,280,120,275,230,228,249,221"/>
+<area shape="rect" id="Node000011" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="5,191,183,229"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="227,210,183,211,183,206,227,205"/>
+<area shape="rect" id="Node000015" href="$classChatView.html#a424556ba1072ba443433af3af827c5d5" title="Sends the text message currently in the input field. Clears the input field and sends the message via..." alt="" coords="231,306,399,330"/>
+<area shape="poly" id="edge13_Node000014_Node000015" title=" " alt="" coords="451,321,399,321,399,315,451,315"/>
+<area shape="rect" id="Node000016" href="$classSessionCoordinator.html#a6bf70b7c88a2f73ab0510bbc97315c02" title="Sends a text message to the currently active wavelength. Delegates the call to WavelengthMessageServi..." alt="" coords="247,355,382,393"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="457,344,384,361,382,356,456,339"/>
+<area shape="poly" id="edge14_Node000015_Node000010" title=" " alt="" coords="215,308,165,302,166,296,216,303"/>
+</map>

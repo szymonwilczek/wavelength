@@ -1,0 +1,5 @@
+<map id="AnimatedDialog::AnimateShow" name="AnimatedDialog::AnimateShow">
+<area shape="rect" id="Node000001" title="Initiates and runs the animation sequence for showing the dialog based on animation_type_...." alt="" coords="5,12,208,37"/>
+<area shape="rect" id="Node000002" href="$classAnimatedDialog.html#aefe3cc111c364df727ca8bd5ebf700b9" title="Emitted when the show animation (AnimateShow) has finished." alt="" coords="256,5,466,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,22,240,22,240,27,208,27"/>
+</map>

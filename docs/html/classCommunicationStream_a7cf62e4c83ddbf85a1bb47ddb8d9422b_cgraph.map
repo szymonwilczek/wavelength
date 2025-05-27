@@ -1,0 +1,14 @@
+<map id="CommunicationStream::OnMessageRead" name="CommunicationStream::OnMessageRead">
+<area shape="rect" id="Node000001" title="Slot triggered when the user requests to close the current message (e.g., clicks &quot;Read&quot; or presses En..." alt="" coords="5,54,160,93"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#ad759a905d0a2cc1874d4781c97b9a2fc" title="Marks the message as read, triggers the appropriate closing animation (Electronic Shutdown or a simpl..." alt="" coords="208,61,408,86"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,71,192,71,192,76,160,76"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#ab76d3005cedeb795654afd453108593f" title="Emitted when the message is marked as read (MarkAsRead() is called)." alt="" coords="458,5,665,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,58,487,31,488,36,368,63"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a54a074c315a53d482650cd24d3e57d60" title="Starts a simpler closing animation (glitch/fade) used specifically for long messages displayed in a s..." alt="" coords="471,54,652,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="408,71,455,71,455,76,408,76"/>
+<area shape="rect" id="Node000006" href="$classStreamMessage.html#a8bbf535db654d1c7c94546c61fdc936c" title="Starts the electronic shutdown closing animation. Applies the ElectronicShutdownEffect and animates i..." alt="" coords="456,117,667,156"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="362,84,467,110,466,115,361,89"/>
+<area shape="rect" id="Node000005" href="$classStreamMessage.html#aa04caea13bddde1d0ea72f43ad26e8f8" title="Emitted when the message finishes its fade&#45;out or closing animation and becomes hidden." alt="" coords="715,93,878,118"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="653,83,700,90,700,95,652,89"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="668,120,699,116,700,121,668,125"/>
+</map>

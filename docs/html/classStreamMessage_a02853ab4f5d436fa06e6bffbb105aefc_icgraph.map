@@ -1,0 +1,5 @@
+<map id="StreamMessage::UpdateScrollAreaMaxHeight" name="StreamMessage::UpdateScrollAreaMaxHeight">
+<area shape="rect" id="Node000001" title="Updates the maximum height constraint for the scroll area used for long messages. Limits the height t..." alt="" coords="273,5,472,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="5,12,225,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,27,225,27,225,22,257,22"/>
+</map>

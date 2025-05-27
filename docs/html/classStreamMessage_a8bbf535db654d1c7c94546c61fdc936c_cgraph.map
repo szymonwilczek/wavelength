@@ -1,0 +1,5 @@
+<map id="StreamMessage::StartShutdownAnimation" name="StreamMessage::StartShutdownAnimation">
+<area shape="rect" id="Node000001" title="Starts the electronic shutdown closing animation. Applies the ElectronicShutdownEffect and animates i..." alt="" coords="5,5,217,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#aa04caea13bddde1d0ea72f43ad26e8f8" title="Emitted when the message finishes its fade&#45;out or closing animation and becomes hidden." alt="" coords="265,12,427,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,22,249,22,249,27,217,27"/>
+</map>

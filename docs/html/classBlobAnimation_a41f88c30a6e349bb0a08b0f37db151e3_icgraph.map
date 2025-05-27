@@ -1,0 +1,7 @@
+<map id="BlobAnimation::updatePhysics" name="BlobAnimation::updatePhysics">
+<area shape="rect" id="Node000001" title="Slot (or helper called by physics thread) to update the blob&#39;s physics simulation...." alt="" coords="498,12,696,37"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#aa73097d69b36c02d99a41b8ab782b012" title="The main function executed by the physics simulation thread. Enters a loop that repeatedly calls upda..." alt="" coords="251,5,450,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="483,27,451,27,451,22,483,22"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,12,203,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="235,27,203,27,203,22,235,22"/>
+</map>

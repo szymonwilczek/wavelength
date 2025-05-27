@@ -1,0 +1,9 @@
+<map id="AudioDecoder::audioInfo" name="AudioDecoder::audioInfo">
+<area shape="rect" id="Node000001" title="Emitted after successful initialization, providing audio stream details." alt="" coords="398,31,562,55"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="183,5,350,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="382,34,350,30,351,25,383,29"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#a412416ae8d5a2153c14c6023a47ceb52" title="Initializes the FFmpeg components and QAudioOutput for playback. Opens the input stream using the cus..." alt="" coords="187,55,346,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="383,57,346,61,346,55,383,51"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a46043f6510cb80d1c4c14a18f23ecee2" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,55,135,79"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,70,135,70,135,64,172,64"/>
+</map>

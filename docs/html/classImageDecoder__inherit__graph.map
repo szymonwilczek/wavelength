@@ -1,0 +1,5 @@
+<map id="ImageDecoder" name="ImageDecoder">
+<area shape="rect" id="Node000001" title="Decodes image data using Qt&#39;s built&#45;in image loading capabilities." alt="" coords="5,117,209,266"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="78,5,137,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,84,110,117,105,117,105,84"/>
+</map>

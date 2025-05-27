@@ -1,0 +1,5 @@
+<map id="SnakeGameLayer::OpenBorder" name="SnakeGameLayer::OpenBorder">
+<area shape="rect" id="Node000001" title="Initiates the &quot;exit open&quot; state after collecting 4 apples. Changes the game state,..." alt="" coords="5,5,206,30"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#abd0a2b6324682d0883a41d5ebae0cc39" title="Renders the current state of the game onto the game_board_ QLabel. Draws the grid,..." alt="" coords="254,5,461,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,15,238,15,238,20,206,20"/>
+</map>

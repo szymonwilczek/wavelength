@@ -1,0 +1,7 @@
+<map id="SessionCoordinator::GetWavelengthInfo" name="SessionCoordinator::GetWavelengthInfo">
+<area shape="rect" id="Node000001" title="Retrieves detailed information about a specific wavelength. Delegates the call to WavelengthStateMana..." alt="" coords="428,5,567,44"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,12,380,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="412,27,380,27,380,22,412,22"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,12,148,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,27,148,27,148,22,180,22"/>
+</map>

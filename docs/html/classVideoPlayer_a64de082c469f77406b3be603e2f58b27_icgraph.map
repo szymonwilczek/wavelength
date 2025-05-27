@@ -1,0 +1,7 @@
+<map id="VideoPlayer::ReleaseResources" name="VideoPlayer::ReleaseResources">
+<area shape="rect" id="Node000001" title="Stops the decoder thread, waits for it to finish, releases its resources, and resets the pointer...." alt="" coords="229,31,436,55"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#add4a7495ad471da7e612235de6e5ba05" title="Overridden close event handler. Stops timers and releases decoder resources before closing the dialog..." alt="" coords="12,5,174,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,33,174,29,175,24,213,28"/>
+<area shape="rect" id="Node000003" href="$classVideoPlayer.html#a4a1c560ed4ca4e4ba93c0510baf603bf" title="Destructor. Stops timers and ensures decoder resources are released by calling ReleaseResources()." alt="" coords="5,55,181,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,58,181,61,181,56,213,52"/>
+</map>

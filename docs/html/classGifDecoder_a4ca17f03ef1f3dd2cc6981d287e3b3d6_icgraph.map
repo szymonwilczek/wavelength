@@ -1,0 +1,7 @@
+<map id="GifDecoder::ExtractAndEmitFirstFrameInternal" name="GifDecoder::ExtractAndEmitFirstFrameInternal">
+<area shape="rect" id="Node000001" title="Internal helper function called by Initialize() to extract and emit the first frame...." alt="" coords="357,5,544,44"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a45c27e6347e3b847aa092323d936044e" title="Initializes the FFmpeg components for decoding the GIF. Opens the input stream using the custom I/O c..." alt="" coords="167,12,309,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="341,27,309,27,309,22,341,22"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a5f3075f25bb1e6e0fbad6a4abc1ccef9" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,12,119,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="151,27,119,27,119,22,151,22"/>
+</map>

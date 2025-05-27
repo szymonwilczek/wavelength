@@ -1,0 +1,7 @@
+<map id="BlobTransitionManager::movementStopped" name="BlobTransitionManager::movementStopped">
+<area shape="rect" id="Node000001" title="Emitted when the inactivity counter exceeds a threshold, indicating that window movement has stopped." alt="" coords="251,26,404,65"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,5,203,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,37,203,33,204,27,235,31"/>
+<area shape="rect" id="Node000003" href="$classBlobTransitionManager.html#af5c3a65c7bcfc785cb2c26e705702b33" title="Processes the buffered window movement samples to calculate velocity and apply inertia." alt="" coords="18,54,190,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,60,190,66,190,60,235,55"/>
+</map>

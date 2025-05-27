@@ -1,0 +1,5 @@
+<map id="CyberpunkTextEffect" name="CyberpunkTextEffect">
+<area shape="rect" id="Node000001" title="Applies a multiphase cyberpunk&#45;style text reveal animation to a QLabel." alt="" coords="5,117,177,401"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="62,5,121,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,83,94,117,89,117,89,83"/>
+</map>

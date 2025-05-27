@@ -1,0 +1,13 @@
+<map id="SecurityCodeLayer::CheckSecurityCode" name="SecurityCodeLayer::CheckSecurityCode">
+<area shape="rect" id="Node000001" title="Checks if the entered code matches the current security code. Called when all input fields are filled..." alt="" coords="5,61,145,100"/>
+<area shape="rect" id="Node000002" href="$classSecurityCodeLayer.html#a698e622b7e3a9e3543059f57c9b17a81" title="Gets the code currently entered by the user by concatenating the text from all input fields." alt="" coords="222,5,362,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,60,206,44,208,49,146,65"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="193,68,391,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,78,177,78,177,83,145,83"/>
+<area shape="rect" id="Node000004" href="$classSecurityCodeLayer.html#a1f24bdfc759b707fe364b4a6d377bab5" title="Triggers a visual error effect on the input fields. Temporarily changes the background and border col..." alt="" coords="222,117,362,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,96,208,112,206,117,145,101"/>
+<area shape="rect" id="Node000005" href="$classSecurityCodeLayer.html#aff90508ace024d15efd490efb2b1b13a" title="Clears all input fields and resets their styles to the default (error/red) state. Sets focus on the f..." alt="" coords="439,85,578,124"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="362,124,423,114,424,120,363,129"/>
+<area shape="rect" id="Node000006" href="$classSecurityCodeLayer.html#a5f1194e6e5185b40eeb6aed165d8e58b" title="Sets the input validators for all code input fields based on whether the current code is numeric." alt="" coords="439,148,578,187"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="362,144,424,153,424,158,362,149"/>
+</map>

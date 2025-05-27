@@ -1,0 +1,7 @@
+<map id="MessageProcessor::ProcessUserJoined" name="MessageProcessor::ProcessUserJoined">
+<area shape="rect" id="Node000001" title="Processes messages of type &quot;user_joined&quot;. Formats a system message indicating a user joined and emits..." alt="" coords="5,37,195,76"/>
+<area shape="rect" id="Node000002" href="$classMessageFormatter.html#a88534a822f6f08f08d70360bbbbe912f" title="Formats a simple string as a system message." alt="" coords="244,5,424,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,41,228,36,229,42,195,46"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#a61e0cab5d5efc6d69d06e842ccd17f71" title="Emitted when a system event message (e.g., user join/leave) is processed." alt="" coords="243,68,425,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,66,227,71,227,76,194,72"/>
+</map>

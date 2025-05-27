@@ -1,0 +1,7 @@
+<map id="VideoDecoder::HandleAudioFinished" name="VideoDecoder::HandleAudioFinished">
+<area shape="rect" id="Node000001" title="Slot connected to the internal AudioDecoder&#39;s playbackFinished signal. Sets the audio_finished_ flag ..." alt="" coords="389,5,574,44"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#aa8f8aabbe65727acd5ef5cfdc5f3b69b" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="183,12,341,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="374,27,341,27,341,22,374,22"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a134b48e98d0b9db4011cfea08d0924da" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="5,12,135,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="167,27,135,27,135,22,167,22"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="HandprintLayer::HandprintLayer" name="HandprintLayer::HandprintLayer">
+<area shape="rect" id="Node000001" title="Constructs a HandprintLayer. Initializes the UI elements (title, handprint image label,..." alt="" coords="5,89,178,128"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="264,5,398,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,86,225,54,248,46,250,51,227,59,142,91"/>
+<area shape="rect" id="Node000004" href="$classSecurityLayer.html#adc79fa2453a0034a739a7cfcc225db42" title="Constructs a SecurityLayer." alt="" coords="237,68,424,93"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="178,96,221,91,222,96,179,101"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="264,117,398,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="179,116,248,124,248,130,178,121"/>
+<area shape="rect" id="Node000006" href="$classHandprintLayer.html#a7153d3b1fcc6d838df1f335be5f124d4" title="Slot called periodically by handprint_timer_ when the user is holding the mouse button...." alt="" coords="226,180,436,205"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="134,126,227,165,255,173,253,178,225,170,132,131"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="535,5,677,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="399,22,519,22,519,27,399,27"/>
+<area shape="rect" id="Node000007" href="$classHandprintLayer.html#a8bfdc6419e93709149f942109421218b" title="Handles the completion of the handprint scan. Changes the UI element styles (border,..." alt="" coords="496,155,716,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="436,180,480,176,481,182,437,186"/>
+<area shape="rect" id="Node000009" href="$classHandprintLayer.html#a5c7f6a6adad5116e806d557a093d7919" title="Updates the visual appearance of the handprint image during the scan. Renders the SVG and applies a c..." alt="" coords="484,204,728,229"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="437,199,469,202,468,207,436,204"/>
+<area shape="rect" id="Node000008" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="776,155,975,180"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="717,165,761,165,761,170,717,170"/>
+</map>

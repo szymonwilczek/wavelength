@@ -1,0 +1,13 @@
+<map id="WavelengthStateManager::IsWavelengthPasswordProtected" name="WavelengthStateManager::IsWavelengthPasswordProtected">
+<area shape="rect" id="Node000001" title="Checks if a specific wavelength is password protected." alt="" coords="5,37,226,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="274,37,443,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,54,258,54,258,59,226,59"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="492,5,629,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="443,41,477,35,477,41,444,46"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="491,68,630,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="444,67,476,72,475,77,443,72"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="678,5,824,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="630,22,663,22,663,27,630,27"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="682,68,820,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="631,85,667,85,667,90,631,90"/>
+</map>

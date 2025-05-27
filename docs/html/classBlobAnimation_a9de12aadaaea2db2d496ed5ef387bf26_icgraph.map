@@ -1,0 +1,5 @@
+<map id="BlobAnimation::CalculateBlobBoundingRect" name="BlobAnimation::CalculateBlobBoundingRect">
+<area shape="rect" id="Node000001" title="Calculates the bounding rectangle encompassing the blob&#39;s control points, including margins for borde..." alt="" coords="228,5,395,44"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a4dbe06dfa0e90257370c5c03e9555aac" title="Overridden paint event handler. Delegates rendering to BlobRenderer after checking if the paint area ..." alt="" coords="5,12,180,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,27,180,27,180,22,212,22"/>
+</map>

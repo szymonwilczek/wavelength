@@ -1,0 +1,5 @@
+<map id="GLTransitionWidget" name="GLTransitionWidget">
+<area shape="rect" id="Node000001" title="An OpenGL widget designed to render smooth, animated slide transitions between two other widgets." alt="" coords="5,117,194,485"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="45,5,155,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

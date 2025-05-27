@@ -1,0 +1,28 @@
+var classBlobTransitionManager =
+[
+    [ "WindowMovementSample", "structBlobTransitionManager_1_1WindowMovementSample.html", "structBlobTransitionManager_1_1WindowMovementSample" ],
+    [ "BlobTransitionManager", "classBlobTransitionManager.html#a332f12fd7a47ba2272d7d9a809a555b7", null ],
+    [ "AddMovementSample", "classBlobTransitionManager.html#a53767925d346d5e01ba3c7b33f120203", null ],
+    [ "ClearAllMovementBuffers", "classBlobTransitionManager.html#aa9ffb22664438f54806e5f3277765b49", null ],
+    [ "ClearMovementBuffer", "classBlobTransitionManager.html#af9013a025cae926fb1ca64ba11aab4df", null ],
+    [ "GetInactivityCounter", "classBlobTransitionManager.html#af69b0630024c4949a3728fdaa76df41d", null ],
+    [ "GetLastMovementTime", "classBlobTransitionManager.html#ae85cf2be93671b4a82ce423e438c0a19", null ],
+    [ "GetMovementBuffer", "classBlobTransitionManager.html#a20a9aae9d9e57bfc931a27a07ed10229", null ],
+    [ "IncrementInactivityCounter", "classBlobTransitionManager.html#a341ac3be3cac607e202386b18a196ea7", null ],
+    [ "IsMoving", "classBlobTransitionManager.html#accbe59e84be15a7f62eb3dabc11b21b8", null ],
+    [ "movementStopped", "classBlobTransitionManager.html#a0368480b181fcb29158d53c685bcd9e9", null ],
+    [ "ProcessMovementBuffer", "classBlobTransitionManager.html#af5c3a65c7bcfc785cb2c26e705702b33", null ],
+    [ "ResetInactivityCounter", "classBlobTransitionManager.html#ac03b6ddce8c3c9e43a93951f16362148", null ],
+    [ "SetLastMovementTime", "classBlobTransitionManager.html#a689169d0bcebf7e83fb462d05f087802", null ],
+    [ "SetMoving", "classBlobTransitionManager.html#ad4a476fe60339de53e4a2cfbfd941cd8", null ],
+    [ "SetResizingState", "classBlobTransitionManager.html#ae597b4477057042d53e9db073f65d541", null ],
+    [ "significantMovementDetected", "classBlobTransitionManager.html#a106ed377c5900517cd28d562734277fe", null ],
+    [ "transitionCompleted", "classBlobTransitionManager.html#ace325f2fb00583ebeb4ab4993f018df1", null ],
+    [ "inactivity_counter_", "classBlobTransitionManager.html#ad8ce255500ba38ca8c06b310472dbd42", null ],
+    [ "is_moving_", "classBlobTransitionManager.html#ac5459916fedfdd75382a7ab3114ecc19", null ],
+    [ "is_resizing_", "classBlobTransitionManager.html#ae4697891ecacf4d291656fd2dc387c85", null ],
+    [ "kMaxMovementSamples", "classBlobTransitionManager.html#a4d278af41b729e562a4412f5ae9236f1", null ],
+    [ "last_movement_time_", "classBlobTransitionManager.html#a3f9d1262ed9f518fca5e2771d752e18c", null ],
+    [ "m_smoothed_velocity_", "classBlobTransitionManager.html#a378f2a0e500851cbb1d6b568afa96d40", null ],
+    [ "movement_buffer_", "classBlobTransitionManager.html#a34fd25f09e084d1fe7e644490384366b", null ]
+];

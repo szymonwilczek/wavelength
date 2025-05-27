@@ -1,0 +1,5 @@
+<map id="AuthenticationManager::AuthenticationManager" name="AuthenticationManager::AuthenticationManager">
+<area shape="rect" id="Node000001" title="Deleted copy constructor to prevent copying." alt="" coords="5,5,168,44"/>
+<area shape="rect" id="Node000002" href="$classAuthenticationManager.html#a3a24c8dc18303d4ad65c17aff6cdd705" title="Private constructor to enforce the singleton pattern." alt="" coords="216,5,378,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,22,200,22,200,27,168,27"/>
+</map>

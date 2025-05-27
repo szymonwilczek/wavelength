@@ -1,0 +1,8 @@
+<map id="ImageViewer::HandleError" name="ImageViewer::HandleError">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s error signal. Logs the error and displays an error message in the QLa..." alt="" coords="462,42,635,66"/>
+<area shape="rect" id="Node000002" href="$classImageViewer.html#ad7f75120309ec5bcc4618dee53e028b7" title="Slot connected to the decoder&#39;s imageReady signal. Stores the decoded image, sets it as the pixmap fo..." alt="" coords="233,5,414,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="446,43,414,39,415,34,447,38"/>
+<area shape="rect" id="Node000003" href="$classImageViewer.html#a9f9cd61953b303c108ab1b8cabef1870" title="Constructs an InlineImageViewer widget. Initializes the UI (QLabel), creates the ImageDecoder instanc..." alt="" coords="5,42,185,66"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="446,58,414,58,233,58,185,58,185,52,233,53,414,53,446,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,41,185,45,185,40,217,36"/>
+</map>

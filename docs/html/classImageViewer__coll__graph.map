@@ -1,0 +1,19 @@
+<map id="ImageViewer" name="ImageViewer">
+<area shape="rect" id="Node000001" title="A widget for displaying static images (PNG, JPEG, etc.) within a chat interface." alt="" coords="36,878,216,1271"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="20,753,78,816"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,830,77,878,72,879,59,831"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="234,753,440,816"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="317,817,229,938,224,935,313,814"/>
+<area shape="rect" id="Node000004" href="$classImageDecoder.html" title="Decodes image data using Qt&#39;s built&#45;in image loading capabilities." alt="" coords="150,131,354,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="301,278,310,303,325,362,336,423,347,544,348,653,344,736,339,736,342,653,341,545,331,424,320,363,305,305,296,280"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="126,5,185,69"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="183,80,212,129,207,132,179,83"/>
+<area shape="rect" id="Node000008" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="5,304,218,729"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="148,84,140,131,123,304,118,304,135,130,143,83"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="378,174,507,237"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="447,252,447,342,439,463,419,598,402,665,380,730,366,754,361,752,375,728,397,663,413,596,434,462,441,342,442,252"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="433,5,452,69"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="445,68,445,157,440,157,440,68"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="120,728,124,861,118,861,115,729"/>
+<area shape="poly" id="edge9_Node000008_Node000008" title=" " alt="" coords="220,470,238,487,245,516,242,537,233,552,229,550,237,535,240,516,233,490,216,473"/>
+</map>

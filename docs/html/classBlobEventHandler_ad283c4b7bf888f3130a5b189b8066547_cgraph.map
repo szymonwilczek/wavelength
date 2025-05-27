@@ -1,0 +1,7 @@
+<map id="BlobEventHandler::HandleMoveEvent" name="BlobEventHandler::HandleMoveEvent">
+<area shape="rect" id="Node000001" title="Handles the logic for processing QMoveEvent received by the event filter. Applies throttling based on..." alt="" coords="5,37,180,76"/>
+<area shape="rect" id="Node000002" href="$classBlobEventHandler.html#aad583f5951b3014d66d3914a8d060cad" title="Emitted periodically during window movement to provide samples for velocity calculation...." alt="" coords="228,5,421,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,42,212,37,213,43,180,47"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#ac63c9e11e620e4d19e4e2ca2b264087b" title="Emitted when a significant window move event is detected after throttling." alt="" coords="236,68,413,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,66,220,71,220,76,179,71"/>
+</map>

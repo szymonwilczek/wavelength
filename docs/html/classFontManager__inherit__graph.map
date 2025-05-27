@@ -1,0 +1,5 @@
+<map id="FontManager" name="FontManager">
+<area shape="rect" id="Node000001" title="Manages application fonts using a singleton pattern." alt="" coords="5,117,191,469"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="69,5,128,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,84,101,117,96,117,96,84"/>
+</map>

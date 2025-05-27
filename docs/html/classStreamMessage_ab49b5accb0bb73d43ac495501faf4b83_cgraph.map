@@ -1,0 +1,5 @@
+<map id="StreamMessage::FadeOut" name="StreamMessage::FadeOut">
+<area shape="rect" id="Node000001" title="Starts the fade&#45;out animation (opacity and glow). Hides the widget and emits the hidden() signal upon..." alt="" coords="5,5,180,30"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#aa04caea13bddde1d0ea72f43ad26e8f8" title="Emitted when the message finishes its fade&#45;out or closing animation and becomes hidden." alt="" coords="228,5,390,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,15,212,15,212,20,180,20"/>
+</map>

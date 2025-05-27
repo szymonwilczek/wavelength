@@ -1,0 +1,5 @@
+<map id="CyberChatButton" name="CyberChatButton">
+<area shape="rect" id="Node000001" title="A custom QPushButton styled with a simple cyberpunk aesthetic for chat input areas." alt="" coords="5,117,194,241"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="56,5,144,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="SessionCoordinator::IsWavelengthPasswordProtected" name="SessionCoordinator::IsWavelengthPasswordProtected">
+<area shape="rect" id="Node000001" title="Checks if a specific wavelength is password protected. Delegates the call to WavelengthStateManager." alt="" coords="5,37,226,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="299,5,468,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,41,284,34,284,39,226,46"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#a7fdc767c6e09c46297e53fdc4c75110e" title="Checks if a specific wavelength is password protected." alt="" coords="274,68,494,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="226,67,258,70,258,76,226,72"/>
+<area shape="rect" id="Node000003" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="542,5,719,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="469,22,526,22,526,27,469,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="546,68,715,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="494,85,530,85,530,90,494,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="768,36,906,75"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="715,72,753,66,754,71,716,77"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="767,99,907,137"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="716,97,752,103,752,108,715,103"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="SnakeGameLayer::HandleInput" name="SnakeGameLayer::HandleInput">
+<area shape="rect" id="Node000001" title="Processes user input (arrow keys) to change the snake&#39;s direction. Prevents the snake from reversing ..." alt="" coords="245,33,446,58"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a38158054aeefbf54c2c7a03705ba2760" title="Filters key press events specifically for the game_board_ QLabel. Ensures that arrow key presses are ..." alt="" coords="5,5,197,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,35,197,31,197,26,230,30"/>
+<area shape="rect" id="Node000003" href="$classSnakeGameLayer.html#a2b59156072865df27427a9159034f9c0" title="Handles key press events for controlling the snake. Passes the key code to HandleInput() and accepts ..." alt="" coords="8,54,194,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="230,62,194,66,194,60,229,56"/>
+</map>

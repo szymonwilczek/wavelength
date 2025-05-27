@@ -1,0 +1,17 @@
+<map id="AudioDecoder::Reinitialize" name="AudioDecoder::Reinitialize">
+<area shape="rect" id="Node000001" title="Reinitializes the decoder after it has been stopped or encountered an error. Releases existing resour..." alt="" coords="5,80,179,105"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a4c483a41bf7d57354b63bec009ac222e" title="Emitted when an error occurs during initialization or decoding." alt="" coords="758,5,896,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,77,168,57,226,40,367,20,509,10,639,8,743,10,743,16,639,13,509,15,368,25,227,46,170,62,121,82"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#afbc8e3bdffc473d8ca7a059dc30ce268" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal audio_data_ QByteArray bu..." alt="" coords="246,55,428,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,81,230,75,231,81,179,86"/>
+<area shape="rect" id="Node000005" href="$classAudioDecoder.html#a5f63aa27abafaeded80d3688638ace64" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="736,55,918,79"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="179,94,410,99,549,97,688,88,750,80,750,85,689,94,549,102,410,104,179,99"/>
+<area shape="rect" id="Node000006" href="$classAudioDecoder.html#ad1c938bcc5cb7becf9d08865a1c09409" title="Releases all FFmpeg and Qt Multimedia resources. Stops audio output, frees contexts (format,..." alt="" coords="227,153,447,178"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="133,103,227,132,275,146,273,151,226,138,132,108"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a5cf09a96a04ce8afd751d985c71e4211" title="Constructs an AudioDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I..." alt="" coords="495,55,688,79"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="428,73,479,73,479,79,428,78"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="654,51,749,31,750,36,655,57"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="494,61,443,61,443,55,494,56"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="689,73,721,73,721,79,689,79"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="736,61,704,61,704,55,736,56"/>
+</map>

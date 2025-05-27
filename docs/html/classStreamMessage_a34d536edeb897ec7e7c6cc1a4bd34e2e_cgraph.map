@@ -1,0 +1,9 @@
+<map id="StreamMessage::FadeIn" name="StreamMessage::FadeIn">
+<area shape="rect" id="Node000001" title="Starts the fade&#45;in animation (opacity and glow). Also triggers the text reveal animation (CyberTextDi..." alt="" coords="5,12,170,37"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#ad9da8cfd5969d6509d622fc708957fb3" title="Starts or restarts the text revealing animation from the beginning. If the text has been fully reveal..." alt="" coords="218,5,350,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,22,202,22,202,27,170,27"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#a743994a8ebe09bd1d4536a2e2ce4ee23" title="Sets the number of revealed characters. Updates the internal count, triggers a repaint,..." alt="" coords="398,5,530,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="350,22,383,22,383,27,350,27"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#af2538be2d26c4f11de6f1198063f67e2" title="Emitted exactly once when the text revealing animation completes for the first time after StartReveal..." alt="" coords="578,5,711,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="531,22,563,22,563,27,531,27"/>
+</map>

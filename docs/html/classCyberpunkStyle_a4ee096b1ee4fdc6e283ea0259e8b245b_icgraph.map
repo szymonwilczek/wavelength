@@ -1,0 +1,5 @@
+<map id="CyberpunkStyle::GetBackgroundMediumColor" name="CyberpunkStyle::GetBackgroundMediumColor">
+<area shape="rect" id="Node000001" title="Gets the medium background color." alt="" coords="240,5,452,44"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#aab9d53bca1b64a79b2df831183173b12" title="Applies the cyberpunk style globally to the QApplication. Sets the application style to &quot;Fusion&quot;,..." alt="" coords="5,12,192,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,27,192,27,192,22,224,22"/>
+</map>

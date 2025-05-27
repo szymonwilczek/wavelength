@@ -1,0 +1,5 @@
+<map id="WavelengthEventBroker" name="WavelengthEventBroker">
+<area shape="rect" id="Node000001" title="A singleton event broker for decoupling components within the Wavelength application." alt="" coords="5,117,211,962"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="79,5,138,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,84,111,117,106,117,106,84"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="WavelengthConfig::SetStreamColor" name="WavelengthConfig::SetStreamColor">
+<area shape="rect" id="Node000001" title="Sets the color for stream visualization elements. Adds the color to recent colors...." alt="" coords="5,37,202,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a7ebb29db2d1c1664c1fca81e52f67565" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="250,5,448,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,41,234,37,235,42,202,46"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="264,68,434,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,66,249,72,248,77,202,72"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="496,5,666,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,22,480,22,480,27,448,27"/>
+</map>

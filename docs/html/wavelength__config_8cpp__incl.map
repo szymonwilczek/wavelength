@@ -1,0 +1,17 @@
+<map id="src/app/wavelength_config.cpp" name="src/app/wavelength_config.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="296,5,428,44"/>
+<area shape="rect" id="Node000002" href="$wavelength__config_8h.html" title=" " alt="" coords="138,92,276,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="326,47,245,87,243,82,323,42"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="300,92,424,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="364,45,364,76,359,76,359,45"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="447,92,516,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="392,42,453,81,450,86,389,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,165,68,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,120,80,161,78,156,178,115"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="92,165,203,189"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="199,119,169,155,165,151,195,115"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="228,165,307,189"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="219,115,250,151,246,155,215,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="330,165,396,189"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="234,115,325,155,322,160,232,120"/>
+</map>

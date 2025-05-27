@@ -1,0 +1,13 @@
+<map id="src/ui/buttons/navbar_button.cpp" name="src/ui/buttons/navbar_button.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="246,5,389,44"/>
+<area shape="rect" id="Node000002" href="$navbar__button_8h.html" title=" " alt="" coords="5,92,120,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="256,47,116,90,115,84,255,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="144,92,336,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="300,47,264,83,260,79,297,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="360,92,432,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="338,43,375,79,371,83,334,47"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="456,92,595,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="368,42,481,84,479,89,367,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="13,165,112,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="65,117,65,149,60,149,60,117"/>
+</map>

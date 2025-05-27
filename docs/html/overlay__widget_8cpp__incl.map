@@ -1,0 +1,15 @@
+<map id="src/ui/widgets/overlay_widget.cpp" name="src/ui/widgets/overlay_widget.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="165,5,312,44"/>
+<area shape="rect" id="Node000002" href="$overlay__widget_8h.html" title=" " alt="" coords="5,92,123,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,47,105,88,103,83,195,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="146,92,219,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="227,46,202,81,198,78,223,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="243,92,346,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="254,43,279,78,275,81,250,46"/>
+<area shape="rect" id="Node000006" href="$navbar_8h.html" title=" " alt="" coords="371,92,517,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="289,42,400,84,398,89,287,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="28,165,100,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="67,117,67,149,61,149,61,117"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="406,165,482,189"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="447,117,447,149,441,149,441,117"/>
+</map>

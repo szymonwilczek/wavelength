@@ -1,0 +1,5 @@
+<map id="VideoDecoder::Initialize" name="VideoDecoder::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="183,5,341,30"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a134b48e98d0b9db4011cfea08d0924da" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="5,5,135,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,20,135,20,135,15,167,15"/>
+</map>

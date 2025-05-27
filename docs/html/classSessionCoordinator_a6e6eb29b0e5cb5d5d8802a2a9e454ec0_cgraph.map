@@ -1,0 +1,5 @@
+<map id="SessionCoordinator::onAudioDataReceived" name="SessionCoordinator::onAudioDataReceived">
+<area shape="rect" id="Node000001" title="Relays the audioDataReceived signal." alt="" coords="5,5,162,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#adc4b7bd69dbf66ba858d227c8e1ce3dd" title="Emitted when raw audio data is received. Relayed from WavelengthMessageService." alt="" coords="210,5,350,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,22,194,22,194,27,162,27"/>
+</map>

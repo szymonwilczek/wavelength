@@ -1,0 +1,18 @@
+<map id="Navbar" name="Navbar">
+<area shape="rect" id="Node000001" title="A custom QToolBar serving as the main navigation bar for the application." alt="" coords="98,1163,296,1518"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,807,76,871"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,885,67,973,91,1073,122,1162,117,1164,86,1074,62,974,47,886"/>
+<area shape="rect" id="Node000003" href="$classNetworkStatusWidget.html" title="A widget displaying network connection status and ping time with cyberpunk aesthetics." alt="" coords="100,626,295,1052"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,1052,200,1146,195,1146,195,1052"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,299,67,362"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="45,376,60,454,81,542,109,625,104,627,76,543,54,455,40,377"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="91,118,304,543"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="200,543,200,609,195,609,195,543"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="305,289,323,304,331,330,328,348,319,362,315,359,323,346,325,330,319,307,302,293"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="168,5,227,69"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="200,83,200,118,195,118,195,83"/>
+<area shape="rect" id="Node000007" href="$classCyberpunkButton.html" title="A custom QPushButton styled with a cyberpunk aesthetic, featuring animated glow effects." alt="" coords="341,605,536,1073"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="344,1068,309,1140,305,1150,300,1147,304,1138,339,1065"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="416,299,504,362"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="461,377,451,605,446,605,456,377"/>
+</map>

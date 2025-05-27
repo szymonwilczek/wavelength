@@ -1,0 +1,15 @@
+<map id="src/ui/chat/effects/electronic_shutdown_effect.cpp" name="src/ui/chat/effects/electronic_shutdown_effect.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="201,5,345,58"/>
+<area shape="rect" id="Node000002" href="$electronic__shutdown__effect_8h.html" title=" " alt="" coords="28,106,168,145"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,61,148,101,146,96,222,56"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="192,113,260,138"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="262,60,241,101,236,98,257,57"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="285,113,357,138"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="289,57,310,98,306,101,284,60"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="381,113,517,138"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="324,56,414,103,412,108,321,61"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,193,74,217"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="86,147,60,182,55,179,82,144"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="98,193,216,217"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="114,144,141,179,137,182,110,147"/>
+</map>

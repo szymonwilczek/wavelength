@@ -1,0 +1,5 @@
+<map id="MessageService::HandleSendJsonViaSocket" name="MessageService::HandleSendJsonViaSocket">
+<area shape="rect" id="Node000001" title="Slot connected to the sendJsonViaSocket signal. Performs the actual sending of a JSON message...." alt="" coords="279,5,477,44"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#ad74bc604024156fff3b840942187037e" title="Private constructor to enforce the singleton pattern. Connects the internal sendJsonViaSocket signal ..." alt="" coords="5,12,231,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="263,27,231,27,231,22,263,22"/>
+</map>

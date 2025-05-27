@@ -1,0 +1,17 @@
+<map id="BlobPhysics::UpdatePhysicsParallel" name="BlobPhysics::UpdatePhysicsParallel">
+<area shape="rect" id="Node000001" title="Updates the blob physics using QtConcurrent for parallel processing across multiple threads...." alt="" coords="5,46,195,84"/>
+<area shape="rect" id="Node000002" href="$classBlobPhysics.html#afbb545c1990191999b1d53237703e276" title="Gradually moves control points towards an ideal circular/organic shape when the blob is idle...." alt="" coords="480,25,656,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,42,190,24,242,10,309,4,376,4,439,10,495,19,494,24,439,16,376,10,309,9,243,16,191,29,144,47"/>
+<area shape="rect" id="Node000003" href="$classBlobPhysics.html#a611559445990d0a91365e7d1af7886f1" title="Updates the blob physics using a standard sequential approach. Iterates through each control point,..." alt="" coords="243,25,432,49"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,51,227,47,227,53,195,56"/>
+<area shape="rect" id="Node000004" href="$classBlobPhysics.html#a51387fbc8c325be7a3f33aea248caeab" title="Checks if any control points or velocities contain invalid values (NaN, infinity)...." alt="" coords="483,74,653,112"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="138,82,187,105,243,122,296,131,337,132,432,122,481,114,482,119,432,128,337,138,295,136,242,128,185,110,136,87"/>
+<area shape="rect" id="Node000006" href="$classBlobPhysics.html#a5fa268f3582bffc05750430849f43d24" title="Updates the blob physics using an optimized Structure&#45;of&#45;Arrays (SoA) approach with OpenMP paralleliz..." alt="" coords="243,74,432,112"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="195,74,227,77,227,83,195,79"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="432,34,464,34,464,40,432,40"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="392,47,471,67,470,72,391,53"/>
+<area shape="rect" id="Node000005" href="$classBlobMath.html#abef304a2fdf006c9238fe4a265951637" title="Checks if a QPointF contains valid coordinate values. Verifies that coordinates are not NaN,..." alt="" coords="704,81,858,105"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="654,90,689,90,689,96,654,96"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="419,70,499,51,500,56,420,76"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="432,90,467,90,467,96,432,96"/>
+</map>

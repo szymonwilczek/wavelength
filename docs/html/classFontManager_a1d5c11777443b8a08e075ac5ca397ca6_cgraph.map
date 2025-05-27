@@ -1,0 +1,5 @@
+<map id="FontManager::GetInstance" name="FontManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the FontManager." alt="" coords="5,5,182,30"/>
+<area shape="rect" id="Node000002" href="$classFontManager.html#a565773e58e251b669dd1ae63071c1d83" title="Private constructor to enforce the singleton pattern." alt="" coords="230,5,411,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,15,214,15,214,20,182,20"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="AppInstanceManager::StartAbsorptionAnimation" name="AppInstanceManager::StartAbsorptionAnimation">
+<area shape="rect" id="Node000001" title="Starts the animation sequence for absorbing a client instance. This involves moving the client window..." alt="" coords="589,35,769,73"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a46740893551d1b7e70d184740d0f5fee" title="Applies a force to the client window, pulling it towards the target position (creator window)." alt="" coords="390,5,541,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="574,42,541,38,542,32,574,37"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a0f209265d9df4a82fc23ccd0ba99dd82" title="Initializes and starts the background thread responsible for attraction logic." alt="" coords="198,35,342,73"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="574,58,541,58,390,58,342,58,342,52,390,53,541,53,574,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,41,343,46,342,41,374,36"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a1ecdc08b00d9aae9d33976f8ce90d6f5" title="Starts the instance manager." alt="" coords="5,35,150,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="182,57,150,57,150,51,182,51"/>
+</map>

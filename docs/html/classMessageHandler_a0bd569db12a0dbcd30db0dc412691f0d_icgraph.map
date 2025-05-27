@@ -1,0 +1,20 @@
+<map id="MessageHandler::GenerateMessageId" name="MessageHandler::GenerateMessageId">
+<area shape="rect" id="Node000001" title="Generates a unique message identifier using UUID." alt="" coords="677,89,858,128"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="449,68,627,93"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="662,98,627,94,628,89,663,93"/>
+<area shape="rect" id="Node000008" href="$classMessageService.html#ac1041f89fa4eed1b98556cc3f93c2077" title="Sends a text message to the currently active frequency. Retrieves the active frequency and socket fro..." alt="" coords="447,117,629,156"/>
+<area shape="poly" id="edge6_Node000001_Node000008" title=" " alt="" coords="662,124,630,128,629,123,662,119"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="243,12,387,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="470,67,366,40,368,35,472,61"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#a8c66229e945eb35fa8791ea88d37cdaa" title="Sends a file to the currently active wavelength. Delegates the call to WavelengthMessageService." alt="" coords="247,61,382,100"/>
+<area shape="poly" id="edge5_Node000002_Node000007" title=" " alt="" coords="433,83,383,83,383,78,433,78"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="23,96,165,121"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="251,45,232,51,122,98,120,93,230,46,249,40"/>
+<area shape="rect" id="Node000005" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="5,5,183,44"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="227,27,183,27,183,22,227,22"/>
+<area shape="rect" id="Node000009" href="$classChatView.html#a424556ba1072ba443433af3af827c5d5" title="Sends the text message currently in the input field. Clears the input field and sends the message via..." alt="" coords="231,124,399,149"/>
+<area shape="poly" id="edge7_Node000008_Node000009" title=" " alt="" coords="431,139,399,139,399,134,431,134"/>
+<area shape="rect" id="Node000010" href="$classSessionCoordinator.html#a6bf70b7c88a2f73ab0510bbc97315c02" title="Sends a text message to the currently active wavelength. Delegates the call to WavelengthMessageServi..." alt="" coords="247,173,382,212"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="444,163,384,178,382,173,443,158"/>
+<area shape="poly" id="edge8_Node000009_Node000004" title=" " alt="" coords="215,127,165,120,166,115,216,121"/>
+</map>

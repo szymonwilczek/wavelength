@@ -1,0 +1,5 @@
+<map id="AudioDecoder::Reset" name="AudioDecoder::Reset">
+<area shape="rect" id="Node000001" title="Resets the playback position to the beginning (0 seconds). Seeks the FFmpeg format context,..." alt="" coords="5,5,151,30"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a928f569d98a91fae0fa27371a0c85b4e" title="Emitted periodically during playback to indicate the current position." alt="" coords="199,5,407,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,15,183,15,183,20,151,20"/>
+</map>

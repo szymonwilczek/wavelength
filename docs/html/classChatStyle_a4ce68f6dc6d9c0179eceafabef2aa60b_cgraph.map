@@ -1,0 +1,5 @@
+<map id="ChatStyle::GetReceivedMessageStyle" name="ChatStyle::GetReceivedMessageStyle">
+<area shape="rect" id="Node000001" title="Gets the stylesheet for message bubbles received from other users. Defines background,..." alt="" coords="5,5,220,44"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#a444dbf49212293ada2877ceb7a4bbd28" title="Gets the accent color (Purple)." alt="" coords="268,5,453,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,22,252,22,252,27,220,27"/>
+</map>

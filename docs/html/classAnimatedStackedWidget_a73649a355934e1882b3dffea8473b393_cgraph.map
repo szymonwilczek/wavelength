@@ -1,0 +1,9 @@
+<map id="AnimatedStackedWidget::AnimatedStackedWidget" name="AnimatedStackedWidget::AnimatedStackedWidget">
+<area shape="rect" id="Node000001" title="Constructs an AnimatedStackedWidget. Initializes the animation group, sound effect,..." alt="" coords="5,68,178,107"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#a57cdf55739292d948ecdd6f97cba09c0" title="Cleans up graphics effects and resets widget geometries after an animation finishes...." alt="" coords="227,5,392,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,65,224,46,226,51,162,70"/>
+<area shape="rect" id="Node000003" href="$classAnimatedStackedWidget.html#a982b403ae8613bf907ad3fcef9b2db34" title="Slot called when the OpenGL transition animation finishes. Hides the OpenGL widget,..." alt="" coords="226,68,393,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,85,210,85,210,90,178,90"/>
+<area shape="rect" id="Node000004" href="$classGLTransitionWidget.html#a5a60a614a06573740a7499ce5e52439d" title="Emitted when the transition animation (QPropertyAnimation) finishes." alt="" coords="242,131,376,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,105,228,124,227,129,160,110"/>
+</map>

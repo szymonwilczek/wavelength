@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::AddPendingRegistration" name="WavelengthRegistry::AddPendingRegistration">
+<area shape="rect" id="Node000001" title="Marks a frequency as having a pending registration attempt. Used to prevent duplicate registration at..." alt="" coords="5,5,173,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="221,5,358,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,22,205,22,205,27,173,27"/>
+</map>

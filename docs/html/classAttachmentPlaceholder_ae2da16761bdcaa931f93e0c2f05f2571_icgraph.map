@@ -1,0 +1,5 @@
+<map id="AttachmentPlaceholder::GenerateThumbnail" name="AttachmentPlaceholder::GenerateThumbnail">
+<area shape="rect" id="Node000001" title="Generates a thumbnail image from the first frame of a video in a background thread...." alt="" coords="210,5,366,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#a01bfbf08c83898552fbc4fd041d61245" title="Creates and displays a CyberAttachmentViewer containing a video preview (thumbnail + play button)...." alt="" coords="5,5,162,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,27,162,27,162,22,194,22"/>
+</map>

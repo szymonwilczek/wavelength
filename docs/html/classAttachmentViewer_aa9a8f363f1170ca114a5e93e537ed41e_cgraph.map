@@ -1,0 +1,5 @@
+<map id="AttachmentViewer::StartDecryptionAnimation" name="AttachmentViewer::StartDecryptionAnimation">
+<area shape="rect" id="Node000001" title="Starts the decryption phase. Updates the status label, ensures the MaskOverlay is visible,..." alt="" coords="5,5,234,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#af14d1bf565cd71a64db42d386ede1597" title="Slot called when the decryption animation finishes. Sets the state to decrypted, updates the status l..." alt="" coords="282,5,452,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,22,266,22,266,27,234,27"/>
+</map>

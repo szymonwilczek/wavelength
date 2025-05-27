@@ -1,0 +1,5 @@
+<map id="StreamMessage" name="StreamMessage">
+<area shape="rect" id="Node000001" title="A custom widget representing a single message within the CommunicationStream." alt="" coords="5,117,210,1393"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="77,5,139,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,84,110,117,105,117,105,84"/>
+</map>

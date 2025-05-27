@@ -1,0 +1,5 @@
+<map id="AttachmentQueueManager" name="AttachmentQueueManager">
+<area shape="rect" id="Node000001" title="Manages a queue of AttachmentTasks for concurrent execution using a singleton pattern." alt="" coords="5,117,220,380"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="84,5,142,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,83,116,117,110,117,110,83"/>
+</map>

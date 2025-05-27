@@ -1,0 +1,9 @@
+<map id="TypingTestLayer::Initialize" name="TypingTestLayer::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the layer for display. Resets the layer state, sets focus on the hidden input field,..." alt="" coords="5,40,176,65"/>
+<area shape="rect" id="Node000002" href="$classTypingTestLayer.html#a1846a242255497456e13344d9e999bc0" title="Resets the layer to its initial state. Clears the input field, resets progress tracking,..." alt="" coords="224,40,381,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,50,208,50,208,55,176,55"/>
+<area shape="rect" id="Node000003" href="$classTypingTestLayer.html#aef87c3af9034a3e8f9f071cd80f86651" title="Generates a random text passage composed of words from a predefined pool. Ensures the generated text ..." alt="" coords="458,5,634,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="381,41,443,34,443,39,382,46"/>
+<area shape="rect" id="Node000004" href="$classTypingTestLayer.html#abad9bc996ba1e3a86e6d6d1f98f13ee5" title="Updates the display_text_label_ with formatted rich text. Highlights correctly typed characters in gr..." alt="" coords="429,68,663,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="382,59,418,63,418,69,381,64"/>
+</map>

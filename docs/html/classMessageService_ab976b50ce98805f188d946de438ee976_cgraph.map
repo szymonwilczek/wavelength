@@ -1,0 +1,24 @@
+<map id="MessageService::SendFileToServer" name="MessageService::SendFileToServer">
+<area shape="rect" id="Node000001" title="Sends a pre&#45;formatted JSON message (typically containing file data) to the server...." alt="" coords="5,188,184,227"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="275,5,410,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,186,155,121,190,84,230,53,259,39,262,44,233,58,193,88,159,124,110,189"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="274,68,411,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="119,185,169,150,231,116,258,105,260,110,233,120,172,154,123,190"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="273,131,412,169"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="181,185,257,167,258,172,182,190"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="521,160,658,199"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="184,200,505,181,506,187,184,205"/>
+<area shape="rect" id="Node000008" href="$classMessageService.html#a36a3d49b52fad22e0e2d8dc5bb6de6a4" title="Emitted after a file transfer is complete (success or failure) to remove the progress message." alt="" coords="232,245,453,284"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="182,225,241,239,240,244,181,230"/>
+<area shape="rect" id="Node000009" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="275,308,410,347"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="123,225,173,259,233,293,261,304,259,309,231,298,170,264,120,229"/>
+<area shape="rect" id="Node000010" href="$classMessageService.html#a6861f3f01891356e425df53280df134a" title="Slot to update a progress message associated with a file transfer. Emits the progressMessageUpdated s..." alt="" coords="232,371,453,409"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="110,226,159,290,194,325,233,356,243,361,240,366,230,360,190,329,155,293,106,229"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="518,5,661,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="410,22,503,22,503,27,410,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="517,68,662,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="411,85,501,85,501,90,411,90"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="413,156,506,167,505,172,412,161"/>
+<area shape="rect" id="Node000011" href="$classMessageService.html#a4635fcf151d68e3cd873b2d7590c7efc" title="Emitted during file processing and sending to update the status display." alt="" coords="501,371,678,409"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="453,387,485,387,485,393,453,393"/>
+</map>

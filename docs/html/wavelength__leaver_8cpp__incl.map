@@ -1,0 +1,20 @@
+<map id="src/session/events/leaver/wavelength_leaver.cpp" name="src/session/events/leaver/wavelength_leaver.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="163,5,356,44"/>
+<area shape="rect" id="Node000002" href="$wavelength__leaver_8h.html" title=" " alt="" coords="5,99,143,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,47,114,95,112,90,217,42"/>
+<area shape="rect" id="Node000004" href="$message__handler_8h.html" title=" " alt="" coords="167,92,352,131"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="262,45,262,76,257,76,257,45"/>
+<area shape="rect" id="Node000007" href="$wavelength__registry_8h.html" title=" " alt="" coords="375,92,544,131"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="305,42,402,83,400,88,303,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="78,179,147,203"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,123,103,164,98,166,77,125"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="225,134,149,174,147,169,223,129"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="191,179,288,203"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="257,132,249,164,244,163,252,131"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="312,179,370,203"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="281,129,319,166,316,170,277,133"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="408,179,481,203"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="458,132,452,164,447,163,453,131"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="505,179,603,203"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="484,129,530,167,527,171,481,133"/>
+</map>

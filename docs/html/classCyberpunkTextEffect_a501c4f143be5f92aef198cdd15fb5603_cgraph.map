@@ -1,0 +1,9 @@
+<map id="CyberpunkTextEffect::NextAnimationStep" name="CyberpunkTextEffect::NextAnimationStep">
+<area shape="rect" id="Node000001" title="Slot called periodically by the timer to advance the animation. Executes the logic for the current an..." alt="" coords="5,68,150,107"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkTextEffect.html#af7e2300823ad204915bb92001ab7149d" title="Handles the final &quot;Glitching&quot; phase of the animation. Briefly displays the full text with rapidly cha..." alt="" coords="198,5,342,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,65,193,47,195,52,140,70"/>
+<area shape="rect" id="Node000003" href="$classCyberpunkTextEffect.html#a7a70778a198c7f8aaacfb389fd086aa4" title="Handles the &quot;Scanning&quot; phase of the animation. Displays a sweeping vertical bar &quot;|&quot; across the label&#39;..." alt="" coords="198,68,342,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,85,182,85,182,90,150,90"/>
+<area shape="rect" id="Node000004" href="$classCyberpunkTextEffect.html#a5690607a245f94527129f9fb5cb47acb" title="Handles the &quot;Typing&quot; phase of the animation. Reveals the original text character by character,..." alt="" coords="198,131,342,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,105,195,123,193,128,138,110"/>
+</map>

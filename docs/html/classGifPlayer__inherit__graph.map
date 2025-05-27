@@ -1,0 +1,5 @@
+<map id="GifPlayer" name="GifPlayer">
+<area shape="rect" id="Node000001" title="A widget for displaying and playing animated GIFs within a chat interface." alt="" coords="5,117,199,768"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="74,5,131,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,84,105,117,100,117,100,84"/>
+</map>

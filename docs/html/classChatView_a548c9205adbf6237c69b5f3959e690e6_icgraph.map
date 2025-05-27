@@ -1,0 +1,9 @@
+<map id="ChatView::wavelengthAborted" name="ChatView::wavelengthAborted">
+<area shape="rect" id="Node000001" title="Emitted when the user aborts the connection or the Wavelength is closed by the host...." alt="" coords="454,31,649,55"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="209,5,393,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="438,34,393,30,394,24,439,29"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a1324eeddfda31b22a899ed1acf8a8f20" title="Handles the event when the host closes the current Wavelength. Updates the status indicator,..." alt="" coords="196,55,406,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="439,56,407,60,406,54,438,51"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,5,148,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="193,20,148,20,148,15,193,15"/>
+</map>

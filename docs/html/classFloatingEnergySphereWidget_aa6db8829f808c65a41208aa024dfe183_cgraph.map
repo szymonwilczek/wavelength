@@ -1,0 +1,5 @@
+<map id="FloatingEnergySphereWidget::ProcessAudioBuffer" name="FloatingEnergySphereWidget::ProcessAudioBuffer">
+<area shape="rect" id="Node000001" title="Slot called by the audio decoder when a new buffer of decoded audio data is ready...." alt="" coords="5,5,196,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#aff040b4cbf22e0cd620795c85af1aa0e" title="Calculates the Root Mean Square (RMS) amplitude for a given audio buffer. Used to quantify the energy..." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,22,228,22,228,27,196,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="FloatingEnergySphereWidget::closeEvent" name="FloatingEnergySphereWidget::closeEvent">
+<area shape="rect" id="Node000001" title="Handles the widget close event. Stops timers and audio, emits widgetClosed() if allowed (closable_ is..." alt="" coords="5,5,196,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#a29cc66014476f5961a48d45017506b7b" title="Emitted when the widget is closed normally (not during destruction)." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,22,228,22,228,27,196,27"/>
+</map>

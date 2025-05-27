@@ -1,0 +1,5 @@
+<map id="VideoPlayer::closeEvent" name="VideoPlayer::closeEvent">
+<area shape="rect" id="Node000001" title="Overridden close event handler. Stops timers and releases decoder resources before closing the dialog..." alt="" coords="5,5,168,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a64de082c469f77406b3be603e2f58b27" title="Stops the decoder thread, waits for it to finish, releases its resources, and resets the pointer...." alt="" coords="216,5,423,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,15,200,15,200,20,168,20"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ResizingState::ApplyForce" name="ResizingState::ApplyForce">
+<area shape="rect" id="Node000001" title="Applies an external force to the blob, similar to the Moving state. The force applied to each control..." alt="" coords="243,5,418,30"/>
+<area shape="rect" id="Node000002" href="$classResizingState.html#ab54812de2866620613f6ca91d148af91" title="Handles the logic when a resize event occurs while in this state. Recalculates the blob&#39;s center base..." alt="" coords="5,5,195,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,20,195,20,195,15,227,15"/>
+</map>

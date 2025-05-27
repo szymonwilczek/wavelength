@@ -1,0 +1,11 @@
+<map id="AttachmentViewer::UpdateDecryptionStatus" name="AttachmentViewer::UpdateDecryptionStatus">
+<area shape="rect" id="Node000001" title="Updates the status label text to show the current decryption percentage." alt="" coords="776,26,954,65"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#a586152c0b840192e11c1453cbfd20926" title="Sets the decryption progress counter (0&#45;100). Updates the internal value, updates the status label te..." alt="" coords="509,26,728,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="760,48,729,48,729,43,760,43"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a6e5885d1dc1476a3dcff4b76e2e95df1" title="Sets the widget to be displayed after the decryption animation. Removes any previous content,..." alt="" coords="251,5,452,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="493,35,453,31,453,26,493,30"/>
+<area shape="rect" id="Node000004" href="$classAttachmentViewer.html#a847f3bd1aea14895c10cdc6a50a07765" title="Starts the visual scanning phase. Updates the status label, ensures the MaskOverlay is visible and an..." alt="" coords="243,54,461,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="494,61,462,65,461,60,493,56"/>
+<area shape="rect" id="Node000005" href="$classAttachmentViewer.html#a7f2dccdaa47930c6103f9392da17c17b" title="Slot triggered automatically after a short delay or potentially by a user action (though currently au..." alt="" coords="5,54,195,93"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="227,76,195,76,195,71,227,71"/>
+</map>

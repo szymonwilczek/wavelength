@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::GetWavelengthInfo" name="WavelengthRegistry::GetWavelengthInfo">
+<area shape="rect" id="Node000001" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="5,5,145,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="193,5,330,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,22,177,22,177,27,145,27"/>
+</map>

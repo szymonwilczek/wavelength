@@ -1,0 +1,11 @@
+<map id="CreateWavelengthDialog::ValidateInputs" name="CreateWavelengthDialog::ValidateInputs">
+<area shape="rect" id="Node000001" title="Validates the input fields (currently just the password if protection is enabled)...." alt="" coords="650,5,815,44"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#acb82ee7ee77da3a02fbd18f622f3c660" title="Constructs a WavelengthDialog. Sets up the UI elements (labels, input fields, buttons,..." alt="" coords="5,27,178,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="634,24,602,23,414,22,226,33,178,37,178,32,225,27,414,17,602,18,635,19"/>
+<area shape="rect" id="Node000003" href="$classCreateWavelengthDialog.html#a187675567db20379b9bec8d57da522b0" title="Slot triggered when the frequency search (FindLowestAvailableFrequency) completes...." alt="" coords="438,33,602,72"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="635,40,603,44,602,39,635,35"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="422,54,178,50,178,45,422,48"/>
+<area shape="rect" id="Node000004" href="$classCreateWavelengthDialog.html#aac53c51a52d92e2ccc1a0f945aaec449" title="Starts the asynchronous process of finding the lowest available frequency via the relay server...." alt="" coords="226,84,390,123"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="424,78,391,86,390,81,422,73"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="217,82,167,69,168,63,218,77"/>
+</map>

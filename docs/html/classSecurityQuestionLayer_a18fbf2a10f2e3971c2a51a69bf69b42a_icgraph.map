@@ -1,0 +1,5 @@
+<map id="SecurityQuestionLayer::Reset" name="SecurityQuestionLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Stops the hint timer, clears the input field and question labe..." alt="" coords="206,5,358,44"/>
+<area shape="rect" id="Node000002" href="$classSecurityQuestionLayer.html#a5e9aa84c48c45d130ae470c34c81b9b5" title="Initializes the layer for display. Resets the input field and styles, sets the initial question text,..." alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ChatView::TriggerConnectionEffect" name="ChatView::TriggerConnectionEffect">
+<area shape="rect" id="Node000001" title="Triggers a more pronounced scanline effect animation when connecting to a Wavelength." alt="" coords="226,5,416,44"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a4cbbc74a8774cc401a3117bedf750e0f" title="Configures the view for a specific Wavelength. Sets the header title with the frequency and optional ..." alt="" coords="5,12,178,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,27,178,27,178,22,210,22"/>
+</map>

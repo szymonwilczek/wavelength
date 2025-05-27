@@ -1,0 +1,7 @@
+<map id="GifDecoder::ReleaseResources" name="GifDecoder::ReleaseResources">
+<area shape="rect" id="Node000001" title="Releases all FFmpeg resources (contexts, frames, buffers). Does not release the custom I/O context bu..." alt="" coords="223,31,427,55"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a6cba2bb829e0608c96c2818df2ed844c" title="Reinitializes the decoder after it has been stopped or encountered an error. Stops the thread if runn..." alt="" coords="11,5,169,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,33,169,29,170,24,207,28"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#ad692e147e12716108096fac4fd45f1a3" title="Destructor. Stops the decoding thread, waits for it to finish, and releases all allocated resources." alt="" coords="5,55,175,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,58,176,61,175,56,207,52"/>
+</map>

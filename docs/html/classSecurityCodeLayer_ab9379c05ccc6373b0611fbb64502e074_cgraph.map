@@ -1,0 +1,15 @@
+<map id="SecurityCodeLayer::OnDigitEntered" name="SecurityCodeLayer::OnDigitEntered">
+<area shape="rect" id="Node000001" title="Slot called when the text in any input field changes. Handles automatic focus progression to the next..." alt="" coords="5,61,145,100"/>
+<area shape="rect" id="Node000002" href="$classSecurityCodeLayer.html#ae952b967add30cb12c1a68adaaa3ec54" title="Checks if the entered code matches the current security code. Called when all input fields are filled..." alt="" coords="193,61,332,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,78,177,78,177,83,145,83"/>
+<area shape="rect" id="Node000003" href="$classSecurityCodeLayer.html#a698e622b7e3a9e3543059f57c9b17a81" title="Gets the code currently entered by the user by concatenating the text from all input fields." alt="" coords="410,5,549,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,60,394,44,395,49,333,65"/>
+<area shape="rect" id="Node000004" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="380,68,578,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="333,78,364,78,364,83,333,83"/>
+<area shape="rect" id="Node000005" href="$classSecurityCodeLayer.html#a1f24bdfc759b707fe364b4a6d377bab5" title="Triggers a visual error effect on the input fields. Temporarily changes the background and border col..." alt="" coords="410,117,549,156"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="333,96,395,112,394,117,332,101"/>
+<area shape="rect" id="Node000006" href="$classSecurityCodeLayer.html#aff90508ace024d15efd490efb2b1b13a" title="Clears all input fields and resets their styles to the default (error/red) state. Sets focus on the f..." alt="" coords="626,85,766,124"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="549,124,611,114,612,120,550,129"/>
+<area shape="rect" id="Node000007" href="$classSecurityCodeLayer.html#a5f1194e6e5185b40eeb6aed165d8e58b" title="Sets the input validators for all code input fields based on whether the current code is numeric." alt="" coords="626,148,766,187"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="550,144,612,153,611,158,549,149"/>
+</map>

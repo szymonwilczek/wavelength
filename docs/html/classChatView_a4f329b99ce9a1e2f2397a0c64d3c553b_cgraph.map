@@ -1,0 +1,5 @@
+<map id="ChatView::OnPttDenied" name="ChatView::OnPttDenied">
+<area shape="rect" id="Node000001" title="Slot called when the server denies the PTT request. If the frequency matches and the state is Request..." alt="" coords="5,12,166,37"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a5d0b4d046c069b49e17f1eabdf350455" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="214,5,396,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,22,198,22,198,27,166,27"/>
+</map>

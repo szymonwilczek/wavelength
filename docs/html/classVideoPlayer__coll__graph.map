@@ -1,0 +1,31 @@
+<map id="VideoPlayer" name="VideoPlayer">
+<area shape="rect" id="Node000001" title="A QDialog overlay for playing videos with a cyberpunk aesthetic." alt="" coords="312,2302,508,3308"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,1979,63,2043"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="41,2057,54,2137,64,2182,78,2225,129,2345,190,2462,254,2570,315,2664,310,2667,250,2573,186,2464,125,2347,73,2227,59,2183,48,2138,36,2058"/>
+<area shape="rect" id="Node000003" href="$classCyberPushButton.html" title="A custom QPushButton styled with a cyberpunk aesthetic, featuring pulsing glow effects." alt="" coords="87,1796,290,2226"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,2225,310,2436,305,2438,246,2227"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="144,1306,233,1370"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="192,1385,192,1796,186,1796,186,1385"/>
+<area shape="rect" id="Node000005" href="$classCyberSlider.html" title="A custom QSlider styled with a general cyberpunk aesthetic (blue theme)." alt="" coords="314,1872,506,2150"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="413,2149,413,2286,408,2286,408,2149"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="377,1306,430,1370"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="407,1385,411,1873,406,1873,401,1385"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="530,1979,733,2043"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="626,2043,515,2438,510,2436,621,2042"/>
+<area shape="rect" id="Node000008" href="$classVideoDecoder.html" title="Decodes video data frame by frame using FFmpeg libraries in a separate thread." alt="" coords="455,942,672,1734"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="606,1733,629,1962,624,1963,601,1734"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="456,5,516,69"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="487,84,482,416,486,645,498,880,504,942,499,942,493,880,480,646,477,416,482,84"/>
+<area shape="rect" id="Node000010" href="$classAudioDecoder.html" title="Decodes and plays audio data using FFmpeg libraries in a separate thread." alt="" coords="507,118,692,880"/>
+<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="500,82,510,122,504,124,495,84"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="586,880,584,925,579,925,580,880"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="696,1306,826,1370"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="755,1385,640,1980,635,1979,750,1384"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="752,467,770,531"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="764,531,764,1289,758,1289,758,531"/>
+<area shape="rect" id="Node000013" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="768,1799,981,2223"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="770,2195,519,2624,514,2621,765,2193"/>
+<area shape="poly" id="edge15_Node000013_Node000013" title=" " alt="" coords="982,1968,1000,1984,1007,2011,1004,2030,996,2044,992,2041,999,2028,1002,2011,996,1987,978,1972"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="850,1306,909,1370"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="882,1384,879,1799,873,1799,876,1384"/>
+</map>

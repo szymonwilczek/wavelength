@@ -1,0 +1,5 @@
+<map id="AppearanceSettingsWidget::ChooseBackgroundColor" name="AppearanceSettingsWidget::ChooseBackgroundColor">
+<area shape="rect" id="Node000001" title="Opens a QColorDialog to allow the user to select the background color. Updates the local preview and ..." alt="" coords="5,5,185,44"/>
+<area shape="rect" id="Node000002" href="$classAppearanceSettingsWidget.html#ade1faf2be357c3745ae918673356810d" title="Static utility function to update the background color of a ClickableColorPreview widget." alt="" coords="233,5,412,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,22,217,22,217,27,185,27"/>
+</map>

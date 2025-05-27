@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::SetWavelengthSocket" name="WavelengthRegistry::SetWavelengthSocket">
+<area shape="rect" id="Node000001" title="Sets or updates the WebSocket connection associated with a specific frequency." alt="" coords="5,5,162,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="210,5,347,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,22,194,22,194,27,162,27"/>
+</map>

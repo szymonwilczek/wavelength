@@ -1,0 +1,19 @@
+<map id="src/chat/files/audio/decoder/audio_decoder.h" name="src/chat/files/audio/decoder/audio_decoder.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="328,5,498,44"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,92,111,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="328,47,127,91,125,86,327,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="135,92,202,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="354,47,218,90,216,85,353,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="226,92,295,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="377,47,298,87,296,82,375,42"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="320,92,391,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="401,46,375,81,371,78,397,43"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="415,92,528,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="429,43,456,78,451,81,425,46"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="552,92,697,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="465,42,580,84,578,89,463,47"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="722,92,872,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="499,41,724,86,723,91,498,46"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="895,92,1085,117"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="499,35,888,87,887,92,498,40"/>
+</map>

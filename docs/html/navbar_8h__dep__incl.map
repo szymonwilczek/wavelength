@@ -1,0 +1,9 @@
+<map id="src/ui/navigation/navbar.h" name="src/ui/navigation/navbar.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="215,5,385,30"/>
+<area shape="rect" id="Node000002" href="$shortcut__manager_8cpp.html" title=" " alt="" coords="5,78,184,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="256,38,145,80,143,75,254,33"/>
+<area shape="rect" id="Node000003" href="$navbar_8cpp.html" title=" " alt="" coords="208,85,392,110"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="302,46,302,85,297,85,297,46"/>
+<area shape="rect" id="Node000004" href="$overlay__widget_8cpp.html" title=" " alt="" coords="416,78,563,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="343,34,444,75,442,80,341,39"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="FloatingEnergySphereWidget::widgetClosed" name="FloatingEnergySphereWidget::widgetClosed">
+<area shape="rect" id="Node000001" title="Emitted when the widget is closed normally (not during destruction)." alt="" coords="745,92,936,131"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#a856ae09aa6116cfe47f0d842f2ad4397" title="Handles the widget close event. Stops timers and audio, emits widgetClosed() if allowed (closable_ is..." alt="" coords="507,5,697,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="776,88,696,58,665,47,667,42,698,53,778,83"/>
+<area shape="rect" id="Node000003" href="$classSystemOverrideManager.html#a0834ff9c3ad9bfec1d08ba05648e6122" title="Restores the system state to normal. Uninstalls input hooks (Windows), restores the original wallpape..." alt="" coords="520,92,684,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="730,114,684,114,684,109,730,109"/>
+<area shape="rect" id="Node000005" href="$classSystemOverrideManager.html#ad55be1ff40ee203da7ed94a15e7e3de5" title="Creates, configures, positions, and shows the FloatingEnergySphereWidget. Connects the necessary sign..." alt="" coords="5,92,213,131"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="780,139,680,174,618,191,550,206,478,216,405,221,331,217,260,203,223,190,188,171,132,133,135,129,191,167,225,185,261,198,332,212,405,215,478,211,549,201,617,186,679,169,778,134"/>
+<area shape="poly" id="edge6_Node000003_Node000003" title=" " alt="" coords="642,79,627,73,602,71,579,73,565,77,560,83,563,91,558,93,555,82,562,73,578,67,602,65,628,68,644,74"/>
+<area shape="rect" id="Node000004" href="$classSystemOverrideManager.html#a1d774843ddf2350e4b0ebd78777733bf" title="Slot called when the FloatingEnergySphereWidget emits its widgetClosed signal. Cleans up the widget p..." alt="" coords="261,35,459,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="505,100,412,77,414,71,506,95"/>
+<area shape="poly" id="edge7_Node000003_Node000005" title=" " alt="" coords="505,114,213,114,213,109,505,109"/>
+<area shape="rect" id="Node000007" href="$classSystemOverrideManager.html#a97a21907f73c99fc8dd4defaadfd5f48" title="Destructor. Ensures the system state is restored if the override is active. Cleans up the floating wi..." alt="" coords="270,149,450,188"/>
+<area shape="poly" id="edge8_Node000003_Node000007" title=" " alt="" coords="506,137,445,151,444,146,505,132"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="475,69,550,89,549,94,473,75"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="258,80,197,94,196,89,257,75"/>
+</map>

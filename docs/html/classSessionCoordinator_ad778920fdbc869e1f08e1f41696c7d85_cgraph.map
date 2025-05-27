@@ -1,0 +1,10 @@
+<map id="SessionCoordinator::GetRelayServerAddress" name="SessionCoordinator::GetRelayServerAddress">
+<area shape="rect" id="Node000001" title="Gets the configured relay server address. Delegates the call to WavelengthConfig." alt="" coords="5,57,175,96"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abe95f3b7789e1e60f7bd535352644c0d" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="223,36,428,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,64,207,60,207,65,176,69"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#adf2ecac39e18de2b5ed81eb8fde47d8a" title="Gets the configured relay server address." alt="" coords="231,85,420,124"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="176,84,216,89,215,94,175,89"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="476,29,677,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="429,46,461,46,461,51,429,51"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="530,30,527,20,534,10,551,5,577,3,604,5,620,11,618,16,603,10,577,8,552,10,537,15,532,21,535,28"/>
+</map>

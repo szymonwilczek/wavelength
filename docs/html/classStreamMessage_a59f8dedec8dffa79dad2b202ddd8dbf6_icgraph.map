@@ -1,0 +1,13 @@
+<map id="StreamMessage::CleanupContent" name="StreamMessage::CleanupContent">
+<area shape="rect" id="Node000001" title="Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities...." alt="" coords="759,55,978,79"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#ab018e0c173fde148dec8f2441b5db300" title="Parses HTML content to find an attachment placeholder and adds the corresponding AttachmentPlaceholde..." alt="" coords="494,5,709,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="782,54,672,33,673,28,783,49"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="492,55,711,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="744,70,712,70,712,64,744,64"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="496,104,708,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="783,85,673,106,672,101,782,80"/>
+<area shape="rect" id="Node000005" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="254,97,444,136"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="480,119,444,119,444,114,480,114"/>
+<area shape="rect" id="Node000006" href="$classStreamDisplay.html#ab49c3a484e911bc8cf752e2d3791516a" title="Constructs a WavelengthStreamDisplay widget. Creates the main layout, instantiates the CommunicationS..." alt="" coords="5,104,206,129"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="238,119,206,119,206,114,238,114"/>
+</map>

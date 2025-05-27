@@ -1,0 +1,15 @@
+<map id="WavelengthJoiner::wavelengthClosed" name="WavelengthJoiner::wavelengthClosed">
+<area shape="rect" id="Node000001" title="Emitted if the WebSocket connection for the wavelength is closed unexpectedly (e.g...." alt="" coords="678,40,874,79"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="452,9,587,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="663,48,587,39,588,34,663,43"/>
+<area shape="rect" id="Node000004" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="408,75,630,100"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="663,74,631,78,630,73,663,69"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="218,5,353,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="436,30,353,28,353,23,436,25"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="218,68,353,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="392,90,353,90,353,85,392,85"/>
+<area shape="rect" id="Node000006" href="$classJoinWavelengthDialog.html#a0cb74ecdcc726cea2ce437c85cd75185" title="Attempts to join the wavelength using the entered frequency and password. Shows a wait cursor,..." alt="" coords="211,131,360,169"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="456,107,361,133,359,128,454,102"/>
+<area shape="rect" id="Node000007" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="5,131,163,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="195,153,163,153,163,147,195,147"/>
+</map>

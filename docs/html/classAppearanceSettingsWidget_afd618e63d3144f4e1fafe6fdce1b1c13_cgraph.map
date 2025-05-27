@@ -1,0 +1,29 @@
+<map id="AppearanceSettingsWidget::SetupUi" name="AppearanceSettingsWidget::SetupUi">
+<area shape="rect" id="Node000001" title="Creates and arranges all the UI elements (labels, previews, spin boxes, layouts) for the widget." alt="" coords="5,256,185,295"/>
+<area shape="rect" id="Node000002" href="$classAppearanceSettingsWidget.html#a4550e9feb1a4020d3dd2b0ca8d134e12" title="Opens a QColorDialog to allow the user to select the background color. Updates the local preview and ..." alt="" coords="233,5,412,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,255,118,213,145,159,183,103,206,76,231,53,235,50,238,55,234,57,210,80,187,106,150,162,123,215,106,257"/>
+<area shape="rect" id="Node000004" href="$classAppearanceSettingsWidget.html#a6a93e091e4ab3f12c05e04ca4ae5c6cd" title="Opens a QColorDialog to allow the user to select the blob color. Updates the local preview and immedi..." alt="" coords="233,68,412,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="106,254,156,187,191,149,231,116,238,112,241,116,234,120,194,153,160,190,111,257"/>
+<area shape="rect" id="Node000005" href="$classAppearanceSettingsWidget.html#aa59b5dc13a7abfda4bd28c6aa4f939bb" title="Opens a QColorDialog to allow the user to select the grid color. Updates the local preview and immedi..." alt="" coords="233,131,412,169"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="119,253,169,216,231,178,242,173,244,178,234,183,172,220,122,258"/>
+<area shape="rect" id="Node000006" href="$classAppearanceSettingsWidget.html#aa562ee5bd248d8f1a161c21aaaf3d93c" title="Opens a QColorDialog to allow the user to select the stream color. Updates the local preview and imme..." alt="" coords="233,193,412,232"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="167,253,234,234,236,239,168,258"/>
+<area shape="rect" id="Node000007" href="$classAppearanceSettingsWidget.html#ac57ce626ae67684c72621e4a927c85e9" title="Opens a QColorDialog to allow the user to select the title border color. Updates the local preview an..." alt="" coords="233,256,412,295"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="185,273,217,273,217,278,185,278"/>
+<area shape="rect" id="Node000008" href="$classAppearanceSettingsWidget.html#a215dad6034dfc20a10ab89d3f448e7f0" title="Opens a QColorDialog to allow the user to select the title glow color. Updates the local preview and ..." alt="" coords="233,319,412,357"/>
+<area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="168,293,236,311,234,317,167,298"/>
+<area shape="rect" id="Node000009" href="$classAppearanceSettingsWidget.html#a25382da42c1f3225b9c5c0393e14d0d0" title="Opens a QColorDialog to allow the user to select the title text color. Updates the local preview and ..." alt="" coords="233,381,412,420"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="123,293,173,329,234,366,247,373,245,377,231,371,170,334,120,297"/>
+<area shape="rect" id="Node000010" href="$classClickableColorPreview.html#aa0291a9c0f494c29b0e33219d81d5e2f" title="Emitted when the widget is clicked with the left mouse button." alt="" coords="246,444,399,483"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="111,293,160,359,195,397,234,429,243,434,240,439,231,433,191,401,156,363,106,297"/>
+<area shape="rect" id="Node000011" href="$classAppearanceSettingsWidget.html#a75775949816a0c54f6238b4b194d9a41" title="Slot triggered when the grid spacing spin box value changes. Immediately saves the new spacing value ..." alt="" coords="233,507,412,545"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="106,294,123,335,150,388,188,444,210,469,234,492,240,496,237,501,231,496,206,473,183,447,146,391,118,337,101,296"/>
+<area shape="rect" id="Node000003" href="$classAppearanceSettingsWidget.html#ade1faf2be357c3745ae918673356810d" title="Static utility function to update the background color of a ClickableColorPreview widget." alt="" coords="460,193,639,232"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,42,413,53,450,82,482,115,530,179,526,182,478,119,446,86,411,58,391,47"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="389,105,413,116,467,148,513,181,510,185,464,152,411,120,387,110"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="395,167,463,186,462,191,394,172"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="412,210,444,210,444,215,412,215"/>
+<area shape="poly" id="edge10_Node000007_Node000003" title=" " alt="" coords="394,253,462,234,463,239,395,258"/>
+<area shape="poly" id="edge12_Node000008_Node000003" title=" " alt="" coords="384,316,411,304,464,272,510,240,513,244,466,277,413,308,386,321"/>
+<area shape="poly" id="edge14_Node000009_Node000003" title=" " alt="" coords="389,378,411,366,446,338,477,305,526,243,530,246,481,309,449,342,413,371,391,383"/>
+</map>

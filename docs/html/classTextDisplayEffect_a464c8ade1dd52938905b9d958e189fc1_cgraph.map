@@ -1,0 +1,5 @@
+<map id="TextDisplayEffect::resizeEvent" name="TextDisplayEffect::resizeEvent">
+<area shape="rect" id="Node000001" title="Overridden resize event handler. Recalculates the required height based on the new width." alt="" coords="5,5,138,44"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#a11d1fbc1c104ee6c184d9b4ac0ba3fa5" title="Recalculates the required height for the widget based on the plain_text_ content and current width...." alt="" coords="186,5,318,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,22,170,22,170,27,138,27"/>
+</map>

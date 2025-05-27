@@ -1,0 +1,5 @@
+<map id="AnimatedStackedWidget" name="AnimatedStackedWidget">
+<area shape="rect" id="Node000001" title="A QStackedWidget subclass that provides animated transitions between widgets." alt="" coords="5,117,202,877"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="50,5,158,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,84,106,117,101,117,101,84"/>
+</map>

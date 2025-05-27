@@ -1,0 +1,16 @@
+<map id="TextDisplayEffect::fullTextRevealed" name="TextDisplayEffect::fullTextRevealed">
+<area shape="rect" id="Node000001" title="Emitted exactly once when the text revealing animation completes for the first time after StartReveal..." alt="" coords="578,124,711,163"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#a743994a8ebe09bd1d4536a2e2ce4ee23" title="Sets the number of revealed characters. Updates the internal count, triggers a repaint,..." alt="" coords="398,95,530,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="562,133,530,127,531,122,563,127"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="21,121,154,160"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="563,147,530,147,218,147,154,146,154,140,218,142,530,142,563,142"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#aff24a16ba912a1d96cf23516936f538d" title="Slot called by the text_timer_. Reveals the next character in the sequence. Adjusts the timer interva..." alt="" coords="218,95,350,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,117,350,117,350,111,383,111"/>
+<area shape="rect" id="Node000005" href="$classTextDisplayEffect.html#ad9da8cfd5969d6509d622fc708957fb3" title="Starts or restarts the text revealing animation from the beginning. If the text has been fully reveal..." alt="" coords="218,32,350,71"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="391,92,341,74,343,69,393,87"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="203,128,154,134,154,129,202,122"/>
+<area shape="rect" id="Node000006" href="$classStreamMessage.html#a34d536edeb897ec7e7c6cc1a4bd34e2e" title="Starts the fade&#45;in animation (opacity and glow). Also triggers the text reveal animation (CyberTextDi..." alt="" coords="5,68,170,93"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="203,66,171,71,170,66,202,61"/>
+<area shape="rect" id="Node000015" href="$classTextDisplayEffect.html#a08a497134c49a1068add82b03ea21712" title="Sets new text content for the widget. Updates the internal text, removes HTML, recalculates required ..." alt="" coords="21,5,154,44"/>
+<area shape="poly" id="edge6_Node000005_Node000015" title=" " alt="" coords="202,43,154,36,154,31,203,38"/>
+</map>

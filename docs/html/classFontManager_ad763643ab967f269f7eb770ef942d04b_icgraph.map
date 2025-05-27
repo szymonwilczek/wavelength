@@ -1,0 +1,5 @@
+<map id="FontManager::GetFontFamily" name="FontManager::GetFontFamily">
+<area shape="rect" id="Node000001" title="Retrieves the actual font family name associated with a logical font name." alt="" coords="206,5,397,30"/>
+<area shape="rect" id="Node000002" href="$classFontManager.html#a89e13ed70be0e2e40a1593f07e766b7d" title="Creates a QFont object with the specified logical name, size, and weight." alt="" coords="5,5,158,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,20,158,20,158,15,190,15"/>
+</map>

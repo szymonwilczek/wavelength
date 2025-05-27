@@ -1,0 +1,5 @@
+<map id="AttachmentQueueManager::GetInstance" name="AttachmentQueueManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="5,5,182,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentQueueManager.html#a7d8e4bb17b92bb0e390215015c269349" title="Private constructor to enforce the singleton pattern. Determines the maximum number of concurrent tas..." alt="" coords="230,5,414,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,22,214,22,214,27,182,27"/>
+</map>

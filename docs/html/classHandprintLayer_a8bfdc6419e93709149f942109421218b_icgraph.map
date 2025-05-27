@@ -1,0 +1,7 @@
+<map id="HandprintLayer::ProcessHandprint" name="HandprintLayer::ProcessHandprint">
+<area shape="rect" id="Node000001" title="Handles the completion of the handprint scan. Changes the UI element styles (border,..." alt="" coords="484,12,704,37"/>
+<area shape="rect" id="Node000002" href="$classHandprintLayer.html#a7153d3b1fcc6d838df1f335be5f124d4" title="Slot called periodically by handprint_timer_ when the user is holding the mouse button...." alt="" coords="226,12,436,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="468,27,436,27,436,22,468,22"/>
+<area shape="rect" id="Node000003" href="$classHandprintLayer.html#a8ad520d9a942969b2095fdad95a0c989" title="Constructs a HandprintLayer. Initializes the UI elements (title, handprint image label,..." alt="" coords="5,5,178,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="210,27,178,27,178,22,210,22"/>
+</map>

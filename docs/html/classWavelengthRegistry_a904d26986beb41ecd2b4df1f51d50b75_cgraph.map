@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::IsWavelengthClosing" name="WavelengthRegistry::IsWavelengthClosing">
+<area shape="rect" id="Node000001" title="Checks if a wavelength is currently marked as closing." alt="" coords="5,5,157,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="205,5,342,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,22,189,22,189,27,157,27"/>
+</map>

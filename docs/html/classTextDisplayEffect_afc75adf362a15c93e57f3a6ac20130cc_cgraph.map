@@ -1,0 +1,7 @@
+<map id="TextDisplayEffect::RandomGlitch" name="TextDisplayEffect::RandomGlitch">
+<area shape="rect" id="Node000001" title="Slot called by the glitch_timer_. Randomly triggers a glitch effect or fades the current intensity." alt="" coords="5,37,138,76"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#af50db065eb47f6a4e0f2140603e95e7f" title="Sets the intensity of the glitch effect. Updates the internal intensity value and triggers a repaint." alt="" coords="186,5,318,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,42,170,36,171,42,138,48"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#ac471819b99230b9f5a8e4bc7f03c2e77" title="Initiates a short, animated glitch effect by animating the glitchIntensity property." alt="" coords="186,68,318,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,65,171,71,170,76,138,71"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="AudioPlayer::AdjustVolume" name="AudioPlayer::AdjustVolume">
+<area shape="rect" id="Node000001" title="Adjusts the playback volume via the AudioDecoder. Also updates the volume icon based on the new volum..." alt="" coords="221,5,399,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

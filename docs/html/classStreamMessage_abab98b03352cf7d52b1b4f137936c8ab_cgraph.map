@@ -1,0 +1,5 @@
+<map id="StreamMessage::UpdateAnimation" name="StreamMessage::UpdateAnimation">
+<area shape="rect" id="Node000001" title="Slot called by animation_timer_ to update subtle background animations (e.g., glow pulsing)." alt="" coords="5,5,230,30"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a04a58d5ef3fd9973d946088bc947dff3" title="Sets the glow intensity level and triggers a repaint." alt="" coords="278,5,502,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,15,262,15,262,20,230,20"/>
+</map>

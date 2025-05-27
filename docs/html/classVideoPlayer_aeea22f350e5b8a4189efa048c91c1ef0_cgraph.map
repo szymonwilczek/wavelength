@@ -1,0 +1,5 @@
+<map id="VideoPlayer::OnSliderReleased" name="VideoPlayer::OnSliderReleased">
+<area shape="rect" id="Node000001" title="Slot called when the user releases the progress slider. Performs the seek operation based on the slid..." alt="" coords="5,5,208,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a5e1ada602659cecd28886da1b8f245ba" title="Initiates a seek operation in the VideoDecoder. Converts the slider position (milliseconds) to second..." alt="" coords="256,5,417,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,15,240,15,240,20,208,20"/>
+</map>

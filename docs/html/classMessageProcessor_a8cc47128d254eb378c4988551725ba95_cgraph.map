@@ -1,0 +1,26 @@
+<map id="MessageProcessor::ProcessWavelengthClosed" name="MessageProcessor::ProcessWavelengthClosed">
+<area shape="rect" id="Node000001" title="Processes messages indicating a wavelength was closed (e.g., &quot;wavelength_closed&quot;, &quot;close_wavelength&quot; ..." alt="" coords="5,188,195,227"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a6ce8627bbb1db084bf76053aa92f9a47" title="Gets the identifier of the currently active wavelength." alt="" coords="269,5,422,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,186,164,121,200,84,241,53,253,46,256,51,244,58,204,88,168,124,117,189"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="277,68,414,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,185,178,150,242,116,261,108,263,113,244,120,181,155,129,190"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="518,185,656,224"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="195,204,503,202,503,208,195,209"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#aebbe5d55c6ac560efb88510ac972f7b4" title="Marks or unmarks a wavelength as being in the process of closing." alt="" coords="260,131,430,169"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="185,185,244,171,246,176,186,190"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a21547e9bcb55b4b6ac50a276c01cab84" title="Removes a wavelength from the registry. If the removed wavelength was the active one,..." alt="" coords="274,245,417,284"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="186,225,259,242,258,247,185,230"/>
+<area shape="rect" id="Node000009" href="$classWavelengthRegistry.html#a4548037308651c141a62473296dc2b1e" title="Sets the specified frequency as the currently active wavelength. If the frequency does not exist in t..." alt="" coords="269,308,422,347"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="130,225,181,259,244,293,260,300,258,305,242,298,179,263,127,229"/>
+<area shape="rect" id="Node000011" href="$classMessageProcessor.html#a857bd885170f17df9b31bc85ccece812" title="Emitted when a wavelength is closed (either by host or server command)." alt="" coords="243,371,448,409"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="117,226,168,290,204,326,244,357,252,361,249,366,241,362,200,330,164,294,112,229"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="514,68,660,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="415,85,499,85,499,90,415,90"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="432,167,504,183,503,188,430,172"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="416,244,503,223,504,228,418,250"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a28770c18c4d884809355dbe9e851e7a4" title="Emitted when a wavelength is successfully removed from the registry." alt="" coords="514,248,661,287"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="417,263,498,264,498,269,417,268"/>
+<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="421,307,446,293,461,279,470,264,479,249,494,233,503,228,506,232,498,237,483,252,474,267,466,282,450,297,423,311"/>
+<area shape="rect" id="Node000010" href="$classWavelengthRegistry.html#ac86f04e6e88b2ba0dee509b7fbdc6e40" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="496,311,678,349"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="422,326,481,326,481,331,422,331"/>
+</map>

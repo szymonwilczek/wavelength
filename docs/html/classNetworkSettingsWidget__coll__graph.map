@@ -1,0 +1,14 @@
+<map id="NetworkSettingsWidget" name="NetworkSettingsWidget">
+<area shape="rect" id="Node000001" title="A widget for configuring advanced network settings for the application." alt="" coords="104,970,290,1281"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,481,67,545"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="38,559,39,628,45,716,58,812,81,907,107,971,102,973,76,909,53,813,40,716,34,628,33,559"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="91,118,304,908"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,908,200,953,195,953,195,908"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="305,441,316,452,324,468,329,488,331,513,327,547,317,571,312,569,322,545,325,513,324,489,319,470,311,455,302,445"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="168,5,227,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="200,84,200,118,195,118,195,84"/>
+<area shape="rect" id="Node000005" href="$classCyberLineEdit.html" title="A custom QLineEdit styled with a cyberpunk aesthetic." alt="" coords="416,255,605,771"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="464,771,439,842,406,909,359,977,305,1036,301,1033,355,974,402,907,434,840,459,770"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="477,5,545,69"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="514,84,514,255,508,255,508,84"/>
+</map>

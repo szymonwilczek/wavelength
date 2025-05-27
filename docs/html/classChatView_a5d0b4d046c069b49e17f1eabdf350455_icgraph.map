@@ -1,0 +1,32 @@
+<map id="ChatView::UpdatePttButtonState" name="ChatView::UpdatePttButtonState">
+<area shape="rect" id="Node000001" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="943,246,1125,285"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a19088a1cf7c1314fcdc1bca5a0b28b81" title="Slot called when the PTT button is pressed. Plays the PTT activation sound, sets the state to Request..." alt="" coords="196,5,401,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1005,236,956,188,926,164,893,144,831,116,766,93,633,58,507,37,401,25,402,20,508,31,635,53,768,88,833,111,896,139,929,160,960,184,1009,233"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="683,153,895,178"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="983,241,894,199,840,181,842,176,896,194,985,236"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#ae1708fe2be43fe0f0bf4e000d968b385" title="Slot called when the server grants the PTT request. If the frequency matches and the state is Request..." alt="" coords="216,204,381,229"/>
+<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="927,267,706,261,577,254,449,243,369,232,370,227,449,238,578,248,707,256,927,262"/>
+<area shape="rect" id="Node000006" href="$classChatView.html#a4cbbc74a8774cc401a3117bedf750e0f" title="Configures the view for a specific Wavelength. Sets the header title with the frequency and optional ..." alt="" coords="456,204,628,229"/>
+<area shape="poly" id="edge19_Node000001_Node000006" title=" " alt="" coords="927,254,894,250,629,225,629,220,895,244,928,248"/>
+<area shape="rect" id="Node000008" href="$classChatView.html#a4f329b99ce9a1e2f2397a0c64d3c553b" title="Slot called when the server denies the PTT request. If the frequency matches and the state is Request..." alt="" coords="709,304,869,329"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="928,290,853,306,852,301,927,285"/>
+<area shape="rect" id="Node000009" href="$classChatView.html#aad17ec29d4babcf3177b49eea7c48065" title="Slot called when another user starts transmitting PTT on the current Wavelength. If the state is Idle..." alt="" coords="196,355,401,379"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="994,296,948,322,895,343,831,358,764,369,630,381,505,383,401,379,401,373,505,378,630,376,763,364,830,353,894,338,946,317,991,291"/>
+<area shape="rect" id="Node000010" href="$classChatView.html#aabba720d117ae8d235dfc9b27d66881f" title="Slot called when the remote user stops transmitting PTT. If the frequency matches and the state is Re..." alt="" coords="687,404,891,429"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="1007,298,958,344,928,368,896,388,852,406,850,401,893,383,925,363,954,340,1003,295"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,279,148,303"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="214,39,197,50,171,77,149,107,115,174,94,235,83,279,78,278,89,234,110,171,145,105,167,73,194,46,211,35"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="741,150,690,134,635,122,542,113,449,122,375,132,318,144,264,162,197,195,165,215,135,238,91,280,88,276,132,234,162,210,194,190,262,157,317,139,375,127,449,116,542,107,636,116,692,129,742,145"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="720,152,661,143,593,136,521,136,450,146,412,157,376,173,320,206,317,201,374,169,410,152,448,140,520,130,594,131,662,137,721,147"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="711,184,607,206,606,201,710,179"/>
+<area shape="rect" id="Node000007" href="$classChatView.html#a119a0cb1a68f2e3a60e4153912fa43f2" title="Starts capturing audio from the microphone if PTT state is Transmitting. Connects the readyRead signa..." alt="" coords="454,155,630,179"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="668,169,631,169,631,164,668,164"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="246,237,117,281,115,276,244,232"/>
+<area shape="poly" id="edge9_Node000007_Node000005" title=" " alt="" coords="463,186,364,206,362,201,462,180"/>
+<area shape="poly" id="edge11_Node000008_Node000003" title=" " alt="" coords="693,316,148,296,148,291,693,310"/>
+<area shape="poly" id="edge14_Node000009_Node000003" title=" " alt="" coords="239,352,195,338,110,306,112,301,197,332,241,347"/>
+<area shape="poly" id="edge16_Node000010_Node000003" title=" " alt="" coords="709,434,603,447,471,452,400,447,330,437,260,419,194,393,161,373,131,349,87,306,91,302,134,345,164,369,197,389,262,414,331,432,401,442,471,446,602,442,708,429"/>
+<area shape="rect" id="Node000011" href="$classChatView.html#afb21e71849031ae941a3f44e9f697c39" title="Starts audio playback if PTT state is Receiving. Prepares the audio output device to receive data." alt="" coords="449,404,635,429"/>
+<area shape="poly" id="edge17_Node000010_Node000011" title=" " alt="" coords="672,419,636,419,636,414,672,414"/>
+<area shape="poly" id="edge18_Node000011_Node000009" title=" " alt="" coords="462,403,362,383,364,377,463,398"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="WavelengthStateManager::RegisterJoinedWavelength" name="WavelengthStateManager::RegisterJoinedWavelength">
+<area shape="rect" id="Node000001" title="Registers that the user has successfully joined a specific wavelength. Adds the frequency to an inter..." alt="" coords="189,37,371,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,43,141,38,142,33,174,38"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="5,68,141,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,75,142,80,141,75,173,70"/>
+</map>

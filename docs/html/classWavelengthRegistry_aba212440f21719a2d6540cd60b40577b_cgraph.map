@@ -1,0 +1,9 @@
+<map id="WavelengthRegistry::ClearAllWavelengths" name="WavelengthRegistry::ClearAllWavelengths">
+<area shape="rect" id="Node000001" title="Removes all wavelengths and pending registrations from the registry. Sets the active wavelength to &quot;&#45;..." alt="" coords="5,37,155,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a21547e9bcb55b4b6ac50a276c01cab84" title="Removes a wavelength from the registry. If the removed wavelength was the active one,..." alt="" coords="203,37,346,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,54,187,54,187,59,155,59"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="399,5,536,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,42,383,36,384,41,347,47"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a28770c18c4d884809355dbe9e851e7a4" title="Emitted when a wavelength is successfully removed from the registry." alt="" coords="394,68,541,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="347,65,379,71,378,76,346,71"/>
+</map>

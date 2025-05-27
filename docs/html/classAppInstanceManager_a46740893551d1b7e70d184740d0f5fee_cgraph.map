@@ -1,0 +1,7 @@
+<map id="AppInstanceManager::ApplyAttractionForce" name="AppInstanceManager::ApplyAttractionForce">
+<area shape="rect" id="Node000001" title="Applies a force to the client window, pulling it towards the target position (creator window)." alt="" coords="5,5,157,44"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a47fb8c069b2b3e5e6a19304726d59feb" title="Starts the animation sequence for absorbing a client instance. This involves moving the client window..." alt="" coords="205,5,384,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,22,189,22,189,27,157,27"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#abe3a7b8fc1126f8ad31e8358139f815e" title="Finalizes the absorption process by quitting the client application." alt="" coords="432,5,576,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,22,416,22,416,27,384,27"/>
+</map>

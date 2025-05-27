@@ -1,0 +1,5 @@
+<map id="SettingsView" name="SettingsView">
+<area shape="rect" id="Node000001" title="The main view for configuring application settings." alt="" coords="5,117,211,821"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="78,5,139,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,84,111,117,106,117,106,84"/>
+</map>

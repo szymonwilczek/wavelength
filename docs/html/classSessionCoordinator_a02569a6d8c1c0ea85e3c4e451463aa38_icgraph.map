@@ -1,0 +1,8 @@
+<map id="SessionCoordinator::GetInstance" name="SessionCoordinator::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthSessionCoordinator." alt="" coords="428,24,563,62"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,5,380,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="412,36,380,32,381,26,413,30"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,31,148,55"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="413,46,148,46,148,40,413,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="181,33,148,37,147,32,180,28"/>
+</map>

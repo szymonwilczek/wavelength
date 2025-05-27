@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['reached_5fend_5fof_5fstream_5f_0',['reached_end_of_stream_',['../classAudioDecoder.html#a3f16fcfb1303426c4f870a7cb65c9509',1,'AudioDecoder::reached_end_of_stream_'],['../classGifDecoder.html#a67bda0c0f5fbf7f3feb4c812e2713c26',1,'GifDecoder::reached_end_of_stream_']]],
+  ['read_5fposition_5f_1',['read_position_',['../classAudioDecoder.html#ad0e74c589757bc53b9c1a72fb61f936e',1,'AudioDecoder::read_position_'],['../classGifDecoder.html#a462ecf67aa5c4ab579d8201d652e5e92',1,'GifDecoder::read_position_']]],
+  ['recent_5fcolor_5fbuttons_5f_2',['recent_color_buttons_',['../classAppearanceSettingsWidget.html#a4786432f826b5ead796555a883b8a8d4',1,'AppearanceSettingsWidget']]],
+  ['recent_5fcolors_5f_3',['recent_colors_',['../classWavelengthConfig.html#a927091f25f9765ffc301ecb2a0f9059d',1,'WavelengthConfig']]],
+  ['recent_5fcolors_5flayout_5f_4',['recent_colors_layout_',['../classAppearanceSettingsWidget.html#a289e7f0e84ea907ccf12f5776eb25c1e',1,'AppearanceSettingsWidget']]],
+  ['recognition_5fprogress_5f_5',['recognition_progress_',['../classVoiceRecognitionLayer.html#a0830ca8922b5175e4038fdeaadcd59a5',1,'VoiceRecognitionLayer']]],
+  ['recognition_5ftimer_5f_6',['recognition_timer_',['../classVoiceRecognitionLayer.html#a40a5edf2a167779ecd54cea77ba4d85d',1,'VoiceRecognitionLayer']]],
+  ['refresh_5ftimer_5f_7',['refresh_timer_',['../classCreateWavelengthDialog.html#a73b7e213cbb3210331907545543e6f84',1,'CreateWavelengthDialog::refresh_timer_'],['../classJoinWavelengthDialog.html#a399b1f4924577ed202fa947e0cd49e4d',1,'JoinWavelengthDialog::refresh_timer_'],['../classSettingsView.html#adb88d64d7e9c1e8065fd8295ae4ef103',1,'SettingsView::refresh_timer_']]],
+  ['registered_5fshortcuts_5f_8',['registered_shortcuts_',['../classShortcutManager.html#af8a7abf424a60a707f41d777c54beaef',1,'ShortcutManager']]],
+  ['relay_5fserver_5faddress_5f_9',['relay_server_address_',['../classWavelengthConfig.html#a30786496349ac2849559876552a1ceab',1,'WavelengthConfig']]],
+  ['relay_5fserver_5fport_5f_10',['relay_server_port_',['../classWavelengthConfig.html#abf4d04875590c6389975bf982493f9a3',1,'WavelengthConfig']]],
+  ['renderer_5f_11',['renderer_',['../classBlobAnimation.html#aef92dab013364cbf86616bdfd3c4cfc3',1,'BlobAnimation']]],
+  ['resize_5fdebounce_5ftimer_5f_12',['resize_debounce_timer_',['../classBlobAnimation.html#aa990f3da68c5fab4f43c2b85fcbaa3b3',1,'BlobAnimation']]],
+  ['resizing_5fstate_5f_13',['resizing_state_',['../classBlobAnimation.html#a5a89f3f96844ede0544ebac22b33c6c4',1,'BlobAnimation']]],
+  ['resolution_5flabel_5f_14',['resolution_label_',['../classVideoPlayer.html#a4c40009d41b414fcd5f3beab518159d1',1,'VideoPlayer']]],
+  ['restitution_15',['restitution',['../structBlobConfig_1_1PhysicsParameters.html#ac799383db1bc151e92fe99f4a4d9182b',1,'BlobConfig::PhysicsParameters']]],
+  ['restore_5fbutton_5f_16',['restore_button_',['../classShortcutsSettingsWidget.html#a1f79f97670f27fee0b4c699a7be2eade',1,'ShortcutsSettingsWidget']]],
+  ['result_5fcache_5f_17',['result_cache_',['../classElectronicShutdownEffect.html#aa00db31213db3afbfa53352463f7728c',1,'ElectronicShutdownEffect']]],
+  ['retina_5fscan_5flayer_5f_18',['retina_scan_layer_',['../classSettingsView.html#a3d0aa220c41e04cfde355b60efdc993f',1,'SettingsView']]],
+  ['reveal_5fpercentage_5f_19',['reveal_percentage_',['../classMaskOverlayEffect.html#a632a445525f5881f1dbfea2faf77a409',1,'MaskOverlayEffect']]],
+  ['revealed_5fchars_5f_20',['revealed_chars_',['../classTextDisplayEffect.html#a60ab62711aea816d67eff11c69947589',1,'TextDisplayEffect']]],
+  ['rotation_5f_21',['rotation_',['../classFloatingEnergySphereWidget.html#a88bf5e321b9445ffa82571db76e22dda',1,'FloatingEnergySphereWidget']]],
+  ['rotation_5fphase_5f_22',['rotation_phase_',['../classIdleState.html#a79c978e11208869e9d1a1d11bbd6a899',1,'IdleState']]]
+];

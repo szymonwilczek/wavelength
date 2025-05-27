@@ -1,0 +1,9 @@
+<map id="VideoDecoder::ExtractFirstFrame" name="VideoDecoder::ExtractFirstFrame">
+<area shape="rect" id="Node000001" title="Synchronously extracts the first video frame from the data. Performs a separate, simplified FFmpeg in..." alt="" coords="5,48,186,86"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="234,5,415,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,45,248,31,249,37,187,50"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a8462c72da3486c3c93af01d90f60e7d5" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal QBuffer (buffer_)." alt="" coords="234,55,415,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,64,218,64,218,70,186,70"/>
+<area shape="rect" id="Node000004" href="$classVideoDecoder.html#afb14e8c4ad3db91e7171125a4d7be37f" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the position within the internal QBuffer (buff..." alt="" coords="234,104,415,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="187,84,249,97,248,103,186,89"/>
+</map>

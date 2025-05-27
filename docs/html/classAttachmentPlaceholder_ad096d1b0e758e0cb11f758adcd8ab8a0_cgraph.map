@@ -1,0 +1,15 @@
+<map id="AttachmentPlaceholder::ShowFullSizeDialog" name="AttachmentPlaceholder::ShowFullSizeDialog">
+<area shape="rect" id="Node000001" title="Creates and shows a non&#45;modal dialog to display the full&#45;size attachment (image or GIF)...." alt="" coords="5,136,162,175"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#a255e1bdfbb4daf874ce90b167fe12910" title="Adjusts the size and position of the full&#45;size dialog and shows it. Calculates the preferred dialog s..." alt="" coords="229,5,388,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,133,150,94,208,54,222,48,224,53,211,59,153,98,107,137"/>
+<area shape="rect" id="Node000003" href="$classGifPlayer.html#a9d015c1250b0652d7d04a9f1e6a87b4f" title="Emitted after the GIF information (dimensions, duration, etc.) has been successfully received from th..." alt="" coords="240,68,378,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,133,209,103,238,95,239,100,211,109,132,138"/>
+<area shape="rect" id="Node000004" href="$classImageViewer.html#a592fe08df0615189242b4b68a77fa504" title="Emitted after the image information (dimensions, alpha) has been successfully received from the decod..." alt="" coords="210,118,408,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,144,194,140,194,146,162,149"/>
+<area shape="rect" id="Node000005" href="$classImageViewer.html#a4dc697303dccbc44c425fd91f2bf2077" title="Emitted after the image has been successfully decoded and set in the QLabel. Can be used by parent wi..." alt="" coords="218,167,400,192"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,161,203,165,203,171,162,166"/>
+<area shape="rect" id="Node000006" href="$classGifPlayer.html#a535a67f0bced639155af15997528b7cd" title="Provides a size hint based on the original dimensions of the GIF. Returns the actual GIF width and he..." alt="" coords="244,216,374,241"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="134,173,211,201,239,209,238,214,209,206,132,178"/>
+<area shape="rect" id="Node000007" href="$classGifPlayer.html#a8e9d8e851a0d476b74fdf082b7519d35" title="Starts or resumes GIF playback. Sets the is_playing_ flag and calls Resume() on the GifDecoder...." alt="" coords="226,266,392,290"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="106,173,152,212,211,250,229,258,226,263,208,255,149,217,103,177"/>
+</map>

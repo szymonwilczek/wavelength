@@ -1,0 +1,5 @@
+<map id="CommunicationStream::TriggerRandomGlitch" name="CommunicationStream::TriggerRandomGlitch">
+<area shape="rect" id="Node000001" title="Slot called by glitch_timer_ to trigger random glitch effects during the Idle state." alt="" coords="5,5,160,44"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#afb372e0e2c10a955c7627d1cbe7ba408" title="Starts a short, intense glitch animation." alt="" coords="208,5,362,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,22,192,22,192,27,160,27"/>
+</map>

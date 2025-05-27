@@ -1,0 +1,7 @@
+<map id="WavelengthRegistry::UpdateWavelength" name="WavelengthRegistry::UpdateWavelength">
+<area shape="rect" id="Node000001" title="Updates the information for an existing wavelength. Emits wavelengthUpdated signal." alt="" coords="5,37,144,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="194,5,332,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,42,179,36,180,41,144,48"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a46b3b0f51da19b9ec9d912cc79f1a633" title="Emitted when the information for an existing wavelength is updated." alt="" coords="192,68,334,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,65,177,71,176,76,143,71"/>
+</map>

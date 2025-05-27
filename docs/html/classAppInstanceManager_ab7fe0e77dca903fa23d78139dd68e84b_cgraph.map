@@ -1,0 +1,11 @@
+<map id="AppInstanceManager::readData" name="AppInstanceManager::readData">
+<area shape="rect" id="Node000001" title="Slot called when data can be read from a connected socket." alt="" coords="5,68,150,107"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a46df6d357b1a69b71bfa325166b179ea" title="Processes an incoming message received from a socket." alt="" coords="198,68,342,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,85,182,85,182,90,150,90"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a7fcae156e69f8d718d0d3f4189e0158f" title="Creates a QByteArray message containing the current instance&#39;s position data." alt="" coords="396,5,564,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,65,397,46,399,52,337,70"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a6b8397127dcbea79612dfe2bfed1a2d7" title="Emitted when a new client instance connects (on the server) or when connection to the server is estab..." alt="" coords="408,68,552,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="342,85,392,85,392,90,342,90"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#a7adb5fbcaba5932cb88cb33cdf0ab610" title="Emitted when position data from another instance is received." alt="" coords="390,130,569,183"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="331,105,384,122,383,127,330,110"/>
+</map>

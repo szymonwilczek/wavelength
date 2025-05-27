@@ -1,0 +1,7 @@
+<map id="CommunicationStream" name="CommunicationStream">
+<area shape="rect" id="Node000001" title="A custom OpenGL widget displaying an animated communication stream visualization." alt="" coords="5,117,268,1659"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="11,5,121,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,83,75,117,70,117,67,84"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="145,5,270,69"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,84,204,117,198,117,201,83"/>
+</map>

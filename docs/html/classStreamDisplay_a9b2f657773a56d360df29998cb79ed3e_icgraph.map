@@ -1,0 +1,7 @@
+<map id="StreamDisplay::OnStreamMessageDestroyed" name="StreamDisplay::OnStreamMessageDestroyed">
+<area shape="rect" id="Node000001" title="Slot called when a StreamMessage associated with a progress ID is destroyed. Removes the correspondin..." alt="" coords="492,5,718,44"/>
+<area shape="rect" id="Node000002" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="254,5,444,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="476,27,445,27,445,22,476,22"/>
+<area shape="rect" id="Node000003" href="$classStreamDisplay.html#ab49c3a484e911bc8cf752e2d3791516a" title="Constructs a WavelengthStreamDisplay widget. Creates the main layout, instantiates the CommunicationS..." alt="" coords="5,12,206,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="238,27,206,27,206,22,238,22"/>
+</map>

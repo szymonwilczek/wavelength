@@ -1,0 +1,5 @@
+<map id="DatabaseManager" name="DatabaseManager">
+<area shape="rect" id="Node000001" title="Singleton class responsible for managing the connection to the PostgreSQL database." alt="" coords="5,117,198,408"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="72,5,131,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,84,104,117,99,117,99,84"/>
+</map>

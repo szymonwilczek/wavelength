@@ -1,0 +1,11 @@
+<map id="AnimatedStackedWidget::CleanupAfterAnimation" name="AnimatedStackedWidget::CleanupAfterAnimation">
+<area shape="rect" id="Node000001" title="Cleans up graphics effects and resets widget geometries after an animation finishes...." alt="" coords="438,37,602,76"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#a73649a355934e1882b3dffea8473b393" title="Constructs an AnimatedStackedWidget. Initializes the animation group, sound effect,..." alt="" coords="218,5,390,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,45,390,40,391,35,423,40"/>
+<area shape="rect" id="Node000003" href="$classAnimatedStackedWidget.html#a0a9829357f507ac7b5e0a7daf69b279f" title="Initiates an animated transition to the widget at the specified index. Plays a sound effect and start..." alt="" coords="222,68,386,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="423,73,387,78,386,73,422,68"/>
+<area shape="rect" id="Node000004" href="$classAnimatedStackedWidget.html#a4f2d6e971acad290609ecf9881a604dd" title="Initiates an animated transition to the next widget in the stack (wraps around). Useful for creating ..." alt="" coords="5,36,170,75"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,76,170,70,170,65,206,70"/>
+<area shape="rect" id="Node000005" href="$classAnimatedStackedWidget.html#a396f55db2591170791fe0d388217de5a" title="Initiates an animated transition to the specified widget. Convenience slot that finds the index of th..." alt="" coords="5,99,170,137"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="206,104,170,109,170,104,206,99"/>
+</map>

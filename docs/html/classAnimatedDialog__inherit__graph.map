@@ -1,0 +1,9 @@
+<map id="AnimatedDialog" name="AnimatedDialog">
+<area shape="rect" id="Node000001" title="A base class for QDialogs that adds animated transitions for showing and closing." alt="" coords="124,117,329,552"/>
+<area shape="rect" id="Node000003" href="$classCreateWavelengthDialog.html" title="A dialog window for creating a new Wavelength frequency." alt="" coords="5,600,215,1662"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,567,190,600,185,600,190,566"/>
+<area shape="rect" id="Node000004" href="$classJoinWavelengthDialog.html" title="A dialog window for joining an existing Wavelength frequency." alt="" coords="240,615,448,1647"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="263,566,270,615,265,615,258,567"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="198,5,255,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,83,229,117,224,117,224,83"/>
+</map>

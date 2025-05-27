@@ -1,0 +1,17 @@
+<map id="Navbar::Navbar" name="Navbar::Navbar">
+<area shape="rect" id="Node000001" title="Constructs the Navbar. Initializes the toolbar&#39;s appearance and behavior (non&#45;movable,..." alt="" coords="5,156,119,181"/>
+<area shape="rect" id="Node000002" href="$classNavbar.html#a35a159d5b981d7027d65c0b4d2e80669" title="Emitted when the &quot;Generate Wavelength&quot; button is clicked." alt="" coords="180,5,354,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,154,107,105,134,77,165,53,172,49,175,54,168,58,138,81,111,109,74,157"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="200,68,334,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="87,153,166,117,185,110,187,115,168,122,89,158"/>
+<area shape="rect" id="Node000005" href="$classNavbar.html#a2300661cc6485278de90db3a5b572e0f" title="Emitted when the &quot;Merge Wavelength&quot; button is clicked." alt="" coords="167,131,368,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="119,159,151,155,152,160,120,164"/>
+<area shape="rect" id="Node000006" href="$classNavbar.html#a4d02a35dbcd7f3e0971ccbd93547e492" title="Plays a predefined click sound effect. Triggered when any of the main action buttons are clicked." alt="" coords="185,180,350,205"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="120,173,170,179,169,184,119,178"/>
+<area shape="rect" id="Node000007" href="$classNavbar.html#ae5174435c781910c3a3a7a335d831a9e" title="Emitted when the &quot;Settings&quot; button is clicked." alt="" coords="187,230,348,254"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="89,179,168,214,194,223,193,228,166,219,87,184"/>
+<area shape="rect" id="Node000008" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="200,279,334,317"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="75,179,114,221,140,244,168,264,187,273,185,278,165,268,136,248,110,225,71,183"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="416,68,558,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="335,85,401,85,401,90,335,90"/>
+</map>

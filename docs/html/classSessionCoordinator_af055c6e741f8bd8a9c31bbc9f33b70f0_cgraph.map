@@ -1,0 +1,15 @@
+<map id="SessionCoordinator::IsWavelengthHost" name="SessionCoordinator::IsWavelengthHost">
+<area shape="rect" id="Node000001" title="Checks if the current user is the host of a specific wavelength. Delegates the call to WavelengthStat..." alt="" coords="5,37,141,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="189,5,358,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,43,173,38,174,43,142,48"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#aee0d046c58fb88b38ff063413c846733" title="Checks if the current user is the host of a specific wavelength." alt="" coords="189,68,358,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="142,64,174,69,173,75,141,70"/>
+<area shape="rect" id="Node000003" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="406,5,583,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,22,391,22,391,27,359,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="410,68,579,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="359,85,395,85,395,90,359,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="632,36,770,75"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="579,72,617,66,618,71,580,77"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="631,99,771,137"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="580,97,616,103,616,108,579,103"/>
+</map>

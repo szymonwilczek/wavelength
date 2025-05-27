@@ -1,0 +1,10 @@
+<map id="VideoPlayer::HandleVideoInfo" name="VideoPlayer::HandleVideoInfo">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s videoInfo signal. Stores video dimensions, duration,..." alt="" coords="688,31,883,55"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a6f8d803263d342bf12f9cf29c40536de" title="Initializes the VideoDecoder instance and connects its signals. Creates the decoder,..." alt="" coords="459,31,640,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="673,46,641,46,641,40,673,40"/>
+<area shape="rect" id="Node000003" href="$classVideoPlayer.html#aee93bdf909227c7d4f7c48eca8874af6" title="Toggles the playback state (play/pause) or resets if finished. If finished, resets the decoder...." alt="" coords="221,5,411,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="444,34,411,31,412,25,444,29"/>
+<area shape="rect" id="Node000004" href="$classVideoPlayer.html#a6ee50b34775069f86b0cace600c3923c" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,31,173,55"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="443,46,173,46,173,40,443,40"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="205,33,174,36,173,31,205,27"/>
+</map>

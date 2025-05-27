@@ -1,0 +1,7 @@
+<map id="VoiceRecognitionLayer::Reset" name="VoiceRecognitionLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Stops recording and timers, resets progress,..." alt="" coords="5,37,158,76"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="210,5,362,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,42,194,36,194,42,158,47"/>
+<area shape="rect" id="Node000003" href="$classVoiceRecognitionLayer.html#a40f32b30534b60b480311a5dbb6571e7" title="Updates the audio_visualizer_label_ with a waveform representation of the audio data...." alt="" coords="206,68,366,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,65,191,70,190,76,158,71"/>
+</map>

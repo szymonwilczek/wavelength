@@ -1,0 +1,9 @@
+<map id="VoiceRecognitionLayer::UpdateProgress" name="VoiceRecognitionLayer::UpdateProgress">
+<area shape="rect" id="Node000001" title="Slot called periodically by progress_timer_ to update the recognition progress bar...." alt="" coords="5,26,158,65"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#ae8357c2294de9d555370995ae5e0c30e" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="206,26,358,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,43,190,43,190,48,158,48"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="406,5,604,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,33,390,29,391,35,359,39"/>
+<area shape="rect" id="Node000004" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="429,54,581,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="359,53,414,60,413,65,358,58"/>
+</map>

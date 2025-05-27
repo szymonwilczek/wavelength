@@ -1,0 +1,5 @@
+<map id="NetworkStatusWidget::CreateNetworkIcon" name="NetworkStatusWidget::CreateNetworkIcon">
+<area shape="rect" id="Node000001" title="Generates the WiFi&#45;style icon as a QPixmap based on the network quality. Draws a series of arcs,..." alt="" coords="5,5,155,44"/>
+<area shape="rect" id="Node000002" href="$classNetworkStatusWidget.html#a558c920e0f92e05a73bbe9245c85e065" title="Static utility function to get the appropriate color for a given network quality level...." alt="" coords="203,5,352,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,22,187,22,187,27,155,27"/>
+</map>

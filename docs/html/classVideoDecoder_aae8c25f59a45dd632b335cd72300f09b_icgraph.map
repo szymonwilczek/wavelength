@@ -1,0 +1,5 @@
+<map id="VideoDecoder::Stop" name="VideoDecoder::Stop">
+<area shape="rect" id="Node000001" title="Stops the decoding thread and playback gracefully. Sets the stopped_ flag, stops the internal audio d..." alt="" coords="255,5,393,30"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a98c4c55212f768b295079d016f5e05d7" title="Destructor. Stops the decoding thread, waits for it to finish, and releases all allocated resources." alt="" coords="5,5,207,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,20,207,20,207,15,239,15"/>
+</map>

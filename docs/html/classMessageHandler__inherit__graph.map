@@ -1,0 +1,5 @@
+<map id="MessageHandler" name="MessageHandler">
+<area shape="rect" id="Node000001" title="Singleton class responsible for handling WebSocket message operations." alt="" coords="5,117,267,1093"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="107,5,166,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,84,139,117,134,117,134,84"/>
+</map>

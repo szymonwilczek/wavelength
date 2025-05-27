@@ -1,0 +1,15 @@
+<map id="MessageService::sendJsonViaSocket" name="MessageService::sendJsonViaSocket">
+<area shape="rect" id="Node000001" title="Internal signal emitted by the background file processing task when the JSON message is ready to be s..." alt="" coords="696,30,880,69"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#ad74bc604024156fff3b840942187037e" title="Private constructor to enforce the singleton pattern. Connects the internal sendJsonViaSocket signal ..." alt="" coords="423,12,648,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="681,42,648,38,649,33,681,36"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="446,61,625,86"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="681,62,626,68,625,63,681,57"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="231,33,375,58"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="431,64,375,57,376,52,431,58"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#a8c66229e945eb35fa8791ea88d37cdaa" title="Sends a file to the currently active wavelength. Delegates the call to WavelengthMessageService." alt="" coords="235,82,370,121"/>
+<area shape="poly" id="edge6_Node000003_Node000008" title=" " alt="" coords="432,89,371,96,371,91,431,84"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="23,5,165,30"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="215,37,165,30,166,25,216,31"/>
+<area shape="rect" id="Node000006" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="5,54,183,93"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="216,60,184,64,183,59,215,55"/>
+</map>

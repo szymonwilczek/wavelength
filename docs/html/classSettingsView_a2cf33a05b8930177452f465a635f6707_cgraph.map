@@ -1,0 +1,5 @@
+<map id="SettingsView::SwitchToTab" name="SettingsView::SwitchToTab">
+<area shape="rect" id="Node000001" title="Switches the visible tab content based on the clicked tab button. Updates the active state of tab but..." alt="" coords="5,12,185,37"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a220c6d57ea52dc424ad3c3db5c0a9c7a" title="Resets all security layers in the CLASSIFIED tab to their initial state. Calls Reset() on each layer...." alt="" coords="233,5,420,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,22,217,22,217,27,185,27"/>
+</map>

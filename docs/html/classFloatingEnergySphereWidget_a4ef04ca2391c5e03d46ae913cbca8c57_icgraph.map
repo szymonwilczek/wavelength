@@ -1,0 +1,7 @@
+<map id="FloatingEnergySphereWidget::HandleMediaPlayerError" name="FloatingEnergySphereWidget::HandleMediaPlayerError">
+<area shape="rect" id="Node000001" title="Slot called when the QMediaPlayer encounters an error. Logs the error." alt="" coords="482,5,672,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#ad35420b1d445bfab1078548c35b92b96" title="Initializes audio components (QMediaPlayer, QAudioDecoder), connects signals, selects the appropriate..." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="466,27,434,27,434,22,466,22"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#ac8fbc3182f94c6322cfc6e494375a146" title="Initializes OpenGL resources (functions, shaders, geometry, VAO/VBO) and audio setup...." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="NetworkStatusWidget::NetworkStatusWidget" name="NetworkStatusWidget::NetworkStatusWidget">
+<area shape="rect" id="Node000001" title="Constructs a NetworkStatusWidget. Initializes UI elements (labels, layout), sets appearance (size,..." alt="" coords="5,65,163,104"/>
+<area shape="rect" id="Node000002" href="$classNetworkStatusWidget.html#a621b931ee58720e3e35b0a4a6a56e74a" title="Performs a network status check. Sends a network request, measures the response time (ping),..." alt="" coords="211,33,365,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,70,195,65,196,70,164,75"/>
+<area shape="rect" id="Node000006" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="221,96,355,135"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="164,94,206,100,205,106,163,99"/>
+<area shape="rect" id="Node000003" href="$classNetworkStatusWidget.html#ae67562eeae82707e25e7d1c3a883de3b" title="Updates the text of the status and ping labels, the icon, and the border color based on the current_q..." alt="" coords="413,33,566,72"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="366,50,397,50,397,55,366,55"/>
+<area shape="rect" id="Node000004" href="$classNetworkStatusWidget.html#aff2fa82e8167c32a69998f2438f60f2f" title="Generates the WiFi&#45;style icon as a QPixmap based on the network quality. Draws a series of arcs,..." alt="" coords="614,5,764,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="566,39,598,35,599,40,567,45"/>
+<area shape="rect" id="Node000005" href="$classNetworkStatusWidget.html#a558c920e0f92e05a73bbe9245c85e065" title="Static utility function to get the appropriate color for a given network quality level...." alt="" coords="812,35,961,73"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="567,52,614,53,764,53,796,52,796,58,764,58,614,58,567,57"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="764,33,797,38,796,43,764,38"/>
+<area shape="rect" id="Node000007" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="418,96,561,135"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="355,113,403,113,403,118,355,118"/>
+</map>

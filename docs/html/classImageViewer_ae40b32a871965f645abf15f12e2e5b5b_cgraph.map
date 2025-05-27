@@ -1,0 +1,5 @@
+<map id="ImageViewer::HandleImageInfo" name="ImageViewer::HandleImageInfo">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s imageInfo signal. Stores the image dimensions and alpha channel infor..." alt="" coords="5,5,209,30"/>
+<area shape="rect" id="Node000002" href="$classImageViewer.html#a592fe08df0615189242b4b68a77fa504" title="Emitted after the image information (dimensions, alpha) has been successfully received from the decod..." alt="" coords="257,5,455,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,15,241,15,241,20,209,20"/>
+</map>

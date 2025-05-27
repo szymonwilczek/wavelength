@@ -1,0 +1,7 @@
+<map id="CommunicationStream::StartGlitchAnimation" name="CommunicationStream::StartGlitchAnimation">
+<area shape="rect" id="Node000001" title="Starts a short, intense glitch animation." alt="" coords="418,5,572,44"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#a1d9429e136bd752ee9cf57c4987f626c" title="Slot called by glitch_timer_ to trigger random glitch effects during the Idle state." alt="" coords="216,5,370,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="403,27,370,27,370,22,403,22"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html#a4fe34ce867f3ece68bda3e512c544e18" title="Constructs a CommunicationStream widget. Initializes OpenGL format, timers for animation and glitches..." alt="" coords="5,5,168,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="200,27,168,27,168,22,200,22"/>
+</map>

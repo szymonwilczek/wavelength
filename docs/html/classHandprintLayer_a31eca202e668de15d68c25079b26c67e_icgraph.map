@@ -1,0 +1,5 @@
+<map id="HandprintLayer::LoadRandomHandprint" name="HandprintLayer::LoadRandomHandprint">
+<area shape="rect" id="Node000001" title="Loads the handprint SVG file from handprint_files_ and renders it into base_handprint_...." alt="" coords="217,5,409,44"/>
+<area shape="rect" id="Node000002" href="$classHandprintLayer.html#aedbb4395a82db53c8577e28545313235" title="Initializes the layer for display. Resets the progress bar and styles, loads the handprint image,..." alt="" coords="5,12,169,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,27,169,27,169,22,201,22"/>
+</map>

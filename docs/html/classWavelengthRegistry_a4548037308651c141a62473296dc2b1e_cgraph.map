@@ -1,0 +1,7 @@
+<map id="WavelengthRegistry::SetActiveWavelength" name="WavelengthRegistry::SetActiveWavelength">
+<area shape="rect" id="Node000001" title="Sets the specified frequency as the currently active wavelength. If the frequency does not exist in t..." alt="" coords="5,37,158,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#ac86f04e6e88b2ba0dee509b7fbdc6e40" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="206,5,388,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,43,190,38,191,43,158,48"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="228,68,366,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,65,213,73,212,78,157,70"/>
+</map>

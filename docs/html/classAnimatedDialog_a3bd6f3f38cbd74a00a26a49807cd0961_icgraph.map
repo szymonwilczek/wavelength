@@ -1,0 +1,7 @@
+<map id="AnimatedDialog::SetAnimationDuration" name="AnimatedDialog::SetAnimationDuration">
+<area shape="rect" id="Node000001" title="Sets the duration for the show and close animations." alt="" coords="226,37,425,76"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#acb82ee7ee77da3a02fbd18f622f3c660" title="Constructs a WavelengthDialog. Sets up the UI elements (labels, input fields, buttons,..." alt="" coords="5,5,178,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,44,178,39,178,34,210,38"/>
+<area shape="rect" id="Node000003" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="13,68,170,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="211,74,171,80,170,74,210,69"/>
+</map>

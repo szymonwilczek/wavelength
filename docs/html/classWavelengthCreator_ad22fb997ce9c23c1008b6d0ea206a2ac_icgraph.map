@@ -1,0 +1,9 @@
+<map id="WavelengthCreator::GetInstance" name="WavelengthCreator::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthCreator." alt="" coords="372,37,511,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="189,5,324,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,45,324,39,325,34,357,39"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="189,68,324,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="357,73,325,79,324,74,357,68"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,27,141,27,141,22,173,22"/>
+</map>

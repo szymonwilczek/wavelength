@@ -1,0 +1,10 @@
+<map id="NetworkStatusWidget::CheckNetworkStatus" name="NetworkStatusWidget::CheckNetworkStatus">
+<area shape="rect" id="Node000001" title="Performs a network status check. Sends a network request, measures the response time (ping),..." alt="" coords="5,35,160,73"/>
+<area shape="rect" id="Node000002" href="$classNetworkStatusWidget.html#ae67562eeae82707e25e7d1c3a883de3b" title="Updates the text of the status and ping labels, the icon, and the border color based on the current_q..." alt="" coords="208,35,361,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,51,192,51,192,57,160,57"/>
+<area shape="rect" id="Node000003" href="$classNetworkStatusWidget.html#aff2fa82e8167c32a69998f2438f60f2f" title="Generates the WiFi&#45;style icon as a QPixmap based on the network quality. Draws a series of arcs,..." alt="" coords="409,5,558,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,40,393,35,394,41,362,45"/>
+<area shape="rect" id="Node000004" href="$classNetworkStatusWidget.html#a558c920e0f92e05a73bbe9245c85e065" title="Static utility function to get the appropriate color for a given network quality level...." alt="" coords="606,35,756,73"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="361,52,409,53,558,53,591,52,591,58,558,58,409,58,361,58"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="559,33,591,38,590,43,558,38"/>
+</map>

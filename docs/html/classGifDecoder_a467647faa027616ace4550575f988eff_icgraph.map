@@ -1,0 +1,12 @@
+<map id="GifDecoder::SeekPacket" name="GifDecoder::SeekPacket">
+<area shape="rect" id="Node000001" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="633,5,799,30"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a07f76f9758f596da1d500741c03af66f" title="Constructs a GifDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I/O ..." alt="" coords="424,5,585,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="617,29,586,29,586,24,617,24"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html#a6cba2bb829e0608c96c2818df2ed844c" title="Reinitializes the decoder after it has been stopped or encountered an error. Stops the thread if runn..." alt="" coords="5,31,163,55"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="643,36,586,44,471,52,355,54,163,50,163,44,355,49,470,46,585,39,643,31"/>
+<area shape="poly" id="edge5_Node000002_Node000001" title=" " alt="" coords="601,6,633,6,633,12,601,11"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a01de0ef70e11e3a5f2d34abf6f3abc59" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal gif_data_ QByteArray buff..." alt="" coords="211,5,376,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="409,29,376,29,376,24,409,24"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="392,6,424,6,424,12,392,11"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="196,32,163,36,163,31,195,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="CyberpunkTextEffect::NextAnimationStep" name="CyberpunkTextEffect::NextAnimationStep">
+<area shape="rect" id="Node000001" title="Slot called periodically by the timer to advance the animation. Executes the logic for the current an..." alt="" coords="206,5,350,44"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkTextEffect.html#a653eb101b8c4be7430ffaf8f8246a267" title="Constructs a CyberpunkTextEffect. Stores the target QLabel, hides it initially, and sets up the anima..." alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

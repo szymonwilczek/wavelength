@@ -1,0 +1,7 @@
+<map id="BlobEventHandler::resizeStateRequested" name="BlobEventHandler::resizeStateRequested">
+<area shape="rect" id="Node000001" title="Emitted during a resize event to request a specific &quot;resizing&quot; state in the Blob animation." alt="" coords="251,26,418,65"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,5,203,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,36,203,32,204,27,235,31"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#a1cb2f26d8e6fc000903830d85719298d" title="Processes a resize event for the parent widget. Applies throttling and checks for significant size ch..." alt="" coords="13,54,195,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,60,195,65,195,60,235,55"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="StreamMessage::ProcessImageAttachment" name="StreamMessage::ProcessImageAttachment">
+<area shape="rect" id="Node000001" title="Helper to process image attachments (likely superseded by AddAttachment)." alt="" coords="5,5,214,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a7b45f69684874de644b83da9078864eb" title="Static utility function to extract the value of an HTML attribute from a string." alt="" coords="262,12,477,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,22,246,22,246,27,214,27"/>
+</map>

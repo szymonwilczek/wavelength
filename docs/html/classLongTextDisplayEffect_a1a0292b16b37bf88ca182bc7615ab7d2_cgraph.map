@@ -1,0 +1,10 @@
+<map id="LongTextDisplayEffect::minimumSizeHint" name="LongTextDisplayEffect::minimumSizeHint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,158,73"/>
+<area shape="rect" id="Node000002" href="$classLongTextDisplayEffect.html#a04a72982e54ac8d38728aa94996c9b48" title="Returns the recommended size for the widget based on the processed text content. The height is calcul..." alt="" coords="206,35,358,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,51,190,51,190,57,158,57"/>
+<area shape="rect" id="Node000003" href="$classLongTextDisplayEffect.html#a515b93e6788d2cbb060950762233b25a" title="Constructs a CyberLongTextDisplay widget. Initializes the widget with default size policies,..." alt="" coords="406,5,566,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,40,390,36,391,41,359,46"/>
+<area shape="rect" id="Node000004" href="$classLongTextDisplayEffect.html#a3c62e6c78599b4e8eac2ef62cdae7319" title="Processes the original_text_ into wrapped lines based on the current widget width...." alt="" coords="614,35,767,73"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="359,52,406,53,566,53,599,52,599,58,566,58,406,58,358,58"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="567,34,599,38,599,44,566,39"/>
+</map>

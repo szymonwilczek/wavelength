@@ -1,0 +1,9 @@
+<map id="ImageDecoder::Decode" name="ImageDecoder::Decode">
+<area shape="rect" id="Node000001" title="Attempts to decode the image data stored internally. Uses QImage::loadFromData() to perform the decod..." alt="" coords="5,55,165,79"/>
+<area shape="rect" id="Node000002" href="$classImageDecoder.html#ab1491046831dfad229646a6e4595dd9a" title="Emitted if an error occurs during image loading or decoding." alt="" coords="236,5,376,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,51,232,31,233,37,144,57"/>
+<area shape="rect" id="Node000003" href="$classImageDecoder.html#a70845edad11aa50e416631053127ceb7" title="Emitted after successful decoding, providing basic image information." alt="" coords="220,55,392,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,64,204,64,204,70,165,70"/>
+<area shape="rect" id="Node000004" href="$classImageDecoder.html#a0f9c9e6496b140b8b85264b7446de303" title="Emitted when the image has been successfully decoded." alt="" coords="213,104,399,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,77,233,97,232,103,143,83"/>
+</map>

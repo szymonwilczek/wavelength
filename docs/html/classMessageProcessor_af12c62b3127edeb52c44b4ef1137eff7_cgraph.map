@@ -1,0 +1,32 @@
+<map id="MessageProcessor::MessageProcessor" name="MessageProcessor::MessageProcessor">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern. Connects internal signals to the corresponding ..." alt="" coords="5,321,200,360"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#a8c07a0a03713a5c6537de3035346cd57" title="Emitted when raw audio data is received via a binary WebSocket message." alt="" coords="261,5,460,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,320,120,267,147,195,165,156,188,119,215,84,246,53,249,51,253,55,249,57,219,87,192,122,170,159,151,197,125,269,111,322"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#a3a48f71eba26efb121180a59ec2dfdc4" title="Emitted when raw audio data is received via a binary WebSocket message. Relayed from WavelengthMessag..." alt="" coords="268,68,454,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="109,320,127,277,156,223,196,166,220,140,246,117,254,112,257,117,249,121,223,144,200,169,161,225,132,280,114,322"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#a3d9355ae6f778ed4799141d921b6e7e4" title="Gets the singleton instance of the MessageService." alt="" coords="262,131,460,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="112,320,133,286,163,244,201,202,246,166,260,159,262,164,249,171,205,206,167,248,137,289,117,322"/>
+<area shape="rect" id="Node000006" href="$classMessageProcessor.html#a8a7d6f3aa3796919753ab2c6f222303c" title="Emitted when the server denies permission to transmit audio (Push&#45;to&#45;Talk)." alt="" coords="262,180,460,205"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="119,319,173,267,208,239,246,216,265,208,267,213,249,220,211,243,176,271,123,323"/>
+<area shape="rect" id="Node000007" href="$classMessageService.html#a76b38eb9b8f50d34697c19b136f8ceb5" title="Emitted when the server denies permission to transmit audio (Push&#45;to&#45;Talk). Relayed from WavelengthMe..." alt="" coords="269,230,452,254"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="136,318,187,291,247,265,275,256,276,261,249,270,189,296,138,323"/>
+<area shape="rect" id="Node000008" href="$classMessageProcessor.html#ab39baddad577c52d27adc8689857a154" title="Emitted when the server grants permission to transmit audio (Push&#45;to&#45;Talk)." alt="" coords="260,279,462,304"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="200,319,277,305,278,310,201,325"/>
+<area shape="rect" id="Node000009" href="$classMessageService.html#aac7b1e495c6500654fc82767da1a2a7f" title="Emitted when the server grants permission to transmit audio (Push&#45;to&#45;Talk). Relayed from WavelengthMe..." alt="" coords="267,328,455,353"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="200,338,251,338,251,343,200,343"/>
+<area shape="rect" id="Node000010" href="$classMessageProcessor.html#a22bcd6ed76175518ae1d02d3cd34e830" title="Emitted when another user starts transmitting audio on the frequency." alt="" coords="268,377,454,416"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="196,358,254,371,253,376,194,363"/>
+<area shape="rect" id="Node000011" href="$classMessageService.html#abe426680ea6451a9b4dc4b7b4e115e25" title="Emitted when another user starts transmitting audio on the frequency. Relayed from WavelengthMessageP..." alt="" coords="275,440,446,479"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="133,358,186,392,249,425,267,432,265,437,247,430,183,397,130,363"/>
+<area shape="rect" id="Node000012" href="$classMessageProcessor.html#a81d299c293bcea69de997931c2b5370f" title="Emitted when the currently transmitting user stops sending audio." alt="" coords="269,503,452,541"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="119,359,172,422,208,458,249,488,260,494,257,498,246,492,205,462,168,426,115,362"/>
+<area shape="rect" id="Node000013" href="$classMessageService.html#a980ef8b65ca246ae6e18e5eb6eb078e5" title="Emitted when the currently transmitting user stops sending audio. Relayed from WavelengthMessageProce..." alt="" coords="248,566,474,590"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="114,359,132,400,161,452,200,506,223,530,249,550,260,557,257,561,246,555,220,534,196,509,156,455,127,402,109,361"/>
+<area shape="rect" id="Node000014" href="$classMessageProcessor.html#afe988619e44bae35710d27d1f22bdacb" title="Emitted when the server sends an update about the remote audio amplitude (optional)." alt="" coords="270,615,452,653"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="112,360,127,409,155,474,195,542,221,573,249,600,258,606,255,610,246,604,217,577,191,545,150,476,122,410,106,361"/>
+<area shape="rect" id="Node000015" href="$classMessageService.html#a3ccbdec16931e5061142cbb7062c2eb6" title="Emitted when the server sends an update about the remote audio amplitude (optional)...." alt="" coords="261,677,461,716"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="109,360,122,419,147,501,165,545,188,588,216,628,249,663,255,667,251,671,246,667,212,631,184,591,160,547,142,503,116,421,104,361"/>
+<area shape="rect" id="Node000005" href="$classMessageService.html#a2a6e9a079ac7a537b6342e1fb63a52dc" title="Deleted copy constructor to prevent copying." alt="" coords="522,131,747,156"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="460,141,506,141,506,146,460,146"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="591,133,581,123,586,113,604,106,635,104,671,108,687,116,684,121,669,113,635,110,605,112,589,117,586,122,594,129"/>
+</map>

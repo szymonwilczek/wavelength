@@ -1,0 +1,5 @@
+<map id="BlobMath::GenerateCircularPoints" name="BlobMath::GenerateCircularPoints">
+<area shape="rect" id="Node000001" title="Generates a specified number of points approximately distributed on a circle. Introduces slight rando..." alt="" coords="228,5,410,44"/>
+<area shape="rect" id="Node000002" href="$classBlobPhysics.html#a4b88e1607122025d461c066446af9cbb" title="Initializes the blob&#39;s state vectors (control points, target points, velocity) and center position...." alt="" coords="5,12,180,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,27,180,27,180,22,212,22"/>
+</map>

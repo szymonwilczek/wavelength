@@ -1,0 +1,5 @@
+<map id="SnakeGameLayer::UpdateGame" name="SnakeGameLayer::UpdateGame">
+<area shape="rect" id="Node000001" title="Slot called periodically by game_timer_ to update the game state. Calls MoveSnake() if the game is no..." alt="" coords="256,12,464,37"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a4ce8dd997b82e3ac19cf6409ad2bc4df" title="Constructs a SnakeGameLayer. Initializes the UI elements (title, instructions, game board,..." alt="" coords="5,5,208,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,27,208,27,208,22,240,22"/>
+</map>

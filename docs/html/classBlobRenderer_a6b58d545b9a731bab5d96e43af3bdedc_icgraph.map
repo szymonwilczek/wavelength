@@ -1,0 +1,7 @@
+<map id="BlobRenderer::DrawBorder" name="BlobRenderer::DrawBorder">
+<area shape="rect" id="Node000001" title="Draws the border outline of the blob. Includes a main border and a thinner, lighter inner line for a ..." alt="" coords="461,5,637,30"/>
+<area shape="rect" id="Node000002" href="$classBlobRenderer.html#ac41f68d45bee143775f351676f901986" title="Renders the blob shape itself (filling, border, glow)." alt="" coords="239,5,413,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="446,20,413,20,413,15,446,15"/>
+<area shape="rect" id="Node000003" href="$classBlobRenderer.html#aae648021f032b685785a809f615ec0be" title="Renders the entire scene, including a background, blob, and potentially HUD. Orchestrates the drawing..." alt="" coords="5,5,191,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,20,191,20,191,15,223,15"/>
+</map>

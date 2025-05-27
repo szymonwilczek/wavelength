@@ -1,0 +1,11 @@
+<map id="AudioPlayer::TogglePlayback" name="AudioPlayer::TogglePlayback">
+<area shape="rect" id="Node000001" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="5,93,196,118"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a54cdd24d841a87257e605472a019156b" title="Activates this player instance. If another player is active, it deactivates it first...." alt="" coords="276,5,422,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,90,178,65,243,39,267,32,269,37,245,44,181,70,127,95"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#a380a2522ca3504fe87f5a5784e9ebc33" title="Starts an animation to decrease the spectrum intensity (e.g., when playback pauses or finishes)." alt="" coords="244,54,454,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,91,228,87,228,92,196,96"/>
+<area shape="rect" id="Node000004" href="$classAudioPlayer.html#a19c2b80607821596a7ebb8ed095a796c" title="Starts an animation to increase the spectrum intensity (e.g., when playback starts)." alt="" coords="247,117,451,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="196,115,232,119,231,124,196,120"/>
+<area shape="rect" id="Node000005" href="$classAudioPlayer.html#a688cb8aee215677b6e48e30c5677a501" title="Slot called when the progress slider&#39;s value changes (e.g., user dragging). Updates the time label di..." alt="" coords="249,180,449,205"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="129,116,182,140,245,164,273,173,272,178,243,170,180,145,127,121"/>
+</map>

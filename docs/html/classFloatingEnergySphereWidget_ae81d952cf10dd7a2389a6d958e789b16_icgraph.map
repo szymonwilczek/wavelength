@@ -1,0 +1,21 @@
+<map id="FloatingEnergySphereWidget::destructionSequenceFinished" name="FloatingEnergySphereWidget::destructionSequenceFinished">
+<area shape="rect" id="Node000001" title="Emitted when the destruction animation sequence (visual and audio) completes." alt="" coords="745,149,946,188"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#afa782499ff88d287b930feb5168baaaa" title="Slot called when the QMediaPlayer&#39;s state changes (e.g., Playing, Stopped). Used to detect the end of..." alt="" coords="507,5,697,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="811,141,759,98,696,58,672,47,674,42,699,53,762,94,814,137"/>
+<area shape="rect" id="Node000003" href="$classSystemOverrideManager.html#a0834ff9c3ad9bfec1d08ba05648e6122" title="Restores the system state to normal. Uninstalls input hooks (Windows), restores the original wallpape..." alt="" coords="520,92,684,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="745,148,684,133,685,128,746,143"/>
+<area shape="rect" id="Node000005" href="$classSystemOverrideManager.html#ad55be1ff40ee203da7ed94a15e7e3de5" title="Creates, configures, positions, and shows the FloatingEnergySphereWidget. Connects the necessary sign..." alt="" coords="5,63,213,101"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="730,189,629,199,510,202,384,195,321,186,260,173,223,159,189,141,133,104,136,100,191,137,225,154,261,167,322,181,384,190,510,197,629,193,730,184"/>
+<area shape="rect" id="Node000008" href="$classFloatingEnergySphereWidget.html#aea15fae32db46c7a4f372e555afc5dee" title="Initiates the destruction animation sequence. Sets the is_destroying_ flag, resets progress,..." alt="" coords="507,235,697,273"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="775,196,661,237,659,232,773,191"/>
+<area shape="poly" id="edge6_Node000003_Node000003" title=" " alt="" coords="642,79,628,73,602,71,579,73,564,77,559,83,562,91,557,93,554,82,561,73,577,67,602,65,629,68,644,74"/>
+<area shape="rect" id="Node000004" href="$classSystemOverrideManager.html#a1d774843ddf2350e4b0ebd78777733bf" title="Slot called when the FloatingEnergySphereWidget emits its widgetClosed signal. Cleans up the widget p..." alt="" coords="261,5,459,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="507,89,397,47,398,42,509,84"/>
+<area shape="poly" id="edge7_Node000003_Node000005" title=" " alt="" coords="504,108,213,91,213,85,505,103"/>
+<area shape="rect" id="Node000007" href="$classSystemOverrideManager.html#a97a21907f73c99fc8dd4defaadfd5f48" title="Destructor. Ensures the system state is restored if the override is active. Cleans up the floating wi..." alt="" coords="270,120,450,159"/>
+<area shape="poly" id="edge8_Node000003_Node000007" title=" " alt="" coords="505,125,450,132,450,126,505,120"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="455,47,565,89,563,94,453,52"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="258,51,197,65,196,59,257,45"/>
+<area shape="rect" id="Node000009" href="$classFloatingEnergySphereWidget.html#a630cbacaf6b67fe50e50eed814a3de50" title="Handles key press events. Detects the Konami code sequence." alt="" coords="265,235,455,273"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="491,257,455,257,455,251,491,251"/>
+</map>

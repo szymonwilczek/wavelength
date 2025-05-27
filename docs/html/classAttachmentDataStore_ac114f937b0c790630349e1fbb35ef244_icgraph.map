@@ -1,0 +1,10 @@
+<map id="AttachmentDataStore::StoreAttachmentData" name="AttachmentDataStore::StoreAttachmentData">
+<area shape="rect" id="Node000001" title="Stores base64&#45;encoded attachment data and returns a unique ID. Generates a UUID for the attachment an..." alt="" coords="707,35,862,73"/>
+<area shape="rect" id="Node000002" href="$classMessageFormatter.html#af3a717bfa398187a653410d3febeb9cb" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="480,5,659,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="692,44,659,40,660,34,693,39"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="243,35,432,73"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="692,58,659,58,480,58,433,58,433,52,480,53,659,53,692,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="465,41,433,45,432,39,464,35"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="5,35,195,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="227,57,195,57,195,51,227,51"/>
+</map>

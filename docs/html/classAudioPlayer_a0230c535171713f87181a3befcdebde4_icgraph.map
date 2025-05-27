@@ -1,0 +1,5 @@
+<map id="AudioPlayer::OnSliderPressed" name="AudioPlayer::OnSliderPressed">
+<area shape="rect" id="Node000001" title="Slot called when the user presses the progress slider. Remembers the playback state and pauses playba..." alt="" coords="221,5,417,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

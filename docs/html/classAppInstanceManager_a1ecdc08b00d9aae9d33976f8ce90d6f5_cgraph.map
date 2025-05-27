@@ -1,0 +1,24 @@
+<map id="AppInstanceManager::Start" name="AppInstanceManager::Start">
+<area shape="rect" id="Node000001" title="Starts the instance manager." alt="" coords="5,151,150,189"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a6aa626dd1ea5e5c57860d532bdb85d5e" title="Establishes a connection to the server instance for a client instance." alt="" coords="198,68,342,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,148,208,111,210,116,125,153"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#acb57c2842c3eff0de2fe0c4009f8cdcb" title="Statically checks if another instance of the application is already running." alt="" coords="589,91,773,129"/>
+<area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="150,160,573,118,574,123,150,166"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#af09b098118800e025bcdce635b382ddd" title="Sets up the QLocalServer for the creator instance." alt="" coords="609,165,753,204"/>
+<area shape="poly" id="edge12_Node000001_Node000006" title=" " alt="" coords="150,169,593,180,593,185,150,174"/>
+<area shape="rect" id="Node000013" href="$classAppInstanceManager.html#a0f209265d9df4a82fc23ccd0ba99dd82" title="Initializes and starts the background thread responsible for attraction logic." alt="" coords="198,233,342,272"/>
+<area shape="poly" id="edge7_Node000001_Node000013" title=" " alt="" coords="125,187,210,224,208,229,123,192"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="394,5,538,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="331,65,388,47,390,52,333,70"/>
+<area shape="rect" id="Node000008" href="$classAppInstanceManager.html#ab7fe0e77dca903fa23d78139dd68e84b" title="Slot called when data can be read from a connected socket." alt="" coords="394,68,538,107"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="343,85,378,85,378,90,343,90"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a1ac17dc2cb4f3ae1f968109a180acd2e" title="Emitted when a client instance disconnects (on the server) or when the connection to the server is lo..." alt="" coords="602,5,760,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="538,22,586,22,586,27,538,27"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="517,42,617,82,615,87,515,47"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="528,42,543,53,560,75,568,97,575,118,591,139,614,155,611,160,587,143,571,120,563,99,556,78,539,57,525,47"/>
+<area shape="rect" id="Node000014" href="$classAppInstanceManager.html#a46740893551d1b7e70d184740d0f5fee" title="Applies a force to the client window, pulling it towards the target position (creator window)." alt="" coords="390,287,541,325"/>
+<area shape="poly" id="edge8_Node000013_Node000014" title=" " alt="" coords="343,270,378,279,377,285,342,275"/>
+<area shape="rect" id="Node000015" href="$classAppInstanceManager.html#a47fb8c069b2b3e5e6a19304726d59feb" title="Starts the animation sequence for absorbing a client instance. This involves moving the client window..." alt="" coords="591,252,771,291"/>
+<area shape="poly" id="edge10_Node000013_Node000015" title=" " alt="" coords="342,253,576,264,575,269,342,259"/>
+<area shape="poly" id="edge9_Node000014_Node000015" title=" " alt="" coords="542,291,575,286,576,291,542,296"/>
+</map>

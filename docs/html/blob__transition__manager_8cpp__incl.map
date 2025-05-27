@@ -1,0 +1,13 @@
+<map id="src/blob/core/dynamics/blob_transition_manager.cpp" name="src/blob/core/dynamics/blob_transition_manager.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="102,5,293,44"/>
+<area shape="rect" id="Node000002" href="$blob__transition__manager_8h.html" title=" " alt="" coords="34,92,207,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,47,144,83,140,79,177,43"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="231,92,318,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="218,43,255,79,251,83,214,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,165,62,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,119,61,157,58,153,104,115"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="86,165,155,189"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="123,117,123,149,118,149,118,117"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="179,165,264,189"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="138,115,194,154,191,158,135,119"/>
+</map>

@@ -1,0 +1,42 @@
+<map id="CommunicationStream::AddMessageWithAttachment" name="CommunicationStream::AddMessageWithAttachment">
+<area shape="rect" id="Node000001" title="Adds a new message with attachment content to the stream. Initiates the receiving animation...." alt="" coords="5,391,205,429"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#aa91c3c46034a10ca7393998082e26a25" title="Connects the necessary signals (navigation, read, hidden) from a StreamMessage widget to this Communi..." alt="" coords="253,281,446,320"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,388,289,324,291,329,151,393"/>
+<area shape="rect" id="Node000008" href="$classCommunicationStream.html#aba44a533978e83748764534a8682c56f" title="Displays the message at the specified index in the messages_ list. Hides the previously displayed mes..." alt="" coords="773,161,934,200"/>
+<area shape="poly" id="edge22_Node000001_Node000008" title=" " alt="" coords="120,388,174,327,260,244,312,202,369,163,429,130,493,105,552,90,599,86,647,92,706,105,750,123,805,151,803,156,748,128,705,110,646,97,599,92,553,95,495,110,432,135,371,168,315,206,263,248,178,330,124,392"/>
+<area shape="rect" id="Node000015" href="$classCommunicationStream.html#a1b1a57ca6f1ccaac8e413cacdd3e69f6" title="Updates the visibility of the &quot;Next&quot; and &quot;Previous&quot; buttons on the currently displayed message based ..." alt="" coords="1008,386,1206,439"/>
+<area shape="poly" id="edge24_Node000001_Node000015" title=" " alt="" coords="178,427,323,462,409,478,494,490,600,497,705,490,856,468,993,439,994,444,857,473,706,495,600,502,494,495,408,483,322,467,177,433"/>
+<area shape="rect" id="Node000026" href="$classCommunicationStream.html#aa16b60b9e17e8d90034a30e8d9f91f0a" title="Initiates the &quot;Receiving&quot; state animation (wave becomes more active). Animates amplitude,..." alt="" coords="263,556,436,595"/>
+<area shape="poly" id="edge23_Node000001_Node000026" title=" " alt="" coords="127,428,181,480,217,509,254,534,278,547,275,552,251,539,213,513,178,484,123,432"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#adb6463258367b6d672096da549b66b3c" title="Gets a pointer to the Next navigation button." alt="" coords="494,456,705,481"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,318,419,380,455,413,495,441,510,448,508,453,493,446,451,417,415,383,363,322"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#ac27d661cfaa66160fc573acd3db4746e" title="Gets a pointer to the Previous navigation button." alt="" coords="494,119,705,144"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="364,279,416,220,453,188,493,160,521,147,523,152,495,164,456,192,420,224,368,283"/>
+<area shape="rect" id="Node000005" href="$classCommunicationStream.html#a2283a11febe30f9d2d1887c2c20e7ea3" title="Slot triggered when a StreamMessage widget finishes its hiding animation (or is hidden)...." alt="" coords="518,5,682,44"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="361,279,414,200,451,152,492,105,556,51,559,55,496,109,455,155,418,203,365,282"/>
+<area shape="rect" id="Node000018" href="$classStreamMessage.html#aa04caea13bddde1d0ea72f43ad26e8f8" title="Emitted when the message finishes its fade&#45;out or closing animation and becomes hidden." alt="" coords="518,407,681,432"/>
+<area shape="poly" id="edge13_Node000002_Node000018" title=" " alt="" coords="377,318,429,356,495,392,517,400,515,405,493,396,427,360,374,322"/>
+<area shape="rect" id="Node000019" href="$classCommunicationStream.html#a7cf62e4c83ddbf85a1bb47ddb8d9422b" title="Slot triggered when the user requests to close the current message (e.g., clicks &quot;Read&quot; or presses En..." alt="" coords="522,344,677,383"/>
+<area shape="poly" id="edge14_Node000002_Node000019" title=" " alt="" coords="430,318,508,338,507,343,429,323"/>
+<area shape="rect" id="Node000024" href="$classCommunicationStream.html#a600acedc2f4f586b28c147077f768438" title="Shows the next message in the list, if available." alt="" coords="522,281,677,320"/>
+<area shape="poly" id="edge16_Node000002_Node000024" title=" " alt="" coords="446,298,507,298,507,303,446,303"/>
+<area shape="rect" id="Node000025" href="$classCommunicationStream.html#a918c54f07703dce3733f2aec5b09503d" title="Shows the previous message in the list, if available." alt="" coords="516,219,683,257"/>
+<area shape="poly" id="edge19_Node000002_Node000025" title=" " alt="" coords="429,278,504,259,505,264,430,283"/>
+<area shape="rect" id="Node000006" href="$classCommunicationStream.html#a26fe6873c1da55aaa2b9f82c69ace778" title="Disconnects all signals originating from the given StreamMessage widget that are connected to this Co..." alt="" coords="1002,136,1212,175"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="666,42,754,67,1004,129,1002,135,753,73,665,47"/>
+<area shape="rect" id="Node000007" href="$classCommunicationStream.html#a1924054445cb48103b7422b7789cb1d9" title="Initiates the animation returning the wave to the &quot;Idle&quot; state. Animates amplitude,..." alt="" coords="1027,64,1186,103"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="682,31,1012,70,1012,75,682,37"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="671,42,707,61,723,75,732,88,741,101,755,116,804,151,801,155,752,120,737,105,728,91,719,78,704,66,668,47"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="773,178,711,177,640,180,566,190,495,209,464,221,435,238,386,273,383,269,432,233,462,217,493,203,565,185,640,175,711,172,773,172"/>
+<area shape="poly" id="edge9_Node000008_Node000006" title=" " alt="" coords="934,170,986,165,987,170,934,175"/>
+<area shape="poly" id="edge11_Node000008_Node000007" title=" " alt="" coords="905,158,1001,121,1039,106,1041,111,1003,126,907,163"/>
+<area shape="rect" id="Node000013" href="$classCommunicationStream.html#a3dacb87ca5d81ace1a6c96d8d6dfbdfd" title="Temporarily reduces the background animation frame rate during message transitions for smoother UI pe..." alt="" coords="1003,219,1211,257"/>
+<area shape="poly" id="edge10_Node000008_Node000013" title=" " alt="" coords="935,196,1005,212,1004,217,934,201"/>
+<area shape="poly" id="edge12_Node000008_Node000015" title=" " alt="" coords="878,198,1067,374,1064,378,874,202"/>
+<area shape="rect" id="Node000020" href="$classStreamMessage.html#ad759a905d0a2cc1874d4781c97b9a2fc" title="Marks the message as read, triggers the appropriate closing animation (Electronic Shutdown or a simpl..." alt="" coords="753,351,954,376"/>
+<area shape="poly" id="edge15_Node000019_Node000020" title=" " alt="" coords="677,361,738,361,738,366,677,366"/>
+<area shape="poly" id="edge18_Node000024_Node000008" title=" " alt="" coords="673,278,704,266,760,237,810,207,813,211,763,242,706,271,675,283"/>
+<area shape="poly" id="edge17_Node000024_Node000013" title=" " alt="" coords="677,289,987,250,987,255,677,294"/>
+<area shape="poly" id="edge21_Node000025_Node000008" title=" " alt="" coords="683,217,757,200,759,205,684,222"/>
+<area shape="poly" id="edge20_Node000025_Node000013" title=" " alt="" coords="683,235,987,235,987,241,683,241"/>
+</map>

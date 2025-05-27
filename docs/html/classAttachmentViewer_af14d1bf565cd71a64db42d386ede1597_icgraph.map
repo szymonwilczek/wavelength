@@ -1,0 +1,9 @@
+<map id="AttachmentViewer::FinishDecryption" name="AttachmentViewer::FinishDecryption">
+<area shape="rect" id="Node000001" title="Slot called when the decryption animation finishes. Sets the state to decrypted, updates the status l..." alt="" coords="785,5,956,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#aa9a8f363f1170ca114a5e93e537ed41e" title="Starts the decryption phase. Updates the status label, ensures the MaskOverlay is visible,..." alt="" coords="509,5,737,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="770,27,738,27,738,22,770,22"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a847f3bd1aea14895c10cdc6a50a07765" title="Starts the visual scanning phase. Updates the status label, ensures the MaskOverlay is visible and an..." alt="" coords="243,5,461,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="494,27,461,27,461,22,494,22"/>
+<area shape="rect" id="Node000004" href="$classAttachmentViewer.html#a7f2dccdaa47930c6103f9392da17c17b" title="Slot triggered automatically after a short delay or potentially by a user action (though currently au..." alt="" coords="5,5,195,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="227,27,195,27,195,22,227,22"/>
+</map>

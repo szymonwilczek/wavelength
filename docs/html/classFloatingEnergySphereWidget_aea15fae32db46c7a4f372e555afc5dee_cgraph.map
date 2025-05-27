@@ -1,0 +1,7 @@
+<map id="FloatingEnergySphereWidget::StartDestructionSequence" name="FloatingEnergySphereWidget::StartDestructionSequence">
+<area shape="rect" id="Node000001" title="Initiates the destruction animation sequence. Sets the is_destroying_ flag, resets progress,..." alt="" coords="5,37,196,76"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#ae81d952cf10dd7a2389a6d958e789b16" title="Emitted when the destruction animation sequence (visual and audio) completes." alt="" coords="244,5,444,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,41,228,37,229,43,197,47"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#af257d6363120d5b830cd4885f67e1114" title="Sets whether the widget can be closed by the user or programmatically. Used to prevent closing during..." alt="" coords="249,68,439,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,66,234,71,233,76,196,71"/>
+</map>

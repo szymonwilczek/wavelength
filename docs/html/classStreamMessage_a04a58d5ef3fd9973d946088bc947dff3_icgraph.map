@@ -1,0 +1,7 @@
+<map id="StreamMessage::SetGlowIntensity" name="StreamMessage::SetGlowIntensity">
+<area shape="rect" id="Node000001" title="Sets the glow intensity level and triggers a repaint." alt="" coords="545,5,769,30"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#abab98b03352cf7d52b1b4f137936c8ab" title="Slot called by animation_timer_ to update subtle background animations (e.g., glow pulsing)." alt="" coords="273,5,497,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="530,20,498,20,498,15,530,15"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="5,5,225,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,20,225,20,225,15,257,15"/>
+</map>

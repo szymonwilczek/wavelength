@@ -1,0 +1,5 @@
+<map id="AttachmentDataStore::GetInstance" name="AttachmentDataStore::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the AttachmentDataStore." alt="" coords="5,5,152,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentDataStore.html#a8eaf2333a11d901e4d62a0a7c9f4c2c4" title="Private default constructor to enforce the singleton pattern." alt="" coords="200,5,354,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,22,184,22,184,27,152,27"/>
+</map>

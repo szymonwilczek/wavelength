@@ -1,0 +1,16 @@
+<map id="MessageProcessor::wavelengthClosed" name="MessageProcessor::wavelengthClosed">
+<area shape="rect" id="Node000001" title="Emitted when a wavelength is closed (either by host or server command)." alt="" coords="967,37,1172,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="756,5,892,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="951,44,892,36,892,31,952,39"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#a8cc47128d254eb378c4988551725ba95" title="Processes messages indicating a wavelength was closed (e.g., &quot;wavelength_closed&quot;, &quot;close_wavelength&quot; ..." alt="" coords="729,68,919,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="951,74,920,78,919,73,951,69"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="519,5,654,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="741,27,655,27,655,22,741,22"/>
+<area shape="rect" id="Node000005" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="255,95,444,133"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="714,96,444,111,444,106,714,91"/>
+<area shape="rect" id="Node000013" href="$classMessageProcessor.html#a901206afb9503ef54fdba2a2a594b5df" title="Processes messages of type &quot;system_command&quot;. Handles commands like &quot;ping&quot;, &quot;close_wavelength&quot;,..." alt="" coords="492,123,681,161"/>
+<area shape="poly" id="edge6_Node000004_Node000013" title=" " alt="" coords="723,113,674,125,673,119,722,108"/>
+<area shape="rect" id="Node000006" href="$classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="5,95,207,133"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="239,117,207,117,207,111,239,111"/>
+<area shape="poly" id="edge7_Node000013_Node000005" title=" " alt="" coords="476,132,444,128,445,123,477,126"/>
+</map>

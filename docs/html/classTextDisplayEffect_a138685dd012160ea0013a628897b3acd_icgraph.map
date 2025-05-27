@@ -1,0 +1,7 @@
+<map id="TextDisplayEffect::RemoveHtml" name="TextDisplayEffect::RemoveHtml">
+<area shape="rect" id="Node000001" title="Static utility function to remove basic HTML tags and decode common entities from a string." alt="" coords="186,37,318,76"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#a08a497134c49a1068add82b03ea21712" title="Sets new text content for the widget. Updates the internal text, removes HTML, recalculates required ..." alt="" coords="5,5,138,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,45,138,39,138,34,171,40"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="5,68,138,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,73,138,79,138,73,170,68"/>
+</map>

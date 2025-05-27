@@ -1,0 +1,27 @@
+var classGifPlayer =
+[
+    [ "GifPlayer", "classGifPlayer.html#ac183e77217bfd80689ab931f0115aea0", null ],
+    [ "~GifPlayer", "classGifPlayer.html#ae157664e5a79d817ae811310c5713f33", null ],
+    [ "DisplayThumbnail", "classGifPlayer.html#a4627379a46cabfa1fccf101186715910", null ],
+    [ "enterEvent", "classGifPlayer.html#ab7124d4f0d0d6c95f81246ad1a342928", null ],
+    [ "gifLoaded", "classGifPlayer.html#a9d015c1250b0652d7d04a9f1e6a87b4f", null ],
+    [ "HandleError", "classGifPlayer.html#a5bda890a9ca8e1653e0c2e502a606e79", null ],
+    [ "HandleGifInfo", "classGifPlayer.html#a3954eb892874d554d1c025ab2684115f", null ],
+    [ "leaveEvent", "classGifPlayer.html#a45224f765158d3bbe1858ab6e502199e", null ],
+    [ "ReleaseResources", "classGifPlayer.html#a8d13a43724552310ff832e80bc27e0e2", null ],
+    [ "sizeHint", "classGifPlayer.html#a535a67f0bced639155af15997528b7cd", null ],
+    [ "StartPlayback", "classGifPlayer.html#a8e9d8e851a0d476b74fdf082b7519d35", null ],
+    [ "StopPlayback", "classGifPlayer.html#aba6bddbb9596395352dee7c5381f3a7b", null ],
+    [ "UpdateFrame", "classGifPlayer.html#a57c94bcaef1a3c76e1bb49ac58380f01", null ],
+    [ "current_position_", "classGifPlayer.html#a085941104d895cbe0d9c2dcd2bbeffde", null ],
+    [ "decoder_", "classGifPlayer.html#a2e732d4ef8cf97633c41abca831b210d", null ],
+    [ "frame_rate_", "classGifPlayer.html#ab2a57cbba8f284ef4b469c9b059dc4ef", null ],
+    [ "gif_data_", "classGifPlayer.html#a8b929a60c6e377627e78e941f033b45a", null ],
+    [ "gif_duration_", "classGifPlayer.html#a471514ba9296047740bf1232bac46dd0", null ],
+    [ "gif_height_", "classGifPlayer.html#aa78ed5408f2e7bea757156fa93b761f2", null ],
+    [ "gif_label_", "classGifPlayer.html#a6850726bcea3baf213ef1539999ffb1e", null ],
+    [ "gif_width_", "classGifPlayer.html#ad5576398bd3290531fad931b13091a1b", null ],
+    [ "is_playing_", "classGifPlayer.html#ab73aaf68a355cdf967933af1d6683ff5", null ],
+    [ "thumbnail_pixmap_", "classGifPlayer.html#a698c0d369bfbd324a1d4bce9f7cd0dbe", null ],
+    [ "translator_", "classGifPlayer.html#a87f8210404a989c9d8c2e3d5bf2c69df", null ]
+];

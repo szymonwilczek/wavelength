@@ -1,0 +1,5 @@
+<map id="StreamMessage::CreateColoredSvgIcon" name="StreamMessage::CreateColoredSvgIcon">
+<area shape="rect" id="Node000001" title="Static utility function to create a QIcon from an SVG file, colored with the specified color." alt="" coords="273,5,481,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="5,12,225,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,27,225,27,225,22,257,22"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="WavelengthLeaver::GetInstance" name="WavelengthLeaver::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthLeaver." alt="" coords="5,12,211,37"/>
+<area shape="rect" id="Node000002" href="$classWavelengthLeaver.html#a8e05b87c2dc74058b77f75d87405eb96" title="Private constructor to enforce the singleton pattern." alt="" coords="259,5,460,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,22,243,22,243,27,211,27"/>
+</map>

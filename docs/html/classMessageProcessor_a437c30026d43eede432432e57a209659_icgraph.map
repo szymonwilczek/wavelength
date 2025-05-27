@@ -1,0 +1,13 @@
+<map id="MessageProcessor::messageReceived" name="MessageProcessor::messageReceived">
+<area shape="rect" id="Node000001" title="Emitted when a regular chat message (text or attachment placeholder) is processed." alt="" coords="729,37,924,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="519,5,654,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="713,44,655,36,655,31,714,39"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="492,68,681,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="714,74,682,78,681,73,713,68"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="282,5,417,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="503,27,417,27,417,22,503,22"/>
+<area shape="rect" id="Node000005" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="255,68,444,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="476,90,445,90,445,85,476,85"/>
+<area shape="rect" id="Node000006" href="$classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="5,68,207,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="239,90,207,90,207,85,239,85"/>
+</map>

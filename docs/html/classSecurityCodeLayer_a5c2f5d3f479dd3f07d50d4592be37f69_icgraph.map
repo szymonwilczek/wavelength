@@ -1,0 +1,5 @@
+<map id="SecurityCodeLayer::Reset" name="SecurityCodeLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Clears input fields, resets their styles, clears the hint,..." alt="" coords="193,5,332,44"/>
+<area shape="rect" id="Node000002" href="$classSecurityCodeLayer.html#ac91e905c2b4ccef623f0539ed4a922ab" title="Initializes the layer for display. Resets the input fields, selects a new random security code and hi..." alt="" coords="5,5,145,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,27,145,27,145,22,177,22"/>
+</map>

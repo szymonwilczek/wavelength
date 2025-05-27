@@ -1,0 +1,7 @@
+<map id="RetinaScanLayer" name="RetinaScanLayer">
+<area shape="rect" id="Node000001" title="A security layer simulating a retina scan process." alt="" coords="5,314,183,665"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html" title="Abstract base class for individual security challenge layers." alt="" coords="10,117,178,266"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,281,97,314,92,314,92,281"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="64,5,125,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,84,97,117,92,117,92,84"/>
+</map>

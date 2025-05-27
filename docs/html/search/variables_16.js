@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['wait_5fcondition_5f_0',['wait_condition_',['../classAudioDecoder.html#a22151d6b4208360dcebe8ad345f52df4',1,'AudioDecoder::wait_condition_'],['../classGifDecoder.html#acecc00811d61127d65a12ba6200c9ac8',1,'GifDecoder::wait_condition_'],['../classVideoDecoder.html#a80a14382e4561751ac387cb82fcc5ebd',1,'VideoDecoder::wait_condition_']]],
+  ['was_5fplaying_5f_1',['was_playing_',['../classAudioPlayer.html#a015f61797a79aeb6697c4d0759b2643c',1,'AudioPlayer::was_playing_'],['../classVideoPlayer.html#aeebf8406522b79652d4f575d9e65b705',1,'VideoPlayer::was_playing_']]],
+  ['wave_5famplitude_2',['wave_amplitude',['../structBlobConfig_1_1IdleParameters.html#a25e196e7c0bc50555c385f6d35164ded',1,'BlobConfig::IdleParameters']]],
+  ['wave_5famplitude_5f_3',['wave_amplitude_',['../classCommunicationStream.html#aa46f0ee02a2b308d4673d74fd14879c5',1,'CommunicationStream']]],
+  ['wave_5ffrequency_4',['wave_frequency',['../structBlobConfig_1_1IdleParameters.html#ab907440132586e7373a9992547f74709',1,'BlobConfig::IdleParameters']]],
+  ['wave_5ffrequency_5f_5',['wave_frequency_',['../classCommunicationStream.html#a1d3decef5e4936d6f280341adc695e14',1,'CommunicationStream']]],
+  ['wave_5fphase_6',['wave_phase',['../structBlobConfig_1_1IdleParameters.html#a16a7c216a4b71da870af85e5dd290d04',1,'BlobConfig::IdleParameters::wave_phase'],['../structPathMarkersManager_1_1PathMarker.html#af6a59d8c0ed3793b77151d102416a8c8',1,'PathMarkersManager::PathMarker::wave_phase']]],
+  ['wave_5fspeed_5f_7',['wave_speed_',['../classCommunicationStream.html#a0d6941e4a9b73a4c9a4df6045bcf06ee',1,'CommunicationStream']]],
+  ['wave_5fthickness_5f_8',['wave_thickness_',['../classCommunicationStream.html#a5c2f2bbaa007a1b495974e1ba71b110e',1,'CommunicationStream']]],
+  ['wavelength_5fpasswords_5f_9',['wavelength_passwords_',['../classAuthenticationManager.html#a3acce0e1fd0e30dbca73d70490cfa77b',1,'AuthenticationManager']]],
+  ['wavelength_5ftab_5fwidget_5f_10',['wavelength_tab_widget_',['../classSettingsView.html#a5a41251a050f46f9c06c5fb9f3c66c3d',1,'SettingsView']]],
+  ['wavelengths_5f_11',['wavelengths_',['../classWavelengthRegistry.html#a8dad7f6d4460a89240c718003e6e66cb',1,'WavelengthRegistry']]],
+  ['window_5fposition_12',['window_position',['../structInstanceInfo.html#a62a4a373c16163738d18779d1e3d3182',1,'InstanceInfo']]],
+  ['window_5fposition_5ftimer_5f_13',['window_position_timer_',['../classBlobAnimation.html#a29bbac47d7e9d0a02e8a5af399fd850b',1,'BlobAnimation']]],
+  ['window_5fsize_14',['window_size',['../structInstanceInfo.html#afb035f798ba41a307045953c27e2fa92',1,'InstanceInfo']]],
+  ['words_5f_15',['words_',['../classTypingTestLayer.html#afb7a19e74cf8a5cd867c6aa1cf76aabf',1,'TypingTestLayer']]]
+];

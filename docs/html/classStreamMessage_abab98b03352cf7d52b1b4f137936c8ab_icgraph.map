@@ -1,0 +1,5 @@
+<map id="StreamMessage::UpdateAnimation" name="StreamMessage::UpdateAnimation">
+<area shape="rect" id="Node000001" title="Slot called by animation_timer_ to update subtle background animations (e.g., glow pulsing)." alt="" coords="273,5,497,30"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="5,5,225,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,20,225,20,225,15,257,15"/>
+</map>

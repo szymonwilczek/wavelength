@@ -1,0 +1,19 @@
+<map id="AutoScalingAttachment::AutoScalingAttachment" name="AutoScalingAttachment::AutoScalingAttachment">
+<area shape="rect" id="Node000001" title="Constructs an AutoScalingAttachment widget. Sets up the layout, installs event filters,..." alt="" coords="5,149,172,188"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a7015780c0eaee602b00ec42e97440415" title="Checks the content&#39;s original size against the maximum allowed size and applies scaling if necessary...." alt="" coords="234,5,404,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,147,153,100,185,75,218,53,227,48,230,53,221,58,188,79,157,104,109,151"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="252,68,386,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,146,219,117,240,109,242,114,221,122,141,151"/>
+<area shape="rect" id="Node000006" href="$classGifPlayer.html#a9d015c1250b0652d7d04a9f1e6a87b4f" title="Emitted after the GIF information (dimensions, duration, etc.) has been successfully received from th..." alt="" coords="250,131,388,156"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="172,157,234,150,234,155,172,162"/>
+<area shape="rect" id="Node000007" href="$classImageViewer.html#a592fe08df0615189242b4b68a77fa504" title="Emitted after the image information (dimensions, alpha) has been successfully received from the decod..." alt="" coords="220,180,418,205"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="172,175,204,178,204,183,172,180"/>
+<area shape="rect" id="Node000008" href="$classImageViewer.html#a4dc697303dccbc44c425fd91f2bf2077" title="Emitted after the image has been successfully decoded and set in the QLabel. Can be used by parent wi..." alt="" coords="228,230,410,254"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="141,186,220,214,249,223,248,228,219,219,139,191"/>
+<area shape="rect" id="Node000009" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="252,279,386,317"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="113,186,161,225,221,264,238,272,236,276,218,268,158,229,110,190"/>
+<area shape="rect" id="Node000003" href="$classAutoScalingAttachment.html#a60f80f3deb928c42709695ba324d7f8f" title="Updates the position of the info_label_ (&quot;Click to enlarge&quot;) to be centered at the bottom of the cont..." alt="" coords="466,5,637,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="404,22,450,22,450,27,404,27"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="480,68,623,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="386,85,465,85,465,90,386,90"/>
+</map>

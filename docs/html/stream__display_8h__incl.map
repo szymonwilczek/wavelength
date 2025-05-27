@@ -1,0 +1,11 @@
+<map id="src/ui/chat/stream_display.h" name="src/ui/chat/stream_display.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="57,5,183,44"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,92,62,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,47,60,83,56,79,97,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="86,92,155,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,45,123,76,118,76,118,45"/>
+<area shape="rect" id="Node000004" href="$stream__message_8h.html" title=" " alt="" coords="179,92,312,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="152,42,215,81,212,86,149,47"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="209,165,282,189"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="248,117,248,149,243,149,243,117"/>
+</map>

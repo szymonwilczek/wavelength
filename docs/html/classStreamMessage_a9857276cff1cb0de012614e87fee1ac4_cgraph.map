@@ -1,0 +1,30 @@
+<map id="StreamMessage::StreamMessage" name="StreamMessage::StreamMessage">
+<area shape="rect" id="Node000001" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="5,215,225,240"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#aa2651038d1d658245ad6fbaeb79fd57b" title="Adjusts the stylesheet of the scroll area (scrollbar colors) based on the message type." alt="" coords="288,5,482,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,213,178,138,221,93,271,54,282,49,284,53,274,59,225,97,182,142,127,216"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a59f8dedec8dffa79dad2b202ddd8dbf6" title="Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities...." alt="" coords="276,68,494,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,213,185,159,226,128,271,102,287,96,289,101,274,107,229,133,189,163,130,217"/>
+<area shape="rect" id="Node000004" href="$classLongTextDisplayEffect.html#aa577c95b45549f021c2ca984f7e5f8b3" title="Emitted after ProcessText() finishes, indicating the total calculated height required to display all ..." alt="" coords="304,117,466,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,212,272,165,292,158,294,163,274,170,148,217"/>
+<area shape="rect" id="Node000005" href="$classStreamMessage.html#a5723dde941742cb120fae125bd7d21b9" title="Static utility function to create a QIcon from an SVG file, colored with the specified color." alt="" coords="281,180,489,219"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="225,213,265,209,265,214,225,219"/>
+<area shape="rect" id="Node000006" href="$classStreamMessage.html#ad759a905d0a2cc1874d4781c97b9a2fc" title="Marks the message as read, triggers the appropriate closing animation (Electronic Shutdown or a simpl..." alt="" coords="285,243,485,268"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="225,236,270,241,269,246,225,241"/>
+<area shape="rect" id="Node000011" href="$classLongTextDisplayEffect.html#a93d2f41161e89f9c7f9f0122846b6025" title="Sets the vertical scroll position. This determines which part of the processed text is rendered in th..." alt="" coords="309,292,461,331"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="154,238,273,277,299,285,298,290,272,282,153,243"/>
+<area shape="rect" id="Node000012" href="$classStreamMessage.html#abab98b03352cf7d52b1b4f137936c8ab" title="Slot called by animation_timer_ to update subtle background animations (e.g., glow pulsing)." alt="" coords="273,355,497,380"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="131,238,190,288,231,316,274,340,294,347,292,352,272,344,228,320,187,292,128,242"/>
+<area shape="rect" id="Node000014" href="$classStreamMessage.html#a02853ab4f5d436fa06e6bffbb105aefc" title="Updates the maximum height constraint for the scroll area used for long messages. Limits the height t..." alt="" coords="285,404,484,443"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="127,239,183,310,226,353,274,389,285,395,282,400,271,394,222,357,179,314,123,242"/>
+<area shape="rect" id="Node000007" href="$classStreamMessage.html#ab76d3005cedeb795654afd453108593f" title="Emitted when the message is marked as read (MarkAsRead() is called)." alt="" coords="554,184,761,209"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="445,240,544,218,581,210,582,215,546,223,446,245"/>
+<area shape="rect" id="Node000008" href="$classStreamMessage.html#a54a074c315a53d482650cd24d3e57d60" title="Starts a simpler closing animation (glitch/fade) used specifically for long messages displayed in a s..." alt="" coords="566,233,748,272"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="485,252,551,251,551,256,485,257"/>
+<area shape="rect" id="Node000010" href="$classStreamMessage.html#a8bbf535db654d1c7c94546c61fdc936c" title="Starts the electronic shutdown closing animation. Applies the ElectronicShutdownEffect and animates i..." alt="" coords="552,296,763,335"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="447,266,498,277,554,289,553,295,496,282,446,271"/>
+<area shape="rect" id="Node000009" href="$classStreamMessage.html#aa04caea13bddde1d0ea72f43ad26e8f8" title="Emitted when the message finishes its fade&#45;out or closing animation and becomes hidden." alt="" coords="817,272,980,297"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="749,262,802,269,801,274,748,267"/>
+<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="763,299,802,294,802,300,764,305"/>
+<area shape="rect" id="Node000013" href="$classStreamMessage.html#a04a58d5ef3fd9973d946088bc947dff3" title="Sets the glow intensity level and triggers a repaint." alt="" coords="545,359,769,384"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="497,366,529,367,529,372,497,372"/>
+</map>

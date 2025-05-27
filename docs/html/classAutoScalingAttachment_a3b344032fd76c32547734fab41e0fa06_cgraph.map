@@ -1,0 +1,5 @@
+<map id="AutoScalingAttachment::eventFilter" name="AutoScalingAttachment::eventFilter">
+<area shape="rect" id="Node000001" title="Filters events for the content container, specifically capturing mouse clicks. Emits the clicked() si..." alt="" coords="5,5,164,44"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a7ca6d12c1c12311e3eb9dcfe185dba4d" title="Emitted when the user clicks on the attachment container. Typically used to trigger showing the full&#45;..." alt="" coords="212,5,370,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,22,196,22,196,27,164,27"/>
+</map>

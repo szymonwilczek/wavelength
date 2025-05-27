@@ -1,0 +1,7 @@
+<map id="SecurityQuestionLayer" name="SecurityQuestionLayer">
+<area shape="rect" id="Node000001" title="A security layer simulating a security question challenge." alt="" coords="5,314,202,630"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html" title="Abstract base class for individual security challenge layers." alt="" coords="20,117,188,266"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,281,106,314,101,314,101,281"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="73,5,135,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,84,106,117,101,117,101,84"/>
+</map>

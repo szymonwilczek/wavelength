@@ -1,0 +1,7 @@
+<map id="FingerprintLayer::ProcessFingerprint" name="FingerprintLayer::ProcessFingerprint">
+<area shape="rect" id="Node000001" title="Handles the completion of the fingerprint scan. Changes the UI element styles (border,..." alt="" coords="450,5,620,44"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#ac63e2235cb171874d2647bd8dbf9d5cd" title="Slot called periodically by fingerprint_timer_ when the user is holding the mouse button...." alt="" coords="238,5,402,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="435,27,403,27,403,22,435,22"/>
+<area shape="rect" id="Node000003" href="$classFingerprintLayer.html#ac3c17d23030e0f5de68c4c4472692559" title="Constructs a FingerprintLayer. Initializes the UI elements (title, fingerprint image label,..." alt="" coords="5,5,190,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,27,190,27,190,22,222,22"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="VideoDecoder::videoInfo" name="VideoDecoder::videoInfo">
+<area shape="rect" id="Node000001" title="Emitted after successful initialization, providing video stream details." alt="" coords="688,31,853,55"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#aa8f8aabbe65727acd5ef5cfdc5f3b69b" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="470,5,629,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="673,34,629,29,630,24,673,29"/>
+<area shape="rect" id="Node000004" href="$classVideoPlayer.html#a6f8d803263d342bf12f9cf29c40536de" title="Initializes the VideoDecoder instance and connects its signals. Creates the decoder,..." alt="" coords="459,55,640,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="673,56,641,60,640,54,673,51"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a134b48e98d0b9db4011cfea08d0924da" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="251,5,380,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="455,20,381,20,381,15,455,15"/>
+<area shape="rect" id="Node000005" href="$classVideoPlayer.html#aee93bdf909227c7d4f7c48eca8874af6" title="Toggles the playback state (play/pause) or resets if finished. If finished, resets the decoder...." alt="" coords="221,55,411,79"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="444,70,412,70,412,64,444,64"/>
+<area shape="rect" id="Node000006" href="$classVideoPlayer.html#a6ee50b34775069f86b0cace600c3923c" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,80,173,105"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="473,85,411,94,286,99,173,98,173,93,286,94,411,88,472,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="205,82,174,86,173,80,205,77"/>
+</map>

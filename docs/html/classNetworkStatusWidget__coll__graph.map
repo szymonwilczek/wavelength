@@ -1,0 +1,10 @@
+<map id="NetworkStatusWidget" name="NetworkStatusWidget">
+<area shape="rect" id="Node000001" title="A widget displaying network connection status and ping time with cyberpunk aesthetics." alt="" coords="5,605,200,1031"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="21,299,83,362"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,376,83,605,78,605,54,377"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="107,118,320,543"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,543,158,589,152,588,163,542"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="321,289,339,304,347,330,344,348,335,362,331,359,339,346,341,330,335,307,318,293"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="184,5,243,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="216,83,216,118,211,118,211,83"/>
+</map>

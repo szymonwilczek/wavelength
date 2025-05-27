@@ -1,0 +1,5 @@
+<map id="SessionCoordinator::onPttStartReceiving" name="SessionCoordinator::onPttStartReceiving">
+<area shape="rect" id="Node000001" title="Relays the pttStartReceiving signal." alt="" coords="5,5,152,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ab1d45aaa51cbd91296713af4b78fc3e2" title="Emitted when another user starts PTT transmission. Relayed from WavelengthMessageService." alt="" coords="200,5,335,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,22,184,22,184,27,152,27"/>
+</map>

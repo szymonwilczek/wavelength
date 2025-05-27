@@ -1,0 +1,19 @@
+<map id="src/auth/authentication_manager.cpp" name="src/auth/authentication_manager.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="406,5,559,44"/>
+<area shape="rect" id="Node000002" href="$authentication__manager_8h.html" title=" " alt="" coords="60,92,230,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="406,46,211,91,210,85,405,41"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="254,92,398,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="446,47,364,87,362,82,443,42"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="423,92,542,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="485,45,485,76,480,76,480,45"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="566,92,663,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="516,42,583,81,580,86,513,47"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="688,92,824,117"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="549,42,700,85,699,90,548,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,165,93,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,119,78,158,75,153,128,115"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="117,165,173,189"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="148,117,148,149,142,149,142,117"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="197,165,266,189"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="161,115,208,153,204,157,158,119"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::IsWavelengthPasswordProtected" name="WavelengthStateManager::IsWavelengthPasswordProtected">
+<area shape="rect" id="Node000001" title="Checks if a specific wavelength is password protected." alt="" coords="274,5,494,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#aa0256473933f5d5f8001feff315aac38" title="Checks if a specific wavelength is password protected. Delegates the call to WavelengthStateManager." alt="" coords="5,5,226,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="258,27,226,27,226,22,258,22"/>
+</map>

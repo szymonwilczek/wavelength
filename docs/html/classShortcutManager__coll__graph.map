@@ -1,0 +1,9 @@
+<map id="ShortcutManager" name="ShortcutManager">
+<area shape="rect" id="Node000001" title="Manages application&#45;wide keyboard shortcuts using a singleton pattern." alt="" coords="5,970,236,1451"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="86,5,145,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,84,122,971,117,971,113,84"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="137,118,350,908"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="130,82,140,117,135,119,125,84"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,908,169,954,163,953,171,907"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="351,441,362,452,370,468,375,488,377,513,373,547,363,571,358,569,368,545,371,513,370,489,365,470,357,455,348,445"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="LongTextDisplayEffect::contentHeightChanged" name="LongTextDisplayEffect::contentHeightChanged">
+<area shape="rect" id="Node000001" title="Emitted after ProcessText() finishes, indicating the total calculated height required to display all ..." alt="" coords="681,148,844,187"/>
+<area shape="rect" id="Node000002" href="$classLongTextDisplayEffect.html#a3c62e6c78599b4e8eac2ef62cdae7319" title="Processes the original_text_ into wrapped lines based on the current widget width...." alt="" coords="448,120,600,159"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="666,159,600,151,601,146,667,153"/>
+<area shape="rect" id="Node000009" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="414,183,633,208"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="667,181,634,185,633,180,666,176"/>
+<area shape="rect" id="Node000003" href="$classLongTextDisplayEffect.html#a515b93e6788d2cbb060950762233b25a" title="Constructs a CyberLongTextDisplay widget. Initializes the widget with default size policies,..." alt="" coords="206,5,366,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="467,115,327,47,329,42,469,110"/>
+<area shape="rect" id="Node000004" href="$classLongTextDisplayEffect.html#a04a72982e54ac8d38728aa94996c9b48" title="Returns the recommended size for the widget based on the processed text content. The height is calcul..." alt="" coords="5,35,158,73"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="432,123,365,110,158,70,159,65,367,105,433,118"/>
+<area shape="rect" id="Node000006" href="$classLongTextDisplayEffect.html#a8764be077716dbe61b07607cd1a470ba" title="Overridden paint event handler. Draws the widget&#39;s appearance. Ensures the text is processed,..." alt="" coords="210,120,362,159"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="432,142,362,142,362,137,432,137"/>
+<area shape="rect" id="Node000007" href="$classLongTextDisplayEffect.html#a21a0e7d167e18228eebc2fb163d9b880" title="Overridden resize event handler. Invalidates the processed text cache and triggers delayed text proce..." alt="" coords="210,183,362,221"/>
+<area shape="poly" id="edge5_Node000002_Node000007" title=" " alt="" coords="434,166,363,185,361,180,432,161"/>
+<area shape="rect" id="Node000008" href="$classLongTextDisplayEffect.html#a63a27a4868ea0b72ad337f476786db1e" title="Sets the text content to be displayed. Updates the internal original text, invalidates the processed ..." alt="" coords="210,245,362,284"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="435,163,416,173,400,188,392,203,383,219,368,235,348,247,345,242,364,231,379,215,387,200,396,185,412,169,432,158"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="191,41,158,46,157,40,190,36"/>
+</map>

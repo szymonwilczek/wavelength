@@ -1,0 +1,5 @@
+<map id="AttachmentViewer::CloseViewer" name="AttachmentViewer::CloseViewer">
+<area shape="rect" id="Node000001" title="Closes the viewer by emitting the viewingFinished signal." alt="" coords="5,12,214,37"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#aec3d228e36d5e01358f24a6827865b62" title="Emitted when the viewer is closed (either manually or automatically after decryption)." alt="" coords="262,5,441,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,22,246,22,246,27,214,27"/>
+</map>

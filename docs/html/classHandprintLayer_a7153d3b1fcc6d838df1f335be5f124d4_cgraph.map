@@ -1,0 +1,9 @@
+<map id="HandprintLayer::UpdateProgress" name="HandprintLayer::UpdateProgress">
+<area shape="rect" id="Node000001" title="Slot called periodically by handprint_timer_ when the user is holding the mouse button...." alt="" coords="5,31,216,55"/>
+<area shape="rect" id="Node000002" href="$classHandprintLayer.html#a8bfdc6419e93709149f942109421218b" title="Handles the completion of the handprint scan. Changes the UI element styles (border,..." alt="" coords="276,5,496,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,31,260,27,260,32,216,36"/>
+<area shape="rect" id="Node000004" href="$classHandprintLayer.html#a5c7f6a6adad5116e806d557a093d7919" title="Updates the visual appearance of the handprint image during the scan. Renders the SVG and applies a c..." alt="" coords="264,55,508,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="216,50,248,52,248,58,216,55"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="556,5,754,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="496,15,540,15,540,20,496,20"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="CommunicationStream::ClearMessages" name="CommunicationStream::ClearMessages">
+<area shape="rect" id="Node000001" title="Removes all messages currently managed by the stream. Hides and schedules deletion for all message wi..." alt="" coords="5,37,160,76"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#a26fe6873c1da55aaa2b9f82c69ace778" title="Disconnects all signals originating from the given StreamMessage widget that are connected to this Co..." alt="" coords="208,5,418,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,43,192,39,193,44,161,49"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html#a1924054445cb48103b7422b7789cb1d9" title="Initiates the animation returning the wave to the &quot;Idle&quot; state. Animates amplitude,..." alt="" coords="233,68,392,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,64,218,72,217,77,160,70"/>
+</map>

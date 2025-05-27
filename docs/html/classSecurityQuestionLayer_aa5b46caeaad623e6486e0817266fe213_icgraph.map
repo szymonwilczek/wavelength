@@ -1,0 +1,5 @@
+<map id="SecurityQuestionLayer::CheckSecurityAnswer" name="SecurityQuestionLayer::CheckSecurityAnswer">
+<area shape="rect" id="Node000001" title="Checks the security answer (always accepts in this implementation). Called when the user presses Ente..." alt="" coords="214,5,372,44"/>
+<area shape="rect" id="Node000002" href="$classSecurityQuestionLayer.html#a538c6acd1a8bcc50dd1502a7110a2603" title="Constructs a SecurityQuestionLayer. Initializes the UI elements (title, instructions,..." alt="" coords="5,5,166,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,27,166,27,166,22,198,22"/>
+</map>

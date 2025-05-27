@@ -1,0 +1,13 @@
+<map id="TextDisplayEffect::SetText" name="TextDisplayEffect::SetText">
+<area shape="rect" id="Node000001" title="Sets new text content for the widget. Updates the internal text, removes HTML, recalculates required ..." alt="" coords="5,68,138,107"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#a11d1fbc1c104ee6c184d9b4ac0ba3fa5" title="Recalculates the required height for the widget based on the plain_text_ content and current width...." alt="" coords="186,5,318,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,65,179,47,180,52,130,70"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#a138685dd012160ea0013a628897b3acd" title="Static utility function to remove basic HTML tags and decode common entities from a string." alt="" coords="186,68,318,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,85,170,85,170,90,138,90"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#ad9da8cfd5969d6509d622fc708957fb3" title="Starts or restarts the text revealing animation from the beginning. If the text has been fully reveal..." alt="" coords="186,131,318,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="130,105,180,122,179,127,128,110"/>
+<area shape="rect" id="Node000005" href="$classTextDisplayEffect.html#a743994a8ebe09bd1d4536a2e2ce4ee23" title="Sets the number of revealed characters. Updates the internal count, triggers a repaint,..." alt="" coords="366,131,498,169"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="318,147,351,147,351,153,318,153"/>
+<area shape="rect" id="Node000006" href="$classTextDisplayEffect.html#af2538be2d26c4f11de6f1198063f67e2" title="Emitted exactly once when the text revealing animation completes for the first time after StartReveal..." alt="" coords="546,131,679,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="499,147,531,147,531,153,499,153"/>
+</map>

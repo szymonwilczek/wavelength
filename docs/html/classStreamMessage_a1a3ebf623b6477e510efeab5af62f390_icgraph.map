@@ -1,0 +1,11 @@
+<map id="StreamMessage::AdjustSizeToContent" name="StreamMessage::AdjustSizeToContent">
+<area shape="rect" id="Node000001" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="754,24,941,62"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#ab018e0c173fde148dec8f2441b5db300" title="Parses HTML content to find an attachment placeholder and adds the corresponding AttachmentPlaceholde..." alt="" coords="492,5,706,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="739,35,707,31,707,26,739,29"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="493,55,705,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="739,56,706,59,706,54,739,51"/>
+<area shape="rect" id="Node000004" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="254,48,444,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="477,70,444,70,444,64,477,64"/>
+<area shape="rect" id="Node000005" href="$classStreamDisplay.html#ab49c3a484e911bc8cf752e2d3791516a" title="Constructs a WavelengthStreamDisplay widget. Creates the main layout, instantiates the CommunicationS..." alt="" coords="5,55,206,79"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="238,70,206,70,206,64,238,64"/>
+</map>

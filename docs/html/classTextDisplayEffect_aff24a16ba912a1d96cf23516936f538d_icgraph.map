@@ -1,0 +1,5 @@
+<map id="TextDisplayEffect::RevealNextChar" name="TextDisplayEffect::RevealNextChar">
+<area shape="rect" id="Node000001" title="Slot called by the text_timer_. Reveals the next character in the sequence. Adjusts the timer interva..." alt="" coords="186,5,318,44"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="5,5,138,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,27,138,27,138,22,170,22"/>
+</map>

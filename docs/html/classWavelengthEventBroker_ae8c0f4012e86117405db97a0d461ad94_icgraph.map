@@ -1,0 +1,49 @@
+<map id="WavelengthEventBroker::eventPublished" name="WavelengthEventBroker::eventPublished">
+<area shape="rect" id="Node000001" title="Signal emitted whenever any event is published via PublishEvent(). Subscribed components connect to t..." alt="" coords="690,383,849,421"/>
+<area shape="rect" id="Node000002" href="$classWavelengthEventBroker.html#ac664ef807bf6e0f08cf8e6435e7dbbc5" title="Publishes an event of a specific type with associated data. Emits the eventPublished signal,..." alt="" coords="484,351,642,389"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="675,390,642,385,643,380,675,385"/>
+<area shape="rect" id="Node000026" href="$classWavelengthEventBroker.html#acfd18053951e1530a00877803defe392" title="Subscribes a receiver object&#39;s slot to a specific event type. Uses a template to ensure the receiver ..." alt="" coords="484,413,642,452"/>
+<area shape="poly" id="edge23_Node000001_Node000026" title=" " alt="" coords="675,419,643,424,642,418,675,413"/>
+<area shape="rect" id="Node000003" href="$classWavelengthEventBroker.html#a91ad519d9d39e214cb74b7e4c4f0baa3" title="Publishes an &quot;active_wavelength_changed&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="252,5,436,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="555,336,543,276,521,201,505,162,486,124,462,89,434,57,420,47,423,42,438,53,466,85,490,121,510,160,526,199,549,275,560,335"/>
+<area shape="rect" id="Node000007" href="$classWavelengthEventBroker.html#a60448a9bffbea7241fa9dccf48f428ff" title="Publishes an &quot;authentication_failed&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="265,68,423,107"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="551,336,536,288,512,230,479,171,458,144,434,120,419,109,422,105,438,116,462,140,483,168,517,227,541,286,556,335"/>
+<area shape="rect" id="Node000009" href="$classWavelengthEventBroker.html#ab0480fb08de6b572b01435d061e7e0e4" title="Publishes a &quot;connection_error&quot; event. Data: {&quot;error&quot;: QString}." alt="" coords="265,131,423,169"/>
+<area shape="poly" id="edge6_Node000002_Node000009" title=" " alt="" coords="546,338,528,302,503,260,472,218,434,183,417,172,420,168,438,179,476,215,507,257,532,299,550,336"/>
+<area shape="rect" id="Node000011" href="$classWavelengthEventBroker.html#ac8b54b121980d4ab3d28cf34b7a2f14e" title="Publishes a &quot;message_received&quot; event. Data: {&quot;frequency&quot;: QString, &quot;message&quot;: QString}..." alt="" coords="265,193,423,232"/>
+<area shape="poly" id="edge8_Node000002_Node000011" title=" " alt="" coords="536,340,491,292,464,267,435,246,414,235,416,230,437,241,467,263,495,288,540,337"/>
+<area shape="rect" id="Node000013" href="$classWavelengthEventBroker.html#a81a7fdd866c5a57a8fc1acdf5fc9fc8d" title="Publishes a &quot;message_sent&quot; event. Data: {&quot;frequency&quot;: QString, &quot;message&quot;: QString}..." alt="" coords="265,256,423,295"/>
+<area shape="poly" id="edge10_Node000002_Node000013" title=" " alt="" coords="512,346,435,308,407,298,409,293,437,304,514,341"/>
+<area shape="rect" id="Node000015" href="$classWavelengthEventBroker.html#af051237c7fedcaefb3d3ad95f733aed9" title="Publishes a &quot;system_message&quot; event. Data: {&quot;frequency&quot;: QString, &quot;message&quot;: QString}..." alt="" coords="265,319,423,357"/>
+<area shape="poly" id="edge12_Node000002_Node000015" title=" " alt="" coords="468,359,423,352,424,347,469,354"/>
+<area shape="rect" id="Node000016" href="$classWavelengthEventBroker.html#ac04ab0f9ff9a953cf2e1fc0deae585a6" title="Publishes a &quot;ui_state_changed&quot; event. Data: {&quot;component&quot;: QString, &quot;state&quot;: QVariant}..." alt="" coords="265,381,423,420"/>
+<area shape="poly" id="edge13_Node000002_Node000016" title=" " alt="" coords="469,386,424,392,423,387,468,381"/>
+<area shape="rect" id="Node000017" href="$classWavelengthEventBroker.html#a46cf0c1b69ac40de9410eb9d878e773d" title="Publishes a &quot;user_kicked&quot; event. Data: {&quot;frequency&quot;: QString, &quot;reason&quot;: QString}." alt="" coords="265,444,423,483"/>
+<area shape="poly" id="edge14_Node000002_Node000017" title=" " alt="" coords="494,399,485,403,462,418,437,434,409,446,406,441,435,429,459,414,483,398,492,394"/>
+<area shape="rect" id="Node000018" href="$classWavelengthEventBroker.html#a16c13a8b8494fdc39af37f50115ac1f7" title="Publishes a &quot;wavelength_closed&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="265,507,423,545"/>
+<area shape="poly" id="edge15_Node000002_Node000018" title=" " alt="" coords="488,400,486,402,469,425,463,448,456,472,438,496,419,508,416,504,434,492,451,470,458,447,464,423,482,399,485,396"/>
+<area shape="rect" id="Node000020" href="$classWavelengthEventBroker.html#a9d17783d116d9732ded0fa0140d0bb11" title="Publishes a &quot;wavelength_created&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="265,569,423,608"/>
+<area shape="poly" id="edge17_Node000002_Node000020" title=" " alt="" coords="487,401,486,402,472,422,465,441,463,479,460,518,453,538,438,559,422,571,419,567,434,555,448,536,455,517,458,479,460,440,467,419,482,399,484,397"/>
+<area shape="rect" id="Node000022" href="$classWavelengthEventBroker.html#a835c6abe043f0e4f8324e2498c39e1bd" title="Publishes a &quot;wavelength_joined&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="265,632,423,671"/>
+<area shape="poly" id="edge19_Node000002_Node000022" title=" " alt="" coords="487,402,486,402,469,430,461,457,460,483,463,510,466,537,465,565,457,593,438,621,423,634,420,630,434,618,452,591,460,564,460,537,458,511,455,484,456,456,464,428,482,399,483,398"/>
+<area shape="rect" id="Node000024" href="$classWavelengthEventBroker.html#a26e30b82289444c474a1ce093af8f630" title="Publishes a &quot;wavelength_left&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="265,695,423,733"/>
+<area shape="poly" id="edge21_Node000002_Node000024" title=" " alt="" coords="487,402,486,402,465,438,457,473,458,507,463,541,469,576,469,611,461,647,438,684,424,696,420,692,434,680,456,645,464,611,463,577,458,542,453,508,452,472,460,436,482,399,483,398"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a6dc28d3cac53b7fd819d9b03261b8559" title="Slot triggered when the active wavelength changes. Relays the signal and publishes the event via Wave..." alt="" coords="5,5,204,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="236,27,204,27,204,22,236,22"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#a49f9948b0199f5b1cef30fcba5a4d4bb" title="Slot triggered when authentication fails during join. Relays the signal and publishes the event via W..." alt="" coords="24,68,185,107"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="249,90,186,90,186,85,249,85"/>
+<area shape="rect" id="Node000010" href="$classSessionCoordinator.html#a4deb194a3657876bd6aa2f9096b91cea" title="Slot triggered when a connection error occurs. Relays the signal and publishes the event via Waveleng..." alt="" coords="36,131,173,169"/>
+<area shape="poly" id="edge7_Node000009_Node000010" title=" " alt="" coords="249,153,174,153,174,147,249,147"/>
+<area shape="rect" id="Node000012" href="$classSessionCoordinator.html#ad2ca912b6663d0ef33d7c90a5a8ea4e8" title="Slot triggered when a message is received. Relays the signal and publishes the event via WavelengthEv..." alt="" coords="30,193,179,232"/>
+<area shape="poly" id="edge9_Node000011_Node000012" title=" " alt="" coords="249,215,179,215,179,210,249,210"/>
+<area shape="rect" id="Node000014" href="$classSessionCoordinator.html#a01bf147e840740a52b2efa33f93ba295" title="Slot triggered when a message is sent. Relays the signal and publishes the event via WavelengthEventB..." alt="" coords="37,256,172,295"/>
+<area shape="poly" id="edge11_Node000013_Node000014" title=" " alt="" coords="249,278,173,278,173,273,249,273"/>
+<area shape="rect" id="Node000019" href="$classSessionCoordinator.html#a7bfbd709b035beb0038e20f558480d03" title="Slot triggered when a wavelength is closed. Relays the signal and publishes the event via WavelengthE..." alt="" coords="29,507,180,545"/>
+<area shape="poly" id="edge16_Node000018_Node000019" title=" " alt="" coords="250,529,181,529,181,523,250,523"/>
+<area shape="rect" id="Node000021" href="$classSessionCoordinator.html#a63f6efb0bb2370a49e3877f5d3127233" title="Slot triggered when a wavelength is created. Relays the signal and publishes the event via Wavelength..." alt="" coords="26,569,183,608"/>
+<area shape="poly" id="edge18_Node000020_Node000021" title=" " alt="" coords="249,591,183,591,183,586,249,586"/>
+<area shape="rect" id="Node000023" href="$classSessionCoordinator.html#adb301afe6d4380746abe6cb168f0f50a" title="Slot triggered when a wavelength is joined. Relays the signal and publishes the event via WavelengthE..." alt="" coords="30,632,179,671"/>
+<area shape="poly" id="edge20_Node000022_Node000023" title=" " alt="" coords="249,654,179,654,179,649,249,649"/>
+<area shape="rect" id="Node000025" href="$classSessionCoordinator.html#aab82ebce6f6cf064602b95c4f213e94b" title="Slot triggered when the active wavelength is left. Relays the signal and publishes the event via Wave..." alt="" coords="37,695,172,733"/>
+<area shape="poly" id="edge22_Node000024_Node000025" title=" " alt="" coords="249,717,173,717,173,711,249,711"/>
+</map>

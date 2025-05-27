@@ -1,0 +1,5 @@
+<map id="ImageViewer::HandleImageReady" name="ImageViewer::HandleImageReady">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s imageReady signal. Stores the decoded image, sets it as the pixmap fo..." alt="" coords="233,5,414,44"/>
+<area shape="rect" id="Node000002" href="$classImageViewer.html#a9f9cd61953b303c108ab1b8cabef1870" title="Constructs an InlineImageViewer widget. Initializes the UI (QLabel), creates the ImageDecoder instanc..." alt="" coords="5,12,185,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,27,185,27,185,22,217,22"/>
+</map>

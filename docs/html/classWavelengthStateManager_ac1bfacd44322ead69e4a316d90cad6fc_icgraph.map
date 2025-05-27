@@ -1,0 +1,11 @@
+<map id="WavelengthStateManager::activeWavelengthChanged" name="WavelengthStateManager::activeWavelengthChanged">
+<area shape="rect" id="Node000001" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="423,37,605,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="223,5,358,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="408,44,358,37,359,32,409,39"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#a1d0a330ff6c0c11b93da9610195d20c6" title="Sets the specified frequency as the currently active wavelength. Updates the registry and emits the a..." alt="" coords="206,68,375,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="408,74,376,78,375,73,407,69"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="14,5,149,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="207,27,150,27,150,22,207,22"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a58a056dc90d0c5e57749b2a1f81583ad" title="Sets the specified frequency as the currently active wavelength. Delegates the call to WavelengthStat..." alt="" coords="5,68,158,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="190,90,158,90,158,85,190,85"/>
+</map>

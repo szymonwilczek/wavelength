@@ -1,0 +1,7 @@
+<map id="ChatStyle::GetSendButtonStyle" name="ChatStyle::GetSendButtonStyle">
+<area shape="rect" id="Node000001" title="Gets the stylesheet for the &quot;Send&quot; message button (QPushButton). Defines background,..." alt="" coords="5,37,182,76"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#abfd4f5b01a3833e07116b1d4b4242fa6" title="Gets the primary color (Neon Blue)." alt="" coords="238,5,428,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,42,222,37,223,42,182,48"/>
+<area shape="rect" id="Node000003" href="$classCyberpunkStyle.html#aa351ffeca18a1ba66c5c288e9683f89f" title="Gets the secondary color (Lighter Blue)." alt="" coords="230,68,437,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,65,214,69,214,75,182,71"/>
+</map>

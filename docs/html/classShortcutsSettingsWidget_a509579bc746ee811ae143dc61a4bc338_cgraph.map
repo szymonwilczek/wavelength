@@ -1,0 +1,5 @@
+<map id="ShortcutsSettingsWidget::RestoreDefaultShortcuts" name="ShortcutsSettingsWidget::RestoreDefaultShortcuts">
+<area shape="rect" id="Node000001" title="Restores all keyboard shortcuts to their default values defined in WavelengthConfig...." alt="" coords="5,5,179,44"/>
+<area shape="rect" id="Node000002" href="$classShortcutsSettingsWidget.html#a1a064a45dd1aa4818e899cec0b4016e1" title="Loads the current shortcut settings from WavelengthConfig and updates the UI elements (QKeySequenceEd..." alt="" coords="227,5,394,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,22,211,22,211,27,179,27"/>
+</map>

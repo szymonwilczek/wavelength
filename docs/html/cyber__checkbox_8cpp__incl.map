@@ -1,0 +1,15 @@
+<map id="src/ui/checkbox/cyber_checkbox.cpp" name="src/ui/checkbox/cyber_checkbox.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="227,5,376,44"/>
+<area shape="rect" id="Node000002" href="$cyber__checkbox_8h.html" title=" " alt="" coords="5,92,132,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,47,119,89,118,84,245,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="156,92,229,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="277,47,223,85,220,81,274,42"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="252,92,352,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="304,45,304,76,299,76,299,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="376,92,516,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="338,42,412,82,410,87,335,47"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="540,92,677,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="377,42,548,85,547,90,375,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="22,165,115,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,117,71,149,66,149,66,117"/>
+</map>

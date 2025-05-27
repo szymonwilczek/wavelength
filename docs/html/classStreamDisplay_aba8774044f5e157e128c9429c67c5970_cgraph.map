@@ -1,0 +1,15 @@
+<map id="StreamDisplay::ProcessNextQueuedMessage" name="StreamDisplay::ProcessNextQueuedMessage">
+<area shape="rect" id="Node000001" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="5,33,196,72"/>
+<area shape="rect" id="Node000002" href="$classStreamDisplay.html#a9b2f657773a56d360df29998cb79ed3e" title="Slot called when a StreamMessage associated with a progress ID is destroyed. Removes the correspondin..." alt="" coords="244,5,470,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,40,228,36,229,41,197,45"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="251,68,463,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,60,235,65,235,70,196,66"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a1a3ebf623b6477e510efeab5af62f390" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="534,33,720,72"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="463,67,518,61,519,67,464,72"/>
+<area shape="rect" id="Node000007" href="$classStreamMessage.html#a59f8dedec8dffa79dad2b202ddd8dbf6" title="Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities...." alt="" coords="518,96,736,121"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="464,89,503,93,502,98,463,94"/>
+<area shape="rect" id="Node000005" href="$classAttachmentViewer.html#a8e9e8d50bde441b62f513f5f4d6100c9" title="Returns the recommended size for the viewer based on its content and layout. Calculates the size need..." alt="" coords="795,16,978,41"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="721,41,780,36,780,41,721,47"/>
+<area shape="rect" id="Node000006" href="$classStreamMessage.html#a520ebf30923492083e94819640a79323" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="784,66,989,90"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="721,59,769,64,768,69,721,64"/>
+</map>

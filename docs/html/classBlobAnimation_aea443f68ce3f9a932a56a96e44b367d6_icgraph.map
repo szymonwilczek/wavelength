@@ -1,0 +1,5 @@
+<map id="BlobAnimation::ResumeAllEventTracking" name="BlobAnimation::ResumeAllEventTracking">
+<area shape="rect" id="Node000001" title="Resumes all event tracking mechanisms after being paused. Restarts timers, enables the event handler,..." alt="" coords="256,5,432,44"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a6dd0c09acbfa1be7967d6d7114719fbf" title="Makes the animation widget visible and resumes event tracking." alt="" coords="5,12,208,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,27,208,27,208,22,240,22"/>
+</map>

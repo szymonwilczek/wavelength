@@ -1,0 +1,11 @@
+<map id="CyberpunkTextEffect::CyberpunkTextEffect" name="CyberpunkTextEffect::CyberpunkTextEffect">
+<area shape="rect" id="Node000001" title="Constructs a CyberpunkTextEffect. Stores the target QLabel, hides it initially, and sets up the anima..." alt="" coords="5,68,158,107"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkTextEffect.html#a501c4f143be5f92aef198cdd15fb5603" title="Slot called periodically by the timer to advance the animation. Executes the logic for the current an..." alt="" coords="206,68,350,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,85,190,85,190,90,158,90"/>
+<area shape="rect" id="Node000003" href="$classCyberpunkTextEffect.html#af7e2300823ad204915bb92001ab7149d" title="Handles the final &quot;Glitching&quot; phase of the animation. Briefly displays the full text with rapidly cha..." alt="" coords="398,5,542,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="338,65,393,47,395,52,340,70"/>
+<area shape="rect" id="Node000004" href="$classCyberpunkTextEffect.html#a7a70778a198c7f8aaacfb389fd086aa4" title="Handles the &quot;Scanning&quot; phase of the animation. Displays a sweeping vertical bar &quot;|&quot; across the label&#39;..." alt="" coords="398,68,542,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="350,85,383,85,383,90,350,90"/>
+<area shape="rect" id="Node000005" href="$classCyberpunkTextEffect.html#a5690607a245f94527129f9fb5cb47acb" title="Handles the &quot;Typing&quot; phase of the animation. Reveals the original text character by character,..." alt="" coords="398,131,542,169"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="340,105,395,123,393,128,338,110"/>
+</map>

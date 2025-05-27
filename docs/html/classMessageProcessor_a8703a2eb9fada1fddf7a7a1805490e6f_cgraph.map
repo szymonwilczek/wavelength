@@ -1,0 +1,6 @@
+<map id="MessageProcessor::operator=" name="MessageProcessor::operator=">
+<area shape="rect" id="Node000001" title="Deleted assignment operator to prevent assignment." alt="" coords="5,36,202,61"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#af073515175802398f049574a52fe9795" title="Deleted copy constructor to prevent copying." alt="" coords="250,29,444,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,46,234,46,234,51,202,51"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="302,30,299,20,306,10,322,5,347,3,374,5,389,11,387,16,372,10,347,8,323,10,309,15,304,21,307,28"/>
+</map>

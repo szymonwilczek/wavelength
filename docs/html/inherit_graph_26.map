@@ -1,0 +1,55 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="14,597,83,622"/>
+<area shape="rect" id="Node000001" href="$classAppInstanceManager.html" title="Manages communication and interaction between multiple instances of the application." alt="" coords="156,55,300,79"/>
+<area shape="poly" id="edge15_Node000000_Node000001" title=" " alt="" coords="48,582,55,475,70,328,81,254,96,186,115,129,138,91,154,78,157,82,142,94,120,132,101,187,86,255,75,329,60,475,54,582"/>
+<area shape="rect" id="Node000002" href="$classAttachmentQueueManager.html" title="Manages a queue of AttachmentTasks for concurrent execution using a singleton pattern." alt="" coords="140,104,316,129"/>
+<area shape="poly" id="edge16_Node000000_Node000002" title=" " alt="" coords="49,582,57,484,73,352,84,286,99,225,117,175,138,140,154,127,158,131,142,143,121,177,104,226,90,287,78,353,62,485,54,582"/>
+<area shape="rect" id="Node000003" href="$classAttachmentTask.html" title="Represents a single task (a function) to be executed in a thread pool." alt="" coords="170,5,286,30"/>
+<area shape="poly" id="edge17_Node000000_Node000003" title=" " alt="" coords="48,582,53,466,66,304,78,222,93,147,113,84,125,60,138,41,152,30,168,22,170,27,155,34,142,45,129,63,118,86,98,148,83,223,72,305,58,466,53,582"/>
+<area shape="rect" id="Node000005" href="$classAuthenticationManager.html" title="Manages authentication and session handling for Wavelength frequencies using a singleton pattern." alt="" coords="151,153,305,178"/>
+<area shape="poly" id="edge18_Node000000_Node000005" title=" " alt="" coords="49,582,59,493,76,376,102,264,118,220,138,189,155,176,158,181,142,193,123,222,107,265,81,377,64,494,55,582"/>
+<area shape="rect" id="Node000006" href="$classBlobEventHandler.html" title="Handles and processes window events (move, resize) for the Blob animation." alt="" coords="165,203,290,227"/>
+<area shape="poly" id="edge19_Node000000_Node000006" title=" " alt="" coords="50,581,61,502,79,400,105,303,120,265,138,238,163,222,166,227,142,242,125,267,110,305,85,401,66,503,56,582"/>
+<area shape="rect" id="Node000007" href="$classBlobTransitionManager.html" title="Manages transitions and movement analysis for the Blob animation based on window events." alt="" coords="151,252,304,277"/>
+<area shape="poly" id="edge20_Node000000_Node000007" title=" " alt="" coords="47,582,49,522,61,443,73,401,89,360,110,322,138,288,156,275,159,279,141,292,115,325,94,362,78,403,67,444,55,522,52,582"/>
+<area shape="rect" id="Node000008" href="$classCyberpunkTextEffect.html" title="Applies a multiphase cyberpunk&#45;style text reveal animation to a QLabel." alt="" coords="156,301,300,326"/>
+<area shape="poly" id="edge21_Node000000_Node000008" title=" " alt="" coords="48,581,54,529,68,464,95,396,114,365,138,337,156,324,159,329,141,341,118,368,100,399,73,465,59,530,54,582"/>
+<area shape="rect" id="Node000009" href="$classDatabaseManager.html" title="Singleton class responsible for managing the connection to the PostgreSQL database." alt="" coords="165,351,291,375"/>
+<area shape="poly" id="edge22_Node000000_Node000009" title=" " alt="" coords="51,582,59,539,75,486,100,433,118,408,138,386,163,371,165,376,141,390,122,411,105,435,80,488,64,540,56,583"/>
+<area shape="rect" id="Node000010" href="$classFontManager.html" title="Manages application fonts using a singleton pattern." alt="" coords="179,400,276,425"/>
+<area shape="poly" id="edge23_Node000000_Node000010" title=" " alt="" coords="54,582,65,548,83,509,107,469,138,436,157,424,178,417,179,422,159,429,141,440,111,473,87,511,70,550,59,583"/>
+<area shape="rect" id="Node000011" href="$classImageDecoder.html" title="Decodes image data using Qt&#39;s built&#45;in image loading capabilities." alt="" coords="175,449,281,474"/>
+<area shape="poly" id="edge24_Node000000_Node000011" title=" " alt="" coords="60,582,91,532,113,507,138,485,173,468,176,473,141,489,117,511,95,536,65,585"/>
+<area shape="rect" id="Node000012" href="$classMessageHandler.html" title="Singleton class responsible for handling WebSocket message operations." alt="" coords="168,499,288,523"/>
+<area shape="poly" id="edge25_Node000000_Node000012" title=" " alt="" coords="71,585,101,558,138,534,169,521,171,526,141,539,105,563,74,589"/>
+<area shape="rect" id="Node000013" href="$classMessageProcessor.html" title="Singleton class responsible for processing incoming WebSocket messages for specific wavelengths." alt="" coords="161,548,294,573"/>
+<area shape="poly" id="edge26_Node000000_Node000013" title=" " alt="" coords="97,594,180,571,181,576,99,599"/>
+<area shape="rect" id="Node000014" href="$classMessageService.html" title="Singleton service responsible for sending messages and files over WebSocket connections." alt="" coords="168,597,288,622"/>
+<area shape="poly" id="edge27_Node000000_Node000014" title=" " alt="" coords="98,607,168,607,168,612,98,612"/>
+<area shape="rect" id="Node000015" href="$classResizeEventFilter.html" title="An event filter specifically designed to center a QLabel within a BlobAnimation widget whenever the B..." alt="" coords="167,647,289,671"/>
+<area shape="poly" id="edge28_Node000000_Node000015" title=" " alt="" coords="99,621,181,644,180,649,97,626"/>
+<area shape="rect" id="Node000016" href="$classSessionCoordinator.html" title="Singleton coordinator class acting as a facade for Wavelength session management." alt="" coords="160,696,296,721"/>
+<area shape="poly" id="edge29_Node000000_Node000016" title=" " alt="" coords="74,631,105,657,141,681,171,693,169,698,138,685,101,661,71,635"/>
+<area shape="rect" id="Node000017" href="$classShortcutManager.html" title="Manages application&#45;wide keyboard shortcuts using a singleton pattern." alt="" coords="167,745,288,770"/>
+<area shape="poly" id="edge30_Node000000_Node000017" title=" " alt="" coords="65,635,95,684,117,709,141,730,168,743,165,748,138,735,113,713,91,687,60,637"/>
+<area shape="rect" id="Node000018" href="$classSystemOverrideManager.html" title="Manages a &quot;system override&quot; sequence involving visual and system&#45;level changes." alt="" coords="146,795,310,819"/>
+<area shape="poly" id="edge31_Node000000_Node000018" title=" " alt="" coords="59,636,70,669,87,708,111,747,141,780,162,792,159,796,138,784,107,750,83,710,65,671,54,638"/>
+<area shape="rect" id="Node000019" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="161,844,295,869"/>
+<area shape="poly" id="edge32_Node000000_Node000019" title=" " alt="" coords="56,637,64,679,80,731,105,784,122,808,141,829,161,842,159,846,138,833,118,811,100,787,75,733,59,681,51,638"/>
+<area shape="rect" id="Node000020" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="165,893,291,918"/>
+<area shape="poly" id="edge33_Node000000_Node000020" title=" " alt="" coords="54,638,59,689,73,754,100,821,118,851,141,878,166,893,163,898,138,882,114,855,95,823,68,755,54,690,48,638"/>
+<area shape="rect" id="Node000021" href="$classWavelengthCreator.html" title="Singleton class responsible for initiating the creation of a new wavelength." alt="" coords="162,943,294,967"/>
+<area shape="poly" id="edge34_Node000000_Node000021" title=" " alt="" coords="52,637,55,697,67,775,78,817,94,857,115,895,141,928,163,942,160,946,138,932,110,898,89,859,73,818,61,776,49,698,47,637"/>
+<area shape="rect" id="Node000022" href="$classWavelengthEventBroker.html" title="A singleton event broker for decoupling components within the Wavelength application." alt="" coords="149,992,307,1017"/>
+<area shape="poly" id="edge35_Node000000_Node000022" title=" " alt="" coords="56,637,66,716,85,818,110,915,125,952,142,977,158,989,155,994,138,981,120,954,105,916,79,819,61,717,50,638"/>
+<area shape="rect" id="Node000023" href="$classWavelengthJoiner.html" title="Singleton class responsible for initiating the process of joining an existing wavelength." alt="" coords="166,1041,290,1066"/>
+<area shape="poly" id="edge36_Node000000_Node000023" title=" " alt="" coords="55,637,64,726,81,842,107,954,123,997,142,1026,167,1043,164,1047,138,1030,118,1000,102,956,76,843,59,726,49,638"/>
+<area shape="rect" id="Node000024" href="$classWavelengthLeaver.html" title="Singleton class responsible for handling the process of leaving or closing wavelengths." alt="" coords="165,1091,291,1115"/>
+<area shape="poly" id="edge37_Node000000_Node000024" title=" " alt="" coords="54,637,62,735,78,866,90,933,104,993,121,1042,142,1076,166,1092,163,1096,138,1080,117,1045,99,995,84,934,73,867,57,735,49,637"/>
+<area shape="rect" id="Node000025" href="$classWavelengthRegistry.html" title="Singleton registry managing active and pending wavelength connections and their associated informatio..." alt="" coords="159,1140,296,1165"/>
+<area shape="poly" id="edge38_Node000000_Node000025" title=" " alt="" coords="54,637,60,744,75,891,86,965,101,1032,120,1088,142,1125,160,1139,157,1143,138,1129,115,1090,96,1034,81,966,70,891,55,745,48,638"/>
+<area shape="rect" id="Node000026" href="$classWavelengthStateManager.html" title="Singleton class providing a centralized interface for querying and managing the state of wavelengths." alt="" coords="143,1189,312,1214"/>
+<area shape="poly" id="edge39_Node000000_Node000026" title=" " alt="" coords="53,637,58,753,72,914,83,997,98,1071,118,1133,129,1157,142,1175,157,1187,154,1191,138,1178,125,1159,113,1135,93,1073,78,997,66,915,53,754,48,638"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,92,30"/>
+<area shape="poly" id="edge40_Node000004_Node000003" title=" " alt="" coords="107,15,169,15,169,20,107,20"/>
+</map>

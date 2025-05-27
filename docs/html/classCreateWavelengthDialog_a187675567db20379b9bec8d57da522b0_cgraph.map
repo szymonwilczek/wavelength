@@ -1,0 +1,5 @@
+<map id="CreateWavelengthDialog::OnFrequencyFound" name="CreateWavelengthDialog::OnFrequencyFound">
+<area shape="rect" id="Node000001" title="Slot triggered when the frequency search (FindLowestAvailableFrequency) completes...." alt="" coords="5,5,170,44"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#a290db27d17d3b01490f6d3ef80e3ec94" title="Validates the input fields (currently just the password if protection is enabled)...." alt="" coords="218,5,382,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,22,202,22,202,27,170,27"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ImageViewer::ReleaseResources" name="ImageViewer::ReleaseResources">
+<area shape="rect" id="Node000001" title="Releases resources held by the ImageDecoder. Resets the shared pointer to the decoder." alt="" coords="241,31,454,55"/>
+<area shape="rect" id="Node000002" href="$classImageViewer.html#a9f9cd61953b303c108ab1b8cabef1870" title="Constructs an InlineImageViewer widget. Initializes the UI (QLabel), creates the ImageDecoder instanc..." alt="" coords="9,5,189,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,33,189,29,189,24,225,28"/>
+<area shape="rect" id="Node000003" href="$classImageViewer.html#a563f6c886b7d372b3f0bd0f9e735c3a5" title="Destructor. Ensures resources are released by calling ReleaseResources()." alt="" coords="5,55,193,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,57,193,61,193,55,225,52"/>
+</map>

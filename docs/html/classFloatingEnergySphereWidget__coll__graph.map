@@ -1,0 +1,29 @@
+<map id="FloatingEnergySphereWidget" name="FloatingEnergySphereWidget">
+<area shape="rect" id="Node000001" title="An OpenGL widget displaying a floating, interactive energy sphere." alt="" coords="442,434,668,1552"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,302,115,365"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,375,444,840,440,843,90,378"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="140,295,279,372"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,384,444,775,439,778,234,387"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="486,302,624,365"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="558,365,558,418,552,418,552,365"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="656,150,760,213"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="668,226,588,304,584,300,664,222"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="648,302,768,365"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="711,228,711,302,706,302,706,228"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="304,302,462,365"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="643,211,529,259,439,304,437,299,526,254,641,206"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="792,302,902,365"/>
+<area shape="poly" id="edge15_Node000012_Node000005" title=" " alt="" coords="749,223,821,300,817,304,745,226"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="763,5,782,69"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="765,50,736,94,721,135,716,133,731,91,761,47"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="799,150,903,213"/>
+<area shape="poly" id="edge13_Node000011_Node000006" title=" " alt="" coords="784,54,828,134,823,136,779,56"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="700,365,691,397,675,457,669,456,686,395,695,364"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="393,364,440,543,435,544,388,365"/>
+<area shape="rect" id="Node000009" href="$structImpactInfo.html" title="Structure holding information about a single impact effect on the sphere." alt="" coords="323,131,443,233"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="386,233,386,285,380,285,380,233"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="925,302,1035,365"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="963,366,679,805,675,802,959,363"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="889,223,956,300,952,304,885,226"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="836,366,677,723,672,721,831,364"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="VoiceRecognitionLayer" name="VoiceRecognitionLayer">
+<area shape="rect" id="Node000001" title="A security layer simulating voice recognition verification." alt="" coords="5,314,190,1009"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html" title="Abstract base class for individual security challenge layers." alt="" coords="14,117,182,266"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,281,100,314,95,314,95,281"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="67,5,129,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="100,84,100,117,95,117,95,84"/>
+</map>

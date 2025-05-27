@@ -1,0 +1,5 @@
+<map id="FingerprintLayer::UpdateProgress" name="FingerprintLayer::UpdateProgress">
+<area shape="rect" id="Node000001" title="Slot called periodically by fingerprint_timer_ when the user is holding the mouse button...." alt="" coords="238,5,402,44"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#ac3c17d23030e0f5de68c4c4472692559" title="Constructs a FingerprintLayer. Initializes the UI elements (title, fingerprint image label,..." alt="" coords="5,5,190,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,27,190,27,190,22,222,22"/>
+</map>

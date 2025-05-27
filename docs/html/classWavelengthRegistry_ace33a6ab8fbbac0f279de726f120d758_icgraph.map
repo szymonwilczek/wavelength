@@ -1,0 +1,15 @@
+<map id="WavelengthRegistry::IsPendingRegistration" name="WavelengthRegistry::IsPendingRegistration">
+<area shape="rect" id="Node000001" title="Checks if a frequency is currently marked as having a pending registration." alt="" coords="678,40,834,79"/>
+<area shape="rect" id="Node000002" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="450,9,589,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="663,50,589,40,590,35,663,45"/>
+<area shape="rect" id="Node000004" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="408,75,630,100"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="663,73,630,77,629,72,663,68"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="218,5,353,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="434,30,353,28,354,23,434,25"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="218,68,353,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="392,90,353,90,353,85,392,85"/>
+<area shape="rect" id="Node000006" href="$classJoinWavelengthDialog.html#a0cb74ecdcc726cea2ce437c85cd75185" title="Attempts to join the wavelength using the entered frequency and password. Shows a wait cursor,..." alt="" coords="211,131,360,169"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="456,107,361,133,359,128,454,102"/>
+<area shape="rect" id="Node000007" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="5,131,163,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="195,153,163,153,163,147,195,147"/>
+</map>

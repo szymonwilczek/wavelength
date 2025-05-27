@@ -1,0 +1,5 @@
+<map id="WavelengthSettingsWidget::LoadSettings" name="WavelengthSettingsWidget::LoadSettings">
+<area shape="rect" id="Node000001" title="Loads the current preferred start frequency from WavelengthConfig and updates the UI elements...." alt="" coords="239,5,416,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthSettingsWidget.html#a3e1ff6fdaafffc124978061715da3792" title="Constructs the WavelengthSettingsWidget. Initializes the UI, loads the current preferred frequency fr..." alt="" coords="5,5,191,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,27,191,27,191,22,223,22"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="AudioDecoder::run" name="AudioDecoder::run">
+<area shape="rect" id="Node000001" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,94,135,118"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a66c187d6a3c0e49bf1be0ead9be415a5" title="Decodes a single audio frame using the FFmpeg resampler and writes the result to the audio device." alt="" coords="194,5,384,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,91,182,54,203,47,205,52,184,59,99,96"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#a412416ae8d5a2153c14c6023a47ceb52" title="Initializes the FFmpeg components and QAudioOutput for playback. Opens the input stream using the cus..." alt="" coords="210,68,368,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,96,194,89,195,94,135,101"/>
+<area shape="rect" id="Node000006" href="$classAudioDecoder.html#a4f5e8f4dd5f45b60bc5ed68ccd8a90c3" title="Emitted when the decoder reaches the end of the audio stream." alt="" coords="183,118,395,142"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="135,110,167,114,167,119,135,116"/>
+<area shape="rect" id="Node000007" href="$classAudioDecoder.html#a928f569d98a91fae0fa27371a0c85b4e" title="Emitted periodically during playback to indicate the current position." alt="" coords="185,167,393,192"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="99,116,184,151,213,160,211,165,182,157,97,121"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a70ae7be45d270a97159bd5f6c36c2ad8" title="Emitted after successful initialization, providing audio stream details." alt="" coords="443,44,607,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="368,70,427,64,428,69,369,75"/>
+<area shape="rect" id="Node000005" href="$classAudioDecoder.html#a4c483a41bf7d57354b63bec009ac222e" title="Emitted when an error occurs during initialization or decoding." alt="" coords="456,94,594,118"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="369,87,441,94,441,100,368,92"/>
+</map>

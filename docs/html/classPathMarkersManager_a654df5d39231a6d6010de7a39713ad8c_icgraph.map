@@ -1,0 +1,5 @@
+<map id="PathMarkersManager::GetMarkerColor" name="PathMarkersManager::GetMarkerColor">
+<area shape="rect" id="Node000001" title="Determines the appropriate color for a marker based on its type and current color phase...." alt="" coords="200,5,346,44"/>
+<area shape="rect" id="Node000002" href="$classPathMarkersManager.html#a700bd8bfd28b4b453e07e57a4644ce40" title="Draws all managed markers onto the provided QPainter. Calculates the time delta since the last draw c..." alt="" coords="5,5,152,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,27,152,27,152,22,184,22"/>
+</map>

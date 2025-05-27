@@ -1,0 +1,8 @@
+<map id="AudioPlayer::UpdateTimeLabel" name="AudioPlayer::UpdateTimeLabel">
+<area shape="rect" id="Node000001" title="Slot called when the progress slider&#39;s value changes (e.g., user dragging). Updates the time label di..." alt="" coords="459,5,659,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="443,20,173,20,173,15,443,15"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#afd42f1d9043e96d8b8ce55f7afd08483" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="221,29,411,54"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="444,32,412,35,411,30,443,26"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="205,33,173,29,174,24,205,27"/>
+</map>

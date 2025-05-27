@@ -1,0 +1,16 @@
+<map id="VoiceRecognitionLayer::StopRecording" name="VoiceRecognitionLayer::StopRecording">
+<area shape="rect" id="Node000001" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="630,123,783,161"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#ae8357c2294de9d555370995ae5e0c30e" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="422,60,574,99"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="625,120,564,102,566,97,626,115"/>
+<area shape="rect" id="Node000005" href="$classVoiceRecognitionLayer.html#a480b7354b4fe82a5b24f30ac1a02194d" title="Resets the layer to its initial state. Stops recording and timers, resets progress,..." alt="" coords="422,123,574,161"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="614,145,575,145,575,139,614,139"/>
+<area shape="rect" id="Node000007" href="$classVoiceRecognitionLayer.html#a5a97d1313c8ec7a8b3efaff8120fe0ae" title="Destructor. Stops audio recording and processing, stops and deletes timers." alt="" coords="414,185,582,224"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="626,169,566,187,564,182,625,164"/>
+<area shape="rect" id="Node000003" href="$classVoiceRecognitionLayer.html#a49b97cb50c3d5533e70b68d0af5258c5" title="Slot called periodically by progress_timer_ to update the recognition progress bar...." alt="" coords="214,5,366,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="407,58,366,47,367,42,408,53"/>
+<area shape="rect" id="Node000004" href="$classVoiceRecognitionLayer.html#afe92e691948df9da5e2da29444995f99" title="Constructs a VoiceRecognitionLayer. Initializes the UI elements (title, audio visualizer,..." alt="" coords="5,35,166,73"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="407,76,166,62,166,56,407,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="199,40,166,45,166,40,198,35"/>
+<area shape="rect" id="Node000006" href="$classVoiceRecognitionLayer.html#ae71584992dd14f1917a17bb72e516287" title="Initializes the layer for display. Resets the layer state, ensures the layer is fully opaque,..." alt="" coords="214,123,366,161"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="406,145,367,145,367,139,406,139"/>
+</map>

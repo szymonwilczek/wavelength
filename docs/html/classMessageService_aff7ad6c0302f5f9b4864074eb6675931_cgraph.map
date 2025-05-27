@@ -1,0 +1,41 @@
+<map id="MessageService::SendFile" name="MessageService::SendFile">
+<area shape="rect" id="Node000001" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="5,375,184,399"/>
+<area shape="rect" id="Node000002" href="$classAttachmentQueueManager.html#a9fc5b79cd8dd31a11ff60fedf183f5d2" title="Adds a new task (represented by a std::function) to the execution queue. Creates an AttachmentTask wr..." alt="" coords="243,26,419,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,374,106,319,129,239,147,195,169,151,197,110,230,74,233,72,236,76,234,78,201,113,174,154,152,197,134,241,111,320,100,375"/>
+<area shape="rect" id="Node000005" href="$classAuthenticationManager.html#a746a91c33a014dad53ab34565fe5e64e" title="Generates a unique client identifier." alt="" coords="254,89,408,128"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="96,374,110,329,137,265,176,197,201,165,230,137,238,131,242,135,233,141,205,168,180,200,141,268,116,331,102,375"/>
+<area shape="rect" id="Node000006" href="$classMessageHandler.html#a0bd569db12a0dbcd30db0dc412691f0d" title="Generates a unique message identifier using UUID." alt="" coords="241,152,421,190"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="99,373,117,338,145,292,183,242,230,200,236,196,239,200,233,204,187,246,150,295,122,341,104,375"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a6ce8627bbb1db084bf76053aa92f9a47" title="Gets the identifier of the currently active wavelength." alt="" coords="254,214,408,253"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="105,372,155,320,191,289,230,262,239,257,242,262,233,267,194,293,159,323,108,376"/>
+<area shape="rect" id="Node000008" href="$classAttachmentQueueManager.html#ad4882521922da9692f3ff5734761e230" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="243,277,419,316"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="121,372,231,325,247,319,249,324,233,329,124,377"/>
+<area shape="rect" id="Node000010" href="$classAuthenticationManager.html#abb3d14d1e380282208dbb4f533d129af" title="Gets the singleton instance of the AuthenticationManager." alt="" coords="254,340,408,378"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="184,374,238,367,239,373,184,379"/>
+<area shape="rect" id="Node000012" href="$classMessageHandler.html#afa8afa05bb7b07783162bf420a91ac92" title="Gets the singleton instance of the MessageHandler." alt="" coords="232,403,430,427"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="184,395,216,399,216,404,184,400"/>
+<area shape="rect" id="Node000014" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="264,452,398,490"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="129,397,233,436,254,444,252,449,231,442,127,402"/>
+<area shape="rect" id="Node000016" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="262,514,400,553"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="110,398,160,447,195,475,233,499,249,507,247,512,230,504,192,479,157,451,106,402"/>
+<area shape="rect" id="Node000018" href="$classMessageService.html#a4635fcf151d68e3cd873b2d7590c7efc" title="Emitted during file processing and sending to update the status display." alt="" coords="242,577,420,616"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="104,399,123,431,151,475,188,522,233,562,241,567,239,572,230,566,184,526,147,479,118,434,100,401"/>
+<area shape="rect" id="Node000019" href="$classMessageService.html#aabe00ddfe3f0fb4bcdae08fd977ecc6f" title="Internal signal emitted by the background file processing task when the JSON message is ready to be s..." alt="" coords="239,640,422,678"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="102,399,116,442,143,503,182,568,206,599,233,625,239,629,236,634,230,629,202,602,177,571,138,505,111,444,97,400"/>
+<area shape="rect" id="Node000020" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="264,702,398,741"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="100,399,111,452,135,529,153,572,175,614,202,653,233,688,251,700,248,704,230,692,197,657,170,617,148,574,130,531,106,453,95,400"/>
+<area shape="rect" id="Node000003" href="$classAttachmentTask.html#a08ea014777b2a92f1863c8bca688e0e9" title="Emitted after the task function (TaskFunc_) has finished executing." alt="" coords="506,5,675,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="419,33,491,26,491,31,420,39"/>
+<area shape="rect" id="Node000004" href="$classAttachmentQueueManager.html#aab8e65b34981358a309208cf2118febe" title="Processes the task queue, starting new tasks if slots are available. Checks if the number of active t..." alt="" coords="502,54,679,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="420,53,487,60,487,65,419,58"/>
+<area shape="rect" id="Node000009" href="$classAttachmentQueueManager.html#a7d8e4bb17b92bb0e390215015c269349" title="Private constructor to enforce the singleton pattern. Determines the maximum number of concurrent tas..." alt="" coords="498,277,683,316"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="420,294,483,294,483,299,420,299"/>
+<area shape="rect" id="Node000011" href="$classAuthenticationManager.html#a3a24c8dc18303d4ad65c17aff6cdd705" title="Private constructor to enforce the singleton pattern." alt="" coords="510,340,672,378"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="409,356,494,356,494,362,409,362"/>
+<area shape="rect" id="Node000013" href="$classMessageHandler.html#ad3b43ca875118c1bafa19f354678cbec" title="Private constructor to enforce the singleton pattern." alt="" coords="478,403,703,427"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="430,412,463,412,463,418,430,418"/>
+<area shape="rect" id="Node000015" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="520,452,662,490"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="398,468,504,468,504,474,398,474"/>
+<area shape="rect" id="Node000017" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="518,514,663,553"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="400,531,502,531,502,536,400,536"/>
+</map>

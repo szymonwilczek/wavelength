@@ -1,0 +1,7 @@
+<map id="WavelengthConfig::SetRelayServerPort" name="WavelengthConfig::SetRelayServerPort">
+<area shape="rect" id="Node000001" title="Sets the relay server port. Emits configChanged(&quot;relayServerPort&quot;) if the value changes." alt="" coords="372,5,559,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ad68b22d6bafb0633e47a9c29d156a1a3" title="Loads the application configuration using WavelengthConfig. Sets default values if the configuration ..." alt="" coords="189,5,324,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,27,325,27,325,22,357,22"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,27,141,27,141,22,173,22"/>
+</map>

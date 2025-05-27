@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::IsWavelengthConnected" name="WavelengthStateManager::IsWavelengthConnected">
+<area shape="rect" id="Node000001" title="Checks if the WebSocket connection for a specific wavelength is currently established and valid." alt="" coords="224,5,394,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#afdd26cb48cc5a63173af38deda4ae1f5" title="Checks if the WebSocket connection for a specific wavelength is established and valid...." alt="" coords="5,5,176,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,27,176,27,176,22,208,22"/>
+</map>

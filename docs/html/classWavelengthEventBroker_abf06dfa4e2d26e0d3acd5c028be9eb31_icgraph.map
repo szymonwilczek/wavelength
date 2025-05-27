@@ -1,0 +1,37 @@
+<map id="WavelengthEventBroker::WavelengthEventBroker" name="WavelengthEventBroker::WavelengthEventBroker">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern." alt="" coords="649,319,816,357"/>
+<area shape="rect" id="Node000002" href="$classWavelengthEventBroker.html#ac5c82b2b8f57045b0700c350549a6b39" title="Gets the singleton instance of the WavelengthEventBroker." alt="" coords="439,256,597,295"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="649,317,586,298,588,293,651,311"/>
+<area shape="rect" id="Node000014" href="$classWavelengthEventBroker.html#a3b414e6096245b9896836f6a38e1f9ae" title="Deleted assignment operator to prevent assignment." alt="" coords="439,319,597,357"/>
+<area shape="poly" id="edge20_Node000001_Node000014" title=" " alt="" coords="634,341,598,341,598,335,634,335"/>
+<area shape="rect" id="Node000015" href="$classWavelengthEventBroker.html#ab886cad572b88acf939135a5a606e3bf" title="Deleted copy constructor to prevent copying." alt="" coords="435,381,601,420"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="651,365,588,383,586,378,649,359"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a6dc28d3cac53b7fd819d9b03261b8559" title="Slot triggered when the active wavelength changes. Relays the signal and publishes the event via Wave..." alt="" coords="189,5,387,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="503,242,486,200,461,150,427,100,385,57,369,47,372,42,389,53,431,97,465,147,491,198,508,240"/>
+<area shape="rect" id="Node000006" href="$classSessionCoordinator.html#a49f9948b0199f5b1cef30fcba5a4d4bb" title="Slot triggered when authentication fails during join. Relays the signal and publishes the event via W..." alt="" coords="207,68,368,107"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="496,244,450,181,420,148,386,120,366,110,369,105,388,116,424,144,455,178,500,241"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#a4deb194a3657876bd6aa2f9096b91cea" title="Slot triggered when a connection error occurs. Relays the signal and publishes the event via Waveleng..." alt="" coords="219,131,356,169"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="481,248,437,214,386,183,356,171,358,166,388,178,440,210,484,243"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#ad2ca912b6663d0ef33d7c90a5a8ea4e8" title="Slot triggered when a message is received. Relays the signal and publishes the event via WavelengthEv..." alt="" coords="213,193,362,232"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="429,254,361,235,362,230,431,249"/>
+<area shape="rect" id="Node000009" href="$classSessionCoordinator.html#a01bf147e840740a52b2efa33f93ba295" title="Slot triggered when a message is sent. Relays the signal and publishes the event via WavelengthEventB..." alt="" coords="220,256,356,295"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="424,278,356,278,356,273,424,273"/>
+<area shape="rect" id="Node000010" href="$classSessionCoordinator.html#a7bfbd709b035beb0038e20f558480d03" title="Slot triggered when a wavelength is closed. Relays the signal and publishes the event via WavelengthE..." alt="" coords="212,319,364,357"/>
+<area shape="poly" id="edge12_Node000002_Node000010" title=" " alt="" coords="431,302,362,321,361,316,429,297"/>
+<area shape="rect" id="Node000011" href="$classSessionCoordinator.html#a63f6efb0bb2370a49e3877f5d3127233" title="Slot triggered when a wavelength is created. Relays the signal and publishes the event via Wavelength..." alt="" coords="210,381,366,420"/>
+<area shape="poly" id="edge14_Node000002_Node000011" title=" " alt="" coords="441,305,437,308,422,323,414,339,405,355,389,371,367,383,364,378,385,367,400,352,409,336,417,320,433,304,438,300"/>
+<area shape="rect" id="Node000012" href="$classSessionCoordinator.html#adb301afe6d4380746abe6cb168f0f50a" title="Slot triggered when a wavelength is joined. Relays the signal and publishes the event via WavelengthE..." alt="" coords="214,444,362,483"/>
+<area shape="poly" id="edge16_Node000002_Node000012" title=" " alt="" coords="439,306,437,308,425,323,418,338,414,369,409,401,402,417,389,433,364,450,361,445,385,429,397,414,404,400,409,369,413,337,420,320,433,304,435,302"/>
+<area shape="rect" id="Node000013" href="$classSessionCoordinator.html#aab82ebce6f6cf064602b95c4f213e94b" title="Slot triggered when the active wavelength is left. Relays the signal and publishes the event via Wave..." alt="" coords="220,507,356,545"/>
+<area shape="poly" id="edge18_Node000002_Node000013" title=" " alt="" coords="438,307,437,308,421,331,414,354,414,400,416,424,414,448,406,472,389,496,374,508,357,517,355,512,371,503,385,492,401,469,409,447,410,424,409,401,409,353,416,329,433,304,434,303"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="5,256,141,295"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="194,55,190,57,168,80,148,105,116,161,94,215,82,256,76,255,89,213,111,159,143,102,164,76,187,53,190,51"/>
+<area shape="poly" id="edge5_Node000006_Node000004" title=" " alt="" coords="196,116,190,120,155,152,125,190,86,257,81,254,121,187,151,149,187,116,193,112"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="206,175,190,183,137,220,95,258,91,254,133,216,187,178,204,171"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="206,239,142,258,140,253,204,234"/>
+<area shape="poly" id="edge11_Node000009_Node000004" title=" " alt="" coords="205,278,141,278,141,273,205,273"/>
+<area shape="poly" id="edge13_Node000010_Node000004" title=" " alt="" coords="204,316,140,298,142,292,206,311"/>
+<area shape="poly" id="edge15_Node000011_Node000004" title=" " alt="" coords="200,377,187,371,134,334,92,297,96,293,137,330,190,366,202,373"/>
+<area shape="poly" id="edge17_Node000012_Node000004" title=" " alt="" coords="198,441,187,433,151,401,121,363,81,297,86,294,126,360,155,397,190,429,201,436"/>
+<area shape="poly" id="edge19_Node000013_Node000004" title=" " alt="" coords="204,508,187,496,164,473,144,447,111,391,89,337,77,296,82,294,94,335,116,389,148,444,168,470,190,492,207,503"/>
+</map>

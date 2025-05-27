@@ -1,0 +1,78 @@
+<map id="WavelengthRegistry::GetWavelengthInfo" name="WavelengthRegistry::GetWavelengthInfo">
+<area shape="rect" id="Node000001" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="1021,629,1160,668"/>
+<area shape="rect" id="Node000002" href="$classWavelengthLeaver.html#af9c574c0d19226e480a7af8edd48f759" title="Closes a specific wavelength (only if the current user is the host). Checks if the user is the host f..." alt="" coords="737,888,973,913"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1084,684,1070,728,1048,781,1017,833,997,857,974,877,952,890,950,885,971,873,993,853,1012,830,1044,778,1065,726,1079,682"/>
+<area shape="rect" id="Node000006" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="785,103,925,141"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1086,614,1080,534,1062,426,1048,367,1028,308,1002,252,971,200,938,167,901,144,904,140,942,163,975,196,1007,249,1033,306,1053,366,1067,425,1085,533,1091,614"/>
+<area shape="rect" id="Node000008" href="$classMessageFormatter.html#af3a717bfa398187a653410d3febeb9cb" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="765,17,945,56"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1083,614,1070,498,1047,342,1032,264,1014,192,994,133,971,92,950,73,926,59,928,54,953,69,975,88,998,131,1019,191,1037,263,1053,341,1076,497,1088,613"/>
+<area shape="rect" id="Node000016" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="761,211,949,249"/>
+<area shape="poly" id="edge10_Node000001_Node000016" title=" " alt="" coords="1069,617,865,251,870,248,1073,615"/>
+<area shape="rect" id="Node000025" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="770,467,940,505"/>
+<area shape="poly" id="edge18_Node000001_Node000025" title=" " alt="" coords="1047,622,883,508,886,504,1050,618"/>
+<area shape="rect" id="Node000036" href="$classMessageService.html#a4396f2ede94cf2d9a36cf51407db7e14" title="Slot connected to the sendJsonViaSocket signal. Performs the actual sending of a JSON message...." alt="" coords="756,763,954,801"/>
+<area shape="poly" id="edge30_Node000001_Node000036" title=" " alt="" coords="1063,681,1023,718,974,752,946,765,944,760,971,748,1020,714,1059,677"/>
+<area shape="rect" id="Node000012" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="744,714,966,738"/>
+<area shape="poly" id="edge32_Node000001_Node000012" title=" " alt="" coords="1037,677,974,703,928,716,926,710,972,698,1035,673"/>
+<area shape="rect" id="Node000038" href="$classWavelengthLeaver.html#a11a552cbede70a46b0f5cb9a509328d7" title="Leaves the currently active wavelength. Retrieves the active frequency from the registry...." alt="" coords="737,664,973,689"/>
+<area shape="poly" id="edge33_Node000001_Node000038" title=" " alt="" coords="1006,661,964,666,964,661,1005,656"/>
+<area shape="rect" id="Node000040" href="$classMessageService.html#ab976b50ce98805f188d946de438ee976" title="Sends a pre&#45;formatted JSON message (typically containing file data) to the server...." alt="" coords="766,825,944,864"/>
+<area shape="poly" id="edge36_Node000001_Node000040" title=" " alt="" coords="1076,683,1037,750,1008,785,974,815,946,830,943,825,971,810,1004,781,1032,747,1072,680"/>
+<area shape="rect" id="Node000041" href="$classMessageService.html#ac1041f89fa4eed1b98556cc3f93c2077" title="Sends a text message to the currently active frequency. Retrieves the active frequency and socket fro..." alt="" coords="764,601,946,640"/>
+<area shape="poly" id="edge37_Node000001_Node000041" title=" " alt="" coords="1005,641,947,634,947,629,1006,636"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a0dd567ac5a1ab2f57e17698c1dc93a1b" title="Closes a specific wavelength (only if the current user is the host). Unregisters the wavelength local..." alt="" coords="509,881,644,920"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="722,903,645,903,645,898,722,898"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="214,708,398,733"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="493,885,463,871,415,838,373,800,315,735,319,732,377,796,418,834,465,866,495,880"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,387,148,412"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="253,704,222,686,194,663,168,631,146,596,112,523,90,458,78,412,83,411,95,456,117,521,151,593,173,628,198,659,225,682,256,699"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="509,68,644,107"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="769,114,644,98,645,93,770,109"/>
+<area shape="rect" id="Node000009" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="482,5,671,44"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="750,35,672,31,672,26,750,29"/>
+<area shape="rect" id="Node000010" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="211,5,400,44"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="467,27,401,27,401,22,467,22"/>
+<area shape="rect" id="Node000017" href="$classMessageService.html#aa7fee176b576b103691c4fcc39aaac9e" title="Sends raw audio data as a binary message for the specified frequency. Used for transmitting audio dur..." alt="" coords="468,230,685,254"/>
+<area shape="poly" id="edge11_Node000016_Node000017" title=" " alt="" coords="746,237,686,240,686,235,745,232"/>
+<area shape="rect" id="Node000018" href="$classMessageService.html#a75fb7423ceb5f01542eb53c93c332df7" title="Sends a Push&#45;to&#45;Talk (PTT) release message for the specified frequency. Constructs a JSON message of ..." alt="" coords="466,131,687,156"/>
+<area shape="poly" id="edge12_Node000016_Node000018" title=" " alt="" coords="791,207,689,171,641,159,642,154,690,166,792,202"/>
+<area shape="rect" id="Node000023" href="$classMessageService.html#a630325196d5dd1c14713691505301d74" title="Sends a Push&#45;to&#45;Talk (PTT) request message for the specified frequency. Constructs a JSON message of ..." alt="" coords="466,180,688,205"/>
+<area shape="poly" id="edge15_Node000016_Node000023" title=" " alt="" coords="745,218,673,208,674,203,746,213"/>
+<area shape="rect" id="Node000019" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="200,155,412,180"/>
+<area shape="poly" id="edge13_Node000018_Node000019" title=" " alt="" coords="451,157,412,161,412,155,450,152"/>
+<area shape="poly" id="edge14_Node000019_Node000005" title=" " alt="" coords="230,188,197,207,175,228,155,252,122,304,98,352,84,388,79,386,93,350,117,301,150,248,171,224,194,203,228,183"/>
+<area shape="rect" id="Node000024" href="$classChatView.html#a19088a1cf7c1314fcdc1bca5a0b28b81" title="Slot called when the PTT button is pressed. Plays the PTT activation sound, sets the state to Request..." alt="" coords="203,216,408,241"/>
+<area shape="poly" id="edge16_Node000023_Node000024" title=" " alt="" coords="464,210,404,218,403,213,463,205"/>
+<area shape="poly" id="edge17_Node000024_Node000005" title=" " alt="" coords="236,249,197,268,161,297,130,331,88,388,84,385,126,327,158,293,194,264,234,244"/>
+<area shape="rect" id="Node000026" href="$classWavelengthStateManager.html#a670856cf048444edfe50b5e491435427" title="Gets the creation timestamp of a specific wavelength." alt="" coords="480,404,674,443"/>
+<area shape="poly" id="edge19_Node000025_Node000026" title=" " alt="" coords="754,466,665,446,666,441,755,461"/>
+<area shape="rect" id="Node000027" href="$classSessionCoordinator.html#a4628044d476e4292e2150e251998b2c1" title="Retrieves detailed information about a specific wavelength. Delegates the call to WavelengthStateMana..." alt="" coords="507,592,646,631"/>
+<area shape="poly" id="edge20_Node000025_Node000027" title=" " alt="" coords="813,516,756,550,690,582,647,597,646,592,688,577,753,545,810,511"/>
+<area shape="rect" id="Node000028" href="$classWavelengthStateManager.html#aa0ec9ff3f23e40a6984ddd46ee5a72af" title="Checks if the current user is the host of the currently active wavelength." alt="" coords="491,467,662,505"/>
+<area shape="poly" id="edge22_Node000025_Node000028" title=" " alt="" coords="755,489,663,489,663,483,755,483"/>
+<area shape="rect" id="Node000030" href="$classWavelengthStateManager.html#a1bec41b38f90afbe8d57ec5c71549750" title="Checks if the WebSocket connection for a specific wavelength is currently established and valid." alt="" coords="492,529,662,568"/>
+<area shape="poly" id="edge24_Node000025_Node000030" title=" " alt="" coords="756,511,663,532,662,527,755,506"/>
+<area shape="rect" id="Node000032" href="$classWavelengthStateManager.html#aee0d046c58fb88b38ff063413c846733" title="Checks if the current user is the host of a specific wavelength." alt="" coords="492,279,661,317"/>
+<area shape="poly" id="edge26_Node000025_Node000032" title=" " alt="" coords="827,457,768,393,730,359,688,331,661,319,663,314,691,326,733,355,772,389,831,453"/>
+<area shape="rect" id="Node000034" href="$classWavelengthStateManager.html#a7fdc767c6e09c46297e53fdc4c75110e" title="Checks if a specific wavelength is password protected." alt="" coords="466,341,687,380"/>
+<area shape="poly" id="edge28_Node000025_Node000034" title=" " alt="" coords="811,460,754,426,688,394,659,383,661,378,690,389,756,421,813,456"/>
+<area shape="poly" id="edge21_Node000027_Node000004" title=" " alt="" coords="514,639,340,710,338,705,512,634"/>
+<area shape="rect" id="Node000029" href="$classSessionCoordinator.html#a668b71b01c108671a17924cb0ed55fff" title="Checks if the current user is the host of the currently active wavelength. Delegates the call to Wave..." alt="" coords="220,467,392,505"/>
+<area shape="poly" id="edge23_Node000028_Node000029" title=" " alt="" coords="475,489,392,489,392,483,475,483"/>
+<area shape="rect" id="Node000031" href="$classSessionCoordinator.html#afdd26cb48cc5a63173af38deda4ae1f5" title="Checks if the WebSocket connection for a specific wavelength is established and valid...." alt="" coords="221,529,391,568"/>
+<area shape="poly" id="edge25_Node000030_Node000031" title=" " alt="" coords="476,551,391,551,391,546,476,546"/>
+<area shape="rect" id="Node000033" href="$classSessionCoordinator.html#af055c6e741f8bd8a9c31bbc9f33b70f0" title="Checks if the current user is the host of a specific wavelength. Delegates the call to WavelengthStat..." alt="" coords="238,279,374,317"/>
+<area shape="poly" id="edge27_Node000032_Node000033" title=" " alt="" coords="477,301,374,301,374,295,477,295"/>
+<area shape="rect" id="Node000035" href="$classSessionCoordinator.html#aa0256473933f5d5f8001feff315aac38" title="Checks if a specific wavelength is password protected. Delegates the call to WavelengthStateManager." alt="" coords="196,341,416,380"/>
+<area shape="poly" id="edge29_Node000034_Node000035" title=" " alt="" coords="451,363,416,363,416,358,451,358"/>
+<area shape="rect" id="Node000037" href="$classMessageService.html#ad74bc604024156fff3b840942187037e" title="Private constructor to enforce the singleton pattern. Connects the internal sendJsonViaSocket signal ..." alt="" coords="464,832,689,857"/>
+<area shape="poly" id="edge31_Node000036_Node000037" title=" " alt="" coords="752,808,636,834,634,829,751,803"/>
+<area shape="rect" id="Node000039" href="$classSessionCoordinator.html#ad7c56b7b495b53ea905a6157e2bc5e93" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="509,769,644,808"/>
+<area shape="poly" id="edge34_Node000038_Node000039" title=" " alt="" coords="753,697,739,704,724,717,715,730,706,745,691,759,646,779,644,774,688,754,702,741,711,728,720,713,736,700,750,692"/>
+<area shape="poly" id="edge35_Node000039_Node000004" title=" " alt="" coords="493,771,357,736,359,731,494,765"/>
+<area shape="rect" id="Node000042" href="$classChatView.html#a424556ba1072ba443433af3af827c5d5" title="Sends the text message currently in the input field. Clears the input field and sends the message via..." alt="" coords="222,624,390,649"/>
+<area shape="poly" id="edge38_Node000041_Node000042" title=" " alt="" coords="749,639,689,645,577,648,464,645,391,643,391,637,464,639,577,642,689,639,748,634"/>
+<area shape="rect" id="Node000043" href="$classSessionCoordinator.html#a6bf70b7c88a2f73ab0510bbc97315c02" title="Sends a text message to the currently active wavelength. Delegates the call to WavelengthMessageServi..." alt="" coords="509,707,644,745"/>
+<area shape="poly" id="edge40_Node000041_Node000043" title=" " alt="" coords="755,648,739,655,715,672,691,690,646,709,644,704,688,685,712,668,736,650,753,643"/>
+<area shape="poly" id="edge39_Node000042_Node000005" title=" " alt="" coords="255,620,224,603,194,581,154,538,122,490,81,413,86,411,126,487,158,534,197,577,226,599,258,615"/>
+</map>

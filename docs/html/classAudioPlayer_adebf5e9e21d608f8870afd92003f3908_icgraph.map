@@ -1,0 +1,5 @@
+<map id="AudioPlayer::UpdateSliderPosition" name="AudioPlayer::UpdateSliderPosition">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s positionChanged signal. Updates the progress slider&#39;s position and th..." alt="" coords="221,5,394,44"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,12,173,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,27,173,27,173,22,205,22"/>
+</map>

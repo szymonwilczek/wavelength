@@ -1,0 +1,5 @@
+<map id="NetworkStatusWidget::CheckNetworkStatus" name="NetworkStatusWidget::CheckNetworkStatus">
+<area shape="rect" id="Node000001" title="Performs a network status check. Sends a network request, measures the response time (ping),..." alt="" coords="211,5,365,44"/>
+<area shape="rect" id="Node000002" href="$classNetworkStatusWidget.html#a6a11f48fc069cc7f73316a70ffc3ac6c" title="Constructs a NetworkStatusWidget. Initializes UI elements (labels, layout), sets appearance (size,..." alt="" coords="5,5,163,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,27,163,27,163,22,195,22"/>
+</map>

@@ -1,0 +1,24 @@
+<map id="JoinWavelengthDialog" name="JoinWavelengthDialog">
+<area shape="rect" id="Node000001" title="A dialog window for joining an existing Wavelength frequency." alt="" coords="374,1069,582,2064"/>
+<area shape="rect" id="Node000002" href="$classAnimatedDialog.html" title="A base class for QDialogs that adds animated transitions for showing and closing." alt="" coords="45,527,250,943"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,955,377,1304,372,1306,233,957"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,235,63,298"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="48,312,100,526,95,528,42,313"/>
+<area shape="rect" id="Node000004" href="$classOverlayWidget.html" title="A semi&#45;transparent overlay widget used to dim the background content." alt="" coords="88,118,277,415"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="174,415,167,510,161,510,169,414"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="151,5,213,69"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="185,83,185,118,180,118,180,83"/>
+<area shape="rect" id="Node000006" href="$classCyberLineEdit.html" title="A custom QLineEdit styled with a cyberpunk aesthetic." alt="" coords="274,477,463,993"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="405,992,413,1052,408,1052,400,993"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="335,235,403,298"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="372,313,372,477,366,477,366,313"/>
+<area shape="rect" id="Node000008" href="$classCyberButton.html" title="A custom QPushButton styled with a cyberpunk aesthetic." alt="" coords="487,539,690,930"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="566,930,549,1052,544,1051,560,929"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="544,235,633,298"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="592,313,592,539,586,539,586,313"/>
+<area shape="rect" id="Node000010" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="714,522,927,947"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="736,948,591,1299,586,1297,731,946"/>
+<area shape="poly" id="edge11_Node000010_Node000010" title=" " alt="" coords="929,684,947,703,954,735,951,757,942,773,938,771,946,755,949,735,942,706,925,688"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="792,235,850,298"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="824,313,824,522,818,522,818,313"/>
+</map>

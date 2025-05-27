@@ -1,0 +1,5 @@
+<map id="StreamMessage::ProcessAudioAttachment" name="StreamMessage::ProcessAudioAttachment">
+<area shape="rect" id="Node000001" title="Helper to process audio attachments (likely superseded by AddAttachment)." alt="" coords="5,5,211,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a7b45f69684874de644b83da9078864eb" title="Static utility function to extract the value of an HTML attribute from a string." alt="" coords="259,12,474,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,22,243,22,243,27,211,27"/>
+</map>

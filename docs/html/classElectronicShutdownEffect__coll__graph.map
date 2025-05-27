@@ -1,0 +1,5 @@
+<map id="ElectronicShutdownEffect" name="ElectronicShutdownEffect">
+<area shape="rect" id="Node000001" title="A QGraphicsEffect that simulates an old CRT monitor or electronic device shutting down." alt="" coords="5,117,194,366"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="46,5,153,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

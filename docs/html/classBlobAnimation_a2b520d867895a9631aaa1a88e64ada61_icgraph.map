@@ -1,0 +1,9 @@
+<map id="BlobAnimation::InitializeBlob" name="BlobAnimation::InitializeBlob">
+<area shape="rect" id="Node000001" title="Initializes the blob&#39;s state (control points, target points, velocity, center) based on current param..." alt="" coords="501,33,687,58"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="256,5,453,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,36,453,32,454,27,486,30"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#aea443f68ce3f9a932a56a96e44b367d6" title="Resumes all event tracking mechanisms after being paused. Restarts timers, enables the event handler,..." alt="" coords="266,54,442,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="486,61,443,66,443,61,485,56"/>
+<area shape="rect" id="Node000004" href="$classBlobAnimation.html#a6dd0c09acbfa1be7967d6d7114719fbf" title="Makes the animation widget visible and resumes event tracking." alt="" coords="5,61,208,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="251,76,208,76,208,71,251,71"/>
+</map>

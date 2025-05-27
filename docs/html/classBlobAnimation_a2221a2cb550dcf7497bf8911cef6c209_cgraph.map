@@ -1,0 +1,14 @@
+<map id="BlobAnimation::ResetVisualization" name="BlobAnimation::ResetVisualization">
+<area shape="rect" id="Node000001" title="Resets the entire blob visualization to its initial state. Resets blob position, shape,..." alt="" coords="5,106,227,130"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a883189070c4bbe6054d084c4d4184c0a" title="Resets the blob&#39;s position to the center of the widget and regenerates its shape. Clears velocities a..." alt="" coords="281,61,454,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,102,265,93,266,98,204,108"/>
+<area shape="rect" id="Node000005" href="$classBlobAnimation.html#ab6f17e7001f4bd38473a68aee43c1990" title="Emitted when the entire visualization is reset via ResetVisualization(). Allows other UI elements to ..." alt="" coords="275,129,460,168"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="223,128,259,133,259,138,222,134"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a152a62b2db9d731d14939708a4a8496a" title="Generates a set of points forming an organic, blob&#45;like shape around a center point...." alt="" coords="508,5,719,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="454,58,510,45,511,51,455,64"/>
+<area shape="rect" id="Node000004" href="$classBlobAnimation.html#a90940f8b5f62d348952264e233b2aafb" title="Switches the blob&#39;s current animation state (Idle, Moving, Resizing). Updates the current_blob_state_..." alt="" coords="514,68,713,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="455,78,499,78,499,83,455,83"/>
+<area shape="rect" id="Node000006" href="$classBlobAnimation.html#ae5180933d2c5bc51e08f3a57f229a0f8" title="Overridden generic event handler." alt="" coords="542,142,686,166"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="460,148,526,149,526,155,460,153"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="574,143,565,133,570,123,586,117,614,115,645,118,660,126,658,130,644,123,614,120,587,122,573,127,570,132,578,140"/>
+</map>

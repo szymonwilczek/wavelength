@@ -1,0 +1,27 @@
+<map id="CommunicationStream::OptimizeForMessageTransition" name="CommunicationStream::OptimizeForMessageTransition">
+<area shape="rect" id="Node000001" title="Temporarily reduces the background animation frame rate during message transitions for smoother UI pe..." alt="" coords="917,219,1125,257"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#aba44a533978e83748764534a8682c56f" title="Displays the message at the specified index in the messages_ list. Hides the previously displayed mes..." alt="" coords="708,161,869,200"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="924,217,868,203,870,198,926,212"/>
+<area shape="rect" id="Node000007" href="$classCommunicationStream.html#a600acedc2f4f586b28c147077f768438" title="Shows the next message in the list, if available." alt="" coords="500,219,654,257"/>
+<area shape="poly" id="edge15_Node000001_Node000007" title=" " alt="" coords="901,241,655,241,655,235,901,235"/>
+<area shape="rect" id="Node000009" href="$classCommunicationStream.html#a918c54f07703dce3733f2aec5b09503d" title="Shows the previous message in the list, if available." alt="" coords="494,281,660,320"/>
+<area shape="poly" id="edge16_Node000001_Node000009" title=" " alt="" coords="902,258,661,292,661,286,901,252"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html#ae3b9b361caa5123daac847c60475d605" title="Adds a new standard message to the stream. Initiates the receiving animation. The message is displaye..." alt="" coords="28,9,182,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="763,151,719,102,690,79,659,62,598,40,534,24,468,15,403,10,282,11,183,20,182,14,281,5,404,5,469,9,535,19,600,35,661,57,693,75,722,98,767,147"/>
+<area shape="rect" id="Node000004" href="$classCommunicationStream.html#a10a56a4dc3eeeaf4865d0f63f077e3bf" title="Adds a new message with attachment content to the stream. Initiates the receiving animation...." alt="" coords="5,97,205,136"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="755,153,712,120,686,105,660,94,597,78,532,70,466,67,402,68,281,81,184,99,183,94,280,76,401,63,466,61,532,64,598,73,661,89,689,100,715,115,758,149"/>
+<area shape="rect" id="Node000005" href="$classCommunicationStream.html#a2283a11febe30f9d2d1887c2c20e7ea3" title="Slot triggered when a StreamMessage widget finishes its hiding animation (or is hidden)...." alt="" coords="495,104,659,143"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="699,159,650,146,652,141,701,154"/>
+<area shape="poly" id="edge9_Node000002_Node000007" title=" " alt="" coords="701,207,652,221,650,216,699,202"/>
+<area shape="poly" id="edge12_Node000002_Node000009" title=" " alt="" coords="752,212,710,242,662,271,636,283,634,278,659,266,707,237,749,207"/>
+<area shape="rect" id="Node000006" href="$classCommunicationStream.html#aa91c3c46034a10ca7393998082e26a25" title="Connects the necessary signals (navigation, read, hidden) from a StreamMessage widget to this Communi..." alt="" coords="253,148,446,187"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="480,145,447,151,446,146,479,140"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="462,168,708,176,708,181,462,173"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="300,142,203,87,140,51,143,46,206,82,302,138"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="237,147,201,139,202,134,239,142"/>
+<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="497,216,413,190,415,185,499,211"/>
+<area shape="rect" id="Node000008" href="$classCommunicationStream.html#a8a07b470a5e55591ef90260ad5ec60da" title="Handles key presses for message navigation (Left/Right arrows) and closing (Enter)." alt="" coords="272,239,426,277"/>
+<area shape="poly" id="edge11_Node000007_Node000008" title=" " alt="" coords="485,249,427,254,427,249,484,244"/>
+<area shape="poly" id="edge13_Node000009_Node000006" title=" " alt="" coords="502,276,492,271,468,250,444,228,385,189,387,185,448,224,471,246,496,267,505,272"/>
+<area shape="poly" id="edge14_Node000009_Node000008" title=" " alt="" coords="479,285,426,275,427,270,480,280"/>
+</map>

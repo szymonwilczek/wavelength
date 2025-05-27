@@ -1,0 +1,15 @@
+<map id="StreamMessage" name="StreamMessage">
+<area shape="rect" id="Node000001" title="A custom widget representing a single message within the CommunicationStream." alt="" coords="226,1156,431,2432"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="188,5,250,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,60,140,85,124,101,112,119,79,189,53,254,34,316,20,374,12,430,9,484,14,590,32,698,57,814,86,944,112,1094,134,1206,162,1319,195,1429,229,1531,224,1533,189,1430,157,1321,129,1207,107,1094,80,945,52,816,27,699,9,590,3,484,7,429,15,373,29,314,48,252,74,187,107,117,120,97,137,81,174,56"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html" title="A custom widget that displays text with cyberpunk terminal&#45;style &quot;typing&quot; reveal animation and glitch..." alt="" coords="122,118,317,1094"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="222,84,222,118,216,118,216,84"/>
+<area shape="rect" id="Node000004" href="$classLongTextDisplayEffect.html" title="A custom widget for displaying potentially long text with cyberpunk aesthetics and efficient renderin..." alt="" coords="340,352,538,860"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="264,58,300,83,331,116,362,172,386,230,405,291,420,352,414,353,400,293,381,232,357,174,326,120,296,87,261,62"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="267,1093,271,1139,266,1139,261,1094"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="418,860,392,1139,387,1139,413,859"/>
+<area shape="rect" id="Node000005" href="$classElectronicShutdownEffect.html" title="A QGraphicsEffect that simulates an old CRT monitor or electronic device shutting down." alt="" coords="562,481,751,731"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="635,731,599,904,552,1095,497,1287,439,1475,434,1473,492,1286,547,1093,593,903,630,730"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="603,5,710,69"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="659,84,659,482,654,482,654,84"/>
+</map>

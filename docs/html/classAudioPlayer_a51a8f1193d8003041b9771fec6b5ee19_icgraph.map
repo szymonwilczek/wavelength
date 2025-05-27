@@ -1,0 +1,5 @@
+<map id="AudioPlayer::OnSliderReleased" name="AudioPlayer::OnSliderReleased">
+<area shape="rect" id="Node000001" title="Slot called when the user releases the progress slider. Performs the actual seek operation based on t..." alt="" coords="221,5,423,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

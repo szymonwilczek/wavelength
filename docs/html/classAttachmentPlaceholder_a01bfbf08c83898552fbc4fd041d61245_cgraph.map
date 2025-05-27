@@ -1,0 +1,27 @@
+<map id="AttachmentPlaceholder::ShowCyberVideo" name="AttachmentPlaceholder::ShowCyberVideo">
+<area shape="rect" id="Node000001" title="Creates and displays a CyberAttachmentViewer containing a video preview (thumbnail + play button)...." alt="" coords="5,221,162,260"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#ae2da16761bdcaa931f93e0c2f05f2571" title="Generates a thumbnail image from the first frame of a video in a background thread...." alt="" coords="221,98,378,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,218,249,143,252,147,121,223"/>
+<area shape="rect" id="Node000009" href="$classAttachmentPlaceholder.html#a4fa15de6d78a0f59a6b5c15bf8784e66" title="Sets the actual content widget to be displayed within the placeholder. Replaces any existing content,..." alt="" coords="221,189,378,228"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="161,226,205,220,206,225,162,231"/>
+<area shape="rect" id="Node000012" href="$classAttachmentPlaceholder.html#a77ebd2ac2acb0920388709f2d6d1c1ec" title="Updates the UI elements to reflect the loading state. Disables/enables the load button and shows/hide..." alt="" coords="221,252,378,290"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="162,249,206,255,205,260,161,254"/>
+<area shape="rect" id="Node000013" href="$classAttachmentViewer.html#aec3d228e36d5e01358f24a6827865b62" title="Emitted when the viewer is closed (either manually or automatically after decryption)." alt="" coords="210,314,389,353"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="123,258,211,301,224,306,222,311,209,305,120,263"/>
+<area shape="rect" id="Node000003" href="$classAttachmentQueueManager.html#a9fc5b79cd8dd31a11ff60fedf183f5d2" title="Adds a new task (represented by a std::function) to the execution queue. Creates an AttachmentTask wr..." alt="" coords="440,29,616,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,95,446,70,448,75,366,100"/>
+<area shape="rect" id="Node000006" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="437,92,618,117"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="378,110,421,108,421,113,378,116"/>
+<area shape="rect" id="Node000007" href="$classAttachmentQueueManager.html#ad4882521922da9692f3ff5734761e230" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="440,141,616,180"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="378,130,425,138,424,144,377,135"/>
+<area shape="rect" id="Node000004" href="$classAttachmentTask.html#a08ea014777b2a92f1863c8bca688e0e9" title="Emitted after the task function (TaskFunc_) has finished executing." alt="" coords="674,5,843,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="616,34,659,28,659,33,616,39"/>
+<area shape="rect" id="Node000005" href="$classAttachmentQueueManager.html#aab8e65b34981358a309208cf2118febe" title="Processes the task queue, starting new tasks if slots are available. Checks if the number of active t..." alt="" coords="670,54,847,93"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="616,55,655,60,654,65,616,61"/>
+<area shape="rect" id="Node000008" href="$classAttachmentQueueManager.html#a7d8e4bb17b92bb0e390215015c269349" title="Private constructor to enforce the singleton pattern. Determines the maximum number of concurrent tas..." alt="" coords="666,141,851,180"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="616,158,651,158,651,163,616,163"/>
+<area shape="rect" id="Node000010" href="$classAttachmentPlaceholder.html#a52b917064beb0822fe62d7448a1f549b" title="Emits the attachmentLoaded signal after ensuring layout updates. Called internally after SetContent c..." alt="" coords="450,204,606,242"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="378,211,434,214,434,220,378,216"/>
+<area shape="rect" id="Node000011" href="$classAttachmentPlaceholder.html#ab83f0cf3a4db5e16cc136fa515d91a75" title="Emitted after the attachment content has been successfully loaded, set, and the layout updated." alt="" coords="680,204,837,242"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="606,220,665,220,665,226,606,226"/>
+</map>

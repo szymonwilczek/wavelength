@@ -1,0 +1,5 @@
+<map id="CommunicationStream::resizeGL" name="CommunicationStream::resizeGL">
+<area shape="rect" id="Node000001" title="Handles resizing of the OpenGL viewport and repositions overlay widgets." alt="" coords="5,5,160,44"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#abc68c909fea5d149eba5ceca8dcf5894" title="Updates the position of the currently displayed message to keep it centered." alt="" coords="208,5,379,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,22,192,22,192,27,160,27"/>
+</map>

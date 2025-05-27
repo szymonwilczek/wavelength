@@ -1,0 +1,7 @@
+<map id="CommunicationStream::UpdateNavigationButtonsForCurrentMessage" name="CommunicationStream::UpdateNavigationButtonsForCurrentMessage">
+<area shape="rect" id="Node000001" title="Updates the visibility of the &quot;Next&quot; and &quot;Previous&quot; buttons on the currently displayed message based ..." alt="" coords="5,5,203,58"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#aa9f352104e279f4e61c7a0693a056586" title="Shows or hides the navigation buttons (Next, Previous) and the Mark Read button. Updates the layout t..." alt="" coords="251,12,470,51"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,29,235,29,235,34,203,34"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a520ebf30923492083e94819640a79323" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="518,19,722,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="470,29,502,29,502,34,470,34"/>
+</map>

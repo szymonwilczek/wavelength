@@ -1,0 +1,5 @@
+<map id="CyberLineEdit" name="CyberLineEdit">
+<area shape="rect" id="Node000001" title="A custom QLineEdit styled with a cyberpunk aesthetic." alt="" coords="5,117,194,633"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="66,5,134,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

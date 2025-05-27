@@ -1,0 +1,11 @@
+<map id="VoiceRecognitionLayer::Initialize" name="VoiceRecognitionLayer::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the layer for display. Resets the layer state, ensures the layer is fully opaque,..." alt="" coords="5,68,158,107"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#a480b7354b4fe82a5b24f30ac1a02194d" title="Resets the layer to its initial state. Stops recording and timers, resets progress,..." alt="" coords="206,36,358,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,73,190,67,191,73,159,78"/>
+<area shape="rect" id="Node000005" href="$classVoiceRecognitionLayer.html#aa0e8a2d7dfb9e7bb8c584d348292724b" title="Starts capturing audio from the default input device. Configures the audio format,..." alt="" coords="206,99,358,137"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="159,96,191,101,190,107,158,102"/>
+<area shape="rect" id="Node000003" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="410,5,562,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,41,394,36,395,41,359,47"/>
+<area shape="rect" id="Node000004" href="$classVoiceRecognitionLayer.html#a40f32b30534b60b480311a5dbb6571e7" title="Updates the audio_visualizer_label_ with a waveform representation of the audio data...." alt="" coords="406,68,566,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="359,65,391,70,390,75,358,70"/>
+</map>

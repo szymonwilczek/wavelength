@@ -1,0 +1,7 @@
+<map id="AppInstanceManager::SendToAllClients" name="AppInstanceManager::SendToAllClients">
+<area shape="rect" id="Node000001" title="Sends a message to all connected clients (only applicable for the creator instance)." alt="" coords="400,5,544,44"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#ae9bddf9404ee3f9fed9e1d367bb603af" title="Slot called periodically by position_timer_ to send the current instance&#39;s position data." alt="" coords="206,5,352,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="385,27,352,27,352,22,385,22"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a897370674b4179edd7469b35335ef921" title="Constructs an AppInstanceManager." alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

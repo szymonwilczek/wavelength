@@ -1,0 +1,15 @@
+<map id="ImageViewer::imageInfoReady" name="ImageViewer::imageInfoReady">
+<area shape="rect" id="Node000001" title="Emitted after the image information (dimensions, alpha) has been successfully received from the decod..." alt="" coords="484,68,682,93"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a1fefb825e29bd915fa4e157f53975651" title="Constructs an AutoScalingAttachment widget. Sets up the layout, installs event filters,..." alt="" coords="251,5,418,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="510,67,418,46,419,41,511,62"/>
+<area shape="rect" id="Node000003" href="$classImageViewer.html#ae40b32a871965f645abf15f12e2e5b5b" title="Slot connected to the decoder&#39;s imageInfo signal. Stores the image dimensions and alpha channel infor..." alt="" coords="233,68,436,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="468,83,436,83,436,78,468,78"/>
+<area shape="rect" id="Node000005" href="$classAttachmentPlaceholder.html#ad096d1b0e758e0cb11f758adcd8ab8a0" title="Creates and shows a non&#45;modal dialog to display the full&#45;size attachment (image or GIF)...." alt="" coords="256,117,412,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="510,100,414,122,412,116,509,94"/>
+<area shape="rect" id="Node000004" href="$classImageViewer.html#a9f9cd61953b303c108ab1b8cabef1870" title="Constructs an InlineImageViewer widget. Initializes the UI (QLabel), creates the ImageDecoder instanc..." alt="" coords="5,68,185,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="217,83,185,83,185,78,217,78"/>
+<area shape="rect" id="Node000006" href="$classAttachmentPlaceholder.html#a7a72f70ced1002d2324eefbb2c92b21d" title="Creates and displays a CyberAttachmentViewer containing a GIF. Wraps an InlineGifPlayer in an AutoSca..." alt="" coords="17,117,173,156"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="240,139,174,139,174,134,240,134"/>
+<area shape="rect" id="Node000007" href="$classAttachmentPlaceholder.html#ac5eac78fb7804294986a0b63c8253616" title="Creates and displays a CyberAttachmentViewer containing an image. Wraps an InlineImageViewer in an Au..." alt="" coords="17,180,173,219"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="244,163,172,182,171,177,243,158"/>
+</map>

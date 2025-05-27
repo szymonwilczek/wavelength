@@ -1,0 +1,13 @@
+<map id="AttachmentViewer::StartScanningAnimation" name="AttachmentViewer::StartScanningAnimation">
+<area shape="rect" id="Node000001" title="Starts the visual scanning phase. Updates the status label, ensures the MaskOverlay is visible and an..." alt="" coords="5,100,224,139"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#a586152c0b840192e11c1453cbfd20926" title="Sets the decryption progress counter (0&#45;100). Updates the internal value, updates the status label te..." alt="" coords="276,68,496,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,104,260,99,261,105,224,109"/>
+<area shape="rect" id="Node000005" href="$classAttachmentViewer.html#aa9a8f363f1170ca114a5e93e537ed41e" title="Starts the decryption phase. Updates the status label, ensures the MaskOverlay is visible,..." alt="" coords="272,131,500,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="224,129,256,133,256,138,224,134"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a37125c2f6e7eda53cd7a02ff5de60a97" title="Emitted when the decryptionCounter property changes. Connected to the MaskOverlay&#39;s SetRevealProgress..." alt="" coords="548,5,744,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="468,65,547,46,549,51,470,70"/>
+<area shape="rect" id="Node000004" href="$classAttachmentViewer.html#a0ec55f1bb4c15bac94e09814d0bf844f" title="Updates the status label text to show the current decryption percentage." alt="" coords="558,68,735,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="496,85,542,85,542,90,496,90"/>
+<area shape="rect" id="Node000006" href="$classAttachmentViewer.html#af14d1bf565cd71a64db42d386ede1597" title="Slot called when the decryption animation finishes. Sets the state to decrypted, updates the status l..." alt="" coords="561,131,731,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="501,147,545,147,545,153,501,153"/>
+</map>

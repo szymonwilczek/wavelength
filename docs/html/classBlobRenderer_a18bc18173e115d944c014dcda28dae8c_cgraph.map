@@ -1,0 +1,7 @@
+<map id="BlobRenderer::ForceHUDInitialization" name="BlobRenderer::ForceHUDInitialization">
+<area shape="rect" id="Node000001" title="Forces the immediate initialization and buffering of the static HUD elements for the Idle state...." alt="" coords="5,33,245,58"/>
+<area shape="rect" id="Node000002" href="$classBlobRenderer.html#a1a71f510ea1194b21f26769543d99fdd" title="Draws the complete static Heads&#45;Up Display (HUD) elements used in the Idle state. Includes corner mar..." alt="" coords="293,5,517,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="245,31,277,28,277,33,245,36"/>
+<area shape="rect" id="Node000003" href="$classBlobRenderer.html#acf88ce3d746ecf3a6d3b5833cc7fa5ae" title="Initializes parameters specific to the Idle state HUD display. Generates random ID,..." alt="" coords="328,54,482,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="245,55,312,62,312,67,245,60"/>
+</map>

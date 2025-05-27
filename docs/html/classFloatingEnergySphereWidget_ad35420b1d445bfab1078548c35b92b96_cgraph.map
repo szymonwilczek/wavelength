@@ -1,0 +1,13 @@
+<map id="FloatingEnergySphereWidget::SetupAudio" name="FloatingEnergySphereWidget::SetupAudio">
+<area shape="rect" id="Node000001" title="Initializes audio components (QMediaPlayer, QAudioDecoder), connects signals, selects the appropriate..." alt="" coords="5,100,196,139"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#a1e3d19f3f35298cdafa9b2aad74d82d7" title="Slot called by the audio decoder when it finishes decoding the entire source file." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,97,243,53,258,47,260,52,245,58,144,102"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#a43b09697cd4078bf3e083e3cf549f9e7" title="Slot called when the QAudioDecoder encounters an error. Logs the error." alt="" coords="244,68,434,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,104,228,100,229,105,197,109"/>
+<area shape="rect" id="Node000004" href="$classFloatingEnergySphereWidget.html#a4ef04ca2391c5e03d46ae913cbca8c57" title="Slot called when the QMediaPlayer encounters an error. Logs the error." alt="" coords="244,131,434,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="197,129,229,133,228,138,196,134"/>
+<area shape="rect" id="Node000005" href="$classFloatingEnergySphereWidget.html#aa6db8829f808c65a41208aa024dfe183" title="Slot called by the audio decoder when a new buffer of decoded audio data is ready...." alt="" coords="244,193,434,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="147,137,245,178,264,185,262,190,243,183,145,142"/>
+<area shape="rect" id="Node000006" href="$classFloatingEnergySphereWidget.html#aff040b4cbf22e0cd620795c85af1aa0e" title="Calculates the Root Mean Square (RMS) amplitude for a given audio buffer. Used to quantify the energy..." alt="" coords="482,193,672,232"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="435,210,467,210,467,215,435,215"/>
+</map>

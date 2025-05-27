@@ -1,0 +1,55 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,425,78,450"/>
+<area shape="rect" id="Node000001" href="$classAppearanceSettingsWidget.html" title="A widget for configuring the application&#39;s appearance settings." alt="" coords="126,5,305,30"/>
+<area shape="poly" id="edge61_Node000000_Node000001" title=" " alt="" coords="42,410,51,326,66,216,90,111,106,70,124,41,140,29,144,33,128,45,110,72,95,113,72,217,56,326,48,410"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html" title="A widget that acts as a placeholder for chat attachments before they are loaded." alt="" coords="137,55,294,79"/>
+<area shape="poly" id="edge62_Node000000_Node000002" title=" " alt="" coords="43,410,53,335,70,240,93,150,108,115,124,90,141,78,144,82,128,94,112,117,98,152,75,241,58,336,49,410"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html" title="A widget that displays another widget (content) with a cyberpunk&#45;themed decryption animation." alt="" coords="152,104,279,129"/>
+<area shape="poly" id="edge63_Node000000_Node000003" title=" " alt="" coords="40,410,42,353,54,281,64,243,79,206,99,171,124,140,150,123,153,128,127,144,103,174,84,208,69,245,59,282,48,354,45,410"/>
+<area shape="rect" id="Node000004" href="$classAutoScalingAttachment.html" title="A wrapper widget that automatically scales its content (e.g., image, GIF) to fit within the maximum a..." alt="" coords="136,153,294,178"/>
+<area shape="poly" id="edge64_Node000000_Node000004" title=" " alt="" coords="41,410,47,362,60,303,85,242,102,214,124,189,142,176,145,181,127,193,107,217,89,244,65,305,52,363,47,410"/>
+<area shape="rect" id="Node000005" href="$classChatView.html" title="The main view for displaying and interacting with a specific Wavelength chat session." alt="" coords="176,203,254,227"/>
+<area shape="poly" id="edge65_Node000000_Node000005" title=" " alt="" coords="44,410,52,371,67,325,91,279,124,238,148,224,175,216,176,221,150,229,127,242,95,281,72,327,58,373,49,411"/>
+<area shape="rect" id="Node000006" href="$classClickableColorPreview.html" title="A small, clickable widget that displays a solid color preview." alt="" coords="139,252,292,277"/>
+<area shape="poly" id="edge66_Node000000_Node000006" title=" " alt="" coords="48,409,75,348,97,315,124,288,146,275,148,280,127,292,101,319,80,351,53,411"/>
+<area shape="rect" id="Node000007" href="$classLongTextDisplayEffect.html" title="A custom widget for displaying potentially long text with cyberpunk aesthetics and efficient renderin..." alt="" coords="139,301,292,326"/>
+<area shape="poly" id="edge67_Node000000_Node000007" title=" " alt="" coords="56,411,84,373,103,353,124,337,150,324,152,329,127,341,107,357,88,376,60,414"/>
+<area shape="rect" id="Node000008" href="$classMaskOverlayEffect.html" title="A custom overlay widget that creates a &quot;reveal&quot; effect using a moving scanline." alt="" coords="150,351,281,375"/>
+<area shape="poly" id="edge68_Node000000_Node000008" title=" " alt="" coords="73,414,125,386,160,373,161,378,127,391,75,419"/>
+<area shape="rect" id="Node000009" href="$classNetworkSettingsWidget.html" title="A widget for configuring advanced network settings for the application." alt="" coords="136,400,295,425"/>
+<area shape="poly" id="edge69_Node000000_Node000009" title=" " alt="" coords="93,428,135,421,136,427,93,433"/>
+<area shape="rect" id="Node000010" href="$classNetworkStatusWidget.html" title="A widget displaying network connection status and ping time with cyberpunk aesthetics." alt="" coords="141,449,290,474"/>
+<area shape="poly" id="edge70_Node000000_Node000010" title=" " alt="" coords="94,442,140,449,140,454,93,447"/>
+<area shape="rect" id="Node000011" href="$classOverlayWidget.html" title="A semi&#45;transparent overlay widget used to dim the background content." alt="" coords="162,499,268,523"/>
+<area shape="poly" id="edge71_Node000000_Node000011" title=" " alt="" coords="76,456,127,483,163,496,161,501,125,488,73,461"/>
+<area shape="rect" id="Node000012" href="$classSecurityLayer.html" title="Abstract base class for individual security challenge layers." alt="" coords="165,548,266,573"/>
+<area shape="poly" id="edge72_Node000000_Node000012" title=" " alt="" coords="60,461,89,498,127,533,166,549,164,554,124,537,85,502,56,464"/>
+<area shape="rect" id="Node000021" href="$classSettingsView.html" title="The main view for configuring application settings." alt="" coords="166,597,264,622"/>
+<area shape="poly" id="edge81_Node000000_Node000021" title=" " alt="" coords="53,464,80,524,101,555,127,582,146,593,167,600,165,606,144,598,124,586,97,559,75,527,49,466"/>
+<area shape="rect" id="Node000022" href="$classShortcutsSettingsWidget.html" title="A widget for configuring keyboard shortcuts for various application actions." alt="" coords="132,647,299,671"/>
+<area shape="poly" id="edge82_Node000000_Node000022" title=" " alt="" coords="49,464,58,502,72,547,95,593,127,632,147,644,144,648,124,636,91,596,68,549,53,504,44,466"/>
+<area shape="rect" id="Node000023" href="$classStreamDisplay.html" title="A widget that manages and displays messages within a CommunicationStream." alt="" coords="162,696,269,721"/>
+<area shape="poly" id="edge83_Node000000_Node000023" title=" " alt="" coords="47,465,52,512,66,570,90,630,107,657,127,681,143,692,162,699,160,704,141,697,124,685,102,660,85,632,60,572,47,513,41,466"/>
+<area shape="rect" id="Node000024" href="$classStreamMessage.html" title="A custom widget representing a single message within the CommunicationStream." alt="" coords="157,745,274,770"/>
+<area shape="poly" id="edge84_Node000000_Node000024" title=" " alt="" coords="45,465,48,521,59,592,69,630,84,666,103,700,128,730,141,741,158,748,156,753,139,745,124,734,99,703,79,669,64,631,54,593,42,522,40,466"/>
+<area shape="rect" id="Node000025" href="$classTextDisplayEffect.html" title="A custom widget that displays text with cyberpunk terminal&#45;style &quot;typing&quot; reveal animation and glitch..." alt="" coords="153,795,278,819"/>
+<area shape="poly" id="edge85_Node000000_Node000025" title=" " alt="" coords="49,465,59,539,75,634,98,722,112,757,128,780,154,796,151,801,124,784,108,759,93,724,70,635,53,540,43,466"/>
+<area shape="rect" id="Node000026" href="$classWavelengthSettingsWidget.html" title="A widget for configuring Wavelength&#45;specific settings, primarily the preferred start frequency." alt="" coords="127,844,304,869"/>
+<area shape="poly" id="edge86_Node000000_Node000026" title=" " alt="" coords="48,466,56,549,72,658,96,762,111,802,128,829,144,841,141,846,124,833,106,804,90,763,67,659,51,550,42,466"/>
+<area shape="rect" id="Node000013" href="$classFingerprintLayer.html" title="A security layer simulating fingerprint authentication." alt="" coords="372,376,486,401"/>
+<area shape="poly" id="edge73_Node000012_Node000013" title=" " alt="" coords="279,547,303,533,315,519,322,504,327,474,331,443,338,427,351,412,370,399,373,403,355,416,343,430,336,445,332,475,327,506,320,522,307,537,282,552"/>
+<area shape="rect" id="Node000014" href="$classHandprintLayer.html" title="A security layer simulating handprint authentication." alt="" coords="375,425,483,450"/>
+<area shape="poly" id="edge74_Node000012_Node000014" title=" " alt="" coords="279,546,303,533,319,516,327,498,335,480,351,461,374,448,376,453,355,465,339,482,332,500,324,519,307,537,281,551"/>
+<area shape="rect" id="Node000015" href="$classRetinaScanLayer.html" title="A security layer simulating a retina scan process." alt="" coords="370,475,489,499"/>
+<area shape="poly" id="edge75_Node000012_Node000015" title=" " alt="" coords="279,541,304,533,352,510,386,497,388,502,354,515,306,537,281,546"/>
+<area shape="rect" id="Node000016" href="$classSecurityCodeLayer.html" title="A security layer requiring the user to enter a 4&#45;character security code." alt="" coords="364,524,495,549"/>
+<area shape="poly" id="edge76_Node000012_Node000016" title=" " alt="" coords="281,550,363,541,363,546,281,556"/>
+<area shape="rect" id="Node000017" href="$classSecurityQuestionLayer.html" title="A security layer simulating a security question challenge." alt="" coords="353,573,505,598"/>
+<area shape="poly" id="edge77_Node000012_Node000017" title=" " alt="" coords="281,565,353,574,352,579,280,571"/>
+<area shape="rect" id="Node000018" href="$classSnakeGameLayer.html" title="A security layer implementing a classic Snake game as a challenge." alt="" coords="368,623,491,647"/>
+<area shape="poly" id="edge78_Node000012_Node000018" title=" " alt="" coords="281,574,306,583,354,607,387,620,385,625,352,612,304,588,279,579"/>
+<area shape="rect" id="Node000019" href="$classTypingTestLayer.html" title="A security layer implementing a typing verification test." alt="" coords="372,672,487,697"/>
+<area shape="poly" id="edge79_Node000012_Node000019" title=" " alt="" coords="281,570,307,584,324,602,332,621,339,639,355,657,376,669,374,674,351,661,335,642,327,623,319,605,303,588,279,575"/>
+<area shape="rect" id="Node000020" href="$classVoiceRecognitionLayer.html" title="A security layer simulating voice recognition verification." alt="" coords="353,721,505,746"/>
+<area shape="poly" id="edge80_Node000012_Node000020" title=" " alt="" coords="282,569,307,584,320,599,327,615,332,646,336,677,343,692,355,706,373,719,370,723,351,710,338,694,331,678,327,647,322,617,316,602,303,588,279,573"/>
+</map>

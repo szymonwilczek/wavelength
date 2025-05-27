@@ -1,0 +1,5 @@
+<map id="TranslationManager::operator=" name="TranslationManager::operator=">
+<area shape="rect" id="Node000001" title="Removed assignment constructor." alt="" coords="5,5,140,44"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="188,5,330,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,22,172,22,172,27,140,27"/>
+</map>

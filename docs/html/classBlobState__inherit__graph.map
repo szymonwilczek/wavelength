@@ -1,0 +1,9 @@
+<map id="BlobState" name="BlobState">
+<area shape="rect" id="Node000001" title="Abstract base class defining the interface for different blob animation states." alt="" coords="400,5,670,275"/>
+<area shape="rect" id="Node000002" href="$classIdleState.html" title="Implements the Idle state behavior for the Blob animation." alt="" coords="5,323,379,809"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="420,288,381,336,377,333,415,285"/>
+<area shape="rect" id="Node000003" href="$classMovingState.html" title="Implements the Moving state behavior for the Blob animation." alt="" coords="403,401,667,732"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="538,290,538,401,532,401,532,290"/>
+<area shape="rect" id="Node000004" href="$classResizingState.html" title="Implements the Resizing state behavior for the Blob animation." alt="" coords="691,401,955,732"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="655,286,681,322,732,400,727,403,677,325,651,289"/>
+</map>

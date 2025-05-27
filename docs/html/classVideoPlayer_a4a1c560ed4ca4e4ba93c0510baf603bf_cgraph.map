@@ -1,0 +1,5 @@
+<map id="VideoPlayer::~VideoPlayer" name="VideoPlayer::~VideoPlayer">
+<area shape="rect" id="Node000001" title="Destructor. Stops timers and ensures decoder resources are released by calling ReleaseResources()." alt="" coords="5,5,181,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a64de082c469f77406b3be603e2f58b27" title="Stops the decoder thread, waits for it to finish, releases its resources, and resets the pointer...." alt="" coords="229,5,436,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,15,213,15,213,20,181,20"/>
+</map>

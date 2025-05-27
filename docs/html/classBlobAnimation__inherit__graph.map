@@ -1,0 +1,7 @@
+<map id="BlobAnimation" name="BlobAnimation">
+<area shape="rect" id="Node000001" title="Main widget responsible for rendering and animating the dynamic blob." alt="" coords="27,117,234,1475"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,115,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="67,83,70,117,65,117,62,84"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="139,5,264,69"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,84,197,117,191,117,195,83"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="FloatingEnergySphereWidget::CalculateRMSAmplitude" name="FloatingEnergySphereWidget::CalculateRMSAmplitude">
+<area shape="rect" id="Node000001" title="Calculates the Root Mean Square (RMS) amplitude for a given audio buffer. Used to quantify the energy..." alt="" coords="720,5,911,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#aa6db8829f808c65a41208aa024dfe183" title="Slot called by the audio decoder when a new buffer of decoded audio data is ready...." alt="" coords="482,5,672,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="705,27,673,27,673,22,705,22"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#ad35420b1d445bfab1078548c35b92b96" title="Initializes audio components (QMediaPlayer, QAudioDecoder), connects signals, selects the appropriate..." alt="" coords="244,5,434,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="466,27,434,27,434,22,466,22"/>
+<area shape="rect" id="Node000004" href="$classFloatingEnergySphereWidget.html#ac8fbc3182f94c6322cfc6e494375a146" title="Initializes OpenGL resources (functions, shaders, geometry, VAO/VBO) and audio setup...." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

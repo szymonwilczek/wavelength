@@ -1,0 +1,22 @@
+<map id="MessageProcessor::MessageProcessor" name="MessageProcessor::MessageProcessor">
+<area shape="rect" id="Node000001" title="Deleted copy constructor to prevent copying." alt="" coords="733,93,928,132"/>
+<area shape="poly" id="edge9_Node000001_Node000001" title=" " alt="" coords="872,80,857,74,830,72,806,74,791,79,786,85,789,92,784,94,781,84,788,74,805,69,831,67,858,69,874,75"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#a26caf4168e131060a69bec30612f7596" title="Gets the singleton instance of the MessageProcessor." alt="" coords="473,75,685,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="717,104,685,101,686,95,718,99"/>
+<area shape="rect" id="Node000011" href="$classMessageProcessor.html#a8703a2eb9fada1fddf7a7a1805490e6f" title="Deleted assignment operator to prevent assignment." alt="" coords="481,124,677,149"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="718,126,678,130,678,125,717,121"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="246,5,382,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="508,73,381,43,383,38,510,68"/>
+<area shape="rect" id="Node000005" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="244,68,384,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="457,90,384,90,384,85,457,85"/>
+<area shape="rect" id="Node000007" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="203,138,425,162"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="509,106,370,140,369,134,508,101"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="12,5,148,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="231,27,148,27,148,22,231,22"/>
+<area shape="rect" id="Node000006" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="12,68,148,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="229,90,148,90,148,85,229,85"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="12,131,148,169"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="187,153,148,153,148,147,187,147"/>
+<area shape="rect" id="Node000009" href="$classJoinWavelengthDialog.html#a0cb74ecdcc726cea2ce437c85cd75185" title="Attempts to join the wavelength using the entered frequency and password. Shows a wait cursor,..." alt="" coords="5,193,155,232"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="251,170,155,195,154,190,249,164"/>
+</map>

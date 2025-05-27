@@ -1,0 +1,7 @@
+<map id="BlobTransitionManager::ProcessMovementBuffer" name="BlobTransitionManager::ProcessMovementBuffer">
+<area shape="rect" id="Node000001" title="Processes the buffered window movement samples to calculate velocity and apply inertia." alt="" coords="5,37,177,76"/>
+<area shape="rect" id="Node000002" href="$classBlobTransitionManager.html#a0368480b181fcb29158d53c685bcd9e9" title="Emitted when the inactivity counter exceeds a threshold, indicating that window movement has stopped." alt="" coords="249,5,402,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,42,233,35,233,40,178,48"/>
+<area shape="rect" id="Node000003" href="$classBlobTransitionManager.html#a106ed377c5900517cd28d562734277fe" title="Emitted when the calculated velocity exceeds a threshold, indicating significant window movement." alt="" coords="225,68,426,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,65,209,69,209,75,177,71"/>
+</map>

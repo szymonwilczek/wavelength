@@ -1,0 +1,7 @@
+<map id="SessionCoordinator::userKicked" name="SessionCoordinator::userKicked">
+<area shape="rect" id="Node000001" title="Emitted when the current user is kicked from a frequency. Relayed from WavelengthMessageProcessor." alt="" coords="372,5,507,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="189,5,324,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="356,27,324,27,324,22,356,22"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,27,141,27,141,22,173,22"/>
+</map>

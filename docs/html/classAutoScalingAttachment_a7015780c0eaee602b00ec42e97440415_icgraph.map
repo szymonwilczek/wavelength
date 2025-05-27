@@ -1,0 +1,7 @@
+<map id="AutoScalingAttachment::CheckAndScaleContent" name="AutoScalingAttachment::CheckAndScaleContent">
+<area shape="rect" id="Node000001" title="Checks the content&#39;s original size against the maximum allowed size and applies scaling if necessary...." alt="" coords="220,37,389,76"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a1fefb825e29bd915fa4e157f53975651" title="Constructs an AutoScalingAttachment widget. Sets up the layout, installs event filters,..." alt="" coords="5,5,172,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,44,172,40,173,34,205,39"/>
+<area shape="rect" id="Node000003" href="$classAutoScalingAttachment.html#aec4295e8fc53e3ad2f91b33326ddc62e" title="Sets the maximum allowed size for the content. If the content&#39;s original size exceeds this,..." alt="" coords="9,68,168,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,73,168,79,168,73,204,68"/>
+</map>

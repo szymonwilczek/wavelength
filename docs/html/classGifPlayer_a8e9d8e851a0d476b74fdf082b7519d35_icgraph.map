@@ -1,0 +1,11 @@
+<map id="GifPlayer::StartPlayback" name="GifPlayer::StartPlayback">
+<area shape="rect" id="Node000001" title="Starts or resumes GIF playback. Sets the is_playing_ flag and calls Resume() on the GifDecoder...." alt="" coords="414,33,579,58"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#ab7124d4f0d0d6c95f81246ad1a342928" title="Handles mouse enter events. Calls StartPlayback() to begin animation when the mouse cursor enters the..." alt="" coords="216,5,360,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="398,35,360,30,360,25,399,30"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#ad096d1b0e758e0cb11f758adcd8ab8a0" title="Creates and shows a non&#45;modal dialog to display the full&#45;size attachment (image or GIF)...." alt="" coords="210,54,366,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="399,61,367,66,366,61,398,56"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#a7a72f70ced1002d2324eefbb2c92b21d" title="Creates and displays a CyberAttachmentViewer containing a GIF. Wraps an InlineGifPlayer in an AutoSca..." alt="" coords="5,22,162,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="194,62,161,56,162,51,194,56"/>
+<area shape="rect" id="Node000005" href="$classAttachmentPlaceholder.html#ac5eac78fb7804294986a0b63c8253616" title="Creates and displays a CyberAttachmentViewer containing an image. Wraps an InlineImageViewer in an Au..." alt="" coords="5,85,162,124"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="194,90,162,95,161,90,194,85"/>
+</map>

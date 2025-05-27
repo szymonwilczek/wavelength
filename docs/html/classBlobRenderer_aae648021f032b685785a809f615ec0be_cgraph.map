@@ -1,0 +1,23 @@
+<map id="BlobRenderer::RenderScene" name="BlobRenderer::RenderScene">
+<area shape="rect" id="Node000001" title="Renders the entire scene, including a background, blob, and potentially HUD. Orchestrates the drawing..." alt="" coords="5,83,191,107"/>
+<area shape="rect" id="Node000002" href="$classBlobRenderer.html#ae2174c1c65ec04749bde716ca9fa7616" title="Draws the background, including a static texture and the dynamic grid. Uses internal caching (grid_bu..." alt="" coords="248,5,454,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,80,238,40,271,31,273,37,239,46,131,85"/>
+<area shape="rect" id="Node000003" href="$classBlobRenderer.html#a1a71f510ea1194b21f26769543d99fdd" title="Draws the complete static Heads&#45;Up Display (HUD) elements used in the Idle state. Includes corner mar..." alt="" coords="239,55,463,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,82,223,79,223,84,191,87"/>
+<area shape="rect" id="Node000004" href="$classBlobRenderer.html#acf88ce3d746ecf3a6d3b5833cc7fa5ae" title="Initializes parameters specific to the Idle state HUD display. Generates random ID,..." alt="" coords="274,104,428,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="191,103,259,110,258,115,191,108"/>
+<area shape="rect" id="Node000005" href="$classBlobRenderer.html#ac41f68d45bee143775f351676f901986" title="Renders the blob shape itself (filling, border, glow)." alt="" coords="264,167,438,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="127,105,179,128,240,151,270,160,269,165,238,156,177,133,125,110"/>
+<area shape="rect" id="Node000006" href="$classBlobPath.html#a310778241d88d50a019a16d566cb3336" title="Creates a closed, smooth QPainterPath using Catmull&#45;Rom&#45;like spline interpolation." alt="" coords="525,92,699,117"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="420,164,462,151,486,139,510,127,536,119,537,124,512,132,488,144,464,156,421,169"/>
+<area shape="rect" id="Node000008" href="$classBlobRenderer.html#a6b58d545b9a731bab5d96e43af3bdedc" title="Draws the border outline of the blob. Includes a main border and a thinner, lighter inner line for a ..." alt="" coords="524,141,700,166"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="438,168,508,161,509,166,439,173"/>
+<area shape="rect" id="Node000009" href="$classBlobRenderer.html#a530eed21e0447e1bcc29483922bdcad9" title="Draws the filling inside the blob path using a radial gradient. The gradient fades from a lighter,..." alt="" coords="526,191,698,215"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="439,184,511,191,511,196,438,190"/>
+<area shape="rect" id="Node000010" href="$classBlobRenderer.html#ac6e7cd4835ad3ede2f822982470dcfda" title="Draws the glow effect around the blob path. Uses internal caching (glow_buffer_) to optimize renderin..." alt="" coords="511,240,713,265"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="394,189,512,224,544,233,543,238,510,230,392,194"/>
+<area shape="rect" id="Node000007" href="$classBlobMath.html#abef304a2fdf006c9238fe4a265951637" title="Checks if a QPointF contains valid coordinate values. Verifies that coordinates are not NaN,..." alt="" coords="774,92,927,117"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="700,102,758,102,758,107,700,107"/>
+<area shape="rect" id="Node000011" href="$classBlobRenderer.html#a0572f5868bbb75fb82e403609307a793" title="Renders the multi&#45;layered glow effect using QPainter drawPath operations with varying pen widths and ..." alt="" coords="761,233,940,272"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="714,250,746,250,746,255,714,255"/>
+</map>

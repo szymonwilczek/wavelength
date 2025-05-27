@@ -1,0 +1,21 @@
+<map id="AttachmentQueueManager::GetInstance" name="AttachmentQueueManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="669,68,846,107"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#ae2da16761bdcaa931f93e0c2f05f2571" title="Generates a thumbnail image from the first frame of a video in a background thread...." alt="" coords="454,5,610,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="671,66,604,47,605,42,672,61"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#a8d2443eb9d37bbbc16b5c7a8ead875e2" title="Slot triggered when the load/retry button is clicked or automatically after initialization...." alt="" coords="454,68,610,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="654,90,611,90,611,85,654,85"/>
+<area shape="rect" id="Node000006" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="443,131,621,156"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="663,113,586,133,584,128,662,108"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#a01bfbf08c83898552fbc4fd041d61245" title="Creates and displays a CyberAttachmentViewer containing a video preview (thumbnail + play button)...." alt="" coords="235,5,391,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="439,27,392,27,392,22,439,22"/>
+<area shape="rect" id="Node000005" href="$classAttachmentPlaceholder.html#a75277d4204ecadbc370f7a4c393cd0be" title="Constructs an AttachmentPlaceholder widget. Initializes the UI elements (labels, button,..." alt="" coords="231,68,395,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="439,90,395,90,395,85,439,85"/>
+<area shape="rect" id="Node000007" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="241,131,385,156"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="427,146,386,146,386,141,427,141"/>
+<area shape="rect" id="Node000011" href="$classSessionCoordinator.html#a8c66229e945eb35fa8791ea88d37cdaa" title="Sends a file to the currently active wavelength. Delegates the call to WavelengthMessageService." alt="" coords="245,180,380,219"/>
+<area shape="poly" id="edge9_Node000006_Node000011" title=" " alt="" coords="466,163,382,185,380,179,465,158"/>
+<area shape="rect" id="Node000008" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="23,103,165,128"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="225,135,165,127,166,122,226,130"/>
+<area shape="rect" id="Node000009" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="5,152,183,191"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="226,157,184,163,183,157,225,152"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="SessionCoordinator::GetJoinedWavelengthCount" name="SessionCoordinator::GetJoinedWavelengthCount">
+<area shape="rect" id="Node000001" title="Gets the count of wavelengths the user is currently joined to. Delegates the call to WavelengthStateM..." alt="" coords="5,37,196,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="254,5,424,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,41,238,35,239,41,197,46"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#a3f257e59bcba5b49ec2ad0c9258916de" title="Gets the total number of wavelengths the user is currently joined to." alt="" coords="244,68,434,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="197,66,229,70,228,76,196,72"/>
+<area shape="rect" id="Node000003" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="482,5,659,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="424,22,466,22,466,27,424,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthStateManager.html#a86aa87926dad61bb38a9de713bee956d" title="Gets a list of frequency identifiers for all wavelengths the user is currently joined to...." alt="" coords="486,68,655,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="434,85,470,85,470,90,434,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="707,68,845,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="656,85,691,85,691,90,656,90"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ChatView::StopAudioInput" name="ChatView::StopAudioInput">
+<area shape="rect" id="Node000001" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="5,5,180,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a034774a31cd27434eeb01e9965736aeb" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="228,5,426,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,15,212,15,212,20,180,20"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#aab2d772652852a6156c9f075bc21a03e" title="Calculates the Root Mean Square (RMS) amplitude of a raw audio buffer. Used for audio visualization...." alt="" coords="474,5,671,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="426,15,458,15,458,20,426,20"/>
+</map>

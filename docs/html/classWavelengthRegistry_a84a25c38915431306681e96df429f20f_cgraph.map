@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::GetInstance" name="WavelengthRegistry::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="5,5,143,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="191,5,336,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,22,175,22,175,27,143,27"/>
+</map>

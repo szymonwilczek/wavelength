@@ -1,0 +1,20 @@
+<map id="WavelengthLeaver::WavelengthLeaver" name="WavelengthLeaver::WavelengthLeaver">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern." alt="" coords="674,117,876,156"/>
+<area shape="rect" id="Node000002" href="$classWavelengthLeaver.html#a95c859d6204642e432fadb032665192d" title="Gets the singleton instance of the WavelengthLeaver." alt="" coords="421,75,626,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="658,117,590,103,591,98,660,111"/>
+<area shape="rect" id="Node000009" href="$classWavelengthLeaver.html#a8b7ab04cbf7cf44751644eda4be85f54" title="Deleted assignment operator to prevent assignment." alt="" coords="429,124,618,149"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="659,139,619,139,619,134,659,134"/>
+<area shape="rect" id="Node000010" href="$classWavelengthLeaver.html#a0b31e88dd4644b682fe532a7c927f04f" title="Deleted copy constructor to prevent copying." alt="" coords="423,173,624,212"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="671,163,614,175,613,170,670,157"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a0dd567ac5a1ab2f57e17698c1dc93a1b" title="Closes a specific wavelength (only if the current user is the host). Unregisters the wavelength local..." alt="" coords="238,5,373,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="462,73,373,47,374,42,464,68"/>
+<area shape="rect" id="Node000006" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="238,131,373,169"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="453,107,422,115,366,133,364,127,420,110,452,101"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#ad7c56b7b495b53ea905a6157e2bc5e93" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="238,68,373,107"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="406,90,373,90,373,85,406,85"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="5,44,190,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="223,40,182,46,182,41,222,35"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="30,131,165,169"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="223,153,166,153,166,147,223,147"/>
+<area shape="poly" id="edge7_Node000008_Node000004" title=" " alt="" coords="222,78,185,72,186,67,223,72"/>
+</map>

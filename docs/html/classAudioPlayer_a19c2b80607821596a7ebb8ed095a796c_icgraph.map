@@ -1,0 +1,10 @@
+<map id="AudioPlayer::IncreaseSpectrumIntensity" name="AudioPlayer::IncreaseSpectrumIntensity">
+<area shape="rect" id="Node000001" title="Starts an animation to increase the spectrum intensity (e.g., when playback starts)." alt="" coords="471,24,675,62"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a51a8f1193d8003041b9771fec6b5ee19" title="Slot called when the user releases the progress slider. Performs the actual seek operation based on t..." alt="" coords="221,5,423,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="455,34,423,31,424,25,456,29"/>
+<area shape="rect" id="Node000004" href="$classAudioPlayer.html#afd42f1d9043e96d8b8ce55f7afd08483" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="227,55,417,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="456,57,418,61,417,55,455,52"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,31,173,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,33,173,37,173,31,205,28"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="211,58,173,54,173,49,211,53"/>
+</map>

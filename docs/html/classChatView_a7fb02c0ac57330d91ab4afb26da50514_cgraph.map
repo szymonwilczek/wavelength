@@ -1,0 +1,11 @@
+<map id="ChatView::~ChatView" name="ChatView::~ChatView">
+<area shape="rect" id="Node000001" title="Destructor. Stops audio input/output and cleans up audio resources." alt="" coords="5,31,156,55"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#abd9ae8e738358b9be6f5e935ea4826a3" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="209,5,383,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,31,193,27,193,32,157,37"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#a3caa164d3775d977cedb7757e932f2dd" title="Stops audio playback. Resets the output device pointer." alt="" coords="204,55,388,79"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="157,49,188,52,188,58,156,54"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a034774a31cd27434eeb01e9965736aeb" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="436,5,634,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,15,421,15,421,20,384,20"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#aab2d772652852a6156c9f075bc21a03e" title="Calculates the Root Mean Square (RMS) amplitude of a raw audio buffer. Used for audio visualization...." alt="" coords="682,5,880,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="635,15,667,15,667,20,635,20"/>
+</map>

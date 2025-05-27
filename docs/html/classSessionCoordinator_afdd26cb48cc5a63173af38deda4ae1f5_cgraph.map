@@ -1,0 +1,15 @@
+<map id="SessionCoordinator::IsWavelengthConnected" name="SessionCoordinator::IsWavelengthConnected">
+<area shape="rect" id="Node000001" title="Checks if the WebSocket connection for a specific wavelength is established and valid...." alt="" coords="5,37,176,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="224,5,394,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,42,208,37,209,42,176,47"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#a1bec41b38f90afbe8d57ec5c71549750" title="Checks if the WebSocket connection for a specific wavelength is currently established and valid." alt="" coords="224,68,394,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="176,66,208,71,208,76,175,71"/>
+<area shape="rect" id="Node000003" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="442,5,619,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,22,426,22,426,27,394,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="446,68,615,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="394,85,430,85,430,90,394,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="668,36,806,75"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="615,72,653,66,654,71,616,77"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="667,99,807,137"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="616,97,652,103,652,108,615,103"/>
+</map>

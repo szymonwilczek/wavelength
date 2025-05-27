@@ -1,0 +1,22 @@
+<map id="AppInstanceManager::onNewConnection" name="AppInstanceManager::onNewConnection">
+<area shape="rect" id="Node000001" title="Slot called when a new client attempts to connect to the server." alt="" coords="5,131,150,169"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="198,71,342,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,127,191,112,192,117,143,133"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#ab7fe0e77dca903fa23d78139dd68e84b" title="Slot called when data can be read from a connected socket." alt="" coords="198,191,342,229"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="143,167,192,183,191,188,141,173"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a1ac17dc2cb4f3ae1f968109a180acd2e" title="Emitted when a client instance disconnects (on the server) or when the connection to the server is lo..." alt="" coords="402,5,561,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="334,67,401,47,403,52,336,73"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#acb57c2842c3eff0de2fe0c4009f8cdcb" title="Statically checks if another instance of the application is already running." alt="" coords="390,68,573,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="343,86,374,86,374,91,343,92"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#af09b098118800e025bcdce635b382ddd" title="Sets up the QLocalServer for the creator instance." alt="" coords="410,131,554,169"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="342,107,397,123,395,128,340,113"/>
+<area shape="poly" id="edge5_Node000005_Node000001" title=" " alt="" coords="409,153,165,153,165,147,409,147"/>
+<area shape="rect" id="Node000007" href="$classAppInstanceManager.html#a46df6d357b1a69b71bfa325166b179ea" title="Processes an incoming message received from a socket." alt="" coords="410,193,554,232"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="343,208,394,209,394,214,343,214"/>
+<area shape="rect" id="Node000008" href="$classAppInstanceManager.html#a7fcae156e69f8d718d0d3f4189e0158f" title="Creates a QByteArray message containing the current instance&#39;s position data." alt="" coords="627,131,795,169"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="553,190,622,171,624,177,555,196"/>
+<area shape="rect" id="Node000009" href="$classAppInstanceManager.html#a6b8397127dcbea79612dfe2bfed1a2d7" title="Emitted when a new client instance connects (on the server) or when connection to the server is estab..." alt="" coords="639,193,783,232"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="554,210,624,210,624,215,554,215"/>
+<area shape="rect" id="Node000010" href="$classAppInstanceManager.html#a7adb5fbcaba5932cb88cb33cdf0ab610" title="Emitted when position data from another instance is received." alt="" coords="621,256,801,308"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="549,230,608,248,606,253,547,235"/>
+</map>

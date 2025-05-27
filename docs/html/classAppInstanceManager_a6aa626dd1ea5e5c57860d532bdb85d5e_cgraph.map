@@ -1,0 +1,17 @@
+<map id="AppInstanceManager::ConnectToServer" name="AppInstanceManager::ConnectToServer">
+<area shape="rect" id="Node000001" title="Establishes a connection to the server instance for a client instance." alt="" coords="5,185,150,224"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="198,131,342,169"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,182,184,172,186,177,149,187"/>
+<area shape="rect" id="Node000007" href="$classAppInstanceManager.html#ab7fe0e77dca903fa23d78139dd68e84b" title="Slot called when data can be read from a connected socket." alt="" coords="814,211,958,249"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="150,207,361,219,621,229,766,229,798,228,798,234,766,234,621,234,361,224,150,212"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a1ac17dc2cb4f3ae1f968109a180acd2e" title="Emitted when a client instance disconnects (on the server) or when the connection to the server is lo..." alt="" coords="402,5,561,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,128,333,91,389,53,398,48,400,53,391,58,337,95,293,132"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#acb57c2842c3eff0de2fe0c4009f8cdcb" title="Statically checks if another instance of the application is already running." alt="" coords="390,68,573,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="337,128,398,109,400,114,338,133"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#af09b098118800e025bcdce635b382ddd" title="Sets up the QLocalServer for the creator instance." alt="" coords="410,131,554,169"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="343,147,394,147,394,153,343,153"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#af7e9143a1ff0af2932c1d0afc1f31231" title="Slot called when a new client attempts to connect to the server." alt="" coords="621,181,766,220"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="555,165,607,177,605,182,554,170"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="621,202,512,197,390,183,353,176,354,171,390,178,512,192,621,197"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="766,209,799,214,798,219,766,214"/>
+</map>

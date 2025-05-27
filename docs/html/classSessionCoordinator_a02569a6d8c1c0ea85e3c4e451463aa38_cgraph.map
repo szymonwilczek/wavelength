@@ -1,0 +1,6 @@
+<map id="SessionCoordinator::GetInstance" name="SessionCoordinator::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthSessionCoordinator." alt="" coords="5,29,141,68"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a7c2f6bb86730ef786958f3889641bb3c" title="Deleted copy constructor to prevent copying." alt="" coords="189,29,332,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,46,173,46,173,51,141,51"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="225,30,223,20,228,11,241,5,260,3,281,5,293,12,291,16,280,10,260,8,242,10,232,15,228,21,230,28"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="WavelengthConfig::SetGridColor" name="WavelengthConfig::SetGridColor">
+<area shape="rect" id="Node000001" title="Sets the color for the background grid lines. Adds the color to recent colors. Emits configChanged(&quot;g..." alt="" coords="5,37,184,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a7ebb29db2d1c1664c1fca81e52f67565" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="232,5,430,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,42,216,38,217,43,185,47"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="246,68,416,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="185,66,231,72,230,77,184,71"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="478,5,648,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,22,462,22,462,27,430,27"/>
+</map>

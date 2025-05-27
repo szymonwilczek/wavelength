@@ -1,0 +1,11 @@
+<map id="ShortcutManager::RegisterMainWindowShortcuts" name="ShortcutManager::RegisterMainWindowShortcuts">
+<area shape="rect" id="Node000001" title="Registers shortcuts specific to the main application window." alt="" coords="5,96,183,135"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a6305ee4ce31c956ea2c1d63b907e21cf" title="Template helper function to create and connect a QShortcut." alt="" coords="236,5,427,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,93,230,53,247,47,248,52,232,58,138,98"/>
+<area shape="rect" id="Node000003" href="$classNavbar.html#a35a159d5b981d7027d65c0b4d2e80669" title="Emitted when the &quot;Generate Wavelength&quot; button is clicked." alt="" coords="244,68,418,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="183,102,228,97,229,102,183,108"/>
+<area shape="rect" id="Node000004" href="$classNavbar.html#a2300661cc6485278de90db3a5b572e0f" title="Emitted when the &quot;Merge Wavelength&quot; button is clicked." alt="" coords="231,131,432,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="183,123,215,127,215,132,183,128"/>
+<area shape="rect" id="Node000005" href="$classNavbar.html#ae5174435c781910c3a3a7a335d831a9e" title="Emitted when the &quot;Settings&quot; button is clicked." alt="" coords="251,180,412,205"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="144,133,232,165,261,173,259,178,230,170,142,138"/>
+</map>

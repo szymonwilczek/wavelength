@@ -1,0 +1,10 @@
+<map id="AppearanceSettingsWidget::SelectRecentColor" name="AppearanceSettingsWidget::SelectRecentColor">
+<area shape="rect" id="Node000001" title="Slot triggered when a recent color button is clicked. Adds the selected color back to the top of the ..." alt="" coords="695,5,875,44"/>
+<area shape="rect" id="Node000002" href="$classAppearanceSettingsWidget.html#a596c1f9d621dfcc6c7e949c76b35f985" title="Updates the UI section displaying recently used colors. Clears the existing recent color buttons and ..." alt="" coords="468,5,647,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="680,27,648,27,648,22,680,22"/>
+<area shape="rect" id="Node000003" href="$classAppearanceSettingsWidget.html#a1ecc9de064a98ca57c7147d11116fca4" title="Constructs the AppearanceSettingsWidget. Initializes the UI, loads current settings from WavelengthCo..." alt="" coords="5,5,193,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="452,24,420,23,241,23,193,24,193,19,241,18,420,18,452,19"/>
+<area shape="rect" id="Node000004" href="$classAppearanceSettingsWidget.html#a6fe0566bf80009056b20a9cada6d7f63" title="Loads the current appearance settings from WavelengthConfig and updates the UI elements." alt="" coords="241,33,420,72"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="453,40,421,44,420,39,452,35"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="225,43,193,39,193,33,226,37"/>
+</map>

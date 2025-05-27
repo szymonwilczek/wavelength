@@ -1,0 +1,11 @@
+<map id="SessionCoordinator::pttStartReceiving" name="SessionCoordinator::pttStartReceiving">
+<area shape="rect" id="Node000001" title="Emitted when another user starts PTT transmission. Relayed from WavelengthMessageService." alt="" coords="566,26,702,65"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="374,5,516,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="551,36,516,31,517,26,551,31"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a88c89957fe9dcd94f4ff5ac3f862aa60" title="Relays the pttStartReceiving signal." alt="" coords="372,54,518,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="551,61,519,65,518,60,550,55"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="189,54,324,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="357,76,325,76,325,71,357,71"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,54,141,93"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,76,141,76,141,71,173,71"/>
+</map>

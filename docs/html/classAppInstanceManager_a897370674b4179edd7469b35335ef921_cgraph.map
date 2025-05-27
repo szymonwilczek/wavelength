@@ -1,0 +1,9 @@
+<map id="AppInstanceManager::AppInstanceManager" name="AppInstanceManager::AppInstanceManager">
+<area shape="rect" id="Node000001" title="Constructs an AppInstanceManager." alt="" coords="5,37,158,76"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#ae9bddf9404ee3f9fed9e1d367bb603af" title="Slot called periodically by position_timer_ to send the current instance&#39;s position data." alt="" coords="206,37,352,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,54,191,54,191,59,158,59"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a7fcae156e69f8d718d0d3f4189e0158f" title="Creates a QByteArray message containing the current instance&#39;s position data." alt="" coords="400,5,568,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,43,384,38,385,43,353,48"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a85fd688a72994704b714e1bcb0e9549a" title="Sends a message to all connected clients (only applicable for the creator instance)." alt="" coords="412,68,556,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="353,65,397,72,396,77,352,70"/>
+</map>

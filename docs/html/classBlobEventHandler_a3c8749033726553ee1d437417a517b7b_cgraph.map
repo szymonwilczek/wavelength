@@ -1,0 +1,5 @@
+<map id="BlobEventHandler::EnableEvents" name="BlobEventHandler::EnableEvents">
+<area shape="rect" id="Node000001" title="Enables event processing. Emits the eventsReEnabled() signal." alt="" coords="5,5,179,44"/>
+<area shape="rect" id="Node000002" href="$classBlobEventHandler.html#a785a7b849357d099ea2bbf0d5c9e953f" title="Emitted when event processing is re&#45;enabled after being disabled." alt="" coords="227,5,398,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,22,211,22,211,27,179,27"/>
+</map>

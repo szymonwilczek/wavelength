@@ -1,0 +1,15 @@
+<map id="TextDisplayEffect::SetRevealedChars" name="TextDisplayEffect::SetRevealedChars">
+<area shape="rect" id="Node000001" title="Sets the number of revealed characters. Updates the internal count, triggers a repaint,..." alt="" coords="606,37,739,76"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#aff24a16ba912a1d96cf23516936f538d" title="Slot called by the text_timer_. Reveals the next character in the sequence. Adjusts the timer interva..." alt="" coords="426,5,558,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="590,45,558,39,559,34,591,40"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#ad9da8cfd5969d6509d622fc708957fb3" title="Starts or restarts the text revealing animation from the beginning. If the text has been fully reveal..." alt="" coords="426,68,558,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="591,73,559,79,558,73,590,68"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="230,5,362,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,27,362,27,362,22,411,22"/>
+<area shape="rect" id="Node000005" href="$classStreamMessage.html#a34d536edeb897ec7e7c6cc1a4bd34e2e" title="Starts the fade&#45;in animation (opacity and glow). Also triggers the text reveal animation (CyberTextDi..." alt="" coords="214,71,378,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="411,88,378,88,379,82,411,83"/>
+<area shape="rect" id="Node000014" href="$classTextDisplayEffect.html#a08a497134c49a1068add82b03ea21712" title="Sets new text content for the widget. Updates the internal text, removes HTML, recalculates required ..." alt="" coords="230,120,362,159"/>
+<area shape="poly" id="edge6_Node000004_Node000014" title=" " alt="" coords="412,111,363,124,362,119,410,106"/>
+<area shape="rect" id="Node000006" href="$classCommunicationStream.html#aba44a533978e83748764534a8682c56f" title="Displays the message at the specified index in the messages_ list. Hides the previously displayed mes..." alt="" coords="5,64,166,103"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="198,86,166,86,166,81,198,81"/>
+</map>

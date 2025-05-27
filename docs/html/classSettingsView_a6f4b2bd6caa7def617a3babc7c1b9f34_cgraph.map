@@ -1,0 +1,7 @@
+<map id="SettingsView::showEvent" name="SettingsView::showEvent">
+<area shape="rect" id="Node000001" title="Overridden show event handler. Loads settings from the configuration and resets the CLASSIFIED tab&#39;s ..." alt="" coords="5,44,175,69"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a23258b6c0cb0fc74537588ea6283b873" title="Loads settings from the WavelengthConfig object into the UI elements of all tabs. Delegates loading t..." alt="" coords="226,5,407,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,42,210,37,211,42,176,47"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a220c6d57ea52dc424ad3c3db5c0a9c7a" title="Resets all security layers in the CLASSIFIED tab to their initial state. Calls Reset() on each layer...." alt="" coords="223,68,410,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,66,208,70,207,75,175,71"/>
+</map>

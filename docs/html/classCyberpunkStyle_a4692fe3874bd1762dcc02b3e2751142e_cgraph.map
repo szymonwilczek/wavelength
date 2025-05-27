@@ -1,0 +1,7 @@
+<map id="CyberpunkStyle::GetCyberpunkFrameStyle" name="CyberpunkStyle::GetCyberpunkFrameStyle">
+<area shape="rect" id="Node000001" title="Generates a CSS&#45;like style string for a basic cyberpunk&#45;themed frame. Includes background color,..." alt="" coords="5,37,214,76"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#a670307ddf81246897d6ff54114cd6172" title="Gets the dark background color." alt="" coords="262,5,474,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,41,246,37,246,42,214,46"/>
+<area shape="rect" id="Node000003" href="$classCyberpunkStyle.html#abfd4f5b01a3833e07116b1d4b4242fa6" title="Gets the primary color (Neon Blue)." alt="" coords="273,68,463,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="214,66,258,72,257,77,214,72"/>
+</map>

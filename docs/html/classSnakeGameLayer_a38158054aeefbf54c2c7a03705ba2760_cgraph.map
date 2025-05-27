@@ -1,0 +1,5 @@
+<map id="SnakeGameLayer::eventFilter" name="SnakeGameLayer::eventFilter">
+<area shape="rect" id="Node000001" title="Filters key press events specifically for the game_board_ QLabel. Ensures that arrow key presses are ..." alt="" coords="5,5,197,30"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a2474c1e79264cffbfd70e211e20abca0" title="Processes user input (arrow keys) to change the snake&#39;s direction. Prevents the snake from reversing ..." alt="" coords="245,5,446,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,15,229,15,229,20,197,20"/>
+</map>

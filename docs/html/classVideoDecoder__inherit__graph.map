@@ -1,0 +1,5 @@
+<map id="VideoDecoder" name="VideoDecoder">
+<area shape="rect" id="Node000001" title="Decodes video data frame by frame using FFmpeg libraries in a separate thread." alt="" coords="5,117,222,909"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="84,5,144,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,84,116,117,111,117,111,84"/>
+</map>

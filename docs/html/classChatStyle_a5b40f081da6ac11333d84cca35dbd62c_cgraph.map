@@ -1,0 +1,5 @@
+<map id="ChatStyle::GetSentMessageStyle" name="ChatStyle::GetSentMessageStyle">
+<area shape="rect" id="Node000001" title="Gets the stylesheet for message bubbles sent by the current user. Defines background,..." alt="" coords="5,5,194,44"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#abfd4f5b01a3833e07116b1d4b4242fa6" title="Gets the primary color (Neon Blue)." alt="" coords="242,5,432,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,22,226,22,226,27,194,27"/>
+</map>

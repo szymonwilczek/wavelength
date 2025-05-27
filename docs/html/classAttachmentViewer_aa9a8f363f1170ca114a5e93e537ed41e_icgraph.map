@@ -1,0 +1,9 @@
+<map id="AttachmentViewer::StartDecryptionAnimation" name="AttachmentViewer::StartDecryptionAnimation">
+<area shape="rect" id="Node000001" title="Starts the decryption phase. Updates the status label, ensures the MaskOverlay is visible,..." alt="" coords="759,5,988,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#a847f3bd1aea14895c10cdc6a50a07765" title="Starts the visual scanning phase. Updates the status label, ensures the MaskOverlay is visible and an..." alt="" coords="493,5,711,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="744,27,712,27,712,22,744,22"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a7f2dccdaa47930c6103f9392da17c17b" title="Slot triggered automatically after a short delay or potentially by a user action (though currently au..." alt="" coords="256,5,445,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="477,27,445,27,445,22,477,22"/>
+<area shape="rect" id="Node000004" href="$classAttachmentViewer.html#a725b0a8c1d40b97e2d6cdf59ceb93b38" title="Constructs a CyberAttachmentViewer. Initializes the layout, status label, content container,..." alt="" coords="5,5,208,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="240,27,208,27,208,22,240,22"/>
+</map>

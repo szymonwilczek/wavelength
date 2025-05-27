@@ -1,0 +1,27 @@
+<map id="AttachmentPlaceholder::AttachmentPlaceholder" name="AttachmentPlaceholder::AttachmentPlaceholder">
+<area shape="rect" id="Node000001" title="Constructs an AttachmentPlaceholder widget. Initializes the UI elements (labels, button,..." alt="" coords="5,132,170,171"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="229,53,363,92"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,129,227,95,229,100,142,134"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#a8d2443eb9d37bbbc16b5c7a8ead875e2" title="Slot triggered when the load/retry button is clicked or automatically after initialization...." alt="" coords="218,163,374,201"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,161,203,166,202,171,170,166"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="439,5,581,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,55,424,41,425,46,364,60"/>
+<area shape="rect" id="Node000005" href="$classAttachmentQueueManager.html#a9fc5b79cd8dd31a11ff60fedf183f5d2" title="Adds a new task (represented by a std::function) to the execution queue. Creates an AttachmentTask wr..." alt="" coords="422,68,598,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="331,160,421,116,434,110,436,115,423,120,334,165"/>
+<area shape="rect" id="Node000008" href="$classAttachmentDataStore.html#adf293df4b2c07531b27478a958bc573d" title="Retrieves the base64&#45;encoded attachment data associated with a given ID. This operation is thread&#45;saf..." alt="" coords="437,131,583,169"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="374,168,421,161,422,166,375,173"/>
+<area shape="rect" id="Node000009" href="$classAttachmentDataStore.html#a954fe97d063ada489bb0b29ad4f4f4e0" title="Gets the singleton instance of the AttachmentDataStore." alt="" coords="437,193,583,232"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="375,191,422,197,421,203,374,196"/>
+<area shape="rect" id="Node000011" href="$classAttachmentQueueManager.html#ad4882521922da9692f3ff5734761e230" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="422,256,598,295"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="336,199,423,241,439,247,437,252,421,246,334,204"/>
+<area shape="rect" id="Node000013" href="$classAttachmentPlaceholder.html#a77ebd2ac2acb0920388709f2d6d1c1ec" title="Updates the UI elements to reflect the loading state. Disables/enables the load button and shows/hide..." alt="" coords="432,319,588,357"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="314,200,360,251,390,279,423,304,433,309,430,314,421,308,387,283,356,255,310,204"/>
+<area shape="rect" id="Node000006" href="$classAttachmentTask.html#a08ea014777b2a92f1863c8bca688e0e9" title="Emitted after the task function (TaskFunc_) has finished executing." alt="" coords="654,47,823,72"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="598,74,639,69,639,74,599,79"/>
+<area shape="rect" id="Node000007" href="$classAttachmentQueueManager.html#aab8e65b34981358a309208cf2118febe" title="Processes the task queue, starting new tasks if slots are available. Checks if the number of active t..." alt="" coords="650,96,827,135"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="599,96,635,100,634,105,598,101"/>
+<area shape="rect" id="Node000010" href="$classAttachmentDataStore.html#a8eaf2333a11d901e4d62a0a7c9f4c2c4" title="Private default constructor to enforce the singleton pattern." alt="" coords="661,193,816,232"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="584,210,646,210,646,215,584,215"/>
+<area shape="rect" id="Node000012" href="$classAttachmentQueueManager.html#a7d8e4bb17b92bb0e390215015c269349" title="Private constructor to enforce the singleton pattern. Determines the maximum number of concurrent tas..." alt="" coords="646,256,831,295"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="599,273,631,273,631,278,599,278"/>
+</map>

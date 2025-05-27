@@ -1,0 +1,5 @@
+<map id="AudioPlayer::~AudioPlayer" name="AudioPlayer::~AudioPlayer">
+<area shape="rect" id="Node000001" title="Destructor. Ensures resources are released." alt="" coords="5,5,181,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#aa2370903faeb477381acc705ba4e928c" title="Stops timers, stops and waits for the decoder thread, and releases decoder resources...." alt="" coords="229,5,436,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,15,213,15,213,20,181,20"/>
+</map>

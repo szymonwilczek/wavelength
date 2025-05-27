@@ -1,0 +1,5 @@
+<map id="SnakeGameLayer::keyPressEvent" name="SnakeGameLayer::keyPressEvent">
+<area shape="rect" id="Node000001" title="Handles key press events for controlling the snake. Passes the key code to HandleInput() and accepts ..." alt="" coords="5,5,191,44"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a2474c1e79264cffbfd70e211e20abca0" title="Processes user input (arrow keys) to change the snake&#39;s direction. Prevents the snake from reversing ..." alt="" coords="239,12,440,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,22,223,22,223,27,191,27"/>
+</map>

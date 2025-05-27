@@ -1,0 +1,7 @@
+<map id="GifDecoder::positionChanged" name="GifDecoder::positionChanged">
+<area shape="rect" id="Node000001" title="Emitted periodically during playback to indicate the current position." alt="" coords="183,31,375,55"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a6c576025608a446b6c9464a656780267" title="Resets the playback position to the beginning of the GIF. Seeks the FFmpeg format context to the star..." alt="" coords="5,5,135,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,32,135,28,135,23,168,27"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a5f3075f25bb1e6e0fbad6a4abc1ccef9" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="13,55,127,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,59,127,63,127,58,167,53"/>
+</map>

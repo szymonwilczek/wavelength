@@ -1,0 +1,7 @@
+<map id="BlobAnimation::hideAnimation" name="BlobAnimation::hideAnimation">
+<area shape="rect" id="Node000001" title="Hides the animation widget and pauses event tracking." alt="" coords="5,12,201,37"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#ac42c30bf37d875ab1424d3ff382afcbe" title="Pauses all event tracking mechanisms (window move/resize). Stops timers, clears movement buffers,..." alt="" coords="249,5,447,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,22,233,22,233,27,201,27"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a90940f8b5f62d348952264e233b2aafb" title="Switches the blob&#39;s current animation state (Idle, Moving, Resizing). Updates the current_blob_state_..." alt="" coords="495,12,693,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,22,479,22,479,27,448,27"/>
+</map>

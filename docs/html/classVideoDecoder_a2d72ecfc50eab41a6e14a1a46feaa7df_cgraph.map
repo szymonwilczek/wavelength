@@ -1,0 +1,5 @@
+<map id="VideoDecoder::HandleAudioFinished" name="VideoDecoder::HandleAudioFinished">
+<area shape="rect" id="Node000001" title="Slot connected to the internal AudioDecoder&#39;s playbackFinished signal. Sets the audio_finished_ flag ..." alt="" coords="5,5,191,44"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a4b36980122d8771e7aff1ed0c1db8420" title="Emitted when both video and audio (if present) streams reach the end." alt="" coords="239,12,451,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,22,223,22,223,27,191,27"/>
+</map>

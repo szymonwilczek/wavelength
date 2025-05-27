@@ -1,0 +1,27 @@
+var classMessageProcessor =
+[
+    [ "MessageProcessor", "classMessageProcessor.html#af073515175802398f049574a52fe9795", null ],
+    [ "MessageProcessor", "classMessageProcessor.html#af12c62b3127edeb52c44b4ef1137eff7", null ],
+    [ "~MessageProcessor", "classMessageProcessor.html#a217434ca90c1717f747f0663e0f83725", null ],
+    [ "AreFrequenciesEqual", "classMessageProcessor.html#a7f959930e3baf8650eea19ce671f7e75", null ],
+    [ "audioDataReceived", "classMessageProcessor.html#a8c07a0a03713a5c6537de3035346cd57", null ],
+    [ "GetInstance", "classMessageProcessor.html#a26caf4168e131060a69bec30612f7596", null ],
+    [ "messageReceived", "classMessageProcessor.html#a437c30026d43eede432432e57a209659", null ],
+    [ "operator=", "classMessageProcessor.html#a8703a2eb9fada1fddf7a7a1805490e6f", null ],
+    [ "ProcessIncomingBinaryMessage", "classMessageProcessor.html#ac4a5f8904c91e407b72ecb3fd5bc17f3", null ],
+    [ "ProcessIncomingMessage", "classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368", null ],
+    [ "ProcessMessageContent", "classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac", null ],
+    [ "ProcessSystemCommand", "classMessageProcessor.html#a901206afb9503ef54fdba2a2a594b5df", null ],
+    [ "ProcessUserJoined", "classMessageProcessor.html#aa940a58824294fd7b610b0f489e467b5", null ],
+    [ "ProcessUserLeft", "classMessageProcessor.html#aabbee5921374be8f4d7e423c5bfe07ae", null ],
+    [ "ProcessWavelengthClosed", "classMessageProcessor.html#a8cc47128d254eb378c4988551725ba95", null ],
+    [ "pttDenied", "classMessageProcessor.html#a8a7d6f3aa3796919753ab2c6f222303c", null ],
+    [ "pttGranted", "classMessageProcessor.html#ab39baddad577c52d27adc8689857a154", null ],
+    [ "pttStartReceiving", "classMessageProcessor.html#a22bcd6ed76175518ae1d02d3cd34e830", null ],
+    [ "pttStopReceiving", "classMessageProcessor.html#a81d299c293bcea69de997931c2b5370f", null ],
+    [ "remoteAudioAmplitudeUpdate", "classMessageProcessor.html#afe988619e44bae35710d27d1f22bdacb", null ],
+    [ "SetSocketMessageHandlers", "classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862", null ],
+    [ "systemMessage", "classMessageProcessor.html#a61e0cab5d5efc6d69d06e842ccd17f71", null ],
+    [ "userKicked", "classMessageProcessor.html#a8ed146c169da49d70d3d516e1c8e0e8b", null ],
+    [ "wavelengthClosed", "classMessageProcessor.html#a857bd885170f17df9b31bc85ccece812", null ]
+];

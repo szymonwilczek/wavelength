@@ -1,0 +1,13 @@
+<map id="WavelengthStateManager::GetWavelengthCreationTime" name="WavelengthStateManager::GetWavelengthCreationTime">
+<area shape="rect" id="Node000001" title="Gets the creation timestamp of a specific wavelength." alt="" coords="5,37,200,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="248,37,417,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,54,232,54,232,59,200,59"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="466,5,603,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="417,41,451,35,451,41,418,46"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="465,68,604,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="418,67,450,72,449,77,417,72"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="652,5,798,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="604,22,637,22,637,27,604,27"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="656,68,794,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="605,85,641,85,641,90,605,90"/>
+</map>

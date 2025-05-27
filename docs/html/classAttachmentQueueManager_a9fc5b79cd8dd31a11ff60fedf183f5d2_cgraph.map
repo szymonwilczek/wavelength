@@ -1,0 +1,7 @@
+<map id="AttachmentQueueManager::AddTask" name="AttachmentQueueManager::AddTask">
+<area shape="rect" id="Node000001" title="Adds a new task (represented by a std::function) to the execution queue. Creates an AttachmentTask wr..." alt="" coords="5,26,182,65"/>
+<area shape="rect" id="Node000002" href="$classAttachmentTask.html#a08ea014777b2a92f1863c8bca688e0e9" title="Emitted after the task function (TaskFunc_) has finished executing." alt="" coords="234,5,402,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,32,218,27,218,33,182,37"/>
+<area shape="rect" id="Node000003" href="$classAttachmentQueueManager.html#aab8e65b34981358a309208cf2118febe" title="Processes the task queue, starting new tasks if slots are available. Checks if the number of active t..." alt="" coords="230,54,406,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,54,214,58,214,63,181,59"/>
+</map>

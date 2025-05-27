@@ -1,0 +1,5 @@
+<map id="IdleState::ApplyHeartbeatEffect" name="IdleState::ApplyHeartbeatEffect">
+<area shape="rect" id="Node000001" title="Applies a pulsating &quot;heartbeat&quot; effect to the blob. Used during the initial phase after entering the ..." alt="" coords="168,5,340,44"/>
+<area shape="rect" id="Node000002" href="$classIdleState.html#aa008ead194b81d1f7aedf5234c53b4f2" title="Applies the idle animation effects (waves, rotation, centering) or the initial heartbeat effect...." alt="" coords="5,12,120,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,27,120,27,120,22,152,22"/>
+</map>

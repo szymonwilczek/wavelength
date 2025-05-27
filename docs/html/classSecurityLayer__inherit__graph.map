@@ -1,0 +1,21 @@
+<map id="SecurityLayer" name="SecurityLayer">
+<area shape="rect" id="Node000001" title="Abstract base class for individual security challenge layers." alt="" coords="770,117,938,266"/>
+<area shape="rect" id="Node000003" href="$classFingerprintLayer.html" title="A security layer simulating fingerprint authentication." alt="" coords="5,463,202,937"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="756,202,615,215,455,237,379,252,310,270,255,292,216,316,187,348,164,384,145,423,131,464,126,463,140,421,159,381,183,344,213,312,252,287,309,265,377,247,454,232,615,209,756,196"/>
+<area shape="rect" id="Node000004" href="$classHandprintLayer.html" title="A security layer simulating handprint authentication." alt="" coords="227,463,421,937"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="756,197,678,207,591,228,549,243,507,263,469,287,435,316,408,348,385,385,367,424,353,465,348,463,362,422,381,382,403,345,431,312,466,282,505,258,547,238,590,222,677,202,755,192"/>
+<area shape="rect" id="Node000005" href="$classRetinaScanLayer.html" title="A security layer simulating a retina scan process." alt="" coords="446,525,624,876"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="758,229,693,265,664,288,638,316,607,364,583,416,565,471,553,525,548,524,560,470,578,414,602,361,634,312,660,284,690,260,756,224"/>
+<area shape="rect" id="Node000006" href="$classSecurityCodeLayer.html" title="A security layer requiring the user to enter a 4&#45;character security code." alt="" coords="648,423,842,978"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="838,281,807,424,802,423,833,280"/>
+<area shape="rect" id="Node000007" href="$classSecurityQuestionLayer.html" title="A security layer simulating a security question challenge." alt="" coords="867,542,1064,858"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="876,280,934,542,928,543,871,281"/>
+<area shape="rect" id="Node000008" href="$classSnakeGameLayer.html" title="A security layer implementing a classic Snake game as a challenge." alt="" coords="1088,314,1285,1087"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="954,224,1020,260,1051,284,1078,312,1090,329,1086,332,1074,316,1047,288,1017,265,951,229"/>
+<area shape="rect" id="Node000009" href="$classTypingTestLayer.html" title="A security layer implementing a typing verification test." alt="" coords="1309,468,1482,933"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="954,205,1050,223,1151,248,1241,277,1275,294,1299,312,1327,346,1349,384,1367,425,1380,467,1375,469,1362,427,1345,387,1323,349,1295,316,1272,299,1239,282,1150,253,1049,229,953,211"/>
+<area shape="rect" id="Node000010" href="$classVoiceRecognitionLayer.html" title="A security layer simulating voice recognition verification." alt="" coords="1506,353,1691,1048"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="954,196,1095,209,1255,231,1332,247,1401,265,1457,287,1496,312,1530,351,1526,355,1493,316,1454,291,1399,270,1331,252,1254,237,1094,214,953,201"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="824,5,885,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="857,84,857,117,852,117,852,84"/>
+</map>

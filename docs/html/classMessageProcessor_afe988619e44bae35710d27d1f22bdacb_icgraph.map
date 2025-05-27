@@ -1,0 +1,13 @@
+<map id="MessageProcessor::remoteAudioAmplitudeUpdate" name="MessageProcessor::remoteAudioAmplitudeUpdate">
+<area shape="rect" id="Node000001" title="Emitted when the server sends an update about the remote audio amplitude (optional)." alt="" coords="767,37,949,76"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#af12c62b3127edeb52c44b4ef1137eff7" title="Private constructor to enforce the singleton pattern. Connects internal signals to the corresponding ..." alt="" coords="525,5,719,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="752,45,719,41,720,35,752,40"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="528,68,717,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="752,73,717,78,717,72,751,68"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="276,68,477,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="512,90,477,90,477,85,512,85"/>
+<area shape="rect" id="Node000005" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="47,40,186,79"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="260,77,186,69,187,64,260,72"/>
+<area shape="rect" id="Node000007" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="5,103,228,128"/>
+<area shape="poly" id="edge5_Node000004_Node000007" title=" " alt="" coords="261,102,229,106,228,101,260,97"/>
+</map>

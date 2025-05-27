@@ -1,0 +1,5 @@
+<map id="Navbar::PlayClickSound" name="Navbar::PlayClickSound">
+<area shape="rect" id="Node000001" title="Plays a predefined click sound effect. Triggered when any of the main action buttons are clicked." alt="" coords="167,5,331,30"/>
+<area shape="rect" id="Node000002" href="$classNavbar.html#a04ffab38c9324469760999c0e5822992" title="Constructs the Navbar. Initializes the toolbar&#39;s appearance and behavior (non&#45;movable,..." alt="" coords="5,5,119,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,20,119,20,119,15,151,15"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="AttachmentViewer::SetDecryptionCounter" name="AttachmentViewer::SetDecryptionCounter">
+<area shape="rect" id="Node000001" title="Sets the decryption progress counter (0&#45;100). Updates the internal value, updates the status label te..." alt="" coords="5,37,225,76"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#a37125c2f6e7eda53cd7a02ff5de60a97" title="Emitted when the decryptionCounter property changes. Connected to the MaskOverlay&#39;s SetRevealProgress..." alt="" coords="273,5,469,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,40,257,36,258,41,226,46"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a0ec55f1bb4c15bac94e09814d0bf844f" title="Updates the status label text to show the current decryption percentage." alt="" coords="282,68,460,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,67,267,72,266,78,225,72"/>
+</map>

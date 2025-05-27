@@ -1,0 +1,5 @@
+<map id="VideoPlayer::AdjustVolume" name="VideoPlayer::AdjustVolume">
+<area shape="rect" id="Node000001" title="Adjusts the playback volume via the VideoDecoder. Also updates the volume icon based on the new volum..." alt="" coords="5,5,184,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a9c9f4464260500d2a27d2feab1e1fd7d" title="Updates the volume button icon based on the current volume level. Shows different icons for muted,..." alt="" coords="232,5,440,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,15,216,15,216,20,184,20"/>
+</map>

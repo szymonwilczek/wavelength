@@ -1,0 +1,5 @@
+<map id="OverlayWidget::UpdateGeometry" name="OverlayWidget::UpdateGeometry">
+<area shape="rect" id="Node000001" title="Updates the geometry of the overlay widget. Typically called when the parent widget resizes." alt="" coords="228,5,442,30"/>
+<area shape="rect" id="Node000002" href="$classOverlayWidget.html#a486a46b8d0f9a64cbddeb283735f1462" title="Filters events from the parent widget. Specifically, watches for Resize events on the parent to call ..." alt="" coords="5,5,180,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,20,180,20,180,15,212,15"/>
+</map>

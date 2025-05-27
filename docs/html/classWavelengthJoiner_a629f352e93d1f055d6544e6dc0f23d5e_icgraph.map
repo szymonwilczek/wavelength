@@ -1,0 +1,20 @@
+<map id="WavelengthJoiner::WavelengthJoiner" name="WavelengthJoiner::WavelengthJoiner">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern." alt="" coords="658,145,857,184"/>
+<area shape="rect" id="Node000002" href="$classWavelengthJoiner.html#a793fbc6ca34a34f0a2ac3df5006bc345" title="Gets the singleton instance of the WavelengthJoiner." alt="" coords="408,103,610,128"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="643,145,574,131,576,126,644,139"/>
+<area shape="rect" id="Node000008" href="$classWavelengthJoiner.html#aecb9a679a69c1caf896ea18c61a9cf3f" title="Deleted assignment operator to prevent assignment." alt="" coords="416,152,602,177"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="643,167,603,167,603,162,643,162"/>
+<area shape="rect" id="Node000009" href="$classWavelengthJoiner.html#afb262c9376fa0860bfaf4d79c27da9f2" title="Deleted copy constructor to prevent copying." alt="" coords="410,201,608,240"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="654,191,599,203,598,198,653,185"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="218,5,353,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="461,99,334,47,336,42,463,94"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="218,68,353,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="392,103,353,98,354,93,393,98"/>
+<area shape="rect" id="Node000006" href="$classJoinWavelengthDialog.html#a22f6a3f4da1054f306ee566edf3f2d74" title="Constructs a JoinWavelengthDialog. Sets up the UI elements (labels, input fields, buttons),..." alt="" coords="5,153,163,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="398,133,163,165,163,159,397,128"/>
+<area shape="rect" id="Node000007" href="$classJoinWavelengthDialog.html#a0cb74ecdcc726cea2ce437c85cd75185" title="Attempts to join the wavelength using the entered frequency and password. Shows a wait cursor,..." alt="" coords="211,183,360,221"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="434,135,409,143,326,184,324,180,407,138,433,130"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="16,5,152,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,27,152,27,152,22,202,22"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="195,192,163,187,163,182,195,186"/>
+</map>

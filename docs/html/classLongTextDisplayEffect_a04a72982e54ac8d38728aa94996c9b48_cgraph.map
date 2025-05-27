@@ -1,0 +1,10 @@
+<map id="LongTextDisplayEffect::sizeHint" name="LongTextDisplayEffect::sizeHint">
+<area shape="rect" id="Node000001" title="Returns the recommended size for the widget based on the processed text content. The height is calcul..." alt="" coords="5,35,158,73"/>
+<area shape="rect" id="Node000002" href="$classLongTextDisplayEffect.html#a515b93e6788d2cbb060950762233b25a" title="Constructs a CyberLongTextDisplay widget. Initializes the widget with default size policies,..." alt="" coords="206,5,366,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,40,190,36,191,41,158,46"/>
+<area shape="rect" id="Node000003" href="$classLongTextDisplayEffect.html#a3c62e6c78599b4e8eac2ef62cdae7319" title="Processes the original_text_ into wrapped lines based on the current widget width...." alt="" coords="414,35,566,73"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="158,52,206,53,366,53,398,52,398,58,366,58,206,58,158,58"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,34,399,38,398,44,366,39"/>
+<area shape="rect" id="Node000004" href="$classLongTextDisplayEffect.html#aa577c95b45549f021c2ca984f7e5f8b3" title="Emitted after ProcessText() finishes, indicating the total calculated height required to display all ..." alt="" coords="614,35,777,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="567,51,599,51,599,57,567,57"/>
+</map>

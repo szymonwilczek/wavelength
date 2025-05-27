@@ -1,0 +1,18 @@
+<map id="RetinaScanLayer::RetinaScanLayer" name="RetinaScanLayer::RetinaScanLayer">
+<area shape="rect" id="Node000001" title="Constructs a RetinaScanLayer. Initializes the UI elements (title, eye image container,..." alt="" coords="5,112,200,151"/>
+<area shape="rect" id="Node000002" href="$classRetinaScanLayer.html#a6b4dfb9d13e9c9e6328441272084276a" title="Slot called when the scan completes (either by timer or scanline finishing). Changes the UI element s..." alt="" coords="495,150,687,174"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,109,256,102,318,97,383,97,448,105,503,120,552,140,550,145,501,125,446,110,383,103,319,102,256,107,200,114"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="280,5,414,44"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="143,109,247,61,279,48,281,52,249,66,145,114"/>
+<area shape="rect" id="Node000006" href="$classSecurityLayer.html#adc79fa2453a0034a739a7cfcc225db42" title="Constructs a SecurityLayer." alt="" coords="254,119,441,144"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="200,129,238,129,238,134,200,134"/>
+<area shape="rect" id="Node000007" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="280,168,414,207"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="191,149,266,166,265,171,190,154"/>
+<area shape="rect" id="Node000008" href="$classRetinaScanLayer.html#a52b3474809f40e8accf0e6f50d3c52f6" title="Slot called periodically by scan_timer_ to update the scan animation. Increments the progress bar,..." alt="" coords="248,231,447,256"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="132,149,185,184,249,217,267,224,265,229,247,222,182,188,129,153"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="735,150,934,174"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="688,159,720,159,720,165,688,165"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="520,5,662,44"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="415,22,504,22,504,27,415,27"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="407,228,446,217,547,178,548,183,448,222,409,233"/>
+</map>

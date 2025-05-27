@@ -1,0 +1,7 @@
+<map id="HandprintLayer::Initialize" name="HandprintLayer::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the layer for display. Resets the progress bar and styles, loads the handprint image,..." alt="" coords="5,40,169,65"/>
+<area shape="rect" id="Node000002" href="$classHandprintLayer.html#a31eca202e668de15d68c25079b26c67e" title="Loads the handprint SVG file from handprint_files_ and renders it into base_handprint_...." alt="" coords="217,5,409,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,40,201,36,202,41,169,45"/>
+<area shape="rect" id="Node000003" href="$classHandprintLayer.html#af7b461fb0f3cfe04c444854395f485c8" title="Resets the layer to its initial state. Stops the progress timer, resets the progress bar value and st..." alt="" coords="238,68,388,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,60,222,67,222,72,169,65"/>
+</map>

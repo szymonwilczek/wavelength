@@ -1,0 +1,5 @@
+<map id="GLTransitionWidget::GLTransitionWidget" name="GLTransitionWidget::GLTransitionWidget">
+<area shape="rect" id="Node000001" title="Constructs a GLTransitionWidget. Initializes the QPropertyAnimation for the offset and sets widget at..." alt="" coords="5,5,148,44"/>
+<area shape="rect" id="Node000002" href="$classGLTransitionWidget.html#a5a60a614a06573740a7499ce5e52439d" title="Emitted when the transition animation (QPropertyAnimation) finishes." alt="" coords="196,5,330,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,22,180,22,180,27,148,27"/>
+</map>

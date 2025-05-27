@@ -1,0 +1,8 @@
+<map id="CreateWavelengthDialog::OnFrequencyFound" name="CreateWavelengthDialog::OnFrequencyFound">
+<area shape="rect" id="Node000001" title="Slot triggered when the frequency search (FindLowestAvailableFrequency) completes...." alt="" coords="438,5,602,44"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#acb82ee7ee77da3a02fbd18f622f3c660" title="Constructs a WavelengthDialog. Sets up the UI elements (labels, input fields, buttons,..." alt="" coords="5,5,178,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,24,390,23,226,23,178,24,178,19,226,18,390,18,422,19"/>
+<area shape="rect" id="Node000003" href="$classCreateWavelengthDialog.html#aac53c51a52d92e2ccc1a0f945aaec449" title="Starts the asynchronous process of finding the lowest available frequency via the relay server...." alt="" coords="226,33,390,72"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="423,40,391,44,390,39,422,35"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="210,43,178,39,179,33,211,37"/>
+</map>

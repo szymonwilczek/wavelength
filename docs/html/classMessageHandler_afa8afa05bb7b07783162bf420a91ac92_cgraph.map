@@ -1,0 +1,5 @@
+<map id="MessageHandler::GetInstance" name="MessageHandler::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the MessageHandler." alt="" coords="5,5,204,30"/>
+<area shape="rect" id="Node000002" href="$classMessageHandler.html#ad3b43ca875118c1bafa19f354678cbec" title="Private constructor to enforce the singleton pattern." alt="" coords="252,5,477,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,15,236,15,236,20,204,20"/>
+</map>

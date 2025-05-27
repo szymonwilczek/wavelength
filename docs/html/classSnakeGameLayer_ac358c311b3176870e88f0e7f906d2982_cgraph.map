@@ -1,0 +1,7 @@
+<map id="SnakeGameLayer::InitializeGame" name="SnakeGameLayer::InitializeGame">
+<area shape="rect" id="Node000001" title="Sets up the initial state of the game board and snake. Clears the grid, places the snake in the cente..." alt="" coords="5,40,219,65"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#af54d4598528129caff991bee016d961d" title="Generates a new apple at a random empty cell on the grid." alt="" coords="278,5,462,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,38,262,34,263,39,219,44"/>
+<area shape="rect" id="Node000003" href="$classSnakeGameLayer.html#abd0a2b6324682d0883a41d5ebae0cc39" title="Renders the current state of the game onto the game_board_ QLabel. Draws the grid,..." alt="" coords="267,68,474,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="219,62,251,65,251,70,219,67"/>
+</map>

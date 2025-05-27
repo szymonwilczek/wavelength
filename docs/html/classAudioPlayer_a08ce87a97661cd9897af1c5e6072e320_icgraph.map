@@ -1,0 +1,5 @@
+<map id="AudioPlayer::PaintSpectrum" name="AudioPlayer::PaintSpectrum">
+<area shape="rect" id="Node000001" title="Custom painting method for the spectrum visualization widget. Draws a background grid and vertical ba..." alt="" coords="212,5,396,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#aa33925aea18fdd7df014853c67922a32" title="Overridden event filter. Intercepts paint events for the spectrum_view_ widget to call the custom Pai..." alt="" coords="5,5,164,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,20,164,20,164,15,196,15"/>
+</map>

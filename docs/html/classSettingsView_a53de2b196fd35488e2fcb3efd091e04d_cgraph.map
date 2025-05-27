@@ -1,0 +1,12 @@
+<map id="SettingsView::SaveSettings" name="SettingsView::SaveSettings">
+<area shape="rect" id="Node000001" title="Saves all current settings from the various tabs to the WavelengthConfig object and persists them...." alt="" coords="5,86,188,110"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a785ee2205518cfe2ba40c8c818cf9b0b" title="Gets the singleton instance of the ShortcutManager." alt="" coords="251,36,451,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,82,268,62,269,67,164,88"/>
+<area shape="rect" id="Node000004" href="$classSettingsView.html#ae9abfe25abeea5fa897efdf85e9a4cab" title="Emitted when settings are saved or restored to defaults, indicating that other parts of the applicati..." alt="" coords="249,86,452,110"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="188,95,234,95,234,101,188,101"/>
+<area shape="rect" id="Node000005" href="$classShortcutManager.html#a001d08c7f43e1e651eabc5ef353da310" title="Updates the key sequences for all currently registered shortcuts." alt="" coords="236,135,466,173"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="157,108,246,128,245,133,156,114"/>
+<area shape="rect" id="Node000003" href="$classShortcutManager.html#a3bfcb924aeb88b7e4baded8bd37ed3c4" title="Deleted copy constructor to prevent copying." alt="" coords="514,29,693,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="451,46,498,46,498,51,451,51"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="557,30,554,20,561,10,578,5,604,3,631,5,648,11,646,16,630,10,604,8,579,10,564,15,559,21,562,28"/>
+</map>

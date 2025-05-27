@@ -1,0 +1,65 @@
+<map id="BlobAnimation::BlobAnimation" name="BlobAnimation::BlobAnimation">
+<area shape="rect" id="Node000001" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,603,203,628"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a48ba42d68eb17ce96466930166b1722c" title="Slot connected to window_position_timer_. Called frequently to check the window position...." alt="" coords="263,5,462,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,602,119,497,149,331,169,244,193,164,219,98,234,73,249,54,250,52,254,56,253,57,238,76,224,101,198,166,175,246,154,332,125,498,110,603"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#a785a7b849357d099ea2bbf0d5c9e953f" title="Emitted when event processing is re&#45;enabled after being disabled." alt="" coords="277,68,448,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="102,603,104,521,110,459,120,390,138,317,164,244,200,176,223,145,249,116,262,106,265,110,252,120,227,148,205,179,169,246,143,319,125,391,115,460,109,521,108,603"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#a1e01ece4ceabead4dfc94927040b8e56" title="Gets the main background color." alt="" coords="251,131,474,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="103,602,108,529,115,475,128,415,146,352,171,289,205,230,249,179,251,177,255,181,253,183,210,233,176,291,151,354,133,416,121,476,113,529,108,603"/>
+<area shape="rect" id="Node000005" href="$classWavelengthConfig.html#ac3b9b097dc17cd31a21a6245ffaaa74b" title="Gets the color used for the blob animation." alt="" coords="272,193,453,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="104,602,112,538,135,441,154,387,178,334,210,285,249,241,257,235,260,239,252,245,214,288,183,337,159,389,140,442,118,539,109,603"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html#a8326430efbbfc3bb57baeaef807d7282" title="Gets the color for the background grid lines." alt="" coords="273,256,452,295"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="105,602,117,547,143,467,162,423,186,379,214,339,249,304,258,297,261,302,252,308,219,342,190,382,167,425,148,469,122,549,110,603"/>
+<area shape="rect" id="Node000007" href="$classWavelengthConfig.html#a986fd6f61f35d0bb9319577d25aad683" title="Gets the spacing between background grid lines in pixels." alt="" coords="273,319,452,357"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="107,601,123,557,151,494,193,426,219,395,249,368,258,362,261,366,252,372,223,399,197,429,156,496,127,559,112,603"/>
+<area shape="rect" id="Node000008" href="$classWavelengthConfig.html#abe95f3b7789e1e60f7bd535352644c0d" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="260,382,465,406"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="109,601,128,565,158,517,199,466,249,422,273,410,276,414,252,427,203,470,163,520,133,568,114,604"/>
+<area shape="rect" id="Node000010" href="$classBlobAnimation.html#a36a2a04ace71e1fefc7c1c0cfd1f9e18" title="Slot connected to resize_debounce_timer_. Called after a short delay following resize events...." alt="" coords="266,481,459,520"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="126,600,182,570,250,537,284,523,286,528,252,542,184,575,129,605"/>
+<area shape="rect" id="Node000013" href="$classBlobAnimation.html#a90940f8b5f62d348952264e233b2aafb" title="Switches the blob&#39;s current animation state (Idle, Moving, Resizing). Updates the current_blob_state_..." alt="" coords="796,546,994,570"/>
+<area shape="poly" id="edge29_Node000001_Node000013" title=" " alt="" coords="154,600,250,581,393,566,536,558,780,554,780,559,536,563,393,572,251,586,155,605"/>
+<area shape="rect" id="Node000014" href="$classBlobAnimation.html#a2b520d867895a9631aaa1a88e64ada61" title="Initializes the blob&#39;s state (control points, target points, velocity, center) based on current param..." alt="" coords="538,432,725,457"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="111,601,131,572,162,534,202,496,250,466,318,443,389,431,459,427,523,429,523,434,459,433,390,436,319,448,252,471,206,500,166,537,136,575,115,604"/>
+<area shape="rect" id="Node000015" href="$classBlobEventHandler.html#aad583f5951b3014d66d3914a8d060cad" title="Emitted periodically during window movement to provide samples for velocity calculation...." alt="" coords="266,596,459,635"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="203,613,250,613,250,618,203,618"/>
+<area shape="rect" id="Node000016" href="$classBlobTransitionManager.html#a0368480b181fcb29158d53c685bcd9e9" title="Emitted when the inactivity counter exceeds a threshold, indicating that window movement has stopped." alt="" coords="286,659,439,697"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="159,626,271,653,270,658,158,631"/>
+<area shape="rect" id="Node000017" href="$classBlobAnimation.html#aa14ab827c77e7ca4e2869e5141ce27ea" title="Slot connected to state_reset_timer_. Called after a period of inactivity in Moving or Resizing state..." alt="" coords="536,656,728,695"/>
+<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="121,626,175,668,212,690,251,706,290,715,329,720,409,720,485,710,550,696,551,702,486,715,409,725,329,725,289,720,250,711,210,695,172,673,118,630"/>
+<area shape="rect" id="Node000018" href="$classBlobAnimation.html#aa73097d69b36c02d99a41b8ab782b012" title="The main function executed by the physics simulation thread. Enters a loop that repeatedly calls upda..." alt="" coords="263,773,462,812"/>
+<area shape="poly" id="edge20_Node000001_Node000018" title=" " alt="" coords="118,627,171,686,210,721,252,752,277,765,275,769,249,756,206,725,168,690,114,630"/>
+<area shape="rect" id="Node000024" href="$classBlobEventHandler.html#adee9e347de86d1914b6671935d9bd758" title="Emitted during a resize event to request a specific &quot;resizing&quot; state in the Blob animation." alt="" coords="279,836,446,875"/>
+<area shape="poly" id="edge25_Node000001_Node000024" title=" " alt="" coords="113,627,131,665,160,718,201,773,226,799,252,821,266,830,264,834,249,826,222,803,197,777,156,720,126,667,108,629"/>
+<area shape="rect" id="Node000025" href="$classBlobTransitionManager.html#a106ed377c5900517cd28d562734277fe" title="Emitted when the calculated velocity exceeds a threshold, indicating significant window movement." alt="" coords="262,899,463,937"/>
+<area shape="poly" id="edge26_Node000001_Node000025" title=" " alt="" coords="111,627,125,675,152,745,171,782,194,820,221,854,252,884,258,888,255,893,249,888,217,858,190,823,167,785,148,747,120,677,106,629"/>
+<area shape="rect" id="Node000026" href="$classBlobEventHandler.html#a608f7c9b14093c8e0a02be39d780af3d" title="Emitted when a significant resize event is detected after throttling." alt="" coords="266,961,458,1000"/>
+<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="110,628,120,686,145,772,164,819,188,866,217,909,252,947,258,951,254,955,249,951,213,912,183,868,159,821,140,773,115,687,104,629"/>
+<area shape="rect" id="Node000027" href="$classBlobEventHandler.html#aad7907b15e659d39275aa21d97a0665c" title="Emitted after a resize event to request resetting any temporary state timers." alt="" coords="264,1024,460,1063"/>
+<area shape="poly" id="edge28_Node000001_Node000027" title=" " alt="" coords="109,628,116,695,138,798,156,855,181,911,213,964,253,1009,257,1013,253,1017,249,1013,208,967,176,914,151,857,132,799,111,696,103,628"/>
+<area shape="rect" id="Node000028" href="$classBlobTransitionManager.html#ace325f2fb00583ebeb4ab4993f018df1" title="Emitted when a transition (e.g., to idle state) completes." alt="" coords="286,1087,439,1125"/>
+<area shape="poly" id="edge30_Node000001_Node000028" title=" " alt="" coords="108,628,112,704,119,760,130,824,148,890,174,956,208,1018,252,1072,273,1086,270,1091,249,1076,204,1021,169,958,143,892,125,825,113,761,107,705,103,628"/>
+<area shape="rect" id="Node000029" href="$classBlobAnimation.html#a09f6a9ff089a61d4ddb808e3caf388e2" title="Slot connected to animation_timer_. Called periodically (~60 FPS) to update the animation state...." alt="" coords="257,1150,468,1174"/>
+<area shape="poly" id="edge31_Node000001_Node000029" title=" " alt="" coords="110,628,126,727,156,881,176,961,199,1035,225,1095,253,1135,258,1139,254,1143,249,1138,220,1098,194,1037,171,963,151,882,120,728,104,628"/>
+<area shape="rect" id="Node000031" href="$classBlobEventHandler.html#ac63c9e11e620e4d19e4e2ca2b264087b" title="Emitted when a significant window move event is detected after throttling." alt="" coords="274,1199,451,1237"/>
+<area shape="poly" id="edge33_Node000001_Node000031" title=" " alt="" coords="110,628,124,735,154,903,174,992,197,1073,224,1140,238,1165,253,1184,262,1193,259,1197,249,1188,233,1168,219,1142,192,1075,169,993,149,905,119,736,104,629"/>
+<area shape="rect" id="Node000009" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="531,369,732,408"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="466,389,515,388,516,394,466,395"/>
+<area shape="poly" id="edge9_Node000009_Node000009" title=" " alt="" coords="583,370,580,360,587,350,605,345,632,343,661,345,677,351,675,356,659,350,632,348,606,350,590,355,585,361,588,368"/>
+<area shape="rect" id="Node000011" href="$classBlobAnimation.html#a883189070c4bbe6054d084c4d4184c0a" title="Resets the blob&#39;s position to the center of the widget and regenerates its shape. Clears velocities a..." alt="" coords="545,481,718,520"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="460,498,530,498,530,503,460,503"/>
+<area shape="rect" id="Node000012" href="$classBlobAnimation.html#a152a62b2db9d731d14939708a4a8496a" title="Generates a set of points forming an organic, blob&#45;like shape around a center point...." alt="" coords="789,453,1001,492"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="718,489,774,483,774,488,719,494"/>
+<area shape="poly" id="edge13_Node000011_Node000013" title=" " alt="" coords="719,517,820,539,819,544,718,522"/>
+<area shape="poly" id="edge15_Node000014_Node000012" title=" " alt="" coords="726,452,774,457,774,462,725,457"/>
+<area shape="poly" id="edge19_Node000017_Node000013" title=" " alt="" coords="676,653,850,575,852,580,678,658"/>
+<area shape="rect" id="Node000019" href="$classBlobAnimation.html#a41f88c30a6e349bb0a08b0f37db151e3" title="Slot (or helper called by physics thread) to update the blob&#39;s physics simulation...." alt="" coords="532,780,731,805"/>
+<area shape="poly" id="edge21_Node000018_Node000019" title=" " alt="" coords="463,790,517,790,517,795,463,795"/>
+<area shape="rect" id="Node000020" href="$classBlobPhysics.html#aad5dc54cd1600108772e45e8ed43af40" title="Enforces minimum and maximum distance constraints between neighboring control points...." alt="" coords="790,829,1000,868"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="694,803,787,823,785,828,693,808"/>
+<area shape="rect" id="Node000022" href="$classBlobPhysics.html#ab10ff17b667674fbdc49c61ae65cef92" title="Handles collisions between blob control points and the widget borders. Adjusts positions and reverses..." alt="" coords="805,717,985,756"/>
+<area shape="poly" id="edge23_Node000019_Node000022" title=" " alt="" coords="693,777,789,756,790,762,694,782"/>
+<area shape="rect" id="Node000023" href="$classBlobPhysics.html#aaa1ea680c71270e1150272e9483cfff2" title="Applies a smoothing filter to the blob&#39;s shape. Moves each control point slightly towards the average..." alt="" coords="790,780,1000,805"/>
+<area shape="poly" id="edge24_Node000019_Node000023" title=" " alt="" coords="731,790,775,790,775,795,731,795"/>
+<area shape="rect" id="Node000030" href="$classBlobAnimation.html#a81dce6351b80274f5d16cf564025e2c4" title="Slot (or helper called by updateAnimation) to process the window movement buffer via BlobTransitionMa..." alt="" coords="522,1143,741,1181"/>
+<area shape="poly" id="edge32_Node000029_Node000030" title=" " alt="" coords="468,1159,507,1159,507,1165,468,1165"/>
+</map>

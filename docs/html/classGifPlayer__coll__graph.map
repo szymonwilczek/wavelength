@@ -1,0 +1,20 @@
+<map id="GifPlayer" name="GifPlayer">
+<area shape="rect" id="Node000001" title="A widget for displaying and playing animated GIFs within a chat interface." alt="" coords="142,1394,336,1979"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="64,1088,121,1151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,1165,136,1331,152,1394,147,1395,131,1333,97,1166"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="145,1088,333,1151"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="242,1151,242,1377,236,1377,236,1151"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html" title="Decodes GIF data frame by frame using FFmpeg libraries in a separate thread." alt="" coords="5,131,203,845"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="183,845,232,1071,226,1072,178,846"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="74,5,135,69"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="107,84,107,131,102,131,102,84"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="228,456,357,520"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="291,534,244,1088,239,1088,286,534"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="283,5,302,69"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="295,68,295,440,290,440,290,68"/>
+<area shape="rect" id="Node000008" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="356,907,570,1332"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="382,1333,345,1426,340,1424,377,1331"/>
+<area shape="poly" id="edge9_Node000008_Node000008" title=" " alt="" coords="571,1077,589,1093,596,1120,593,1138,585,1152,580,1149,588,1136,591,1120,584,1096,567,1081"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="434,456,492,520"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="466,534,466,907,460,907,460,534"/>
+</map>

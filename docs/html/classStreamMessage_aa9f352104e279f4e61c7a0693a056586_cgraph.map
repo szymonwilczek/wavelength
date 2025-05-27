@@ -1,0 +1,5 @@
+<map id="StreamMessage::ShowNavigationButtons" name="StreamMessage::ShowNavigationButtons">
+<area shape="rect" id="Node000001" title="Shows or hides the navigation buttons (Next, Previous) and the Mark Read button. Updates the layout t..." alt="" coords="5,5,225,44"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a520ebf30923492083e94819640a79323" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="273,12,477,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,22,257,22,257,27,225,27"/>
+</map>

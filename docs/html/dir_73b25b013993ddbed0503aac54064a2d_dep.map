@@ -1,0 +1,29 @@
+<map id="src/ui/settings/tabs/classified/layers" name="src/ui/settings/tabs/classified/layers">
+<area shape="rect" id="node2" href="dir_6ce25797e91e85f2620a6822d7183482.html" title="code" alt="" coords="118,62,167,87"/>
+<area shape="rect" id="node10" href="dir_5194e5fea318fda12687127c23f8aba1.html" title="app" alt="" coords="459,135,501,159"/>
+<area shape="poly" id="edge1" href="dir_000011_000000.html" alt="" coords="154,85,166,96,180,106,230,119,302,130,443,141,443,146,302,135,229,125,178,110,162,101,150,89"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000011_000000.html" title="1" alt="" coords="437,128,444,142"/>
+<area shape="rect" id="node3" href="dir_5fdeceb31487967ff70df32a2bd1dd02.html" title="fingerprint" alt="" coords="191,62,270,87"/>
+<area shape="poly" id="edge2" href="dir_000028_000000.html" alt="" coords="247,85,284,106,325,119,368,129,444,140,443,145,367,134,324,124,282,110,244,89"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000028_000000.html" title="1" alt="" coords="438,127,445,141"/>
+<area shape="rect" id="node4" href="dir_38c5dca69bda0bc021c09acaef3fb0dc.html" title="handprint" alt="" coords="295,62,369,87"/>
+<area shape="poly" id="edge3" href="dir_000032_000000.html" alt="" coords="349,85,383,106,445,132,443,137,380,110,346,89"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000032_000000.html" title="1" alt="" coords="440,118,447,132"/>
+<area shape="rect" id="node5" href="dir_fdc357cb9fc7c869861b7014f7628171.html" title="question" alt="" coords="393,62,463,87"/>
+<area shape="poly" id="edge4" href="dir_000047_000000.html" alt="" coords="439,86,465,121,460,124,434,89"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000047_000000.html" title="1" alt="" coords="464,108,471,122"/>
+<area shape="rect" id="node6" href="dir_18d6a4607b827eab2fc8cd963a741965.html" title="retina_scan" alt="" coords="488,62,576,87"/>
+<area shape="poly" id="edge5" href="dir_000049_000000.html" alt="" coords="526,89,500,124,495,121,521,86"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000049_000000.html" title="1" alt="" coords="503,118,510,132"/>
+<area shape="rect" id="node7" href="dir_0ad7bb40d87f02e5be4966b8e1ac6677.html" title="snake_game" alt="" coords="601,62,695,87"/>
+<area shape="poly" id="edge6" href="dir_000056_000000.html" alt="" coords="630,90,589,110,517,137,515,132,587,106,627,85"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000056_000000.html" title="1" alt="" coords="518,135,525,149"/>
+<area shape="rect" id="node8" href="dir_88fdf9e53474d81fb6ef5f057e0e6f50.html" title="typing_test" alt="" coords="719,62,804,87"/>
+<area shape="poly" id="edge7" href="dir_000063_000000.html" alt="" coords="747,90,708,110,657,126,605,136,517,146,516,141,604,131,656,120,706,106,744,85"/>
+<area shape="rect" id="edge7-headlabel" href="dir_000063_000000.html" title="1" alt="" coords="516,145,523,159"/>
+<area shape="rect" id="node9" href="dir_6346bce032bc8647b39b64cba7f1a4ac.html" title="voice_recognition" alt="" coords="829,62,950,87"/>
+<area shape="poly" id="edge8" href="dir_000069_000000.html" alt="" coords="869,90,817,111,734,128,650,139,517,148,517,143,650,134,733,123,815,105,867,85"/>
+<area shape="rect" id="edge8-headlabel" href="dir_000069_000000.html" title="1" alt="" coords="516,147,523,161"/>
+<area shape="rect" id="clust2" href="dir_73b25b013993ddbed0503aac54064a2d.html" alt="" coords="27,51,961,97"/>
+<area shape="rect" id="clust1" href="dir_30f2727690e99ba81a73188f7dd8c44f.html" title="classified" alt="" coords="16,16,972,108"/>
+</map>

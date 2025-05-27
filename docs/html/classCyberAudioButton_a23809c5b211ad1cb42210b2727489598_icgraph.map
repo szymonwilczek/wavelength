@@ -1,0 +1,5 @@
+<map id="CyberAudioButton::SetGlowIntensity" name="CyberAudioButton::SetGlowIntensity">
+<area shape="rect" id="Node000001" title="Sets the intensity of the glow effect. Triggers a repaint of the button." alt="" coords="257,5,442,44"/>
+<area shape="rect" id="Node000002" href="$classCyberAudioButton.html#a358d294dcd146d17cfeeb4f85e0e9c83" title="Constructs a CyberAudioButton. Initializes the button style (transparent background,..." alt="" coords="5,5,209,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="241,27,209,27,209,22,241,22"/>
+</map>

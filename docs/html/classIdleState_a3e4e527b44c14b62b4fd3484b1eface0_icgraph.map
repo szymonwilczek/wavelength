@@ -1,0 +1,5 @@
+<map id="IdleState::UpdatePhases" name="IdleState::UpdatePhases">
+<area shape="rect" id="Node000001" title="Updates the internal phase variables used for the wave and rotation animations. Increments wave_phase..." alt="" coords="168,5,335,30"/>
+<area shape="rect" id="Node000002" href="$classIdleState.html#aa008ead194b81d1f7aedf5234c53b4f2" title="Applies the idle animation effects (waves, rotation, centering) or the initial heartbeat effect...." alt="" coords="5,5,120,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,20,120,20,120,15,152,15"/>
+</map>

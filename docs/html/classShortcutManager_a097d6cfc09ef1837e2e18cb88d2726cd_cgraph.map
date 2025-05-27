@@ -1,0 +1,25 @@
+<map id="ShortcutManager::RegisterShortcuts" name="ShortcutManager::RegisterShortcuts">
+<area shape="rect" id="Node000001" title="Registers shortcuts specific to the provided parent widget." alt="" coords="5,85,183,124"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="231,22,408,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,82,232,63,234,68,167,87"/>
+<area shape="rect" id="Node000027" href="$classShortcutManager.html#a1da8274438f6c05921ba4e029b4015c6" title="Registers shortcuts specific to the main application window." alt="" coords="231,148,408,186"/>
+<area shape="poly" id="edge6_Node000001_Node000027" title=" " alt="" coords="167,122,234,140,232,146,165,127"/>
+<area shape="rect" id="Node000031" href="$classShortcutManager.html#ade860152de6a9bd0e34796a400ffe4dc" title="Registers shortcuts specific to the SettingsView." alt="" coords="231,85,408,124"/>
+<area shape="poly" id="edge11_Node000001_Node000031" title=" " alt="" coords="183,102,215,102,215,107,183,107"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="484,29,629,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="408,39,469,39,469,44,408,44"/>
+<area shape="rect" id="Node000026" href="$classShortcutManager.html#a6305ee4ce31c956ea2c1d63b907e21cf" title="Template helper function to create and connect a QShortcut." alt="" coords="461,81,652,120"/>
+<area shape="poly" id="edge5_Node000002_Node000026" title=" " alt="" coords="401,59,462,74,460,79,399,64"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#a3d9355ae6f778ed4799141d921b6e7e4" title="Gets the singleton instance of the MessageService." alt="" coords="705,5,904,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="629,32,690,26,690,31,629,37"/>
+<area shape="rect" id="Node000006" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="715,55,894,79"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="629,46,700,54,700,59,629,52"/>
+<area shape="poly" id="edge7_Node000027_Node000026" title=" " alt="" coords="390,145,470,122,471,127,391,150"/>
+<area shape="rect" id="Node000028" href="$classNavbar.html#a35a159d5b981d7027d65c0b4d2e80669" title="Emitted when the &quot;Generate Wavelength&quot; button is clicked." alt="" coords="470,144,644,182"/>
+<area shape="poly" id="edge8_Node000027_Node000028" title=" " alt="" coords="408,163,454,162,454,167,408,168"/>
+<area shape="rect" id="Node000029" href="$classNavbar.html#a2300661cc6485278de90db3a5b572e0f" title="Emitted when the &quot;Merge Wavelength&quot; button is clicked." alt="" coords="456,207,657,231"/>
+<area shape="poly" id="edge9_Node000027_Node000029" title=" " alt="" coords="409,184,483,200,481,205,408,189"/>
+<area shape="rect" id="Node000030" href="$classNavbar.html#ae5174435c781910c3a3a7a335d831a9e" title="Emitted when the &quot;Settings&quot; button is clicked." alt="" coords="476,256,637,281"/>
+<area shape="poly" id="edge10_Node000027_Node000030" title=" " alt="" coords="352,185,400,213,457,241,480,249,479,254,455,245,398,218,349,189"/>
+<area shape="poly" id="edge12_Node000031_Node000026" title=" " alt="" coords="408,100,445,100,446,105,408,106"/>
+</map>

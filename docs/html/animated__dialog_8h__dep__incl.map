@@ -1,0 +1,16 @@
+<map id="src/ui/dialogs/animated_dialog.h" name="src/ui/dialogs/animated_dialog.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="234,5,389,44"/>
+<area shape="rect" id="Node000002" href="$animated__dialog_8cpp.html" title=" " alt="" coords="188,179,344,217"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="297,59,284,93,275,139,270,179,265,178,269,138,279,91,292,57"/>
+<area shape="rect" id="Node000003" href="$create__wavelength__dialog_8cpp.html" title=" " alt="" coords="387,179,545,217"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="397,48,427,66,452,90,463,112,469,136,471,178,465,178,464,136,458,114,448,94,424,70,394,53"/>
+<area shape="rect" id="Node000004" href="$create__wavelength__dialog_8h.html" title=" " alt="" coords="294,92,438,131"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="334,56,356,90,351,93,329,59"/>
+<area shape="rect" id="Node000005" href="$join__wavelength__dialog_8h.html" title=" " alt="" coords="75,92,219,131"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="263,54,185,94,182,89,260,49"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="334,143,290,180,286,176,330,139"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="401,139,445,176,442,180,398,143"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="187,138,241,176,238,180,184,142"/>
+<area shape="rect" id="Node000006" href="$join__wavelength__dialog_8cpp.html" title=" " alt="" coords="5,179,164,217"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="126,145,101,180,96,176,122,142"/>
+</map>

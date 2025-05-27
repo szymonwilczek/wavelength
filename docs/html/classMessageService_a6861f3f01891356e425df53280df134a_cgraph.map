@@ -1,0 +1,5 @@
+<map id="MessageService::UpdateProgressMessage" name="MessageService::UpdateProgressMessage">
+<area shape="rect" id="Node000001" title="Slot to update a progress message associated with a file transfer. Emits the progressMessageUpdated s..." alt="" coords="5,5,227,44"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#a4635fcf151d68e3cd873b2d7590c7efc" title="Emitted during file processing and sending to update the status display." alt="" coords="275,5,452,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,22,259,22,259,27,227,27"/>
+</map>

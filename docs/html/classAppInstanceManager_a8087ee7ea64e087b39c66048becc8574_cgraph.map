@@ -1,0 +1,14 @@
+<map id="AppInstanceManager::clientDisconnected" name="AppInstanceManager::clientDisconnected">
+<area shape="rect" id="Node000001" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="5,100,150,139"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a1ac17dc2cb4f3ae1f968109a180acd2e" title="Emitted when a client instance disconnects (on the server) or when the connection to the server is lo..." alt="" coords="210,5,368,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,97,197,53,210,48,212,52,199,58,113,102"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#acb57c2842c3eff0de2fe0c4009f8cdcb" title="Statically checks if another instance of the application is already running." alt="" coords="198,68,381,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,106,182,101,183,106,151,111"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#af09b098118800e025bcdce635b382ddd" title="Sets up the QLocalServer for the creator instance." alt="" coords="217,131,362,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,127,202,135,201,140,150,132"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#af7e9143a1ff0af2932c1d0afc1f31231" title="Slot called when a new client attempts to connect to the server." alt="" coords="429,160,573,199"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="362,157,414,165,413,170,362,163"/>
+<area shape="poly" id="edge5_Node000005_Node000001" title=" " alt="" coords="429,192,319,197,257,193,197,183,156,169,119,149,122,145,158,164,198,178,258,188,319,192,428,187"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#ab7fe0e77dca903fa23d78139dd68e84b" title="Slot called when data can be read from a connected socket." alt="" coords="621,160,766,199"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="574,177,606,177,606,182,574,182"/>
+</map>

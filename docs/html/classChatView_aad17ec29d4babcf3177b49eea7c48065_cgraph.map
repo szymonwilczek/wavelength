@@ -1,0 +1,12 @@
+<map id="ChatView::OnPttStartReceiving" name="ChatView::OnPttStartReceiving">
+<area shape="rect" id="Node000001" title="Slot called when another user starts transmitting PTT on the current Wavelength. If the state is Idle..." alt="" coords="5,37,211,62"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#afb21e71849031ae941a3f44e9f697c39" title="Starts audio playback if PTT state is Receiving. Prepares the audio output device to receive data." alt="" coords="259,12,445,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,36,243,33,243,38,212,42"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#a5d0b4d046c069b49e17f1eabdf350455" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="745,54,928,93"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="211,50,730,68,730,73,211,56"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#aabba720d117ae8d235dfc9b27d66881f" title="Slot called when the remote user stops transmitting PTT. If the frequency matches and the state is Re..." alt="" coords="493,12,696,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="445,22,477,22,477,27,445,27"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a3caa164d3775d977cedb7757e932f2dd" title="Stops audio playback. Resets the output device pointer." alt="" coords="744,5,929,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="697,19,728,18,728,23,697,24"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="659,35,730,49,729,55,658,40"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="TypingTestLayer::OnTextChanged" name="TypingTestLayer::OnTextChanged">
+<area shape="rect" id="Node000001" title="Slot called when the text in the hidden_input_ field changes. Validates the entered text against the ..." alt="" coords="5,55,222,79"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="288,5,486,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,51,299,31,300,36,186,57"/>
+<area shape="rect" id="Node000003" href="$classTypingTestLayer.html#abad9bc996ba1e3a86e6d6d1f98f13ee5" title="Updates the display_text_label_ with formatted rich text. Highlights correctly typed characters in gr..." alt="" coords="270,55,504,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,64,254,64,254,70,222,70"/>
+<area shape="rect" id="Node000004" href="$classTypingTestLayer.html#a663b4a2951a08ecd5f9874954f02b109" title="Updates the text display label after the test is successfully completed. Sets the entire text to gree..." alt="" coords="279,104,495,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="186,77,300,98,299,103,185,83"/>
+</map>

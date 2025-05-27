@@ -1,0 +1,7 @@
+<map id="AudioPlayer::OnSliderReleased" name="AudioPlayer::OnSliderReleased">
+<area shape="rect" id="Node000001" title="Slot called when the user releases the progress slider. Performs the actual seek operation based on t..." alt="" coords="5,40,208,65"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a19c2b80607821596a7ebb8ed095a796c" title="Starts an animation to increase the spectrum intensity (e.g., when playback starts)." alt="" coords="256,5,460,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,39,240,35,241,40,209,44"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#ad8076e6a4672d7769669725cda600b39" title="Initiates a seek operation in the AudioDecoder. Converts the slider position (milliseconds) to second..." alt="" coords="277,68,438,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,61,262,67,261,73,208,67"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="MessageService::SendPttRequest" name="MessageService::SendPttRequest">
+<area shape="rect" id="Node000001" title="Sends a Push&#45;to&#45;Talk (PTT) request message for the specified frequency. Constructs a JSON message of ..." alt="" coords="449,5,671,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a19088a1cf7c1314fcdc1bca5a0b28b81" title="Slot called when the PTT button is pressed. Plays the PTT activation sound, sets the state to Request..." alt="" coords="196,5,401,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="434,20,402,20,402,15,434,15"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,5,148,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,20,148,20,148,15,180,15"/>
+</map>

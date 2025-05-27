@@ -1,0 +1,25 @@
+<map id="ChatView::OnPttGranted" name="ChatView::OnPttGranted">
+<area shape="rect" id="Node000001" title="Slot called when the server grants the PTT request. If the frequency matches and the state is Request..." alt="" coords="5,120,171,145"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="443,119,654,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,129,427,129,427,134,171,135"/>
+<area shape="rect" id="Node000014" href="$classChatView.html#a5d0b4d046c069b49e17f1eabdf350455" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="722,192,904,230"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="171,139,707,197,706,202,171,144"/>
+<area shape="rect" id="Node000015" href="$classChatView.html#a119a0cb1a68f2e3a60e4153912fa43f2" title="Starts capturing audio from the microphone if PTT state is Transmitting. Connects the readyRead signa..." alt="" coords="219,71,395,95"/>
+<area shape="poly" id="edge10_Node000001_Node000015" title=" " alt="" coords="146,117,233,97,234,102,147,122"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#a3d9355ae6f778ed4799141d921b6e7e4" title="Gets the singleton instance of the MessageService." alt="" coords="714,143,912,167"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="655,138,699,142,698,147,655,143"/>
+<area shape="rect" id="Node000005" href="$classMessageService.html#a75fb7423ceb5f01542eb53c93c332df7" title="Sends a Push&#45;to&#45;Talk (PTT) release message for the specified frequency. Constructs a JSON message of ..." alt="" coords="702,93,924,118"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="655,118,687,115,687,120,655,123"/>
+<area shape="rect" id="Node000011" href="$classChatView.html#abd9ae8e738358b9be6f5e935ea4826a3" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="726,44,900,69"/>
+<area shape="poly" id="edge7_Node000002_Node000011" title=" " alt="" coords="586,116,702,79,737,70,738,75,703,84,587,121"/>
+<area shape="poly" id="edge9_Node000002_Node000014" title=" " alt="" coords="591,141,703,176,729,184,727,189,702,182,589,146"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#a2a6e9a079ac7a537b6342e1fb63a52dc" title="Deleted copy constructor to prevent copying." alt="" coords="972,163,1197,187"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="913,160,956,163,956,168,912,165"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="1041,164,1031,154,1036,144,1054,138,1084,136,1120,139,1135,147,1133,152,1118,144,1084,141,1055,143,1039,148,1036,153,1044,160"/>
+<area shape="rect" id="Node000006" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="990,76,1178,114"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="924,99,974,97,975,102,924,104"/>
+<area shape="rect" id="Node000012" href="$classChatView.html#a034774a31cd27434eeb01e9965736aeb" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="985,5,1184,30"/>
+<area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="900,41,978,30,978,35,901,47"/>
+<area shape="poly" id="edge11_Node000015_Node000002" title=" " alt="" coords="373,93,468,112,467,118,372,99"/>
+<area shape="poly" id="edge12_Node000015_Node000012" title=" " alt="" coords="391,67,536,47,702,30,841,21,969,17,969,22,841,26,703,35,537,53,392,73"/>
+</map>

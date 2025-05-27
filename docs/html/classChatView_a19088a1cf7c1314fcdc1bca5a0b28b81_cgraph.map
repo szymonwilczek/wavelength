@@ -1,0 +1,21 @@
+<map id="ChatView::OnPttButtonPressed" name="ChatView::OnPttButtonPressed">
+<area shape="rect" id="Node000001" title="Slot called when the PTT button is pressed. Plays the PTT activation sound, sets the state to Request..." alt="" coords="5,83,211,107"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#a3d9355ae6f778ed4799141d921b6e7e4" title="Gets the singleton instance of the MessageService." alt="" coords="271,31,469,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,79,289,56,290,62,175,85"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#a630325196d5dd1c14713691505301d74" title="Sends a Push&#45;to&#45;Talk (PTT) request message for the specified frequency. Constructs a JSON message of ..." alt="" coords="259,83,481,107"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="211,92,243,92,243,98,211,98"/>
+<area shape="rect" id="Node000010" href="$classChatView.html#a5d0b4d046c069b49e17f1eabdf350455" title="Updates the appearance and enabled state of the PTT button based on the current ptt_state_...." alt="" coords="279,132,461,170"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="170,105,264,126,263,131,169,111"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#a2a6e9a079ac7a537b6342e1fb63a52dc" title="Deleted copy constructor to prevent copying." alt="" coords="529,29,754,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="469,40,513,40,513,45,469,45"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="604,31,596,21,600,11,616,5,642,3,671,6,685,13,682,17,669,11,642,8,617,10,604,15,601,20,608,27"/>
+<area shape="rect" id="Node000005" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="548,78,736,117"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="481,93,532,94,532,99,481,99"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="803,16,941,54"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="714,75,788,55,789,60,716,80"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="802,78,942,117"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="736,95,787,95,787,100,736,100"/>
+<area shape="rect" id="Node000009" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="990,108,1127,146"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="731,115,803,126,872,128,942,126,974,125,974,131,942,131,872,133,802,131,730,120"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="943,106,975,111,974,116,942,111"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="VoiceRecognitionLayer::VoiceRecognitionLayer" name="VoiceRecognitionLayer::VoiceRecognitionLayer">
+<area shape="rect" id="Node000001" title="Constructs a VoiceRecognitionLayer. Initializes the UI elements (title, audio visualizer,..." alt="" coords="5,125,166,164"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#ae8357c2294de9d555370995ae5e0c30e" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="453,97,605,136"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,137,437,120,438,125,166,142"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="240,5,374,44"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="109,123,155,88,212,53,225,47,227,52,215,58,158,92,112,127"/>
+<area shape="rect" id="Node000007" href="$classVoiceRecognitionLayer.html#ae6055906297bcb0590c41015a9cabbb6" title="Slot called periodically by audio_process_timer_ to read and process available audio data...." alt="" coords="231,231,384,269"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="119,162,163,189,215,216,230,222,228,227,213,220,161,194,116,167"/>
+<area shape="rect" id="Node000009" href="$classSecurityLayer.html#adc79fa2453a0034a739a7cfcc225db42" title="Constructs a SecurityLayer." alt="" coords="214,182,401,206"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="167,160,234,175,233,180,165,165"/>
+<area shape="rect" id="Node000010" href="$classVoiceRecognitionLayer.html#a49b97cb50c3d5533e70b68d0af5258c5" title="Slot called periodically by progress_timer_ to update the recognition progress bar...." alt="" coords="231,68,384,107"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="162,122,216,108,217,113,164,127"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="657,76,856,101"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="606,105,642,100,642,105,606,110"/>
+<area shape="rect" id="Node000004" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="680,125,833,164"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="606,123,665,131,665,136,606,129"/>
+<area shape="rect" id="Node000006" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="458,5,600,44"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="375,22,442,22,442,27,375,27"/>
+<area shape="rect" id="Node000008" href="$classVoiceRecognitionLayer.html#a40f32b30534b60b480311a5dbb6571e7" title="Updates the audio_visualizer_label_ with a waveform representation of the audio data...." alt="" coords="449,231,609,269"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="384,247,434,247,434,253,384,253"/>
+<area shape="poly" id="edge10_Node000010_Node000002" title=" " alt="" coords="384,95,438,102,437,107,384,100"/>
+</map>

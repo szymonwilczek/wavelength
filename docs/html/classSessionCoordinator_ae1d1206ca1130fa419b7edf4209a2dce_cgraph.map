@@ -1,0 +1,5 @@
+<map id="SessionCoordinator::onPttStopReceiving" name="SessionCoordinator::onPttStopReceiving">
+<area shape="rect" id="Node000001" title="Relays the pttStopReceiving signal." alt="" coords="5,5,150,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ad7421eba7d649bc2ae6e5288723725d2" title="Emitted when another user stops PTT transmission. Relayed from WavelengthMessageService." alt="" coords="198,5,333,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,22,182,22,182,27,150,27"/>
+</map>

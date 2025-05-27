@@ -1,0 +1,5 @@
+<map id="CyberpunkStyle::GetAccentColor" name="CyberpunkStyle::GetAccentColor">
+<area shape="rect" id="Node000001" title="Gets the accent color (Purple)." alt="" coords="268,5,453,44"/>
+<area shape="rect" id="Node000002" href="$classChatStyle.html#a4ce68f6dc6d9c0179eceafabef2aa60b" title="Gets the stylesheet for message bubbles received from other users. Defines background,..." alt="" coords="5,5,220,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,27,220,27,220,22,252,22"/>
+</map>

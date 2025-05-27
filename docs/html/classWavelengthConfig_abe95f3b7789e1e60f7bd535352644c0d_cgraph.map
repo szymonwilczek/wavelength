@@ -1,0 +1,6 @@
+<map id="WavelengthConfig::GetInstance" name="WavelengthConfig::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="5,36,211,61"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="259,29,460,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,46,243,46,243,51,211,51"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="313,30,310,20,317,10,334,5,359,3,387,5,403,11,401,16,386,10,359,8,335,10,320,15,315,21,318,28"/>
+</map>

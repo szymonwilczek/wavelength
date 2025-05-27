@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::SetActiveWavelength" name="WavelengthStateManager::SetActiveWavelength">
+<area shape="rect" id="Node000001" title="Sets the specified frequency as the currently active wavelength. Updates the registry and emits the a..." alt="" coords="206,5,375,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a58a056dc90d0c5e57749b2a1f81583ad" title="Sets the specified frequency as the currently active wavelength. Delegates the call to WavelengthStat..." alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

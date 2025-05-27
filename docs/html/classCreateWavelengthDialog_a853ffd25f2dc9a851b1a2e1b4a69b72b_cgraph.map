@@ -1,0 +1,14 @@
+<map id="CreateWavelengthDialog::FindLowestAvailableFrequency" name="CreateWavelengthDialog::FindLowestAvailableFrequency">
+<area shape="rect" id="Node000001" title="Static function executed concurrently to query the relay server for the next available frequency...." alt="" coords="5,117,213,156"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abe95f3b7789e1e60f7bd535352644c0d" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="262,36,468,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,114,202,92,260,70,285,63,287,68,262,75,204,97,153,119"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#aa7656025f97129a8a7396d435d0b8054" title="Gets the preferred starting frequency for new Wavelengths." alt="" coords="261,85,469,124"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="213,121,245,117,246,122,214,126"/>
+<area shape="rect" id="Node000005" href="$classWavelengthConfig.html#adf2ecac39e18de2b5ed81eb8fde47d8a" title="Gets the configured relay server address." alt="" coords="271,148,459,187"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="214,146,256,152,255,157,213,152"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html#a4102c95b0ba46a067d7ca8161bcd7916" title="Gets the configured relay server port." alt="" coords="271,211,459,249"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="157,154,262,195,283,203,282,208,260,201,155,159"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="517,29,718,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="468,46,502,46,502,51,468,51"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="571,30,568,20,575,10,592,5,618,3,645,5,662,11,660,16,644,10,618,8,593,10,578,15,573,21,576,28"/>
+</map>

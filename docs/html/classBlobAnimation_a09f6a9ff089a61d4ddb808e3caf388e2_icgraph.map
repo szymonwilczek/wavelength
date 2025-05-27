@@ -1,0 +1,5 @@
+<map id="BlobAnimation::updateAnimation" name="BlobAnimation::updateAnimation">
+<area shape="rect" id="Node000001" title="Slot connected to animation_timer_. Called periodically (~60 FPS) to update the animation state...." alt="" coords="251,5,461,30"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,5,203,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,20,203,20,203,15,235,15"/>
+</map>

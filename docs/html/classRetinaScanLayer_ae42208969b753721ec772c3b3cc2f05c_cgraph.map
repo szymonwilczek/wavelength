@@ -1,0 +1,9 @@
+<map id="RetinaScanLayer::Initialize" name="RetinaScanLayer::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the layer for display. Resets the layer state, generates a new random eye image,..." alt="" coords="5,68,180,93"/>
+<area shape="rect" id="Node000002" href="$classRetinaScanLayer.html#a586e2ddf905f181954614724467b1128" title="Generates a random eye image (iris color, patterns, reflections) and draws it onto base_eye_image_...." alt="" coords="231,5,411,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,65,224,46,225,51,147,70"/>
+<area shape="rect" id="Node000003" href="$classRetinaScanLayer.html#a50fb6cea0c9adac90fe96fc7451ccbd0" title="Resets the layer to its initial state. Stops timers, resets the scanline position and progress bar,..." alt="" coords="240,68,402,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,78,224,78,224,83,180,83"/>
+<area shape="rect" id="Node000004" href="$classRetinaScanLayer.html#a407213631665f40eebbbeef64656a0b9" title="Starts the scan animation timers (scan_timer_ and complete_timer_)." alt="" coords="228,117,414,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="147,91,225,110,224,116,146,96"/>
+</map>

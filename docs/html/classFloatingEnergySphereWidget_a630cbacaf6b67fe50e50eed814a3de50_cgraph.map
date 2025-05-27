@@ -1,0 +1,9 @@
+<map id="FloatingEnergySphereWidget::keyPressEvent" name="FloatingEnergySphereWidget::keyPressEvent">
+<area shape="rect" id="Node000001" title="Handles key press events. Detects the Konami code sequence." alt="" coords="5,37,196,76"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#aea15fae32db46c7a4f372e555afc5dee" title="Initiates the destruction animation sequence. Sets the is_destroying_ flag, resets progress,..." alt="" coords="244,37,434,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,54,228,54,228,59,196,59"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#ae81d952cf10dd7a2389a6d958e789b16" title="Emitted when the destruction animation sequence (visual and audio) completes." alt="" coords="482,5,682,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="434,41,466,37,467,43,435,47"/>
+<area shape="rect" id="Node000004" href="$classFloatingEnergySphereWidget.html#af257d6363120d5b830cd4885f67e1114" title="Sets whether the widget can be closed by the user or programmatically. Used to prevent closing during..." alt="" coords="487,68,677,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="435,66,472,71,471,76,434,71"/>
+</map>

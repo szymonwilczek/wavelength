@@ -1,0 +1,14 @@
+<map id="MessageService::SendAudioData" name="MessageService::SendAudioData">
+<area shape="rect" id="Node000001" title="Sends raw audio data as a binary message for the specified frequency. Used for transmitting audio dur..." alt="" coords="5,75,223,100"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#ac47c8ae3b3defb430c71fcc9b0636615" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="271,68,459,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,85,255,85,255,90,223,90"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="508,5,645,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="432,65,493,46,495,52,433,70"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="507,68,646,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="459,85,491,85,491,90,459,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="698,96,836,135"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="444,105,507,115,577,118,646,115,683,115,683,120,646,121,577,123,507,121,443,110"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="694,5,840,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="646,22,679,22,679,27,646,27"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="647,95,683,100,683,106,646,100"/>
+</map>

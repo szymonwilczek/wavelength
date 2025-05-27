@@ -1,0 +1,11 @@
+<map id="src/ui/buttons/cyber_chat_button.cpp" name="src/ui/buttons/cyber_chat_button.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="136,5,272,44"/>
+<area shape="rect" id="Node000002" href="$cyber__chat__button_8h.html" title=" " alt="" coords="5,92,145,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,47,109,86,106,82,172,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="168,92,240,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="207,45,207,76,202,76,202,45"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="264,92,363,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="232,42,286,81,283,85,229,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="25,165,125,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="78,117,78,149,72,149,72,117"/>
+</map>

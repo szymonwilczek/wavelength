@@ -1,0 +1,10 @@
+<map id="TextDisplayEffect::TriggerGlitch" name="TextDisplayEffect::TriggerGlitch">
+<area shape="rect" id="Node000001" title="Initiates a short, animated glitch effect by animating the glitchIntensity property." alt="" coords="366,37,498,76"/>
+<area shape="rect" id="Node000002" href="$classTextDisplayEffect.html#afc75adf362a15c93e57f3a6ac20130cc" title="Slot called by the glitch_timer_. Randomly triggers a glitch effect or fades the current intensity." alt="" coords="186,5,318,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="350,45,318,39,319,34,351,40"/>
+<area shape="rect" id="Node000004" href="$classTextDisplayEffect.html#aff24a16ba912a1d96cf23516936f538d" title="Slot called by the text_timer_. Reveals the next character in the sequence. Adjusts the timer interva..." alt="" coords="186,68,318,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="351,73,319,79,318,73,350,68"/>
+<area shape="rect" id="Node000003" href="$classTextDisplayEffect.html#ab932cea0d25bd73f289eb0a46356b20c" title="Constructs a CyberTextDisplay widget. Initializes the widget with text, sets up timers for text revea..." alt="" coords="5,37,138,76"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,42,138,48,138,42,170,36"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="170,76,138,71,138,65,171,71"/>
+</map>

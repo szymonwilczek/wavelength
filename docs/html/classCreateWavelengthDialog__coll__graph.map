@@ -1,0 +1,28 @@
+<map id="CreateWavelengthDialog" name="CreateWavelengthDialog">
+<area shape="rect" id="Node000001" title="A dialog window for creating a new Wavelength frequency." alt="" coords="481,1069,691,2141"/>
+<area shape="rect" id="Node000002" href="$classAnimatedDialog.html" title="A base class for QDialogs that adds animated transitions for showing and closing." alt="" coords="49,527,254,943"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,955,269,991,378,1209,484,1410,479,1412,373,1211,264,994,246,957"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,235,63,298"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="48,312,102,526,97,528,43,313"/>
+<area shape="rect" id="Node000004" href="$classOverlayWidget.html" title="A semi&#45;transparent overlay widget used to dim the background content." alt="" coords="88,118,277,415"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="175,415,169,510,164,510,170,414"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="151,5,213,69"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="185,83,185,118,180,118,180,83"/>
+<area shape="rect" id="Node000006" href="$classCyberCheckBox.html" title="A custom QCheckBox styled with a cyberpunk aesthetic." alt="" coords="278,579,467,890"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="413,889,480,1159,474,1161,408,890"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="332,235,414,298"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="376,313,376,580,370,580,370,313"/>
+<area shape="rect" id="Node000008" href="$classCyberLineEdit.html" title="A custom QLineEdit styled with a cyberpunk aesthetic." alt="" coords="492,477,681,993"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="589,992,589,1052,584,1052,584,992"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="552,235,620,298"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="589,313,589,477,584,477,584,313"/>
+<area shape="rect" id="Node000010" href="$classCyberButton.html" title="A custom QPushButton styled with a cyberpunk aesthetic." alt="" coords="705,539,908,930"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="760,931,698,1174,693,1172,754,930"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="762,235,850,298"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="809,313,809,539,804,539,804,313"/>
+<area shape="rect" id="Node000012" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="932,522,1145,947"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="944,948,922,994,810,1207,702,1405,697,1403,806,1205,917,991,940,946"/>
+<area shape="poly" id="edge13_Node000012_Node000012" title=" " alt="" coords="1146,684,1164,703,1171,735,1168,757,1160,773,1155,771,1163,755,1166,735,1160,706,1142,688"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="1009,235,1068,298"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="1041,313,1041,522,1036,522,1036,313"/>
+</map>

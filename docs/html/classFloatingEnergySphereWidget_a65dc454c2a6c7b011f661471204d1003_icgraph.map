@@ -1,0 +1,5 @@
+<map id="FloatingEnergySphereWidget::TriggerImpactAtScreenPos" name="FloatingEnergySphereWidget::TriggerImpactAtScreenPos">
+<area shape="rect" id="Node000001" title="Triggers a visual impact effect at a point on the sphere corresponding to a screen position...." alt="" coords="244,5,434,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#a7c2a15e15321b4e8421519bd4f3e761c" title="Slot called periodically by click_simulation_timer_ to trigger random impacts on the sphere." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

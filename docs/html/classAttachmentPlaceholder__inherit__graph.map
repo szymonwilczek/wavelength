@@ -1,0 +1,5 @@
+<map id="AttachmentPlaceholder" name="AttachmentPlaceholder">
+<area shape="rect" id="Node000001" title="A widget that acts as a placeholder for chat attachments before they are loaded." alt="" coords="5,117,233,1180"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="88,5,150,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,84,122,117,117,117,117,84"/>
+</map>

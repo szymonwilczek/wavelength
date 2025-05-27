@@ -1,0 +1,5 @@
+<map id="VoiceRecognitionLayer::~VoiceRecognitionLayer" name="VoiceRecognitionLayer::~VoiceRecognitionLayer">
+<area shape="rect" id="Node000001" title="Destructor. Stops audio recording and processing, stops and deletes timers." alt="" coords="5,5,174,44"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="222,5,374,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,22,206,22,206,27,174,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="JoinWavelengthDialog::InitRenderBuffers" name="JoinWavelengthDialog::InitRenderBuffers">
+<area shape="rect" id="Node000001" title="Initializes or reinitializes the QPixmap buffer used for rendering the vertical scanline effect...." alt="" coords="203,5,352,44"/>
+<area shape="rect" id="Node000002" href="$classJoinWavelengthDialog.html#ac467c595ec7fa1ba4177fdb091fcca6c" title="Overridden paint event handler. Draws the custom dialog appearance. Renders the background gradient,..." alt="" coords="5,5,155,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,27,155,27,155,22,187,22"/>
+</map>

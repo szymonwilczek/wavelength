@@ -1,0 +1,7 @@
+<map id="src/ui/views/chat_view.h" name="src/ui/views/chat_view.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="32,5,196,30"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,78,111,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,32,79,68,74,64,103,29"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="135,78,208,103"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,29,154,64,150,68,121,32"/>
+</map>

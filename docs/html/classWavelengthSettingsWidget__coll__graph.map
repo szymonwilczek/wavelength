@@ -1,0 +1,14 @@
+<map id="WavelengthSettingsWidget" name="WavelengthSettingsWidget">
+<area shape="rect" id="Node000001" title="A widget for configuring Wavelength&#45;specific settings, primarily the preferred start frequency." alt="" coords="104,970,292,1267"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,481,67,545"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="38,559,39,628,45,716,58,812,81,907,107,969,102,971,76,909,53,813,40,716,34,628,33,559"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="91,118,304,908"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,908,200,953,195,953,195,908"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="305,441,316,452,324,468,329,488,331,513,327,547,317,571,312,569,322,545,325,513,324,489,319,470,311,455,302,445"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="330,5,388,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="346,84,306,200,301,199,341,82"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="416,301,629,725"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="388,80,407,117,442,208,471,300,466,301,437,209,402,119,383,83"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="482,726,450,820,430,866,406,909,360,974,306,1031,302,1027,356,970,402,907,425,863,445,818,477,724"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="631,441,641,452,649,468,654,488,656,513,652,547,643,571,638,569,647,545,651,513,649,489,644,470,637,455,627,445"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="src/ui/dialogs" name="src/ui/dialogs">
+<area shape="rect" id="node1" href="dir_0f1c84026f0749c812b50c9c6cbf93d5.html" title="checkbox" alt="" coords="27,124,104,149"/>
+<area shape="rect" id="node2" href="dir_190f94016319c59eafbcb034935cf65c.html" title="buttons" alt="" coords="128,124,192,149"/>
+<area shape="rect" id="node3" href="dir_5db6716e6e1cd4ca0adcf14448824aca.html" title="input" alt="" coords="217,124,266,149"/>
+<area shape="rect" id="node4" href="dir_f3911b9629b0e27ea480d06d47573cbf.html" title="widgets" alt="" coords="290,124,356,149"/>
+<area shape="rect" id="node5" href="dir_245f7b9d123e9e592dc07948578b88f2.html" title="dialogs" alt="" coords="250,51,312,76"/>
+<area shape="poly" id="edge1" href="dir_000020_000009.html" alt="" coords="251,78,116,121,115,116,249,73"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000020_000009.html" title="1" alt="" coords="117,119,124,133"/>
+<area shape="poly" id="edge2" href="dir_000020_000006.html" alt="" coords="263,79,194,118,191,114,260,74"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000020_000006.html" title="2" alt="" coords="196,115,203,129"/>
+<area shape="poly" id="edge5" href="dir_000020_000034.html" alt="" coords="277,78,258,112,253,109,272,75"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000020_000034.html" title="2" alt="" coords="261,105,268,119"/>
+<area shape="poly" id="edge6" href="dir_000020_000071.html" alt="" coords="290,75,311,109,306,112,286,78"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000020_000071.html" title="1" alt="" coords="311,97,318,111"/>
+<area shape="rect" id="node6" href="dir_5194e5fea318fda12687127c23f8aba1.html" title="app" alt="" coords="380,124,422,149"/>
+<area shape="poly" id="edge3" href="dir_000020_000000.html" alt="" coords="302,74,370,113,367,118,300,79"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000020_000000.html" title="3" alt="" coords="367,100,374,114"/>
+<area shape="rect" id="node7" href="dir_53e88f7fa585331171beac223e0e5b81.html" title="session" alt="" coords="447,124,513,149"/>
+<area shape="poly" id="edge4" href="dir_000020_000052.html" alt="" coords="314,74,433,116,432,121,312,79"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000020_000052.html" title="2" alt="" coords="429,102,436,116"/>
+<area shape="rect" id="clust1" href="dir_da5c6b39c0a2f54e57df6799511cd3ab.html" title="ui" alt="" coords="16,16,367,159"/>
+</map>

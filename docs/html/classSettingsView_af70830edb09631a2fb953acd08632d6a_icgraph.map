@@ -1,0 +1,7 @@
+<map id="SettingsView::RestoreDefaults" name="SettingsView::RestoreDefaults">
+<area shape="rect" id="Node000001" title="Restores all settings across all tabs to their default values. Prompts the user for confirmation befo..." alt="" coords="436,5,635,30"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a88aeaa2ebb222180310ba66f0dba95d5" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="236,5,388,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="420,20,388,20,388,15,420,15"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a4b22f39018ca1c051b4d88f6d2636683" title="Constructs the SettingsView. Initializes the UI, sets up all tabs including the security layers for t..." alt="" coords="5,5,188,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="220,20,188,20,188,15,220,15"/>
+</map>

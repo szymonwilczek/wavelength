@@ -1,0 +1,13 @@
+<map id="StreamDisplay::StreamDisplay" name="StreamDisplay::StreamDisplay">
+<area shape="rect" id="Node000001" title="Constructs a WavelengthStreamDisplay widget. Creates the main layout, instantiates the CommunicationS..." alt="" coords="5,40,206,65"/>
+<area shape="rect" id="Node000002" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="254,33,444,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,50,238,50,238,55,206,55"/>
+<area shape="rect" id="Node000003" href="$classStreamDisplay.html#a9b2f657773a56d360df29998cb79ed3e" title="Slot called when a StreamMessage associated with a progress ID is destroyed. Removes the correspondin..." alt="" coords="492,5,718,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="444,40,476,36,477,41,445,45"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="499,68,711,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="445,60,484,65,483,70,444,66"/>
+<area shape="rect" id="Node000005" href="$classStreamMessage.html#a1a3ebf623b6477e510efeab5af62f390" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="782,33,969,72"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="712,67,767,61,767,67,712,72"/>
+<area shape="rect" id="Node000008" href="$classStreamMessage.html#a59f8dedec8dffa79dad2b202ddd8dbf6" title="Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities...." alt="" coords="766,96,985,121"/>
+<area shape="poly" id="edge5_Node000004_Node000008" title=" " alt="" coords="712,89,751,93,750,98,712,94"/>
+</map>

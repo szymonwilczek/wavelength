@@ -1,0 +1,9 @@
+<map id="NetworkSettingsWidget::SetupUi" name="NetworkSettingsWidget::SetupUi">
+<area shape="rect" id="Node000001" title="Creates and arranges all the UI elements (labels, inputs, layouts) for the widget." alt="" coords="5,37,165,76"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="213,5,347,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,41,197,36,198,41,165,46"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="213,68,347,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,67,198,72,197,77,165,72"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="395,5,537,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="347,22,380,22,380,27,347,27"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="WavelengthLeaver::GetInstance" name="WavelengthLeaver::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthLeaver." alt="" coords="611,75,817,100"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0dd567ac5a1ab2f57e17698c1dc93a1b" title="Closes a specific wavelength (only if the current user is the host). Unregisters the wavelength local..." alt="" coords="428,5,563,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="653,73,563,47,564,42,654,68"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="428,131,563,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="654,107,564,133,563,128,653,102"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#ad7c56b7b495b53ea905a6157e2bc5e93" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="428,68,563,107"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="596,90,564,90,564,85,596,85"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,44,380,69"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="413,40,373,46,372,41,413,35"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,44,148,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,59,148,59,148,54,180,54"/>
+<area shape="rect" id="Node000006" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="220,131,356,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="413,153,356,153,356,147,413,147"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="412,78,376,72,376,67,413,72"/>
+</map>

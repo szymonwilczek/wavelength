@@ -1,0 +1,7 @@
+<map id="ImageViewer::HandleImageReady" name="ImageViewer::HandleImageReady">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s imageReady signal. Stores the decoded image, sets it as the pixmap fo..." alt="" coords="5,24,187,62"/>
+<area shape="rect" id="Node000002" href="$classImageViewer.html#a15bd5b0675fc5ad4926dcfd33e3a8dd5" title="Slot connected to the decoder&#39;s error signal. Logs the error and displays an error message in the QLa..." alt="" coords="239,5,412,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,30,223,26,223,32,187,36"/>
+<area shape="rect" id="Node000003" href="$classImageViewer.html#a4dc697303dccbc44c425fd91f2bf2077" title="Emitted after the image has been successfully decoded and set in the QLabel. Can be used by parent wi..." alt="" coords="235,55,416,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,50,219,53,219,59,187,55"/>
+</map>

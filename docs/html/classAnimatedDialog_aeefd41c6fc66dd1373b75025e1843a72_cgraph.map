@@ -1,0 +1,7 @@
+<map id="AnimatedDialog::showEvent" name="AnimatedDialog::showEvent">
+<area shape="rect" id="Node000001" title="Overridden show event handler. Creates and shows the overlay widget (if applicable),..." alt="" coords="5,12,191,37"/>
+<area shape="rect" id="Node000002" href="$classAnimatedDialog.html#a39c5005e28e9549496050d25c1ec02f6" title="Initiates and runs the animation sequence for showing the dialog based on animation_type_...." alt="" coords="239,12,441,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,22,223,22,223,27,191,27"/>
+<area shape="rect" id="Node000003" href="$classAnimatedDialog.html#aefe3cc111c364df727ca8bd5ebf700b9" title="Emitted when the show animation (AnimateShow) has finished." alt="" coords="489,5,699,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="441,22,473,22,473,27,441,27"/>
+</map>

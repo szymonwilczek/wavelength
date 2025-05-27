@@ -1,0 +1,5 @@
+<map id="TabButton" name="TabButton">
+<area shape="rect" id="Node000001" title="A custom QPushButton styled as a tab button with an animated underline effect." alt="" coords="5,117,194,447"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="56,5,144,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

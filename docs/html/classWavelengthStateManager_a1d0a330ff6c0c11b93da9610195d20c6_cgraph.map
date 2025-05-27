@@ -1,0 +1,15 @@
+<map id="WavelengthStateManager::SetActiveWavelength" name="WavelengthStateManager::SetActiveWavelength">
+<area shape="rect" id="Node000001" title="Sets the specified frequency as the currently active wavelength. Updates the registry and emits the a..." alt="" coords="5,68,175,107"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#ac1bfacd44322ead69e4a316d90cad6fc" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="223,5,405,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,65,227,46,229,51,162,70"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="245,68,382,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,85,229,85,229,90,175,90"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a4548037308651c141a62473296dc2b1e" title="Sets the specified frequency as the currently active wavelength. If the frequency does not exist in t..." alt="" coords="238,131,390,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,105,229,123,227,129,161,110"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="472,68,617,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="383,85,456,85,456,90,383,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#ac86f04e6e88b2ba0dee509b7fbdc6e40" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="453,131,635,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="390,147,438,147,438,153,390,153"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="476,193,613,232"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="388,167,461,187,460,193,386,172"/>
+</map>

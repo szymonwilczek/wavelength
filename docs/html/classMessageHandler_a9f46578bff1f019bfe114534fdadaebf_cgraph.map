@@ -1,0 +1,5 @@
+<map id="MessageHandler::operator=" name="MessageHandler::operator=">
+<area shape="rect" id="Node000001" title="Deleted assignment operator to prevent assignment." alt="" coords="5,5,188,30"/>
+<area shape="rect" id="Node000002" href="$classMessageHandler.html#ad3b43ca875118c1bafa19f354678cbec" title="Private constructor to enforce the singleton pattern." alt="" coords="236,5,461,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,15,220,15,220,20,188,20"/>
+</map>

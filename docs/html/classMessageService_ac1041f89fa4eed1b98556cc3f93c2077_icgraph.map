@@ -1,0 +1,9 @@
+<map id="MessageService::SendTextMessage" name="MessageService::SendTextMessage">
+<area shape="rect" id="Node000001" title="Sends a text message to the currently active frequency. Retrieves the active frequency and socket fro..." alt="" coords="412,26,594,65"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a424556ba1072ba443433af3af827c5d5" title="Sends the text message currently in the input field. Clears the input field and sends the message via..." alt="" coords="196,5,364,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="396,35,364,31,365,26,397,30"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a6bf70b7c88a2f73ab0510bbc97315c02" title="Sends a text message to the currently active wavelength. Delegates the call to WavelengthMessageServi..." alt="" coords="212,54,348,93"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="397,62,348,68,348,63,396,56"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,5,148,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,20,148,20,148,15,180,15"/>
+</map>

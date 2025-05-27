@@ -1,0 +1,9 @@
+<map id="BlobEventHandler::eventFilter" name="BlobEventHandler::eventFilter">
+<area shape="rect" id="Node000001" title="Filters events installed on the parent widget&#39;s window. Specifically, intercepts and handles QEvent::..." alt="" coords="5,44,199,69"/>
+<area shape="rect" id="Node000002" href="$classBlobEventHandler.html#ad283c4b7bf888f3130a5b189b8066547" title="Handles the logic for processing QMoveEvent received by the event filter. Applies throttling based on..." alt="" coords="247,37,421,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,54,231,54,231,59,199,59"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#aad583f5951b3014d66d3914a8d060cad" title="Emitted periodically during window movement to provide samples for velocity calculation...." alt="" coords="469,5,662,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="421,42,453,37,454,43,422,47"/>
+<area shape="rect" id="Node000004" href="$classBlobEventHandler.html#ac63c9e11e620e4d19e4e2ca2b264087b" title="Emitted when a significant window move event is detected after throttling." alt="" coords="477,68,654,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="422,66,462,71,461,76,421,71"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="MessageService::progressMessageUpdated" name="MessageService::progressMessageUpdated">
+<area shape="rect" id="Node000001" title="Emitted during file processing and sending to update the status display." alt="" coords="773,73,951,112"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="23,16,165,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="812,68,770,50,725,35,649,22,570,14,415,8,275,13,166,23,166,17,275,8,415,3,571,8,649,17,726,30,772,45,814,64"/>
+<area shape="rect" id="Node000003" href="$classMessageService.html#a4396f2ede94cf2d9a36cf51407db7e14" title="Slot connected to the sendJsonViaSocket signal. Performs the actual sending of a JSON message...." alt="" coords="516,45,714,84"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="758,84,714,79,715,73,758,78"/>
+<area shape="rect" id="Node000005" href="$classMessageService.html#aff7ad6c0302f5f9b4864074eb6675931" title="Initiates the process of sending a file to the currently active frequency. Reads the file,..." alt="" coords="526,108,704,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="758,107,705,113,704,108,758,102"/>
+<area shape="rect" id="Node000010" href="$classMessageService.html#a6861f3f01891356e425df53280df134a" title="Slot to update a progress message associated with a file transfer. Emits the progressMessageUpdated s..." alt="" coords="504,181,725,220"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="803,121,662,183,660,179,801,116"/>
+<area shape="rect" id="Node000004" href="$classMessageService.html#ad74bc604024156fff3b840942187037e" title="Private constructor to enforce the singleton pattern. Connects the internal sendJsonViaSocket signal ..." alt="" coords="231,44,456,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="500,64,457,63,457,57,500,59"/>
+<area shape="rect" id="Node000006" href="$classChatView.html#a4b181808cf22581bd24eb4bab9e07e43" title="Opens a file dialog to allow the user to select a file for sending. If a file is selected,..." alt="" coords="271,94,416,118"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="510,118,416,113,416,107,510,113"/>
+<area shape="rect" id="Node000009" href="$classSessionCoordinator.html#a8c66229e945eb35fa8791ea88d37cdaa" title="Sends a file to the currently active wavelength. Delegates the call to WavelengthMessageService." alt="" coords="276,143,411,181"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="515,139,412,154,411,149,514,133"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="262,92,230,83,124,44,126,39,231,78,264,87"/>
+<area shape="rect" id="Node000007" href="$classShortcutManager.html#a4d014d550ca996c51abb06649f71a3fa" title="Registers shortcuts specific to the WavelengthChatView." alt="" coords="5,87,183,125"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="256,109,183,109,183,103,256,103"/>
+<area shape="rect" id="Node000011" href="$classMessageService.html#ab976b50ce98805f188d946de438ee976" title="Sends a pre&#45;formatted JSON message (typically containing file data) to the server...." alt="" coords="254,205,432,244"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="489,215,433,220,433,214,488,209"/>
+</map>

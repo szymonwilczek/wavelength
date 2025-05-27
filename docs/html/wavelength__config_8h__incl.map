@@ -1,0 +1,11 @@
+<map id="src/app/wavelength_config.h" name="src/app/wavelength_config.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="141,5,273,44"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,92,68,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,47,77,88,75,83,165,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="92,92,203,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,46,168,81,163,78,191,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="228,92,307,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="224,43,251,78,247,81,220,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="330,92,396,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="246,42,328,82,325,87,244,47"/>
+</map>

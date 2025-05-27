@@ -1,0 +1,9 @@
+<map id="BlobEventHandler::movementSampleAdded" name="BlobEventHandler::movementSampleAdded">
+<area shape="rect" id="Node000001" title="Emitted periodically during window movement to provide samples for velocity calculation...." alt="" coords="492,26,685,65"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="247,5,444,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="476,35,444,32,445,26,477,30"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#ad283c4b7bf888f3130a5b189b8066547" title="Handles the logic for processing QMoveEvent received by the event filter. Applies throttling based on..." alt="" coords="258,54,432,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="477,61,433,66,432,61,476,56"/>
+<area shape="rect" id="Node000004" href="$classBlobEventHandler.html#abeeb4f08bb1444ae0df7e85c2ea58e2c" title="Filters events installed on the parent widget&#39;s window. Specifically, intercepts and handles QEvent::..." alt="" coords="5,61,199,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="243,76,199,76,199,71,243,71"/>
+</map>

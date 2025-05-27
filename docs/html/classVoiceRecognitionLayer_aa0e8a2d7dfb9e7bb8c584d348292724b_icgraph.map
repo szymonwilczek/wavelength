@@ -1,0 +1,5 @@
+<map id="VoiceRecognitionLayer::StartRecording" name="VoiceRecognitionLayer::StartRecording">
+<area shape="rect" id="Node000001" title="Starts capturing audio from the default input device. Configures the audio format,..." alt="" coords="206,5,358,44"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#ae71584992dd14f1917a17bb72e516287" title="Initializes the layer for display. Resets the layer state, ensures the layer is fully opaque,..." alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

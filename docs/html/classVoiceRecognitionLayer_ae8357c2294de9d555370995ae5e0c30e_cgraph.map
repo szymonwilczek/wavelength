@@ -1,0 +1,7 @@
+<map id="VoiceRecognitionLayer::FinishRecognition" name="VoiceRecognitionLayer::FinishRecognition">
+<area shape="rect" id="Node000001" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="5,26,158,65"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="206,5,404,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,33,190,29,190,35,158,39"/>
+<area shape="rect" id="Node000003" href="$classVoiceRecognitionLayer.html#afa3f6710eb25231a7bfb5b20b720ed09" title="Stops capturing audio and processing. Stops the QAudioInput, deletes the audio input object,..." alt="" coords="229,54,381,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,53,213,60,213,65,158,58"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="VideoPlayer::TogglePlayback" name="VideoPlayer::TogglePlayback">
+<area shape="rect" id="Node000001" title="Toggles the playback state (play/pause) or resets if finished. If finished, resets the decoder...." alt="" coords="5,203,196,227"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a6f8d803263d342bf12f9cf29c40536de" title="Initializes the VideoDecoder instance and connects its signals. Creates the decoder,..." alt="" coords="244,203,425,227"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,212,228,212,228,218,196,218"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a51e7a40e369cc4e80033f1dd9068cdd4" title="Emitted when an error occurs during initialization or decoding." alt="" coords="510,5,648,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="340,201,358,168,387,125,425,79,472,41,495,29,497,34,474,45,429,83,391,128,362,171,344,204"/>
+<area shape="rect" id="Node000004" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="488,55,670,79"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="344,201,395,147,431,116,472,90,488,82,491,87,474,95,434,120,399,151,348,204"/>
+<area shape="rect" id="Node000005" href="$classVideoPlayer.html#a28a1008317bdb86d8a95822d97fb0a22" title="Slot connected to the decoder&#39;s error signal. Logs the error and displays it in the status_label_ and..." alt="" coords="496,104,663,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="354,200,407,170,472,139,498,131,499,136,474,144,409,174,357,204"/>
+<area shape="rect" id="Node000006" href="$classVideoPlayer.html#aa5e9a37abf6b5479169ac6f92517c2a0" title="Slot connected to the decoder&#39;s videoInfo signal. Stores video dimensions, duration,..." alt="" coords="482,153,676,178"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="399,199,499,179,500,184,400,205"/>
+<area shape="rect" id="Node000007" href="$classVideoDecoder.html#a4b36980122d8771e7aff1ed0c1db8420" title="Emitted when both video and audio (if present) streams reach the end." alt="" coords="473,203,685,227"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="425,212,457,212,457,218,425,218"/>
+<area shape="rect" id="Node000008" href="$classVideoDecoder.html#a72403db422317c2377fbf95fedd14077" title="Emitted periodically during playback to indicate the current position (based on audio if available,..." alt="" coords="475,252,683,277"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="400,225,500,246,499,251,399,231"/>
+<area shape="rect" id="Node000009" href="$classVideoPlayer.html#a2ddaf785e9a0b2cb177e62261e5261e3" title="Slot connected to the decoder&#39;s frameReady signal. Displays the received video frame in the video_lab..." alt="" coords="490,301,668,326"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="357,226,409,256,474,286,499,294,498,299,472,291,407,260,354,230"/>
+<area shape="rect" id="Node000010" href="$classVideoPlayer.html#a497bfcdf3da4ed1d16db8130197b9588" title="Slot connected to the decoder&#39;s positionChanged signal. Updates the progress slider&#39;s position and th..." alt="" coords="492,350,666,389"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="348,226,399,279,435,309,474,335,486,342,484,346,472,340,432,313,396,283,345,230"/>
+<area shape="rect" id="Node000011" href="$classVideoDecoder.html#a0680707eda3a8c22786559ff45bdb46e" title="Emitted after successful initialization, providing video stream details." alt="" coords="497,413,661,438"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="344,227,361,261,389,308,427,357,450,379,474,398,486,404,483,409,472,403,446,383,423,361,385,311,356,264,339,229"/>
+</map>

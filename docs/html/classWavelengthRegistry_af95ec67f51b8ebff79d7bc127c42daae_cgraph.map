@@ -1,0 +1,7 @@
+<map id="WavelengthRegistry::AddWavelength" name="WavelengthRegistry::AddWavelength">
+<area shape="rect" id="Node000001" title="Adds a new wavelength and its information to the registry. Removes any pending registration for the s..." alt="" coords="5,37,143,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="191,5,328,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,42,175,37,176,42,143,47"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a1c7cecfc90d7c53ea641329c53b70c62" title="Emitted when a new wavelength is successfully added to the registry." alt="" coords="191,68,328,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,65,176,71,175,76,142,71"/>
+</map>

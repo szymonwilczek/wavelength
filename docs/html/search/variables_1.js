@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['back_5fbutton_5f_0',['back_button_',['../classSettingsView.html#a3463742b48423d4d69081cb721902853',1,'SettingsView']]],
+  ['background_5fcolor_1',['background_color',['../structBlobConfig_1_1BlobParameters.html#ac8df5d43245d5cbfa109db5176ec40e5',1,'BlobConfig::BlobParameters']]],
+  ['background_5fcolor_5f_2',['background_color_',['../classWavelengthConfig.html#ad0abce337774065d51db21e732b41ca4',1,'WavelengthConfig']]],
+  ['base64_5fdata_5f_3',['base64_data_',['../classAttachmentPlaceholder.html#a454c395879d56b288cb85a4b061a8dee',1,'AttachmentPlaceholder']]],
+  ['base_5feye_5fimage_5f_4',['base_eye_image_',['../classRetinaScanLayer.html#abef9d912f5d9505a5dceaaaeacb74678',1,'RetinaScanLayer']]],
+  ['base_5ffingerprint_5f_5',['base_fingerprint_',['../classFingerprintLayer.html#ad485761a293077a64377a9c21ba869c0',1,'FingerprintLayer']]],
+  ['base_5fglow_5fintensity_5f_6',['base_glow_intensity_',['../classCyberAudioButton.html#a6cd709ec3b141ce1c3f1925e40408dc3',1,'CyberAudioButton::base_glow_intensity_'],['../classCyberPushButton.html#a24794094f1dff7a5da0122c2c3d48376',1,'CyberPushButton::base_glow_intensity_']]],
+  ['base_5fhandprint_5f_7',['base_handprint_',['../classHandprintLayer.html#a131e41ae10339c475935ebf582aa021f',1,'HandprintLayer']]],
+  ['base_5fwave_5famplitude_5f_8',['base_wave_amplitude_',['../classCommunicationStream.html#a3f1178e6a7afe4457e08074692baee33',1,'CommunicationStream']]],
+  ['bg_5fcolor_5fpreview_5f_9',['bg_color_preview_',['../classAppearanceSettingsWidget.html#a9f7f08030e9ec3f161e59d8e55a1b749',1,'AppearanceSettingsWidget']]],
+  ['bitrate_5flabel_5f_10',['bitrate_label_',['../classVideoPlayer.html#a0edd5b3b115f8b7f19de019c6d28abc6',1,'VideoPlayer']]],
+  ['blob_5f_11',['blob_',['../classAppInstanceManager.html#af505a10fdb9dd1d092b6b7e3ec42bb5e',1,'AppInstanceManager']]],
+  ['blob_5fcenter_12',['blob_center',['../structInstanceInfo.html#ae0ea52f807850ae9404761f2c93a35e8',1,'InstanceInfo']]],
+  ['blob_5fcenter_5f_13',['blob_center_',['../classBlobAnimation.html#a1c51085c2b81e77dc1e144029e7660af',1,'BlobAnimation']]],
+  ['blob_5fcolor_5f_14',['blob_color_',['../classWavelengthConfig.html#a024bd7e7b0f84d2fe4b948778ff1b51e',1,'WavelengthConfig']]],
+  ['blob_5fcolor_5fpreview_5f_15',['blob_color_preview_',['../classAppearanceSettingsWidget.html#adcc8b3c9e5b93ef4bc78a6f82e361fb1',1,'AppearanceSettingsWidget']]],
+  ['blob_5fradius_16',['blob_radius',['../structBlobConfig_1_1BlobParameters.html#ace9b465b44ea474496b54b9e5c671768',1,'BlobConfig::BlobParameters']]],
+  ['border_5fanimation_5ftimer_5f_17',['border_animation_timer_',['../classSnakeGameLayer.html#a8850f61e1dfca37f520a92e9bf0eb4de',1,'SnakeGameLayer']]],
+  ['border_5fcolor_18',['border_color',['../structBlobConfig_1_1BlobParameters.html#accc27baf83ba4a72771991ce3936a2c5',1,'BlobConfig::BlobParameters']]],
+  ['border_5fcolor_5f_19',['border_color_',['../classNetworkStatusWidget.html#aedf5d9c20d8cfe87f83a0014e1c05f44',1,'NetworkStatusWidget']]],
+  ['border_5fwidth_20',['border_width',['../structBlobConfig_1_1BlobParameters.html#ab05e55d402dca6ce8b5599d6d3359127',1,'BlobConfig::BlobParameters']]],
+  ['buffer_5f_21',['buffer_',['../classGifDecoder.html#a1c34a14b7c2e9cb5010587f0c867f5b9',1,'GifDecoder::buffer_'],['../classVideoDecoder.html#afa81ba19332e0a19eb208d39337801d6',1,'VideoDecoder::buffer_']]],
+  ['buffer_5fsize_5f_22',['buffer_size_',['../classGifDecoder.html#addffd30081ef8039070c972091394c87',1,'GifDecoder']]],
+  ['buffers_5finitialized_5f_23',['buffers_initialized_',['../classCreateWavelengthDialog.html#ab1ee156fc19826f219d5489a6f3eff9c',1,'CreateWavelengthDialog::buffers_initialized_'],['../classJoinWavelengthDialog.html#ae3afde6823833a4f2da9f9d0f2599efc',1,'JoinWavelengthDialog::buffers_initialized_']]],
+  ['buttons_5fcontainer_5f_24',['buttons_container_',['../classNavbar.html#a8306252fa871b9c75a46e1cfaeb6a03a',1,'Navbar']]]
+];

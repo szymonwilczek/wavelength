@@ -1,0 +1,5 @@
+<map id="VideoDecoder::Reset" name="VideoDecoder::Reset">
+<area shape="rect" id="Node000001" title="Resets the playback position to the beginning of the video. Pauses playback, seeks both video and int..." alt="" coords="5,5,151,30"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a97bfdada9e03663ee5f063b7eece3ad0" title="Checks if the video file contains an audio stream." alt="" coords="199,5,367,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,15,183,15,183,20,151,20"/>
+</map>

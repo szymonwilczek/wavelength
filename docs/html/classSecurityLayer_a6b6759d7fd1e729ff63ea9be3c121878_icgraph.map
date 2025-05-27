@@ -1,0 +1,55 @@
+<map id="SecurityLayer::layerCompleted" name="SecurityLayer::layerCompleted">
+<area shape="rect" id="Node000001" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="788,323,987,348"/>
+<area shape="rect" id="Node000002" href="$classSecurityQuestionLayer.html#aa5b46caeaad623e6486e0817266fe213" title="Checks the security answer (always accepts in this implementation). Called when the user presses Ente..." alt="" coords="551,13,709,52"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="876,309,858,259,830,195,790,129,766,99,739,72,708,54,711,49,742,68,770,95,795,126,835,192,863,257,881,307"/>
+<area shape="rect" id="Node000004" href="$classSecurityCodeLayer.html#ae952b967add30cb12c1a68adaaa3ec54" title="Checks if the entered code matches the current security code. Called when all input fields are filled..." alt="" coords="560,83,700,121"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="870,311,818,233,781,189,739,151,691,124,694,120,742,147,785,186,822,230,874,308"/>
+<area shape="rect" id="Node000007" href="$classSnakeGameLayer.html#af2e6b78d4d5f24e0df450f63b378392a" title="Handles the end of the game (success or failure). Stops timers. On success, updates UI to green,..." alt="" coords="530,160,731,185"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="858,315,805,272,739,227,662,188,664,183,742,222,808,268,862,311"/>
+<area shape="rect" id="Node000011" href="$classVoiceRecognitionLayer.html#ae8357c2294de9d555370995ae5e0c30e" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="554,237,706,276"/>
+<area shape="poly" id="edge9_Node000001_Node000011" title=" " alt="" coords="829,320,695,279,697,274,830,315"/>
+<area shape="rect" id="Node000014" href="$classRetinaScanLayer.html#a6b4dfb9d13e9c9e6328441272084276a" title="Slot called when the scan completes (either by timer or scanline finishing). Changes the UI element s..." alt="" coords="534,323,726,348"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="773,338,727,338,727,333,773,333"/>
+<area shape="rect" id="Node000017" href="$classTypingTestLayer.html#ac3e556568f03d6283a4749ea641d8354" title="Slot called when the text in the hidden_input_ field changes. Validates the entered text against the ..." alt="" coords="522,375,738,400"/>
+<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="808,354,695,377,694,372,807,349"/>
+<area shape="rect" id="Node000019" href="$classFingerprintLayer.html#a8010338395204b1737a32235a799a1e1" title="Handles the completion of the fingerprint scan. Changes the UI element styles (border,..." alt="" coords="545,431,715,469"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="852,358,741,414,693,433,691,428,739,409,850,353"/>
+<area shape="rect" id="Node000022" href="$classHandprintLayer.html#a8bfdc6419e93709149f942109421218b" title="Handles the completion of the handprint scan. Changes the UI element styles (border,..." alt="" coords="520,507,740,532"/>
+<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="869,362,816,422,781,454,742,483,713,498,683,509,681,504,711,493,739,478,777,450,812,418,865,358"/>
+<area shape="rect" id="Node000025" href="$classSettingsView.html#a1e089a2a90ea4b3e13e3a06c99933c39" title="Creates and configures the &quot;CLASSIFIED&quot; tab. Sets up the stacked widget containing all the security l..." alt="" coords="521,556,739,581"/>
+<area shape="poly" id="edge25_Node000001_Node000025" title=" " alt="" coords="878,363,858,404,828,454,790,504,742,546,717,558,714,553,739,541,786,500,824,451,853,401,873,361"/>
+<area shape="rect" id="Node000003" href="$classSecurityQuestionLayer.html#a538c6acd1a8bcc50dd1502a7110a2603" title="Constructs a SecurityQuestionLayer. Initializes the UI elements (title, instructions,..." alt="" coords="287,5,447,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="535,32,447,30,447,24,535,27"/>
+<area shape="rect" id="Node000005" href="$classSecurityCodeLayer.html#ab9379c05ccc6373b0611fbb64502e074" title="Slot called when the text in any input field changes. Handles automatic focus progression to the next..." alt="" coords="297,68,436,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="545,100,437,94,437,89,545,95"/>
+<area shape="rect" id="Node000006" href="$classSecurityCodeLayer.html#ac8d540d84842278f2a8b55710743fb09" title="Constructs a SecurityCodeLayer. Initializes the UI elements (title, instructions, input fields,..." alt="" coords="40,68,179,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="281,90,180,90,180,85,281,85"/>
+<area shape="rect" id="Node000008" href="$classSnakeGameLayer.html#a2b11869c78eead91d7124948615fea73" title="Moves the snake one step in the current direction_. Calculates the new head position,..." alt="" coords="268,131,466,156"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="514,162,466,157,467,152,514,157"/>
+<area shape="rect" id="Node000009" href="$classSnakeGameLayer.html#a602655706fe1871a80f00e427d0bfb48" title="Slot called periodically by game_timer_ to update the game state. Calls MoveSnake() if the game is no..." alt="" coords="5,131,214,156"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="252,146,214,146,214,141,252,141"/>
+<area shape="rect" id="Node000012" href="$classVoiceRecognitionLayer.html#a49b97cb50c3d5533e70b68d0af5258c5" title="Slot called periodically by progress_timer_ to update the recognition progress bar...." alt="" coords="291,180,443,219"/>
+<area shape="poly" id="edge10_Node000011_Node000012" title=" " alt="" coords="538,239,443,218,444,213,539,234"/>
+<area shape="rect" id="Node000013" href="$classVoiceRecognitionLayer.html#afe92e691948df9da5e2da29444995f99" title="Constructs a VoiceRecognitionLayer. Initializes the UI elements (title, audio visualizer,..." alt="" coords="29,209,190,248"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="538,254,190,236,190,230,538,249"/>
+<area shape="poly" id="edge11_Node000012_Node000013" title=" " alt="" coords="275,212,190,222,190,217,275,207"/>
+<area shape="rect" id="Node000015" href="$classRetinaScanLayer.html#a967482762796522d275e6ed7f40d1c7f" title="Constructs a RetinaScanLayer. Initializes the UI elements (title, eye image container,..." alt="" coords="12,313,207,352"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="519,336,472,335,207,335,207,330,472,330,519,331"/>
+<area shape="rect" id="Node000016" href="$classRetinaScanLayer.html#a52b3474809f40e8accf0e6f50d3c52f6" title="Slot called periodically by scan_timer_ to update the scan animation. Increments the progress bar,..." alt="" coords="267,344,466,369"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="519,347,467,351,467,346,518,342"/>
+<area shape="poly" id="edge16_Node000016_Node000015" title=" " alt="" coords="252,349,207,344,207,339,252,343"/>
+<area shape="rect" id="Node000018" href="$classTypingTestLayer.html#a0e7b55d536094d7b8eb20c03d8662a85" title="Constructs a TypingTestLayer. Initializes the UI elements (title, instructions, text display panel,..." alt="" coords="274,393,460,432"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="507,402,461,406,460,401,507,397"/>
+<area shape="rect" id="Node000020" href="$classFingerprintLayer.html#ac63e2235cb171874d2647bd8dbf9d5cd" title="Slot called periodically by fingerprint_timer_ when the user is holding the mouse button...." alt="" coords="285,456,449,495"/>
+<area shape="poly" id="edge20_Node000019_Node000020" title=" " alt="" coords="530,462,450,470,449,465,529,457"/>
+<area shape="rect" id="Node000021" href="$classFingerprintLayer.html#ac3c17d23030e0f5de68c4c4472692559" title="Constructs a FingerprintLayer. Initializes the UI elements (title, fingerprint image label,..." alt="" coords="17,449,202,488"/>
+<area shape="poly" id="edge21_Node000020_Node000021" title=" " alt="" coords="269,475,202,474,202,468,269,470"/>
+<area shape="rect" id="Node000023" href="$classHandprintLayer.html#a7153d3b1fcc6d838df1f335be5f124d4" title="Slot called periodically by handprint_timer_ when the user is holding the mouse button...." alt="" coords="262,519,472,544"/>
+<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="504,528,472,529,472,524,504,522"/>
+<area shape="rect" id="Node000024" href="$classHandprintLayer.html#a8ad520d9a942969b2095fdad95a0c989" title="Constructs a HandprintLayer. Initializes the UI elements (title, handprint image label,..." alt="" coords="23,512,196,551"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="246,534,196,534,196,529,246,529"/>
+<area shape="rect" id="Node000026" href="$classSettingsView.html#a88aeaa2ebb222180310ba66f0dba95d5" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="291,571,443,596"/>
+<area shape="poly" id="edge26_Node000025_Node000026" title=" " alt="" coords="505,578,444,582,443,576,505,573"/>
+<area shape="rect" id="Node000027" href="$classSettingsView.html#a4b22f39018ca1c051b4d88f6d2636683" title="Constructs the SettingsView. Initializes the UI, sets up all tabs including the security layers for t..." alt="" coords="18,575,201,600"/>
+<area shape="poly" id="edge27_Node000026_Node000027" title=" " alt="" coords="275,587,201,589,201,583,275,582"/>
+</map>

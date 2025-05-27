@@ -1,0 +1,25 @@
+<map id="AudioDecoder::error" name="AudioDecoder::error">
+<area shape="rect" id="Node000001" title="Emitted when an error occurs during initialization or decoding." alt="" coords="697,153,835,178"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a5cf09a96a04ce8afd751d985c71e4211" title="Constructs an AudioDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I..." alt="" coords="456,55,649,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="732,147,692,123,648,100,600,82,602,77,650,95,695,118,734,142"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a6948c3168d8c0c5a3badeeacf88f59bc" title="Reinitializes the decoder after it has been stopped or encountered an error. Releases existing resour..." alt="" coords="5,55,179,79"/>
+<area shape="poly" id="edge13_Node000001_Node000004" title=" " alt="" coords="692,152,649,144,531,127,438,118,345,109,226,94,161,83,161,77,227,88,346,104,438,113,531,122,650,139,693,147"/>
+<area shape="rect" id="Node000006" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="469,153,636,178"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="682,168,637,168,637,163,682,163"/>
+<area shape="rect" id="Node000007" href="$classAudioDecoder.html#a412416ae8d5a2153c14c6023a47ceb52" title="Initializes the FFmpeg components and QAudioOutput for playback. Opens the input stream using the cus..." alt="" coords="474,203,632,227"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="695,185,610,205,609,199,694,180"/>
+<area shape="rect" id="Node000009" href="$classVideoDecoder.html#aa8f8aabbe65727acd5ef5cfdc5f3b69b" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="474,252,632,277"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="737,190,697,216,650,241,615,254,613,249,648,237,695,212,735,185"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#afbc8e3bdffc473d8ca7a059dc30ce268" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal audio_data_ QByteArray bu..." alt="" coords="227,5,408,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="440,55,349,33,350,28,441,50"/>
+<area shape="rect" id="Node000005" href="$classAudioDecoder.html#a5f63aa27abafaeded80d3688638ace64" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="227,55,408,79"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="440,79,408,78,408,73,440,73"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="424,28,521,52,520,57,423,34"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="243,37,152,57,151,51,242,31"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="424,55,455,55,455,61,424,61"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="211,70,179,70,179,64,211,64"/>
+<area shape="rect" id="Node000008" href="$classAudioDecoder.html#a46043f6510cb80d1c4c14a18f23ecee2" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="253,203,382,227"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="458,218,383,218,383,212,458,212"/>
+<area shape="rect" id="Node000010" href="$classVideoDecoder.html#a134b48e98d0b9db4011cfea08d0924da" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="253,252,382,277"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="458,267,383,267,383,262,458,262"/>
+</map>

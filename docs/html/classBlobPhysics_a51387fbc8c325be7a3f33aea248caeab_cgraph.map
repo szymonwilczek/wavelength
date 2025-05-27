@@ -1,0 +1,5 @@
+<map id="BlobPhysics::ValidateAndRepairControlPoints" name="BlobPhysics::ValidateAndRepairControlPoints">
+<area shape="rect" id="Node000001" title="Checks if any control points or velocities contain invalid values (NaN, infinity)...." alt="" coords="5,5,176,44"/>
+<area shape="rect" id="Node000002" href="$classBlobMath.html#abef304a2fdf006c9238fe4a265951637" title="Checks if a QPointF contains valid coordinate values. Verifies that coordinates are not NaN,..." alt="" coords="224,12,377,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,22,208,22,208,27,176,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ChatView::OnReadyReadInput" name="ChatView::OnReadyReadInput">
+<area shape="rect" id="Node000001" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="5,5,204,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#aab2d772652852a6156c9f075bc21a03e" title="Calculates the Root Mean Square (RMS) amplitude of a raw audio buffer. Used for audio visualization...." alt="" coords="252,5,449,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,15,236,15,236,20,204,20"/>
+</map>

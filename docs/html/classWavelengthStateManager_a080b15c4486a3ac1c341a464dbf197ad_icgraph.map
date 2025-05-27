@@ -1,0 +1,34 @@
+<map id="WavelengthStateManager::GetInstance" name="WavelengthStateManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="696,351,866,389"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0dd567ac5a1ab2f57e17698c1dc93a1b" title="Closes a specific wavelength (only if the current user is the host). Unregisters the wavelength local..." alt="" coords="470,68,606,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="769,336,753,288,728,229,693,170,671,143,647,120,627,108,605,100,607,95,630,103,650,116,675,140,697,167,733,227,758,286,774,335"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="470,5,606,44"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="773,336,760,275,737,200,721,161,700,123,676,88,647,57,627,45,605,36,607,31,630,40,650,53,680,85,705,120,726,159,742,198,766,274,778,335"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#ad439996ffc2f1a6fc57835502c69ce7d" title="Initiates the creation of a new wavelength. Delegates the call to WavelengthCreator and registers the..." alt="" coords="470,131,606,169"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="763,338,744,302,718,260,685,219,647,184,627,173,605,164,607,159,629,168,650,180,689,215,722,257,748,299,767,335"/>
+<area shape="rect" id="Node000008" href="$classSessionCoordinator.html#a53f18e845c87c6efcdcf7c99823aa5a7" title="Gets the count of wavelengths the user is currently joined to. Delegates the call to WavelengthStateM..." alt="" coords="443,193,633,232"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="752,340,706,292,678,268,647,247,622,235,624,230,650,242,681,263,710,288,756,336"/>
+<area shape="rect" id="Node000009" href="$classSessionCoordinator.html#ae9832c3641377296715a89522e938192" title="Gets a list of frequencies the user is currently joined to. Delegates the call to WavelengthStateMana..." alt="" coords="457,256,619,295"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="728,346,647,310,612,298,614,293,649,305,730,341"/>
+<area shape="rect" id="Node000010" href="$classSessionCoordinator.html#afdd26cb48cc5a63173af38deda4ae1f5" title="Checks if the WebSocket connection for a specific wavelength is established and valid...." alt="" coords="453,319,623,357"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="680,359,624,352,624,347,681,354"/>
+<area shape="rect" id="Node000011" href="$classSessionCoordinator.html#af055c6e741f8bd8a9c31bbc9f33b70f0" title="Checks if the current user is the host of a specific wavelength. Delegates the call to WavelengthStat..." alt="" coords="470,381,606,420"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="681,385,607,395,606,389,680,380"/>
+<area shape="rect" id="Node000012" href="$classSessionCoordinator.html#a3c36788c829032c9552f7b4a2e526e45" title="Checks if the user is considered joined to a specific wavelength (based on registry presence)...." alt="" coords="466,444,611,483"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="730,399,649,435,612,447,611,442,647,430,728,394"/>
+<area shape="rect" id="Node000013" href="$classSessionCoordinator.html#aa0256473933f5d5f8001feff315aac38" title="Checks if a specific wavelength is password protected. Delegates the call to WavelengthStateManager." alt="" coords="428,507,648,545"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="757,403,710,452,681,477,650,498,627,509,624,504,647,493,678,472,707,448,753,399"/>
+<area shape="rect" id="Node000014" href="$classSessionCoordinator.html#a78a62f7f321920c128757ee20568a972" title="Initiates joining an existing wavelength. Delegates the call to WavelengthJoiner and registers the wa..." alt="" coords="470,569,606,608"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="767,405,749,441,722,483,689,525,650,560,629,572,607,580,605,575,627,567,647,556,686,521,718,480,744,439,763,402"/>
+<area shape="rect" id="Node000015" href="$classSessionCoordinator.html#ad7c56b7b495b53ea905a6157e2bc5e93" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="470,632,606,671"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="774,405,758,454,733,513,697,572,675,599,650,623,630,635,607,644,605,639,627,631,647,619,671,595,693,569,728,510,753,452,769,404"/>
+<area shape="rect" id="Node000016" href="$classSessionCoordinator.html#a58a056dc90d0c5e57749b2a1f81583ad" title="Sets the specified frequency as the currently active wavelength. Delegates the call to WavelengthStat..." alt="" coords="462,695,614,733"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="778,406,765,466,742,541,725,581,705,619,680,654,650,685,616,705,614,700,647,681,676,651,700,616,720,578,737,539,760,465,772,405"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,356,380,381"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="457,105,430,120,401,147,375,179,335,248,309,312,295,357,290,355,304,310,331,245,371,176,397,144,426,116,455,100"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,356,148,381"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,371,148,371,148,366,180,366"/>
+<area shape="rect" id="Node000006" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="220,5,356,44"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="456,27,356,27,356,22,456,22"/>
+<area shape="poly" id="edge15_Node000015_Node000003" title=" " alt="" coords="455,639,426,623,397,595,371,563,331,493,304,428,290,382,295,381,309,426,335,490,375,560,401,591,430,619,457,634"/>
+</map>

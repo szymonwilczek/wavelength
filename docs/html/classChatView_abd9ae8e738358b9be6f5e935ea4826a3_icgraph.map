@@ -1,0 +1,17 @@
+<map id="ChatView::StopAudioInput" name="ChatView::StopAudioInput">
+<area shape="rect" id="Node000001" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="893,81,1067,106"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="633,56,845,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="877,86,845,82,845,77,878,80"/>
+<area shape="rect" id="Node000007" href="$classChatView.html#a7fb02c0ac57330d91ab4afb26da50514" title="Destructor. Stops audio input/output and cleans up audio resources." alt="" coords="664,105,814,130"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="877,107,815,113,814,108,877,101"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,5,148,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="669,55,585,39,465,26,345,20,148,18,148,13,346,14,466,21,586,34,670,49"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ae1708fe2be43fe0f0bf4e000d968b385" title="Slot called when the server grants the PTT request. If the frequency matches and the state is Request..." alt="" coords="196,31,361,55"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="618,64,361,50,362,45,618,59"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#a4cbbc74a8774cc401a3117bedf750e0f" title="Configures the view for a specific Wavelength. Sets the header title with the frequency and optional ..." alt="" coords="411,80,583,105"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="618,83,584,86,584,81,618,78"/>
+<area shape="rect" id="Node000006" href="$classChatView.html#a119a0cb1a68f2e3a60e4153912fa43f2" title="Starts capturing audio from the microphone if PTT state is Transmitting. Connects the readyRead signa..." alt="" coords="409,129,585,154"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="662,88,634,96,586,119,548,131,547,126,584,114,632,91,660,83"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="180,33,148,29,148,24,181,28"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="429,127,408,119,347,88,298,58,300,54,349,83,410,114,431,122"/>
+</map>

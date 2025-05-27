@@ -1,0 +1,5 @@
+<map id="VideoPlayer::OnSliderReleased" name="VideoPlayer::OnSliderReleased">
+<area shape="rect" id="Node000001" title="Slot called when the user releases the progress slider. Performs the seek operation based on the slid..." alt="" coords="221,5,423,30"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a6ee50b34775069f86b0cace600c3923c" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

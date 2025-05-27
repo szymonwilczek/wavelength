@@ -1,0 +1,52 @@
+<map id="VideoPlayer::VideoPlayer" name="VideoPlayer::VideoPlayer">
+<area shape="rect" id="Node000001" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,277,173,302"/>
+<area shape="rect" id="Node000002" href="$classVideoPlayer.html#a476690b6a533aedfd4bc44776d309367" title="Adjusts the playback volume via the VideoDecoder. Also updates the volume icon based on the new volum..." alt="" coords="233,40,411,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,276,106,236,132,181,169,123,193,97,219,74,226,70,229,74,222,78,196,101,174,127,137,184,111,238,97,278"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="255,89,389,128"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="97,275,144,214,179,177,219,145,241,132,244,137,222,149,183,181,148,217,101,278"/>
+<area shape="rect" id="Node000006" href="$classVideoPlayer.html#a6f8d803263d342bf12f9cf29c40536de" title="Initializes the VideoDecoder instance and connects its signals. Creates the decoder,..." alt="" coords="484,203,666,227"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="100,275,148,230,182,206,220,188,259,178,299,173,380,172,456,182,518,196,517,201,455,187,380,178,300,178,260,183,222,194,185,211,151,234,103,279"/>
+<area shape="rect" id="Node000016" href="$classVideoPlayer.html#a2c628fd7afd374c0914e37ea87fc489a" title="Slot called when the user presses the progress slider. Remembers the playback state,..." alt="" coords="224,203,420,227"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="121,274,220,238,249,229,251,234,221,243,123,279"/>
+<area shape="rect" id="Node000017" href="$classVideoPlayer.html#aeea22f350e5b8a4189efa048c91c1ef0" title="Slot called when the user releases the progress slider. Performs the seek operation based on the slid..." alt="" coords="221,351,423,375"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="124,300,221,335,251,344,250,349,220,340,122,305"/>
+<area shape="rect" id="Node000019" href="$classVideoPlayer.html#a79240b971c57424608c4f8b6059b36c2" title="Toggles the mute state. If currently unmuted, mutes and remembers the last volume...." alt="" coords="239,301,404,326"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="173,296,224,301,223,306,173,301"/>
+<area shape="rect" id="Node000020" href="$classVideoPlayer.html#aee93bdf909227c7d4f7c48eca8874af6" title="Toggles the playback state (play/pause) or resets if finished. If finished, resets the decoder...." alt="" coords="227,252,417,277"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="172,278,211,274,211,279,173,283"/>
+<area shape="rect" id="Node000021" href="$classVideoPlayer.html#a1e8c783ec71f5284c63dbf997132e702" title="Slot called periodically by glitch_timer_. Sets a random intensity for the glitch effect applied in U..." alt="" coords="236,400,408,425"/>
+<area shape="poly" id="edge21_Node000001_Node000021" title=" " alt="" coords="105,300,154,342,187,365,222,385,241,392,239,397,220,389,184,369,151,346,102,304"/>
+<area shape="rect" id="Node000022" href="$classVideoPlayer.html#a744acff3b09cc5609f627be962fc94d2" title="Slot called when the progress slider&#39;s value changes (e.g., user dragging). Updates the time label di..." alt="" coords="222,449,422,474"/>
+<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="100,301,146,365,181,403,222,434,235,441,233,446,219,439,178,407,142,369,96,304"/>
+<area shape="rect" id="Node000023" href="$classVideoPlayer.html#a7a1d5f9195e91b97fdb61afaf91fae05" title="Slot called periodically by update_timer_. Updates UI elements like pulsing effects (scanline/grid op..." alt="" coords="245,499,399,523"/>
+<area shape="poly" id="edge23_Node000001_Node000023" title=" " alt="" coords="97,302,113,338,139,388,176,440,198,463,222,484,232,489,229,494,219,488,194,467,172,443,135,390,108,340,93,304"/>
+<area shape="rect" id="Node000003" href="$classVideoPlayer.html#a9c9f4464260500d2a27d2feab1e1fd7d" title="Updates the volume button icon based on the current volume level. Shows different icons for muted,..." alt="" coords="471,40,679,65"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="412,50,455,50,455,55,412,55"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="504,89,646,128"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="389,106,488,106,488,111,389,111"/>
+<area shape="rect" id="Node000007" href="$classVideoDecoder.html#a51e7a40e369cc4e80033f1dd9068cdd4" title="Emitted when an error occurs during initialization or decoding." alt="" coords="765,5,902,30"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="598,200,638,174,677,137,692,112,698,88,706,64,726,41,749,28,752,32,729,45,711,67,703,89,697,114,681,141,641,178,601,204"/>
+<area shape="rect" id="Node000008" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="743,55,924,79"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="594,200,678,137,700,112,710,101,726,90,742,83,744,87,729,95,714,105,704,116,681,141,597,204"/>
+<area shape="rect" id="Node000009" href="$classVideoPlayer.html#a28a1008317bdb86d8a95822d97fb0a22" title="Slot connected to the decoder&#39;s error signal. Logs the error and displays it in the status_label_ and..." alt="" coords="750,104,917,129"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="598,200,655,170,726,139,754,131,755,136,728,144,657,175,600,205"/>
+<area shape="rect" id="Node000010" href="$classVideoPlayer.html#aa5e9a37abf6b5479169ac6f92517c2a0" title="Slot connected to the decoder&#39;s videoInfo signal. Stores video dimensions, duration,..." alt="" coords="736,153,931,178"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="643,199,750,179,751,184,644,205"/>
+<area shape="rect" id="Node000011" href="$classVideoDecoder.html#a4b36980122d8771e7aff1ed0c1db8420" title="Emitted when both video and audio (if present) streams reach the end." alt="" coords="727,203,940,227"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="666,212,712,212,712,218,666,218"/>
+<area shape="rect" id="Node000012" href="$classVideoDecoder.html#a72403db422317c2377fbf95fedd14077" title="Emitted periodically during playback to indicate the current position (based on audio if available,..." alt="" coords="729,252,938,277"/>
+<area shape="poly" id="edge11_Node000006_Node000012" title=" " alt="" coords="644,225,751,246,750,251,643,231"/>
+<area shape="rect" id="Node000013" href="$classVideoPlayer.html#a2ddaf785e9a0b2cb177e62261e5261e3" title="Slot connected to the decoder&#39;s frameReady signal. Displays the received video frame in the video_lab..." alt="" coords="745,301,922,326"/>
+<area shape="poly" id="edge12_Node000006_Node000013" title=" " alt="" coords="600,225,657,255,728,286,755,294,754,299,726,291,655,260,598,230"/>
+<area shape="rect" id="Node000014" href="$classVideoPlayer.html#a497bfcdf3da4ed1d16db8130197b9588" title="Slot connected to the decoder&#39;s positionChanged signal. Updates the progress slider&#39;s position and th..." alt="" coords="747,350,920,389"/>
+<area shape="poly" id="edge13_Node000006_Node000014" title=" " alt="" coords="590,226,647,278,686,309,729,335,742,342,740,347,726,340,683,313,644,282,587,230"/>
+<area shape="rect" id="Node000015" href="$classVideoDecoder.html#a0680707eda3a8c22786559ff45bdb46e" title="Emitted after successful initialization, providing video stream details." alt="" coords="751,413,916,438"/>
+<area shape="poly" id="edge14_Node000006_Node000015" title=" " alt="" coords="589,226,681,337,703,371,713,385,729,398,740,404,738,409,726,403,709,388,698,374,677,341,585,230"/>
+<area shape="rect" id="Node000018" href="$classVideoPlayer.html#a5e1ada602659cecd28886da1b8f245ba" title="Initiates a seek operation in the VideoDecoder. Converts the slider position (milliseconds) to second..." alt="" coords="494,351,656,375"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="423,360,479,360,479,366,423,366"/>
+<area shape="poly" id="edge20_Node000020_Node000006" title=" " alt="" coords="389,249,492,228,493,234,390,254"/>
+<area shape="rect" id="Node000024" href="$classVideoPlayer.html#abf2b63d3ad93ffedd3615966e52b6aa0" title="Sets the opacity for the background grid effect. Triggers an update() to repaint the widget." alt="" coords="482,471,669,495"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="399,500,466,492,467,498,400,505"/>
+<area shape="rect" id="Node000025" href="$classVideoPlayer.html#a1e79879c54531c1947e52ba04cc67491" title="Sets the opacity for the scanline effect. Triggers an update() to repaint the widget." alt="" coords="491,520,659,558"/>
+<area shape="poly" id="edge25_Node000023_Node000025" title=" " alt="" coords="400,517,476,525,475,531,399,522"/>
+</map>

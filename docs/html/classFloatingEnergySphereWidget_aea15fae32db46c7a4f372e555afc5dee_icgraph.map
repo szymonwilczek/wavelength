@@ -1,0 +1,5 @@
+<map id="FloatingEnergySphereWidget::StartDestructionSequence" name="FloatingEnergySphereWidget::StartDestructionSequence">
+<area shape="rect" id="Node000001" title="Initiates the destruction animation sequence. Sets the is_destroying_ flag, resets progress,..." alt="" coords="244,5,434,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#a630cbacaf6b67fe50e50eed814a3de50" title="Handles key press events. Detects the Konami code sequence." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

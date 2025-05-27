@@ -1,0 +1,5 @@
+<map id="WavelengthRegistry::WavelengthRegistry" name="WavelengthRegistry::WavelengthRegistry">
+<area shape="rect" id="Node000001" title="Deleted copy constructor to prevent copying." alt="" coords="5,5,151,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="199,5,344,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,22,183,22,183,27,151,27"/>
+</map>

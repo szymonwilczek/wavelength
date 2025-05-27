@@ -1,0 +1,5 @@
+<map id="SessionCoordinator::onPttGranted" name="SessionCoordinator::onPttGranted">
+<area shape="rect" id="Node000001" title="Relays the pttGranted signal." alt="" coords="5,5,141,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a75dd225e503b9ff835a458d3728b0184" title="Emitted when PTT transmission is granted. Relayed from WavelengthMessageService." alt="" coords="189,5,324,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,22,173,22,173,27,141,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="SnakeGameLayer::UpdateBorderAnimation" name="SnakeGameLayer::UpdateBorderAnimation">
+<area shape="rect" id="Node000001" title="Slot called periodically by border_animation_timer_ to animate the border opening...." alt="" coords="5,5,217,44"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#abd0a2b6324682d0883a41d5ebae0cc39" title="Renders the current state of the game onto the game_board_ QLabel. Draws the grid,..." alt="" coords="265,12,472,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,22,249,22,249,27,217,27"/>
+</map>

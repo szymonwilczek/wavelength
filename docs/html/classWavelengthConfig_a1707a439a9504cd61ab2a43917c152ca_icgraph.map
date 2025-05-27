@@ -1,0 +1,9 @@
+<map id="WavelengthConfig::SaveSettings" name="WavelengthConfig::SaveSettings">
+<area shape="rect" id="Node000001" title="Saves all current configuration settings to persistent storage (QSettings)." alt="" coords="416,44,627,69"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ad68b22d6bafb0633e47a9c29d156a1a3" title="Loads the application configuration using WavelengthConfig. Sets default values if the configuration ..." alt="" coords="211,5,346,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="407,44,346,36,347,31,408,39"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#a045bf9dd6f33936f8c172525958f446c" title="Restores all configuration settings to their default values. Also clears saved shortcuts in persisten..." alt="" coords="189,68,368,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="404,74,369,79,368,73,403,69"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="195,27,141,27,141,22,195,22"/>
+</map>

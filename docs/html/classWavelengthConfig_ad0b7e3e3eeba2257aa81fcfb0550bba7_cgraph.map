@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::SetConnectionTimeout" name="WavelengthConfig::SetConnectionTimeout">
+<area shape="rect" id="Node000001" title="Sets the connection timeout in milliseconds. Emits configChanged(&quot;connectionTimeout&quot;) if the value ch..." alt="" coords="5,5,226,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="274,5,443,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,22,258,22,258,27,226,27"/>
+</map>

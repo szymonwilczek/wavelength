@@ -1,0 +1,5 @@
+<map id="FloatingEnergySphereWidget::HandlePlayerStateChanged" name="FloatingEnergySphereWidget::HandlePlayerStateChanged">
+<area shape="rect" id="Node000001" title="Slot called when the QMediaPlayer&#39;s state changes (e.g., Playing, Stopped). Used to detect the end of..." alt="" coords="5,5,196,44"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#ae81d952cf10dd7a2389a6d958e789b16" title="Emitted when the destruction animation sequence (visual and audio) completes." alt="" coords="244,5,444,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,22,228,22,228,27,196,27"/>
+</map>

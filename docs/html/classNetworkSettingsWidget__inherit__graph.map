@@ -1,0 +1,5 @@
+<map id="NetworkSettingsWidget" name="NetworkSettingsWidget">
+<area shape="rect" id="Node000001" title="A widget for configuring advanced network settings for the application." alt="" coords="5,117,191,494"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="68,5,129,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,84,101,117,96,117,96,84"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ChatStyle::GetAttachButtonStyle" name="ChatStyle::GetAttachButtonStyle">
+<area shape="rect" id="Node000001" title="Gets the stylesheet for the &quot;Attach File&quot; button (QPushButton). Defines background,..." alt="" coords="5,37,190,76"/>
+<area shape="rect" id="Node000002" href="$classCyberpunkStyle.html#abfd4f5b01a3833e07116b1d4b4242fa6" title="Gets the primary color (Neon Blue)." alt="" coords="246,5,436,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,42,231,36,231,42,190,47"/>
+<area shape="rect" id="Node000003" href="$classCyberpunkStyle.html#aa351ffeca18a1ba66c5c288e9683f89f" title="Gets the secondary color (Lighter Blue)." alt="" coords="238,68,445,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,66,223,70,222,75,190,71"/>
+</map>

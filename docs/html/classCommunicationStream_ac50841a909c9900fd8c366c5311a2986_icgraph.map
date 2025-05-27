@@ -1,0 +1,5 @@
+<map id="CommunicationStream::GenerateUserVisuals" name="CommunicationStream::GenerateUserVisuals">
+<area shape="rect" id="Node000001" title="Generates visual properties (currently color) based on a user ID hash." alt="" coords="208,5,362,44"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#a010e90bead5b34f8137d888b2343b119" title="Displays the identifier of the user currently transmitting audio. Generates a unique color for the us..." alt="" coords="5,5,160,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,27,160,27,160,22,192,22"/>
+</map>

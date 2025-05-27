@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::GetJoinedWavelengthCount" name="WavelengthStateManager::GetJoinedWavelengthCount">
+<area shape="rect" id="Node000001" title="Gets the total number of wavelengths the user is currently joined to." alt="" coords="244,5,434,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a53f18e845c87c6efcdcf7c99823aa5a7" title="Gets the count of wavelengths the user is currently joined to. Delegates the call to WavelengthStateM..." alt="" coords="5,5,196,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,27,196,27,196,22,228,22"/>
+</map>

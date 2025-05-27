@@ -1,0 +1,18 @@
+<map id="AttachmentDataStore::AttachmentDataStore" name="AttachmentDataStore::AttachmentDataStore">
+<area shape="rect" id="Node000001" title="Private default constructor to enforce the singleton pattern." alt="" coords="672,68,827,107"/>
+<area shape="rect" id="Node000002" href="$classAttachmentDataStore.html#a0d93dafc03e5e57aa61f0b26aef99b5e" title="Deleted copy constructor to prevent copying." alt="" coords="470,5,624,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="670,65,611,47,613,42,671,60"/>
+<area shape="rect" id="Node000003" href="$classAttachmentDataStore.html#a954fe97d063ada489bb0b29ad4f4f4e0" title="Gets the singleton instance of the AttachmentDataStore." alt="" coords="474,68,620,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="657,90,620,90,620,85,657,85"/>
+<area shape="rect" id="Node000016" href="$classAttachmentDataStore.html#a1a1f12a776bb00661246b7ab553f284d" title="Deleted assignment operator to prevent assignment." alt="" coords="474,131,620,169"/>
+<area shape="poly" id="edge8_Node000001_Node000016" title=" " alt="" coords="671,114,613,133,611,128,670,109"/>
+<area shape="rect" id="Node000004" href="$classMessageFormatter.html#af3a717bfa398187a653410d3febeb9cb" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="243,11,422,49"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="458,66,407,53,408,47,459,61"/>
+<area shape="rect" id="Node000005" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="5,37,195,76"/>
+<area shape="poly" id="edge7_Node000003_Node000005" title=" " alt="" coords="458,84,195,66,195,60,458,79"/>
+<area shape="rect" id="Node000014" href="$classAttachmentPlaceholder.html#a8d2443eb9d37bbbc16b5c7a8ead875e2" title="Slot triggered when the load/retry button is clicked or automatically after initialization...." alt="" coords="254,125,410,164"/>
+<area shape="poly" id="edge5_Node000003_Node000014" title=" " alt="" coords="459,113,408,127,407,122,458,108"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="228,45,196,48,195,43,227,39"/>
+<area shape="rect" id="Node000015" href="$classAttachmentPlaceholder.html#a75277d4204ecadbc370f7a4c393cd0be" title="Constructs an AttachmentPlaceholder widget. Initializes the UI elements (labels, button,..." alt="" coords="18,125,182,164"/>
+<area shape="poly" id="edge6_Node000014_Node000015" title=" " alt="" coords="239,147,183,147,183,142,239,142"/>
+</map>

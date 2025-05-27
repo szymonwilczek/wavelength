@@ -1,0 +1,5 @@
+<map id="ChatView::AbortWavelength" name="ChatView::AbortWavelength">
+<area shape="rect" id="Node000001" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,5,380,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,5,148,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,20,148,20,148,15,180,15"/>
+</map>

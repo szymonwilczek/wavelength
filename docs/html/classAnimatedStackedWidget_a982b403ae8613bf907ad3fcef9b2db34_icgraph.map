@@ -1,0 +1,5 @@
+<map id="AnimatedStackedWidget::OnGLTransitionFinished" name="AnimatedStackedWidget::OnGLTransitionFinished">
+<area shape="rect" id="Node000001" title="Slot called when the OpenGL transition animation finishes. Hides the OpenGL widget,..." alt="" coords="226,5,393,44"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#a73649a355934e1882b3dffea8473b393" title="Constructs an AnimatedStackedWidget. Initializes the animation group, sound effect,..." alt="" coords="5,5,178,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,27,178,27,178,22,210,22"/>
+</map>

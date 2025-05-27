@@ -1,0 +1,9 @@
+<map id="NetworkStatusWidget::CreateNetworkIcon" name="NetworkStatusWidget::CreateNetworkIcon">
+<area shape="rect" id="Node000001" title="Generates the WiFi&#45;style icon as a QPixmap based on the network quality. Draws a series of arcs,..." alt="" coords="614,5,764,44"/>
+<area shape="rect" id="Node000002" href="$classNetworkStatusWidget.html#ae67562eeae82707e25e7d1c3a883de3b" title="Updates the text of the status and ping labels, the icon, and the border color based on the current_q..." alt="" coords="413,5,566,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="599,27,567,27,567,22,599,22"/>
+<area shape="rect" id="Node000003" href="$classNetworkStatusWidget.html#a621b931ee58720e3e35b0a4a6a56e74a" title="Performs a network status check. Sends a network request, measures the response time (ping),..." alt="" coords="211,5,365,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="397,27,365,27,365,22,397,22"/>
+<area shape="rect" id="Node000004" href="$classNetworkStatusWidget.html#a6a11f48fc069cc7f73316a70ffc3ac6c" title="Constructs a NetworkStatusWidget. Initializes UI elements (labels, layout), sets appearance (size,..." alt="" coords="5,5,163,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="195,27,163,27,163,22,195,22"/>
+</map>

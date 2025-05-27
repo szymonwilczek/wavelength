@@ -1,0 +1,7 @@
+<map id="AttachmentPlaceholder::SetContent" name="AttachmentPlaceholder::SetContent">
+<area shape="rect" id="Node000001" title="Sets the actual content widget to be displayed within the placeholder. Replaces any existing content,..." alt="" coords="5,5,162,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#a52b917064beb0822fe62d7448a1f549b" title="Emits the attachmentLoaded signal after ensuring layout updates. Called internally after SetContent c..." alt="" coords="210,5,366,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,22,195,22,195,27,162,27"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#ab83f0cf3a4db5e16cc136fa515d91a75" title="Emitted after the attachment content has been successfully loaded, set, and the layout updated." alt="" coords="414,5,570,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,22,399,22,399,27,367,27"/>
+</map>

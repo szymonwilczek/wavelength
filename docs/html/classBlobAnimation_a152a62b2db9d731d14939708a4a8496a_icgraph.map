@@ -1,0 +1,18 @@
+<map id="BlobAnimation::GenerateOrganicShape" name="BlobAnimation::GenerateOrganicShape">
+<area shape="rect" id="Node000001" title="Generates a set of points forming an organic, blob&#45;like shape around a center point...." alt="" coords="759,88,971,127"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a2b520d867895a9631aaa1a88e64ada61" title="Initializes the blob&#39;s state (control points, target points, velocity, center) based on current param..." alt="" coords="525,67,711,92"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="743,96,711,93,712,87,744,91"/>
+<area shape="rect" id="Node000006" href="$classBlobAnimation.html#a883189070c4bbe6054d084c4d4184c0a" title="Resets the blob&#39;s position to the center of the widget and regenerates its shape. Clears velocities a..." alt="" coords="532,116,705,155"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="744,124,706,128,705,123,743,118"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="8,122,205,146"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="510,87,388,96,256,110,172,124,171,118,255,105,387,91,509,82"/>
+<area shape="rect" id="Node000004" href="$classBlobAnimation.html#aea443f68ce3f9a932a56a96e44b367d6" title="Resumes all event tracking mechanisms after being paused. Restarts timers, enables the event handler,..." alt="" coords="278,5,454,44"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="542,66,455,46,456,41,543,61"/>
+<area shape="rect" id="Node000005" href="$classBlobAnimation.html#a6dd0c09acbfa1be7967d6d7114719fbf" title="Makes the animation widget visible and resumes event tracking." alt="" coords="5,12,208,37"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="263,27,208,27,208,22,263,22"/>
+<area shape="rect" id="Node000007" href="$classBlobAnimation.html#a36a2a04ace71e1fefc7c1c0cfd1f9e18" title="Slot connected to resize_debounce_timer_. Called after a short delay following resize events...." alt="" coords="270,168,463,207"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="517,159,464,170,463,165,516,154"/>
+<area shape="rect" id="Node000008" href="$classBlobAnimation.html#a2221a2cb550dcf7497bf8911cef6c209" title="Resets the entire blob visualization to its initial state. Resets blob position, shape,..." alt="" coords="256,119,477,144"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="516,136,477,136,477,130,516,131"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="254,167,170,150,171,144,255,162"/>
+</map>

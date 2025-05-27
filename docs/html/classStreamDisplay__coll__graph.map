@@ -1,0 +1,20 @@
+<map id="StreamDisplay" name="StreamDisplay">
+<area shape="rect" id="Node000001" title="A widget that manages and displays messages within a CommunicationStream." alt="" coords="5,2589,263,3047"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="82,1724,144,1787"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,1802,132,2589,127,2589,111,1802"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html" title="A custom OpenGL widget displaying an animated communication stream visualization." alt="" coords="168,984,431,2527"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,2527,175,2572,170,2571,177,2526"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="48,481,157,545"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="112,559,180,984,174,985,107,560"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="181,481,306,545"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="248,559,268,984,262,984,243,559"/>
+<area shape="rect" id="Node000006" href="$classUserInfoLabel.html" title="A custom QLabel that displays text alongside a colored circle with a glow effect." alt="" coords="330,350,520,676"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="411,676,382,967,377,967,406,675"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="399,5,451,69"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="428,84,428,350,422,350,422,84"/>
+<area shape="rect" id="Node000008" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="544,118,757,908"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="546,891,438,1274,433,1272,541,890"/>
+<area shape="poly" id="edge9_Node000008_Node000008" title=" " alt="" coords="758,441,769,452,777,468,782,488,783,513,780,547,770,571,765,569,775,545,778,513,776,489,772,470,764,455,754,445"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="621,5,680,69"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="653,84,653,118,648,118,648,84"/>
+</map>

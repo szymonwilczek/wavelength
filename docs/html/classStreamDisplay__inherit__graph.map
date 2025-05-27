@@ -1,0 +1,5 @@
+<map id="StreamDisplay" name="StreamDisplay">
+<area shape="rect" id="Node000001" title="A widget that manages and displays messages within a CommunicationStream." alt="" coords="5,117,263,608"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="104,5,165,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,83,137,117,132,117,132,83"/>
+</map>

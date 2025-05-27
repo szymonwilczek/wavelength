@@ -1,0 +1,5 @@
+<map id="BlobAnimation::PauseAllEventTracking" name="BlobAnimation::PauseAllEventTracking">
+<area shape="rect" id="Node000001" title="Pauses all event tracking mechanisms (window move/resize). Stops timers, clears movement buffers,..." alt="" coords="249,5,447,44"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a390f9dabfe7b7ceac870b19ea4dc1038" title="Hides the animation widget and pauses event tracking." alt="" coords="5,12,201,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,27,201,27,201,22,233,22"/>
+</map>

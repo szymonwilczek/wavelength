@@ -1,0 +1,15 @@
+<map id="AttachmentPlaceholder::GenerateThumbnail" name="AttachmentPlaceholder::GenerateThumbnail">
+<area shape="rect" id="Node000001" title="Generates a thumbnail image from the first frame of a video in a background thread...." alt="" coords="5,85,162,124"/>
+<area shape="rect" id="Node000002" href="$classAttachmentQueueManager.html#a9fc5b79cd8dd31a11ff60fedf183f5d2" title="Adds a new task (represented by a std::function) to the execution queue. Creates an AttachmentTask wr..." alt="" coords="212,29,388,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,82,207,70,209,75,162,87"/>
+<area shape="rect" id="Node000005" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="210,92,391,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,102,194,102,194,107,162,107"/>
+<area shape="rect" id="Node000006" href="$classAttachmentQueueManager.html#ad4882521922da9692f3ff5734761e230" title="Gets the singleton instance of the AttachmentQueueManager." alt="" coords="212,141,388,180"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="162,122,209,134,207,139,160,127"/>
+<area shape="rect" id="Node000003" href="$classAttachmentTask.html#a08ea014777b2a92f1863c8bca688e0e9" title="Emitted after the task function (TaskFunc_) has finished executing." alt="" coords="447,5,615,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,34,431,28,432,33,389,39"/>
+<area shape="rect" id="Node000004" href="$classAttachmentQueueManager.html#aab8e65b34981358a309208cf2118febe" title="Processes the task queue, starting new tasks if slots are available. Checks if the number of active t..." alt="" coords="443,54,619,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="389,55,428,60,427,65,388,61"/>
+<area shape="rect" id="Node000007" href="$classAttachmentQueueManager.html#a7d8e4bb17b92bb0e390215015c269349" title="Private constructor to enforce the singleton pattern. Determines the maximum number of concurrent tas..." alt="" coords="439,141,623,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="389,158,423,158,423,163,389,163"/>
+</map>

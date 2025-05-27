@@ -1,0 +1,5 @@
+<map id="VoiceRecognitionLayer::ProcessAudioInput" name="VoiceRecognitionLayer::ProcessAudioInput">
+<area shape="rect" id="Node000001" title="Slot called periodically by audio_process_timer_ to read and process available audio data...." alt="" coords="5,5,158,44"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#a40f32b30534b60b480311a5dbb6571e7" title="Updates the audio_visualizer_label_ with a waveform representation of the audio data...." alt="" coords="206,5,366,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,22,190,22,190,27,158,27"/>
+</map>

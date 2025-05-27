@@ -1,0 +1,30 @@
+<map id="SystemOverrideManager" name="SystemOverrideManager">
+<area shape="rect" id="Node000001" title="Manages a &quot;system override&quot; sequence involving visual and system&#45;level changes." alt="" coords="263,1489,479,1971"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="320,836,379,899"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="353,914,368,1489,362,1489,348,914"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html" title="An OpenGL widget displaying a floating, interactive energy sphere." alt="" coords="403,309,629,1427"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="425,1427,417,1473,412,1472,419,1426"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,176,115,240"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="127,243,129,244,263,271,345,289,376,298,392,307,405,320,402,324,389,311,374,303,344,294,262,276,127,249,125,248"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="140,169,279,247"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="294,249,357,283,393,307,406,325,401,328,389,311,354,287,292,253"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="619,176,757,240"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="683,240,636,419,631,418,678,239"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="575,25,679,88"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="649,100,661,130,679,176,674,177,656,132,644,103"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="781,176,902,240"/>
+<area shape="poly" id="edge8_Node000009_Node000007" title=" " alt="" coords="688,94,740,129,803,174,800,179,737,134,685,98"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="437,176,595,240"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="591,101,566,133,536,178,531,175,561,130,587,98"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="304,176,414,240"/>
+<area shape="poly" id="edge15_Node000014_Node000007" title=" " alt="" coords="563,96,427,172,414,179,411,174,424,167,560,91"/>
+<area shape="poly" id="edge7_Node000003_Node000009" title=" " alt="" coords="829,240,813,272,639,624,634,621,808,269,824,238"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="519,239,519,292,514,292,514,239"/>
+<area shape="rect" id="Node000011" href="$structImpactInfo.html" title="Structure holding information about a single impact effect on the sphere." alt="" coords="338,5,458,107"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="392,107,394,126,401,144,412,154,430,166,427,171,409,159,397,147,389,128,387,107"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="925,176,1035,240"/>
+<area shape="poly" id="edge12_Node000003_Node000012" title=" " alt="" coords="961,241,641,694,637,691,957,238"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="928,25,1032,88"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="983,103,983,177,978,177,978,103"/>
+<area shape="poly" id="edge14_Node000003_Node000014" title=" " alt="" coords="372,239,393,308,401,338,396,339,388,309,367,240"/>
+</map>

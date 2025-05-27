@@ -1,0 +1,7 @@
+<map id="AnimatedStackedWidget::SlideToIndex" name="AnimatedStackedWidget::SlideToIndex">
+<area shape="rect" id="Node000001" title="Initiates an animated transition to the widget at the specified index. Plays a sound effect and start..." alt="" coords="218,37,382,76"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#a4f2d6e971acad290609ecf9881a604dd" title="Initiates an animated transition to the next widget in the stack (wraps around). Useful for creating ..." alt="" coords="5,5,170,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,45,170,40,170,34,203,39"/>
+<area shape="rect" id="Node000003" href="$classAnimatedStackedWidget.html#a396f55db2591170791fe0d388217de5a" title="Initiates an animated transition to the specified widget. Convenience slot that finds the index of th..." alt="" coords="5,68,170,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,73,170,78,170,73,202,68"/>
+</map>

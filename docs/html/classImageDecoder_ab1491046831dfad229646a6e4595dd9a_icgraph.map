@@ -1,0 +1,7 @@
+<map id="ImageDecoder::error" name="ImageDecoder::error">
+<area shape="rect" id="Node000001" title="Emitted if an error occurs during image loading or decoding." alt="" coords="233,31,373,55"/>
+<area shape="rect" id="Node000002" href="$classImageDecoder.html#a7f74a698bed67d7562aebae7f7d3c307" title="Attempts to decode the image data stored internally. Uses QImage::loadFromData() to perform the decod..." alt="" coords="15,5,175,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,35,175,30,176,25,218,30"/>
+<area shape="rect" id="Node000003" href="$classImageViewer.html#a9f9cd61953b303c108ab1b8cabef1870" title="Constructs an InlineImageViewer widget. Initializes the UI (QLabel), creates the ImageDecoder instanc..." alt="" coords="5,55,185,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,56,185,59,185,54,217,50"/>
+</map>

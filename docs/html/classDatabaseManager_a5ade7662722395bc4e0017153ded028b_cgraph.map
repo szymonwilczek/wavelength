@@ -1,0 +1,5 @@
+<map id="DatabaseManager::GetInstance" name="DatabaseManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the DatabaseManager." alt="" coords="5,12,211,37"/>
+<area shape="rect" id="Node000002" href="$classDatabaseManager.html#aebfb8cc7427256623ccbe059b30b6450" title="Private constructor to enforce the singleton pattern. Attempts to establish the connection to the Pos..." alt="" coords="259,5,448,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,22,243,22,243,27,211,27"/>
+</map>

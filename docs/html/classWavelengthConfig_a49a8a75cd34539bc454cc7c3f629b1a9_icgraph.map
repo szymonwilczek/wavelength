@@ -1,0 +1,7 @@
+<map id="WavelengthConfig::LoadDefaults" name="WavelengthConfig::LoadDefaults">
+<area shape="rect" id="Node000001" title="Loads the hardcoded default values for all settings into the member variables. Also copies the defaul..." alt="" coords="255,44,466,69"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a045bf9dd6f33936f8c172525958f446c" title="Restores all configuration settings to their default values. Also clears saved shortcuts in persisten..." alt="" coords="16,5,196,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,44,196,39,196,33,243,39"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a4c1332c2b5c244fb8d20da90fb1790a7" title="Private constructor to enforce the singleton pattern. Loads default shortcuts, default values,..." alt="" coords="5,68,207,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,74,208,78,207,73,239,69"/>
+</map>

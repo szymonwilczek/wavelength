@@ -1,0 +1,49 @@
+<map id="AudioPlayer::AudioPlayer" name="AudioPlayer::AudioPlayer">
+<area shape="rect" id="Node000001" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,389,173,414"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#a733a6f2a4eef91204f5ff1226182563a" title="Adjusts the playback volume via the AudioDecoder. Also updates the volume icon based on the new volum..." alt="" coords="238,5,416,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,389,94,326,113,232,130,181,152,130,182,82,219,41,225,36,229,40,222,45,186,85,157,132,135,183,118,234,100,327,94,389"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a70ae7be45d270a97159bd5f6c36c2ad8" title="Emitted after successful initialization, providing audio stream details." alt="" coords="245,55,409,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="89,388,98,333,119,253,136,209,158,165,185,125,219,90,229,83,232,87,222,94,190,128,163,168,141,211,125,254,103,334,94,389"/>
+<area shape="rect" id="Node000005" href="$classAudioDecoder.html#a4c483a41bf7d57354b63bec009ac222e" title="Emitted when an error occurs during initialization or decoding." alt="" coords="258,104,396,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="90,388,102,341,125,273,142,236,164,200,189,167,219,138,242,125,245,130,222,142,193,170,168,203,147,239,130,275,107,342,95,390"/>
+<area shape="rect" id="Node000006" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="260,153,394,192"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="93,388,109,351,135,301,172,248,194,224,219,202,244,188,247,193,222,207,198,227,176,251,140,304,113,354,98,390"/>
+<area shape="rect" id="Node000008" href="$classAudioPlayer.html#a549285e964df7326b963dd25afd2f91d" title="Slot connected to the decoder&#39;s audioInfo signal. Stores the audio duration, sets the range for the p..." alt="" coords="230,216,424,241"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="95,387,141,322,177,284,219,251,233,244,235,249,222,256,181,288,146,326,100,391"/>
+<area shape="rect" id="Node000009" href="$classAudioPlayer.html#a81aae890bcc518f51780c7dd33ba4588" title="Slot connected to the decoder&#39;s error signal. Prints the error message to debug output and updates th..." alt="" coords="243,265,410,290"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="101,387,151,345,184,321,220,301,240,293,242,297,222,305,187,325,154,349,105,391"/>
+<area shape="rect" id="Node000010" href="$classAudioPlayer.html#a0230c535171713f87181a3befcdebde4" title="Slot called when the user presses the progress slider. Remembers the playback state and pauses playba..." alt="" coords="229,315,425,339"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="120,386,220,350,251,341,252,346,221,355,122,391"/>
+<area shape="rect" id="Node000011" href="$classAudioPlayer.html#a51a8f1193d8003041b9771fec6b5ee19" title="Slot called when the user releases the progress slider. Performs the actual seek operation based on t..." alt="" coords="226,364,428,389"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="173,390,210,386,210,391,174,395"/>
+<area shape="rect" id="Node000014" href="$classAudioDecoder.html#a4f5e8f4dd5f45b60bc5ed68ccd8a90c3" title="Emitted when the decoder reaches the end of the audio stream." alt="" coords="221,413,433,438"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="174,407,205,411,205,416,173,413"/>
+<area shape="rect" id="Node000015" href="$classAudioDecoder.html#a928f569d98a91fae0fa27371a0c85b4e" title="Emitted periodically during playback to indicate the current position." alt="" coords="223,463,431,487"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="123,412,221,447,253,456,251,461,220,452,121,417"/>
+<area shape="rect" id="Node000016" href="$classAudioPlayer.html#aa2370903faeb477381acc705ba4e928c" title="Stops timers, stops and waits for the decoder thread, and releases decoder resources...." alt="" coords="223,512,430,537"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="105,412,154,454,187,477,222,497,242,505,240,509,220,501,184,482,151,458,102,417"/>
+<area shape="rect" id="Node000017" href="$classAudioPlayer.html#a0351bb7ba5ddf76732450b474324448b" title="Toggles the mute state. If currently unmuted, mutes and remembers the last volume...." alt="" coords="244,561,410,586"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="100,413,146,477,181,515,222,546,235,553,233,558,219,551,178,519,142,481,96,416"/>
+<area shape="rect" id="Node000018" href="$classAudioPlayer.html#afd42f1d9043e96d8b8ce55f7afd08483" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="232,611,422,635"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="97,414,113,450,139,500,176,552,198,575,222,595,232,601,229,606,219,600,194,579,171,555,135,503,108,452,93,416"/>
+<area shape="rect" id="Node000021" href="$classAudioPlayer.html#a688cb8aee215677b6e48e30c5677a501" title="Slot called when the progress slider&#39;s value changes (e.g., user dragging). Updates the time label di..." alt="" coords="486,664,686,689"/>
+<area shape="poly" id="edge23_Node000001_Node000021" title=" " alt="" coords="95,414,107,459,130,524,147,558,167,591,192,620,222,645,254,663,289,676,362,690,435,693,500,689,501,694,435,698,362,696,288,681,252,667,219,649,189,624,163,594,142,561,125,526,101,461,90,415"/>
+<area shape="rect" id="Node000022" href="$classAudioPlayer.html#adebf5e9e21d608f8870afd92003f3908" title="Slot connected to the decoder&#39;s positionChanged signal. Updates the progress slider&#39;s position and th..." alt="" coords="240,710,414,749"/>
+<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="95,414,106,464,129,538,146,578,167,618,192,656,222,689,238,700,234,705,219,693,188,659,163,621,141,580,124,539,101,465,90,415"/>
+<area shape="rect" id="Node000023" href="$classAudioPlayer.html#aa488a7e87ced2bbbbf8ca27783c51d40" title="Slot called periodically by ui_timer_. Updates UI elements, primarily the spectrum data for visualiza..." alt="" coords="250,773,404,798"/>
+<area shape="poly" id="edge24_Node000001_Node000023" title=" " alt="" coords="93,414,99,477,118,571,134,622,157,672,186,719,222,760,237,770,234,774,219,764,181,723,152,675,129,624,113,572,94,478,88,415"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#a7298913087e0194db1d904f5556479ee" title="Updates the volume button icon based on the current volume level. Shows different icons for muted,..." alt="" coords="482,5,690,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,15,466,15,466,20,416,20"/>
+<area shape="rect" id="Node000007" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="515,153,657,192"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="395,170,499,170,499,175,395,175"/>
+<area shape="rect" id="Node000012" href="$classAudioPlayer.html#a19c2b80607821596a7ebb8ed095a796c" title="Starts an animation to increase the spectrum intensity (e.g., when playback starts)." alt="" coords="484,452,688,490"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="391,387,434,399,535,442,532,447,432,404,390,392"/>
+<area shape="rect" id="Node000013" href="$classAudioPlayer.html#ad8076e6a4672d7769669725cda600b39" title="Initiates a seek operation in the AudioDecoder. Converts the slider position (milliseconds) to second..." alt="" coords="506,364,667,389"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="429,374,490,374,490,379,429,379"/>
+<area shape="poly" id="edge20_Node000018_Node000012" title=" " alt="" coords="405,608,432,595,447,583,456,569,465,555,479,538,535,497,539,501,483,542,469,558,461,572,451,586,434,600,407,613"/>
+<area shape="rect" id="Node000019" href="$classAudioPlayer.html#a54cdd24d841a87257e605472a019156b" title="Activates this player instance. If another player is active, it deactivates it first...." alt="" coords="514,552,659,577"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="384,608,513,578,514,583,385,613"/>
+<area shape="rect" id="Node000020" href="$classAudioPlayer.html#a380a2522ca3504fe87f5a5784e9ebc33" title="Starts an animation to decrease the spectrum intensity (e.g., when playback pauses or finishes)." alt="" coords="481,601,691,640"/>
+<area shape="poly" id="edge19_Node000018_Node000020" title=" " alt="" coords="423,619,466,619,466,624,423,625"/>
+<area shape="poly" id="edge21_Node000018_Node000021" title=" " alt="" coords="391,633,508,658,507,663,390,639"/>
+</map>

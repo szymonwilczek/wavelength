@@ -1,0 +1,5 @@
+<map id="BlobRenderer::RenderBlob" name="BlobRenderer::RenderBlob">
+<area shape="rect" id="Node000001" title="Renders the blob shape itself (filling, border, glow)." alt="" coords="239,5,413,30"/>
+<area shape="rect" id="Node000002" href="$classBlobRenderer.html#aae648021f032b685785a809f615ec0be" title="Renders the entire scene, including a background, blob, and potentially HUD. Orchestrates the drawing..." alt="" coords="5,5,191,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,20,191,20,191,15,223,15"/>
+</map>

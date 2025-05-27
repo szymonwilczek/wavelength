@@ -1,0 +1,14 @@
+<map id="AttachmentDataStore::GetInstance" name="AttachmentDataStore::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the AttachmentDataStore." alt="" coords="707,63,854,101"/>
+<area shape="rect" id="Node000002" href="$classMessageFormatter.html#af3a717bfa398187a653410d3febeb9cb" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="480,5,659,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="692,61,643,47,644,42,693,55"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="243,32,432,71"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="692,79,432,61,433,55,692,73"/>
+<area shape="rect" id="Node000012" href="$classAttachmentPlaceholder.html#a8d2443eb9d37bbbc16b5c7a8ead875e2" title="Slot triggered when the load/retry button is clicked or automatically after initialization...." alt="" coords="492,120,648,159"/>
+<area shape="poly" id="edge4_Node000001_Node000012" title=" " alt="" coords="693,109,644,122,643,117,692,103"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="465,39,433,43,432,38,464,34"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="5,32,195,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="227,54,195,54,195,49,227,49"/>
+<area shape="rect" id="Node000013" href="$classAttachmentPlaceholder.html#a75277d4204ecadbc370f7a4c393cd0be" title="Constructs an AttachmentPlaceholder widget. Initializes the UI elements (labels, button,..." alt="" coords="255,120,420,159"/>
+<area shape="poly" id="edge5_Node000012_Node000013" title=" " alt="" coords="476,142,420,142,420,137,476,137"/>
+</map>

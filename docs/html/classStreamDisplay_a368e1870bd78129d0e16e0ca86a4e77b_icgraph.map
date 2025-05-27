@@ -1,0 +1,5 @@
+<map id="StreamDisplay::Clear" name="StreamDisplay::Clear">
+<area shape="rect" id="Node000001" title="Clears all messages from the display and the processing queue. Calls ClearMessages() on the Communica..." alt="" coords="249,5,394,30"/>
+<area shape="rect" id="Node000002" href="$classStreamDisplay.html#acf62745fd5998b75873b324e7adb02a4" title="Sets the frequency identifier and optional name for the stream. Updates the name displayed in the Com..." alt="" coords="5,5,201,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,20,201,20,201,15,233,15"/>
+</map>

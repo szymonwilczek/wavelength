@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::AddRecentColor" name="WavelengthConfig::AddRecentColor">
+<area shape="rect" id="Node000001" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="5,5,204,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="252,5,422,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,22,236,22,236,27,204,27"/>
+</map>

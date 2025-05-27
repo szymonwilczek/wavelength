@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::SetLanguageCode" name="WavelengthConfig::SetLanguageCode">
+<area shape="rect" id="Node000001" title="Sets the application language code. Emits configChanged(&quot;languageCode&quot;) if the value changes...." alt="" coords="5,12,247,37"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="295,5,464,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,22,279,22,279,27,247,27"/>
+</map>

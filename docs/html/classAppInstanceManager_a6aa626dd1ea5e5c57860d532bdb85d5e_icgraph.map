@@ -1,0 +1,5 @@
+<map id="AppInstanceManager::ConnectToServer" name="AppInstanceManager::ConnectToServer">
+<area shape="rect" id="Node000001" title="Establishes a connection to the server instance for a client instance." alt="" coords="198,5,342,44"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a1ecdc08b00d9aae9d33976f8ce90d6f5" title="Starts the instance manager." alt="" coords="5,5,150,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,27,150,27,150,22,182,22"/>
+</map>

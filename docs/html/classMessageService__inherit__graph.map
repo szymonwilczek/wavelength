@@ -1,0 +1,5 @@
+<map id="MessageService" name="MessageService">
+<area shape="rect" id="Node000001" title="Singleton service responsible for sending messages and files over WebSocket connections." alt="" coords="5,117,222,948"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="84,5,143,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,84,116,117,111,117,111,84"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="WavelengthEventBroker::SubscribeToEvent" name="WavelengthEventBroker::SubscribeToEvent">
+<area shape="rect" id="Node000001" title="Subscribes a receiver object&#39;s slot to a specific event type. Uses a template to ensure the receiver ..." alt="" coords="5,5,164,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthEventBroker.html#ae8c0f4012e86117405db97a0d461ad94" title="Signal emitted whenever any event is published via PublishEvent(). Subscribed components connect to t..." alt="" coords="212,5,370,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,22,196,22,196,27,164,27"/>
+</map>

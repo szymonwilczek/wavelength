@@ -1,0 +1,9 @@
+<map id="BlobEventHandler::ProcessResizeEvent" name="BlobEventHandler::ProcessResizeEvent">
+<area shape="rect" id="Node000001" title="Processes a resize event for the parent widget. Applies throttling and checks for significant size ch..." alt="" coords="5,68,187,107"/>
+<area shape="rect" id="Node000002" href="$classBlobEventHandler.html#adee9e347de86d1914b6671935d9bd758" title="Emitted during a resize event to request a specific &quot;resizing&quot; state in the Blob animation." alt="" coords="249,5,416,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,65,242,46,243,51,172,70"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#a608f7c9b14093c8e0a02be39d780af3d" title="Emitted when a significant resize event is detected after throttling." alt="" coords="237,68,429,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,85,221,85,221,90,187,90"/>
+<area shape="rect" id="Node000004" href="$classBlobEventHandler.html#aad7907b15e659d39275aa21d97a0665c" title="Emitted after a resize event to request resetting any temporary state timers." alt="" coords="235,131,431,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,105,243,124,242,129,171,110"/>
+</map>

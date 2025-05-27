@@ -1,0 +1,16 @@
+<map id="CommunicationStream" name="CommunicationStream">
+<area shape="rect" id="Node000001" title="A custom OpenGL widget displaying an animated communication stream visualization." alt="" coords="126,984,389,2527"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,481,115,545"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,559,138,984,132,985,65,560"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="139,481,264,545"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,559,225,984,220,984,201,559"/>
+<area shape="rect" id="Node000004" href="$classUserInfoLabel.html" title="A custom QLabel that displays text alongside a colored circle with a glow effect." alt="" coords="288,350,477,676"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="369,676,340,967,334,967,364,675"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="357,5,409,69"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="386,84,386,350,380,350,380,84"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="502,118,715,908"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="504,891,396,1274,391,1272,499,890"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="716,441,726,452,734,468,740,488,741,513,738,547,728,571,723,569,733,545,736,513,734,489,729,470,722,455,712,445"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="579,5,638,69"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="611,84,611,118,606,118,606,84"/>
+</map>

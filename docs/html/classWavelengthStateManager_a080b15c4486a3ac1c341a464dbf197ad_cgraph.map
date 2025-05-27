@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::GetInstance" name="WavelengthStateManager::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="5,5,175,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="223,5,400,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,22,207,22,207,27,175,27"/>
+</map>

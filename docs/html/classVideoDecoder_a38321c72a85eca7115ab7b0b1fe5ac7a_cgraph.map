@@ -1,0 +1,7 @@
+<map id="VideoDecoder::VideoDecoder" name="VideoDecoder::VideoDecoder">
+<area shape="rect" id="Node000001" title="Constructs a VideoDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I/..." alt="" coords="5,31,199,55"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a8462c72da3486c3c93af01d90f60e7d5" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal QBuffer (buffer_)." alt="" coords="247,5,428,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,30,231,26,232,32,200,35"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#afb14e8c4ad3db91e7171125a4d7be37f" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the position within the internal QBuffer (buff..." alt="" coords="247,55,428,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,50,232,54,231,59,199,56"/>
+</map>

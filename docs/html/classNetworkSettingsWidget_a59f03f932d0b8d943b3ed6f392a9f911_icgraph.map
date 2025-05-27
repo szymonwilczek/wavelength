@@ -1,0 +1,5 @@
+<map id="NetworkSettingsWidget::LoadSettings" name="NetworkSettingsWidget::LoadSettings">
+<area shape="rect" id="Node000001" title="Loads the current network settings from WavelengthConfig and updates the UI elements." alt="" coords="221,5,380,44"/>
+<area shape="rect" id="Node000002" href="$classNetworkSettingsWidget.html#a39abac87779221db1e891712b4dc8db0" title="Constructs the NetworkSettingsWidget. Initializes the UI, loads current settings from WavelengthConfi..." alt="" coords="5,5,173,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,27,173,27,173,22,205,22"/>
+</map>

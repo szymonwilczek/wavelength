@@ -1,0 +1,9 @@
+<map id="FingerprintLayer::UpdateProgress" name="FingerprintLayer::UpdateProgress">
+<area shape="rect" id="Node000001" title="Slot called periodically by fingerprint_timer_ when the user is holding the mouse button...." alt="" coords="5,37,170,76"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#a8010338395204b1737a32235a799a1e1" title="Handles the completion of the fingerprint scan. Changes the UI element styles (border,..." alt="" coords="218,5,388,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,42,202,37,202,42,170,47"/>
+<area shape="rect" id="Node000004" href="$classFingerprintLayer.html#a4cca78c85ba146785ac7b4b9f410c7b7" title="Updates the visual appearance of the fingerprint image during the scan. Renders the SVG and applies a..." alt="" coords="221,68,385,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,66,206,71,205,76,169,71"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="436,12,634,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,22,420,22,420,27,388,27"/>
+</map>

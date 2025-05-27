@@ -1,0 +1,5 @@
+<map id="TranslationManager::Initialize" name="TranslationManager::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the translation manager by loading the appropriate language file." alt="" coords="5,5,140,44"/>
+<area shape="rect" id="Node000002" href="$classTranslationManager.html#aae61b9e46eba5ddf5b41a8a6d3eb3413" title="Loads translations from a JSON file for the specified language code." alt="" coords="188,5,322,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,22,172,22,172,27,140,27"/>
+</map>

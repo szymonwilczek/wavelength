@@ -1,0 +1,7 @@
+<map id="FingerprintLayer::Initialize" name="FingerprintLayer::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the layer for display. Resets the progress bar and styles, loads a random fingerprint ima..." alt="" coords="5,40,175,65"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#a5ce00330053b0039251eff29fbc53ae7" title="Loads a random fingerprint SVG file from fingerprint_files_ and renders it into base_fingerprint_...." alt="" coords="223,5,421,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,40,207,36,208,41,175,45"/>
+<area shape="rect" id="Node000003" href="$classFingerprintLayer.html#aebf84fcb1a08efd5a5715c23d504c2d6" title="Resets the layer to its initial state. Stops the progress timer, resets the progress bar value and st..." alt="" coords="244,68,400,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,60,229,67,228,72,174,66"/>
+</map>

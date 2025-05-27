@@ -1,0 +1,5 @@
+<map id="GifPlayer::enterEvent" name="GifPlayer::enterEvent">
+<area shape="rect" id="Node000001" title="Handles mouse enter events. Calls StartPlayback() to begin animation when the mouse cursor enters the..." alt="" coords="5,5,150,30"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#a8e9d8e851a0d476b74fdf082b7519d35" title="Starts or resumes GIF playback. Sets the is_playing_ flag and calls Resume() on the GifDecoder...." alt="" coords="198,5,363,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,15,182,15,182,20,150,20"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ShortcutsSettingsWidget::GetActionDescription" name="ShortcutsSettingsWidget::GetActionDescription">
+<area shape="rect" id="Node000001" title="Static utility function to get a user&#45;friendly description for a given shortcut action ID." alt="" coords="444,5,611,44"/>
+<area shape="rect" id="Node000002" href="$classShortcutsSettingsWidget.html#a03e62190f2d0499e7f5d0ab6c1d79c16" title="Creates and arranges all the UI elements (labels, input fields, layouts, button) for the widget...." alt="" coords="229,5,396,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="428,27,397,27,397,22,428,22"/>
+<area shape="rect" id="Node000003" href="$classShortcutsSettingsWidget.html#a8efdd7e928247903bf7212cd6e05ca21" title="Constructs the ShortcutsSettingsWidget. Initializes the UI, loads current shortcut settings from Wave..." alt="" coords="5,5,181,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="213,27,181,27,181,22,213,22"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="LongTextDisplayEffect::LongTextDisplayEffect" name="LongTextDisplayEffect::LongTextDisplayEffect">
+<area shape="rect" id="Node000001" title="Constructs a CyberLongTextDisplay widget. Initializes the widget with default size policies,..." alt="" coords="406,5,566,44"/>
+<area shape="rect" id="Node000002" href="$classLongTextDisplayEffect.html#a04a72982e54ac8d38728aa94996c9b48" title="Returns the recommended size for the widget based on the processed text content. The height is calcul..." alt="" coords="206,5,358,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="390,27,358,27,358,22,390,22"/>
+<area shape="rect" id="Node000003" href="$classLongTextDisplayEffect.html#a1a0292b16b37bf88ca182bc7615ab7d2" title=" " alt="" coords="5,5,158,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="190,27,158,27,158,22,190,22"/>
+</map>

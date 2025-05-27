@@ -1,0 +1,5 @@
+<map id="ImageViewer" name="ImageViewer">
+<area shape="rect" id="Node000001" title="A widget for displaying static images (PNG, JPEG, etc.) within a chat interface." alt="" coords="5,117,213,577"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="80,5,138,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,83,112,117,107,117,107,83"/>
+</map>

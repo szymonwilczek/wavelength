@@ -1,0 +1,5 @@
+<map id="BlobRenderer::DrawGlowEffect" name="BlobRenderer::DrawGlowEffect">
+<area shape="rect" id="Node000001" title="Draws the glow effect around the blob path. Uses internal caching (glow_buffer_) to optimize renderin..." alt="" coords="5,12,208,37"/>
+<area shape="rect" id="Node000002" href="$classBlobRenderer.html#a0572f5868bbb75fb82e403609307a793" title="Renders the multi&#45;layered glow effect using QPainter drawPath operations with varying pen widths and ..." alt="" coords="256,5,434,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,22,240,22,240,27,208,27"/>
+</map>

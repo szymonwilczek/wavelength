@@ -1,0 +1,5 @@
+<map id="AppInstanceManager::StartAbsorptionAnimation" name="AppInstanceManager::StartAbsorptionAnimation">
+<area shape="rect" id="Node000001" title="Starts the animation sequence for absorbing a client instance. This involves moving the client window..." alt="" coords="5,5,185,44"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#abe3a7b8fc1126f8ad31e8358139f815e" title="Finalizes the absorption process by quitting the client application." alt="" coords="233,5,377,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,22,217,22,217,27,185,27"/>
+</map>

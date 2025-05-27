@@ -1,0 +1,5 @@
+<map id="RetinaScanLayer::FinishScan" name="RetinaScanLayer::FinishScan">
+<area shape="rect" id="Node000001" title="Slot called when the scan completes (either by timer or scanline finishing). Changes the UI element s..." alt="" coords="5,5,198,30"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="246,5,444,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,15,230,15,230,20,198,20"/>
+</map>

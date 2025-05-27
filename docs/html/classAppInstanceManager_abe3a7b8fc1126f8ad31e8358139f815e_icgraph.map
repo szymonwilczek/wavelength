@@ -1,0 +1,10 @@
+<map id="AppInstanceManager::FinalizeAbsorption" name="AppInstanceManager::FinalizeAbsorption">
+<area shape="rect" id="Node000001" title="Finalizes the absorption process by quitting the client application." alt="" coords="624,35,769,73"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a47fb8c069b2b3e5e6a19304726d59feb" title="Starts the animation sequence for absorbing a client instance. This involves moving the client window..." alt="" coords="397,35,576,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="609,57,577,57,577,51,609,51"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a46740893551d1b7e70d184740d0f5fee" title="Applies a force to the client window, pulling it towards the target position (creator window)." alt="" coords="198,5,349,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="381,42,349,38,350,32,382,37"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a0f209265d9df4a82fc23ccd0ba99dd82" title="Initializes and starts the background thread responsible for attraction logic." alt="" coords="5,35,150,73"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="381,58,349,58,198,58,150,58,150,52,198,53,349,53,381,52"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="183,41,151,46,150,41,182,36"/>
+</map>

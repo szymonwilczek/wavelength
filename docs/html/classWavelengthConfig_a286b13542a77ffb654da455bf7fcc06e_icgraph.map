@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::LoadSettings" name="WavelengthConfig::LoadSettings">
+<area shape="rect" id="Node000001" title="Loads settings from the persistent storage (QSettings) into the member variables, overwriting the def..." alt="" coords="255,12,465,37"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a4c1332c2b5c244fb8d20da90fb1790a7" title="Private constructor to enforce the singleton pattern. Loads default shortcuts, default values,..." alt="" coords="5,5,207,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,27,207,27,207,22,239,22"/>
+</map>

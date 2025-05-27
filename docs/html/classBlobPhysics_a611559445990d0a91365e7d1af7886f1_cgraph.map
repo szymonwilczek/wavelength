@@ -1,0 +1,9 @@
+<map id="BlobPhysics::UpdatePhysics" name="BlobPhysics::UpdatePhysics">
+<area shape="rect" id="Node000001" title="Updates the blob physics using a standard sequential approach. Iterates through each control point,..." alt="" coords="5,33,195,58"/>
+<area shape="rect" id="Node000002" href="$classBlobPhysics.html#afbb545c1990191999b1d53237703e276" title="Gradually moves control points towards an ideal circular/organic shape when the blob is idle...." alt="" coords="243,5,419,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,32,227,28,227,33,195,37"/>
+<area shape="rect" id="Node000003" href="$classBlobPhysics.html#a51387fbc8c325be7a3f33aea248caeab" title="Checks if any control points or velocities contain invalid values (NaN, infinity)...." alt="" coords="246,54,416,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,54,231,59,230,64,194,60"/>
+<area shape="rect" id="Node000004" href="$classBlobMath.html#abef304a2fdf006c9238fe4a265951637" title="Checks if a QPointF contains valid coordinate values. Verifies that coordinates are not NaN,..." alt="" coords="467,61,620,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="416,71,451,71,451,76,416,76"/>
+</map>

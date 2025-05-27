@@ -1,0 +1,25 @@
+<map id="ChatView" name="ChatView">
+<area shape="rect" id="Node000001" title="The main view for displaying and interacting with a specific Wavelength chat session." alt="" coords="253,3505,488,4848"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="165,2120,227,2184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,2199,193,2395,193,2702,204,3068,215,3257,232,3443,256,3618,251,3619,227,3444,210,3258,198,3068,188,2702,188,2395,192,2199"/>
+<area shape="rect" id="Node000003" href="$classStreamDisplay.html" title="A widget that manages and displays messages within a CommunicationStream." alt="" coords="242,2985,500,3443"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="196,2199,190,2325,191,2506,196,2608,205,2714,220,2820,241,2923,260,2985,255,2986,236,2924,215,2821,200,2714,191,2608,186,2506,185,2325,190,2199"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="374,3443,374,3489,368,3489,368,3443"/>
+<area shape="rect" id="Node000004" href="$classCommunicationStream.html" title="A custom OpenGL widget displaying an animated communication stream visualization." alt="" coords="251,1381,514,2923"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="377,2923,376,2968,371,2968,371,2923"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,481,115,545"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="69,559,94,714,129,907,159,1041,185,1144,211,1247,241,1380,254,1440,249,1441,236,1381,206,1248,180,1145,154,1042,124,909,89,715,64,560"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="139,481,264,545"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="209,559,300,1381,295,1382,204,560"/>
+<area shape="rect" id="Node000007" href="$classUserInfoLabel.html" title="A custom QLabel that displays text alongside a colored circle with a glow effect." alt="" coords="288,350,477,676"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="386,676,386,1364,380,1364,380,676"/>
+<area shape="rect" id="Node000009" href="$classWavelengthConfig.html" title="Manages application configuration settings using a singleton pattern." alt="" coords="502,118,715,908"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="559,908,499,1357,498,1364,493,1364,494,1356,554,907"/>
+<area shape="poly" id="edge10_Node000009_Node000009" title=" " alt="" coords="716,441,726,452,734,468,740,488,741,513,738,547,728,571,723,569,733,545,736,513,734,489,729,470,722,455,712,445"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="695,5,754,69"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="716,84,707,119,702,118,711,83"/>
+<area shape="rect" id="Node000011" href="$classTranslationManager.html" title="Manages the loading and delivery of translations for applications." alt="" coords="676,932,889,1357"/>
+<area shape="poly" id="edge12_Node000011_Node000010" title=" " alt="" coords="768,61,796,86,817,117,860,229,873,279,882,327,887,416,881,502,866,589,848,682,830,787,817,908,816,933,810,932,812,908,825,786,843,681,861,588,875,501,882,416,877,327,868,280,855,230,812,119,792,89,764,65"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="766,1357,727,1746,670,2265,599,2852,515,3444,494,3571,489,3570,510,3443,593,2851,665,2265,722,1746,761,1356"/>
+<area shape="poly" id="edge13_Node000011_Node000011" title=" " alt="" coords="891,1037,901,1054,909,1078,914,1108,916,1144,912,1198,901,1236,895,1235,907,1197,911,1144,909,1108,904,1079,896,1056,887,1040"/>
+</map>

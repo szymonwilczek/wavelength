@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::GetRelayServerUrl" name="WavelengthConfig::GetRelayServerUrl">
+<area shape="rect" id="Node000001" title="Constructs the full WebSocket URL for the relay server." alt="" coords="192,5,380,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#aeb2c42a4fc574cc768e3cc5c7f14037e" title="Gets the full URL (ws://address:port) of the relay server. Delegates the call to WavelengthConfig." alt="" coords="5,5,144,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,27,144,27,144,22,176,22"/>
+</map>

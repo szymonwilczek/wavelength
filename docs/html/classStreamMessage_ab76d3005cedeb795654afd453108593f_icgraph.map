@@ -1,0 +1,15 @@
+<map id="StreamMessage::messageRead" name="StreamMessage::messageRead">
+<area shape="rect" id="Node000001" title="Emitted when the message is marked as read (MarkAsRead() is called)." alt="" coords="762,61,970,86"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#ad759a905d0a2cc1874d4781c97b9a2fc" title="Marks the message as read, triggers the appropriate closing animation (Electronic Shutdown or a simpl..." alt="" coords="514,61,714,86"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="747,76,715,76,715,71,747,71"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#a0f7169a7adfa4c161d395db0cc3fa244" title="Overridden key press event handler. Handles Space/Enter to mark as read, and Left/Right arrows for na..." alt="" coords="251,5,462,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="539,60,416,33,417,28,540,55"/>
+<area shape="rect" id="Node000004" href="$classCommunicationStream.html#a7cf62e4c83ddbf85a1bb47ddb8d9422b" title="Slot triggered when the user requests to close the current message (e.g., clicks &quot;Read&quot; or presses En..." alt="" coords="279,54,434,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="498,76,434,76,434,71,498,71"/>
+<area shape="rect" id="Node000013" href="$classStreamMessage.html#a9857276cff1cb0de012614e87fee1ac4" title="Constructs a StreamMessage widget. Initializes UI elements (layout, text display/label/scroll area),..." alt="" coords="247,117,466,142"/>
+<area shape="poly" id="edge6_Node000002_Node000013" title=" " alt="" coords="540,92,417,119,416,114,539,87"/>
+<area shape="rect" id="Node000005" href="$classCommunicationStream.html#aa91c3c46034a10ca7393998082e26a25" title="Connects the necessary signals (navigation, read, hidden) from a StreamMessage widget to this Communi..." alt="" coords="5,24,199,62"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="264,65,199,57,200,52,264,60"/>
+<area shape="rect" id="Node000011" href="$classCommunicationStream.html#a8a07b470a5e55591ef90260ad5ec60da" title="Handles key presses for message navigation (Left/Right arrows) and closing (Enter)." alt="" coords="25,86,179,125"/>
+<area shape="poly" id="edge5_Node000004_Node000011" title=" " alt="" coords="264,88,180,99,179,93,263,83"/>
+</map>

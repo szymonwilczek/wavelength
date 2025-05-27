@@ -1,0 +1,11 @@
+<map id="StreamMessage::UpdateContent" name="StreamMessage::UpdateContent">
+<area shape="rect" id="Node000001" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="5,57,218,82"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a1a3ebf623b6477e510efeab5af62f390" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="282,22,468,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,56,266,51,266,56,218,61"/>
+<area shape="rect" id="Node000005" href="$classStreamMessage.html#a59f8dedec8dffa79dad2b202ddd8dbf6" title="Cleans the message content by removing HTML tags and placeholders, and decoding HTML entities...." alt="" coords="266,85,484,110"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="218,78,250,82,250,87,218,84"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#a8e9e8d50bde441b62f513f5f4d6100c9" title="Returns the recommended size for the viewer based on its content and layout. Calculates the size need..." alt="" coords="543,5,725,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="468,30,528,25,528,30,469,36"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a520ebf30923492083e94819640a79323" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="532,55,736,79"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="469,48,516,53,516,58,468,53"/>
+</map>

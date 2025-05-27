@@ -1,0 +1,9 @@
+<map id="Navbar::joinWavelengthClicked" name="Navbar::joinWavelengthClicked">
+<area shape="rect" id="Node000001" title="Emitted when the &quot;Merge Wavelength&quot; button is clicked." alt="" coords="456,33,657,58"/>
+<area shape="rect" id="Node000002" href="$classNavbar.html#a04ffab38c9324469760999c0e5822992" title="Constructs the Navbar. Initializes the toolbar&#39;s appearance and behavior (non&#45;movable,..." alt="" coords="263,5,376,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="440,35,376,27,376,22,441,29"/>
+<area shape="rect" id="Node000003" href="$classShortcutManager.html#a1da8274438f6c05921ba4e029b4015c6" title="Registers shortcuts specific to the main application window." alt="" coords="231,54,408,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="441,62,409,66,408,61,440,57"/>
+<area shape="rect" id="Node000004" href="$classShortcutManager.html#a097d6cfc09ef1837e2e18cb88d2726cd" title="Registers shortcuts specific to the provided parent widget." alt="" coords="5,54,183,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,76,183,76,183,71,215,71"/>
+</map>

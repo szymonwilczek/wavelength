@@ -1,0 +1,9 @@
+<map id="SecurityCodeLayer::GetEnteredCode" name="SecurityCodeLayer::GetEnteredCode">
+<area shape="rect" id="Node000001" title="Gets the code currently entered by the user by concatenating the text from all input fields." alt="" coords="567,5,707,44"/>
+<area shape="rect" id="Node000002" href="$classSecurityCodeLayer.html#ae952b967add30cb12c1a68adaaa3ec54" title="Checks if the entered code matches the current security code. Called when all input fields are filled..." alt="" coords="380,5,519,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="552,27,520,27,520,22,552,22"/>
+<area shape="rect" id="Node000003" href="$classSecurityCodeLayer.html#ab9379c05ccc6373b0611fbb64502e074" title="Slot called when the text in any input field changes. Handles automatic focus progression to the next..." alt="" coords="193,5,332,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,27,332,27,332,22,365,22"/>
+<area shape="rect" id="Node000004" href="$classSecurityCodeLayer.html#ac8d540d84842278f2a8b55710743fb09" title="Constructs a SecurityCodeLayer. Initializes the UI elements (title, instructions, input fields,..." alt="" coords="5,5,145,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="177,27,145,27,145,22,177,22"/>
+</map>

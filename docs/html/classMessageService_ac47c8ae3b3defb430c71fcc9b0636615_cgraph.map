@@ -1,0 +1,12 @@
+<map id="MessageService::GetSocketForFrequency" name="MessageService::GetSocketForFrequency">
+<area shape="rect" id="Node000001" title="Helper function to retrieve the active WebSocket connection for a given frequency...." alt="" coords="5,68,194,107"/>
+<area shape="rect" id="Node000002" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="243,5,380,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,65,228,46,230,52,168,70"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="242,68,381,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="194,85,226,85,226,90,194,90"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="433,96,570,135"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="179,105,242,115,311,118,381,115,417,115,418,120,381,121,311,123,241,121,178,110"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="429,5,574,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,22,414,22,414,27,380,27"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="382,95,418,100,417,106,381,100"/>
+</map>

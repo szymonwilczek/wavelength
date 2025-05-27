@@ -1,0 +1,5 @@
+<map id="VideoDecoder::UpdateAudioPosition" name="VideoDecoder::UpdateAudioPosition">
+<area shape="rect" id="Node000001" title="Slot connected to the internal AudioDecoder&#39;s positionChanged signal. Updates the internal current_au..." alt="" coords="5,5,192,44"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a72403db422317c2377fbf95fedd14077" title="Emitted periodically during playback to indicate the current position (based on audio if available,..." alt="" coords="240,12,448,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,22,224,22,224,27,192,27"/>
+</map>

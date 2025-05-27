@@ -1,0 +1,10 @@
+<map id="SessionCoordinator::GetRelayServerUrl" name="SessionCoordinator::GetRelayServerUrl">
+<area shape="rect" id="Node000001" title="Gets the full URL (ws://address:port) of the relay server. Delegates the call to WavelengthConfig." alt="" coords="5,57,144,96"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abe95f3b7789e1e60f7bd535352644c0d" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="192,36,397,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,65,177,61,178,66,144,71"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#ac3f5f3c2cab54bb6150234946ee30341" title="Constructs the full WebSocket URL for the relay server." alt="" coords="200,85,388,124"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="144,83,185,88,184,93,144,88"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="445,29,646,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,46,430,46,430,51,398,51"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="499,30,496,20,503,10,520,5,546,3,573,5,589,11,587,16,572,10,546,8,521,10,506,15,501,21,504,28"/>
+</map>

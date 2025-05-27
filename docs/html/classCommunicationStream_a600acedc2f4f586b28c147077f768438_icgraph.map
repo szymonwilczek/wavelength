@@ -1,0 +1,23 @@
+<map id="CommunicationStream::ShowNextMessage" name="CommunicationStream::ShowNextMessage">
+<area shape="rect" id="Node000001" title="Shows the next message in the list, if available." alt="" coords="905,143,1059,181"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#aa91c3c46034a10ca7393998082e26a25" title="Connects the necessary signals (navigation, read, hidden) from a StreamMessage widget to this Communi..." alt="" coords="663,85,857,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="889,141,837,127,838,122,891,136"/>
+<area shape="rect" id="Node000008" href="$classCommunicationStream.html#a8a07b470a5e55591ef90260ad5ec60da" title="Handles key presses for message navigation (Left/Right arrows) and closing (Enter)." alt="" coords="5,128,160,167"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="917,190,784,231,699,252,606,269,507,280,405,282,304,272,255,261,207,247,174,232,144,211,99,169,103,165,147,207,177,227,209,242,256,256,305,266,405,277,506,275,605,264,698,247,783,226,915,185"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html#ae3b9b361caa5123daac847c60475d605" title="Adds a new standard message to the stream. Initiates the receiving animation. The message is displaye..." alt="" coords="230,131,384,169"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="648,115,455,133,385,141,385,136,455,127,647,110"/>
+<area shape="rect" id="Node000004" href="$classCommunicationStream.html#a10a56a4dc3eeeaf4865d0f63f077e3bf" title="Adds a new message with attachment content to the stream. Initiates the receiving animation...." alt="" coords="208,193,407,232"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="724,136,675,169,616,195,564,208,509,216,408,221,407,215,509,211,563,203,614,190,672,164,721,132"/>
+<area shape="rect" id="Node000005" href="$classCommunicationStream.html#aba44a533978e83748764534a8682c56f" title="Displays the message at the specified index in the messages_ list. Hides the previously displayed mes..." alt="" coords="455,143,615,181"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="668,131,614,145,613,139,666,126"/>
+<area shape="poly" id="edge9_Node000005_Node000001" title=" " alt="" coords="631,159,904,159,904,165,631,165"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="439,160,385,157,385,151,440,154"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="440,186,398,195,397,190,439,181"/>
+<area shape="rect" id="Node000006" href="$classCommunicationStream.html#a2283a11febe30f9d2d1887c2c20e7ea3" title="Slot triggered when a StreamMessage widget finishes its hiding animation (or is hidden)...." alt="" coords="225,68,390,107"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="463,140,406,121,372,110,374,105,408,115,464,135"/>
+<area shape="rect" id="Node000007" href="$classCommunicationStream.html#a918c54f07703dce3733f2aec5b09503d" title="Shows the previous message in the list, if available." alt="" coords="224,5,390,44"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="503,134,459,95,406,58,382,47,385,42,408,53,463,90,507,130"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="405,81,507,80,616,83,663,88,663,93,615,89,507,85,405,86"/>
+<area shape="poly" id="edge11_Node000007_Node000002" title=" " alt="" coords="406,32,508,45,616,63,693,82,691,87,615,69,507,50,406,37"/>
+<area shape="poly" id="edge12_Node000007_Node000008" title=" " alt="" coords="219,53,209,58,152,93,107,130,104,125,149,89,206,53,217,48"/>
+</map>

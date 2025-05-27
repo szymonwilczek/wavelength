@@ -1,0 +1,5 @@
+<map id="ClickableColorPreview::mousePressEvent" name="ClickableColorPreview::mousePressEvent">
+<area shape="rect" id="Node000001" title="Overridden mouse press event handler. Emits the clicked() signal if the left mouse button is pressed." alt="" coords="5,5,159,44"/>
+<area shape="rect" id="Node000002" href="$classClickableColorPreview.html#aa0291a9c0f494c29b0e33219d81d5e2f" title="Emitted when the widget is clicked with the left mouse button." alt="" coords="207,5,360,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,22,191,22,191,27,159,27"/>
+</map>

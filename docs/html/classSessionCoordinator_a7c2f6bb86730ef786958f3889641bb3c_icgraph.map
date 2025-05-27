@@ -1,0 +1,13 @@
+<map id="SessionCoordinator::SessionCoordinator" name="SessionCoordinator::SessionCoordinator">
+<area shape="rect" id="Node000001" title="Deleted copy constructor to prevent copying." alt="" coords="611,54,755,93"/>
+<area shape="poly" id="edge6_Node000001_Node000001" title=" " alt="" coords="714,41,702,35,683,33,665,35,654,40,651,46,653,53,648,55,645,45,651,36,664,30,683,28,704,30,716,37"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a02569a6d8c1c0ea85e3c4e451463aa38" title="Gets the singleton instance of the WavelengthSessionCoordinator." alt="" coords="428,22,563,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="595,61,563,56,564,51,596,56"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#aaeffb1501abe5bd4bd69051723c9ad0f" title="Deleted assignment operator to prevent assignment." alt="" coords="428,85,563,124"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="596,91,564,96,563,91,595,85"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,5,380,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="412,35,380,31,381,26,413,29"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,31,148,55"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="413,45,148,45,148,40,413,39"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,33,148,37,147,32,180,28"/>
+</map>

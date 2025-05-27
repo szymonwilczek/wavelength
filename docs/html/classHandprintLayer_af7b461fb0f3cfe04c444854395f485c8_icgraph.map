@@ -1,0 +1,5 @@
+<map id="HandprintLayer::Reset" name="HandprintLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Stops the progress timer, resets the progress bar value and st..." alt="" coords="217,5,367,30"/>
+<area shape="rect" id="Node000002" href="$classHandprintLayer.html#aedbb4395a82db53c8577e28545313235" title="Initializes the layer for display. Resets the progress bar and styles, loads the handprint image,..." alt="" coords="5,5,169,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,20,169,20,169,15,201,15"/>
+</map>

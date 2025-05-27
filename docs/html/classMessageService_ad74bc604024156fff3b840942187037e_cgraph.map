@@ -1,0 +1,24 @@
+<map id="MessageService::MessageService" name="MessageService::MessageService">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern. Connects the internal sendJsonViaSocket signal ..." alt="" coords="5,199,231,224"/>
+<area shape="rect" id="Node000002" href="$classMessageService.html#a4396f2ede94cf2d9a36cf51407db7e14" title="Slot connected to the sendJsonViaSocket signal. Performs the actual sending of a JSON message...." alt="" coords="279,160,477,199"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,196,263,191,264,196,224,201"/>
+<area shape="rect" id="Node000011" href="$classMessageService.html#aabe00ddfe3f0fb4bcdae08fd977ecc6f" title="Internal signal emitted by the background file processing task when the JSON message is ready to be s..." alt="" coords="286,223,470,261"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="228,222,271,227,270,232,228,227"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="546,5,681,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,158,450,106,486,78,524,53,532,48,535,53,526,58,489,82,454,110,400,162"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="545,68,682,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="423,157,524,116,539,110,541,115,526,120,425,162"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="544,131,683,169"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="477,164,528,158,529,163,478,170"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="754,159,892,197"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="477,178,702,178,739,177,739,183,702,183,477,183"/>
+<area shape="rect" id="Node000009" href="$classMessageService.html#a4635fcf151d68e3cd873b2d7590c7efc" title="Emitted during file processing and sending to update the status display." alt="" coords="525,245,702,284"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="446,197,478,207,553,237,551,241,476,213,444,202"/>
+<area shape="rect" id="Node000010" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="546,308,681,347"/>
+<area shape="poly" id="edge10_Node000002_Node000010" title=" " alt="" coords="462,197,479,208,496,230,504,252,511,273,527,293,535,299,531,304,523,297,506,275,499,253,492,232,475,212,459,201"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="752,5,894,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="681,22,736,22,736,27,681,27"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="750,68,896,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="683,85,735,85,735,90,683,90"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="684,157,739,164,738,169,683,162"/>
+</map>

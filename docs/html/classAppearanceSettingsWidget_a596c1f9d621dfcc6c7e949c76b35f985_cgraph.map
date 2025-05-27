@@ -1,0 +1,5 @@
+<map id="AppearanceSettingsWidget::UpdateRecentColorsUI" name="AppearanceSettingsWidget::UpdateRecentColorsUI">
+<area shape="rect" id="Node000001" title="Updates the UI section displaying recently used colors. Clears the existing recent color buttons and ..." alt="" coords="5,5,185,44"/>
+<area shape="rect" id="Node000002" href="$classAppearanceSettingsWidget.html#aa61917cd3e1737b2aaa8f2c18734b61c" title="Slot triggered when a recent color button is clicked. Adds the selected color back to the top of the ..." alt="" coords="233,5,412,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,22,217,22,217,27,185,27"/>
+</map>

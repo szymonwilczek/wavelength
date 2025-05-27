@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::IsWavelengthJoined" name="WavelengthStateManager::IsWavelengthJoined">
+<area shape="rect" id="Node000001" title="Checks if the user is currently considered joined to a specific wavelength (based on registry presenc..." alt="" coords="199,5,368,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a3c36788c829032c9552f7b4a2e526e45" title="Checks if the user is considered joined to a specific wavelength (based on registry presence)...." alt="" coords="5,5,151,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,27,151,27,151,22,183,22"/>
+</map>

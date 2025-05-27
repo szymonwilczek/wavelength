@@ -1,0 +1,20 @@
+<map id="CreateWavelengthDialog::StartFrequencySearch" name="CreateWavelengthDialog::StartFrequencySearch">
+<area shape="rect" id="Node000001" title="Starts the asynchronous process of finding the lowest available frequency via the relay server...." alt="" coords="5,211,170,249"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#a853ffd25f2dc9a851b1a2e1b4a69b72b" title="Static function executed concurrently to query the relay server for the next available frequency...." alt="" coords="218,148,425,187"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,208,232,189,233,194,163,213"/>
+<area shape="rect" id="Node000008" href="$classCreateWavelengthDialog.html#a187675567db20379b9bec8d57da522b0" title="Slot triggered when the frequency search (FindLowestAvailableFrequency) completes...." alt="" coords="239,241,404,280"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="170,238,224,245,224,251,169,243"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#abe95f3b7789e1e60f7bd535352644c0d" title="Gets the singleton instance of the WavelengthConfig." alt="" coords="474,36,680,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="347,145,402,107,472,70,491,63,493,68,474,75,405,112,350,150"/>
+<area shape="rect" id="Node000005" href="$classWavelengthConfig.html#aa7656025f97129a8a7396d435d0b8054" title="Gets the preferred starting frequency for new Wavelengths." alt="" coords="473,85,681,124"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="402,145,480,126,481,131,404,150"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html#adf2ecac39e18de2b5ed81eb8fde47d8a" title="Gets the configured relay server address." alt="" coords="483,148,671,187"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="426,165,468,165,468,170,426,170"/>
+<area shape="rect" id="Node000007" href="$classWavelengthConfig.html#a4102c95b0ba46a067d7ca8161bcd7916" title="Gets the configured relay server port." alt="" coords="483,211,671,249"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="404,185,481,204,480,209,402,190"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#a85e6819278b90f10a1afe5e91ce05cbe" title="Deleted copy constructor." alt="" coords="729,29,931,68"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="680,46,714,46,714,51,680,51"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="783,30,780,20,787,10,804,5,830,3,858,5,874,11,872,16,857,10,830,8,805,10,790,15,785,21,788,28"/>
+<area shape="rect" id="Node000009" href="$classCreateWavelengthDialog.html#a290db27d17d3b01490f6d3ef80e3ec94" title="Validates the input fields (currently just the password if protection is enabled)...." alt="" coords="495,273,659,312"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="404,268,480,278,479,283,404,274"/>
+</map>

@@ -1,0 +1,32 @@
+<map id="VideoDecoder::run" name="VideoDecoder::run">
+<area shape="rect" id="Node000001" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="5,192,135,217"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#ac2d7b995099a90908cf02630f9ce71ce" title="Emitted for each decoded video frame." alt="" coords="183,117,364,142"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,189,182,158,218,145,220,150,184,163,104,194"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a97bfdada9e03663ee5f063b7eece3ad0" title="Checks if the video file contains an audio stream." alt="" coords="434,5,602,30"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,198,264,182,323,169,362,151,374,139,381,126,386,98,390,68,398,54,410,40,419,33,422,38,414,44,402,57,395,70,391,99,386,128,379,142,366,156,325,174,265,188,136,203"/>
+<area shape="rect" id="Node000004" href="$classVideoDecoder.html#aa8f8aabbe65727acd5ef5cfdc5f3b69b" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="194,216,352,241"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="135,209,179,215,179,220,135,215"/>
+<area shape="rect" id="Node000009" href="$classVideoDecoder.html#a4b36980122d8771e7aff1ed0c1db8420" title="Emitted when both video and audio (if present) streams reach the end." alt="" coords="672,413,885,438"/>
+<area shape="poly" id="edge16_Node000001_Node000009" title=" " alt="" coords="83,215,129,268,204,342,250,381,301,418,356,450,413,475,456,486,500,490,545,489,589,484,670,464,734,442,736,447,672,469,590,489,545,494,500,496,455,491,411,480,353,455,298,423,247,385,200,346,125,271,79,219"/>
+<area shape="poly" id="edge10_Node000004_Node000003" title=" " alt="" coords="336,213,362,196,376,177,383,158,384,119,387,79,394,59,410,40,419,33,422,37,414,44,399,62,392,80,390,119,388,159,381,179,366,200,339,218"/>
+<area shape="rect" id="Node000005" href="$classAudioDecoder.html#a4c483a41bf7d57354b63bec009ac222e" title="Emitted when an error occurs during initialization or decoding." alt="" coords="450,167,587,191"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="338,213,438,192,439,198,339,218"/>
+<area shape="rect" id="Node000006" href="$classVideoDecoder.html#a51e7a40e369cc4e80033f1dd9068cdd4" title="Emitted when an error occurs during initialization or decoding." alt="" coords="710,245,847,270"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="353,230,694,250,694,255,352,236"/>
+<area shape="rect" id="Node000007" href="$classVideoDecoder.html#a18dedd90eb28ae766eb81d523625f766" title="Slot connected to the internal AudioDecoder&#39;s error signal. Relays the audio error message via the ma..." alt="" coords="426,266,611,305"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="330,239,419,260,417,265,328,244"/>
+<area shape="rect" id="Node000008" href="$classVideoDecoder.html#a2d72ecfc50eab41a6e14a1a46feaa7df" title="Slot connected to the internal AudioDecoder&#39;s playbackFinished signal. Sets the audio_finished_ flag ..." alt="" coords="426,329,611,368"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="293,239,345,276,413,315,426,321,424,326,411,320,342,281,290,243"/>
+<area shape="rect" id="Node000010" href="$classAudioDecoder.html#a4f5e8f4dd5f45b60bc5ed68ccd8a90c3" title="Emitted when the decoder reaches the end of the audio stream." alt="" coords="412,392,624,417"/>
+<area shape="poly" id="edge11_Node000004_Node000010" title=" " alt="" coords="284,239,333,306,370,345,413,378,424,383,421,388,411,383,366,349,329,310,280,242"/>
+<area shape="rect" id="Node000011" href="$classAudioDecoder.html#a928f569d98a91fae0fa27371a0c85b4e" title="Emitted periodically during playback to indicate the current position." alt="" coords="414,441,622,466"/>
+<area shape="poly" id="edge12_Node000004_Node000011" title=" " alt="" coords="282,240,298,277,326,328,365,381,388,405,414,426,424,432,421,437,410,431,384,409,361,385,322,331,294,280,277,242"/>
+<area shape="rect" id="Node000012" href="$classVideoDecoder.html#aef861f701b488c253cb44f72eeb93831" title="Slot connected to the internal AudioDecoder&#39;s positionChanged signal. Updates the internal current_au..." alt="" coords="425,54,611,93"/>
+<area shape="poly" id="edge13_Node000004_Node000012" title=" " alt="" coords="332,213,362,196,379,174,385,151,392,127,410,104,417,99,420,103,414,108,397,129,390,152,384,176,366,200,334,218"/>
+<area shape="rect" id="Node000014" href="$classVideoDecoder.html#a0680707eda3a8c22786559ff45bdb46e" title="Emitted after successful initialization, providing video stream details." alt="" coords="436,117,600,142"/>
+<area shape="poly" id="edge15_Node000004_Node000014" title=" " alt="" coords="322,213,363,195,377,185,386,174,396,163,411,153,427,145,430,150,413,157,399,167,390,178,380,189,365,200,325,218"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="611,273,694,264,694,269,612,278"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="587,366,720,406,719,411,585,371"/>
+<area shape="rect" id="Node000013" href="$classVideoDecoder.html#a72403db422317c2377fbf95fedd14077" title="Emitted periodically during playback to indicate the current position (based on audio if available,..." alt="" coords="674,61,883,86"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="612,71,659,71,659,76,612,76"/>
+</map>

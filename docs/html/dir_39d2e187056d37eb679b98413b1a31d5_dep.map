@@ -1,0 +1,14 @@
+<map id="src/chat/files/audio" name="src/chat/files/audio">
+<area shape="rect" id="node2" href="dir_04329357cbe645fc2249015be931e6f1.html" title="decoder" alt="" coords="102,135,170,159"/>
+<area shape="rect" id="node3" href="dir_deb693a0e0953b43b410d1fe1121bb9c.html" title="player" alt="" coords="114,62,169,87"/>
+<area shape="poly" id="edge1" href="dir_000044_000016.html" alt="" coords="143,87,141,119,135,119,138,87"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000044_000016.html" title="1" alt="" coords="143,110,150,124"/>
+<area shape="rect" id="node4" href="dir_5194e5fea318fda12687127c23f8aba1.html" title="app" alt="" coords="202,135,244,159"/>
+<area shape="poly" id="edge2" href="dir_000044_000000.html" alt="" coords="157,85,200,122,196,126,153,89"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000044_000000.html" title="1" alt="" coords="198,109,205,123"/>
+<area shape="rect" id="node5" href="dir_da5c6b39c0a2f54e57df6799511cd3ab.html" title="ui" alt="" coords="267,135,306,159"/>
+<area shape="poly" id="edge3" href="dir_000044_000064.html" alt="" coords="166,85,254,127,252,132,164,90"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000044_000064.html" title="2" alt="" coords="251,114,258,128"/>
+<area shape="rect" id="clust2" href="dir_39d2e187056d37eb679b98413b1a31d5.html" alt="" coords="27,51,180,170"/>
+<area shape="rect" id="clust1" href="dir_b7082f3c7a4f01cb8fc261661f9b5dc2.html" title="files" alt="" coords="16,16,191,181"/>
+</map>

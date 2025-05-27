@@ -1,0 +1,5 @@
+<map id="FingerprintLayer::Reset" name="FingerprintLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Stops the progress timer, resets the progress bar value and st..." alt="" coords="223,5,379,30"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#a92b5ab00f16eb9bf0ab1edb5a1d465f4" title="Initializes the layer for display. Resets the progress bar and styles, loads a random fingerprint ima..." alt="" coords="5,5,175,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,20,175,20,175,15,208,15"/>
+</map>

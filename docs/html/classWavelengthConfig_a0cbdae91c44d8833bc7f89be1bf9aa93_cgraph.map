@@ -1,0 +1,9 @@
+<map id="WavelengthConfig::SetBlobColor" name="WavelengthConfig::SetBlobColor">
+<area shape="rect" id="Node000001" title="Sets the color for the blob animation. Adds the color to recent colors. Emits configChanged(&quot;blob_col..." alt="" coords="5,37,186,76"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a7ebb29db2d1c1664c1fca81e52f67565" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="234,5,432,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,42,218,37,219,43,187,47"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="248,68,418,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="187,66,233,72,232,77,186,71"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#aac745a2f42099f82975e7b205aa5a6a7" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="480,5,650,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="432,22,464,22,464,27,432,27"/>
+</map>

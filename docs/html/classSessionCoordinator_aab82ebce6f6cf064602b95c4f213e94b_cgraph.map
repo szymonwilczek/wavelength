@@ -1,0 +1,15 @@
+<map id="SessionCoordinator::onWavelengthLeft" name="SessionCoordinator::onWavelengthLeft">
+<area shape="rect" id="Node000001" title="Slot triggered when the active wavelength is left. Relays the signal and publishes the event via Wave..." alt="" coords="5,68,141,107"/>
+<area shape="rect" id="Node000002" href="$classWavelengthEventBroker.html#ac5c82b2b8f57045b0700c350549a6b39" title="Gets the singleton instance of the WavelengthEventBroker." alt="" coords="189,5,347,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,65,190,47,192,52,136,70"/>
+<area shape="rect" id="Node000004" href="$classWavelengthEventBroker.html#a26e30b82289444c474a1ce093af8f630" title="Publishes a &quot;wavelength_left&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="189,68,347,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,85,173,85,173,90,141,90"/>
+<area shape="rect" id="Node000007" href="$classSessionCoordinator.html#a76077b6fa2053cb6bd934c5d84025297" title="Emitted when the user leaves the active wavelength. Relayed from WavelengthLeaver." alt="" coords="200,131,336,169"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="136,105,192,123,190,128,134,110"/>
+<area shape="rect" id="Node000003" href="$classWavelengthEventBroker.html#abf06dfa4e2d26e0d3acd5c028be9eb31" title="Private constructor to enforce the singleton pattern." alt="" coords="395,5,561,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="347,22,379,22,379,27,347,27"/>
+<area shape="rect" id="Node000005" href="$classWavelengthEventBroker.html#ac664ef807bf6e0f08cf8e6435e7dbbc5" title="Publishes an event of a specific type with associated data. Emits the eventPublished signal,..." alt="" coords="399,68,557,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="347,85,383,85,383,90,347,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthEventBroker.html#ae8c0f4012e86117405db97a0d461ad94" title="Signal emitted whenever any event is published via PublishEvent(). Subscribed components connect to t..." alt="" coords="609,68,768,107"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="557,85,594,85,594,90,557,90"/>
+</map>

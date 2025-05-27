@@ -1,0 +1,63 @@
+<map id="MessageProcessor::SetSocketMessageHandlers" name="MessageProcessor::SetSocketMessageHandlers">
+<area shape="rect" id="Node000001" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="5,459,207,497"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#ac4a5f8904c91e407b72ecb3fd5bc17f3" title="Processes an incoming binary message (expected to be audio data) received from the WebSocket...." alt="" coords="255,216,444,255"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,456,316,264,320,268,129,460"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="255,489,444,528"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,488,240,492,239,497,207,493"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#a8c07a0a03713a5c6537de3035346cd57" title="Emitted when raw audio data is received via a binary WebSocket message." alt="" coords="508,5,708,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,214,378,179,407,136,445,91,490,53,497,49,500,54,494,57,449,95,412,139,383,182,363,217"/>
+<area shape="rect" id="Node000005" href="$classMessageProcessor.html#a7f959930e3baf8650eea19ce671f7e75" title="Compares two frequency strings for equality. Simple string comparison." alt="" coords="492,256,724,295"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="357,488,377,451,406,403,444,354,490,312,512,299,514,304,494,316,448,358,411,406,381,453,362,490"/>
+<area shape="rect" id="Node000006" href="$classMessageHandler.html#afa8afa05bb7b07783162bf420a91ac92" title="Gets the singleton instance of the MessageHandler." alt="" coords="778,259,977,284"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="361,487,412,422,449,386,491,356,552,328,604,318,657,314,724,303,804,285,805,290,725,309,658,319,604,324,553,334,493,360,452,390,416,425,365,491"/>
+<area shape="rect" id="Node000008" href="$classMessageHandler.html#a528c8f85a77a3d6918ecbb15234eda26" title="Extracts the frequency string from a parsed message object." alt="" coords="508,433,709,472"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="441,486,500,473,501,478,443,491"/>
+<area shape="rect" id="Node000009" href="$classMessageHandler.html#ad77add0aea6ba030bf9ec2b97e410db3" title="Extracts the message ID string from a parsed message object." alt="" coords="502,496,714,521"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="445,506,486,506,486,511,445,511"/>
+<area shape="rect" id="Node000010" href="$classMessageHandler.html#a524902c0c6c8f96fae5a696fb550e6ac" title="Extracts the message type string from a parsed message object." alt="" coords="494,546,723,570"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="445,524,525,539,524,545,444,529"/>
+<area shape="rect" id="Node000011" href="$classMessageHandler.html#aad5bdf02a351f87acd5a9d84bb1f3ce8" title="Parses a JSON string message into a QJsonObject." alt="" coords="500,595,716,620"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="384,526,434,554,493,580,520,588,519,593,491,584,432,558,381,531"/>
+<area shape="rect" id="Node000012" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="514,371,703,409"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="375,487,427,452,491,418,506,412,508,417,493,423,430,457,378,491"/>
+<area shape="rect" id="Node000026" href="$classMessageProcessor.html#a901206afb9503ef54fdba2a2a594b5df" title="Processes messages of type &quot;system_command&quot;. Handles commands like &quot;ping&quot;, &quot;close_wavelength&quot;,..." alt="" coords="514,644,703,683"/>
+<area shape="poly" id="edge20_Node000004_Node000026" title=" " alt="" coords="370,526,422,578,456,605,493,629,506,635,504,640,491,634,453,610,418,582,366,530"/>
+<area shape="rect" id="Node000027" href="$classMessageProcessor.html#a8cc47128d254eb378c4988551725ba95" title="Processes messages indicating a wavelength was closed (e.g., &quot;wavelength_closed&quot;, &quot;close_wavelength&quot; ..." alt="" coords="783,669,972,708"/>
+<area shape="poly" id="edge28_Node000004_Node000027" title=" " alt="" coords="361,527,379,565,407,612,445,657,468,676,493,692,529,706,567,716,645,724,720,720,788,709,789,714,721,725,644,729,566,721,527,711,491,696,465,681,442,661,403,615,374,568,356,530"/>
+<area shape="rect" id="Node000035" href="$classMessageProcessor.html#aa940a58824294fd7b610b0f489e467b5" title="Processes messages of type &quot;user_joined&quot;. Formats a system message indicating a user joined and emits..." alt="" coords="514,821,703,860"/>
+<area shape="poly" id="edge22_Node000004_Node000035" title=" " alt="" coords="357,528,370,583,395,659,413,699,436,739,462,775,494,807,502,813,498,817,490,811,458,778,431,741,409,702,390,661,365,585,352,529"/>
+<area shape="rect" id="Node000038" href="$classMessageProcessor.html#aabbee5921374be8f4d7e423c5bfe07ae" title="Processes messages of type &quot;user_left&quot;. Formats a system message indicating a user left and emits the..." alt="" coords="514,759,703,797"/>
+<area shape="poly" id="edge25_Node000004_Node000038" title=" " alt="" coords="360,528,377,571,406,627,444,686,468,713,494,737,512,749,509,754,490,741,464,717,440,690,401,630,373,573,355,530"/>
+<area shape="rect" id="Node000039" href="$classMessageProcessor.html#a8a7d6f3aa3796919753ab2c6f222303c" title="Emitted when the server denies permission to transmit audio (Push&#45;to&#45;Talk)." alt="" coords="510,884,707,909"/>
+<area shape="poly" id="edge29_Node000004_Node000039" title=" " alt="" coords="355,528,364,594,386,687,404,737,427,786,457,831,494,869,500,874,497,878,490,873,453,834,423,788,399,739,381,689,358,595,349,529"/>
+<area shape="rect" id="Node000040" href="$classMessageProcessor.html#ab39baddad577c52d27adc8689857a154" title="Emitted when the server grants permission to transmit audio (Push&#45;to&#45;Talk)." alt="" coords="507,934,709,958"/>
+<area shape="poly" id="edge30_Node000004_Node000040" title=" " alt="" coords="354,528,360,603,367,653,380,708,397,766,422,822,453,874,494,919,500,923,496,928,490,923,449,877,417,824,392,768,374,710,362,654,354,603,348,529"/>
+<area shape="rect" id="Node000041" href="$classMessageProcessor.html#a22bcd6ed76175518ae1d02d3cd34e830" title="Emitted when another user starts transmitting audio on the frequency." alt="" coords="516,68,701,107"/>
+<area shape="poly" id="edge31_Node000004_Node000041" title=" " alt="" coords="356,488,441,265,452,222,455,185,464,151,474,134,490,116,500,108,503,112,494,120,479,137,469,153,460,186,457,223,447,267,361,490"/>
+<area shape="rect" id="Node000042" href="$classMessageProcessor.html#a81d299c293bcea69de997931c2b5370f" title="Emitted when the currently transmitting user stops sending audio." alt="" coords="516,131,700,169"/>
+<area shape="poly" id="edge32_Node000004_Node000042" title=" " alt="" coords="356,488,423,316,462,227,478,196,490,179,501,171,504,175,494,183,482,199,466,230,428,319,361,490"/>
+<area shape="rect" id="Node000043" href="$classMessageProcessor.html#afe988619e44bae35710d27d1f22bdacb" title="Emitted when the server sends an update about the remote audio amplitude (optional)." alt="" coords="518,193,699,232"/>
+<area shape="poly" id="edge33_Node000004_Node000043" title=" " alt="" coords="353,488,368,438,395,371,435,301,461,269,490,241,502,233,505,238,494,245,465,273,439,304,400,374,373,440,358,490"/>
+<area shape="rect" id="Node000007" href="$classMessageHandler.html#ad3b43ca875118c1bafa19f354678cbec" title="Private constructor to enforce the singleton pattern." alt="" coords="1031,259,1256,284"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="977,269,1015,269,1015,274,977,274"/>
+<area shape="poly" id="edge16_Node000012_Node000006" title=" " alt="" coords="686,368,723,349,737,336,746,321,755,307,771,293,781,288,784,292,774,298,759,310,750,324,741,339,726,354,689,372"/>
+<area shape="rect" id="Node000013" href="$classMessageFormatter.html#af3a717bfa398187a653410d3febeb9cb" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="788,485,967,524"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="702,407,726,418,741,430,751,441,760,452,774,464,798,477,796,481,771,468,756,456,747,445,737,434,723,423,700,412"/>
+<area shape="rect" id="Node000014" href="$classAttachmentDataStore.html#a954fe97d063ada489bb0b29ad4f4f4e0" title="Gets the singleton instance of the AttachmentDataStore." alt="" coords="1070,529,1216,568"/>
+<area shape="poly" id="edge15_Node000012_Node000014" title=" " alt="" coords="704,405,726,419,739,433,746,449,750,479,754,508,761,521,774,533,806,551,841,564,877,573,915,577,988,576,1055,568,1055,573,989,582,914,582,876,578,839,569,804,556,771,537,757,525,749,510,744,480,740,450,734,436,723,423,702,409"/>
+<area shape="rect" id="Node000022" href="$classAttachmentDataStore.html#ac114f937b0c790630349e1fbb35ef244" title="Stores base64&#45;encoded attachment data and returns a unique ID. Generates a UUID for the attachment an..." alt="" coords="1066,453,1220,492"/>
+<area shape="poly" id="edge19_Node000012_Node000022" title=" " alt="" coords="704,406,773,418,1051,458,1050,464,772,423,703,411"/>
+<area shape="rect" id="Node000024" href="$classMessageHandler.html#adf6345e4dba6419f84258763471f0626" title="Marks a message ID as processed by adding it to the internal set. Also manages the size of the proces..." alt="" coords="772,308,983,347"/>
+<area shape="poly" id="edge17_Node000012_Node000024" title=" " alt="" coords="694,367,776,348,777,353,695,373"/>
+<area shape="rect" id="Node000025" href="$classMessageProcessor.html#a437c30026d43eede432432e57a209659" title="Emitted when a regular chat message (text or attachment placeholder) is processed." alt="" coords="780,371,975,409"/>
+<area shape="poly" id="edge18_Node000012_Node000025" title=" " alt="" coords="703,387,765,387,765,393,703,393"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="968,517,1055,531,1055,537,967,522"/>
+<area shape="poly" id="edge14_Node000013_Node000022" title=" " alt="" coords="967,491,1050,481,1051,486,968,497"/>
+<area shape="poly" id="edge21_Node000026_Node000027" title=" " alt="" coords="703,670,767,676,767,681,703,675"/>
+<area shape="rect" id="Node000036" href="$classMessageFormatter.html#a88534a822f6f08f08d70360bbbbe912f" title="Formats a simple string as a system message." alt="" coords="788,821,967,860"/>
+<area shape="poly" id="edge23_Node000035_Node000036" title=" " alt="" coords="703,838,772,838,772,843,703,843"/>
+<area shape="rect" id="Node000037" href="$classMessageProcessor.html#a61e0cab5d5efc6d69d06e842ccd17f71" title="Emitted when a system event message (e.g., user join/leave) is processed." alt="" coords="786,759,969,797"/>
+<area shape="poly" id="edge24_Node000035_Node000037" title=" " alt="" coords="694,818,776,799,777,804,695,823"/>
+<area shape="poly" id="edge26_Node000038_Node000036" title=" " alt="" coords="695,795,777,815,776,820,694,801"/>
+<area shape="poly" id="edge27_Node000038_Node000037" title=" " alt="" coords="703,775,771,775,771,781,703,781"/>
+</map>

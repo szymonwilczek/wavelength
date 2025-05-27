@@ -1,0 +1,7 @@
+<map id="LongTextDisplayEffect::SetText" name="LongTextDisplayEffect::SetText">
+<area shape="rect" id="Node000001" title="Sets the text content to be displayed. Updates the internal original text, invalidates the processed ..." alt="" coords="5,5,158,44"/>
+<area shape="rect" id="Node000002" href="$classLongTextDisplayEffect.html#a3c62e6c78599b4e8eac2ef62cdae7319" title="Processes the original_text_ into wrapped lines based on the current widget width...." alt="" coords="206,5,358,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,22,190,22,190,27,158,27"/>
+<area shape="rect" id="Node000003" href="$classLongTextDisplayEffect.html#aa577c95b45549f021c2ca984f7e5f8b3" title="Emitted after ProcessText() finishes, indicating the total calculated height required to display all ..." alt="" coords="406,5,568,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,22,391,22,391,27,359,27"/>
+</map>

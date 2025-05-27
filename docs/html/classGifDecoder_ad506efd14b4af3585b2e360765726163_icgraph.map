@@ -1,0 +1,5 @@
+<map id="GifDecoder::Stop" name="GifDecoder::Stop">
+<area shape="rect" id="Node000001" title="Stops the decoding thread gracefully. Sets the stopped_ flag, unpauses if necessary,..." alt="" coords="223,5,345,30"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#ad692e147e12716108096fac4fd45f1a3" title="Destructor. Stops the decoding thread, waits for it to finish, and releases all allocated resources." alt="" coords="5,5,175,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,20,175,20,175,15,207,15"/>
+</map>

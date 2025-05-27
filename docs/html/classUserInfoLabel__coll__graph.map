@@ -1,0 +1,5 @@
+<map id="UserInfoLabel" name="UserInfoLabel">
+<area shape="rect" id="Node000001" title="A custom QLabel that displays text alongside a colored circle with a glow effect." alt="" coords="5,117,194,443"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="74,5,126,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="CreateWavelengthDialog::paintEvent" name="CreateWavelengthDialog::paintEvent">
+<area shape="rect" id="Node000001" title="Overridden paint event handler. Draws the custom dialog appearance. Renders the background gradient,..." alt="" coords="5,5,170,44"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#aa0c40f6283744db79ab6a4b3ebf70c2c" title="Initializes or reinitializes the QPixmap buffer used for rendering the vertical scanline effect...." alt="" coords="218,5,382,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,22,202,22,202,27,170,27"/>
+</map>

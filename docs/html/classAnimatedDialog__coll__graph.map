@@ -1,0 +1,9 @@
+<map id="AnimatedDialog" name="AnimatedDialog">
+<area shape="rect" id="Node000001" title="A base class for QDialogs that adds animated transitions for showing and closing." alt="" coords="5,477,210,893"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="58,235,115,298"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,313,100,477,95,477,86,313"/>
+<area shape="rect" id="Node000003" href="$classOverlayWidget.html" title="A semi&#45;transparent overlay widget used to dim the background content." alt="" coords="140,118,329,415"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,415,178,461,173,460,187,413"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="204,5,265,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="237,83,237,118,232,118,232,83"/>
+</map>

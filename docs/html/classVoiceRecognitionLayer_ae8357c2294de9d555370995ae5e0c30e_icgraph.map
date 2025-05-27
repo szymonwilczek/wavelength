@@ -1,0 +1,8 @@
+<map id="VoiceRecognitionLayer::FinishRecognition" name="VoiceRecognitionLayer::FinishRecognition">
+<area shape="rect" id="Node000001" title="Slot called when the recognition process completes (either by progress reaching 100% or recognition_t..." alt="" coords="414,35,566,73"/>
+<area shape="rect" id="Node000002" href="$classVoiceRecognitionLayer.html#a49b97cb50c3d5533e70b68d0af5258c5" title="Slot called periodically by progress_timer_ to update the recognition progress bar...." alt="" coords="214,5,366,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="398,43,366,38,367,33,399,38"/>
+<area shape="rect" id="Node000003" href="$classVoiceRecognitionLayer.html#afe92e691948df9da5e2da29444995f99" title="Constructs a VoiceRecognitionLayer. Initializes the UI elements (title, audio visualizer,..." alt="" coords="5,35,166,73"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="398,58,366,58,214,58,166,58,166,52,214,53,366,53,398,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="199,40,166,45,166,40,198,35"/>
+</map>

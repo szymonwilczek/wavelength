@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::SetPreferredStartFrequency" name="WavelengthConfig::SetPreferredStartFrequency">
+<area shape="rect" id="Node000001" title="Sets the preferred starting frequency. Validates that the frequency is a number &gt;= 130...." alt="" coords="5,5,213,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="261,5,430,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,22,245,22,245,27,213,27"/>
+</map>

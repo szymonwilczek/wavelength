@@ -1,0 +1,27 @@
+<map id="AttachmentPlaceholder::ShowCyberGif" name="AttachmentPlaceholder::ShowCyberGif">
+<area shape="rect" id="Node000001" title="Creates and displays a CyberAttachmentViewer containing a GIF. Wraps an InlineGifPlayer in an AutoSca..." alt="" coords="5,100,162,139"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a7ca6d12c1c12311e3eb9dcfe185dba4d" title="Emitted when the user clicks on the attachment container. Typically used to trigger showing the full&#45;..." alt="" coords="210,5,368,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,97,209,53,220,48,222,53,211,58,122,102"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#a4fa15de6d78a0f59a6b5c15bf8784e66" title="Sets the actual content widget to be displayed within the placeholder. Replaces any existing content,..." alt="" coords="211,68,367,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="162,105,195,99,196,105,162,110"/>
+<area shape="rect" id="Node000006" href="$classAttachmentPlaceholder.html#a77ebd2ac2acb0920388709f2d6d1c1ec" title="Updates the UI elements to reflect the loading state. Disables/enables the load button and shows/hide..." alt="" coords="211,131,367,169"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="162,128,196,133,195,139,162,134"/>
+<area shape="rect" id="Node000007" href="$classAttachmentPlaceholder.html#ad096d1b0e758e0cb11f758adcd8ab8a0" title="Creates and shows a non&#45;modal dialog to display the full&#45;size attachment (image or GIF)...." alt="" coords="211,215,367,253"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="121,137,240,204,238,209,119,142"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#a52b917064beb0822fe62d7448a1f549b" title="Emits the attachmentLoaded signal after ensuring layout updates. Called internally after SetContent c..." alt="" coords="437,47,593,85"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="367,77,421,72,422,77,367,83"/>
+<area shape="rect" id="Node000005" href="$classAttachmentPlaceholder.html#ab83f0cf3a4db5e16cc136fa515d91a75" title="Emitted after the attachment content has been successfully loaded, set, and the layout updated." alt="" coords="662,47,819,85"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="594,63,646,63,646,69,594,69"/>
+<area shape="rect" id="Node000008" href="$classAttachmentPlaceholder.html#a255e1bdfbb4daf874ce90b167fe12910" title="Adjusts the size and position of the full&#45;size dialog and shows it. Calculates the preferred dialog s..." alt="" coords="436,109,595,148"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="319,212,363,185,415,158,432,151,434,156,417,163,366,189,322,216"/>
+<area shape="rect" id="Node000009" href="$classGifPlayer.html#a9d015c1250b0652d7d04a9f1e6a87b4f" title="Emitted after the GIF information (dimensions, duration, etc.) has been successfully received from th..." alt="" coords="446,172,584,197"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="367,214,440,198,441,204,368,220"/>
+<area shape="rect" id="Node000010" href="$classImageViewer.html#a592fe08df0615189242b4b68a77fa504" title="Emitted after the image information (dimensions, alpha) has been successfully received from the decod..." alt="" coords="416,222,614,246"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="367,231,400,231,400,237,367,237"/>
+<area shape="rect" id="Node000011" href="$classImageViewer.html#a4dc697303dccbc44c425fd91f2bf2077" title="Emitted after the image has been successfully decoded and set in the QLabel. Can be used by parent wi..." alt="" coords="424,271,606,296"/>
+<area shape="poly" id="edge10_Node000007_Node000011" title=" " alt="" coords="368,248,441,264,440,270,367,254"/>
+<area shape="rect" id="Node000012" href="$classGifPlayer.html#a535a67f0bced639155af15997528b7cd" title="Provides a size hint based on the original dimensions of the GIF. Returns the actual GIF width and he..." alt="" coords="450,320,580,345"/>
+<area shape="poly" id="edge11_Node000007_Node000012" title=" " alt="" coords="320,252,365,279,417,305,439,313,437,318,415,310,362,284,318,256"/>
+<area shape="rect" id="Node000013" href="$classGifPlayer.html#a8e9d8e851a0d476b74fdf082b7519d35" title="Starts or resumes GIF playback. Sets the is_playing_ flag and calls Resume() on the GifDecoder...." alt="" coords="432,370,598,394"/>
+<area shape="poly" id="edge12_Node000007_Node000013" title=" " alt="" coords="307,252,353,304,383,331,417,354,432,362,430,366,415,359,380,335,349,307,303,256"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="SecurityQuestionLayer::SecurityQuestionTimeout" name="SecurityQuestionLayer::SecurityQuestionTimeout">
+<area shape="rect" id="Node000001" title="Slot called by security_question_timer_ after a timeout (10 seconds). Updates the security_question_l..." alt="" coords="214,5,389,44"/>
+<area shape="rect" id="Node000002" href="$classSecurityQuestionLayer.html#a538c6acd1a8bcc50dd1502a7110a2603" title="Constructs a SecurityQuestionLayer. Initializes the UI elements (title, instructions,..." alt="" coords="5,5,166,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,27,166,27,166,22,198,22"/>
+</map>

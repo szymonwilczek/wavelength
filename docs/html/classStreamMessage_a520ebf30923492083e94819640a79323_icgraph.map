@@ -1,0 +1,25 @@
+<map id="StreamMessage::UpdateLayout" name="StreamMessage::UpdateLayout">
+<area shape="rect" id="Node000001" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="1021,111,1225,135"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a1a3ebf623b6477e510efeab5af62f390" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="770,48,956,86"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1046,109,955,90,956,84,1048,104"/>
+<area shape="rect" id="Node000007" href="$classStreamMessage.html#a56f0b99bdf200c841d4d8c1a5ab97dc9" title="Overridden resize event handler. Updates the layout of internal elements (buttons,..." alt="" coords="767,111,959,135"/>
+<area shape="poly" id="edge5_Node000001_Node000007" title=" " alt="" coords="1005,126,959,126,959,120,1005,120"/>
+<area shape="rect" id="Node000008" href="$classStreamMessage.html#aa9f352104e279f4e61c7a0693a056586" title="Shows or hides the navigation buttons (Next, Previous) and the Mark Read button. Updates the layout t..." alt="" coords="753,160,973,198"/>
+<area shape="poly" id="edge6_Node000001_Node000008" title=" " alt="" coords="1048,142,956,162,955,156,1046,137"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#ab018e0c173fde148dec8f2441b5db300" title="Parses HTML content to find an attachment placeholder and adds the corresponding AttachmentPlaceholde..." alt="" coords="491,5,705,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="754,49,668,33,669,28,755,44"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="492,55,704,79"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="754,70,705,70,705,64,754,64"/>
+<area shape="rect" id="Node000005" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="253,46,443,85"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="476,69,443,69,444,64,476,64"/>
+<area shape="rect" id="Node000009" href="$classCommunicationStream.html#a1b1a57ca6f1ccaac8e413cacdd3e69f6" title="Updates the visibility of the &quot;Next&quot; and &quot;Previous&quot; buttons on the currently displayed message based ..." alt="" coords="500,154,697,207"/>
+<area shape="poly" id="edge7_Node000008_Node000009" title=" " alt="" coords="738,182,697,183,697,177,738,177"/>
+<area shape="rect" id="Node000010" href="$classCommunicationStream.html#ae3b9b361caa5123daac847c60475d605" title="Adds a new standard message to the stream. Initiates the receiving animation. The message is displaye..." alt="" coords="28,117,182,156"/>
+<area shape="poly" id="edge8_Node000009_Node000010" title=" " alt="" coords="484,157,443,151,305,140,182,138,183,133,305,135,443,146,485,152"/>
+<area shape="rect" id="Node000011" href="$classCommunicationStream.html#a10a56a4dc3eeeaf4865d0f63f077e3bf" title="Adds a new message with attachment content to the stream. Initiates the receiving animation...." alt="" coords="5,193,205,232"/>
+<area shape="poly" id="edge9_Node000009_Node000011" title=" " alt="" coords="485,208,443,214,320,220,205,220,205,214,319,215,443,208,484,203"/>
+<area shape="rect" id="Node000012" href="$classCommunicationStream.html#aba44a533978e83748764534a8682c56f" title="Displays the message at the specified index in the messages_ list. Hides the previously displayed mes..." alt="" coords="268,161,428,200"/>
+<area shape="poly" id="edge10_Node000009_Node000012" title=" " alt="" coords="484,183,428,183,428,178,484,178"/>
+<area shape="poly" id="edge11_Node000012_Node000010" title=" " alt="" coords="252,166,182,153,183,148,253,160"/>
+<area shape="poly" id="edge12_Node000012_Node000011" title=" " alt="" coords="252,196,206,202,205,197,252,190"/>
+</map>

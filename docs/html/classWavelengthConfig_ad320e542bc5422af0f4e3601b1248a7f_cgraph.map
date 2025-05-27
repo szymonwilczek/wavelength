@@ -1,0 +1,5 @@
+<map id="WavelengthConfig::SetMaxReconnectAttempts" name="WavelengthConfig::SetMaxReconnectAttempts">
+<area shape="rect" id="Node000001" title="Sets the maximum number of reconnection attempts. Emits configChanged(&quot;maxReconnectAttempts&quot;) if the ..." alt="" coords="5,5,186,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="234,5,403,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,22,218,22,218,27,186,27"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="MaskOverlayEffect::SetRevealProgress" name="MaskOverlayEffect::SetRevealProgress">
+<area shape="rect" id="Node000001" title="Sets the vertical reveal progress as a percentage. Controls how much of the underlying widget is reve..." alt="" coords="256,5,395,44"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#a725b0a8c1d40b97e2d6cdf59ceb93b38" title="Constructs a CyberAttachmentViewer. Initializes the layout, status label, content container,..." alt="" coords="5,5,208,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,27,208,27,208,22,240,22"/>
+</map>

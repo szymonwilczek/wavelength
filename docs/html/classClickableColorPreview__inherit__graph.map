@@ -1,0 +1,5 @@
+<map id="ClickableColorPreview" name="ClickableColorPreview">
+<area shape="rect" id="Node000001" title="A small, clickable widget that displays a solid color preview." alt="" coords="5,117,194,308"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="69,5,131,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,84,102,117,97,117,97,84"/>
+</map>

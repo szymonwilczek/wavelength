@@ -1,0 +1,7 @@
+<map id="VideoDecoder::ReadPacket" name="VideoDecoder::ReadPacket">
+<area shape="rect" id="Node000001" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal QBuffer (buffer_)." alt="" coords="247,40,428,65"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a8faedb4d698430fed469c3dc468e2ac2" title="Synchronously extracts the first video frame from the data. Performs a separate, simplified FFmpeg in..." alt="" coords="12,5,192,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,43,192,38,193,33,231,37"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#a38321c72a85eca7115ab7b0b1fe5ac7a" title="Constructs a VideoDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I/..." alt="" coords="5,68,199,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="231,68,200,72,199,66,231,63"/>
+</map>

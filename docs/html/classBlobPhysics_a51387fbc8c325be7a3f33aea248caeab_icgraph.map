@@ -1,0 +1,11 @@
+<map id="BlobPhysics::ValidateAndRepairControlPoints" name="BlobPhysics::ValidateAndRepairControlPoints">
+<area shape="rect" id="Node000001" title="Checks if any control points or velocities contain invalid values (NaN, infinity)...." alt="" coords="480,48,650,86"/>
+<area shape="rect" id="Node000002" href="$classBlobPhysics.html#a611559445990d0a91365e7d1af7886f1" title="Updates the blob physics using a standard sequential approach. Iterates through each control point,..." alt="" coords="243,5,432,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="464,48,397,33,399,28,465,43"/>
+<area shape="rect" id="Node000003" href="$classBlobPhysics.html#a3246e7e25eb2df3437d3789ee12a7dbe" title="Updates the blob physics using QtConcurrent for parallel processing across multiple threads...." alt="" coords="5,48,195,86"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="465,70,195,70,195,64,465,64"/>
+<area shape="rect" id="Node000004" href="$classBlobPhysics.html#a5fa268f3582bffc05750430849f43d24" title="Updates the blob physics using an optimized Structure&#45;of&#45;Arrays (SoA) approach with OpenMP paralleliz..." alt="" coords="243,105,432,144"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="472,93,418,107,416,102,470,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="260,36,196,50,195,45,259,31"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="239,103,182,90,184,84,240,98"/>
+</map>

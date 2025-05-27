@@ -1,0 +1,5 @@
+<map id="AuthenticationManager" name="AuthenticationManager">
+<area shape="rect" id="Node000001" title="Manages authentication and session handling for Wavelength frequencies using a singleton pattern." alt="" coords="5,117,229,915"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="88,5,147,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,84,120,117,115,117,115,84"/>
+</map>

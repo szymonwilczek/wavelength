@@ -1,0 +1,5 @@
+<map id="MaskOverlayEffect::UpdateScanLine" name="MaskOverlayEffect::UpdateScanLine">
+<area shape="rect" id="Node000001" title="Slot called by the scan_timer_ to update the vertical position of the scanline. Moves the scanline do..." alt="" coords="193,5,332,44"/>
+<area shape="rect" id="Node000002" href="$classMaskOverlayEffect.html#a819ba2b27a5cb54118ee66a0618248b4" title="Constructs a MaskOverlay widget. Initializes the widget attributes (transparent for mouse events,..." alt="" coords="5,5,145,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,27,145,27,145,22,177,22"/>
+</map>

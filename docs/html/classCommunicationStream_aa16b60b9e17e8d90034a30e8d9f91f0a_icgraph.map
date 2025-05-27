@@ -1,0 +1,7 @@
+<map id="CommunicationStream::StartReceivingAnimation" name="CommunicationStream::StartReceivingAnimation">
+<area shape="rect" id="Node000001" title="Initiates the &quot;Receiving&quot; state animation (wave becomes more active). Animates amplitude,..." alt="" coords="253,37,426,76"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#ae3b9b361caa5123daac847c60475d605" title="Adds a new standard message to the stream. Initiates the receiving animation. The message is displaye..." alt="" coords="28,5,182,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,45,182,38,183,33,238,40"/>
+<area shape="rect" id="Node000003" href="$classCommunicationStream.html#a10a56a4dc3eeeaf4865d0f63f077e3bf" title="Adds a new message with attachment content to the stream. Initiates the receiving animation...." alt="" coords="5,68,205,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="238,73,206,77,205,72,237,67"/>
+</map>

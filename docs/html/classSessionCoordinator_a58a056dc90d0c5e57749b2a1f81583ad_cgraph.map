@@ -1,0 +1,21 @@
+<map id="SessionCoordinator::SetActiveWavelength" name="SessionCoordinator::SetActiveWavelength">
+<area shape="rect" id="Node000001" title="Sets the specified frequency as the currently active wavelength. Delegates the call to WavelengthStat..." alt="" coords="5,69,158,108"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="206,21,375,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,69,190,61,191,66,158,74"/>
+<area shape="rect" id="Node000004" href="$classWavelengthStateManager.html#a1d0a330ff6c0c11b93da9610195d20c6" title="Sets the specified frequency as the currently active wavelength. Updates the registry and emits the a..." alt="" coords="206,100,375,139"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="158,97,191,102,190,107,157,102"/>
+<area shape="rect" id="Node000003" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="426,5,603,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,32,410,29,410,35,375,37"/>
+<area shape="rect" id="Node000005" href="$classWavelengthStateManager.html#ac1bfacd44322ead69e4a316d90cad6fc" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="423,68,605,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="375,105,407,100,408,105,376,110"/>
+<area shape="rect" id="Node000006" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="446,131,583,169"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="376,128,431,136,430,141,375,134"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a4548037308651c141a62473296dc2b1e" title="Sets the specified frequency as the currently active wavelength. If the frequency does not exist in t..." alt="" coords="438,193,590,232"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="333,137,424,178,442,185,440,190,422,183,330,142"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="672,131,817,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="583,147,656,147,656,153,583,153"/>
+<area shape="rect" id="Node000009" href="$classWavelengthRegistry.html#ac86f04e6e88b2ba0dee509b7fbdc6e40" title="Emitted when the active wavelength changes via SetActiveWavelength()." alt="" coords="653,193,836,232"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="591,210,638,210,638,215,591,215"/>
+<area shape="rect" id="Node000010" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="676,256,813,295"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="588,230,662,250,660,255,587,235"/>
+</map>

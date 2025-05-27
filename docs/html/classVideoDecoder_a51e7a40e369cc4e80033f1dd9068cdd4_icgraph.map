@@ -1,0 +1,17 @@
+<map id="VideoDecoder::error" name="VideoDecoder::error">
+<area shape="rect" id="Node000001" title="Emitted when an error occurs during initialization or decoding." alt="" coords="692,70,830,94"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a18dedd90eb28ae766eb81d523625f766" title="Slot connected to the internal AudioDecoder&#39;s error signal. Relays the audio error message via the ma..." alt="" coords="459,5,644,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="698,68,624,47,626,42,699,62"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#aa8f8aabbe65727acd5ef5cfdc5f3b69b" title="Initializes the FFmpeg components for decoding the video and potentially audio. Opens the input strea..." alt="" coords="237,44,395,69"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="677,80,395,64,395,58,677,75"/>
+<area shape="rect" id="Node000005" href="$classVideoPlayer.html#a6f8d803263d342bf12f9cf29c40536de" title="Initializes the VideoDecoder instance and connects its signals. Creates the decoder,..." alt="" coords="461,119,642,144"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="691,101,608,121,607,116,690,96"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="444,42,396,49,395,43,443,37"/>
+<area shape="rect" id="Node000004" href="$classVideoDecoder.html#a134b48e98d0b9db4011cfea08d0924da" title="The main function executed by the QThread. Contains the loop that reads packets, decodes video frames..." alt="" coords="24,44,154,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="221,59,154,59,154,54,221,54"/>
+<area shape="rect" id="Node000006" href="$classVideoPlayer.html#aee93bdf909227c7d4f7c48eca8874af6" title="Toggles the playback state (play/pause) or resets if finished. If finished, resets the decoder...." alt="" coords="221,94,411,118"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="445,123,411,119,412,114,446,117"/>
+<area shape="rect" id="Node000007" href="$classVideoPlayer.html#a6ee50b34775069f86b0cace600c3923c" title="Constructs a VideoPlayerOverlay dialog. Initializes the cyberpunk UI elements, sets window properties..." alt="" coords="5,118,173,142"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="446,134,173,133,173,128,446,128"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="205,120,174,124,173,118,205,115"/>
+</map>

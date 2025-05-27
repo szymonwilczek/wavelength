@@ -1,0 +1,7 @@
+<map id="AudioPlayer::Activate" name="AudioPlayer::Activate">
+<area shape="rect" id="Node000001" title="Activates this player instance. If another player is active, it deactivates it first...." alt="" coords="459,5,604,30"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#afd42f1d9043e96d8b8ce55f7afd08483" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="221,5,411,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,20,412,20,412,15,444,15"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,5,173,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,20,173,20,173,15,205,15"/>
+</map>

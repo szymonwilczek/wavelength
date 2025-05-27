@@ -1,0 +1,5 @@
+<map id="AudioDecoder::DecodeAudioFrame" name="AudioDecoder::DecodeAudioFrame">
+<area shape="rect" id="Node000001" title="Decodes a single audio frame using the FFmpeg resampler and writes the result to the audio device." alt="" coords="183,5,372,44"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a46043f6510cb80d1c4c14a18f23ecee2" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,12,135,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,27,135,27,135,22,167,22"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="AudioPlayer::DecreaseSpectrumIntensity" name="AudioPlayer::DecreaseSpectrumIntensity">
+<area shape="rect" id="Node000001" title="Starts an animation to decrease the spectrum intensity (e.g., when playback pauses or finishes)." alt="" coords="459,5,669,44"/>
+<area shape="rect" id="Node000002" href="$classAudioPlayer.html#afd42f1d9043e96d8b8ce55f7afd08483" title="Toggles the playback state (play/pause). Activates the player if necessary. Handles restarting playba..." alt="" coords="221,12,411,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="443,27,411,27,411,22,443,22"/>
+<area shape="rect" id="Node000003" href="$classAudioPlayer.html#a4da9701f61a9eb8e270edbf995c72755" title="Constructs an InlineAudioPlayer widget. Initializes UI elements (labels, buttons, sliders,..." alt="" coords="5,12,173,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,27,173,27,173,22,205,22"/>
+</map>

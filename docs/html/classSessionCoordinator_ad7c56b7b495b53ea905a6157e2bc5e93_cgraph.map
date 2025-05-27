@@ -1,0 +1,36 @@
+<map id="SessionCoordinator::LeaveWavelength" name="SessionCoordinator::LeaveWavelength">
+<area shape="rect" id="Node000001" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="5,289,141,328"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a7764e9d8d9abcf7337fd18c6ed5461e4" title="Gets the frequency identifier of the currently active wavelength." alt="" coords="222,68,391,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,288,128,231,187,167,222,138,257,113,261,117,225,142,191,171,132,234,90,291"/>
+<area shape="rect" id="Node000006" href="$classWavelengthLeaver.html#a95c859d6204642e432fadb032665192d" title="Gets the singleton instance of the WavelengthLeaver." alt="" coords="204,296,409,321"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="141,306,188,306,188,311,141,311"/>
+<area shape="rect" id="Node000008" href="$classWavelengthStateManager.html#a080b15c4486a3ac1c341a464dbf197ad" title="Gets the singleton instance of the WavelengthStateManager." alt="" coords="222,345,391,384"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="142,322,209,339,208,344,140,327"/>
+<area shape="rect" id="Node000010" href="$classWavelengthLeaver.html#a11a552cbede70a46b0f5cb9a509328d7" title="Leaves the currently active wavelength. Retrieves the active frequency from the registry...." alt="" coords="189,180,424,205"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="113,286,265,210,267,215,115,291"/>
+<area shape="rect" id="Node000016" href="$classWavelengthStateManager.html#a44d02e59b4af38efc0a24fa37820b531" title="Unregisters that the user has left or been disconnected from a specific wavelength...." alt="" coords="209,408,404,447"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="97,327,138,361,190,393,205,400,203,405,187,398,135,365,94,331"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a6ce8627bbb1db084bf76053aa92f9a47" title="Gets the identifier of the currently active wavelength." alt="" coords="496,5,649,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="391,65,480,44,481,49,392,70"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="504,68,641,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="391,85,488,85,488,90,391,90"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="761,68,907,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="642,85,746,85,746,90,642,90"/>
+<area shape="rect" id="Node000007" href="$classWavelengthLeaver.html#a8e05b87c2dc74058b77f75d87405eb96" title="Private constructor to enforce the singleton pattern." alt="" coords="472,356,673,395"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="376,319,425,330,493,349,492,354,423,335,374,324"/>
+<area shape="rect" id="Node000009" href="$classWavelengthStateManager.html#a9076f87f6e875d36b2853b946d94ce29" title="Private constructor to enforce the singleton pattern." alt="" coords="484,419,661,457"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="385,382,425,393,490,411,488,416,423,398,383,387"/>
+<area shape="poly" id="edge10_Node000010_Node000003" title=" " alt="" coords="332,177,376,151,422,116,436,100,445,84,454,69,470,53,481,47,483,51,474,57,458,72,449,87,441,103,426,120,379,156,334,182"/>
+<area shape="poly" id="edge13_Node000010_Node000004" title=" " alt="" coords="333,177,471,117,491,109,493,114,473,122,335,182"/>
+<area shape="rect" id="Node000011" href="$classMessageHandler.html#afa8afa05bb7b07783162bf420a91ac92" title="Gets the singleton instance of the MessageHandler." alt="" coords="474,131,672,156"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="376,177,487,156,488,162,377,182"/>
+<area shape="rect" id="Node000013" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="503,231,642,269"/>
+<area shape="poly" id="edge14_Node000010_Node000013" title=" " alt="" coords="367,203,488,229,487,234,366,208"/>
+<area shape="rect" id="Node000014" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="765,205,903,244"/>
+<area shape="poly" id="edge16_Node000010_Node000014" title=" " alt="" coords="424,197,750,217,750,222,424,202"/>
+<area shape="rect" id="Node000015" href="$classMessageHandler.html#ac61b2dfc101504adcfbeba40977e224b" title="Sends a JSON&#45;formatted system command over the specified WebSocket. Constructs a JSON object with the..." alt="" coords="472,293,673,332"/>
+<area shape="poly" id="edge17_Node000010_Node000015" title=" " alt="" coords="330,203,393,239,473,278,491,285,489,290,471,283,391,244,328,208"/>
+<area shape="rect" id="Node000012" href="$classMessageHandler.html#ad3b43ca875118c1bafa19f354678cbec" title="Private constructor to enforce the singleton pattern." alt="" coords="721,131,947,156"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="672,141,705,141,705,146,672,146"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="643,241,750,230,750,235,643,246"/>
+</map>

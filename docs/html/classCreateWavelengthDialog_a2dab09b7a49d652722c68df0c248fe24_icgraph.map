@@ -1,0 +1,5 @@
+<map id="CreateWavelengthDialog::TryGenerate" name="CreateWavelengthDialog::TryGenerate">
+<area shape="rect" id="Node000001" title="Attempts to finalize the wavelength generation process. Checks if a password is required and entered...." alt="" coords="226,5,390,44"/>
+<area shape="rect" id="Node000002" href="$classCreateWavelengthDialog.html#acb82ee7ee77da3a02fbd18f622f3c660" title="Constructs a WavelengthDialog. Sets up the UI elements (labels, input fields, buttons,..." alt="" coords="5,5,178,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,27,178,27,178,22,210,22"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="AttachmentPlaceholder::ShowCyberAudio" name="AttachmentPlaceholder::ShowCyberAudio">
+<area shape="rect" id="Node000001" title="Creates and displays a CyberAttachmentViewer containing an audio player. Uses InlineAudioPlayer." alt="" coords="5,68,162,107"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#a4fa15de6d78a0f59a6b5c15bf8784e66" title="Sets the actual content widget to be displayed within the placeholder. Replaces any existing content,..." alt="" coords="221,5,378,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,65,215,46,217,51,153,70"/>
+<area shape="rect" id="Node000005" href="$classAttachmentPlaceholder.html#a77ebd2ac2acb0920388709f2d6d1c1ec" title="Updates the UI elements to reflect the loading state. Disables/enables the load button and shows/hide..." alt="" coords="221,68,378,107"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,85,206,85,206,90,162,90"/>
+<area shape="rect" id="Node000006" href="$classAttachmentViewer.html#aec3d228e36d5e01358f24a6827865b62" title="Emitted when the viewer is closed (either manually or automatically after decryption)." alt="" coords="210,131,389,169"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="153,105,217,123,215,128,152,110"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#a52b917064beb0822fe62d7448a1f549b" title="Emits the attachmentLoaded signal after ensuring layout updates. Called internally after SetContent c..." alt="" coords="437,5,593,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="378,22,422,22,422,27,378,27"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#ab83f0cf3a4db5e16cc136fa515d91a75" title="Emitted after the attachment content has been successfully loaded, set, and the layout updated." alt="" coords="641,5,798,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="594,22,626,22,626,27,594,27"/>
+</map>

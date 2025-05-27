@@ -1,0 +1,7 @@
+<map id="VideoDecoder::~VideoDecoder" name="VideoDecoder::~VideoDecoder">
+<area shape="rect" id="Node000001" title="Destructor. Stops the decoding thread, waits for it to finish, and releases all allocated resources." alt="" coords="5,40,207,65"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a5a7e10221cb9faa6fd891a965feaaa25" title="Releases all FFmpeg resources (contexts, frames, scaler) and deletes the internal AudioDecoder...." alt="" coords="255,5,462,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,39,239,35,239,41,207,44"/>
+<area shape="rect" id="Node000003" href="$classVideoDecoder.html#aae8c25f59a45dd632b335cd72300f09b" title="Stops the decoding thread and playback gracefully. Sets the stopped_ flag, stops the internal audio d..." alt="" coords="289,68,428,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,61,274,69,273,74,207,67"/>
+</map>

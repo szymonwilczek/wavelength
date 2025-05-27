@@ -1,0 +1,17 @@
+<map id="PathMarkersManager::DrawMarkers" name="PathMarkersManager::DrawMarkers">
+<area shape="rect" id="Node000001" title="Draws all managed markers onto the provided QPainter. Calculates the time delta since the last draw c..." alt="" coords="5,193,152,232"/>
+<area shape="rect" id="Node000002" href="$classPathMarkersManager.html#a920d2b38315d9270ccd839560210fa73" title="Calculates the points needed to draw the trailing effect for an impulse marker. Populates the marker&#39;..." alt="" coords="203,5,350,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,192,130,125,162,87,198,53,202,50,205,55,201,57,166,91,135,128,92,194"/>
+<area shape="rect" id="Node000003" href="$classPathMarkersManager.html#a6477ae876580a5dce3ced0279222587e" title="Draws a marker of type 0 (Impulse). Renders a cyberpunk&#45;style head element and a fading trail using p..." alt="" coords="203,68,350,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,191,143,154,198,116,206,111,209,116,201,120,147,158,103,195"/>
+<area shape="rect" id="Node000004" href="$classPathMarkersManager.html#a59dede85fb0beb25bbb363e83871697d" title="Draws a marker of type 2 (Quantum). Renders a central point and several orbiting &quot;quantum copies&quot; who..." alt="" coords="200,131,353,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,190,198,172,200,177,142,195"/>
+<area shape="rect" id="Node000005" href="$classPathMarkersManager.html#a72781c7a7f1ca5ecc25e080c0ddf1f65" title="Draws a marker of type 1 (Wave). Renders expanding concentric rings and a subtle distortion effect or..." alt="" coords="203,193,350,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="152,210,187,210,187,215,152,215"/>
+<area shape="rect" id="Node000006" href="$classPathMarkersManager.html#a654df5d39231a6d6010de7a39713ad8c" title="Determines the appropriate color for a marker based on its type and current color phase...." alt="" coords="203,256,350,295"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="142,230,200,248,198,253,141,235"/>
+<area shape="rect" id="Node000007" href="$classPathMarkersManager.html#aaf6dbebcab6cc90f86e1ecb2e6e2376a" title="Initializes or resets the set of markers. Clears existing markers and creates a new random set with v..." alt="" coords="203,319,350,357"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="103,230,147,267,201,304,211,309,208,314,198,308,144,271,100,234"/>
+<area shape="rect" id="Node000008" href="$classPathMarkersManager.html#a852dcf04c6a7a5ac4fa73065bd194356" title="Updates the state of all markers based on the elapsed time. Calculates new positions,..." alt="" coords="203,381,350,420"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="93,231,135,297,166,334,201,367,207,371,204,375,198,371,162,337,131,300,88,234"/>
+</map>

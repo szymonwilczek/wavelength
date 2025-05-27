@@ -1,0 +1,5 @@
+<map id="CyberpunkStyle::GetWarningColor" name="CyberpunkStyle::GetWarningColor">
+<area shape="rect" id="Node000001" title="Gets the warning color (Warning Yellow)." alt="" coords="259,5,450,44"/>
+<area shape="rect" id="Node000002" href="$classChatStyle.html#a19e4199b18af77815f16e8f88c17ab1d" title="Gets the stylesheet for system messages (e.g., user joined/left, errors). Defines background,..." alt="" coords="5,5,211,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,27,211,27,211,22,243,22"/>
+</map>

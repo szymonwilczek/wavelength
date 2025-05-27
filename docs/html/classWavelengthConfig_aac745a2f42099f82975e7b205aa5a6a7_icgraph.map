@@ -1,0 +1,23 @@
+<map id="WavelengthConfig::recentColorsChanged" name="WavelengthConfig::recentColorsChanged">
+<area shape="rect" id="Node000001" title="Emitted when the list of recent colors changes (a color was added)." alt="" coords="522,256,692,295"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a7ebb29db2d1c1664c1fca81e52f67565" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="276,193,474,232"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="518,254,448,235,450,230,519,249"/>
+<area shape="rect" id="Node000010" href="$classAppearanceSettingsWidget.html#a1ecc9de064a98ca57c7147d11116fca4" title="Constructs the AppearanceSettingsWidget. Initializes the UI, loads current settings from WavelengthCo..." alt="" coords="281,256,468,295"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="507,278,469,278,469,273,507,273"/>
+<area shape="rect" id="Node000011" href="$classWavelengthConfig.html#a045bf9dd6f33936f8c172525958f446c" title="Restores all configuration settings to their default values. Also clears saved shortcuts in persisten..." alt="" coords="285,319,464,357"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="519,302,450,321,448,316,518,297"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a5860f4c0c2e368828d9287c43b2cfcaa" title="Sets the main background color. Adds the color to recent colors. Emits configChanged(&quot;background_colo..." alt="" coords="5,5,228,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="350,182,298,118,264,86,226,58,205,47,207,42,229,53,268,81,302,115,354,179"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#a0cbdae91c44d8833bc7f89be1bf9aa93" title="Sets the color for the blob animation. Adds the color to recent colors. Emits configChanged(&quot;blob_col..." alt="" coords="26,68,207,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="334,186,284,152,227,120,199,110,201,105,229,116,287,147,337,181"/>
+<area shape="rect" id="Node000005" href="$classWavelengthConfig.html#ad10ffe62231ae9e11423239074d13c35" title="Sets the color for the background grid lines. Adds the color to recent colors. Emits configChanged(&quot;g..." alt="" coords="27,131,206,169"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="277,192,199,173,200,167,278,187"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html#a9c3abad31355863be9a66ea30cdcbedb" title="Sets the color for stream visualization elements. Adds the color to recent colors...." alt="" coords="18,193,215,232"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="260,215,215,215,215,210,260,210"/>
+<area shape="rect" id="Node000007" href="$classWavelengthConfig.html#a83eb31f8ab7a2b3e20599841faec5b88" title="Sets the color for the title label border. Adds the color to recent colors. Emits configChanged(&quot;titl..." alt="" coords="27,256,206,295"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="278,239,200,258,199,253,277,234"/>
+<area shape="rect" id="Node000008" href="$classWavelengthConfig.html#a2fb848bed4ad119d39c62e7d526c2791" title="Sets the color for the title label glow effect. Adds the color to recent colors. Emits configChanged(..." alt="" coords="27,319,206,357"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="283,242,277,245,262,260,254,276,245,292,229,308,207,321,204,316,226,304,241,289,249,274,258,257,274,241,280,237"/>
+<area shape="rect" id="Node000009" href="$classWavelengthConfig.html#ade723615fb9e9bd2bef32292b26a4837" title="Sets the color for the title label text. Adds the color to recent colors. Emits configChanged(&quot;title_..." alt="" coords="27,381,206,420"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="280,243,278,245,265,260,259,275,254,307,250,339,243,355,229,371,208,385,205,381,226,367,238,352,245,337,249,306,253,274,261,257,274,241,276,239"/>
+</map>

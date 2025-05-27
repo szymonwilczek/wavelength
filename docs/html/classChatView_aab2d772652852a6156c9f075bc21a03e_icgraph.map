@@ -1,0 +1,23 @@
+<map id="ChatView::CalculateAmplitude" name="ChatView::CalculateAmplitude">
+<area shape="rect" id="Node000001" title="Calculates the Root Mean Square (RMS) amplitude of a raw audio buffer. Used for audio visualization...." alt="" coords="1402,31,1600,55"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a78ee69626741e4bebc50a5222b80b868" title="Slot called when binary audio data is received from the server. If the frequency matches and the stat..." alt="" coords="893,5,1108,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1387,40,1108,26,1108,20,1387,35"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#a034774a31cd27434eeb01e9965736aeb" title="Slot called when the audio input device has data ready to be read. Reads all available audio data,..." alt="" coords="1156,55,1354,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1387,57,1355,60,1355,55,1387,51"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,80,148,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="878,21,738,24,567,32,381,47,196,71,137,82,136,77,195,66,381,42,567,27,738,19,877,15"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#a119a0cb1a68f2e3a60e4153912fa43f2" title="Starts capturing audio from the microphone if PTT state is Transmitting. Connects the readyRead signa..." alt="" coords="409,55,585,79"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1140,70,586,70,586,64,1140,64"/>
+<area shape="rect" id="Node000007" href="$classChatView.html#abd9ae8e738358b9be6f5e935ea4826a3" title="Stops capturing audio from the microphone. Disconnects signals and resets the input device pointer." alt="" coords="913,104,1088,129"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="1173,85,1068,106,1067,101,1172,80"/>
+<area shape="rect" id="Node000006" href="$classChatView.html#ae1708fe2be43fe0f0bf4e000d968b385" title="Slot called when the server grants the PTT request. If the frequency matches and the state is Request..." alt="" coords="196,80,361,105"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="394,82,362,85,361,80,393,76"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="180,95,148,95,148,90,180,90"/>
+<area shape="rect" id="Node000008" href="$classChatView.html#ac40ec4de8eddc9ea4fc2d3e210aa6c4d" title="Slot called when the PTT button is released. Plays the PTT deactivation sound. If transmitting,..." alt="" coords="633,104,845,129"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="898,119,845,119,845,114,898,114"/>
+<area shape="rect" id="Node000010" href="$classChatView.html#a7fb02c0ac57330d91ab4afb26da50514" title="Destructor. Stops audio input/output and cleans up audio resources." alt="" coords="664,153,814,178"/>
+<area shape="poly" id="edge12_Node000007_Node000010" title=" " alt="" coords="916,135,809,155,808,150,915,130"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="618,126,420,130,307,127,195,119,129,108,130,103,196,114,307,122,420,124,618,121"/>
+<area shape="poly" id="edge11_Node000008_Node000005" title=" " alt="" coords="659,103,561,83,562,77,661,98"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="618,113,361,99,362,94,618,107"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ChatView::UpdateProgressMessage" name="ChatView::UpdateProgressMessage">
+<area shape="rect" id="Node000001" title="Slot to update a message in the message area, typically used for file transfer progress...." alt="" coords="196,5,375,44"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,12,148,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,27,148,27,148,22,180,22"/>
+</map>

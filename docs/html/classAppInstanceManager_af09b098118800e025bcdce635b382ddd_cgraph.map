@@ -1,0 +1,16 @@
+<map id="AppInstanceManager::SetupServer" name="AppInstanceManager::SetupServer">
+<area shape="rect" id="Node000001" title="Sets up the QLocalServer for the creator instance." alt="" coords="5,97,150,136"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#af7e9143a1ff0af2932c1d0afc1f31231" title="Slot called when a new client attempts to connect to the server." alt="" coords="198,125,342,164"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,125,183,129,182,135,150,130"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="390,68,534,107"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,122,380,109,382,114,338,127"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#ab7fe0e77dca903fa23d78139dd68e84b" title="Slot called when data can be read from a connected socket." alt="" coords="390,131,534,169"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="342,144,375,145,375,150,342,149"/>
+<area shape="poly" id="edge5_Node000003_Node000001" title=" " alt="" coords="390,95,165,113,165,107,390,90"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a1ac17dc2cb4f3ae1f968109a180acd2e" title="Emitted when a client instance disconnects (on the server) or when the connection to the server is lo..." alt="" coords="595,5,753,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="529,65,591,46,592,52,530,70"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#acb57c2842c3eff0de2fe0c4009f8cdcb" title="Statically checks if another instance of the application is already running." alt="" coords="582,68,766,107"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="535,85,567,85,567,90,535,90"/>
+<area shape="rect" id="Node000007" href="$classAppInstanceManager.html#a46df6d357b1a69b71bfa325166b179ea" title="Processes an incoming message received from a socket." alt="" coords="602,131,746,169"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="535,147,586,147,586,153,535,153"/>
+</map>

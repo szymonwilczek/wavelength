@@ -1,0 +1,8 @@
+<map id="RetinaScanLayer::FinishScan" name="RetinaScanLayer::FinishScan">
+<area shape="rect" id="Node000001" title="Slot called when the scan completes (either by timer or scanline finishing). Changes the UI element s..." alt="" coords="495,12,687,37"/>
+<area shape="rect" id="Node000002" href="$classRetinaScanLayer.html#a967482762796522d275e6ed7f40d1c7f" title="Constructs a RetinaScanLayer. Initializes the UI elements (title, eye image container,..." alt="" coords="5,5,200,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="479,27,200,27,200,22,479,22"/>
+<area shape="rect" id="Node000003" href="$classRetinaScanLayer.html#a52b3474809f40e8accf0e6f50d3c52f6" title="Slot called periodically by scan_timer_ to update the scan animation. Increments the progress bar,..." alt="" coords="248,36,447,61"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="480,38,448,41,447,36,479,33"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="232,40,200,37,200,32,232,35"/>
+</map>

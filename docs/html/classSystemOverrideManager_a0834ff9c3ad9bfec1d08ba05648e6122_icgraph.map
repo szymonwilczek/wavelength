@@ -1,0 +1,14 @@
+<map id="SystemOverrideManager::RestoreSystemState" name="SystemOverrideManager::RestoreSystemState">
+<area shape="rect" id="Node000001" title="Restores the system state to normal. Uninstalls input hooks (Windows), restores the original wallpape..." alt="" coords="729,35,893,73"/>
+<area shape="poly" id="edge5_Node000001_Node000001" title=" " alt="" coords="849,22,835,16,811,13,789,15,775,20,771,26,774,34,769,35,766,25,772,16,788,10,811,8,836,10,851,17"/>
+<area shape="rect" id="Node000002" href="$classSystemOverrideManager.html#a1d774843ddf2350e4b0ebd78777733bf" title="Slot called when the FloatingEnergySphereWidget emits its widgetClosed signal. Cleans up the widget p..." alt="" coords="483,5,681,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="714,53,669,47,670,42,714,48"/>
+<area shape="rect" id="Node000003" href="$classSystemOverrideManager.html#ad55be1ff40ee203da7ed94a15e7e3de5" title="Creates, configures, positions, and shows the FloatingEnergySphereWidget. Connects the necessary sign..." alt="" coords="228,35,435,73"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="714,58,681,58,483,58,435,58,435,52,483,53,681,53,714,52"/>
+<area shape="rect" id="Node000005" href="$classSystemOverrideManager.html#a97a21907f73c99fc8dd4defaadfd5f48" title="Destructor. Ensures the system state is restored if the override is active. Cleans up the floating wi..." alt="" coords="492,120,672,159"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="744,82,637,122,636,117,742,77"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="697,28,730,32,729,38,696,33"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="468,41,436,44,435,39,467,35"/>
+<area shape="rect" id="Node000004" href="$classSystemOverrideManager.html#a2c03d5744eeabdefc7d14ceea6dfdd75" title="Initiates the full system override sequence. Installs input hooks (Windows), changes wallpaper,..." alt="" coords="5,35,180,73"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="212,57,180,57,180,51,212,51"/>
+</map>

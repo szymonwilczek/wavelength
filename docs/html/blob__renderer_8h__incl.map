@@ -1,0 +1,17 @@
+<map id="src/blob/rendering/blob_renderer.h" name="src/blob/rendering/blob_renderer.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="178,5,302,44"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,92,105,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,47,98,88,96,83,194,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="129,92,205,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="225,46,190,82,186,79,221,43"/>
+<area shape="rect" id="Node000004" href="$path__markers__manager_8h.html" title=" " alt="" coords="229,92,398,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="260,43,294,79,290,82,256,46"/>
+<area shape="rect" id="Node000007" href="$blob__config_8h.html" title=" " alt="" coords="422,92,533,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="299,42,428,84,427,89,297,47"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="228,165,301,189"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="308,119,283,153,279,150,303,116"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="326,165,382,189"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="323,116,342,150,337,152,318,119"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="446,165,509,189"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="480,117,480,149,475,149,475,117"/>
+</map>

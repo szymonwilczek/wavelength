@@ -1,0 +1,18 @@
+<map id="WavelengthStateManager::IsActiveWavelengthHost" name="WavelengthStateManager::IsActiveWavelengthHost">
+<area shape="rect" id="Node000001" title="Checks if the current user is the host of the currently active wavelength." alt="" coords="5,69,177,108"/>
+<area shape="rect" id="Node000002" href="$classWavelengthStateManager.html#a7764e9d8d9abcf7337fd18c6ed5461e4" title="Gets the frequency identifier of the currently active wavelength." alt="" coords="225,37,394,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,73,209,69,210,74,177,79"/>
+<area shape="rect" id="Node000006" href="$classWavelengthStateManager.html#af929daf75947f30826d1f7b192f3f1b3" title="Retrieves detailed information about a specific wavelength from the registry." alt="" coords="225,100,394,139"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="177,98,210,103,209,108,177,103"/>
+<area shape="rect" id="Node000003" href="$classWavelengthRegistry.html#a6ce8627bbb1db084bf76053aa92f9a47" title="Gets the identifier of the currently active wavelength." alt="" coords="442,5,595,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,41,426,36,427,41,395,46"/>
+<area shape="rect" id="Node000004" href="$classWavelengthRegistry.html#a84a25c38915431306681e96df429f20f" title="Gets the singleton instance of the WavelengthRegistry." alt="" coords="450,68,587,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="395,66,435,72,434,78,394,72"/>
+<area shape="rect" id="Node000005" href="$classWavelengthRegistry.html#a5ad0b9c059e6c70af54fd27e35035e64" title="Private constructor to enforce the singleton pattern. Initializes active_wavelength_ to &quot;&#45;1&quot;." alt="" coords="643,68,789,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="588,85,628,85,628,90,588,90"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="394,104,434,98,435,103,395,109"/>
+<area shape="rect" id="Node000007" href="$classWavelengthRegistry.html#a022bb5799d095b75026019791ebf5e34" title="Retrieves the WavelengthInfo for a specific frequency." alt="" coords="449,131,588,169"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="395,129,434,135,433,140,394,134"/>
+<area shape="rect" id="Node000008" href="$classWavelengthRegistry.html#a998a355d30053edcff8aac04c7d7dc55" title="Checks if a wavelength with the given frequency exists in the registry." alt="" coords="647,131,785,169"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="589,147,632,147,632,153,589,153"/>
+</map>

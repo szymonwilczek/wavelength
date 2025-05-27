@@ -1,0 +1,5 @@
+<map id="ChatView::ResetStatusIndicator" name="ChatView::ResetStatusIndicator">
+<area shape="rect" id="Node000001" title="Resets the status_indicator_ label to its default &quot;CONNECTION ACTIVE&quot; state and style." alt="" coords="226,5,433,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a4cbbc74a8774cc401a3117bedf750e0f" title="Configures the view for a specific Wavelength. Sets the header title with the frequency and optional ..." alt="" coords="5,5,178,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,20,178,20,178,15,210,15"/>
+</map>

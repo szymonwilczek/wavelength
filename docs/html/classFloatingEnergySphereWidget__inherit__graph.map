@@ -1,0 +1,7 @@
+<map id="FloatingEnergySphereWidget" name="FloatingEnergySphereWidget">
+<area shape="rect" id="Node000001" title="An OpenGL widget displaying a floating, interactive energy sphere." alt="" coords="22,131,248,1249"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,12,115,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,90,73,130,67,131,63,91"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="140,5,279,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,98,202,131,197,131,201,97"/>
+</map>

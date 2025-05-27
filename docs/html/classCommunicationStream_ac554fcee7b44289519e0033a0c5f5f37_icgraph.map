@@ -1,0 +1,5 @@
+<map id="CommunicationStream::UpdateAnimation" name="CommunicationStream::UpdateAnimation">
+<area shape="rect" id="Node000001" title="Slot called by animation_timer_ to update animation time and parameters. Advances time offset,..." alt="" coords="216,5,370,44"/>
+<area shape="rect" id="Node000002" href="$classCommunicationStream.html#a4fe34ce867f3ece68bda3e512c544e18" title="Constructs a CommunicationStream widget. Initializes OpenGL format, timers for animation and glitches..." alt="" coords="5,5,168,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,27,168,27,168,22,200,22"/>
+</map>

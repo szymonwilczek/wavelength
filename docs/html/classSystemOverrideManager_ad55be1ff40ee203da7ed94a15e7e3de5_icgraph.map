@@ -1,0 +1,5 @@
+<map id="SystemOverrideManager::ShowFloatingAnimationWidget" name="SystemOverrideManager::ShowFloatingAnimationWidget">
+<area shape="rect" id="Node000001" title="Creates, configures, positions, and shows the FloatingEnergySphereWidget. Connects the necessary sign..." alt="" coords="228,5,435,44"/>
+<area shape="rect" id="Node000002" href="$classSystemOverrideManager.html#a2c03d5744eeabdefc7d14ceea6dfdd75" title="Initiates the full system override sequence. Installs input hooks (Windows), changes wallpaper,..." alt="" coords="5,5,180,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,27,180,27,180,22,212,22"/>
+</map>

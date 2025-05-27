@@ -1,0 +1,9 @@
+<map id="ClickableColorPreview::clicked" name="ClickableColorPreview::clicked">
+<area shape="rect" id="Node000001" title="Emitted when the widget is clicked with the left mouse button." alt="" coords="468,37,621,76"/>
+<area shape="rect" id="Node000002" href="$classClickableColorPreview.html#ad8118742cff873c5c4d7cdd3631526ff" title="Overridden mouse press event handler. Emits the clicked() signal if the left mouse button is pressed." alt="" coords="254,5,407,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="452,46,407,39,408,33,453,40"/>
+<area shape="rect" id="Node000003" href="$classAppearanceSettingsWidget.html#afd618e63d3144f4e1fafe6fdce1b1c13" title="Creates and arranges all the UI elements (labels, previews, spin boxes, layouts) for the widget." alt="" coords="241,68,420,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="453,72,421,77,420,72,452,67"/>
+<area shape="rect" id="Node000004" href="$classAppearanceSettingsWidget.html#a1ecc9de064a98ca57c7147d11116fca4" title="Constructs the AppearanceSettingsWidget. Initializes the UI, loads current settings from WavelengthCo..." alt="" coords="5,68,193,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="225,90,193,90,193,85,225,85"/>
+</map>

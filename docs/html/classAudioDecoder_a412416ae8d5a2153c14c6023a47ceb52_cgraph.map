@@ -1,0 +1,7 @@
+<map id="AudioDecoder::Initialize" name="AudioDecoder::Initialize">
+<area shape="rect" id="Node000001" title="Initializes the FFmpeg components and QAudioOutput for playback. Opens the input stream using the cus..." alt="" coords="5,31,164,55"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a70ae7be45d270a97159bd5f6c36c2ad8" title="Emitted after successful initialization, providing audio stream details." alt="" coords="212,5,376,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,31,196,27,196,32,164,36"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#a4c483a41bf7d57354b63bec009ac222e" title="Emitted when an error occurs during initialization or decoding." alt="" coords="225,55,362,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,49,210,55,210,60,164,55"/>
+</map>

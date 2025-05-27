@@ -1,0 +1,11 @@
+<map id="SessionCoordinator::audioDataReceived" name="SessionCoordinator::audioDataReceived">
+<area shape="rect" id="Node000001" title="Emitted when raw audio data is received. Relayed from WavelengthMessageService." alt="" coords="576,26,717,65"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="379,5,521,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="560,36,521,30,522,25,561,31"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a6e6eb29b0e5cb5d5d8802a2a9e454ec0" title="Relays the audioDataReceived signal." alt="" coords="372,54,528,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="561,60,529,65,529,60,561,55"/>
+<area shape="rect" id="Node000004" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="189,54,324,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="356,76,324,76,324,71,356,71"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,54,141,93"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,76,141,76,141,71,173,71"/>
+</map>

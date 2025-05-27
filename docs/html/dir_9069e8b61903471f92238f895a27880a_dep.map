@@ -1,0 +1,22 @@
+<map id="src/ui/chat" name="src/ui/chat">
+<area shape="rect" id="node1" href="dir_2c8642ddaa9fb9428585962ee0b27b7c.html" title="files" alt="" coords="259,135,304,159"/>
+<area shape="rect" id="node2" href="dir_675a24a5ae628c83515d467302a93046.html" title="labels" alt="" coords="179,135,234,159"/>
+<area shape="poly" id="edge1" href="dir_000008_000027.html" alt="" coords="84,80,245,131,243,136,82,85"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000008_000027.html" title="1" alt="" coords="240,118,247,132"/>
+<area shape="poly" id="edge4" href="dir_000008_000036.html" alt="" coords="84,84,170,125,168,130,82,89"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000008_000036.html" title="1" alt="" coords="166,112,173,126"/>
+<area shape="rect" id="node4" href="dir_4a7a6ac68bc3f4162a6fd8dee01c108b.html" title="effects" alt="" coords="38,135,98,159"/>
+<area shape="poly" id="edge2" href="dir_000008_000023.html" alt="" coords="64,86,68,119,62,119,59,87"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000008_000023.html" title="3" alt="" coords="70,108,77,122"/>
+<area shape="rect" id="node6" href="dir_5194e5fea318fda12687127c23f8aba1.html" title="app" alt="" coords="398,135,440,159"/>
+<area shape="poly" id="edge3" href="dir_000008_000000.html" alt="" coords="84,81,97,84,175,99,238,107,302,116,383,132,382,137,301,121,237,113,174,105,95,89,82,86"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000008_000000.html" title="3" alt="" coords="378,118,385,132"/>
+<area shape="rect" id="node7" href="dir_905b439cb7102d88af5dfc588e5add64.html" title="chat" alt="" coords="328,135,374,159"/>
+<area shape="poly" id="edge5" href="dir_000008_000007.html" alt="" coords="84,80,97,84,205,107,313,130,312,135,204,112,95,89,82,86"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000008_000007.html" title="2" alt="" coords="308,117,315,131"/>
+<area shape="rect" id="node5" href="dir_ed4fd252e696809cb001fb826b2f92d9.html" title="style" alt="" coords="107,62,157,87"/>
+<area shape="poly" id="edge6" href="dir_000061_000000.html" alt="" coords="158,78,253,99,383,132,382,137,252,104,156,83"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000061_000000.html" title="1" alt="" coords="378,118,385,132"/>
+<area shape="rect" id="clust2" href="dir_9069e8b61903471f92238f895a27880a.html" alt="" coords="27,51,168,170"/>
+<area shape="rect" id="clust1" href="dir_da5c6b39c0a2f54e57df6799511cd3ab.html" title="ui" alt="" coords="16,16,315,181"/>
+</map>

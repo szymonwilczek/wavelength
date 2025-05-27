@@ -1,0 +1,5 @@
+<map id="GifPlayer::~GifPlayer" name="GifPlayer::~GifPlayer">
+<area shape="rect" id="Node000001" title="Destructor. Ensures resources are released by calling ReleaseResources()." alt="" coords="5,5,149,30"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#a8d13a43724552310ff832e80bc27e0e2" title="Stops the decoder thread, waits for it to finish (with timeout), and resets the decoder pointer...." alt="" coords="197,5,388,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,15,181,15,181,20,149,20"/>
+</map>

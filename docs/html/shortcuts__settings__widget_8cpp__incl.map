@@ -1,0 +1,41 @@
+<map id="src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.cpp" name="src/ui/settings/tabs/shortcuts/shortcuts_settings_widget.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="696,5,840,58"/>
+<area shape="rect" id="Node000002" href="$shortcuts__settings__widget_8h.html" title=" " alt="" coords="57,106,186,145"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="696,45,234,109,202,114,201,108,233,103,696,40"/>
+<area shape="rect" id="Node000005" href="$wavelength__config_8h.html" title=" " alt="" coords="245,106,403,145"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="696,50,419,107,418,102,695,45"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="427,113,528,138"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="697,58,530,110,528,105,695,53"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="552,113,651,138"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="723,61,637,107,635,103,720,56"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="676,113,738,138"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="753,60,725,102,721,99,749,57"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="762,113,897,138"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="787,57,816,99,811,102,783,60"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="921,113,1020,138"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="826,56,932,104,930,109,824,61"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="1045,113,1136,138"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="841,50,1033,103,1040,105,1038,111,1031,109,839,55"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1161,113,1268,138"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="841,43,984,69,1149,103,1159,106,1158,111,1148,109,983,74,840,48"/>
+<area shape="rect" id="Node000017" href="$translation__manager_8h.html" title=" " alt="" coords="1293,106,1446,145"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="841,39,1034,65,1278,103,1277,108,1033,71,840,45"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,193,62,217"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,147,60,184,56,180,98,143"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="85,193,158,217"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="124,145,124,177,119,177,119,145"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="182,193,245,217"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="299,147,244,186,241,181,296,143"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="268,193,380,217"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="327,145,327,177,322,177,322,145"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="404,193,484,217"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="355,143,415,182,412,186,352,148"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="508,193,573,217"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="377,143,494,184,493,190,376,148"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="1214,193,1312,217"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="1345,147,1292,186,1289,181,1342,143"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1336,193,1403,217"/>
+<area shape="poly" id="edge18_Node000017_Node000019" title=" " alt="" coords="1372,145,1372,177,1367,177,1367,145"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="1427,193,1496,217"/>
+<area shape="poly" id="edge19_Node000017_Node000020" title=" " alt="" coords="1393,143,1438,180,1434,184,1390,147"/>
+</map>

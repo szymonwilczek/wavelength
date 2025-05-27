@@ -1,0 +1,9 @@
+<map id="AppInstanceManager::ProcessMessage" name="AppInstanceManager::ProcessMessage">
+<area shape="rect" id="Node000001" title="Processes an incoming message received from a socket." alt="" coords="5,68,150,107"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a7fcae156e69f8d718d0d3f4189e0158f" title="Creates a QByteArray message containing the current instance&#39;s position data." alt="" coords="203,5,372,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,65,205,46,206,52,145,70"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a6b8397127dcbea79612dfe2bfed1a2d7" title="Emitted when a new client instance connects (on the server) or when connection to the server is estab..." alt="" coords="215,68,360,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,85,200,85,200,90,150,90"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a7adb5fbcaba5932cb88cb33cdf0ab610" title="Emitted when position data from another instance is received." alt="" coords="198,130,377,183"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,105,192,122,190,127,137,110"/>
+</map>

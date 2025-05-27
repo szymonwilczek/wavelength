@@ -1,0 +1,12 @@
+<map id="BlobEventHandler::eventsReEnabled" name="BlobEventHandler::eventsReEnabled">
+<area shape="rect" id="Node000001" title="Emitted when event processing is re&#45;enabled after being disabled." alt="" coords="719,54,891,93"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="474,5,671,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="707,53,626,33,628,28,708,48"/>
+<area shape="rect" id="Node000003" href="$classBlobEventHandler.html#a3c8749033726553ee1d437417a517b7b" title="Enables event processing. Emits the eventsReEnabled() signal." alt="" coords="486,54,659,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="704,76,660,76,660,71,704,71"/>
+<area shape="rect" id="Node000004" href="$classBlobEventHandler.html#a326cc41d5d694d041205ce8008c27e14" title="Slot connected to the event_re_enable_timer_&#39;s timeout signal. Calls EnableEvents() to re&#45;enable even..." alt="" coords="246,84,426,122"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="717,99,672,107,543,114,426,112,427,106,543,109,671,102,716,94"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="471,89,427,94,426,89,470,84"/>
+<area shape="rect" id="Node000005" href="$classBlobEventHandler.html#af650ab66adda23fa858ab4e85ed12124" title="Constructs a BlobEventHandler. Installs an event filter on the parent widget&#39;s window." alt="" coords="5,84,198,122"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="230,106,198,106,198,100,230,100"/>
+</map>

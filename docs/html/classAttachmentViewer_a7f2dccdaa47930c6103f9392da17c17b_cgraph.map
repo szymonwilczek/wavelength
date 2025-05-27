@@ -1,0 +1,19 @@
+<map id="AttachmentViewer::OnActionButtonClicked" name="AttachmentViewer::OnActionButtonClicked">
+<area shape="rect" id="Node000001" title="Slot triggered automatically after a short delay or potentially by a user action (though currently au..." alt="" coords="5,40,195,79"/>
+<area shape="rect" id="Node000002" href="$classAttachmentViewer.html#abfe3475ab194146dffbf3d2d20c70e21" title="Closes the viewer by emitting the viewingFinished signal." alt="" coords="248,16,456,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,45,232,41,232,46,196,50"/>
+<area shape="rect" id="Node000004" href="$classAttachmentViewer.html#a847f3bd1aea14895c10cdc6a50a07765" title="Starts the visual scanning phase. Updates the status label, ensures the MaskOverlay is visible and an..." alt="" coords="243,68,461,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="195,67,227,71,227,76,195,73"/>
+<area shape="rect" id="Node000003" href="$classAttachmentViewer.html#aec3d228e36d5e01358f24a6827865b62" title="Emitted when the viewer is closed (either manually or automatically after decryption)." alt="" coords="534,5,713,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="457,24,518,24,518,29,457,30"/>
+<area shape="rect" id="Node000005" href="$classAttachmentViewer.html#a586152c0b840192e11c1453cbfd20926" title="Sets the decryption progress counter (0&#45;100). Updates the internal value, updates the status label te..." alt="" coords="514,68,733,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="461,85,498,85,498,90,461,90"/>
+<area shape="rect" id="Node000008" href="$classAttachmentViewer.html#aa9a8f363f1170ca114a5e93e537ed41e" title="Starts the decryption phase. Updates the status label, ensures the MaskOverlay is visible,..." alt="" coords="509,131,737,169"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="439,105,522,124,521,129,438,110"/>
+<area shape="rect" id="Node000006" href="$classAttachmentViewer.html#a37125c2f6e7eda53cd7a02ff5de60a97" title="Emitted when the decryptionCounter property changes. Connected to the MaskOverlay&#39;s SetRevealProgress..." alt="" coords="785,5,982,44"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="706,65,785,46,786,51,707,70"/>
+<area shape="rect" id="Node000007" href="$classAttachmentViewer.html#a0ec55f1bb4c15bac94e09814d0bf844f" title="Updates the status label text to show the current decryption percentage." alt="" coords="795,68,972,107"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="733,85,779,85,779,90,733,90"/>
+<area shape="rect" id="Node000009" href="$classAttachmentViewer.html#af14d1bf565cd71a64db42d386ede1597" title="Slot called when the decryption animation finishes. Sets the state to decrypted, updates the status l..." alt="" coords="798,131,969,169"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="738,147,783,147,783,153,738,153"/>
+</map>

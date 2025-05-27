@@ -1,0 +1,5 @@
+<map id="CyberpunkButton" name="CyberpunkButton">
+<area shape="rect" id="Node000001" title="A custom QPushButton styled with a cyberpunk aesthetic, featuring animated glow effects." alt="" coords="5,117,200,585"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="58,5,147,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,83,106,117,100,117,100,83"/>
+</map>

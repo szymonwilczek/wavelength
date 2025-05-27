@@ -1,0 +1,5 @@
+<map id="VideoDecoder::HandleAudioError" name="VideoDecoder::HandleAudioError">
+<area shape="rect" id="Node000001" title="Slot connected to the internal AudioDecoder&#39;s error signal. Relays the audio error message via the ma..." alt="" coords="5,5,191,44"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a51e7a40e369cc4e80033f1dd9068cdd4" title="Emitted when an error occurs during initialization or decoding." alt="" coords="239,12,376,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,22,223,22,223,27,191,27"/>
+</map>

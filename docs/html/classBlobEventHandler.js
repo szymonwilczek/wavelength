@@ -1,0 +1,27 @@
+var classBlobEventHandler =
+[
+    [ "BlobEventHandler", "classBlobEventHandler.html#af650ab66adda23fa858ab4e85ed12124", null ],
+    [ "~BlobEventHandler", "classBlobEventHandler.html#a35825e37b63ad6683785b8f5e4509b7a", null ],
+    [ "AreEventsEnabled", "classBlobEventHandler.html#ac89d1a161c9fd3ce604217f9c7447f5f", null ],
+    [ "DisableEvents", "classBlobEventHandler.html#abc304d51d94082fa83c73fb63b995473", null ],
+    [ "EnableEvents", "classBlobEventHandler.html#a3c8749033726553ee1d437417a517b7b", null ],
+    [ "eventFilter", "classBlobEventHandler.html#abeeb4f08bb1444ae0df7e85c2ea58e2c", null ],
+    [ "eventsReEnabled", "classBlobEventHandler.html#a785a7b849357d099ea2bbf0d5c9e953f", null ],
+    [ "HandleMoveEvent", "classBlobEventHandler.html#ad283c4b7bf888f3130a5b189b8066547", null ],
+    [ "IsInTransition", "classBlobEventHandler.html#a7ee4d7ebef4b2d61d720c995cced014d", null ],
+    [ "movementSampleAdded", "classBlobEventHandler.html#aad583f5951b3014d66d3914a8d060cad", null ],
+    [ "onEventReEnableTimeout", "classBlobEventHandler.html#a326cc41d5d694d041205ce8008c27e14", null ],
+    [ "ProcessResizeEvent", "classBlobEventHandler.html#a1cb2f26d8e6fc000903830d85719298d", null ],
+    [ "resizeStateRequested", "classBlobEventHandler.html#adee9e347de86d1914b6671935d9bd758", null ],
+    [ "SetTransitionInProgress", "classBlobEventHandler.html#a60938d7749b2289e99fd6055fcc7cb67", null ],
+    [ "significantResizeDetected", "classBlobEventHandler.html#a608f7c9b14093c8e0a02be39d780af3d", null ],
+    [ "stateResetTimerRequested", "classBlobEventHandler.html#aad7907b15e659d39275aa21d97a0665c", null ],
+    [ "windowMoved", "classBlobEventHandler.html#ac63c9e11e620e4d19e4e2ca2b264087b", null ],
+    [ "event_re_enable_timer_", "classBlobEventHandler.html#a04bb6874d46b0019d117066a11a5c243", null ],
+    [ "events_enabled_", "classBlobEventHandler.html#ad05608457c050240ad588343239eb54f", null ],
+    [ "is_resizing_", "classBlobEventHandler.html#a630bcdfd49a1dde400d4b281da60be06", null ],
+    [ "last_processed_move_time_", "classBlobEventHandler.html#a7009b0a5f1ad0bb5ed4b64b7e115d0e2", null ],
+    [ "last_processed_position_", "classBlobEventHandler.html#aee471ead662915591c8686b01d8a16db", null ],
+    [ "parent_widget_", "classBlobEventHandler.html#ac799941c0d60094eec1445a8529cc40f", null ],
+    [ "transition_in_progress_", "classBlobEventHandler.html#a076b221e18b397f3f914424ce5c57e22", null ]
+];

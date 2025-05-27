@@ -1,0 +1,9 @@
+<map id="MessageFormatter::FormatMessage" name="MessageFormatter::FormatMessage">
+<area shape="rect" id="Node000001" title="Formats a message represented by a JSON object into an HTML string." alt="" coords="729,5,909,44"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#a2a7686af1fb4bdbfb0ac9af65bcb85ac" title="Processes messages of type &quot;message&quot; or &quot;send_message&quot;. Checks for duplicates, handles attachments (s..." alt="" coords="492,5,681,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="714,27,682,27,682,22,714,22"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="255,5,444,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="476,27,445,27,445,22,476,22"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="5,5,207,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="239,27,207,27,207,22,239,22"/>
+</map>

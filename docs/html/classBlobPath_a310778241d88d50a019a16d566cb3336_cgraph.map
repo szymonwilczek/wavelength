@@ -1,0 +1,5 @@
+<map id="BlobPath::CreateBlobPath" name="BlobPath::CreateBlobPath">
+<area shape="rect" id="Node000001" title="Creates a closed, smooth QPainterPath using Catmull&#45;Rom&#45;like spline interpolation." alt="" coords="5,5,180,30"/>
+<area shape="rect" id="Node000002" href="$classBlobMath.html#abef304a2fdf006c9238fe4a265951637" title="Checks if a QPointF contains valid coordinate values. Verifies that coordinates are not NaN,..." alt="" coords="228,5,381,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,15,213,15,213,20,180,20"/>
+</map>

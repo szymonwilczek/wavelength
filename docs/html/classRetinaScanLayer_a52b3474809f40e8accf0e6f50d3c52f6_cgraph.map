@@ -1,0 +1,7 @@
+<map id="RetinaScanLayer::UpdateScan" name="RetinaScanLayer::UpdateScan">
+<area shape="rect" id="Node000001" title="Slot called periodically by scan_timer_ to update the scan animation. Increments the progress bar,..." alt="" coords="5,5,205,30"/>
+<area shape="rect" id="Node000002" href="$classRetinaScanLayer.html#a6b4dfb9d13e9c9e6328441272084276a" title="Slot called when the scan completes (either by timer or scanline finishing). Changes the UI element s..." alt="" coords="253,5,445,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,15,237,15,237,20,205,20"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="493,5,691,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="446,15,478,15,478,20,446,20"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="RetinaScanLayer::UpdateScan" name="RetinaScanLayer::UpdateScan">
+<area shape="rect" id="Node000001" title="Slot called periodically by scan_timer_ to update the scan animation. Increments the progress bar,..." alt="" coords="248,12,447,37"/>
+<area shape="rect" id="Node000002" href="$classRetinaScanLayer.html#a967482762796522d275e6ed7f40d1c7f" title="Constructs a RetinaScanLayer. Initializes the UI elements (title, eye image container,..." alt="" coords="5,5,200,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,27,200,27,200,22,232,22"/>
+</map>

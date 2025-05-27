@@ -1,0 +1,19 @@
+<map id="src/ui/chat/communication_stream.h" name="src/ui/chat/communication_stream.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="360,5,534,44"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,99,119,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="360,46,132,95,121,97,120,92,131,89,359,41"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="143,99,264,124"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="394,47,252,96,250,91,392,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="287,99,424,124"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="429,47,381,90,378,86,425,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="448,99,633,124"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="470,43,519,87,515,90,466,47"/>
+<area shape="rect" id="Node000006" href="$stream__message_8h.html" title=" " alt="" coords="657,99,790,124"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="509,42,672,92,670,97,508,47"/>
+<area shape="rect" id="Node000008" href="$user__info__label_8h.html" title=" " alt="" coords="813,92,938,131"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="536,38,798,89,797,94,535,44"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="687,179,760,203"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="726,124,726,163,721,163,721,124"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="844,179,906,203"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="878,131,878,163,873,163,873,131"/>
+</map>

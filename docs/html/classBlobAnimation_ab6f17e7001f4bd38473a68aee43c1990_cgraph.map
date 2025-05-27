@@ -1,0 +1,6 @@
+<map id="BlobAnimation::visualizationReset" name="BlobAnimation::visualizationReset">
+<area shape="rect" id="Node000001" title="Emitted when the entire visualization is reset via ResetVisualization(). Allows other UI elements to ..." alt="" coords="5,22,191,61"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#ae5180933d2c5bc51e08f3a57f229a0f8" title="Overridden generic event handler." alt="" coords="239,29,383,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,39,223,39,223,44,191,44"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="276,31,268,21,272,11,287,5,311,3,338,6,351,13,348,17,336,11,311,8,288,10,276,15,274,20,280,27"/>
+</map>

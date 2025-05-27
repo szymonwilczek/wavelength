@@ -1,0 +1,17 @@
+<map id="AnimatedStackedWidget::SlideToNextIndex" name="AnimatedStackedWidget::SlideToNextIndex">
+<area shape="rect" id="Node000001" title="Initiates an animated transition to the next widget in the stack (wraps around). Useful for creating ..." alt="" coords="5,69,170,108"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#a0a9829357f507ac7b5e0a7daf69b279f" title="Initiates an animated transition to the widget at the specified index. Plays a sound effect and start..." alt="" coords="218,69,382,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,86,202,86,202,91,170,91"/>
+<area shape="rect" id="Node000003" href="$classAnimatedStackedWidget.html#a57cdf55739292d948ecdd6f97cba09c0" title="Cleans up graphics effects and resets widget geometries after an animation finishes...." alt="" coords="430,37,594,76"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,74,414,69,415,74,383,79"/>
+<area shape="rect" id="Node000004" href="$classAnimatedStackedWidget.html#ab948154ce1b983eefb9338d97cb58976" title="Prepares the appropriate animation based on animation_type_. Calls the corresponding Animate* method ..." alt="" coords="430,100,594,139"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="383,98,415,103,414,108,382,103"/>
+<area shape="rect" id="Node000005" href="$classAnimatedStackedWidget.html#acf39fd97b7aa80907c98d6e5ee925e3d" title="Configures and adds animations to the animation_group_ for a fade transition." alt="" coords="642,5,807,44"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="567,97,593,85,617,69,641,53,651,48,653,53,644,58,620,73,596,90,570,102"/>
+<area shape="rect" id="Node000006" href="$classAnimatedStackedWidget.html#ab5df18702b0ae21b22c85c308011ff2c" title="Configures and adds animations to the animation_group_ for a push transition." alt="" coords="642,68,807,107"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="594,104,626,99,627,105,595,110"/>
+<area shape="rect" id="Node000007" href="$classAnimatedStackedWidget.html#a45b1363a258c139ac53df8fece2a9396" title="Configures and adds animations to the animation_group_ for a slide transition (CPU fallback)." alt="" coords="642,131,807,169"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="595,129,627,133,626,139,594,134"/>
+<area shape="rect" id="Node000008" href="$classAnimatedStackedWidget.html#a0b881672aa2d68cbb0c4e37f1f7d74dd" title="Configures and adds animations to the animation_group_ for a combined slide and fade transition." alt="" coords="642,193,807,232"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="554,137,643,178,658,184,656,189,641,183,552,142"/>
+</map>

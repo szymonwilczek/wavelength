@@ -1,0 +1,11 @@
+<map id="AnimatedStackedWidget::PrepareAnimation" name="AnimatedStackedWidget::PrepareAnimation">
+<area shape="rect" id="Node000001" title="Prepares the appropriate animation based on animation_type_. Calls the corresponding Animate* method ..." alt="" coords="5,100,170,139"/>
+<area shape="rect" id="Node000002" href="$classAnimatedStackedWidget.html#acf39fd97b7aa80907c98d6e5ee925e3d" title="Configures and adds animations to the animation_group_ for a fade transition." alt="" coords="218,5,382,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,97,217,53,229,48,231,53,219,58,127,102"/>
+<area shape="rect" id="Node000003" href="$classAnimatedStackedWidget.html#ab5df18702b0ae21b22c85c308011ff2c" title="Configures and adds animations to the animation_group_ for a push transition." alt="" coords="218,68,382,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,104,202,99,203,105,170,110"/>
+<area shape="rect" id="Node000004" href="$classAnimatedStackedWidget.html#a45b1363a258c139ac53df8fece2a9396" title="Configures and adds animations to the animation_group_ for a slide transition (CPU fallback)." alt="" coords="218,131,382,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,129,203,133,202,139,170,134"/>
+<area shape="rect" id="Node000005" href="$classAnimatedStackedWidget.html#a0b881672aa2d68cbb0c4e37f1f7d74dd" title="Configures and adds animations to the animation_group_ for a combined slide and fade transition." alt="" coords="218,193,382,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="130,137,219,178,233,184,231,189,217,183,127,142"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="ShortcutManager::ShortcutManager" name="ShortcutManager::ShortcutManager">
+<area shape="rect" id="Node000001" title="Private constructor to enforce the singleton pattern. Initializes the pointer to the WavelengthConfig..." alt="" coords="5,29,185,68"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a785ee2205518cfe2ba40c8c818cf9b0b" title="Gets the singleton instance of the ShortcutManager." alt="" coords="233,36,433,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,46,217,46,217,51,185,51"/>
+<area shape="rect" id="Node000003" href="$classShortcutManager.html#a3bfcb924aeb88b7e4baded8bd37ed3c4" title="Deleted copy constructor to prevent copying." alt="" coords="481,29,660,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="434,46,465,46,465,51,434,51"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="527,30,524,20,531,10,546,5,571,3,597,5,612,11,610,16,596,10,571,8,547,10,534,15,529,21,532,28"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="BlobAnimation::ResetBlobToCenter" name="BlobAnimation::ResetBlobToCenter">
+<area shape="rect" id="Node000001" title="Resets the blob&#39;s position to the center of the widget and regenerates its shape. Clears velocities a..." alt="" coords="5,33,179,72"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a152a62b2db9d731d14939708a4a8496a" title="Generates a set of points forming an organic, blob&#45;like shape around a center point...." alt="" coords="227,5,438,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,40,211,36,211,41,179,45"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a90940f8b5f62d348952264e233b2aafb" title="Switches the blob&#39;s current animation state (Idle, Moving, Resizing). Updates the current_blob_state_..." alt="" coords="233,68,432,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,60,218,65,217,70,179,65"/>
+</map>

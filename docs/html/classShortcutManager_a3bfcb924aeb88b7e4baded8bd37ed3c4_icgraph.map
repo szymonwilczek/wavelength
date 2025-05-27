@@ -1,0 +1,14 @@
+<map id="ShortcutManager::ShortcutManager" name="ShortcutManager::ShortcutManager">
+<area shape="rect" id="Node000001" title="Deleted copy constructor to prevent copying." alt="" coords="684,52,864,90"/>
+<area shape="poly" id="edge6_Node000001_Node000001" title=" " alt="" coords="813,39,799,33,774,30,751,32,737,37,732,43,735,51,730,52,727,42,734,33,750,27,774,25,800,27,815,34"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a785ee2205518cfe2ba40c8c818cf9b0b" title="Gets the singleton instance of the ShortcutManager." alt="" coords="436,33,636,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="669,62,636,59,637,54,669,57"/>
+<area shape="rect" id="Node000007" href="$classShortcutManager.html#a585876bbaa80b3d6fbc9e42e2ed9d1c5" title="Deleted assignment operator to prevent assignment." alt="" coords="444,83,628,107"/>
+<area shape="poly" id="edge5_Node000001_Node000007" title=" " alt="" coords="669,84,629,88,629,83,669,79"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#a53de2b196fd35488e2fcb3efd091e04d" title="Saves all current settings from the various tabs to the WavelengthConfig object and persists them...." alt="" coords="206,5,388,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="420,35,388,31,389,26,421,29"/>
+<area shape="rect" id="Node000006" href="$classShortcutManager.html#ae16dd7050cee1d6d2eeae7422cba04aa" title="Private constructor to enforce the singleton pattern. Initializes the pointer to the WavelengthConfig..." alt="" coords="207,54,386,93"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="421,62,387,66,387,60,420,57"/>
+<area shape="rect" id="Node000004" href="$classSettingsView.html#a88aeaa2ebb222180310ba66f0dba95d5" title="Creates and arranges the main UI elements of the SettingsView. Sets up the main layout,..." alt="" coords="5,5,158,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="190,20,158,20,158,15,190,15"/>
+</map>

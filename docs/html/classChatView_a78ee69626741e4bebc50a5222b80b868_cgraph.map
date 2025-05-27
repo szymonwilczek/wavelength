@@ -1,0 +1,5 @@
+<map id="ChatView::OnAudioDataReceived" name="ChatView::OnAudioDataReceived">
+<area shape="rect" id="Node000001" title="Slot called when binary audio data is received from the server. If the frequency matches and the stat..." alt="" coords="5,5,221,30"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#aab2d772652852a6156c9f075bc21a03e" title="Calculates the Root Mean Square (RMS) amplitude of a raw audio buffer. Used for audio visualization...." alt="" coords="269,5,466,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,15,253,15,253,20,221,20"/>
+</map>

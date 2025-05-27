@@ -1,0 +1,5 @@
+<map id="GifPlayer::HandleGifInfo" name="GifPlayer::HandleGifInfo">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s gifInfo signal. Stores the GIF&#39;s dimensions, duration,..." alt="" coords="5,5,168,30"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#a9d015c1250b0652d7d04a9f1e6a87b4f" title="Emitted after the GIF information (dimensions, duration, etc.) has been successfully received from th..." alt="" coords="216,5,354,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,15,200,15,200,20,168,20"/>
+</map>

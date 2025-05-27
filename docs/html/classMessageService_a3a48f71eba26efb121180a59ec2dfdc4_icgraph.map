@@ -1,0 +1,9 @@
+<map id="MessageService::audioDataReceived" name="MessageService::audioDataReceived">
+<area shape="rect" id="Node000001" title="Emitted when raw audio data is received via a binary WebSocket message. Relayed from WavelengthMessag..." alt="" coords="431,37,616,76"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#a0a388bb572398d11b8959eac0a8e612f" title="Connects signals between the various Wavelength components. Called during Initialize()." alt="" coords="218,5,354,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="415,45,354,36,354,31,416,39"/>
+<area shape="rect" id="Node000004" href="$classMessageProcessor.html#af12c62b3127edeb52c44b4ef1137eff7" title="Private constructor to enforce the singleton pattern. Connects internal signals to the corresponding ..." alt="" coords="189,68,383,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="416,73,384,77,383,72,415,68"/>
+<area shape="rect" id="Node000003" href="$classSessionCoordinator.html#a34a0ef1f02508f6cfd0b8d60164be83a" title="Initializes the coordinator and its underlying components. Connects signals between various Wavelengt..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="203,27,141,27,141,22,203,22"/>
+</map>

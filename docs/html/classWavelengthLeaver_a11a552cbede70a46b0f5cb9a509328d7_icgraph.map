@@ -1,0 +1,9 @@
+<map id="WavelengthLeaver::LeaveWavelength" name="WavelengthLeaver::LeaveWavelength">
+<area shape="rect" id="Node000001" title="Leaves the currently active wavelength. Retrieves the active frequency from the registry...." alt="" coords="611,12,847,37"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#ad7c56b7b495b53ea905a6157e2bc5e93" title="Leaves the currently active wavelength. Unregisters the wavelength locally and delegates the call to ..." alt="" coords="428,5,563,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="596,27,563,27,563,22,596,22"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a23a3ce66f4af487f1f0571e72aaca9aa" title="Initiates the process of leaving or closing the current Wavelength. Updates the status indicator,..." alt="" coords="196,12,380,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="413,27,380,27,380,22,413,22"/>
+<area shape="rect" id="Node000004" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,12,148,37"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,27,148,27,148,22,180,22"/>
+</map>

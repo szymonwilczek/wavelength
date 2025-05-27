@@ -1,0 +1,5 @@
+<map id="StreamMessage::resizeEvent" name="StreamMessage::resizeEvent">
+<area shape="rect" id="Node000001" title="Overridden resize event handler. Updates the layout of internal elements (buttons,..." alt="" coords="5,5,197,30"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a520ebf30923492083e94819640a79323" title="Updates the position of the navigation and mark read buttons based on the widget&#39;s current size." alt="" coords="245,5,449,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,15,229,15,229,20,197,20"/>
+</map>

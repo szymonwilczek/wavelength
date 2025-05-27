@@ -1,0 +1,5 @@
+<map id="WavelengthSettingsWidget::ValidateFrequencyInput" name="WavelengthSettingsWidget::ValidateFrequencyInput">
+<area shape="rect" id="Node000001" title="Validates the frequency value and unit entered by the user. Checks if the value is a positive number,..." alt="" coords="231,5,408,44"/>
+<area shape="rect" id="Node000002" href="$classWavelengthSettingsWidget.html#a9ecc58973c9509a1342ba5ce6c0756b8" title="Validates the frequency input and saves the preferred start frequency back to WavelengthConfig...." alt="" coords="5,5,183,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,27,183,27,183,22,215,22"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ChatView::TriggerActivityEffect" name="ChatView::TriggerActivityEffect">
+<area shape="rect" id="Node000001" title="Triggers a subtle scanline effect animation when there is activity (e.g., a message received)." alt="" coords="262,5,430,44"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#a76d2ff5def55f6dbeb011adccf78ac8b" title="Handles displaying a received message for the current Wavelength. Adds the message to the message_are..." alt="" coords="5,12,214,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,27,214,27,214,22,246,22"/>
+</map>

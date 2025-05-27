@@ -1,0 +1,13 @@
+<map id="CyberpunkStyle::GetSecondaryColor" name="CyberpunkStyle::GetSecondaryColor">
+<area shape="rect" id="Node000001" title="Gets the secondary color (Lighter Blue)." alt="" coords="444,89,651,128"/>
+<area shape="rect" id="Node000002" href="$classChatStyle.html#a433d066f136e4b0afda397a75921d866" title="Gets the stylesheet for the &quot;Attach File&quot; button (QPushButton). Defines background,..." alt="" coords="204,5,388,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="474,86,395,59,359,47,360,42,397,54,476,81"/>
+<area shape="rect" id="Node000003" href="$classChatStyle.html#a16852d7a0a1434b6b6e4b280a1b07480" title="Gets the base stylesheet for the main chat view container and header. Defines background,..." alt="" coords="196,68,396,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="428,98,396,94,397,89,429,93"/>
+<area shape="rect" id="Node000004" href="$classChatStyle.html#a42a10f37e8049e922883e0bb5b64526d" title="Gets the stylesheet for the chat message input field (QLineEdit). Defines background,..." alt="" coords="213,117,378,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="429,125,379,130,379,125,428,119"/>
+<area shape="rect" id="Node000006" href="$classChatStyle.html#a1034567bebd073115ec5afaf7632c56a" title="Gets the stylesheet for the &quot;Send&quot; message button (QPushButton). Defines background,..." alt="" coords="208,180,384,219"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="485,137,397,170,361,182,360,177,395,165,483,132"/>
+<area shape="rect" id="Node000005" href="$classChatView.html#ad2db6f12afdba4b49ec7775b2d560ad3" title="Constructs a WavelengthChatView. Initializes the UI elements (labels, message area,..." alt="" coords="5,124,148,149"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="197,139,148,139,148,134,197,134"/>
+</map>

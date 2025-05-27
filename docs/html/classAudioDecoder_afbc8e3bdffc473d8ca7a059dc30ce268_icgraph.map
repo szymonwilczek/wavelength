@@ -1,0 +1,12 @@
+<map id="AudioDecoder::ReadPacket" name="AudioDecoder::ReadPacket">
+<area shape="rect" id="Node000001" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal audio_data_ QByteArray bu..." alt="" coords="697,5,879,30"/>
+<area shape="rect" id="Node000002" href="$classAudioDecoder.html#a5cf09a96a04ce8afd751d985c71e4211" title="Constructs an AudioDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I..." alt="" coords="456,5,649,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="681,29,650,29,650,24,681,24"/>
+<area shape="rect" id="Node000004" href="$classAudioDecoder.html#a6948c3168d8c0c5a3badeeacf88f59bc" title="Reinitializes the decoder after it has been stopped or encountered an error. Releases existing resour..." alt="" coords="5,31,179,55"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="711,36,650,44,521,52,393,54,179,50,179,45,393,49,521,47,649,39,711,31"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="665,6,697,6,697,12,665,11"/>
+<area shape="rect" id="Node000003" href="$classAudioDecoder.html#a5f63aa27abafaeded80d3688638ace64" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="227,5,408,30"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="440,29,408,29,408,24,440,24"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="424,6,455,6,455,11,424,11"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="211,32,180,36,179,31,211,27"/>
+</map>

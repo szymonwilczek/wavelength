@@ -1,0 +1,5 @@
+<map id="WavelengthStateManager::IsWavelengthHost" name="WavelengthStateManager::IsWavelengthHost">
+<area shape="rect" id="Node000001" title="Checks if the current user is the host of a specific wavelength." alt="" coords="189,5,358,44"/>
+<area shape="rect" id="Node000002" href="$classSessionCoordinator.html#af055c6e741f8bd8a9c31bbc9f33b70f0" title="Checks if the current user is the host of a specific wavelength. Delegates the call to WavelengthStat..." alt="" coords="5,5,141,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,27,141,27,141,22,173,22"/>
+</map>

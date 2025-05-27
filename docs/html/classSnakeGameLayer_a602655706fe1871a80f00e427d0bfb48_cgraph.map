@@ -1,0 +1,26 @@
+<map id="SnakeGameLayer::UpdateGame" name="SnakeGameLayer::UpdateGame">
+<area shape="rect" id="Node000001" title="Slot called periodically by game_timer_ to update the game state. Calls MoveSnake() if the game is no..." alt="" coords="5,201,214,225"/>
+<area shape="rect" id="Node000002" href="$classSnakeGameLayer.html#a2b11869c78eead91d7124948615fea73" title="Moves the snake one step in the current direction_. Calculates the new head position,..." alt="" coords="262,201,460,225"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,210,246,210,246,216,214,216"/>
+<area shape="rect" id="Node000003" href="$classSnakeGameLayer.html#af2e6b78d4d5f24e0df450f63b378392a" title="Handles the end of the game (success or failure). Stops timers. On success, updates UI to green,..." alt="" coords="508,101,709,125"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="393,198,561,129,563,134,395,203"/>
+<area shape="rect" id="Node000005" href="$classSnakeGameLayer.html#af54d4598528129caff991bee016d961d" title="Generates a new apple at a random empty cell on the grid." alt="" coords="1030,42,1214,80"/>
+<area shape="poly" id="edge8_Node000002_Node000005" title=" " alt="" coords="372,198,426,145,465,114,507,87,573,54,627,35,684,24,757,13,817,5,864,3,911,5,971,13,1014,22,1055,34,1054,39,1013,27,970,18,911,11,864,8,817,11,758,18,685,29,629,40,575,59,509,91,468,118,430,149,376,202"/>
+<area shape="rect" id="Node000006" href="$classSnakeGameLayer.html#abd0a2b6324682d0883a41d5ebae0cc39" title="Renders the current state of the game onto the game_board_ QLabel. Draws the grid,..." alt="" coords="1019,175,1226,200"/>
+<area shape="poly" id="edge13_Node000002_Node000006" title=" " alt="" coords="461,207,1003,189,1004,194,461,212"/>
+<area shape="rect" id="Node000009" href="$classSnakeGameLayer.html#a16fc19f766e6babfeb1badbb6092b4e0" title="Checks if the given coordinates (x, y) represent a collision. Considers collisions with walls (respec..." alt="" coords="512,225,705,249"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="461,220,497,223,497,229,460,225"/>
+<area shape="rect" id="Node000010" href="$classSnakeGameLayer.html#a47f6200cfbc7199f77383455f3ac12aa" title="Checks if the given coordinates (x, y) correspond to the open exit location. Used only when game_stat..." alt="" coords="511,274,706,299"/>
+<area shape="poly" id="edge10_Node000002_Node000010" title=" " alt="" coords="400,223,509,258,540,267,539,272,507,263,398,228"/>
+<area shape="rect" id="Node000011" href="$classSnakeGameLayer.html#a6e2384e237da4be2a462315c44ace5b3" title="Initiates the &quot;exit open&quot; state after collecting 4 apples. Changes the game state,..." alt="" coords="764,274,964,299"/>
+<area shape="poly" id="edge11_Node000002_Node000011" title=" " alt="" coords="377,224,431,268,468,291,509,308,547,317,587,322,667,322,741,313,803,300,804,305,742,318,667,327,586,327,546,322,507,313,466,295,428,272,374,228"/>
+<area shape="rect" id="Node000004" href="$classSnakeGameLayer.html#ac358c311b3176870e88f0e7f906d2982" title="Sets up the initial state of the game board and snake. Clears the grid, places the snake in the cente..." alt="" coords="757,126,971,151"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="710,120,742,124,742,129,710,126"/>
+<area shape="rect" id="Node000007" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="765,27,963,52"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="646,98,757,62,790,54,791,59,758,68,647,103"/>
+<area shape="rect" id="Node000008" href="$classSnakeGameLayer.html#ad83f2c894179072bc795f154f03ff7a9" title="Resets the layer to its initial state. Stops timers, resets game variables (score,..." alt="" coords="781,77,947,101"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="710,101,766,95,766,101,710,106"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="923,123,970,110,1052,83,1054,88,971,116,924,128"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="933,149,1039,169,1038,174,932,154"/>
+<area shape="poly" id="edge12_Node000011_Node000006" title=" " alt="" coords="898,271,1072,203,1074,208,900,276"/>
+</map>

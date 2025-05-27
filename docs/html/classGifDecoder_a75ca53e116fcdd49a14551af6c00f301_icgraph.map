@@ -1,0 +1,21 @@
+<map id="GifDecoder::error" name="GifDecoder::error">
+<area shape="rect" id="Node000001" title="Emitted when an error occurs during initialization or decoding." alt="" coords="633,129,755,154"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a07f76f9758f596da1d500741c03af66f" title="Constructs a GifDecoder object. Initializes internal state, allocates memory for FFmpeg&#39;s custom I/O ..." alt="" coords="424,55,585,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="647,126,584,100,539,82,541,77,586,95,649,121"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html#a6cba2bb829e0608c96c2818df2ed844c" title="Reinitializes the decoder after it has been stopped or encountered an error. Stops the thread if runn..." alt="" coords="5,55,163,79"/>
+<area shape="poly" id="edge11_Node000001_Node000004" title=" " alt="" coords="617,138,432,121,210,94,147,83,147,77,211,88,433,116,618,133"/>
+<area shape="rect" id="Node000006" href="$classGifPlayer.html#ac183e77217bfd80689ab931f0115aea0" title="Constructs an InlineGifPlayer widget. Initializes the UI (QLabel for display), creates the GifDecoder..." alt="" coords="437,153,572,178"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="619,154,573,160,572,154,618,149"/>
+<area shape="rect" id="Node000007" href="$classGifDecoder.html#a45c27e6347e3b847aa092323d936044e" title="Initializes the FFmpeg components for decoding the GIF. Opens the input stream using the custom I/O c..." alt="" coords="434,203,576,227"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="654,163,586,192,550,205,549,200,584,187,651,158"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a01de0ef70e11e3a5f2d34abf6f3abc59" title="Custom read function for FFmpeg&#39;s AVIOContext. Reads data from the internal gif_data_ QByteArray buff..." alt="" coords="211,5,376,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="408,56,322,33,323,28,410,51"/>
+<area shape="rect" id="Node000005" href="$classGifDecoder.html#a467647faa027616ace4550575f988eff" title="Custom seek function for FFmpeg&#39;s AVIOContext. Adjusts the internal read_position_ based on the offse..." alt="" coords="211,55,376,79"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="409,79,376,78,376,73,409,73"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="392,29,476,52,475,57,391,34"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="224,37,140,57,139,51,222,32"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="392,55,424,56,424,61,392,61"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="195,70,163,70,163,64,195,64"/>
+<area shape="rect" id="Node000008" href="$classGifDecoder.html#a5f3075f25bb1e6e0fbad6a4abc1ccef9" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="237,203,350,227"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="418,218,350,218,350,212,418,212"/>
+</map>

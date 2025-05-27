@@ -1,0 +1,5 @@
+<map id="GifPlayer::HandleGifInfo" name="GifPlayer::HandleGifInfo">
+<area shape="rect" id="Node000001" title="Slot connected to the decoder&#39;s gifInfo signal. Stores the GIF&#39;s dimensions, duration,..." alt="" coords="189,5,351,30"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#ac183e77217bfd80689ab931f0115aea0" title="Constructs an InlineGifPlayer widget. Initializes the UI (QLabel for display), creates the GifDecoder..." alt="" coords="5,5,141,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,20,141,20,141,15,173,15"/>
+</map>

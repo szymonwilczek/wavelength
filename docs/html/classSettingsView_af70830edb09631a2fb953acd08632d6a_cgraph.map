@@ -1,0 +1,7 @@
+<map id="SettingsView::RestoreDefaults" name="SettingsView::RestoreDefaults">
+<area shape="rect" id="Node000001" title="Restores all settings across all tabs to their default values. Prompts the user for confirmation befo..." alt="" coords="5,40,205,65"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a23258b6c0cb0fc74537588ea6283b873" title="Loads settings from the WavelengthConfig object into the UI elements of all tabs. Delegates loading t..." alt="" coords="264,5,445,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,39,248,34,248,39,206,44"/>
+<area shape="rect" id="Node000003" href="$classSettingsView.html#ae9abfe25abeea5fa897efdf85e9a4cab" title="Emitted when settings are saved or restored to defaults, indicating that other parts of the applicati..." alt="" coords="253,68,456,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,61,237,65,237,70,205,67"/>
+</map>

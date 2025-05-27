@@ -1,0 +1,11 @@
+<map id="GifDecoder::firstFrameReady" name="GifDecoder::firstFrameReady">
+<area shape="rect" id="Node000001" title="Emitted once after successful initialization, containing the first frame. Useful for displaying a sta..." alt="" coords="592,40,785,65"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a4ca17f03ef1f3dd2cc6981d287e3b3d6" title="Internal helper function called by Initialize() to extract and emit the first frame...." alt="" coords="357,5,544,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="576,42,544,38,545,33,577,37"/>
+<area shape="rect" id="Node000005" href="$classGifPlayer.html#ac183e77217bfd80689ab931f0115aea0" title="Constructs an InlineGifPlayer widget. Initializes the UI (QLabel for display), creates the GifDecoder..." alt="" coords="383,68,518,93"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="577,68,519,75,519,70,577,63"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a45c27e6347e3b847aa092323d936044e" title="Initializes the FFmpeg components for decoding the GIF. Opens the input stream using the custom I/O c..." alt="" coords="167,12,309,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,27,309,27,309,22,341,22"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html#a5f3075f25bb1e6e0fbad6a4abc1ccef9" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,12,119,37"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="151,27,119,27,119,22,151,22"/>
+</map>

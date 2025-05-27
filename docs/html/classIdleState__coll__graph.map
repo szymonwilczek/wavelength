@@ -1,0 +1,7 @@
+<map id="IdleState" name="IdleState">
+<area shape="rect" id="Node000001" title="Implements the Idle state behavior for the Blob animation." alt="" coords="74,337,448,790"/>
+<area shape="rect" id="Node000002" href="$classBlobState.html" title="Abstract base class defining the interface for different blob animation states." alt="" coords="5,5,274,275"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,288,199,337,194,338,180,290"/>
+<area shape="rect" id="Node000003" href="$structBlobConfig_1_1IdleParameters.html" title="Structure holding parameters specific to the Idle state animation." alt="" coords="298,89,470,191"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="372,192,334,322,329,321,367,190"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="AnimatedDialog::closeEvent" name="AnimatedDialog::closeEvent">
+<area shape="rect" id="Node000001" title="Overridden close event handler. Prevents immediate closing, starts the close animation (AnimateClose)..." alt="" coords="5,5,191,30"/>
+<area shape="rect" id="Node000002" href="$classAnimatedDialog.html#a824abccdc52ffd4e986f3a74b827ee9d" title="Initiates and runs the animation sequence for closing the dialog based on animation_type_...." alt="" coords="239,5,442,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,15,223,15,223,20,191,20"/>
+</map>

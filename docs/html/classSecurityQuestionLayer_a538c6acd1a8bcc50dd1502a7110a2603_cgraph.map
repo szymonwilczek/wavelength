@@ -1,0 +1,15 @@
+<map id="SecurityQuestionLayer::SecurityQuestionLayer" name="SecurityQuestionLayer::SecurityQuestionLayer">
+<area shape="rect" id="Node000001" title="Constructs a SecurityQuestionLayer. Initializes the UI elements (title, instructions,..." alt="" coords="5,96,166,135"/>
+<area shape="rect" id="Node000002" href="$classSecurityQuestionLayer.html#aa5b46caeaad623e6486e0817266fe213" title="Checks the security answer (always accepts in this implementation). Called when the user presses Ente..." alt="" coords="228,5,386,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,93,213,53,227,47,229,52,215,58,127,98"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="240,68,374,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,103,224,95,225,100,166,108"/>
+<area shape="rect" id="Node000006" href="$classSecurityLayer.html#adc79fa2453a0034a739a7cfcc225db42" title="Constructs a SecurityLayer." alt="" coords="214,131,401,156"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="166,123,198,127,198,132,166,128"/>
+<area shape="rect" id="Node000007" href="$classSecurityQuestionLayer.html#a23a612347d041e3bb6e5c3cd5f2327ba" title="Slot called by security_question_timer_ after a timeout (10 seconds). Updates the security_question_l..." alt="" coords="220,180,395,219"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="135,133,215,165,234,172,232,177,213,170,133,138"/>
+<area shape="rect" id="Node000003" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="449,12,647,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,22,434,22,434,27,387,27"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="477,68,619,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="375,85,462,85,462,90,375,90"/>
+</map>

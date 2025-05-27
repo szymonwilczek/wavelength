@@ -1,0 +1,6 @@
+<map id="MessageProcessor::GetInstance" name="MessageProcessor::GetInstance">
+<area shape="rect" id="Node000001" title="Gets the singleton instance of the MessageProcessor." alt="" coords="5,36,218,61"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#af073515175802398f049574a52fe9795" title="Deleted copy constructor to prevent copying." alt="" coords="266,29,460,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,46,250,46,250,51,218,51"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="317,30,313,20,321,10,337,5,363,3,390,5,406,11,405,16,389,10,363,8,338,10,324,15,318,21,322,28"/>
+</map>

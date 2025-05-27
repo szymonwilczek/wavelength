@@ -1,0 +1,16 @@
+<map id="AppInstanceManager::IsAnotherInstanceRunning" name="AppInstanceManager::IsAnotherInstanceRunning">
+<area shape="rect" id="Node000001" title="Statically checks if another instance of the application is already running." alt="" coords="775,131,958,169"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="582,76,727,115"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="774,129,726,117,728,111,775,124"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a1ecdc08b00d9aae9d33976f8ce90d6f5" title="Starts the instance manager." alt="" coords="5,79,150,117"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="759,156,643,158,503,156,350,148,197,131,145,121,146,115,198,126,350,142,503,150,643,152,759,151"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a6aa626dd1ea5e5c57860d532bdb85d5e" title="Establishes a connection to the server instance for a client instance." alt="" coords="198,5,342,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="607,71,572,54,534,41,485,31,434,25,342,23,342,18,435,20,485,26,535,35,574,49,609,66"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#af7e9143a1ff0af2932c1d0afc1f31231" title="Slot called when a new client attempts to connect to the server." alt="" coords="390,51,534,89"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="566,86,534,82,535,77,567,81"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="204,52,131,81,129,76,202,47"/>
+<area shape="rect" id="Node000006" href="$classAppInstanceManager.html#af09b098118800e025bcdce635b382ddd" title="Sets up the QLocalServer for the creator instance." alt="" coords="198,79,342,117"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="375,85,342,90,342,85,374,80"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="357,98,534,98,582,96,582,102,534,103,357,103"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="182,101,150,101,150,95,182,95"/>
+</map>

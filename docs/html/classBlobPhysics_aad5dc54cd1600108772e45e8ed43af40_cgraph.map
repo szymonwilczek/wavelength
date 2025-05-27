@@ -1,0 +1,5 @@
+<map id="BlobPhysics::ConstrainNeighborDistances" name="BlobPhysics::ConstrainNeighborDistances">
+<area shape="rect" id="Node000001" title="Enforces minimum and maximum distance constraints between neighboring control points...." alt="" coords="5,5,215,44"/>
+<area shape="rect" id="Node000002" href="$classBlobMath.html#ac9712d62d55012b6839e003bfb902ffd" title="Clamps a value between a minimum and maximum limit. Requires the type T to be totally ordered (suppor..." alt="" coords="263,12,385,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,22,247,22,247,27,215,27"/>
+</map>

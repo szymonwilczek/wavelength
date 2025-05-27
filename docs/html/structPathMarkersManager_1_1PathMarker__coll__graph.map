@@ -1,0 +1,9 @@
+<map id="PathMarkersManager::PathMarker" name="PathMarkersManager::PathMarker">
+<area shape="rect" id="Node000001" title="Structure representing a single animated marker moving along the path." alt="" coords="5,381,189,705"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="26,256,169,319"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,319,100,365,95,365,95,319"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="46,131,149,194"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="100,209,100,256,95,256,95,209"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="88,5,107,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,69,100,114,95,114,95,69"/>
+</map>

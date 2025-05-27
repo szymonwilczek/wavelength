@@ -1,0 +1,11 @@
+<map id="AttachmentViewer::sizeHint" name="AttachmentViewer::sizeHint">
+<area shape="rect" id="Node000001" title="Returns the recommended size for the viewer based on its content and layout. Calculates the size need..." alt="" coords="740,31,923,55"/>
+<area shape="rect" id="Node000002" href="$classStreamMessage.html#a1a3ebf623b6477e510efeab5af62f390" title="Adjusts the size of the message widget to fit its content, especially after an attachment has loaded...." alt="" coords="506,24,692,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="725,46,693,46,693,40,725,40"/>
+<area shape="rect" id="Node000003" href="$classStreamMessage.html#ab018e0c173fde148dec8f2441b5db300" title="Parses HTML content to find an attachment placeholder and adds the corresponding AttachmentPlaceholde..." alt="" coords="244,5,458,30"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="490,35,458,31,459,26,491,29"/>
+<area shape="rect" id="Node000004" href="$classStreamMessage.html#a009bab0169fe961a273ffaf6783dfb15" title="Updates the content of an existing message, typically used for progress updates. Cleans the new conte..." alt="" coords="245,55,457,79"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="491,56,458,59,457,54,490,51"/>
+<area shape="rect" id="Node000005" href="$classStreamDisplay.html#aba8774044f5e157e128c9429c67c5970" title="Processes the next message from the message_queue_. Dequeues a message, checks if it&#39;s an update to a..." alt="" coords="5,48,196,86"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="229,70,196,70,196,64,229,64"/>
+</map>

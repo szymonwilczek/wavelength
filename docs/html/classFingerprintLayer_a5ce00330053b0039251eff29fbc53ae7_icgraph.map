@@ -1,0 +1,5 @@
+<map id="FingerprintLayer::LoadRandomFingerprint" name="FingerprintLayer::LoadRandomFingerprint">
+<area shape="rect" id="Node000001" title="Loads a random fingerprint SVG file from fingerprint_files_ and renders it into base_fingerprint_...." alt="" coords="223,5,421,44"/>
+<area shape="rect" id="Node000002" href="$classFingerprintLayer.html#a92b5ab00f16eb9bf0ab1edb5a1d465f4" title="Initializes the layer for display. Resets the progress bar and styles, loads a random fingerprint ima..." alt="" coords="5,12,175,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,27,175,27,175,22,207,22"/>
+</map>

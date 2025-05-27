@@ -1,0 +1,5 @@
+<map id="HandprintLayer::ProcessHandprint" name="HandprintLayer::ProcessHandprint">
+<area shape="rect" id="Node000001" title="Handles the completion of the handprint scan. Changes the UI element styles (border,..." alt="" coords="5,5,226,30"/>
+<area shape="rect" id="Node000002" href="$classSecurityLayer.html#a6b6759d7fd1e729ff63ea9be3c121878" title="Emitted when the user successfully completes the security challenge presented by this layer." alt="" coords="274,5,472,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,15,258,15,258,20,226,20"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="SecurityCodeLayer::ShowErrorEffect" name="SecurityCodeLayer::ShowErrorEffect">
+<area shape="rect" id="Node000001" title="Triggers a visual error effect on the input fields. Temporarily changes the background and border col..." alt="" coords="5,37,145,76"/>
+<area shape="rect" id="Node000002" href="$classSecurityCodeLayer.html#aff90508ace024d15efd490efb2b1b13a" title="Clears all input fields and resets their styles to the default (error/red) state. Sets focus on the f..." alt="" coords="193,5,332,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,42,177,37,178,42,146,47"/>
+<area shape="rect" id="Node000003" href="$classSecurityCodeLayer.html#a5f1194e6e5185b40eeb6aed165d8e58b" title="Sets the input validators for all code input fields based on whether the current code is numeric." alt="" coords="193,68,332,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,65,178,71,177,76,145,71"/>
+</map>

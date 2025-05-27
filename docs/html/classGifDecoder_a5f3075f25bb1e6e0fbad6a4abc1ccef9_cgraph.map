@@ -1,0 +1,17 @@
+<map id="GifDecoder::run" name="GifDecoder::run">
+<area shape="rect" id="Node000001" title="The main function executed by the QThread. Contains the loop that reads packets, decodes frames,..." alt="" coords="5,61,119,86"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a4d8edc0e3bd7c39f6c540e090987ae77" title="Emitted for each decoded frame of the GIF." alt="" coords="180,12,346,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,58,194,38,195,44,116,63"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a45c27e6347e3b847aa092323d936044e" title="Initializes the FFmpeg components for decoding the GIF. Opens the input stream using the custom I/O c..." alt="" coords="192,61,334,86"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="119,71,176,71,176,76,119,76"/>
+<area shape="rect" id="Node000008" href="$classGifDecoder.html#ae33e9555abafda1bb8c8fd9e7c336f98" title="Emitted periodically during playback to indicate the current position." alt="" coords="167,111,359,135"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="116,84,195,104,194,109,115,89"/>
+<area shape="rect" id="Node000004" href="$classGifDecoder.html#a75ca53e116fcdd49a14551af6c00f301" title="Emitted when an error occurs during initialization or decoding." alt="" coords="440,5,561,30"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,58,430,32,431,37,319,63"/>
+<area shape="rect" id="Node000005" href="$classGifDecoder.html#a4ca17f03ef1f3dd2cc6981d287e3b3d6" title="Internal helper function called by Initialize() to extract and emit the first frame...." alt="" coords="407,54,594,93"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="334,71,392,71,392,76,334,76"/>
+<area shape="rect" id="Node000007" href="$classGifDecoder.html#a1f914a590ac031ee8c90067ec3b51707" title="Emitted after successful initialization, providing GIF stream details." alt="" coords="435,117,566,142"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="319,84,431,111,430,116,318,89"/>
+<area shape="rect" id="Node000006" href="$classGifDecoder.html#af56a2d4106b23043979333d001dac9c9" title="Emitted once after successful initialization, containing the first frame. Useful for displaying a sta..." alt="" coords="642,61,835,86"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="595,71,627,71,627,76,595,76"/>
+</map>

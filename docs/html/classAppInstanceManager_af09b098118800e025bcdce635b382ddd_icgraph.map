@@ -1,0 +1,13 @@
+<map id="AppInstanceManager::SetupServer" name="AppInstanceManager::SetupServer">
+<area shape="rect" id="Node000001" title="Sets up the QLocalServer for the creator instance." alt="" coords="582,72,727,111"/>
+<area shape="rect" id="Node000002" href="$classAppInstanceManager.html#a8087ee7ea64e087b39c66048becc8574" title="Slot called when a connected socket disconnects. Handles cleanup and potential role change (the clien..." alt="" coords="390,15,534,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="572,70,528,56,530,51,574,65"/>
+<area shape="rect" id="Node000004" href="$classAppInstanceManager.html#a1ecdc08b00d9aae9d33976f8ce90d6f5" title="Starts the instance manager." alt="" coords="5,65,150,104"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="567,109,489,119,396,127,296,128,197,121,137,107,138,102,198,115,296,123,396,121,488,114,567,104"/>
+<area shape="rect" id="Node000003" href="$classAppInstanceManager.html#a6aa626dd1ea5e5c57860d532bdb85d5e" title="Establishes a connection to the server instance for a client instance." alt="" coords="198,5,342,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,32,342,31,342,25,375,27"/>
+<area shape="rect" id="Node000005" href="$classAppInstanceManager.html#af7e9143a1ff0af2932c1d0afc1f31231" title="Slot called when a new client attempts to connect to the server." alt="" coords="198,68,342,107"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="376,61,343,70,341,65,375,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="192,52,143,67,141,62,190,47"/>
+<area shape="poly" id="edge5_Node000005_Node000001" title=" " alt="" coords="358,86,582,88,582,93,358,91"/>
+</map>

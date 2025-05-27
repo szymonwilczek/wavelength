@@ -1,0 +1,15 @@
+<map id="SessionCoordinator::onAuthenticationFailed" name="SessionCoordinator::onAuthenticationFailed">
+<area shape="rect" id="Node000001" title="Slot triggered when authentication fails during join. Relays the signal and publishes the event via W..." alt="" coords="5,68,167,107"/>
+<area shape="rect" id="Node000002" href="$classWavelengthEventBroker.html#a60448a9bffbea7241fa9dccf48f428ff" title="Publishes an &quot;authentication_failed&quot; event. Data: {&quot;frequency&quot;: QString}." alt="" coords="215,5,373,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,65,212,46,214,52,153,70"/>
+<area shape="rect" id="Node000005" href="$classSessionCoordinator.html#afbc8b26d3877790bdc6551bdf4d6b5c5" title="Emitted when authentication fails during join. Relayed from WavelengthJoiner." alt="" coords="221,68,366,107"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="167,85,206,85,206,90,167,90"/>
+<area shape="rect" id="Node000006" href="$classWavelengthEventBroker.html#ac5c82b2b8f57045b0700c350549a6b39" title="Gets the singleton instance of the WavelengthEventBroker." alt="" coords="215,131,373,169"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="153,105,214,123,212,128,151,110"/>
+<area shape="rect" id="Node000003" href="$classWavelengthEventBroker.html#ac664ef807bf6e0f08cf8e6435e7dbbc5" title="Publishes an event of a specific type with associated data. Emits the eventPublished signal,..." alt="" coords="425,5,583,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="373,22,409,22,409,27,373,27"/>
+<area shape="rect" id="Node000004" href="$classWavelengthEventBroker.html#ae8c0f4012e86117405db97a0d461ad94" title="Signal emitted whenever any event is published via PublishEvent(). Subscribed components connect to t..." alt="" coords="635,5,794,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="583,22,620,22,620,27,583,27"/>
+<area shape="rect" id="Node000007" href="$classWavelengthEventBroker.html#abf06dfa4e2d26e0d3acd5c028be9eb31" title="Private constructor to enforce the singleton pattern." alt="" coords="421,131,587,169"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="373,147,405,147,405,153,373,153"/>
+</map>

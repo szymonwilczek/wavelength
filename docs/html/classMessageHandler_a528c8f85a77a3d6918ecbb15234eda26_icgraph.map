@@ -1,0 +1,11 @@
+<map id="MessageHandler::GetMessageFrequency" name="MessageHandler::GetMessageFrequency">
+<area shape="rect" id="Node000001" title="Extracts the frequency string from a parsed message object." alt="" coords="762,33,964,72"/>
+<area shape="rect" id="Node000002" href="$classMessageProcessor.html#abdfefd4e6d33731ee50463441ea1a368" title="Processes an incoming text message (JSON) received from the WebSocket. Parses the JSON,..." alt="" coords="525,33,714,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="747,55,715,55,715,50,747,50"/>
+<area shape="rect" id="Node000003" href="$classMessageProcessor.html#ae0f85d4a5a3c92b0873e7889dfb79862" title="Connects the appropriate slots of this processor to the signals of a given QWebSocket...." alt="" coords="276,33,477,72"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="510,55,478,55,478,50,510,50"/>
+<area shape="rect" id="Node000004" href="$classWavelengthCreator.html#aceda419aab0bae7f3323bedfcb0ad6d1" title="Attempts to create and register a new wavelength with the relay server. Checks if the wavelength alre..." alt="" coords="47,5,186,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="260,43,186,35,187,29,260,38"/>
+<area shape="rect" id="Node000006" href="$classWavelengthJoiner.html#a10830ee7f998cc18b6df1949455ae98e" title="Attempts to join an existing wavelength hosted on the relay server. Checks if the wavelength is alrea..." alt="" coords="5,68,228,93"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="261,68,229,71,228,66,260,63"/>
+</map>

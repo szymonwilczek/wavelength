@@ -1,0 +1,4 @@
+<map id="CreateWavelengthDialog::GetDigitalizationProgress" name="CreateWavelengthDialog::GetDigitalizationProgress">
+<area shape="rect" id="Node000001" title="Gets the current digitalization progress (vertical scanline position)." alt="" coords="5,29,183,68"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="61,30,58,20,63,11,76,5,94,3,114,5,125,12,123,16,112,10,94,8,77,10,67,15,63,21,66,28"/>
+</map>

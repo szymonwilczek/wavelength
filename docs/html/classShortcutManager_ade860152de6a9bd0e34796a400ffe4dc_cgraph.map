@@ -1,0 +1,5 @@
+<map id="ShortcutManager::RegisterSettingsViewShortcuts" name="ShortcutManager::RegisterSettingsViewShortcuts">
+<area shape="rect" id="Node000001" title="Registers shortcuts specific to the SettingsView." alt="" coords="5,5,183,44"/>
+<area shape="rect" id="Node000002" href="$classShortcutManager.html#a6305ee4ce31c956ea2c1d63b907e21cf" title="Template helper function to create and connect a QShortcut." alt="" coords="231,5,422,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,22,215,22,215,27,183,27"/>
+</map>

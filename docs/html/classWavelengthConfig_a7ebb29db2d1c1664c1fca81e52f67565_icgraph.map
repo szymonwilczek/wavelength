@@ -1,0 +1,17 @@
+<map id="WavelengthConfig::AddRecentColor" name="WavelengthConfig::AddRecentColor">
+<area shape="rect" id="Node000001" title="Adds a color to the list of recently used colors. If the color already exists, it&#39;s moved to the fron..." alt="" coords="276,193,474,232"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#a5860f4c0c2e368828d9287c43b2cfcaa" title="Sets the main background color. Adds the color to recent colors. Emits configChanged(&quot;background_colo..." alt="" coords="5,5,228,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="350,182,298,118,264,86,226,58,205,47,207,42,229,53,268,81,302,115,354,179"/>
+<area shape="rect" id="Node000003" href="$classWavelengthConfig.html#a0cbdae91c44d8833bc7f89be1bf9aa93" title="Sets the color for the blob animation. Adds the color to recent colors. Emits configChanged(&quot;blob_col..." alt="" coords="26,68,207,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="334,186,284,152,227,120,199,110,201,105,229,116,287,147,337,181"/>
+<area shape="rect" id="Node000004" href="$classWavelengthConfig.html#ad10ffe62231ae9e11423239074d13c35" title="Sets the color for the background grid lines. Adds the color to recent colors. Emits configChanged(&quot;g..." alt="" coords="27,131,206,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="277,192,199,173,200,167,278,187"/>
+<area shape="rect" id="Node000005" href="$classWavelengthConfig.html#a9c3abad31355863be9a66ea30cdcbedb" title="Sets the color for stream visualization elements. Adds the color to recent colors...." alt="" coords="18,193,215,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="260,215,215,215,215,210,260,210"/>
+<area shape="rect" id="Node000006" href="$classWavelengthConfig.html#a83eb31f8ab7a2b3e20599841faec5b88" title="Sets the color for the title label border. Adds the color to recent colors. Emits configChanged(&quot;titl..." alt="" coords="27,256,206,295"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="278,239,200,258,199,253,277,234"/>
+<area shape="rect" id="Node000007" href="$classWavelengthConfig.html#a2fb848bed4ad119d39c62e7d526c2791" title="Sets the color for the title label glow effect. Adds the color to recent colors. Emits configChanged(..." alt="" coords="27,319,206,357"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="337,244,287,277,229,308,197,321,195,316,227,304,284,272,334,239"/>
+<area shape="rect" id="Node000008" href="$classWavelengthConfig.html#ade723615fb9e9bd2bef32292b26a4837" title="Sets the color for the title label text. Adds the color to recent colors. Emits configChanged(&quot;title_..." alt="" coords="27,381,206,420"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="354,247,302,310,267,343,229,371,204,383,202,378,226,366,264,339,298,306,349,243"/>
+</map>

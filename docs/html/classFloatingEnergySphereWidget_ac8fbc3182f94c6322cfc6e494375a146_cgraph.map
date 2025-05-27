@@ -1,0 +1,19 @@
+<map id="FloatingEnergySphereWidget::initializeGL" name="FloatingEnergySphereWidget::initializeGL">
+<area shape="rect" id="Node000001" title="Initializes OpenGL resources (functions, shaders, geometry, VAO/VBO) and audio setup...." alt="" coords="5,161,196,200"/>
+<area shape="rect" id="Node000002" href="$classFloatingEnergySphereWidget.html#ad35420b1d445bfab1078548c35b92b96" title="Initializes audio components (QMediaPlayer, QAudioDecoder), connects signals, selects the appropriate..." alt="" coords="244,99,434,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,158,247,139,248,144,177,163"/>
+<area shape="rect" id="Node000008" href="$classFloatingEnergySphereWidget.html#a4b018c3be823549091b2a232cc992212" title="Compiles and links the vertex and fragment shaders into shader_program_." alt="" coords="244,161,434,200"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="196,178,228,178,228,183,196,183"/>
+<area shape="rect" id="Node000009" href="$classFloatingEnergySphereWidget.html#aba5376ecc7b3bd26466ffb1e24939be4" title="Creates the vertex data (positions) for the sphere geometry using rings and sectors...." alt="" coords="244,224,434,263"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="177,198,248,217,247,222,176,203"/>
+<area shape="rect" id="Node000003" href="$classFloatingEnergySphereWidget.html#a1e3d19f3f35298cdafa9b2aad74d82d7" title="Slot called by the audio decoder when it finishes decoding the entire source file." alt="" coords="482,5,672,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="381,96,481,53,497,47,499,52,483,58,383,101"/>
+<area shape="rect" id="Node000004" href="$classFloatingEnergySphereWidget.html#a43b09697cd4078bf3e083e3cf549f9e7" title="Slot called when the QAudioDecoder encounters an error. Logs the error." alt="" coords="482,68,672,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="434,103,466,99,467,104,435,108"/>
+<area shape="rect" id="Node000005" href="$classFloatingEnergySphereWidget.html#a4ef04ca2391c5e03d46ae913cbca8c57" title="Slot called when the QMediaPlayer encounters an error. Logs the error." alt="" coords="482,131,672,169"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="435,128,467,133,466,138,434,133"/>
+<area shape="rect" id="Node000006" href="$classFloatingEnergySphereWidget.html#aa6db8829f808c65a41208aa024dfe183" title="Slot called by the audio decoder when a new buffer of decoded audio data is ready...." alt="" coords="482,193,672,232"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="410,136,435,146,460,162,483,178,497,185,495,190,481,183,457,167,433,151,408,140"/>
+<area shape="rect" id="Node000007" href="$classFloatingEnergySphereWidget.html#aff040b4cbf22e0cd620795c85af1aa0e" title="Calculates the Root Mean Square (RMS) amplitude for a given audio buffer. Used to quantify the energy..." alt="" coords="720,193,911,232"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="673,210,705,210,705,215,673,215"/>
+</map>

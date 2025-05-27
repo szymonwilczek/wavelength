@@ -1,0 +1,5 @@
+<map id="BlobAnimation::paintGL" name="BlobAnimation::paintGL">
+<area shape="rect" id="Node000001" title="Renders the blob and grid using OpenGL. Called whenever the widget needs to be painted...." alt="" coords="5,12,164,37"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#ad9fd7238f6346627602b66ea7f118eea" title="Updates the internal vertex buffer (gl_vertices_) based on the current blob_center_ and control_point..." alt="" coords="212,5,393,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,22,196,22,196,27,164,27"/>
+</map>

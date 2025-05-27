@@ -1,0 +1,5 @@
+<map id="AutoScalingAttachment::enterEvent" name="AutoScalingAttachment::enterEvent">
+<area shape="rect" id="Node000001" title="Handles mouse enter events. Shows the &quot;Click to enlarge&quot; label if the content is scaled." alt="" coords="5,5,164,44"/>
+<area shape="rect" id="Node000002" href="$classAutoScalingAttachment.html#a60f80f3deb928c42709695ba324d7f8f" title="Updates the position of the info_label_ (&quot;Click to enlarge&quot;) to be centered at the bottom of the cont..." alt="" coords="212,5,383,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,22,196,22,196,27,164,27"/>
+</map>

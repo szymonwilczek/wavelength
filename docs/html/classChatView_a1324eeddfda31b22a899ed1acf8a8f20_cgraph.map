@@ -1,0 +1,7 @@
+<map id="ChatView::OnWavelengthClosed" name="ChatView::OnWavelengthClosed">
+<area shape="rect" id="Node000001" title="Handles the event when the host closes the current Wavelength. Updates the status indicator,..." alt="" coords="5,31,216,55"/>
+<area shape="rect" id="Node000002" href="$classChatView.html#ac319db61a97dccb68843b083b85a868a" title="Clears the view and resets its state. Resets the current frequency, clears the message area,..." alt="" coords="303,5,420,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,30,287,22,288,28,216,35"/>
+<area shape="rect" id="Node000003" href="$classChatView.html#a548c9205adbf6237c69b5f3959e690e6" title="Emitted when the user aborts the connection or the Wavelength is closed by the host...." alt="" coords="264,55,459,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,50,248,54,248,59,216,56"/>
+</map>

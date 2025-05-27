@@ -1,0 +1,5 @@
+<map id="SettingsView::SetDebugMode" name="SettingsView::SetDebugMode">
+<area shape="rect" id="Node000001" title="Enables or disables the debug mode for the CLASSIFIED tab. When enabled, the security layers are bypa..." alt="" coords="5,12,201,37"/>
+<area shape="rect" id="Node000002" href="$classSettingsView.html#a220c6d57ea52dc424ad3c3db5c0a9c7a" title="Resets all security layers in the CLASSIFIED tab to their initial state. Calls Reset() on each layer...." alt="" coords="249,5,436,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,22,233,22,233,27,201,27"/>
+</map>

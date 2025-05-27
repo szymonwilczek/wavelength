@@ -1,0 +1,5 @@
+<map id="VideoDecoder::ReleaseResources" name="VideoDecoder::ReleaseResources">
+<area shape="rect" id="Node000001" title="Releases all FFmpeg and internal AudioDecoder resources. Calls CleanupFFmpegResources()...." alt="" coords="5,12,226,37"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a5a7e10221cb9faa6fd891a965feaaa25" title="Releases all FFmpeg resources (contexts, frames, scaler) and deletes the internal AudioDecoder...." alt="" coords="274,5,481,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,22,258,22,258,27,226,27"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="src/ui/chat/style/chat_style.cpp" name="src/ui/chat/style/chat_style.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="48,5,191,44"/>
+<area shape="rect" id="Node000002" href="$chat__style_8h.html" title=" " alt="" coords="5,99,98,124"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,46,72,89,68,85,102,43"/>
+<area shape="rect" id="Node000004" href="$cyberpunk__style_8h.html" title=" " alt="" coords="121,92,254,131"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,43,165,78,161,81,133,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="19,179,84,203"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="54,124,54,163,49,163,49,124"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="156,179,219,203"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="190,131,190,163,185,163,185,131"/>
+</map>

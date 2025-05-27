@@ -1,0 +1,7 @@
+<map id="GifDecoder::IsDecoderRunning" name="GifDecoder::IsDecoderRunning">
+<area shape="rect" id="Node000001" title="Checks if the decoding thread is currently running." alt="" coords="211,31,414,55"/>
+<area shape="rect" id="Node000002" href="$classGifDecoder.html#a6cba2bb829e0608c96c2818df2ed844c" title="Reinitializes the decoder after it has been stopped or encountered an error. Stops the thread if runn..." alt="" coords="5,5,163,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,33,163,29,163,24,195,27"/>
+<area shape="rect" id="Node000003" href="$classGifDecoder.html#a56fde5005376055b7758f4f60b5fcb40" title="Resumes decoding if paused or starts the thread if not already running. Clears the paused_ flag and w..." alt="" coords="12,55,156,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,58,156,62,156,57,195,53"/>
+</map>

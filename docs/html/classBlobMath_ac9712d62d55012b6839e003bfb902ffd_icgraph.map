@@ -1,0 +1,9 @@
+<map id="BlobMath::Clamp" name="BlobMath::Clamp">
+<area shape="rect" id="Node000001" title="Clamps a value between a minimum and maximum limit. Requires the type T to be totally ordered (suppor..." alt="" coords="756,12,879,37"/>
+<area shape="rect" id="Node000002" href="$classBlobPhysics.html#aad5dc54cd1600108772e45e8ed43af40" title="Enforces minimum and maximum distance constraints between neighboring control points...." alt="" coords="499,5,708,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="741,27,709,27,709,22,741,22"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a41f88c30a6e349bb0a08b0f37db151e3" title="Slot (or helper called by physics thread) to update the blob&#39;s physics simulation...." alt="" coords="253,12,451,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="483,27,451,27,451,22,483,22"/>
+<area shape="rect" id="Node000004" href="$classBlobAnimation.html#aa73097d69b36c02d99a41b8ab782b012" title="The main function executed by the physics simulation thread. Enters a loop that repeatedly calls upda..." alt="" coords="5,5,205,44"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="237,27,205,27,205,22,237,22"/>
+</map>

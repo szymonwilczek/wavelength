@@ -1,0 +1,19 @@
+<map id="CommunicationStream::CommunicationStream" name="CommunicationStream::CommunicationStream">
+<area shape="rect" id="Node000001" title="Constructs a CommunicationStream widget. Initializes OpenGL format, timers for animation and glitches..." alt="" coords="5,163,168,201"/>
+<area shape="rect" id="Node000002" href="$classWavelengthConfig.html#abc5ccf726876bf0f8a5a842b70a2e766" title="Emitted when a configuration setting changes." alt="" coords="216,5,385,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,160,148,108,180,79,214,53,221,49,224,54,217,58,183,83,152,112,105,164"/>
+<area shape="rect" id="Node000003" href="$classTranslationManager.html#a370292d4133519fccf401a6b27b2f6a6" title="Returns an instance of the TranslationManager singleton." alt="" coords="233,68,368,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="124,160,215,116,227,110,229,115,217,120,126,165"/>
+<area shape="rect" id="Node000005" href="$classTranslationManager.html#ab6435893ce84a82ab11a7604aa9746d6" title="Retrieves the translated string for the specified key." alt="" coords="233,131,368,169"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="168,167,217,160,218,165,169,172"/>
+<area shape="rect" id="Node000006" href="$classCommunicationStream.html#a1d9429e136bd752ee9cf57c4987f626c" title="Slot called by glitch_timer_ to trigger random glitch effects during the Idle state." alt="" coords="223,193,378,232"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="169,191,208,197,207,202,168,196"/>
+<area shape="rect" id="Node000008" href="$classCommunicationStream.html#ac554fcee7b44289519e0033a0c5f5f37" title="Slot called by animation_timer_ to update animation time and parameters. Advances time offset,..." alt="" coords="223,256,378,295"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="128,199,217,241,232,247,230,252,215,246,126,204"/>
+<area shape="rect" id="Node000009" href="$classCommunicationStream.html#ae3e174a5a1078bf4ec8d1ae97d8e674a" title="Slot called when a configuration setting changes in WavelengthConfig. Updates the stream color if the..." alt="" coords="223,319,378,357"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="106,200,153,251,184,279,217,304,226,309,224,314,214,308,180,283,149,255,102,204"/>
+<area shape="rect" id="Node000004" href="$classTranslationManager.html#afcf7f2ccfdf410f09d0a740c1826a1f3" title="Private constructor to enforce the singleton pattern." alt="" coords="439,68,581,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="368,85,423,85,423,90,368,90"/>
+<area shape="rect" id="Node000007" href="$classCommunicationStream.html#afb372e0e2c10a955c7627d1cbe7ba408" title="Starts a short, intense glitch animation." alt="" coords="433,193,587,232"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="378,210,417,210,417,215,378,215"/>
+</map>

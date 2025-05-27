@@ -1,0 +1,5 @@
+<map id="AudioDecoder" name="AudioDecoder">
+<area shape="rect" id="Node000001" title="Decodes and plays audio data using FFmpeg libraries in a separate thread." alt="" coords="5,117,190,879"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="68,5,128,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,84,100,117,95,117,95,84"/>
+</map>

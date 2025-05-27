@@ -1,0 +1,5 @@
+<map id="VideoDecoder::Seek" name="VideoDecoder::Seek">
+<area shape="rect" id="Node000001" title="Seeks to a specific position in the video stream. Seeks the internal audio decoder (if present) and s..." alt="" coords="5,5,147,30"/>
+<area shape="rect" id="Node000002" href="$classVideoDecoder.html#a97bfdada9e03663ee5f063b7eece3ad0" title="Checks if the video file contains an audio stream." alt="" coords="195,5,363,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,15,179,15,179,20,147,20"/>
+</map>

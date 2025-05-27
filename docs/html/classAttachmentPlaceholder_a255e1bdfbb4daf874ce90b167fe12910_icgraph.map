@@ -1,0 +1,9 @@
+<map id="AttachmentPlaceholder::AdjustAndShowDialog" name="AttachmentPlaceholder::AdjustAndShowDialog">
+<area shape="rect" id="Node000001" title="Adjusts the size and position of the full&#45;size dialog and shows it. Calculates the preferred dialog s..." alt="" coords="414,37,573,76"/>
+<area shape="rect" id="Node000002" href="$classAttachmentPlaceholder.html#ad096d1b0e758e0cb11f758adcd8ab8a0" title="Creates and shows a non&#45;modal dialog to display the full&#45;size attachment (image or GIF)...." alt="" coords="210,37,366,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="399,59,367,59,367,54,399,54"/>
+<area shape="rect" id="Node000003" href="$classAttachmentPlaceholder.html#a7a72f70ced1002d2324eefbb2c92b21d" title="Creates and displays a CyberAttachmentViewer containing a GIF. Wraps an InlineGifPlayer in an AutoSca..." alt="" coords="5,5,162,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="194,45,161,39,162,34,194,39"/>
+<area shape="rect" id="Node000004" href="$classAttachmentPlaceholder.html#ac5eac78fb7804294986a0b63c8253616" title="Creates and displays a CyberAttachmentViewer containing an image. Wraps an InlineImageViewer in an Au..." alt="" coords="5,68,162,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="194,73,162,78,161,73,194,68"/>
+</map>

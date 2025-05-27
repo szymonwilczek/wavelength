@@ -1,0 +1,5 @@
+<map id="GifPlayer::StopPlayback" name="GifPlayer::StopPlayback">
+<area shape="rect" id="Node000001" title="Stops or pauses GIF playback. Clears the is_playing_ flag and calls Pause() on the GifDecoder...." alt="" coords="199,5,362,30"/>
+<area shape="rect" id="Node000002" href="$classGifPlayer.html#a45224f765158d3bbe1858ab6e502199e" title="Handles mouse leave events. Calls StopPlayback() to pause animation when the mouse cursor leaves the ..." alt="" coords="5,5,151,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,20,151,20,151,15,183,15"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="BlobAnimation::processMovementBuffer" name="BlobAnimation::processMovementBuffer">
+<area shape="rect" id="Node000001" title="Slot (or helper called by updateAnimation) to process the window movement buffer via BlobTransitionMa..." alt="" coords="509,5,728,44"/>
+<area shape="rect" id="Node000002" href="$classBlobAnimation.html#a09f6a9ff089a61d4ddb808e3caf388e2" title="Slot connected to animation_timer_. Called periodically (~60 FPS) to update the animation state...." alt="" coords="251,12,461,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="493,27,461,27,461,22,493,22"/>
+<area shape="rect" id="Node000003" href="$classBlobAnimation.html#a376419bc52ad64329b0ce5e2a2579043" title="Constructs the BlobAnimation widget. Initializes parameters, states, event handlers,..." alt="" coords="5,12,203,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="235,27,203,27,203,22,235,22"/>
+</map>

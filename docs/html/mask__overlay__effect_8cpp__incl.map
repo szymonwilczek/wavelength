@@ -1,0 +1,13 @@
+<map id="src/ui/chat/effects/mask_overlay_effect.cpp" name="src/ui/chat/effects/mask_overlay_effect.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="196,5,365,44"/>
+<area shape="rect" id="Node000002" href="$mask__overlay__effect_8h.html" title=" " alt="" coords="5,92,156,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,47,126,88,124,84,231,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="180,92,253,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="267,46,238,82,234,78,263,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="276,92,413,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="298,43,327,78,323,82,294,46"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="436,92,501,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="327,42,427,83,425,88,325,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="44,165,117,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,117,83,149,78,149,78,117"/>
+</map>

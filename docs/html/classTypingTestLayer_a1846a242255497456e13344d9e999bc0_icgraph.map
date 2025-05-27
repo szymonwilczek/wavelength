@@ -1,0 +1,5 @@
+<map id="TypingTestLayer::Reset" name="TypingTestLayer::Reset">
+<area shape="rect" id="Node000001" title="Resets the layer to its initial state. Clears the input field, resets progress tracking,..." alt="" coords="224,5,381,30"/>
+<area shape="rect" id="Node000002" href="$classTypingTestLayer.html#ade1f77e1a1710c34a0b06e9a35e3f96a" title="Initializes the layer for display. Resets the layer state, sets focus on the hidden input field,..." alt="" coords="5,5,176,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,20,176,20,176,15,208,15"/>
+</map>
