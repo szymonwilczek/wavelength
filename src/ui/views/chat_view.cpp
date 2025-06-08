@@ -478,11 +478,20 @@ void ChatView::OnReadyReadInput() const {
 
     const QByteArray buffer = input_device_->readAll();
 
+    qDebug() << "[CHAT VIEW][DEBUG] Buffer size:" << buffer.size();
+    qDebug() << "[CHAT VIEW][DEBUG] Audio input state:" << audio_input_->state();
+    qDebug() << "[CHAT VIEW][DEBUG] Current frequency:" << current_frequency_;
+
     if (!buffer.isEmpty()) {
+        qDebug() << "[CHAT VIEW][DEBUG] Sending" << buffer.size() << "bytes to server";
+
+        bool sent = MessageService::SendAudioData(current_frequency_, buffer);
+        qDebug() << "[CHAT VIEW][DEBUG] Audio data sent successfully:" << sent;
+
         const qreal amplitude = CalculateAmplitude(buffer);
-        if (message_area_) {
-            message_area_->SetAudioAmplitude(amplitude * 1.5);
-        }
+        message_area_->SetAudioAmplitude(amplitude);
+    } else {
+        qDebug() << "[CHAT VIEW][DEBUG] Empty buffer received from audio input";
     }
 }
 
@@ -572,13 +581,20 @@ void ChatView::TriggerActivityEffect() {
 
 void ChatView::InitializeAudio() {
     audio_format_.setSampleRate(16000);
-    audio_format_.setChannelCount(1); // Mono
-    audio_format_.setSampleSize(16); // 16 bits per sample
+    audio_format_.setChannelCount(1);
+    audio_format_.setSampleSize(16);
     audio_format_.setCodec("audio/pcm");
     audio_format_.setByteOrder(QAudioFormat::LittleEndian);
     audio_format_.setSampleType(QAudioFormat::SignedInt);
 
+    qDebug() << "[CHAT VIEW][DEBUG] Available input devices:";
+    for (const QAudioDeviceInfo &device : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        qDebug() << "  -" << device.deviceName() << "supported:" << device.isFormatSupported(audio_format_);
+    }
+
     const QAudioDeviceInfo input_info = QAudioDeviceInfo::defaultInputDevice();
+    qDebug() << "[CHAT VIEW][DEBUG] Default input device:" << input_info.deviceName();
+    qDebug() << "[CHAT VIEW][DEBUG] Format supported:" << input_info.isFormatSupported(audio_format_);
     if (!input_info.isFormatSupported(audio_format_)) {
         qWarning() << "[CHAT VIEW] Default input format is not supported, I am trying to find the nearest.";
         audio_format_ = input_info.nearestFormat(audio_format_);
@@ -590,7 +606,41 @@ void ChatView::InitializeAudio() {
         audio_format_ = outputInfo.nearestFormat(audio_format_);
     }
 
-    audio_input_ = new QAudioInput(input_info, audio_format_, this);
+    QAudioDeviceInfo pulse_device;
+    for (const QAudioDeviceInfo &device : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        qDebug() << "[AUDIO DEBUG] Checking device:" << device.deviceName();
+        if (device.deviceName() == "pulse") {
+            pulse_device = device;
+            qDebug() << "[AUDIO DEBUG] Found PulseAudio device";
+            break;
+        }
+    }
+
+    // if not pulseaudio, try pipewire
+    if (pulse_device.isNull()) {
+        for (const QAudioDeviceInfo &device : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+            if (device.deviceName() == "pipewire") {
+                pulse_device = device;
+                qDebug() << "[AUDIO DEBUG] Found PipeWire device";
+                break;
+            }
+        }
+    }
+
+    // if still null, try default
+    if (pulse_device.isNull()) {
+        pulse_device = QAudioDeviceInfo::defaultInputDevice();
+        qDebug() << "[AUDIO DEBUG] Using default device:" << pulse_device.deviceName();
+    }
+
+    // is format supported?
+    if (!pulse_device.isFormatSupported(audio_format_)) {
+        qDebug() << "[AUDIO DEBUG] Format not supported, trying to find nearest supported format";
+        audio_format_ = pulse_device.nearestFormat(audio_format_);
+        qDebug() << "[AUDIO DEBUG] New format:" << audio_format_;
+    }
+
+    audio_input_ = new QAudioInput(pulse_device, audio_format_, this);
     audio_output_ = new QAudioOutput(outputInfo, audio_format_, this);
 
     audio_input_->setBufferSize(4096);
@@ -604,6 +654,12 @@ void ChatView::StartAudioInput() {
         qWarning() << "[CHAT VIEW][HOST] Audio Input: Cannot start, m_audioInput is null!";
         return;
     }
+
+    qDebug() << "[AUDIO DEBUG] Audio input buffer size:" << audio_input_->bufferSize();
+
+    audio_input_->setBufferSize(8192); // 8KB buffer
+    qDebug() << "[AUDIO DEBUG] Set buffer size to:" << audio_input_->bufferSize();
+
     if (ptt_state_ != Transmitting) {
         qDebug() << "[CHAT VIEW][HOST] Audio Input: Not starting, state is not Transmitting.";
         return;
@@ -615,15 +671,16 @@ void ChatView::StartAudioInput() {
 
     qDebug() << "[CHAT VIEW][HOST] Audio Input: Attempting to start...";
     input_device_ = audio_input_->start();
-    if (input_device_) {
-        connect(input_device_, &QIODevice::readyRead, this, &ChatView::OnReadyReadInput);
-        qDebug() << "[CHAT VIEW][HOST] Audio Input: Started successfully. State:" << audio_input_->state() << "Error:"
-                << audio_input_->error();
-    } else {
-        qWarning() << "[CHAT VIEW][HOST] Audio Input: Failed to start! State:" << audio_input_->state() << "Error:"
-                << audio_input_->error();
+
+    if (!input_device_) {
+        qDebug() << "[CHAT VIEW][ERROR] Failed to start audio input device";
         OnPttButtonReleased();
+        return;
     }
+
+    connect(input_device_, &QIODevice::readyRead, this, &ChatView::OnReadyReadInput);
+    qDebug() << "[CHAT VIEW][HOST] Audio Input: Started successfully. State:" << audio_input_->state() << "Error:"
+          << audio_input_->error();
 }
 
 void ChatView::StopAudioInput() {
