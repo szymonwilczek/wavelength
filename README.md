@@ -37,6 +37,9 @@ I've focused on delivering a rich, user-friendly experience, crafted from the gr
 - **Extensive Customization Options:** Personalize your Wavelength experience to suit your preferences. From applying different themes and managing notification settings to defining specific UI elements, you have the granular control to tailor the application to your liking. This includes options managed by the **Appearance settings** and the **Shortcut Manager** for defining personalized keyboard shortcuts, enhancing user productivity and accessibility.
   ![settings_tab](./readme-assets/settings_tab.png)
 
+- **Astonishing _Joy_:** To create even more immersion, I've added _Joy_, which imitates the character _Joi_ from _Blade Runner_ movie. It's yours now.
+  ![joy](./readme-assets/joy.mkv)
+
 ## 🏗️ Application Architecture & Core Components
 
 Wavelength's robust architecture is built upon a foundation of well-structured components designed for scalability, maintainability, and efficiency. Each component plays a vital role in the application's overall functionality and performance.
