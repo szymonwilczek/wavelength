@@ -38,7 +38,9 @@ I've focused on delivering a rich, user-friendly experience, crafted from the gr
   ![settings_tab](./readme-assets/settings_tab.png)
 
 - **Astonishing _Joy_:** To create even more immersion, I've added _Joy_, which imitates the character _Joi_ from _Blade Runner_ movie. It's yours now.
-  ![joy](./readme-assets/joy.mkv)
+<video width="320" height="240" controls>
+  <source src="./readme-assets/joy.mp4" type="video/mp4">
+</video>
 
 ## 🏗️ Application Architecture & Core Components
 
