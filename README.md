@@ -39,7 +39,7 @@ I've focused on delivering a rich, user-friendly experience, crafted from the gr
 
 - **Astonishing _Joy_:** To create even more immersion, I've added _Joy_, which imitates the character _Joi_ from _Blade Runner_ movie. It's yours now.
 
-<video src="https://github.com/user-attachments/assets/26fbce46-6d2f-418c-872c-bfa00eabcf4e" controls="controls" style="max-width: 730px;">
+<video src="https://github.com/user-attachments/assets/1253dc7f-7c4e-4006-875a-ce8aec678975" controls="controls" style="max-width: 730px;">
 </video>
 
 
