@@ -11,10 +11,6 @@ height=200
 
 Wavelength is an advanced, next-generation real-time communication system meticulously designed to facilitate seamless, secure, and intuitive information exchange. This project is a testament to continuous evolution, offering innovative solutions at the forefront of online interaction. Born from a deep understanding of modern communication needs, Wavelength aims to set new standards in digital connectivity, ensuring a robust and feature-rich platform for all your communication needs. It doesn't store any of your data. Really.
 
-## 🌊 Why Choose Wavelength?
-
-Wavelength transcends the typical chat application, evolving into a robust platform that prioritizes performance, flexibility, and groundbreaking innovation. It is engineered to provide users with an unparalleled communication experience, focusing on an environment that is not only intuitive and fast but also resilient and ready for future challenges. My commitment is to deliver a reliable and enjoyable communication tool that adapts to your needs, whether for casual conversations or demanding professional use. Wavelength represents the culmination of extensive research and development, aiming to redefine how we connect digitally.
-
 ## 🌟 Core Features
 
 Wavelength is packed with features designed to enhance every aspect of your communication.
@@ -45,21 +41,7 @@ I've focused on delivering a rich, user-friendly experience, crafted from the gr
 
 ## 🏗️ Application Architecture & Core Components
 
-Wavelength's robust architecture is built upon a foundation of well-structured components designed for scalability, maintainability, and efficiency. Each component plays a vital role in the application's overall functionality and performance.
-
-- **System Initialization and Configuration:** The application's lifecycle begins with a robust initialization process managed by the `main()` function. This involves setting up core system parameters, loading configurations from sources or system registries, and ensuring a stable environment from the moment Wavelength launches. This crucial phase ensures proper resource allocation and foundational readiness for all subsequent operations.
-
-- **Application Instance Management:** Wavelength employs sophisticated instance management to ensure seamless operation and efficient resource utilization.
-
-  - **Instance Manager:** This core component acts as a central orchestrator, responsible for managing the lifecycle and intercommunication of various application modules. It ensures that services are properly initialized, accessible, and correctly handle dependencies, providing a single point of control for application-wide services.
-  - **Font Manager:** Dedicated to handling all font-related operations, ensuring consistent typography throughout the UI. It allows for dynamic font adjustments and ensures that fonts are loaded and rendered efficiently for optimal readability.
-  - **Shortcut Manager:** Provides a centralized system for managing and customizing keyboard shortcuts. This significantly enhances user productivity by allowing quick access to features and improves accessibility for users who prefer keyboard navigation or have specific ergonomic needs.
-  - **Translation Manager:** Facilitates robust multi-language support, allowing the application to be easily localized into different languages. This manager dynamically loads and applies language packs, providing a seamless experience for users worldwide and simplifying future localization efforts.
-    [SCREENSHOT HERE: (Optional) A block diagram illustrating the Instance Manager and its sub-managers (Font, Shortcut, Translation)]
-
-- **Communication Architecture:** The backbone of Wavelength's real-time capabilities. This intricate system manages all aspects of message transmission, reception, and processing, ensuring reliable and secure data flow between users. The implementation of the **PTT System** (Push-To-Talk) is a key part of this architecture, handling efficient audio encoding, transmission, and decoding for voice communication. The entire communication stack is designed to handle high volumes of data with minimal latency and high throughput.
-
-For an in-depth understanding of these architectural components, their specific roles, and their interdependencies, please refer to the **"Foundation of the Application"** and **"Communication Architecture"** sections in the accompanying [PDF](./wavelength.pdf).
+For an in-depth understanding of architectural components, their specific roles, and their interdependencies, please refer to the **"Foundation of the Application"** and **"Communication Architecture"** sections in the accompanying [PDF](./wavelength.pdf).
 
 ## 🛠️ Underlying Technologies
 
@@ -73,18 +55,6 @@ Wavelength is built upon a foundation of best possible technologies, ensuring re
 A detailed overview of the technologies employed, their specific roles, and their application within the Wavelength project can be found in the **"Technologies"** section of the [PDF](./wavelength.pdf).
 
 ## 🚧 Challenges and Solutions
-
-During the rigorous development of Wavelength, I encountered numerous technical challenges that demanded creative and robust solutions. Overcoming these hurdles has significantly contributed to the project's stability and sophistication, transforming obstacles into opportunities for innovation and demonstrating advanced problem-solving capabilities:
-
-- **OpenGL Performance Optimization:** I tackled complex issues related to graphics rendering performance through meticulous shader optimization, efficient vertex reduction techniques, and the strategic implementation of caching mechanisms. These efforts were crucial in ensuring smooth visual experiences and maintaining high frame rates, even with intricate UI elements and dynamic content, preventing lag and ensuring a fluid user interface across various hardware configurations.
-
-- **Thread Synchronization Management:** Ensuring flawless concurrent operations in a real-time communication system, where multiple tasks run simultaneously (e.g., UI updates, network I/O, audio processing), was paramount. I've implemented thread synchronization mechanisms utilizing mutexes, robust queues for inter-thread communication, and asynchronous operations. This approach effectively eliminated common concurrency issues such as starvation, livelocks, and deadlocks, guaranteeing stable and predictable multi-threaded execution.
-
-- **Multimedia Support:** Integrating diverse multimedia capabilities, particularly with decoding various file formats, presented significant challenges. The adoption of the powerful FFmpeg library was a key strategic decision. Despite the myriad segmentation errors, memory leaks, and complex memory management issues initially encountered during FFmpeg integration, persistent debugging, extensive error handling, and refinement led to reliable and high-quality multimedia playback and transmission within the application.
-
-- **Interface Consistency:** Maintaining a consistent and intuitive user experience across the entire application, despite its growing complexity and evolving feature set, was a core design principle. This was achieved by designing highly reusable UI components (e.g., custom buttons, input fields, message bubbles) and strictly adhering to consistent naming conventions and robust coding standards throughout the entire codebase, promoting maintainability, scalability, and a cohesive user experience that is easy to learn and use.
-
-This project stands as one of the most rewarding and impactful endeavors I have undertaken, showcasing a deep understanding of complex software engineering principles and a commitment to quality. I am dedicated to its continued development and refinement, ensuring Wavelength remains at the cutting edge of communication technology.
 
 For a more detailed technical dive into the specific challenges faced and the solutions implemented, please refer to the **"Issues and solutions"** section within the accompanying [PDF](./wavelength.pdf).
 
