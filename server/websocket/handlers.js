@@ -1,16 +1,14 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\websocket\handlers.js
 const WebSocket = require("ws");
 const crypto = require("crypto");
-const WavelengthModel = require("../models/wavelength"); // Uses string frequencies
-const connectionManager = require("./connectionManager"); // Uses string frequencies
+const WavelengthModel = require("../models/wavelength"); 
+const connectionManager = require("./connectionManager"); 
 const {
-    normalizeFrequency, // Returns string "XXX.X"
+    normalizeFrequency, 
     generateSessionId,
     generateMessageId,
-    isValidFrequency // Checks if input can be normalized
+    isValidFrequency 
 } = require("../utils/helpers");
-const wavelengthService = require("../services/wavelengthService"); // Uses string frequencies
-// Removed frequencyTracker import as service layer handles it
+const wavelengthService = require("../services/wavelengthService"); 
 
 /**
  * Support for registration of new wavelength
@@ -24,29 +22,26 @@ async function handleRegisterWavelength(ws, data) {
         ws.send(JSON.stringify({ type: "register_result", success: false, error: "Invalid frequency format. Must be a positive number." }));
         return;
     }
-    // Note: Service layer will normalize again, but validation here is good.
-    const frequency = normalizeFrequency(rawFrequency); // For logging
+    const frequency = normalizeFrequency(rawFrequency); 
 
     const name = data.name || `Wavelength-${frequency}`;
     const isPasswordProtected = data.isPasswordProtected || false;
-    const password = data.password || null; // Use null if no password
+    const password = data.password || null; 
 
     try {
         console.log(`Handler: Attempting to register frequency ${frequency}...`);
 
-        // Use WavelengthService for registration logic
         const result = await wavelengthService.registerWavelength(
             ws,
-            rawFrequency, // Pass raw (but validated) frequency to service
+            rawFrequency, 
             name,
             isPasswordProtected,
             password
         );
 
-        // Send result back to client
         ws.send(JSON.stringify({
             type: "register_result",
-            ...result // Contains success, frequency (string), sessionId, error
+            ...result 
         }));
 
         if (result.success) {
@@ -79,9 +74,8 @@ async function handleJoinWavelength(ws, data) {
         ws.send(JSON.stringify({ type: "join_result", success: false, error: "Invalid frequency format. Must be a positive number." }));
         return;
     }
-    const frequency = normalizeFrequency(rawFrequency); // Normalized string for internal use
-
-    const password = data.password || ""; // Keep as empty string if not provided
+    const frequency = normalizeFrequency(rawFrequency); 
+    const password = data.password || ""; 
 
     try {
         console.log(`Handler: Attempting to join frequency ${frequency}...`);
@@ -108,7 +102,7 @@ async function handleJoinWavelength(ws, data) {
             }
 
             const hashedInputPassword = crypto.createHash('sha256').update(password).digest('hex');
-            const hashedStoredPassword = wavelengthInfo.password; // Get hash from memory store
+            const hashedStoredPassword = wavelengthInfo.password; 
 
             if (hashedInputPassword !== hashedStoredPassword) {
                 ws.send(JSON.stringify({ type: "join_result", success: false, error: "Invalid password" }));
@@ -127,7 +121,7 @@ async function handleJoinWavelength(ws, data) {
                 JSON.stringify({
                     type: "join_result",
                     success: true,
-                    frequency: joinResult.frequency, // Send string freq "XXX.X"
+                    frequency: joinResult.frequency, 
                     name: joinResult.name,
                     sessionId: joinResult.sessionId,
                 })
@@ -139,13 +133,12 @@ async function handleJoinWavelength(ws, data) {
                     JSON.stringify({
                         type: "client_joined",
                         clientId: sessionId,
-                        frequency: frequency, // Send string freq "XXX.X"
+                        frequency: frequency, 
                     })
                 );
             }
             console.log(`Handler: Client ${sessionId} joined wavelength ${frequency}`);
         } else {
-            // This case indicates an internal issue if wavelengthInfo was found earlier
             console.error(`Handler: Failed to add client ${sessionId} to wavelength ${frequency} unexpectedly.`);
             throw new Error("Internal error adding client to wavelength.");
         }
@@ -169,8 +162,8 @@ async function handleJoinWavelength(ws, data) {
  * @param {Object} data - Message data
  */
 function handleSendMessage(ws, data) {
-    const frequency = ws.frequency; // Should be normalized string "XXX.X" from join/register
-    const messageContent = data.content || data.message; // Accept 'content' or 'message'
+    const frequency = ws.frequency; 
+    const messageContent = data.content || data.message; 
     const messageId = data.messageId || generateMessageId("msg");
 
     if (!frequency) {
@@ -180,13 +173,11 @@ function handleSendMessage(ws, data) {
     }
     if (!messageContent) {
         console.warn(`Handler: send_message received empty message content on ${frequency} from ${ws.sessionId || 'unknown'}.`);
-        // Optionally send an error or just ignore
-        // ws.send(JSON.stringify({ type: "error", error: "Cannot send empty message" }));
         return;
     }
 
 
-    const wavelength = connectionManager.activeWavelengths.get(frequency); // Use string key
+    const wavelength = connectionManager.activeWavelengths.get(frequency); 
 
     if (!wavelength) {
         console.error(`Handler: Wavelength ${frequency} not found for send_message from ${ws.sessionId || 'unknown'}.`);
@@ -194,52 +185,47 @@ function handleSendMessage(ws, data) {
         return;
     }
 
-    // Check for duplicate messageId
     if (connectionManager.isMessageProcessed(frequency, messageId)) {
         console.log(`Handler: Ignoring duplicate message ${messageId} on ${frequency}`);
-        return; // Silently ignore duplicates
+        return; 
     }
     connectionManager.markMessageProcessed(frequency, messageId);
 
     const isHost = ws.isHost;
-    const sender = isHost ? "Host" : (ws.sessionId ? ws.sessionId.substring(0, 8) : "Client"); // Use prefix of sessionId for clients
+    const sender = isHost ? "Host" : (ws.sessionId ? ws.sessionId.substring(0, 8) : "Client"); 
 
     console.log(`Handler: Message on ${frequency} from ${sender} (ID: ${messageId}): ${messageContent}`);
 
-    // Send confirmation back to sender (optional, useful for client UI)
     ws.send(
         JSON.stringify({
             type: "message",
-            sender: "You", // Indicate it's the sender's own message
+            sender: "You", 
             content: messageContent,
-            frequency: frequency, // Send string freq "XXX.X"
+            frequency: frequency, 
             messageId,
             timestamp: new Date().toISOString(),
-            isSelf: true, // Flag for sender's client
+            isSelf: true, 
         })
     );
 
-    // Prepare broadcast message for others
     const broadcastMessage = {
         type: "message",
-        sender: sender, // "Host" or client ID prefix
-        senderId: ws.sessionId, // Include full session ID
+        sender: sender,
+        senderId: ws.sessionId, 
         content: messageContent,
-        frequency: frequency, // Send string freq "XXX.X"
+        frequency: frequency, 
         messageId,
         timestamp: new Date().toISOString(),
     };
     const broadcastStr = JSON.stringify(broadcastMessage);
     connectionManager.broadcast(frequency, broadcastStr, ws);
 
-    // Send to other clients on the same frequency
     wavelength.clients.forEach((client) => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(broadcastStr);
         }
     });
 
-    // Send to host if the sender is a client
     if (!isHost && wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
         wavelength.host.send(broadcastStr);
     }
@@ -372,29 +358,19 @@ function handleSendFile(ws, data) {
  * @param {Object} data - Request data (may be empty)
  */
 async function handleLeaveWavelength(ws, data) {
-    const frequency = ws.frequency; // Should be normalized string "XXX.X" or null
+    const frequency = ws.frequency; 
     const sessionId = ws.sessionId || 'unknown';
 
     if (!frequency) {
         console.log(`Handler: Client ${sessionId} sent leave_wavelength but was not on a frequency.`);
-        // Optionally send confirmation even if not on frequency?
-        // ws.send(JSON.stringify({ type: "leave_result", success: true, frequency: null }));
         return;
     }
 
     console.log(`Handler: Client ${sessionId} attempting to leave frequency ${frequency}`);
 
-    // Let ConnectionManager handle the logic of removing client/closing wavelength if host
-    // This avoids duplicating logic here and ensures cleanup happens correctly on disconnect too.
-    // We just need to trigger the disconnect flow for this specific client.
     connectionManager.handleDisconnect(ws);
-
-    // Resetting WebSocket properties immediately after triggering disconnect logic
     ws.frequency = null;
     ws.isHost = false;
-    // ws.sessionId = null; // Keep sessionId for potential logging after disconnect
-
-    // Send confirmation back to the client who requested to leave
     ws.send(JSON.stringify({ type: "leave_result", success: true, frequency: frequency }));
 
     console.log(`Handler: Initiated disconnect logic for ${sessionId} leaving ${frequency}.`);
@@ -407,7 +383,7 @@ async function handleLeaveWavelength(ws, data) {
  * @param {Object} data - Request data (may be empty)
  */
 async function handleCloseWavelength(ws, data) {
-    const frequency = ws.frequency; // Should be normalized string "XXX.X" or null
+    const frequency = ws.frequency; 
     const sessionId = ws.sessionId || 'unknown';
 
     if (!frequency) {
@@ -416,18 +392,16 @@ async function handleCloseWavelength(ws, data) {
         return;
     }
 
-    const wavelength = connectionManager.activeWavelengths.get(frequency); // Use string key
+    const wavelength = connectionManager.activeWavelengths.get(frequency);
 
     if (!wavelength) {
         console.warn(`Handler: Wavelength ${frequency} not found for close_wavelength request from ${sessionId}. Might be already closed.`);
         ws.send(JSON.stringify({ type: "error", error: "Wavelength not found or already closed" }));
-        // Reset client state just in case
         ws.frequency = null;
         ws.isHost = false;
         return;
     }
 
-    // Verify the request comes from the actual host stored in memory
     if (!ws.isHost || ws !== wavelength.host) {
         console.error(`Handler: Unauthorized close_wavelength attempt on ${frequency} by ${sessionId}. Expected host: ${wavelength.sessionId}`);
         ws.send(JSON.stringify({ type: "error", error: "Only the host can close the wavelength" }));
@@ -436,20 +410,17 @@ async function handleCloseWavelength(ws, data) {
 
     console.log(`Handler: Host ${sessionId} requested to close wavelength ${frequency}`);
 
-    // Use the service layer to handle the closing process (notifies clients, cleans DB/tracker/memory)
     try {
         const closed = await wavelengthService.closeWavelength(frequency, "Host closed the wavelength");
         if (closed) {
             console.log(`Handler: Wavelength ${frequency} closed successfully by service.`);
-            // Send confirmation back to host
             ws.send(
                 JSON.stringify({
                     type: "close_result",
                     success: true,
-                    frequency: frequency, // Send string freq "XXX.X"
+                    frequency: frequency, 
                 })
             );
-            // Host state (ws.frequency etc.) will be reset by the disconnect flow triggered by closeWavelength
         } else {
             console.error(`Handler: Service failed to close wavelength ${frequency}.`);
             ws.send(JSON.stringify({ type: "close_result", success: false, error: "Failed to close wavelength", frequency: frequency }));
@@ -460,16 +431,13 @@ async function handleCloseWavelength(ws, data) {
     }
 }
 
-
-// --- NOWE HANDLERY PTT ---
-
 /**
  * Handles PTT request from a client.
  * @param {WebSocket} ws - WebSocket connection.
  * @param {object} data - Request data { frequency }.
  */
 function handleRequestPtt(ws, data) {
-    const frequency = ws.frequency; // Użyj częstotliwości przypisanej do ws
+    const frequency = ws.frequency; 
     const requestingSessionId = ws.sessionId;
 
     if (!frequency || data.frequency !== frequency) {
@@ -486,25 +454,20 @@ function handleRequestPtt(ws, data) {
     }
 
     if (wavelength.pttTransmitter === null) {
-        // Slot PTT jest wolny
         wavelength.pttTransmitter = ws;
         console.log(`Handler: PTT Granted for ${requestingSessionId} on ${frequency}`);
-        // Wyślij potwierdzenie do żądającego
         ws.send(JSON.stringify({ type: "ptt_granted", frequency: frequency }));
-        // Powiadom innych, że ktoś zaczyna nadawać
         const startReceivingMsg = JSON.stringify({
             type: "ptt_start_receiving",
             frequency: frequency,
             senderId: requestingSessionId
         });
-        connectionManager.broadcast(frequency, startReceivingMsg, ws); // Wyklucz nadawcę
+        connectionManager.broadcast(frequency, startReceivingMsg, ws); 
     } else if (wavelength.pttTransmitter === ws) {
-        // Klient już nadaje - potwierdź ponownie (na wszelki wypadek)
         console.log(`Handler: PTT Granted (already transmitting) for ${requestingSessionId} on ${frequency}`);
         ws.send(JSON.stringify({ type: "ptt_granted", frequency: frequency }));
     }
     else {
-        // Slot PTT jest zajęty przez kogoś innego
         const currentTransmitterId = wavelength.pttTransmitter.sessionId || 'Unknown';
         console.log(`Handler: PTT Denied for ${requestingSessionId} on ${frequency} (Busy - ${currentTransmitterId})`);
         ws.send(JSON.stringify({ type: "ptt_denied", frequency: frequency, reason: `Transmission slot busy (User ${currentTransmitterId.substring(0,8)})` }));
@@ -522,7 +485,7 @@ function handleReleasePtt(ws, data) {
 
     if (!frequency || data.frequency !== frequency) {
         console.warn(`Handler: PTT release frequency mismatch or missing. WS Freq: ${frequency}, Data Freq: ${data.frequency}, Session: ${releasingSessionId}`);
-        return; // Cicha obsługa - klient po prostu przestał wysyłać
+        return; 
     }
 
     const wavelength = connectionManager.activeWavelengths.get(frequency);
@@ -532,15 +495,13 @@ function handleReleasePtt(ws, data) {
     }
 
     if (wavelength.pttTransmitter === ws) {
-        // Klient, który zwolnił, faktycznie nadawał
         wavelength.pttTransmitter = null;
         console.log(`Handler: PTT Released by ${releasingSessionId} on ${frequency}`);
-        // Powiadom innych, że transmisja się zakończyła
         const stopReceivingMsg = JSON.stringify({
             type: "ptt_stop_receiving",
             frequency: frequency
         });
-        connectionManager.broadcast(frequency, stopReceivingMsg, ws); // Wyklucz zwalniającego
+        connectionManager.broadcast(frequency, stopReceivingMsg, ws); 
     } else {
         console.log(`Handler: PTT Release ignored for ${releasingSessionId} on ${frequency} (was not the transmitter). Current: ${wavelength.pttTransmitter?.sessionId}`);
     }
@@ -555,9 +516,7 @@ function handleAudioData(ws, message) {
     const frequency = ws.frequency;
     const senderSessionId = ws.sessionId;
 
-    // --- DODANE LOGOWANIE ---
     console.log(`[Server] handleAudioData: Received ${message.length} binary bytes from ${senderSessionId} on ${frequency}`);
-    // --- KONIEC LOGOWANIA ---
 
     if (!frequency) {
         console.warn(`[Server] handleAudioData: Sender ${senderSessionId} has no frequency.`);
@@ -571,19 +530,13 @@ function handleAudioData(ws, message) {
     }
 
     if (wavelength.pttTransmitter === ws) {
-        // --- DODANE LOGOWANIE ---
         console.log(`[Server] handleAudioData: Sender ${senderSessionId} IS the PTT transmitter. Broadcasting...`);
-        // --- KONIEC LOGOWANIA ---
-        connectionManager.broadcast(frequency, message, ws); // Wyklucz nadawcę
+        connectionManager.broadcast(frequency, message, ws); 
     } else {
-        // --- DODANE LOGOWANIE ---
         const currentTransmitterId = wavelength.pttTransmitter ? wavelength.pttTransmitter.sessionId : 'none';
         console.warn(`[Server] handleAudioData: Sender ${senderSessionId} is NOT the PTT transmitter (Current: ${currentTransmitterId}). Ignoring data.`);
-        // --- KONIEC LOGOWANIA ---
     }
 }
-
-// --- KONIEC NOWYCH HANDLERÓW PTT ---
 
 
 /**
@@ -659,5 +612,4 @@ async function handleMessage(ws, messageData) {
 
 module.exports = {
     handleMessage,
-    // No need to export individual handlers if handleMessage is the sole entry point
 };

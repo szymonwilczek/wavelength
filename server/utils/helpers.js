@@ -1,4 +1,3 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\utils\helpers.js
 /**
  * Normalizes the frequency value to a string with one decimal place.
  * @param {number|string} frequency - Frequency to be normalized.
@@ -7,10 +6,9 @@
  */
 function normalizeFrequency(frequency) {
   const numFreq = typeof frequency === 'string' ? parseFloat(frequency.trim()) : frequency;
-  if (isNaN(numFreq) || numFreq <= 0) { // Also ensure positivity here
+  if (isNaN(numFreq) || numFreq <= 0) { 
     throw new TypeError(`Invalid frequency value provided: ${frequency}`);
   }
-  // Ensure one decimal place, return as string
   return numFreq.toFixed(1);
 }
 
@@ -39,10 +37,10 @@ function generateMessageId(prefix = "msg") {
  */
 function isValidFrequency(frequency) {
   try {
-    normalizeFrequency(frequency); // Try to normalize
+    normalizeFrequency(frequency); 
     return true;
   } catch (e) {
-    return false; // Normalization failed
+    return false; 
   }
 }
 

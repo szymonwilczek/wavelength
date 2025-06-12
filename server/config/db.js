@@ -1,4 +1,3 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\config\db.js
 const { Pool } = require("pg");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
@@ -57,7 +56,6 @@ async function initDb() {
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       )
     `);
-    // Ensure index exists on the TEXT column
     await query(`
       CREATE INDEX IF NOT EXISTS idx_active_wavelengths_frequency
         ON active_wavelengths(frequency);

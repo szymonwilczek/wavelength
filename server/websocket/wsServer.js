@@ -24,7 +24,6 @@ function initWebSocketServer(httpServer) {
       ws.isAlive = true;
     });
 
-    // Message handling
     ws.on("message", async function incoming(message) {
       try {
         await handleMessage(ws, message);
@@ -39,18 +38,15 @@ function initWebSocketServer(httpServer) {
       }
     });
 
-    // Error handling
     ws.on("error", function onError(error) {
       console.error("WebSocket error:", error);
     });
 
-    // Connection close handling
     ws.on("close", function onClose() {
       console.log("Client disconnected");
       connectionManager.handleDisconnect(ws);
     });
 
-    // Heartbeat mechanism
     ws.send(
       JSON.stringify({
         type: "welcome",
@@ -60,15 +56,12 @@ function initWebSocketServer(httpServer) {
     );
   });
 
-  // Erorr handling for the server
   wss.on("error", function onServerError(error) {
     console.error("WebSocket server error:", error);
   });
 
-  // Heartbeat mechanism
   connectionManager.startHeartbeat(wss);
 
-  // Close heartbeat on server close
   wss.on("close", function onServerClose() {
     console.log("WebSocket server closing");
     connectionManager.stopHeartbeat();

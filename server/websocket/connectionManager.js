@@ -1,9 +1,8 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\websocket\connectionManager.js
 const WebSocket = require("ws");
-const WavelengthModel = require("../models/wavelength"); // Uses string frequencies
+const WavelengthModel = require("../models/wavelength"); 
 const crypto = require("crypto");
-const { normalizeFrequency } = require("../utils/helpers"); // Returns string "XXX.X"
-const frequencyTracker = require("../services/frequencyGapTracker"); // Import tracker
+const { normalizeFrequency } = require("../utils/helpers");
+const frequencyTracker = require("../services/frequencyGapTracker"); 
 
 /**
  * Class that manages WebSocket connections and application state
@@ -26,16 +25,16 @@ class ConnectionManager {
    */
   startHeartbeat(wss) {
     console.log(`Starting heartbeat with interval: ${this.pingInterval}ms`);
-    clearInterval(this.heartbeatInterval); // Clear existing interval if any
+    clearInterval(this.heartbeatInterval); 
     this.heartbeatInterval = setInterval(() => {
       wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
           console.log(`Heartbeat: Client unresponsive (freq: ${ws.frequency || 'none'}), terminating.`);
-          this.handleDisconnect(ws); // Handle disconnect logic
+          this.handleDisconnect(ws); 
           return ws.terminate();
         }
         ws.isAlive = false;
-        ws.ping(() => {}); // Add empty callback to prevent error on some Node versions
+        ws.ping(() => {});
       });
     }, this.pingInterval);
   }
@@ -54,7 +53,7 @@ class ConnectionManager {
    * @param {WebSocket} ws - WebSocket instance of the client (ws.frequency is string "XXX.X")
    */
   handleDisconnect(ws) {
-    const frequency = ws.frequency; // Should be normalized string "XXX.X" or null
+    const frequency = ws.frequency; 
     const sessionId = ws.sessionId || 'unknown';
 
     if (!frequency) {
@@ -64,60 +63,43 @@ class ConnectionManager {
 
     console.log(`Client ${sessionId} disconnected from frequency ${frequency}`);
 
-    const wavelength = this.activeWavelengths.get(frequency); // Use string key
+    const wavelength = this.activeWavelengths.get(frequency); 
     if (!wavelength) {
       console.log(`Wavelength ${frequency} not found in memory during disconnect of ${sessionId}.`);
-      // Maybe it was already closed, or state is inconsistent.
-      // Ensure frequency is marked as free in tracker if this client was the host
-      // This is tricky, as we don't know for sure if ws *was* the host if wavelength is gone.
-      // Rely on closeWavelength logic to handle tracker updates.
       return;
     }
 
-    // --- NOWA LOGIKA PTT PRZY ROZŁĄCZENIU ---
-    // Jeśli rozłączający się klient był nadawcą PTT, zwolnij slot
     if (wavelength.pttTransmitter === ws) {
       console.log(`ConnectionManager: PTT Transmitter ${sessionId} disconnected from ${frequency}. Releasing slot.`);
       wavelength.pttTransmitter = null;
-      // Powiadom pozostałych klientów, że transmisja się zakończyła
       const stopMessage = JSON.stringify({
         type: "ptt_stop_receiving",
         frequency: frequency
       });
-      // Wyślij do hosta (jeśli nie jest rozłączającym się)
       if (wavelength.host && wavelength.host !== ws && wavelength.host.readyState === WebSocket.OPEN) {
         wavelength.host.send(stopMessage);
       }
-      // Wyślij do pozostałych klientów
       wavelength.clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
           client.send(stopMessage);
         }
       });
     }
-    // --- KONIEC NOWEJ LOGIKI PTT ---
 
-    // If the client is the host, trigger wavelength closure
     if (ws.isHost && ws === wavelength.host) {
       console.log(`Host ${sessionId} disconnected from wavelength ${frequency}. Closing wavelength.`);
-      // Use the closeWavelength function from handlers (or service) to ensure consistency
-      // Avoid circular dependency: handlers -> connectionManager -> handlers
-      // Let's call the service method directly.
-      const wavelengthService = require('../services/wavelengthService'); // Local require to avoid cycle
+      const wavelengthService = require('../services/wavelengthService'); 
       wavelengthService.closeWavelength(frequency, "Host disconnected")
           .catch(err => console.error(`Error closing wavelength ${frequency} after host disconnect:`, err));
-      // Note: closeWavelength will handle memory, DB, and tracker cleanup.
     } else if (!ws.isHost) {
-      // If it is a client (not a host), just remove it from the list
       const deleted = wavelength.clients.delete(ws);
       if (deleted) {
         console.log(`Removed client ${sessionId} from wavelength ${frequency}. Clients remaining: ${wavelength.clients.size}`);
-        // Notify the host that the client has disconnected
         if (wavelength.host && wavelength.host.readyState === WebSocket.OPEN) {
           wavelength.host.send(
               JSON.stringify({
                 type: "client_disconnected",
-                frequency: frequency, // Send string freq
+                frequency: frequency, 
                 sessionId: sessionId,
               })
           );
@@ -126,9 +108,7 @@ class ConnectionManager {
         console.log(`Client ${sessionId} not found in client list for ${frequency} during disconnect.`);
       }
     } else {
-      // This case (ws.isHost but ws !== wavelength.host) should ideally not happen
       console.warn(`Disconnecting client ${sessionId} marked as host for ${frequency}, but doesn't match stored host!`);
-      // Treat as regular client disconnect for safety?
       wavelength.clients.delete(ws);
     }
   }
@@ -144,7 +124,6 @@ class ConnectionManager {
    * @returns {Object} - Information about the registered wavelength { frequency: string, sessionId: string }
    */
   registerWavelength(ws, frequency, name, isPasswordProtected, password, sessionId) {
-    // frequency should already be normalized by caller (service/handler)
     ws.frequency = frequency;
     ws.isHost = true;
     ws.sessionId = sessionId;
@@ -152,18 +131,17 @@ class ConnectionManager {
         crypto.createHash('sha256').update(password).digest('hex') :
         null;
 
-    this.activeWavelengths.set(frequency, { // Use string key
+    this.activeWavelengths.set(frequency, { 
       host: ws,
       clients: new Set(),
       name,
       isPasswordProtected,
-      password: hashedPassword, // Store hash
-      sessionId, // Store host session ID
+      password: hashedPassword, 
+      sessionId,
       processedMessageIds: new Set(),
-        pttTransmitter: null, // PTT transmitter (if any)
+        pttTransmitter: null, 
     });
 
-    // Update last recorded frequency (compare numerically, store string)
     try {
       if (parseFloat(frequency) > parseFloat(this.lastRegisteredFrequency)) {
         this.lastRegisteredFrequency = frequency;
@@ -174,7 +152,7 @@ class ConnectionManager {
 
 
     console.log(`ConnectionManager: Registered wavelength ${frequency} in memory for host ${sessionId}.`);
-    return { frequency, sessionId }; // Return string freq
+    return { frequency, sessionId }; 
   }
 
   /**
@@ -188,7 +166,7 @@ class ConnectionManager {
     const wavelength = this.activeWavelengths.get(frequency);
     if (!wavelength) {
       console.error(`ConnectionManager: Attempted to add client ${sessionId} to non-existent wavelength ${frequency}`);
-      return null; // Indicate failure
+      return null; 
     }
 
     ws.frequency = frequency;
@@ -198,7 +176,6 @@ class ConnectionManager {
     wavelength.clients.add(ws);
     console.log(`ConnectionManager: Added client ${sessionId} to wavelength ${frequency}. Total clients: ${wavelength.clients.size}`);
 
-    // Notify host and other clients about user joining (optional)
     const joinMessage = JSON.stringify({
       type: "user_joined",
       frequency: frequency,
@@ -209,14 +186,13 @@ class ConnectionManager {
       wavelength.host.send(joinMessage);
     }
     wavelength.clients.forEach(client => {
-      // Don't send to the joining client itself
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(joinMessage);
       }
     });
 
 
-    return { frequency, name: wavelength.name, sessionId }; // Return some info
+    return { frequency, name: wavelength.name, sessionId }; 
   }
 
   /**
@@ -225,8 +201,7 @@ class ConnectionManager {
    * @returns {boolean} - Whether the wavelength was found and removed from memory
    */
   removeWavelengthFromMemory(frequency) {
-    // frequency should already be normalized by caller
-    const deleted = this.activeWavelengths.delete(frequency); // Use string key
+    const deleted = this.activeWavelengths.delete(frequency); 
     if (deleted) {
       console.log(`ConnectionManager: Removed wavelength ${frequency} from memory.`);
     } else {
@@ -244,43 +219,39 @@ class ConnectionManager {
   async getWavelength(frequency) {
     let normalizedFrequency;
     try {
-      normalizedFrequency = normalizeFrequency(frequency); // Ensure string format "XXX.X"
+      normalizedFrequency = normalizeFrequency(frequency); 
     } catch (e) {
       console.error(`getWavelength: Invalid frequency format: ${frequency}`);
       return null;
     }
 
-    // Memory check
-    if (this.activeWavelengths.has(normalizedFrequency)) { // Use string key
+    if (this.activeWavelengths.has(normalizedFrequency)) { 
       const memWl = this.activeWavelengths.get(normalizedFrequency);
       console.log(`getWavelength: Found ${normalizedFrequency} in memory.`);
       return {
         frequency: normalizedFrequency,
         name: memWl.name,
         isPasswordProtected: memWl.isPasswordProtected,
-        hostSocketId: memWl.sessionId, // Host's session ID
-        passwordHash: memWl.password, // Return hash
-        createdAt: null, // Not typically stored in memory map, get from DB if needed
-        isOnline: true // Indicate it's active in memory
+        hostSocketId: memWl.sessionId, 
+        passwordHash: memWl.password, 
+        createdAt: null, 
+        isOnline: true 
       };
     }
 
-    // Database check
     console.log(`getWavelength: ${normalizedFrequency} not in memory, checking DB.`);
     try {
-      const dbWavelength = await WavelengthModel.findByFrequency(normalizedFrequency); // Use string freq
+      const dbWavelength = await WavelengthModel.findByFrequency(normalizedFrequency); 
       if (dbWavelength) {
         console.log(`getWavelength: Found ${normalizedFrequency} in DB.`);
-        // Ensure frequency is string, add isOnline flag
-        // Map DB fields to consistent names
         return {
           frequency: String(dbWavelength.frequency),
           name: dbWavelength.name,
-          isPasswordProtected: dbWavelength.isPasswordProtected, // Already mapped in model? Check model. Yes.
+          isPasswordProtected: dbWavelength.isPasswordProtected, 
           hostSocketId: dbWavelength.hostSocketId,
           passwordHash: dbWavelength.passwordHash,
           createdAt: dbWavelength.createdAt,
-          isOnline: false // Indicate from DB, host not connected
+          isOnline: false 
         };
       }
       console.log(`getWavelength: ${normalizedFrequency} not found in DB.`);
@@ -298,9 +269,8 @@ class ConnectionManager {
    * @returns {boolean} - Whether the message has been processed
    */
   isMessageProcessed(frequency, messageId) {
-    // frequency should already be normalized by caller
-    const wavelength = this.activeWavelengths.get(frequency); // Use string key
-    if (!wavelength) return false; // Wavelength gone, message not processed by it
+    const wavelength = this.activeWavelengths.get(frequency); 
+    if (!wavelength) return false;
 
     return wavelength.processedMessageIds.has(messageId);
   }
@@ -311,13 +281,11 @@ class ConnectionManager {
    * @param {string} messageId - ID of the message
    */
   markMessageProcessed(frequency, messageId) {
-    // frequency should already be normalized by caller
-    const wavelength = this.activeWavelengths.get(frequency); // Use string key
+    const wavelength = this.activeWavelengths.get(frequency); 
     if (!wavelength) return;
 
     wavelength.processedMessageIds.add(messageId);
 
-    // Limit size of the processed messages set
     const maxSize = 1000;
     const trimSize = 200;
     if (wavelength.processedMessageIds.size > maxSize) {
@@ -328,7 +296,7 @@ class ConnectionManager {
         if (!next.done) {
           wavelength.processedMessageIds.delete(next.value);
         } else {
-          break; // Stop if set becomes smaller than expected
+          break; // stop if set becomes smaller than expected
         }
       }
       console.log(`Trimmed processedMessageIds for frequency ${frequency} (new size: ${wavelength.processedMessageIds.size})`);
@@ -351,18 +319,12 @@ class ConnectionManager {
 
     const isBinary = Buffer.isBuffer(message);
     const senderId = senderWs ? senderWs.sessionId : 'N/A';
-    // --- DODANE LOGOWANIE ---
     console.log(`[Server] Broadcast: Broadcasting ${isBinary ? 'binary (' + message.length + ' bytes)' : 'text'} on ${frequency} from ${senderId}. Excluding sender: ${!!senderWs}`);
     console.log(`[Server] Broadcast: Wavelength ${frequency} has host: ${wavelength.host ? wavelength.host.sessionId : 'none'}, clients: ${wavelength.clients.size}`);
-    // --- KONIEC LOGOWANIA ---
 
-
-    // Send to host (if exists, is not the sender, and is open)
     if (wavelength.host && wavelength.host !== senderWs && wavelength.host.readyState === WebSocket.OPEN) {
       try {
-        // --- DODANE LOGOWANIE ---
         console.log(`[Server] Broadcast: Sending to host ${wavelength.host.sessionId}`);
-        // --- KONIEC LOGOWANIA ---
         wavelength.host.send(message);
       } catch (e) {
         console.error(`[Server] Broadcast Error sending to host on ${frequency}:`, e);
@@ -370,22 +332,16 @@ class ConnectionManager {
     } else if (wavelength.host === senderWs) {
       console.log(`[Server] Broadcast: Host ${senderId} is the sender, not broadcasting back.`);
     }
-    // Add more detailed logs for why host might not receive if needed
 
-
-    // Send to other clients (if they exist, are not the sender, and are open)
     wavelength.clients.forEach(client => {
       if (client !== senderWs && client.readyState === WebSocket.OPEN) {
         try {
-          // --- DODANE LOGOWANIE ---
           console.log(`[Server] Broadcast: Sending to client ${client.sessionId}`);
-          // --- KONIEC LOGOWANIA ---
           client.send(message);
         } catch (e) {
           console.error(`[Server] Broadcast Error sending to client ${client.sessionId} on ${frequency}:`, e);
         }
       } else if (client === senderWs) {
-        // console.log(`[Server] Broadcast: Client ${client.sessionId} is the sender, not broadcasting back.`); // Can be noisy
       } else if (client.readyState !== WebSocket.OPEN) {
         console.log(`[Server] Broadcast: Client ${client.sessionId} not OPEN (state: ${client.readyState}). Not sending.`);
       } else {
@@ -393,7 +349,7 @@ class ConnectionManager {
       }
     });
 
-    if (wavelength.clients.size === 0 && wavelength.host !== senderWs) { // Check if there were any potential recipients other than sender
+    if (wavelength.clients.size === 0 && wavelength.host !== senderWs) { 
       console.log(`[Server] Broadcast: No other clients or host connected to ${frequency} to broadcast to.`);
     } else if (wavelength.clients.size === 0 && wavelength.host === senderWs) {
       console.log(`[Server] Broadcast: Host was sender, no other clients connected to ${frequency}.`);
@@ -402,5 +358,4 @@ class ConnectionManager {
 
 }
 
-// Export singleton instance
 module.exports = new ConnectionManager();

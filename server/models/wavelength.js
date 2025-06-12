@@ -1,9 +1,8 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\models\wavelength.js
 /**
  * Wavelength model - database related operations for wavelengths
  */
 const { query } = require("../config/db");
-const { normalizeFrequency } = require("../utils/helpers"); // Assuming normalizeFrequency now returns string
+const { normalizeFrequency } = require("../utils/helpers"); 
 const crypto = require('crypto');
 
 class WavelengthModel {
@@ -18,7 +17,7 @@ class WavelengthModel {
    * @throws {Error} - Throws an error if the creation fails
    */
   static async create(frequency, name, isPasswordProtected, hostSocketId, password) {
-    const normalizedFrequency = normalizeFrequency(frequency); // Ensures string format "XXX.X"
+    const normalizedFrequency = normalizeFrequency(frequency);
     const hashedPassword = (isPasswordProtected && password) ?
         crypto.createHash('sha256').update(password).digest('hex') :
         null;
@@ -26,10 +25,9 @@ class WavelengthModel {
         `INSERT INTO active_wavelengths
          (frequency, name, is_password_protected, host_socket_id, password_hash, created_at)
          VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, frequency, name, is_password_protected, host_socket_id, password_hash, created_at`, // frequency is TEXT
+           RETURNING id, frequency, name, is_password_protected, host_socket_id, password_hash, created_at`, 
         [normalizedFrequency, name, isPasswordProtected, hostSocketId, hashedPassword, new Date()]
     );
-    // Ensure returned frequency is also treated as string
     if (result.rows[0]) {
       result.rows[0].frequency = String(result.rows[0].frequency);
     }
@@ -42,18 +40,17 @@ class WavelengthModel {
    * @returns {Promise<Object|null>} - Found wavelength object (frequency as string) or null
    */
   static async findByFrequency(frequency) {
-    const normalizedFrequency = normalizeFrequency(frequency); // Ensures string format "XXX.X"
+    const normalizedFrequency = normalizeFrequency(frequency); 
     const result = await query(
         `SELECT
            id, frequency, name, is_password_protected, host_socket_id, password_hash, created_at
          FROM active_wavelengths
-         WHERE frequency = $1`, // frequency is TEXT
+         WHERE frequency = $1`,
         [normalizedFrequency]
     );
     const row = result.rows.length > 0 ? result.rows[0] : null;
     if (row) {
-      row.frequency = String(row.frequency); // Ensure string type
-      // Map db column names to consistent camelCase if needed by consumers
+      row.frequency = String(row.frequency); 
       row.isPasswordProtected = row.is_password_protected;
       row.hostSocketId = row.host_socket_id;
       row.passwordHash = row.password_hash;
@@ -73,7 +70,6 @@ class WavelengthModel {
       FROM active_wavelengths
       ORDER BY created_at DESC
     `);
-    // Ensure frequency is string and map columns
     return result.rows.map(row => ({
       id: row.id,
       frequency: String(row.frequency),
@@ -92,9 +88,9 @@ class WavelengthModel {
    * @throws {Error} - Throws an error if the deletion fails
    */
   static async delete(frequency) {
-    const normalizedFrequency = normalizeFrequency(frequency); // Ensures string format "XXX.X"
+    const normalizedFrequency = normalizeFrequency(frequency); 
     const result = await query(
-        "DELETE FROM active_wavelengths WHERE frequency = $1", // frequency is TEXT
+        "DELETE FROM active_wavelengths WHERE frequency = $1",
         [normalizedFrequency]
     );
     return result.rowCount > 0;
@@ -119,30 +115,26 @@ class WavelengthModel {
     console.warn("Using WavelengthModel.findNextAvailableFrequency - consider using FrequencyGapTracker instead for performance.");
     let currentFreqNum = parseFloat(normalizeFrequency(startFrequency));
     let safetyCounter = 0;
-    const maxCounter = 10000; // Increased safety limit
+    const maxCounter = 10000; 
 
     while (safetyCounter < maxCounter) {
       currentFreqNum += increment;
-      // Ensure precision issues don't skip values
       currentFreqNum = parseFloat(currentFreqNum.toFixed(1));
       const nextFreqStr = currentFreqNum.toFixed(1);
 
-      // Check bounds (example: stop searching above a certain limit)
-      // if (currentFreqNum > 1000.0) { break; }
-
       const existingResult = await query(
-          "SELECT 1 FROM active_wavelengths WHERE frequency = $1 LIMIT 1", // Use SELECT 1 for existence check
+          "SELECT 1 FROM active_wavelengths WHERE frequency = $1 LIMIT 1", 
           [nextFreqStr]
       );
 
       if (existingResult.rows.length === 0) {
-        return nextFreqStr; // Found available
+        return nextFreqStr; 
       }
 
       safetyCounter++;
     }
     console.error(`findNextAvailableFrequency exceeded safety limit (${maxCounter}) starting from ${startFrequency}`);
-    return null; // Not found within safety limit
+    return null; 
   }
 }
 

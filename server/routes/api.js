@@ -1,13 +1,9 @@
-// filepath: c:\Users\szymo\Documents\GitHub\wavelength\server\routes\api.js
 /**
  * API router for Wavelength application
  */
 const express = require("express");
-const wavelengthService = require("../services/wavelengthService"); // Uses string frequencies
-// connectionManager not needed directly if service handles lookups
-const { normalizeFrequency, isValidFrequency } = require("../utils/helpers"); // Use string helpers
-// frequencyTracker not needed directly if service handles finding next
-
+const wavelengthService = require("../services/wavelengthService"); 
+const { normalizeFrequency, isValidFrequency } = require("../utils/helpers"); 
 const router = express.Router();
 
 /**
@@ -29,13 +25,12 @@ router.get("/api/next-available-frequency", async (req, res) => {
     let preferredStartFrequencyInput = req.query.preferredStartFrequency || null;
     console.log(`API: Raw preferredStartFrequency query param: ${preferredStartFrequencyInput}`);
 
-    // Let the service layer handle validation and finding the frequency
     const nextFrequencyStr = await wavelengthService.findNextAvailableFrequency(preferredStartFrequencyInput);
 
     if (nextFrequencyStr !== null) {
       console.log(`API: Found next available frequency: ${nextFrequencyStr}`);
       res.json({
-        frequency: nextFrequencyStr, // Return string frequency "XXX.X"
+        frequency: nextFrequencyStr, 
         status: "success",
       });
     } else {
@@ -46,10 +41,9 @@ router.get("/api/next-available-frequency", async (req, res) => {
       });
     }
   } catch (err) {
-    // Catch errors from the service/tracker (e.g., tracker not initialized)
     console.error("API: Error finding next available frequency:", err);
     res.status(500).json({
-      error: err.message || "Server error finding next frequency", // Provide specific error if available
+      error: err.message || "Server error finding next frequency", 
       status: "error",
     });
   }
@@ -63,16 +57,13 @@ router.get("/api/next-available-frequency", async (req, res) => {
 router.get("/api/wavelengths", async (req, res) => {
   console.log("API: Request received for /api/wavelengths");
   try {
-    // Service returns objects with string frequency and mapped fields
     const wavelengths = await wavelengthService.getAllWavelengths();
 
-    // Format response (already has string frequency and correct field names)
     const response = wavelengths.map((w) => ({
-      frequency: w.frequency, // String "XXX.X"
+      frequency: w.frequency, 
       name: w.name,
       isPasswordProtected: w.isPasswordProtected,
       createdAt: w.createdAt,
-      // Do not expose passwordHash or hostSocketId via public API
     }));
 
     console.log(`API: Returning ${response.length} wavelengths.`);
@@ -101,7 +92,6 @@ router.get("/api/wavelengths/:frequency", async (req, res) => {
 
   let normalizedFrequencyStr;
   try {
-    // Validate/Normalize the frequency from the path parameter
     if (!isValidFrequency(frequencyInput)) {
       throw new Error("Invalid frequency format. Must be a positive number.");
     }
@@ -113,23 +103,19 @@ router.get("/api/wavelengths/:frequency", async (req, res) => {
   }
 
   try {
-    // Use the service layer which checks memory then DB
     const wavelengthInfo = await wavelengthService.getWavelength(normalizedFrequencyStr);
 
     if (wavelengthInfo) {
       console.log(`API: Found info for ${normalizedFrequencyStr}. Online: ${wavelengthInfo.isOnline}`);
-      // wavelengthInfo contains frequency (string), name, isPasswordProtected, isOnline, createdAt
       res.json({
-        frequency: wavelengthInfo.frequency, // String "XXX.X"
+        frequency: wavelengthInfo.frequency, 
         name: wavelengthInfo.name,
         isPasswordProtected: wavelengthInfo.isPasswordProtected,
-        isOnline: wavelengthInfo.isOnline, // Indicates if active in memory (host connected)
-        createdAt: wavelengthInfo.createdAt, // Available if found in DB
-        // Do not expose passwordHash or hostSocketId
+        isOnline: wavelengthInfo.isOnline, 
+        createdAt: wavelengthInfo.createdAt,
         status: "success",
       });
     } else {
-      // Not found in memory or DB
       console.log(`API: Wavelength ${normalizedFrequencyStr} not found.`);
       res.status(404).json({
         error: "Wavelength not found",
