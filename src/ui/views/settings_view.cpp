@@ -56,7 +56,7 @@ SettingsView::SettingsView(QWidget *parent)
       access_granted_widget_(nullptr),
       security_layers_stack_(nullptr),
       current_layer_index_(FingerprintIndex),
-      debug_mode_enabled_(true),
+      debug_mode_enabled_(false),
       classified_features_widget_(nullptr),
       override_button_(nullptr),
       system_override_manager_(nullptr) {
